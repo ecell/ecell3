@@ -10,13 +10,10 @@
 #include "Variable.hpp"
 #include "VariableProxy.hpp"
 
-#include "FluxProcess.hpp"
-#include "ecell3_dm.hpp"
+#include "Process.hpp"
 
 #include <iostream>
 #include <string>
-
-#define ECELL3_DM_TYPE Process
 
 // macros for debugging
 #define COUT_VAR( NAME )\
@@ -50,11 +47,25 @@ ITER++//
 
 USE_LIBECS;
 
-ECELL3_DM_CLASS
-  :  
-  public FluxProcess
+LIBECS_DM_CLASS( BisectionRapidEquilibriumProcess, Process )
 {
-  ECELL3_DM_OBJECT;
+
+ public:
+
+  LIBECS_DM_OBJECT( BisectionRapidEquilibriumProcess, Process )
+    {
+      INHERIT_PROPERTIES( Process );
+
+      PROPERTYSLOT_SET_GET( Real, Keq );
+      PROPERTYSLOT_SET_GET( Real, Tolerance );
+
+      PROPERTYSLOT_SET_GET( Real, KeqConc );
+      PROPERTYSLOT_SET_GET( Real, ToleranceConc );
+      
+      PROPERTYSLOT_SET_GET( String, UnitKeq );
+      PROPERTYSLOT_SET_GET( String, UnitTolerance );
+    } 
+
   
  protected:
   
@@ -70,17 +81,8 @@ ECELL3_DM_CLASS
   
  public:
   
-  ECELL3_DM_CLASSNAME()
+  BisectionRapidEquilibriumProcess()
     {
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, Keq );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, Tolerance );
-      
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KeqConc );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, ToleranceConc );
-      
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( String, UnitKeq );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( String, UnitTolerance );
-      
       theVelocityBuffer = 0;
     }
   
@@ -95,7 +97,7 @@ ECELL3_DM_CLASS
   
   virtual void initialize()
     {
-      FluxProcess::initialize();
+      Process::initialize();
       
       // set KeqConc
       Int aDimention( 0 );
@@ -281,4 +283,4 @@ ECELL3_DM_CLASS
   
 };
 
-ECELL3_DM_INIT;
+LIBECS_DM_INIT( BisectionRapidEquilibriumProcess, Process );

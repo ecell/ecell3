@@ -50,8 +50,6 @@
 #ifndef __NRSTEPPER_HPP
 #define __NRSTEPPER_HPP
 
-//#include <iostream>
-//#include <vector>
 #include <algorithm>
 
 #include "libecs/DynamicPriorityQueue.hpp"
@@ -61,18 +59,12 @@
 
 USE_LIBECS;
 
-DECLARE_CLASS( NRStepper );
 
-class NRStepper 
-  : 
-  public DiscreteEventStepper 
+LIBECS_DM_CLASS( NRStepper, DiscreteEventStepper )
 {
-
-  LIBECS_DM_OBJECT( Stepper, NRStepper );
 
   DECLARE_CLASS( NREvent );
   DECLARE_TYPE( DynamicPriorityQueue<NREvent>, NRPriorityQueue );
-
 
 protected:
 
@@ -125,6 +117,14 @@ protected:
   };
 
 public:
+
+  LIBECS_DM_OBJECT( NRStepper, Stepper )
+    {
+      INHERIT_PROPERTIES( DiscreteEventStepper );
+
+      PROPERTYSLOT_GET    ( Real, TimeScale );
+      PROPERTYSLOT_SET_GET( Real, Tolerance );
+    }
 
   NRStepper(void);
 

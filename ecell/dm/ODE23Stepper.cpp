@@ -32,7 +32,7 @@
 
 #include "ODE23Stepper.hpp"
 
-DM_INIT( Stepper, ODE23Stepper );
+LIBECS_DM_INIT( ODE23Stepper, Stepper );
 
 namespace libecs
 {

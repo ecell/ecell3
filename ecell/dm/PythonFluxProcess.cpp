@@ -37,7 +37,7 @@
 USE_LIBECS;
 
 
-DM_INIT( Process, PythonFluxProcess );
+LIBECS_DM_INIT( PythonFluxProcess, Process );
 
   
 void PythonFluxProcess::process()

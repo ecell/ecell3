@@ -8,25 +8,26 @@
 #include "Variable.hpp"
 #include "VariableProxy.hpp"
 
-#include "FluxProcess.hpp"
-#include "ecell3_dm.hpp"
-
-#define ECELL3_DM_TYPE Process
+#include "Process.hpp"
 
 USE_LIBECS;
 
-ECELL3_DM_CLASS
-  :  
-  public FluxProcess
+LIBECS_DM_CLASS( RapidEquilibriumProcess, Process )
 {
-
-  ECELL3_DM_OBJECT;
 
  public:
 
-  ECELL3_DM_CLASSNAME()
+  LIBECS_DM_OBJECT( RapidEquilibriumProcess, Process )
     {
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, Keq );
+      INHERIT_PROPERTIES( Process );
+
+      PROPERTYSLOT_SET_GET( Real, Keq );
+    }
+
+  // FIXME: initial values
+  RapidEquilibriumProcess()
+    {
+      ; // do nothing
     }
 
   SIMPLE_SET_GET_METHOD( Real, Keq );
@@ -36,7 +37,7 @@ ECELL3_DM_CLASS
   void initialize()
     {
 
-      FluxProcess::initialize();
+      Process::initialize();
       Int d_Keq( 0 );
       for( VariableReferenceVectorConstIterator
 	     i ( theVariableReferenceVector.begin() );
@@ -61,11 +62,10 @@ ECELL3_DM_CLASS
     Real Keq;
 };
 
-ECELL3_DM_INIT;
+LIBECS_DM_INIT( RapidEquilibriumProcess, Process );
 
-using namespace libecs;
 
-void ECELL3_DM_CLASSNAME::process()
+void RapidEquilibriumProcess::process()
 {
  
   Real d( 0 );

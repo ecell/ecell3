@@ -36,7 +36,7 @@
 
 USE_LIBECS;
 
-DM_INIT( Process, PythonProcess );
+LIBECS_DM_INIT( PythonProcess, Process );
 
 
 void PythonProcess::initialize()

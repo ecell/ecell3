@@ -42,14 +42,16 @@ USE_LIBECS;
 
 // DECLARE_CLASS( FixedRungeKutta4Stepper );
 
-class FixedRungeKutta4Stepper 
-  : 
-  public DifferentialStepper
+LIBECS_DM_CLASS( FixedRungeKutta4Stepper, DifferentialStepper )
 {
 
-  LIBECS_DM_OBJECT( Stepper, FixedRungeKutta4Stepper );
-
 public:
+
+  LIBECS_DM_OBJECT( FixedRungeKutta4Stepper, Stepper )
+    {
+      INHERIT_PROPERTIES( Stepper );
+    }
+
 
   FixedRungeKutta4Stepper( void );
   

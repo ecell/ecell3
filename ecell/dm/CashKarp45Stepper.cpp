@@ -32,10 +32,11 @@
 
 #include "CashKarp45Stepper.hpp"
 
-DM_INIT( Stepper, CashKarp45Stepper );
-
 namespace libecs
 {
+
+  LIBECS_DM_INIT( CashKarp45Stepper, Stepper );
+
 
   CashKarp45Stepper::CashKarp45Stepper()
   {

@@ -48,19 +48,26 @@
 #include "PropertySlotMaker.hpp"
 #include "FullID.hpp"
 
-#include "FluxProcess.hpp"
+#include "Process.hpp"
 
 
 USE_LIBECS;
 
 namespace python = boost::python;
 
+//LIBECS_DM_CLASS( PythonProcessBase, Process )
 class PythonProcessBase
   :
-  public FluxProcess
+  public Process
 {
 
 public:
+
+  //  LIBECS_DM_OBJECT_ABSTRACT( PythonProcessBase )
+  //    {
+  //      INHERIT_PROPERTIES( Process );
+  //    }
+
 
   PythonProcessBase()
   {
@@ -127,7 +134,7 @@ void PythonProcessBase::initialize()
 
   // extract 'this' Process's methods and attributes
   python::object 
-    aPySelfProcess( python::ptr( static_cast<FluxProcess*>( this ) ) );
+    aPySelfProcess( python::ptr( static_cast<Process*>( this ) ) );
   //  python::dict aSelfDict( aPySelfProcess.attr("__dict__") );
 
   theGlobalNamespace[ "self" ] = aPySelfProcess;
@@ -143,6 +150,5 @@ void PythonProcessBase::initialize()
   theGlobalNamespace.update( aMainNamespace );
 
 }
-
 
 #endif /* __PYTHONPROCESSBASE_HPP */

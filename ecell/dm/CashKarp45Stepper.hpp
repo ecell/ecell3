@@ -32,24 +32,21 @@
 #define __CASHKARP45_HPP
 
 
-// #include <iostream>
-
 #include "libecs/DifferentialStepper.hpp"
 
 USE_LIBECS;
 
-// DECLARE_VECTOR( Real, RealVector );
 
-// DECLARE_CLASS( CashKarp45Stepper );
-
-class CashKarp45Stepper 
-  : 
-  public AdaptiveDifferentialStepper
+LIBECS_DM_CLASS( CashKarp45Stepper, AdaptiveDifferentialStepper )
 {
 
-  LIBECS_DM_OBJECT( Stepper, CashKarp45Stepper );
+ public:
 
-public:
+  LIBECS_DM_OBJECT( CashKarp45Stepper, Stepper ) 
+  {
+    INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
+  }
+
 
   CashKarp45Stepper( void );
   
@@ -60,7 +57,7 @@ public:
 
   virtual const Int getOrder() const { return 4; }
 
-protected:
+ protected:
 
   //  RealVector theK1;
   RealVector theK2;

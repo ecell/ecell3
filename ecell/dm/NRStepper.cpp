@@ -42,8 +42,7 @@
 #include "NRStepper.hpp"
 
 
-
-DM_INIT( Stepper, NRStepper );
+LIBECS_DM_INIT( NRStepper, Stepper );
 
 
 NRStepper::NRStepper()
@@ -55,8 +54,6 @@ NRStepper::NRStepper()
   setMinStepInterval( std::numeric_limits<Real>::min() );
   setMaxStepInterval( std::numeric_limits<Real>::max() );
 
-  CREATE_PROPERTYSLOT_GET    ( Real, TimeScale, NRStepper );
-  CREATE_PROPERTYSLOT_SET_GET( Real, Tolerance, NRStepper );
 }
 	    
 NRStepper::~NRStepper()

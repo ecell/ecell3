@@ -3,4 +3,4 @@
 #include "GillespieProcess.hpp"
 
 
-DM_INIT( Process, GillespieProcess );
+LIBECS_DM_INIT( GillespieProcess, Process );

@@ -8,6 +8,7 @@
 
 #include <libecs/libecs.hpp>
 #include <libecs/Process.hpp>
+#include <libecs/Stepper.hpp>
 #include <libecs/PropertySlotMaker.hpp>
 #include <libecs/FullID.hpp>
 
@@ -20,18 +21,30 @@ DECLARE_VECTOR( GillespieProcessPtr, GillespieProcessVector );
 /***************************************************************************
      GillespieProcess 
 ***************************************************************************/
-class GillespieProcess 
-  : 
-  public Process
+
+LIBECS_DM_CLASS( GillespieProcess, Process )
 {
-
-  LIBECS_DM_OBJECT( Process, GillespieProcess );
-
+  
   typedef const Real (GillespieProcess::* RealMethodPtr)() const;
+  
+ public:
+  
+  LIBECS_DM_OBJECT( GillespieProcess, Process )
+    {
+      INHERIT_PROPERTIES( Process );
+      
+      PROPERTYSLOT_SET_GET( Real, k );
+      PROPERTYSLOT_GET    ( Real, Mu );
+      PROPERTYSLOT_GET    ( Real, StepInterval );
+      PROPERTYSLOT_GET    ( Int,  Order );
+      
+      PROPERTYSLOT( Polymorph, EffectList,
+			   NULLPTR,
+			   &GillespieProcess::getEffectListProperty );
+    }
 
-public:
 
-
+  
   GillespieProcess() 
     :
     theOrder( 0 ),
@@ -40,23 +53,15 @@ public:
     Index( -1 ),
     theGetMultiplicityMethodPtr( &GillespieProcess::getZero ),
     theGetMinValueMethodPtr( &GillespieProcess::getZero )
-  {
-    CREATE_PROPERTYSLOT_SET_GET( Real, k,            GillespieProcess );
-    CREATE_PROPERTYSLOT_GET    ( Real, Mu,           GillespieProcess );
-    CREATE_PROPERTYSLOT_GET    ( Real, StepInterval, GillespieProcess );
-    CREATE_PROPERTYSLOT_GET    ( Int,  Order,        GillespieProcess );
-      
-    CREATE_PROPERTYSLOT( Polymorph, EffectList,
-			 NULLPTR,
-			 &GillespieProcess::getEffectListProperty );
-  }
-
+    {
+      ; // do nothing
+    }
 
   virtual ~GillespieProcess()
-  {
-    ; // do nothing
-  }
-
+    {
+      ; // do nothing
+    }
+  
 
   SIMPLE_SET_GET_METHOD( Real, k );
   SIMPLE_SET_GET_METHOD( Int, Index );

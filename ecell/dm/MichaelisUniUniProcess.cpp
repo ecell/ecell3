@@ -8,26 +8,27 @@
 #include "Variable.hpp"
 #include "VariableProxy.hpp"
 
-#include "FluxProcess.hpp"
-#include "ecell3_dm.hpp"
-
-#define ECELL3_DM_TYPE Process
+#include "Process.hpp"
 
 USE_LIBECS;
 
-ECELL3_DM_CLASS
-  :  
-  public FluxProcess
+LIBECS_DM_CLASS( MichaelisUniUniProcess, Process )
 {
 
-  ECELL3_DM_OBJECT;
-  
  public:
 
-  ECELL3_DM_CLASSNAME()
+  LIBECS_DM_OBJECT( MichaelisUniUniProcess, Process )
     {
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KmS );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KcF );
+      INHERIT_PROPERTIES( Process );
+
+      PROPERTYSLOT_SET_GET( Real, KmS );
+      PROPERTYSLOT_SET_GET( Real, KcF );
+    }  
+
+  //FIXME: property initial values?
+  MichaelisUniUniProcess()
+    {
+      ; // do nothing
     }
   
   SIMPLE_SET_GET_METHOD( Real, KmS );
@@ -35,7 +36,7 @@ ECELL3_DM_CLASS
     
   virtual void initialize()
     {
-      FluxProcess::initialize();
+      Process::initialize();
       S0 = getVariableReference( "S0" );
       C0 = getVariableReference( "C0" );  
     }
@@ -59,4 +60,4 @@ ECELL3_DM_CLASS
   
 };
 
-ECELL3_DM_INIT;
+LIBECS_DM_INIT( MichaelisUniUniProcess, Process );

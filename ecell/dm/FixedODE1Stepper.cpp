@@ -32,7 +32,7 @@
 
 #include "FixedODE1Stepper.hpp"
 
-DM_INIT( Stepper, FixedODE1Stepper );
+LIBECS_DM_INIT( FixedODE1Stepper, Stepper );
 
 namespace libecs
 {

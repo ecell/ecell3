@@ -8,33 +8,34 @@
 #include "Variable.hpp"
 #include "VariableProxy.hpp"
 
-#include "FluxProcess.hpp"
-#include "ecell3_dm.hpp"
-
-#define ECELL3_DM_TYPE Process
+#include "Process.hpp"
 
 USE_LIBECS;
 
-ECELL3_DM_CLASS
-  :  
-  public FluxProcess
+LIBECS_DM_CLASS( PingPongBiBiProcess, Process )
 {
 
-  ECELL3_DM_OBJECT;
-  
  public:
 
-  ECELL3_DM_CLASSNAME()
+  LIBECS_DM_OBJECT( PingPongBiBiProcess, Process )
     {
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KcF );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KcR );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, Keq );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KmS0 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KmS1 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KmP0 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KmP1 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KiS0 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, KiP1 );
+      INHERIT_PROPERTIES( Process );
+
+      PROPERTYSLOT_SET_GET( Real, KcF );
+      PROPERTYSLOT_SET_GET( Real, KcR );
+      PROPERTYSLOT_SET_GET( Real, Keq );
+      PROPERTYSLOT_SET_GET( Real, KmS0 );
+      PROPERTYSLOT_SET_GET( Real, KmS1 );
+      PROPERTYSLOT_SET_GET( Real, KmP0 );
+      PROPERTYSLOT_SET_GET( Real, KmP1 );
+      PROPERTYSLOT_SET_GET( Real, KiS0 );
+      PROPERTYSLOT_SET_GET( Real, KiP1 );
+    }
+
+  // FIXME: initial values
+  PingPongBiBiProcess()
+    {
+      ; // do nothing
     }
   
   SIMPLE_SET_GET_METHOD( Real, KcF );
@@ -49,7 +50,7 @@ ECELL3_DM_CLASS
     
   virtual void initialize()
     {
-      FluxProcess::initialize();
+      Process::initialize();
       S0 = getVariableReference( "S0" );
       S1 = getVariableReference( "S1" );
       P0 = getVariableReference( "P0" );
@@ -103,4 +104,4 @@ ECELL3_DM_CLASS
   
 };
 
-ECELL3_DM_INIT;
+LIBECS_DM_INIT( PingPongBiBiProcess, Process );

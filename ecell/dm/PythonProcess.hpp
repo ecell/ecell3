@@ -38,20 +38,21 @@
 
 USE_LIBECS;
 
-class PythonProcess
-  :
-  public PythonProcessBase
+LIBECS_DM_CLASS( PythonProcess, PythonProcessBase )
 {
 
 public:
 
-  DM_OBJECT( Process, PythonProcess );
-  
+  LIBECS_DM_OBJECT( PythonProcess, Process )
+    {
+      INHERIT_PROPERTIES( PythonProcessBase );
+
+      PROPERTYSLOT_SET_GET( String, ProcessMethod );
+      PROPERTYSLOT_SET_GET( String, InitializeMethod );
+    }
+
   PythonProcess()
   {
-
-    CREATE_PROPERTYSLOT_SET_GET( String, ProcessMethod, PythonProcess );
-    CREATE_PROPERTYSLOT_SET_GET( String, InitializeMethod, PythonProcess );
 
     setInitializeMethod( "" );
     setProcessMethod( "" );

@@ -39,16 +39,8 @@
 
 USE_LIBECS;
 
-// DECLARE_VECTOR( Real, RealVector );
-
-DECLARE_CLASS( ODE45Stepper );
-
-class ODE45Stepper 
-  : 
-  public AdaptiveDifferentialStepper
+LIBECS_DM_CLASS( ODE45Stepper, AdaptiveDifferentialStepper )
 {
-
-  LIBECS_DM_OBJECT( Stepper, ODE45Stepper );
 
   class VariableProxy
     :
@@ -145,6 +137,12 @@ class ODE45Stepper
   };
 
 public:
+
+  LIBECS_DM_OBJECT( ODE45Stepper, Stepper )
+    {
+      INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
+    }
+
 
   ODE45Stepper();
   virtual ~ODE45Stepper();

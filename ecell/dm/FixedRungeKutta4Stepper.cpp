@@ -32,7 +32,7 @@
 
 #include "FixedRungeKutta4Stepper.hpp"
 
-DM_INIT( Stepper, FixedRungeKutta4Stepper );
+LIBECS_DM_INIT( FixedRungeKutta4Stepper, Stepper );
 
 namespace libecs
 {

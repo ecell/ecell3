@@ -8,40 +8,42 @@
 #include "Variable.hpp"
 #include "VariableProxy.hpp"
 
-#include "FluxProcess.hpp"
-#include "ecell3_dm.hpp"
-
-#define ECELL3_DM_TYPE Process
+#include "Process.hpp"
 
 USE_LIBECS;
 
-ECELL3_DM_CLASS
-  :  
-  public FluxProcess
+LIBECS_DM_CLASS( RandomBiBiProcess, Process )
 {
 
-  ECELL3_DM_OBJECT;
-  
  public:
 
-  ECELL3_DM_CLASSNAME()
+  LIBECS_DM_OBJECT( RandomBiBiProcess, Process )
     {
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k1 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k_1 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k2 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k_2 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k3 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k_3 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k4 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k_4 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k5 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k_5 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k6 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k_6 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k7 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k_7 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k8 );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k_8 );
+      INHERIT_PROPERTIES( Process );
+
+      PROPERTYSLOT_SET_GET( Real, k1 );
+      PROPERTYSLOT_SET_GET( Real, k_1 );
+      PROPERTYSLOT_SET_GET( Real, k2 );
+      PROPERTYSLOT_SET_GET( Real, k_2 );
+      PROPERTYSLOT_SET_GET( Real, k3 );
+      PROPERTYSLOT_SET_GET( Real, k_3 );
+      PROPERTYSLOT_SET_GET( Real, k4 );
+      PROPERTYSLOT_SET_GET( Real, k_4 );
+      PROPERTYSLOT_SET_GET( Real, k5 );
+      PROPERTYSLOT_SET_GET( Real, k_5 );
+      PROPERTYSLOT_SET_GET( Real, k6 );
+      PROPERTYSLOT_SET_GET( Real, k_6 );
+      PROPERTYSLOT_SET_GET( Real, k7 );
+      PROPERTYSLOT_SET_GET( Real, k_7 );
+      PROPERTYSLOT_SET_GET( Real, k8 );
+      PROPERTYSLOT_SET_GET( Real, k_8 );
+    }
+
+
+  // FIXME: initial values
+  RandomBiBiProcess()
+    {
+      ; // do nothing
     }
   
   SIMPLE_SET_GET_METHOD( Real, k1 );
@@ -63,7 +65,7 @@ ECELL3_DM_CLASS
     
   virtual void initialize()
     {
-      FluxProcess::initialize();
+      Process::initialize();
       S_0 = getVariableReference( "S0" );
       S_1 = getVariableReference( "S1" );
       P_0 = getVariableReference( "P0" );
@@ -119,4 +121,4 @@ ECELL3_DM_CLASS
   
 };
 
-ECELL3_DM_INIT;
+LIBECS_DM_INIT( RandomBiBiProcess, Process );

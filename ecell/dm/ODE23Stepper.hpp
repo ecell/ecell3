@@ -38,18 +38,16 @@
 
 USE_LIBECS;
 
-// DECLARE_VECTOR( Real, RealVector );
-
-// DECLARE_CLASS( ODE23Stepper );
-
-class ODE23Stepper 
-  : 
-  public AdaptiveDifferentialStepper
+LIBECS_DM_CLASS( ODE23Stepper, AdaptiveDifferentialStepper )
 {
 
-  LIBECS_DM_OBJECT( Stepper, ODE23Stepper );
-
 public:
+
+  LIBECS_DM_OBJECT( ODE23Stepper, Stepper )
+    {
+      INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
+    }
+
 
   ODE23Stepper( void );
   

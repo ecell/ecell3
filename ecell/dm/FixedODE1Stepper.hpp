@@ -32,21 +32,23 @@
 #define __FIXEDODE1_HPP
 
 
-// #include <iostream>
-
 #include "libecs/DifferentialStepper.hpp"
 
 USE_LIBECS;
 
 
-class FixedODE1Stepper 
-  : 
-  public DifferentialStepper
+LIBECS_DM_CLASS( FixedODE1Stepper, DifferentialStepper )
 {
 
-  LIBECS_DM_OBJECT( Stepper, FixedODE1Stepper );
-
 public:
+
+  LIBECS_DM_OBJECT( FixedODE1Stepper, Stepper )
+    {
+      INHERIT_PROPERTIES( Stepper );
+    }
+
+
+
 
   FixedODE1Stepper( void );
   

@@ -38,19 +38,21 @@
 
 USE_LIBECS;
 
-class PythonFluxProcess
-  :
-  public PythonProcessBase
+LIBECS_DM_CLASS( PythonFluxProcess, PythonProcessBase )
 {
 
 public:
-
-  DM_OBJECT( Process, PythonFluxProcess );
   
+  LIBECS_DM_OBJECT( PythonFluxProcess, Process )
+    {
+      INHERIT_PROPERTIES( Process );
+
+      PROPERTYSLOT_SET_GET( String, Expression );
+    }
+
+
   PythonFluxProcess()
   {
-    CREATE_PROPERTYSLOT_SET_GET( String, Expression, PythonFluxProcess );
-
     //FIXME: additional properties:
     // Unidirectional   -> call declareUnidirectional() in initialize()
     //                     if this is set

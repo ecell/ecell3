@@ -11,30 +11,28 @@
 #include "PropertyInterface.hpp"
 #include "PropertySlotMaker.hpp"
 
-#include "ecell3_dm.hpp"
-
-#define ECELL3_DM_TYPE Process
-
-using namespace std;
-
 USE_LIBECS;
 
-ECELL3_DM_CLASS
-  : 
-  public Process
+LIBECS_DM_CLASS( SSystemProcess, Process )
 {
 
-  ECELL3_DM_OBJECT;
-  
  public:
 
-  ECELL3_DM_CLASSNAME()
+  LIBECS_DM_OBJECT( SSystemProcess, Process )
     {
-      theSystemSize = 0;
-      Order = 3;
+      INHERIT_PROPERTIES( Process );
 
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Int, Order );
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Polymorph, SSystemMatrix );
+      PROPERTYSLOT_SET_GET( Int, Order );
+      PROPERTYSLOT_SET_GET( Polymorph, SSystemMatrix );
+    }
+
+
+  SSystemProcess()
+    :
+    theSystemSize( 0 ),
+    Order( 3 )
+    {
+      ; // do nothing
     }
 
   SIMPLE_GET_METHOD( Int, Order );
@@ -61,29 +59,27 @@ ECELL3_DM_CLASS
   Polymorph SSystemMatrix;
   
   // State variables in log space
-  vector< RealVector > theY;
+  std::vector< RealVector > theY;
   
   // S-System vectors
   RealVector theAlpha;
   RealVector theBeta;
 
-  vector< RealVector > theG;
-  vector< RealVector > theH;
+  std::vector< RealVector > theG;
+  std::vector< RealVector > theH;
   
   // tmp S-System vectors
-  vector< RealVector > theAlphaBuffer;
-  vector< RealVector > theBetaBuffer;
-  vector< RealVector > theGBuffer;
-  vector< RealVector > theHBuffer;
-  vector< RealVector > theFBuffer;
+  std::vector< RealVector > theAlphaBuffer;
+  std::vector< RealVector > theBetaBuffer;
+  std::vector< RealVector > theGBuffer;
+  std::vector< RealVector > theHBuffer;
+  std::vector< RealVector > theFBuffer;
   
 };
 
-ECELL3_DM_INIT;
+LIBECS_DM_INIT( SSystemProcess, Process );
 
-using namespace libecs;
-
-void ECELL3_DM_CLASSNAME::setOrder( IntCref aValue ) 
+void SSystemProcess::setOrder( IntCref aValue ) 
 { 
   Order = aValue;
   
@@ -131,7 +127,7 @@ void ECELL3_DM_CLASSNAME::setOrder( IntCref aValue )
 
 }
 
-void ECELL3_DM_CLASSNAME::setSSystemMatrix( PolymorphCref aValue )
+void SSystemProcess::setSSystemMatrix( PolymorphCref aValue )
 {
   SSystemMatrix = aValue;
   PolymorphVector aValueVector( aValue.asPolymorphVector() );
@@ -218,7 +214,7 @@ void ECELL3_DM_CLASSNAME::setSSystemMatrix( PolymorphCref aValue )
     }
 }
 
-void ECELL3_DM_CLASSNAME::process()
+void SSystemProcess::process()
 {
  //get theY
  Int anIndex = 0;
