@@ -30,7 +30,7 @@ class PropertyWindow(PluginWindow):
         self.theSelected = ''
         
         self.theFullID = FullPropertyNameToFullID( self.theFPNs[0] )
-        self.theType = PrimitiveTypeStringList[ self.theFullID[TYPE] ]
+        self.theType = PrimitiveTypeString[ self.theFullID[TYPE] ]
         self.theID   = str( self.theFullID[ID] )
         self.thePath = str( self.theFullID[SYSTEMPATH] )
         aFullPropertyName = FullIDToFullPropertyName( self.theFullID,

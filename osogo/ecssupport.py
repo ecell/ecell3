@@ -20,7 +20,7 @@ SUBSTANCE  = 2
 REACTOR    = 3
 SYSTEM     = 4
 
-PrimitiveTypeStringList =\
+PrimitiveTypeString =\
 ( 'NONE', 'Entity', 'Substance', 'Reactor', 'System' )
 
 PrimitiveTypeDictionary =\
@@ -58,14 +58,14 @@ def FullPropertyName( fullpropertynamestring ):
 def FullIDString( fullid ):
 
     validateFullID( fullid )
-    aTypeString = PrimitiveTypeStringList[int(fullid[0])]
+    aTypeString = PrimitiveTypeString[int(fullid[0])]
     return aTypeString + ':' + string.join( fullid[1:], ':' )
 
 
 def FullPropertyNameString( fullpropertyname ):
 
     validateFullPropertyName( fullpropertyname )
-    aTypeString = PrimitiveTypeStringList[fullpropertyname[0]]
+    aTypeString = PrimitiveTypeString[fullpropertyname[0]]
     return aTypeString + ':' + string.join( fullpropertyname[1:], ':' )
 
 
