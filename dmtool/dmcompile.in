@@ -19,8 +19,9 @@ VERBOSE=1
 exit_if_failed()
 {
     $@
-    if [ $? -ne 0 ] ; then
-	exit $?
+    exitcode=$?
+    if [ $exitcode -ne 0 ] ; then
+	exit $exitcode
     fi
 }
 
