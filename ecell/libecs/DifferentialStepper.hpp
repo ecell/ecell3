@@ -76,6 +76,7 @@ namespace libecs
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, NextStepInterval );
 	PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real,  TolerableStepInterval );
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Integer,  Stage );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE( Integer,  Order );
       }
 
     class Interpolant
@@ -169,7 +170,7 @@ namespace libecs
 
 	// check if second and higher order calculations are necessary.
 	//	const RealMatrix::size_type aTaylorSize( aTaylorSeries.size() );
-	const RealMatrix::size_type aTaylorSize( theStepper.getStage() );
+	const RealMatrix::size_type aTaylorSize( theStepper.getOrder() );
 	if( aTaylorSize >= 2)
 	  {
 	    const Real 
@@ -265,6 +266,11 @@ namespace libecs
       return 1; 
     }
 
+    virtual GET_METHOD( Integer, Order )
+    { 
+      return getStage(); 
+    }
+
     RealMatrixCref getTaylorSeries() const
     {
       return theTaylorSeries;
@@ -316,7 +322,6 @@ namespace libecs
 	PROPERTYSLOT_SET_GET( Real, RelativeEpsilon );
 
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, MaxErrorRatio );
-	PROPERTYSLOT_GET_NO_LOAD_SAVE( Integer,  Order );
       }
 
   public:
@@ -419,11 +424,6 @@ namespace libecs
       return theRelativeEpsilon;
     }
 
-    virtual GET_METHOD( Integer, Order )
-    { 
-      return 1; 
-    }
-
     virtual void initialize();
     virtual void step();
     virtual bool calculate() = 0;
@@ -431,6 +431,11 @@ namespace libecs
     virtual GET_METHOD( Integer, Stage )
     { 
       return 2;
+    }
+
+    virtual GET_METHOD( Integer, Order )
+    { 
+      return 1; 
     }
 
   private:

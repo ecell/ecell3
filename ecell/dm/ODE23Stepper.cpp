@@ -77,6 +77,8 @@ bool ODE23Stepper::calculate()
 
   const Real aCurrentTime( getCurrentTime() );
 
+  theStateFlag = true;
+
   for ( RealMatrix::size_type s( 0 ); s < theTaylorSeries.size(); ++s )
     for ( RealVector::size_type c( 0 ); c < theTaylorSeries[ s ].size(); ++c )
       {

@@ -60,8 +60,8 @@ public:
 
   virtual void interrupt( StepperPtr const aCaller );
 
-  virtual GET_METHOD( Integer, Order ) { return 5; }
-  virtual GET_METHOD( Integer, Stage ) { return 4; }
+  virtual GET_METHOD( Integer, Order ) { return 4; }
+  virtual GET_METHOD( Integer, Stage ) { return 5; }
 
   GET_METHOD( Real, SpectralRadius )
   {

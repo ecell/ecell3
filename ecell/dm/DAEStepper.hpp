@@ -59,7 +59,7 @@ LIBECS_DM_CLASS( DAEStepper, DifferentialStepper )
     }
 
     virtual const Real getDifference( RealParam aTime, 
-				      RealParam anInterval )
+				      RealParam anInterval ) const
     {
      const Real sq6( 2.4494897427831779 );  // sqrt( 6.0 )      
      const Real c1( ( 4.0 - sq6 ) / 10.0 - 1.0 );      
@@ -186,6 +186,7 @@ public:
     return new DAEStepper::Interpolant( *this, aVariable );
   }
 
+  //  virtual GET_METHOD( Integer, Order ) { return 4; }
   virtual GET_METHOD( Integer, Stage ) { return 4; }
 
 protected:
