@@ -4,17 +4,16 @@ Version: 3.1.102
 Release: 1
 URL: http://www.e-cell.org
 Source0: %{name}-%{version}.tar.gz
+Patch0: p1.patch
 #License: GPL
 Group: Applications
 Copyright: E-Cell Project
 Packager: Takeshi Sakurada
 BuildRoot: %{_tmppath}/%{name}-root
 
-Requires: Numeric
+Requires: python-numeric 
 Requires: gsl
 Requires: gsl-devel
-Requires: boost-python
-Requires: boost-python-devel
 Requires: boost
 Requires: boost-devel
 
@@ -24,6 +23,8 @@ E-Cell Simulation Environment (E-Cell SE) is a software package for cellular and
 %prep
 %setup 
 #%setup -a 1
+
+%patch0 -p1
 
 CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=%{_prefix}
 
@@ -35,7 +36,6 @@ make
 
 make strip 
 make prefix="$RPM_BUILD_ROOT/usr" install
-chmod 666 $RPM_BUILD_ROOT/usr/lib/toollauncher/launcher.ini
 make prefix="$RPM_BUILD_ROOT/usr" doc-install
 
 %clean
@@ -49,6 +49,9 @@ rm -rf $RPM_BUILD_ROOT
 /usr/include/*
 
 %changelog
+* Mon May 31 2004 Takeshi Sakurada <sakurada@e-cell.org>
+- The list of requires was modified for the recent Fedora Core environment. 
+
 * Sun Oct 13 2002 Takeshi Sakurada <sakurada@e-cell.org>
 - Initial build.
 
