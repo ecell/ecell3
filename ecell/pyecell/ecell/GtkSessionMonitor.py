@@ -612,7 +612,7 @@ class GtkSessionMonitor(Session):
 
 	#-------------------------------------------------------------------
 	def saveLoggerData( self, fullpn=0, aSaveDirectory='./Data', aStartTime=-1, anEndTime=-1, anInterval=-1 ):
-		Session.saveLoggerData( self, fullpn=0, aSaveDirectory='./Data', aStartTime=-1, anEndTime=-1, anInterval=-1 )
+		Session.saveLoggerData( self, fullpn, aSaveDirectory, aStartTime, anEndTime, anInterval )
 
 
 
