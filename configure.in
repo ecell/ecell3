@@ -8,7 +8,7 @@ dnl
 dnl 
 ECELL_MAJOR_VERSION=3
 ECELL_MINOR_VERSION=1
-ECELL_MICRO_VERSION=92
+ECELL_MICRO_VERSION=93
 VERSION=$ECELL_MAJOR_VERSION.$ECELL_MINOR_VERSION.$ECELL_MICRO_VERSION
 PACKAGE=ecell
 dnl
@@ -28,8 +28,8 @@ dnl
 AC_CONFIG_SUBDIRS( libltdl ecell bin dmtool libltdl)
 dnl
 AC_ARG_ENABLE(gtk,,[
-ECELL_SUBDIR="libltdl ecell bin dmtool libltdl"],[
-ECELL_SUBDIR="libltdl ecell bin dmtool osogo libltdl"
+ECELL_SUBDIR="libltdl ecell bin dmtool "],[
+ECELL_SUBDIR="libltdl ecell bin dmtool osogo "
 AC_CONFIG_SUBDIRS(osogo)]
 )
 dnl
