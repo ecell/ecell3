@@ -180,9 +180,9 @@ class SBML_Model:
                         return aPath
 
         else:
-            raise Exception, "Version",self.Level," ????"
-
-
+            raise Exception,"Version"+str(self.Level)+" ????"
+        
+        
     # =========================================================
 
     def getSpeciesReferenceID( self, aSpeciesID ):
@@ -198,7 +198,7 @@ class SBML_Model:
                     return self.getPath( aSpecies[2] ) + ":" + aSpeciesID
 
         else:
-            raise Exception, "Version",self.Level," ????"
+            raise Exception,"Version"+str(self.Level)+" ????"
 
 
     # =========================================================
@@ -413,7 +413,7 @@ class SBML_Species( SBML_Model ):
         elif ( self.Model.Level == 2 ):
             aSystemID = self.Model.getPath( aCompartmentID ) + ':' + aSpecies[0]
         else:
-            raise Exception,"Version",self.Level," ????"
+            raise Exception,"Version"+str(self.Level)+" ????"
                 
         return 'Variable:' + aSystemID
 
@@ -847,7 +847,7 @@ class SBML_Reaction( SBML_Model ):
                                 pass
 
                         if( self.Model.Level == 2 and newName == [] ):
-                            raise NameError,"in libSBML :",aName,"isn't defined in VariableReferenceList"
+                            raise NameError,"in libSBML :"+aName+" isn't defined in VariableReferenceList"
 
                         elif( self.Model.Level == 1 and newName == [] ):
 
@@ -984,7 +984,7 @@ class SBML_Reaction( SBML_Model ):
                         return int( aStoichiometry )
 
         else:
-           raise Exception,"Version",self.Level," ????"
+           raise Exception,"Version"+str(self.Level)+" ????"
 
 
     # =========================================================
@@ -1021,7 +1021,7 @@ class SBML_Parameter( SBML_Model ):
                raise NameError, "Parameter must set the Parameter ID"
 
        else:
-           raise Exception,"Version",self.Level," ????"
+           raise Exception,"Version"+str(self.Level)+" ????"
                 
 
    # =========================================================

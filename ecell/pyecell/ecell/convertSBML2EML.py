@@ -304,7 +304,7 @@ def convertSBML2EML( aSBMLString ):
             
             aProductList.append( 'Variable:' + aProductID )
             if ( aProduct[2] != 1 ):
-                Exception "Stoichiometry Error : E-Cell System can't set a floating Stoichiometry"
+                raise Exception,"Stoichiometry Error : E-Cell System can't set a floating Stoichiometry"
 
             aProductList.append( str( 1 * theReaction.getStoichiometry(
                 aProduct[0],  aProduct[1] ) ) )
