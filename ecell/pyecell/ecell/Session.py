@@ -61,53 +61,84 @@ class Session:
 
 
     def loadModel( self, aModel ):
+        # aModel : an EML instance, a file name (string) or a file object
+        # return -> None
+        # This method can thwor exceptions. 
+
+        # checks the type of aModel
+
+        # if the type is EML instance
         if type( aModel ) == type( eml.Eml ):
             anEml = aModel
             aModelName = '<eml.Eml>'  # what should this be?
+
+        # if the type is string
         elif type( aModel ) == str:
             aFileObject = open( aModel )
             aModelName = aModel
             anEml = eml.Eml( aFileObject )
-        else:
+
+        # if the type is file object
+        elif type( aModel ) == file:
             aFileObject = aModel
             aModelName = aModel.name
             anEml = eml.Eml( aFileObject )
 
+        # When the type doesn't match
+        else:
+            raise TypeError, " The type of aModel must be EML instance, string(file name) or file object "
 
+        # calls load methods
         self.__loadStepper( anEml )
-
         self.__loadEntity( anEml )
-
         self.__loadProperty( anEml )
 
-
+        # saves ModelName 
         self.theModelName = aModelName
 
+        # initializes Simulator
         self.theSimulator.initialize()
 
+    # end of loadModel
         
+
     def saveModel( self , aModel ):
+        # aModel : a file name (string) or a file object
+        # return -> None
+        # This method can thwor exceptions. 
         
-        anEml = eml.Eml()
-        self.anEml = anEml
+        # creates ana seve an EML instance 
+        self.anEml = eml.Eml()
+
+        # creates root entity
         self.anEml.createEntity('System', 'System::/')
         
+        # calls save methods
         self.__saveEntity()
-
         self.__saveStepper()
-
         self.__saveProperty()
 
-
+        # if the type is string
         if type( aModel ) == str:
-            aString = self.anEml.asString()
+       	    aString = self.anEml.asString()
             aFileObject = open( aModel, 'w' )
             aFileObject.write( aString )
             aFileObject.close()
 
+        # if the type is file object
+        elif type( aModel ) == file:
+       	    aString = self.anEml.asString()
+            aFileObject = aModel
+            aFileObject.write( aString )
+            aFileObject.close()
+
+        # When the type doesn't match
         else:
-            aModel = self.anEml
-            return aModel
+            raise TypeError, " The type of aModel must be string(file name) or file object "
+
+    # end of saveModel
+
+
         
     def setMessageMethod( self, aMethod ):
         self.theMessageMethod = aMethod
