@@ -34,7 +34,19 @@
 
 Logger* LoggerBroker::getLogger( IDString id_name )
 {
-  ;
+  map::iterator position( theLoggerMap.find( id_name ) );
+  if( position != theLoggerMap.end() )
+    {
+      return position->second;
+    }
+  else
+    {
+      Object obj;  // FIXME temporary
+      Logger* aNewLoggerPtr = new Logger( obj );
+      theLoggerMap.
+	insert( pair< IDString, Logger* >( id_name, aNewLoggerPtr ) );
+      return aNewLoggerPtr;
+    }
 }
 
 
