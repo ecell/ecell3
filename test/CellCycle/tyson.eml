@@ -1,0 +1,1454 @@
+<?xml version="1.0"?>
+<eml>
+
+<info>
+<modelname>Tyson</modelname>
+<author>Tomoya Kitayama</author>
+<created>2002/06/10</created>
+<lastsaved>2002/09/10</lastsaved>
+</info>
+
+<stepperlist>
+<stepper class="Euler1Stepper" id="SRM_01" />
+</stepperlist>
+
+
+<!-- ROOT -->
+<system class="System" id="/" name="Environment">
+<property name="StepperID">
+<value>SRM_01</value>
+</property>
+<property name="Volume">
+<value>0.000000000000001</value>
+</property>
+</system>
+
+
+<!-- CELL -->
+<system class="System" id="/CELL" name="The Cell">
+<property name="StepperID">
+<value>SRM_01</value>
+</property>
+<property name="Volume">
+<value>unknown</value>
+</property>
+</system>
+
+
+<!-- ENVIRONMENT -->
+<system class="System" id="/ENVIRONMENT" name="The Culture Medium">
+<property name="StepperID">
+<value>SRM_01</value>
+</property>
+<property name="Volume">
+<value>1e-15</value>
+</property>
+</system>
+
+
+<!-- MEMBRANE -->
+<system class="System" id="/CELL/MEMBRANE" name="The Membrane">
+<property name="StepperID">
+<value>SRM_01</value>
+</property>
+<property name="Volume">
+<value>unknown</value>
+</property>
+</system>
+
+
+<!-- CYTOPLASM -->
+<!-- for SUBSTANCE -->
+<system class="System" id="/CELL/CYTOPLASM" name="The Cytoplasm">
+<property name="StepperID">
+<value>SRM_01</value>
+</property>
+<property name="Volume">
+<value>1e-18</value>
+</property>
+
+<substance class="Substance" id="Cln2" name="Cln2">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Clb2" name="Clb2">
+<property name="Quantity">
+<value>828044</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Clb2t" name="Clb2total">
+<property name="Quantity">
+<value>828044</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Clb5" name="Clb5">
+<property name="Quantity">
+<value>48177</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Clb5t" name="Clb5total">
+<property name="Quantity">
+<value>48177</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Cln3" name="Cln3">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Sic1" name="Sic1">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Sic1t" name="Sic1total">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Swi5" name="Swi5">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Clb2Sic1" name="Clb2Sic1">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Clb5Sic1" name="Slb5Sic1">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="SBF" name="SBF">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="MBF" name="MBF">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Mcm1" name="Mcm1">
+<property name="Quantity">
+<value>566081</value>
+</property>
+</substance>
+
+<substance class="Substance" id="mass" name="mass">
+<property name="Quantity">
+<value>903321</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Bck2" name="Bck2">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="ORI" name="ORI">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="BUD" name="BUD">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="SPN" name="SPN">
+<property name="Quantity">
+<value>578125</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Hct1t" name="Hct1total">
+<property name="Quantity">
+<value>602214</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Hct1a" name="Hct1act">
+<property name="Quantity">
+<value>0</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Cdc20t" name="Cdc20total">
+<property name="Quantity">
+<value>481771</value>
+</property>
+</substance>
+
+<substance class="Substance" id="Cdc20a" name="Cdc20act">
+<property name="Quantity">
+<value>46370</value>
+</property>
+</substance>
+
+<!-- for REACTOR -->
+<reactor class="CyclinsynthesisReactor" id="Cln2syn" name="Cln2 synthesis">
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Cln2</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:SBF</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:mass</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0</value>
+</property>
+
+<property name="k2">
+<value>0.05</value>
+</property>
+</reactor>
+
+<reactor class="DegradeReactor" id="Cln2deg" name="Cln2 degrade">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Cln2</value>
+<value>-1</value>
+</property>
+
+<property name="kd">
+<value>0.1</value>
+</property>
+</reactor>
+
+<reactor class="CyclinsynthesisReactor" id="Clb2syn" name="Clb2 synthesis">
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2t</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Mcm1</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:mass</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0.002</value>
+</property>
+
+<property name="k2">
+<value>0.05</value>
+</property>
+</reactor>
+
+<reactor class="DegradeClb2Reactor" id="Clb2deg" name="Clb2 degrade">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2t</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Hct1t</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Hct1a</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C2</value>
+<value>Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0.01</value>
+</property>
+
+<property name="k2">
+<value>0.01</value>
+</property>
+
+<property name="k3">
+<value>0.05</value>
+</property>
+</reactor>
+
+<reactor class="CyclinsynthesisReactor" id="Clb5syn" name="Clb5 synthesis">
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5t</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:MBF</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:mass</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0.006</value>
+</property>
+
+<property name="k2">
+<value>0.02</value>
+</property>
+</reactor>
+
+<reactor class="DegradeClb5Reactor" id="Clb5deg" name="Clb5 degrade">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5t</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0.1</value>
+</property>
+
+<property name="k2">
+<value>0.25</value>
+</property>
+</reactor>
+
+<reactor class="Bck2PReactor" id="!Bck" name="Bck calculate">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Bck2</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:mass</value>
+<value>0</value>
+</property>
+
+<property name="Bck2">
+<value>0.0027</value>
+</property>
+</reactor>
+
+<reactor class="Cln3PReactor" id="!Cln3cal" name="Cln3 calculate">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Cln3</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:mass</value>
+<value>0</value>
+</property>
+
+<property name="Max">
+<value>0.02</value>
+</property>
+
+<property name="D">
+<value>1</value>
+</property>
+
+<property name="J">
+<value>6</value>
+</property>
+</reactor>
+
+<reactor class="Sic1Reactor" id="Sic1syn" name="Sic1 synthesis">
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Sic1t</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Swi5</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0.02</value>
+</property>
+
+<property name="k2">
+<value>0.1</value>
+</property>
+</reactor>
+
+<reactor class="DegradeReactor" id="Sic1deg1" name="Sic1 degrade1">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Sic1t</value>
+<value>-1</value>
+</property>
+
+<property name="kd">
+<value>0.01</value>
+</property>
+</reactor>
+
+<reactor class="Sic1ComplexDegradeReactor" id="Sic1deg2" name="Sic1 degrade2">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Sic1t</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Cln3</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Bck2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C2</value>
+<value>Substance:/CELL/CYTOPLASM:Cln2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C3</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C4</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C5</value>
+<value>Substance:/CELL/CYTOPLASM:Sic1t</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0.3</value>
+</property>
+
+<property name="e1">
+<value>20</value>
+</property>
+
+<property name="e2">
+<value>2</value>
+</property>
+
+<property name="e3">
+<value>1</value>
+</property>
+
+<property name="e4">
+<value>0.067</value>
+</property>
+
+<property name="J">
+<value>0.05</value>
+</property>
+</reactor>
+
+<reactor class="BiUniReactor" id="Clb2Sic1syn" name="Clb2Sic1 synthesis">
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2Sic1</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Sic1</value>
+<value>0</value>
+</property>
+
+<property name="k">
+<value>50</value>
+</property>
+</reactor>
+
+<reactor class="DegradeReactor" id="Clb2Sic1deg1" name="Clb2Sic1 degrade1">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2Sic1</value>
+<value>-1</value>
+</property>
+
+<property name="kd">
+<value>0.05</value>
+</property>
+</reactor>
+
+<reactor class="DegradeClb2Reactor" id="Clb2Sic1deg2" name="Clb2Sic1 degrade2">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2Sic1</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Hct1t</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Hct1a</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C2</value>
+<value>Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0.01</value>
+</property>
+
+<property name="k2">
+<value>0.01</value>
+</property>
+
+<property name="k3">
+<value>0.05</value>
+</property>
+</reactor>
+
+
+<reactor class="DegradeReactor" id="Clb2Sic1deg3" name="Clb2Sic1 degrade3">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2Sic1</value>
+<value>-1</value>
+</property>
+
+<property name="kd">
+<value>0.01</value>
+</property>
+</reactor>
+
+<reactor class="Sic1ComplexDegradeReactor" id="Clb2Sic1deg4" name="Clb2Sic1 degrade4">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2Sic1</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Cln3</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Bck2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C2</value>
+<value>Substance:/CELL/CYTOPLASM:Cln2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C3</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C4</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C5</value>
+<value>Substance:/CELL/CYTOPLASM:Sic1t</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0.3</value>
+</property>
+
+<property name="e1">
+<value>20</value>
+</property>
+
+<property name="e2">
+<value>2</value>
+</property>
+
+<property name="e3">
+<value>1</value>
+</property>
+
+<property name="e4">
+<value>0.067</value>
+</property>
+
+<property name="J">
+<value>0.05</value>
+</property>
+</reactor>
+
+<reactor class="BiUniReactor" id="Clb5Sic1syn" name="Clb5Sic1 synthesis">
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5Sic1</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Sic1</value>
+<value>0</value>
+</property>
+
+<property name="k">
+<value>50</value>
+</property>
+</reactor>
+
+
+<reactor class="DegradeReactor" id="Clb5Sic1deg1" name="Clb5Sic1 degrade1">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5Sic1</value>
+<value>-1</value>
+</property>
+
+<property name="kd">
+<value>0.05</value>
+</property>
+</reactor>
+
+
+<reactor class="DegradeClb5Reactor" id="Clb5Sic1deg2" name="Clb5Sic1 degrade2">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5Sic1</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0.1</value>
+</property>
+
+<property name="k2">
+<value>0.25</value>
+</property>
+</reactor>
+
+<reactor class="DegradeReactor" id="Clb5Sic1deg3" name="Clb5Sic1 degrade3">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5Sic1</value>
+<value>-1</value>
+</property>
+
+<property name="kd">
+<value>0.01</value>
+</property>
+</reactor>
+
+
+<reactor class="Sic1ComplexDegradeReactor" id="Clb5Sic1deg4" name="Clb5Sic1 degrade4">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5Sic1</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Cln3</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Bck2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C2</value>
+<value>Substance:/CELL/CYTOPLASM:Cln2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C3</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C4</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C5</value>
+<value>Substance:/CELL/CYTOPLASM:Sic1t</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0.3</value>
+</property>
+
+<property name="e1">
+<value>20</value>
+</property>
+
+<property name="e2">
+<value>2</value>
+</property>
+
+<property name="e3">
+<value>1</value>
+</property>
+
+<property name="e4">
+<value>0.067</value>
+</property>
+
+<property name="J">
+<value>0.05</value>
+</property>
+</reactor>
+
+<reactor class="Sic1Reactor" id="Cdc20tsyn" name="Cdc20t synthesis">
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Cdc20t</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0.005</value>
+</property>
+
+<property name="k2">
+<value>0.06</value>
+</property>
+</reactor>
+
+
+<reactor class="DegradeReactor" id="Cdc20tdeg" name="Cdc20t degrade">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Cdc20t</value>
+<value>-1</value>
+</property>
+
+<property name="kd">
+<value>0.08</value>
+</property>
+</reactor>
+
+<reactor class="Cdc20ActivateReactor" id="Cdc20act" name="Cdc20 activate">
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Cdc20t</value>
+<value>0</value>
+</property>
+
+<property name="k">
+<value>1</value>
+</property>
+</reactor>
+
+<reactor class="Cdc20InactivateReactor" id="Cdc20ina" name="Cdc20 inactivate">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:ORI</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:SPN</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0.1</value>
+</property>
+
+<property name="k2">
+<value>10</value>
+</property>
+
+<property name="kd">
+<value>0.08</value>
+</property>
+</reactor>
+
+
+<reactor class="Hct1ActivateReactor" id="Hct1act" name="Hct1 activate">
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Hct1a</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Hct1t</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0.04</value>
+</property>
+
+<property name="k2">
+<value>2</value>
+</property>
+
+<property name="J">
+<value>0.05</value>
+</property>
+</reactor>
+
+
+<reactor class="Hct1InactivateReactor" id="Hct1ina" name="Hct1 inactivate">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:Hct1a</value>
+<value>-1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Cln3</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Cln2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C2</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C3</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0</value>
+</property>
+
+<property name="k2">
+<value>0.64</value>
+</property>
+
+<property name="e1">
+<value>1</value>
+</property>
+
+<property name="e2">
+<value>0.5</value>
+</property>
+
+<property name="e3">
+<value>1</value>
+</property>
+
+<property name="J">
+<value>0.05</value>
+</property>
+</reactor>
+
+<reactor class="MassCalculateReactor" id="masscalc" name="mass calculate">
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:mass</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:mass</value>
+<value>0</value>
+</property>
+
+<property name="m">
+<value>0.005776</value>
+</property>
+</reactor>
+
+
+<reactor class="DegradeReactor" id="ORIdeg" name="ORI deg">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:ORI</value>
+<value>-1</value>
+</property>
+
+<property name="kd">
+<value>0.06</value>
+</property>
+</reactor>
+
+
+<reactor class="BUDReactor" id="BUD" name="BUD">
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:BUD</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Cln2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Cln3</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C2</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5</value>
+<value>0</value>
+</property>
+
+<property name="k">
+<value>0.3</value>
+</property>
+
+<property name="e">
+<value>1</value>
+</property>
+</reactor>
+
+
+<reactor class="DegradeReactor" id="BUDdeg" name="BUD deg">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:BUD</value>
+<value>-1</value>
+</property>
+
+<property name="kd">
+<value>0.06</value>
+</property>
+</reactor>
+
+<reactor class="SPNReactor" id="SPN" name="SPN">
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:SPN</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2</value>
+<value>0</value>
+</property>
+
+<property name="k">
+<value>0.08</value>
+</property>
+
+<property name="J">
+<value>0.2</value>
+</property>
+</reactor>
+
+
+<reactor class="DegradeReactor" id="SPNdeg" name="SPN deg">
+<property name="Reactant">
+<value>S0</value>
+<value>Substance:/CELL/CYTOPLASM:SPN</value>
+<value>-1</value>
+</property>
+
+<property name="kd">
+<value>0.06</value>
+</property>
+</reactor>
+
+<reactor class="SBFcalcPReactor2" id="!SBF" name="SBF">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:SBF</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Cln2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Cln3</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C2</value>
+<value>Substance:/CELL/CYTOPLASM:Bck2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C3</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C4</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0.5</value>
+</property>
+
+<property name="k2">
+<value>6</value>
+</property>
+
+<property name="k3">
+<value>1</value>
+</property>
+
+<property name="e1">
+<value>75</value>
+</property>
+
+<property name="e2">
+<value>0.5</value>
+</property>
+
+<property name="J1">
+<value>0.01</value>
+</property>
+
+<property name="J2">
+<value>0.01</value>
+</property>
+</reactor>
+
+
+<reactor class="SBFcalcPReactor2" id="!MBF" name="MBF">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:MBF</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Cln2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Cln3</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C2</value>
+<value>Substance:/CELL/CYTOPLASM:Bck2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C3</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C4</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>0.5</value>
+</property>
+
+<property name="k2">
+<value>6</value>
+</property>
+
+<property name="k3">
+<value>1</value>
+</property>
+
+<property name="e1">
+<value>75</value>
+</property>
+
+<property name="e2">
+<value>0.5</value>
+</property>
+
+<property name="J1">
+<value>0.01</value>
+</property>
+
+<property name="J2">
+<value>0.01</value>
+</property>
+</reactor>
+
+<reactor class="Mcm1calcPReactor" id="!Mcm1" name="Mcm1">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Mcm1</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>1</value>
+</property>
+
+<property name="k2">
+<value>0.15</value>
+</property>
+
+<property name="J1">
+<value>1</value>
+</property>
+
+<property name="J2">
+<value>1</value>
+</property>
+</reactor>
+
+
+<reactor class="Swi5calcPReactor2" id="!Swi5" name="Swi5">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Swi5</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Cdc20a</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2</value>
+<value>0</value>
+</property>
+
+<property name="k1">
+<value>1</value>
+</property>
+
+<property name="k2">
+<value>0.3</value>
+</property>
+
+<property name="k3">
+<value>0.2</value>
+</property>
+
+<property name="J1">
+<value>0.1</value>
+</property>
+
+<property name="J2">
+<value>0.1</value>
+</property>
+</reactor>
+
+
+<reactor class="DivisionPReactor" id="!divide" name="divide">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:mass</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P1</value>
+<value>Substance:/CELL/CYTOPLASM:BUD</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>P2</value>
+<value>Substance:/CELL/CYTOPLASM:SPN</value>
+<value>1</value>
+</property>
+
+<property name="m">
+<value>0.005776</value>
+</property>
+</reactor>
+
+<reactor class="ORIPReactor" id="!ORIP" name="ORIP">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:ORI</value>
+<value>1</value>
+</property>
+</reactor>
+
+<reactor class="TotalPReactor" id="!clb2total2" name="CLB2">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2t</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2Sic1</value>
+<value>0</value>
+</property>
+</reactor>
+
+<reactor class="TotalPReactor" id="!clb5total2" name="CLB5">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5t</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5Sic1</value>
+<value>0</value>
+</property>
+</reactor>
+
+<reactor class="Sic1TotalPReactor" id="!sic1total2" name="SIC1">
+<property name="Priority">
+<value>-1</value>
+</property>
+<property name="Reactant">
+<value>P0</value>
+<value>Substance:/CELL/CYTOPLASM:Sic1</value>
+<value>1</value>
+</property>
+
+<property name="Reactant">
+<value>C0</value>
+<value>Substance:/CELL/CYTOPLASM:Sic1t</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C1</value>
+<value>Substance:/CELL/CYTOPLASM:Clb2Sic1</value>
+<value>0</value>
+</property>
+
+<property name="Reactant">
+<value>C2</value>
+<value>Substance:/CELL/CYTOPLASM:Clb5Sic1</value>
+<value>0</value>
+</property>
+</reactor>
+
+</system>
+
+</eml>
+
+
