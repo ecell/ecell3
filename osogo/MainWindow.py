@@ -26,6 +26,7 @@ class MainWindow(Window):
         self.theSimulator = ecs.Simulator()
 
         self.theUpdateInterval = 100
+        self.theStepSize = 1
 
         Window.__init__( self )
 
@@ -45,6 +46,7 @@ class MainWindow(Window):
               'start_button_clicked'     : self.startSimulation ,
               'stop_button_clicked'      : self.stopSimulation ,
               'step_button_clicked'      : self.stepSimulation ,
+              'input_step_size'          : self.setStepSize ,
               'entry_button_clicked'     : self.createNewEntryList ,
               'logger_button_clicked'    : self.createNewLoggerList ,
               'palette_togglebutton_toggled'   : self.togglePaletteWindow ,
@@ -133,7 +135,14 @@ class MainWindow(Window):
 
     def stepSimulation( self, a ) : 
         self.printMessage( "step\n" )
+        self.theTimer = timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
+        self.theSimulator.run( self.theStepSize )
         self.update(0)
+        timeout_remove(self.theTimer)
+
+    def setStepSize( self, obj ):
+        self.theStepSize =  string.atoi( obj.get_text() )
+#        print self.theStepSize
 
     def updateByTimeOut( self, a ):
         timeout_remove(self.theTimer)
