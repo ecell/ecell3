@@ -59,13 +59,12 @@ namespace libemc
      C++ types/classes, and doesn't depend on libecs classes.  An only
      exception is Polymorph class.
 
-     The public API methods are classified into these three groups:
+     The public API methods are classified into these four groups:
 
-     - Simulator methods
      - Entity methods
      - Stepper methods
-     - Logger methods
-
+     - Logger methods, and
+     - Simulator methods
      
      @see libecs
      @see Model
@@ -79,6 +78,13 @@ namespace libemc
 
     Simulator();
     virtual ~Simulator() {}
+
+
+    /**
+       @name Stepper methods.
+    */
+
+    //@{
 
     /**
        Create a new Stepper in the model.
@@ -194,6 +200,17 @@ namespace libemc
       return theSimulatorImplementation->getStepperClassName( aStepperID );
     }
 
+    //@}
+
+
+
+    /**
+       @name Entity methods.
+    */
+
+    //@{
+
+
     /**
        Create a new Entity in the model.
 
@@ -305,6 +322,17 @@ namespace libemc
       return theSimulatorImplementation->getEntityClassName( aFullIDString );
     }
 
+    //@}
+
+
+
+    /**
+       @name Logger methods.
+    */
+
+    //@{
+
+
     /**
        Create a Logger.
 
@@ -389,6 +417,15 @@ namespace libemc
       return theSimulatorImplementation->getLoggerSize( aFullPNString );
     }
 
+    //@}
+
+
+
+    /**
+       @name Simulator methods.
+    */
+
+    //@{
 
     /**
        Conduct a step of the simulation.
@@ -503,11 +540,16 @@ namespace libemc
        theSimulatorImplementation->setEventHandler( anEventHandler );
     }
 
+  //@}
+
   private:
 
     SimulatorImplementation* theSimulatorImplementation;
 
   };
+
+
+
 
   /** @} */ //end of libemc_module 
 
