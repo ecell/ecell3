@@ -58,9 +58,10 @@ class PropertyWindow(OsogoPluginWindow):
         
 		aNameFullPN = convertFullIDToFullPN( self.theFullID() ,'Name' )
 
-		aNameList = list( self.theSession.theSimulator.getEntityProperty( createFullPNString( aNameFullPN ) ) )
+		#aNameList = self.theSession.theSimulator.getEntityProperty( createFullPNString( aNameFullPN ) ) 
+		#aClassName = aNameList[0]
+		aClassName = self.theSession.theSimulator.getEntityProperty( createFullPNString( aNameFullPN ) ) 
 
-		aClassName = aNameList[0]
 		self.theType =ENTITYTYPE_STRING_LIST[ self.theFullID()[TYPE] ]
 		self.theID   = str( self.theFullID()[ID] )
 		self.thePath = str( self.theFullID()[SYSTEMPATH] )
