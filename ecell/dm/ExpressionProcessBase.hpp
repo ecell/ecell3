@@ -609,7 +609,7 @@ namespace libecs
     theFunctionMap["asin"] = asin;
     theFunctionMap["acos"] = acos;
     theFunctionMap["atan"] = atan;
-#ifndef __MINGW32__
+    /**#ifndef __MINGW32__
     theFunctionMap["fact"] = fact;
     theFunctionMap["asinh"] = asinh;
     theFunctionMap["acosh"] = acosh;
@@ -626,7 +626,7 @@ namespace libecs
     theFunctionMap["sec"] = sec;
     theFunctionMap["csc"] = csc;
     theFunctionMap["cot"] = cot;
-#endif    
+    #endif */   
   }
 
 
