@@ -19,6 +19,8 @@ class MainWindow(Window):
 
     def __init__( self ):
 
+        self.theSimulator = ecs.Simulator()
+
         # self.thePluginWindowManager = PluginWindowManager()
 
         Window.__init__( self )
@@ -70,7 +72,7 @@ class MainWindow(Window):
         #### ######## ####
         #### FOR TEST ####
         #### ######## ####
-        self.theSimulator = simulator()
+#        self.theSimulator = simulator()
 
 
     ###### window operation ####
@@ -82,17 +84,28 @@ class MainWindow(Window):
     def openRuleFileSelection( self, obj ) :
         self.theRuleFileSelection.show_all()
 
-    def loadRule( self, button_obj ) : pass
+    def loadRule( self, button_obj ) :
+        aFileName = self.theRuleFileSelection.get_filename()
+        self.theRuleFileSelection.hide()
+        aGlobalMap = { 'MainWindow' : self }
+        execfile( aFileName, aGlobalMap )
+        
+#          aModuleName = string.replace( aFilename, '.py', '' )
+#          aScript = 'import ' + aModuleName
+#          exec( aScript )
+#          aScript = 'aScriptModule = ' + aModuleName
+#          self.theSimulator = aModuleName.makeSimulator()
 
     ###### Load Script ######
     def openScriptFileSelection( self, obj ) :
         self.theScriptFileSelection.show_all()
-
+        
     def loadScript( self, button_obj ):
         aFileName = self.theScriptFileSelection.get_filename()
         self.theScriptFileSelection.hide()
         print aFileName
-        execfile(aFileName)
+        aGlobalNameMap = { 'aMainWindow' : self }
+        execfile(aFileName, aGlobalNameMap)
         
     ###### Save Cell State As ######
     def openSaveCellStateFileSelection( self, obj ) :
