@@ -38,10 +38,10 @@ namespace libemc
 
   using namespace libecs;
 
-  EmcLogger::EmcLogger( MessageSlotObject aMessageCallback )
+  EmcLogger::EmcLogger( MessageSlotObject aMessageSlotClass )
   {
     theLoggerImplementation = 
-      new LocalLoggerImplementation( aMessageCallback );
+      new LocalLoggerImplementation( aMessageSlotClass );
   }
 
 } // namespace libemc

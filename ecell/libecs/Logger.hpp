@@ -97,7 +97,7 @@ namespace libecs
        Constructor
     */
   
-    Logger( AbstractMessageCallbackCptr );
+    Logger( AbstractMessageSlotClassCptr );
   
     /**
        Copy constructor
@@ -184,9 +184,9 @@ namespace libecs
 
      */
 
-    void setMessageCallback( AbstractMessageCallbackCptr aMessageCallback )
+    void setMessageSlotClass( AbstractMessageSlotClassCptr aMessageSlotClass )
     {
-      theMessageCallbackCptr = aMessageCallback;
+      theMessageSlotClassCptr = aMessageSlotClass;
     }
 
   protected:
@@ -195,9 +195,9 @@ namespace libecs
 
      */
 
-    AbstractMessageCallbackCptr getMessageCallbackCptr( void ) const
+    AbstractMessageSlotClassCptr getMessageSlotClassCptr( void ) const
     {
-      return theMessageCallbackCptr;
+      return theMessageSlotClassCptr;
     }
   
   
@@ -255,7 +255,7 @@ namespace libecs
     /// Data members
 
     DataPointVector             theDataPointVector;
-    AbstractMessageCallbackCptr theMessageCallbackCptr;
+    AbstractMessageSlotClassCptr theMessageSlotClassCptr;
     Real                        theMinimumInterval;
     Real                        theCurrentInterval;
 

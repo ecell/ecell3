@@ -54,7 +54,7 @@ public:
   static void init_type();
 
   Object getData( const Tuple& args );
-  Object setMessageCallback( const Tuple& args );
+  Object setMessageSlotClass( const Tuple& args );
   Object update( const Tuple& args );
   
 

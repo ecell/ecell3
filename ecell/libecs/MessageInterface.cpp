@@ -70,7 +70,7 @@ namespace libecs
   }
 
   void MessageInterface::appendSlot( StringCref keyword, 
-				     AbstractMessageCallback* func )
+				     AbstractMessageSlotClass* func )
   {
     if( thePropertyMap.find( keyword ) != thePropertyMap.end() )
       {

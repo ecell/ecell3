@@ -38,9 +38,9 @@ namespace libemc
   using namespace libecs;
 
   LocalLoggerImplementation::
-  LocalLoggerImplementation( MessageSlotObject aMessageCallbackCptr )
+  LocalLoggerImplementation( MessageSlotObject aMessageSlotClassCptr )
     :
-    theLogger( Logger( aMessageCallbackCptr ) ) 
+    theLogger( Logger( aMessageSlotClassCptr ) ) 
   {
     ; // do nothing
   }

@@ -39,7 +39,7 @@
 namespace libemc
 {
 
-  typedef libecs::AbstractMessageCallbackCptr MessageSlotObject;
+  typedef libecs::AbstractMessageSlotClassCptr MessageSlotObject;
 
   class LocalLoggerImplementation
     :

@@ -38,7 +38,7 @@ PyLogger::PyLogger( void )
 
 PyLogger::PyLogger( MessageSlotObject aMessageSlot )
 {
-  EmcLogger::setMessageCallback( aMessageSlot );
+  EmcLogger::setMessageSlotClass( aMessageSlot );
 }
 
 void PyLogger::init_type()
@@ -47,7 +47,7 @@ void PyLogger::init_type()
   behaviors().doc("Logger Python class");
 
   add_varargs_method( "getData", &PyLogger::getData );
-  add_varargs_method( "setMessageCallback", &PyLogger::setMessageCallback );
+  add_varargs_method( "setMessageSlotClass", &PyLogger::setMessageSlotClass );
   add_varargs_method( "update", &PyLogger::update );
 }
 
@@ -60,7 +60,7 @@ Object PyLogger::getData( const Py::Tuple& args )
   return Py::Object();
 }
 
-Object PyLogger::setMessageCallback( const Py::Tuple& args )
+Object PyLogger::setMessageSlotClass( const Py::Tuple& args )
 {
   // FIXME
 

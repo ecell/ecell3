@@ -1,4 +1,4 @@
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+z//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //        This file is part of E-CELL Simulation Environment package
 //
@@ -40,20 +40,20 @@
 namespace libecs
 {
 
-  DECLARE_CLASS( AbstractMessageCallback );
+  DECLARE_CLASS( AbstractMessageSlotClass );
 
-  DECLARE_MAP( const String, AbstractMessageCallbackPtr, 
+  DECLARE_MAP( const String, AbstractMessageSlotClassPtr, 
 	       less<const String>, PropertyMap );
 
 
   /**
-     A base class for MessageCallback class.
+     A base class for MessageSlotClass class.
 
-     @see MessageCallback
+     @see MessageSlotClass
      @see MessageInterface
      @see Message
   */
-  class AbstractMessageCallback
+  class AbstractMessageSlotClass
   {
 
   public:
@@ -73,12 +73,12 @@ namespace libecs
 
      @see Message
      @see MessageInterface
-     @see AbstractMessageCallback
+     @see AbstractMessageSlotClass
   */
 
 
   template <class T>
-  class MessageCallback : public AbstractMessageCallback
+  class MessageSlotClass : public AbstractMessageSlotClass
   {
 
   public:
@@ -88,7 +88,7 @@ namespace libecs
 
   public:
 
-    MessageCallback( T& object, const SetMessageFunc setmethod,
+    MessageSlotClass( T& object, const SetMessageFunc setmethod,
 		     const GetMessageFunc getmethod )
       : 
       theObject( object ), 
@@ -142,7 +142,7 @@ namespace libecs
      FIXME: class-static slots?
 
      @see Message
-     @see MessageCallback
+     @see MessageSlotClass
   */
 
   class MessageInterface
@@ -155,7 +155,7 @@ namespace libecs
     void set( MessageCref );
     const Message get( StringCref );
 
-    PropertyMapIterator getMessageCallback( StringCref property )
+    PropertyMapIterator getMessageSlotClass( StringCref property )
     {
       return thePropertyMap.find( property );
     }
@@ -170,7 +170,7 @@ namespace libecs
 
   protected:
 
-    void appendSlot( StringCref keyword, AbstractMessageCallbackPtr );
+    void appendSlot( StringCref keyword, AbstractMessageSlotClassPtr );
     void deleteSlot( StringCref keyword );
 
   private:
@@ -181,10 +181,10 @@ namespace libecs
 
 
 #define MessageSlot( KEY, CLASS, OBJ, SETMETHOD, GETMETHOD )\
-appendSlot( KEY, new MessageCallback< CLASS >\
-	   ( OBJ, static_cast< MessageCallback< CLASS >::SetMessageFunc >\
+appendSlot( KEY, new MessageSlotClass< CLASS >\
+	   ( OBJ, static_cast< MessageSlotClass< CLASS >::SetMessageFunc >\
 	    ( SETMETHOD ),\
-	    static_cast< MessageCallback< CLASS >::GetMessageFunc >\
+	    static_cast< MessageSlotClass< CLASS >::GetMessageFunc >\
 	    ( GETMETHOD ) ) )
 
 

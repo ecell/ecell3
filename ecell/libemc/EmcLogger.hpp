@@ -71,10 +71,10 @@ namespace libemc
       return theLoggerImplementation->getData( start, end, interval );
     }
 
-    void setMessageCallback( MessageSlotObject aMessageCallback )
+    void setMessageSlotClass( MessageSlotObject aMessageSlotClass )
     {
       theLoggerImplementation = 
-	new LocalLoggerImplementation( aMessageCallback );
+	new LocalLoggerImplementation( aMessageSlotClass );
     }
 
     void update( void )
