@@ -95,7 +95,7 @@ namespace libecs
 						 RealCref anInterval ) const
   {
     const const_iterator aHeadIterator( theDataPointVector.begin() );
-    const const_iterator aTailIterator( theDataPointVector.end() );
+    const const_iterator aTailIterator( theDataPointVector.end() - 1 );
     
     const_iterator 
       aStartIterator( theDataPointVector.lower_bound( aHeadIterator,
@@ -106,11 +106,6 @@ namespace libecs
 						     aTailIterator,
 						     anEndTime ) );    
 
-    if( anEndIterator == aTailIterator )
-      {
-	--anEndIterator;
-      }
-    
     Real aTime( aStartIterator->getTime() );
     const Real aLastTime( anEndIterator->getTime() );
 
