@@ -132,17 +132,6 @@ namespace libecs
       theVelocity = 0.0; 
     }
 
-    virtual void turn()
-    {
-      // dummy. to be deleted 
-    }
-
-
-    virtual void integrate()
-    {
-      // dummy. to be deleted 
-    }
-
     void setVelocity( RealCref aVelocity )
     {
       theVelocity = aVelocity;
@@ -183,7 +172,7 @@ namespace libecs
        @see setQuantity
     */
 
-    void loadQuantity( RealCref aQuantity );
+    virtual void loadQuantity( RealCref aQuantity );
 
     /**
        This simply set the quantity of this Substance if isFixed() is false.
