@@ -147,7 +147,7 @@ Options:
                 else:
                     aSystemFullID = anEml.convertSystemID2SystemFullID( aSystemID )
                 anEriChunk = anEriLine[4].split()
-                print anEriChunk[1:]
+#                print anEriChunk[1:]
                 anEml.setEntityProperty( aSystemFullID, 'Volume', anEriChunk[1:] )
                 
             else:                                              # set other parameters
