@@ -50,6 +50,12 @@ namespace libecs
     
     virtual void step();
 
+    virtual const Real getContinuousVelocity( RealCref aTime, 
+					     UnsignedInt anIndex )
+    {
+      return 0;
+    }
+
     virtual StringLiteral getClassName() const { return "FixedEuler1Stepper"; }
 
 
@@ -69,6 +75,12 @@ namespace libecs
     static StepperPtr createInstance() { return new FixedRungeKutta4Stepper; }
 
     virtual void step();
+
+    virtual const Real getContinuousVelocity( RealCref aTime, 
+					     UnsignedInt anIndex )
+    {
+      return 0;
+    }
 
     virtual StringLiteral getClassName() const { return "FixedRungeKutta4Stepper"; }
 
@@ -94,6 +106,12 @@ namespace libecs
 
     bool calculate();
 
+    virtual const Real getContinuousVelocity( RealCref aTime, 
+					     UnsignedInt anIndex )
+    {
+      return 0;
+    }
+
     virtual StringLiteral getClassName() const { return "Euler1Stepper"; }
 
 
@@ -117,6 +135,12 @@ namespace libecs
     virtual void step();
 
     bool calculate();
+
+    virtual const Real getContinuousVelocity( RealCref aTime, 
+					     UnsignedInt anIndex )
+    {
+      return 0;
+    }
 
     virtual StringLiteral getClassName() const { return "Midpoint2Stepper"; }
 
@@ -143,6 +167,12 @@ namespace libecs
     virtual void step();
  
     bool calculate();
+
+    virtual const Real getContinuousVelocity( RealCref aTime, 
+					     UnsignedInt anIndex )
+    {
+      return 0;
+    }
 
     virtual StringLiteral getClassName() const { return "CashKarp4Stepper"; }
 
@@ -176,6 +206,12 @@ namespace libecs
     virtual void step();
  
     bool calculate();
+
+    virtual const Real getContinuousVelocity( RealCref aTime, 
+					     UnsignedInt anIndex )
+    {
+      return 0;
+    }
 
     virtual StringLiteral getClassName() const
     { 

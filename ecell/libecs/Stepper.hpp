@@ -200,6 +200,9 @@ namespace libecs
       return theStepInterval;
     }
 
+    virtual const Real getContinuousVelocity( RealCref aTime, 
+					     UnsignedInt anIndex ) = 0;
+
     void registerLoggedPropertySlot( PropertySlotPtr );
 
     const String getID() const
@@ -496,6 +499,8 @@ namespace libecs
 
     Real theTolerantStepInterval;
     Real theNextStepInterval;
+
+    Real theMaxErrorRatio;
   };
 
 

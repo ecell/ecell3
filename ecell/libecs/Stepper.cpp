@@ -641,7 +641,6 @@ namespace libecs
     //    setNextStepInterval( getStepInterval() );
   }
 
-
 } // namespace libecs
 
 
