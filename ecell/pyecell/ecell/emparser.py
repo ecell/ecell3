@@ -253,7 +253,7 @@ def p_propertylist(t):
 
 def p_property(t):
 	'''
-	property : name value SEMI
+	property : name valuelist SEMI
 	'''
 	if type(t[2]) == str:
 		t[2] = [t[2]]
@@ -290,9 +290,12 @@ def p_value(t):
 	value : quotedstring
               | name
               | number
-	      | matrixlist
+	      | LBRACKET valuelist RBRACKET
         '''
-	t[0] = t[1]
+	if t[1] == '[':
+		t[0] = t[2]
+	else:
+		t[0] = t[1]
         
 def p_valuelist(t):
         '''
@@ -301,18 +304,18 @@ def p_valuelist(t):
         '''
 	t[0] =  createListleft( t )
 	
-def p_matrix(t):
-	'''
-	matrix : LBRACKET valuelist RBRACKET
-        '''
-	t[0] = t[2]
+#def p_matrix(t):
+#	'''
+#	matrix : LBRACKET valuelist RBRACKET
+#        '''
+#	t[0] = t[2]
 	
-def p_matrixlist(t):
-        '''
-        matrixlist : matrixlist matrix
-                   | matrix
-        '''
-	t[0] =  createListleft( t )
+#def p_matrixlist(t):
+#        '''
+#        matrixlist : matrixlist matrix
+#                   | matrix
+#        '''
+#	t[0] =  createListleft( t )
 	
 def p_empty(t):
 	'''
