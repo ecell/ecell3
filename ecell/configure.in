@@ -3,11 +3,11 @@ AC_REVISION([$Id$])dnl
 dnl Process this file with autoconf to produce a configure script.
 
 
-VERSION=\"3.0.0\"
-PACKAGE=\"ecell\"
+dnl VERSION=\"3.0.0\"
+dnl PACKAGE=\"ecell\"
 
-AC_SUBST(VERSION)
-AC_SUBST(PACKAGE)
+dnl AC_SUBST(VERSION)
+dnl AC_SUBST(PACKAGE)
 
 AC_INIT(libecs/Entity.hpp)
 AM_INIT_AUTOMAKE(ecell,3.0.4)
@@ -42,7 +42,7 @@ AC_SUBST(LIBLTDL)
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 
-AM_PATH_PYTHON(2.0)
+AM_PATH_PYTHON(2.2)
 AC_SUBST(PYTHON)
 
 AC_LANG_CPLUSPLUS
@@ -191,6 +191,6 @@ pyecs/ecell3
 pyecell/Makefile
 pyecell/ecell/Makefile
 ,
-chmod +x pyecs/ecell3
+chmod +x pyecs/ecell3 libecs/emtool
 )
 
