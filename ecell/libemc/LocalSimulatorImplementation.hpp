@@ -91,6 +91,8 @@ namespace libemc
 
     virtual void run();
 
+    virtual void run( libecs::Real aDuration );
+
     virtual void stop();
 
     virtual void setPendingEventChecker( PendingEventCheckerFuncPtr

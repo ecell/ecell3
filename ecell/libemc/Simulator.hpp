@@ -119,6 +119,11 @@ namespace libemc
       theSimulatorImplementation->run();
     }
 
+    void run( libecs::Real aDuration )
+    {
+      theSimulatorImplementation->run( aDuration );
+    }
+
     void stop()
     {
       theSimulatorImplementation->stop();

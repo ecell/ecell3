@@ -160,6 +160,37 @@ namespace libemc
 
   }
 
+  void LocalSimulatorImplementation::run( libecs::Real aDuration )
+  {
+    assert( thePendingEventChecker != NULLPTR );
+    assert( theEventHandler != NULLPTR );
+
+    theRunningFlag = true;
+
+    libecs::Real aStopTime( theRootSystem.getStepperLeader().getCurrentTime() + aDuration );
+
+    do
+      {
+	if( theRootSystem.getStepperLeader().getCurrentTime() >= aStopTime )
+	  {
+	    theRunningFlag = false;
+	    break;
+	  }
+
+	step();
+
+	while( (*thePendingEventChecker)() )
+        {
+	  (*theEventHandler)();
+
+	  if( !theRunningFlag )
+	    break;
+	}
+
+      }	while( theRunningFlag );
+
+  }
+
   void LocalSimulatorImplementation::stop()
   {
     theRunningFlag = false;
