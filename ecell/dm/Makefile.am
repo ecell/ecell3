@@ -80,7 +80,6 @@ ODE45Stepper.hpp
 
 DESCS = \
 BisectionRapidEquilibriumProcess.desc\
-CashKarp45Stepper.desc\
 CatalyzedMassActionFluxProcess.desc\
 ConstantFluxProcess.desc\
 DAEStepper.desc\
