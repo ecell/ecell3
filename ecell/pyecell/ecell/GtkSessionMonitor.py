@@ -308,16 +308,19 @@ class GtkSessionMonitor(Session):
 		anEntityListWindow = None
 		# when Model is already loaded.
 		if len(self.theModelName) > 0:
-
 			# creates new EntityListWindow instance
 			anEntityListWindow = EntityListWindow.EntityListWindow( self )
 			anEntityListWindow.openWindow()
-
 			# saves the instance into map
 			self.theEntityListInstanceMap[ anEntityListWindow ] = None
 		
 			# updates all fundamental windows
 			self.updateFundamentalWindows()
+
+		else:
+			anEntityListWindow = EntityListWindow.EntityListWindow( None )
+			anEntityListWindow.openWindow()
+
 		return anEntityListWindow
 
 

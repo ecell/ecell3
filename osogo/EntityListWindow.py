@@ -30,7 +30,11 @@ class EntityListWindow(OsogoWindow):
 
 		# initializes parameters
 		self.theSelectedFullPNList = []
-		self.thePluginManager = aSession.thePluginManager
+
+		# fix me
+		if( self.theSession != None ):
+			self.thePluginManager = aSession.thePluginManager
+
 		self.thePluginInstanceSelection = None
 
 		self.theSelectedSystemIter = None
@@ -69,39 +73,86 @@ class EntityListWindow(OsogoWindow):
 		# calls initializes methods
 		# --------------------------------------------
 
+		if( self.theSession == None ):
+			self['search_button'].set_sensitive(0)
+			self['view_button'].set_sensitive(0)
+			self['search_entry'].set_sensitive(0)
+			self['plugin_optionmenu'].set_sensitive(0)
+		else:
+
+			self.__initializeSystemTree()
+			self.__initializeProcessTree()
+			self.__initializeVariableTree()
+
+			self.__initializePluginWindowOptionMenu()
+			self.__initializePropertyWindow()
+			self.__initializePopupMenu()
+
+
+			# --------------------------------------------
+			# initializes system tree
+			# --------------------------------------------
+			# set up system tree
+			self.theSysTreeStore.clear()
+			
+			# create route ID
+			aRootSystemFullID = createFullID( 'System::/' )
+			self.constructTree( None, aRootSystemFullID )
+			self.update()
+
+			# --------------------------------------------
+			# initializes buffer
+			# --------------------------------------------
+			self.theSelectedEntityList = []
+			self.theSelectedPluginInstanceList = []
+			
+			# --------------------------------------------
+			# initializes Add to Board button
+			# --------------------------------------------
+		        #self.checkBoardExists()
+		        self.CloseOrder = False
+
+	def setSession( self, aSession ):
+		self.theSession = aSession
+		self.thePluginManager = aSession.thePluginManager
+
+		self['search_button'].set_sensitive(1)
+		self['view_button'].set_sensitive(1)
+		self['search_entry'].set_sensitive(1)
+		self['plugin_optionmenu'].set_sensitive(1)
+
 		self.__initializeSystemTree()
 		self.__initializeProcessTree()
 		self.__initializeVariableTree()
-
+		
 		self.__initializePluginWindowOptionMenu()
 		self.__initializePropertyWindow()
 		self.__initializePopupMenu()
 
-
+		
 		# --------------------------------------------
 		# initializes system tree
 		# --------------------------------------------
 		# set up system tree
 		self.theSysTreeStore.clear()
-
+		
 		# create route ID
 		aRootSystemFullID = createFullID( 'System::/' )
 		self.constructTree( None, aRootSystemFullID )
 		self.update()
-
+		
 		# --------------------------------------------
 		# initializes buffer
 		# --------------------------------------------
 		self.theSelectedEntityList = []
 		self.theSelectedPluginInstanceList = []
-		
+			
 		# --------------------------------------------
 		# initializes Add to Board button
 		# --------------------------------------------
 		#self.checkBoardExists()
 		self.CloseOrder = False
-
-
+			
 	def checkBoardExists( self ):
 		if self.theSession.getWindow('BoardWindow').exists():
 			self['add_to_board'].set_sensitive(TRUE)
