@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.5  2003/04/02 11:42:18  shafi
+ :	my_open_to_read( off_t )
+ :
  :	Revision 1.4  2003/03/18 09:06:36  shafi
  :	logger performance improvement by gabor
- :
+ :	
  :	Revision 1.2  2003/02/03 15:31:56  shafi
  :	changed vvector cache sizes to 1024
  :	
@@ -120,7 +123,7 @@ protected:
 // protected methods
   void initBase(char const * const dirname);
   void my_open_to_append();
-  void my_open_to_read(long offset);
+  void my_open_to_read(off_t offset);
   void my_close();
 //  ssize_t my_direct_read(void* buffer, size_t num_to_read, off_t position);
 //  long get_logical_block_size();
