@@ -28,7 +28,6 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include <stdlib.h>
 #include "ReactorMaker.hpp"
 
 ////////////////////// ReactorMaker
@@ -36,16 +35,7 @@
 
 ReactorMaker::ReactorMaker()
 {
-  //FIXME:  addSearchPath(REACTOR_SO_DIR);
-
-  //  char* env = getenv("REACTOR_PATH");
-  //  if(env)
-  //    addSearchPath(env);
-
-  //FIXME: addSearchPath(Serizawa::REACTOR_PATH);
-
-  //FIXME:*theMessageWindow << "ReactorMaker: Reactor path = [" << searchPath()
-  //FIXME:	    << "].\n";
+  ; // do nothing
 }
 
 

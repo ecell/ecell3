@@ -30,11 +30,8 @@
 
 #ifndef ___ROOTSYSTEM_H___
 #define ___ROOTSYSTEM_H___
+
 #include "System.hpp"
-#include "SubstanceMaker.hpp"
-#include "ReactorMaker.hpp"
-#include "SystemMaker.hpp"
-#include "AccumulatorMaker.hpp"
 
 
 class RootSystem : public System
@@ -72,13 +69,13 @@ private:
 
 private:
 
-  StepperLeader    theStepperLeader;
+  StepperLeaderRef    theStepperLeader;
 
-  ReactorMaker     theReactorMaker;
-  SubstanceMaker   theSubstanceMaker;
-  SystemMaker      theSystemMaker;
-  StepperMaker     theStepperMaker;
-  AccumulatorMaker theAccumulatorMaker;
+  ReactorMakerRef     theReactorMaker;
+  SubstanceMakerRef   theSubstanceMaker;
+  SystemMakerRef      theSystemMaker;
+  StepperMakerRef     theStepperMaker;
+  AccumulatorMakerRef theAccumulatorMaker;
 
 };
 

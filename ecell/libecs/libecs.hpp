@@ -69,6 +69,8 @@ DECLARE_CLASS( SubstanceMaker );
 DECLARE_CLASS( System );
 DECLARE_CLASS( isRegularReactorItem );
 DECLARE_CLASS( SystemMaker );
+DECLARE_CLASS( Message );
+DECLARE_CLASS( MessageInterface );
 
 
 // exceptions

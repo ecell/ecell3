@@ -30,7 +30,6 @@
 
 #ifndef ___STEPPER_H___
 #define ___STEPPER_H___
-#include <stl.h>
 #include "libecs.hpp"
 
 typedef IntegratorPtr ( *IntegratorAllocator_ )( Substance& );

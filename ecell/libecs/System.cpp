@@ -28,8 +28,6 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include <memory>
-
 #include "System.hpp"
 #include "Reactor.hpp"
 #include "RootSystem.hpp"

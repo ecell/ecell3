@@ -30,7 +30,6 @@
 
 #ifndef ___REACTORMAKER_H___
 #define ___REACTORMAKER_H___
-#include <stl.h>
 #include "Reactor.hpp"
 #include "ModuleMaker.hpp"
 

@@ -31,7 +31,6 @@
 #include "Entity.hpp"
 #include "System.hpp"
 #include "FQPI.hpp"
-#include "RootSystem.hpp"
 #include "Stepper.hpp"
 
 

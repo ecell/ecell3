@@ -8,6 +8,8 @@ s = ecs.Simulator()
 print 'makePrimitive()...'
 s.makePrimitive('Substance','Substance:/:A','substance A')
 
+s.makePrimitive('ConstantParameterReactor','Reactor:/:RC1','constant')
+
 print 'sendMessage()...'
 s.sendMessage( 'Substance:/:A', 'quantity', '30' )
 

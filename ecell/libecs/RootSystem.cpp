@@ -28,10 +28,25 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "RootSystem.hpp"
+#include "SubstanceMaker.hpp"
+#include "ReactorMaker.hpp"
+#include "SystemMaker.hpp"
+#include "StepperMaker.hpp"
+#include "Stepper.hpp"
+#include "AccumulatorMaker.hpp"
 #include "FQPI.hpp"
 
+#include "RootSystem.hpp"
+
+
 RootSystem::RootSystem() 
+  :
+  theStepperLeader( *new StepperLeader ),
+  theReactorMaker( *new ReactorMaker ),
+  theSubstanceMaker( *new SubstanceMaker ),
+  theSystemMaker( *new SystemMaker ),
+  theStepperMaker( *new StepperMaker ),
+  theAccumulatorMaker( *new AccumulatorMaker )
 {
   setRootSystem( this );
   setSuperSystem( this );
@@ -39,7 +54,12 @@ RootSystem::RootSystem()
 
 RootSystem::~RootSystem()
 {
-  ; // do nothing
+  delete &theAccumulatorMaker;
+  delete &theStepperMaker;
+  delete &theSystemMaker;
+  delete &theSubstanceMaker;
+  delete &theReactorMaker;
+  delete &theStepperLeader;
 }
 
 void RootSystem::initialize()

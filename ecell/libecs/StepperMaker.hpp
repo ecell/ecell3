@@ -30,7 +30,6 @@
 
 #ifndef ___STEPPERMAKER_H___
 #define ___STEPPERMAKER_H___
-#include <stl.h>
 #include "Stepper.hpp"
 #include "ModuleMaker.hpp"
 

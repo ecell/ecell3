@@ -31,10 +31,9 @@
 #ifndef __STRINGLIST_H___
 #define __STRINGLIST_H___
 #include <stl.h>
-#include <string>
 #include "Defs.hpp"
 
-class StringList : public vector< String >
+class StringList : public vector<String>
 {
 
 public:

@@ -30,8 +30,6 @@
 
 #ifndef ___UTIL_H___
 #define ___UTIL_H___
-#include <string>
-#include <typeinfo>
 #include "Defs.hpp"
 #include "korandom/korandom.h"
 

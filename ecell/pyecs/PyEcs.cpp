@@ -10,6 +10,8 @@
 // PyEcs class     //
 //-----------------// 
 
+#include <dlfcn.h>
+
 PyEcs::PyEcs()
   :
   Py::ExtensionModule<PyEcs>( "ecs" )
@@ -18,6 +20,8 @@ PyEcs::PyEcs()
   add_varargs_method( "Simulator", 
 		      &PyEcs::createSimulator, 
 		      "Simulator( type = \"Local\" )" );
+  //  dlopen("./ecs.so",RTLD_NOW|RTLD_GLOBAL);
+
     
   initialize();
 }

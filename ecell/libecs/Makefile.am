@@ -1,14 +1,18 @@
 
-DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE@
+DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
 KORANDOM_INCLUDE=-I@KORANDOM_DIR@
+INCLTDL=@INCLTDL@
+LIBLTDL=@LIBLTDL@
+libdir=@libdir@
 
-INCLUDES = -I..  -I../include ${KORANDOM_INCLUDE} ${DMTOOL_INCLUDE}
+INCLUDES = -I..  -I../include ${KORANDOM_INCLUDE} ${DMTOOL_INCLUDE} ${INCLTDL}
 noinst_LTLIBRARIES = libecs.la
 
 CXXFLAGS= @CXXFLAGS@ 
 
-libecs_la_LDFLAGS=-static
-libecs_la_SOURCES =\
+libecs_la_LDFLAGS= -rpath ${libdir}
+libecs_la_LIBADD= ${LIBLTDL} -lstdc++
+libecs_la_SOURCES=\
 Util.cpp\
 StringList.cpp\
 Message.cpp\
@@ -29,3 +33,26 @@ Reactor.cpp\
 StepperMaker.cpp\
 SystemMaker.cpp
 
+libecsdir=${pkginclude}/libecs
+libecs_HEADERS=\
+libecs.hpp\
+Defs.hpp\
+Util.hpp\
+StringList.hpp\
+Message.hpp\
+MessageInterface.hpp\
+AccumulatorMaker.hpp\
+FQPI.hpp\
+ReactorMaker.hpp\
+Substance.hpp\
+Accumulators.hpp\
+Integrators.hpp\
+RootSystem.hpp\
+SubstanceMaker.hpp\
+Stepper.hpp\
+PrimitiveType.hpp\
+System.hpp\
+Entity.hpp\
+Reactor.hpp\
+StepperMaker.hpp\
+SystemMaker.hpp

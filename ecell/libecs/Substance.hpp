@@ -30,9 +30,6 @@
 
 #ifndef ___SUBSTANCE_H___
 #define ___SUBSTANCE_H___
-#include <cmath>
-#include <errno.h>
-#include <iostream.h>
 #include "libecs.hpp"
 #include "Entity.hpp"
 

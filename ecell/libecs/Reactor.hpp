@@ -32,8 +32,8 @@
 #define ___REACTOR_H___
 
 #include <climits>
-
 #include <stl.h>
+
 #include "libecs.hpp"
 #include "Entity.hpp"
 
@@ -66,7 +66,7 @@ public:
 	}
       return false;
     }
-    bool operator() ( const ReactorPtr r ) const
+    bool operator() ( ReactorCptr r ) const
     {
       return isRegularName( r->getId() );
     }

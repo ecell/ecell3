@@ -143,7 +143,7 @@ void Reactor::setInitialActivity( Float activity )
   theInitialActivity = activity;
   // FIXME: take delta T from supersystem
   theActivity= activity * 
-    getSuperSystem()->getRootSystem()->getStepperLeader().getDeltaT();
+    getSuperSystem()->getStepper()->getDeltaT();
 }
 
 Reactor::Reactor() 

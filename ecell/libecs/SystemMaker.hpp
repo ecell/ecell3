@@ -30,9 +30,7 @@
 
 #ifndef ___SYSTEMMAKER_H___
 #define ___SYSTEMMAKER_H___
-#include <stl.h>
 #include "System.hpp"
-#include "StepperMaker.hpp"
 #include "ModuleMaker.hpp"
 
 

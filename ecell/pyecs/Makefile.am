@@ -29,14 +29,20 @@ clean-local:
 	rm -f ${CXXSRC}
 
 noinst_LTLIBRARIES=ecs.la
-ecs_la_SOURCES=PyEcs.cpp PySimulator.cpp $(CXXSRC)
-ecs_la_LDFLAGS=-module -avoid-version -rpath /usr/local/lib
-ecs_la_LIBADD=$(ECELLDIR)/libecs/libecs.la $(ECELLDIR)/emc/libemc.la $(LIBKORANDOM) ${LIBLTDL} -lstdc++
-
-ecs.so: ecs.la
-	ln -s .libs/ecs.so .
+ecs_la_SOURCES=PyEcs.cpp PySimulator.cpp $(CXXSRC) 
+ecs_la_LDFLAGS=-module -export-dynamic -avoid-version -rpath /usr/local/lib
+ecs_la_LIBADD= -lstdc++
+#$(ECELLDIR)/emc/libemc.la $(ECELLDIR)/libecs/libecs.la $(LIBKORANDOM) ${LIBLTDL} 
 
 all-local: ecs.so
 
+ecs.so: ecs.la 
+	ln -sf .libs/ecs.so .
+
 clean-local:
 	rm -f ecs.so
+
+pyecsdir=${pkginclude}/pyecs
+pyecs_HEADERS=\
+PyEcs.hpp\
+PySimulator.hpp

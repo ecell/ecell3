@@ -31,13 +31,10 @@
 #ifndef ___SYSTEM_H___
 #define ___SYSTEM_H___
 #include <stl.h>
-#include <string>
 
 #include "libecs.hpp"
 
 #include "Entity.hpp"
-#include "Exceptions.hpp"
-#include "PrimitiveType.hpp"
 
 
 // Tree data structures used for entry lists

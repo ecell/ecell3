@@ -34,6 +34,7 @@
 #include "RootSystem.hpp"
 #include "Accumulators.hpp"
 #include "AccumulatorMaker.hpp"
+#include "PrimitiveType.hpp"
 #include "Util.hpp"
 
 const String Substance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "ReserveAccumulator";

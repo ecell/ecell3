@@ -28,16 +28,16 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "Util.hpp"
 #include "Integrators.hpp"
 #include "RootSystem.hpp"
+#include "Util.hpp"
 
 #include "Stepper.hpp"
 
 
 ////////////////////////// Stepper
 
-Stepper::Stepper() : theOwner(NULL)
+Stepper::Stepper() : theOwner( NULL )
 {
 
 }

@@ -32,7 +32,6 @@
 #define __PRIMITIVETYPE_HPP 
 
 #include "libecs.hpp"
-#include "Exceptions.hpp"
 
 enum PrimitiveType
 {
@@ -49,7 +48,6 @@ const String  PrimitiveTypeStringOf( PrimitiveType type );
 const String  PrimitiveTypeStringOf( StringCref fqpistring );
 
 
-// NOTE!!: not virtual methods
 StringCref  PrimitiveTypeStringOf( EntityCref );
 StringCref  PrimitiveTypeStringOf( ReactorCref ); 
 StringCref  PrimitiveTypeStringOf( SubstanceCref );

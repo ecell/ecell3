@@ -36,8 +36,12 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
 AM_DISABLE_STATIC
+AC_LIBLTDL_CONVENIENCE(../libltdl)
+AC_SUBST(INCLTDL)
+AC_SUBST(LIBLTDL)
 AC_LIBTOOL_DLOPEN
 AM_PROG_LIBTOOL
+
 
 AC_LANG_CPLUSPLUS
 
@@ -92,9 +96,10 @@ if test "$DMTOOL_DIR" = "" ; then
 
         AC_MSG_RESULT($ac_cv_dmtool_dir)
         DMTOOL_DIR=$ac_cv_dmtool_dir
-        DMTOOL_INCLUDE=$ac_cv_dmtool_dir/dmtool/include
+        DMTOOL_INCLUDE_DIR=$ac_cv_dmtool_dir/dmtool/include
 fi
-AC_SUBST(DMTOOL_INCLUDE)
+AC_SUBST(DMTOOL_DIR)
+AC_SUBST(DMTOOL_INCLUDE_DIR)
 dnl
 dnl
 dnl korandom package

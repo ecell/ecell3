@@ -30,7 +30,6 @@
 
 #ifndef ___ENTITY_H___
 #define ___ENTITY_H___
-#include <string>
 #include "libecs.hpp"
 #include "MessageInterface.hpp"
 

@@ -31,8 +31,7 @@
 #ifndef __MESSAGE_HPP
 #define __MESSAGE_HPP
 #include <string>
-#include <map>
-#include <vector>
+
 #include "libecs.hpp"
 #include "Exceptions.hpp"
 #include "StringList.hpp"

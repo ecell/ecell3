@@ -58,8 +58,8 @@ public:
 
 protected:
 
-  const String theMessage;
   const String theMethod;
+  const String theMessage;
 };
 
 #define DEFINE_EXCEPTION( CLASSNAME, BASECLASS )\

@@ -28,10 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include "Exceptions.hpp"
 #include "PrimitiveType.hpp"
-
-//FIXME: remove this
-#include "FQPI.hpp"
 
 const String PrimitiveTypeStringOf( PrimitiveType type )
 {
@@ -109,7 +107,6 @@ PrimitiveType PrimitiveTypeOf( StringCref typestring )
   return aType;
 }
 
-// NOTE!!: not virtual methods
 StringCref  PrimitiveTypeStringOf( EntityCref ) 
 {
   const static String aString( "Entity" );
