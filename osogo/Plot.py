@@ -11,7 +11,8 @@ import operator
 
 from ecell.ecssupport import *
 
-#class Plot, 
+#class Plot,
+ 
 #initializes graphics
 #changes screen, handles color allocation when adding/removing traces
 #clears plot areas on request, sets tityle
