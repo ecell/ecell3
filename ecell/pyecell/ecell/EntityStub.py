@@ -147,7 +147,7 @@ class EntityStub( ObjectStub ):
 
 		aFullPN = self.theFullIDString + ':' + aPropertyName	
 
-		self.theSimulator.setProperty( aFullPN, aValue )
+		self.theSimulator.setEntityProperty( aFullPN, aValue )
 
 	# end of setProperty
 
