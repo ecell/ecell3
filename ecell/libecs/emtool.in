@@ -155,12 +155,14 @@ cppfile=$base$CPPSUFFIX
 sofile=$base$SOSUFFIX
 
 
+CURRENTDIR=$(pwd)
+
+
 if [ $DO_ALL ] ; then 
 
     #copy dmfile to ETTMPDIR
     run_command "cp $inputfile $ETTMPDIR" 
 
-    CURRENTDIR=$(pwd)
     run_command "pushd $ETTMPDIR"     
     DO_GENERATE=yes
     DO_COMPILE=yes
