@@ -38,22 +38,41 @@ class MainWindow(Window):
         self.addHandlers( self.theHandlerMap)
          
         self.thePropertyClist = self.getWidget( "clist1" )
-        self.thePropertyName= self.getWidget( "label3" )
-
-
+        self.thePropertyListA = self.getWidget( "list7" )
+        self.thePropertyListB = self.getWidget( "list8" )
+        self.thePropertyListC = self.getWidget( "list9" )
+        
         #    def setName( self ):
         #        MainWindow.thePropertyEntity.set_text('EntytyName')
         #    setName( self )
-       
+
+
+    FQPPList = ['MichaMen','/CELL/CYTOPLASM','MichaelisMentenReactor']
+
+              
     def update( self ):
         aPropertyList = list( tmpget( 'PropertyList' ) )
-
+#        aFQPP = list( FQPP )
+        
         # remove keyword
         aPropertyList = aPropertyList[1:] 
         # remove PropertyList itself
         aPropertyList.remove( 'PropertyList' )
 
         self.thePropertyClist.clear()
+#        self.thePropertyListA.clear()
+#        self.thePropertyListB.clear()
+#        self.thePropertyListC.clear()
+
+#        for y in FQPPList:
+#            FQPPList = map( toString, FQPPList)
+#            print FQPPList
+            
+#        print FQPPList[0]
+
+         self.thePropertyListA.append( FQPPList[0] )
+#        self.thePropertyListB.append( FQPPdic[1] )
+#        self.thePropertyListC.append( FQPPdic[2] )
 
         for x in aPropertyList:
             aValueList = tmpget( x )
@@ -62,7 +81,7 @@ class MainWindow(Window):
             aValueList = map( toString, aValueList )
 
             self.thePropertyClist.append( aValueList )
-            print aValueList
+#            print aValueList
 
 
 def toString( object ):
@@ -77,7 +96,7 @@ def mainLoop():
     gtk.mainloop()
 
 def main():
-    aMainWindow = MainWindow( 'property_window.glade' )
+    aMainWindow = MainWindow( 'PropertyWindow.glade' )
     aMainWindow.addHandler( 'gtk_main_quit', mainQuit )    
     aMainWindow.update()
     mainLoop()

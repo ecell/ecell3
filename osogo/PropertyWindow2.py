@@ -47,6 +47,7 @@ class MainWindow(Window):
        
     def update( self ):
         aPropertyList = tmpget( 'PropertyList' )
+
         for x in aPropertyList:
             aValueList = tmpget( x )
             aName = aValueList[0]
@@ -69,7 +70,9 @@ def main():
     mainLoop()
     
 testdic={ 'PropertyList': ('PropertyList', 'A','B','C'),
-          'A': ('aaa',) ,'B': (1.04E-3,) ,'C': (41,) }
+          'A': ('aaa',) ,
+          'B': (1.04E-3,) ,
+          'C': (41,) }
 
 def tmpget( name ):
     aList = list(testdic[name])
@@ -79,9 +82,8 @@ def tmpget( name ):
 if __name__ == "__main__":
 
     main()
-    
         
-
+('A': ('aaa',))
 
 
 
