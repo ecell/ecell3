@@ -327,134 +327,13 @@ namespace libecs
 	      continue;
 	    }
 
-	  case ExpressionCompiler::EQ:
-	    {
-	      Real aStackTopValue( aStackPtr->theReal );
-	      --aStackPtr;
-
-	      if( aStackTopValue == aStackPtr->theReal )
-		{
-		  aStackPtr->theReal = 1.0;
-		}
-	      else
-		{
-		  aStackPtr->theReal = 0.0;
-		}
-
-
-	      INCREMENT_PC( EQ );
-	      continue;
-	    }
-
-	  case ExpressionCompiler::NEQ:
-	    {
-	      Real aStackTopValue( aStackPtr->theReal );
-	      --aStackPtr;
-	      
-	      aStackPtr->theReal =
-		Real( aStackPtr->theReal != aStackTopValue );
-
-	      INCREMENT_PC( NEQ );
-	      continue;
-	    }
-
-	  case ExpressionCompiler::GT:
-	    {
-	      Real aStackTopValue( aStackPtr->theReal );
-	      --aStackPtr;
-	      
-	      aStackPtr->theReal = Real( aStackPtr->theReal > aStackTopValue );
-
-	      INCREMENT_PC( GT );
-	      continue;
-	    }
-
-	  case ExpressionCompiler::GEQ:
-	    {
-	      Real aStackTopValue( aStackPtr->theReal );
-	      --aStackPtr;
-	      
-	      aStackPtr->theReal = 
-		Real( aStackPtr->theReal >= aStackTopValue );
-
-	      INCREMENT_PC( GEQ );
-	      continue;
-	    }
-
-	  case ExpressionCompiler::LT:
-	    {
-	      Real aStackTopValue( aStackPtr->theReal );
-	      --aStackPtr;
-	      
-	      aStackPtr->theReal = Real( aStackPtr->theReal < aStackTopValue );
-
-	      INCREMENT_PC( LT );
-	      continue;
-	    }
-
-	  case ExpressionCompiler::LEQ:
-	    {
-	      Real aStackTopValue( aStackPtr->theReal );
-	      --aStackPtr;
-	      
-	      aStackPtr->theReal =
-		Real( aStackPtr->theReal <= aStackTopValue );
-
-	      INCREMENT_PC( LEQ );
-	      continue;
-	    }
-
-	  case ExpressionCompiler::AND:
-	    {
-	      Real aStackTopValue( aStackPtr->theReal );
-	      --aStackPtr;
-	      
-	      aStackPtr->theReal =
-		Real( aStackTopValue && aStackPtr->theReal );
-
-	      INCREMENT_PC( AND );
-	      continue;
-	    }
-
-	  case ExpressionCompiler::OR:
-	    {
-	      Real aStackTopValue( aStackPtr->theReal );
-	      --aStackPtr;
-	      
-	      aStackPtr->theReal = 
-		Real( aStackTopValue || aStackPtr->theReal );
-
-	      INCREMENT_PC( OR );
-	      continue;
-	    }
-
-	  case ExpressionCompiler::XOR:
-	    {
-	      Real aStackTopValue( aStackPtr->theReal );
-	      --aStackPtr;
-	      
-	      aStackPtr->theReal = 
-		Real( aStackPtr->theReal && !( aStackTopValue ) );
-
-	      INCREMENT_PC( XOR );
-	      continue;
-	    }
-
-	  case ExpressionCompiler::NOT:
-	    {
-	      aStackPtr->theReal = !( aStackPtr->theReal );
-
-	      INCREMENT_PC( NOT );
-	      continue;
-	    }
-
 	  case ExpressionCompiler::CALL_FUNC1:
 	    {
               DECODE_INSTRUCTION( CALL_FUNC1 );
 
 	      aStackPtr->theReal
 		= ( anInstruction->getOperand() )( aStackPtr->theReal );
-	      
+
 	      INCREMENT_PC( CALL_FUNC1 );
 	      continue;
 	    }
@@ -462,7 +341,7 @@ namespace libecs
 	  case ExpressionCompiler::CALL_FUNC2:
 	    {
               DECODE_INSTRUCTION( CALL_FUNC2 );
-	      
+
 	      Real aStackTopValue( aStackPtr->theReal );
 	      --aStackPtr;
 
