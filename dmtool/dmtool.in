@@ -33,9 +33,9 @@ INSUFFIX=".rd"
 SOSUFFIX=".so"
 
 # internal variables. DO NOT EDIT BELOW
-OPTS="vcd::fho:st:T:I:"
+OPTS="vcdfho:st:T:I:"
 LONGOPTS=\
-"verbose,compile,docify,docify=:,force,help,outdir=:,strip,templatedir=:,tmpdir=:,test,includedir=:"
+"verbose,compile,docify=:,force,help,outdir=:,strip,templatedir:,tmpdir=:,includedir=:,test"
 
 unset VERBOSE DO_COMPILE DO_DOCIFY DO_STRIP FORCE CLASS TEST_MODE
 INCLUDES=""
@@ -126,6 +126,9 @@ fi
 CLASS=$1
 shift
 
+TEMPLATEDIR=$SHAREDIR/$CLASS/template
+
+
 #
 # parse remaining commandline options
 #
@@ -137,29 +140,39 @@ while true ; do
 	case "$1" in
 		-v|--verbose) VERBOSE=yes ; shift ;;
 		-c|--compile) DO_COMPILE=yes ; shift ;;
-		-d|--docify|docify=) DO_DOCIFY=yes 
+		-d|--docify|docify) DO_DOCIFY=yes 
 			case "$2" in
 				"") shift 2 ;;
 				*)  TEXOUT="$2" ; shift 2 ;;
 			esac ;;
 		-f|--force)  FORCE=yes ; shift ;;
-		-o|--outdir=) OUTDIR=$2 ; shift 2 ;;
+		-o|--outdir) OUTDIR=$2 ; shift 2 ;;
 		-s|--strip)  DO_STRIP=yes ; shift ;;
-		-t|--templatedir=) TEMPLATEDIR=$2 ; shift ;;
-		-T|--tmpdir=)      TMPDIR=$2 ; shift ;;
+		-t|--templatedir) TEMPLATEDIR=$2 ; shift 2 ;;
+		-T|--tmpdir)      TMPDIR=$2 ; shift 2 ;;
 		--test)		TEST_MODE=yes ; shift ;;
-		-I|--includedir=)  INCLUDES="$INCLUDES -I$2" ; shift ;;
+		-I|--includedir)  INCLUDES="$INCLUDES -I$2" ; shift 2 ;;
 		-h|--help) help ; exit 0 ;;
 		--) shift ; break ;;
-		*) echo "Internal error!" ; exit 1 ;;
+		*) echo "Internal error!"; exit 1 ;;
 	esac
 done
+
+# check if TEMPLATEDIR exists
+
+if [ ! -d $TEMPLATEDIR ] ; then
+	echo "Template directory for [$CLASS] class does not exist."
+	echo "(template directory = [$TEMPLATEDIR])"
+	exit 1
+fi
 
 
 #
 # initialize
 #
 initialize
+
+
 
 
 #
@@ -191,7 +204,7 @@ if [ $DO_COMPILE  ] ; then
 		fi
 
 		# make source files. (-> .[Ch])
-		run_command "$RD2CH $rdfile -d $DTTMPDIR -t $SHAREDIR/$CLASS/template"
+		run_command "$RD2CH $rdfile -d $DTTMPDIR -t $TEMPLATEDIR"
 		if [ $? = 0 ] ; then
 			:
 		else
