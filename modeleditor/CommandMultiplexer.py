@@ -25,10 +25,12 @@ class CommandMultiplexer:
 		returnCmdList = []
 		anIterator = self.theLayoutManager.createObjectIterator()
 		returnCmdList.append( aCmd )
-		if cmdType == "DeleteEntity":
+		if cmdType == "DeleteEntityList":
 			fullIDList = aCmd.theArgs[ aCmd.IDLIST ]
+			returnCmdList = []
 			for aFullID in fullIDList:
-				returnCmdList.extend( self.__deleteObjectsByFullID( aFullID) )
+				returnCmdList .extend( self.__deleteObjectsByFullID( aFullID) )
+			returnCmdList.append( aCmd )				
 
 		elif cmdType == "RenameEntity":
 			oldFullID = aCmd.theArgs[ aCmd.OLDID ]
@@ -113,7 +115,7 @@ class CommandMultiplexer:
 						newClass = DM_VARIABLE_CLASS
 					elif objectType == ME_SYSTEM_TYPE:
 						newClass = DM_SYSTEM_CLASS
-					print "creating new entity", objectFullID
+
 					createCmd = CreateEntity( self.theModelEditor, objectFullID, newClass )
 					returnCmdList.append( createCmd )
 		elif cmdType == "SetObjectProperty":
@@ -199,11 +201,11 @@ class CommandMultiplexer:
 						thePackingStrategy = anObject.getLayout().thePackingStrategy
 						relocateCommand = thePackingStrategy.autoMoveObject( targetSystemID, anObject.getID() )
 						returnCmdList.extend( relocateCommand )
-		elif cmdType == "DeleteObject":
-			aLayout = aCmd.theReceiver
-			objectID = aCmd.theArgs[ aCmd.OBJECTID ]
-			anObject = aLayout.getObject( objectID )
-			returnCmdList.extend( self.__deleteObjectsByID( anObject ) )
+#		elif cmdType == "DeleteObject":
+#			aLayout = aCmd.theReceiver
+#			objectID = aCmd.theArgs[ aCmd.OBJECTID ]
+#			anObject = aLayout.getObject( objectID )
+#			returnCmdList.extend( self.__deleteObjectByID( anObject ) )
 		elif cmdType == "PasteObject":
 			# construct real fullid
 			aBuffer = aCmd.theBuffer
@@ -358,6 +360,7 @@ class CommandMultiplexer:
 		cmdList = []
 		anIterator = self.theLayoutManager.createObjectIterator()
 		anIterator.filterByFullID( aFullID )
+
 		while True:
 			anObject = anIterator.getNextObject()
 			if anObject == None:
@@ -373,18 +376,18 @@ class CommandMultiplexer:
 		cmdList.append( deleteCommand )
 		# issue commands for deleting connections
 
-		objectType = anObject.getProperty( OB_TYPE )
-		if objectType == ME_VARIABLE_TYPE:
-			IDProperty = VR_CONNECTIONLIST
-		elif objectType == ME_PROCESS_TYPE:
-			IDProperty = PR_CONNECTIONLIST
-		else:
-			return cmdList
-		connectionList = anObject.getProperty( IDProperty )
-
-		for aConnection in connectionList:
-			deleteCommand = DeleteObject( aConnection.getLayout(), aConnection.getID() )
-			cmdList.append( deleteCommand )
+#		objectType = anObject.getProperty( OB_TYPE )
+#		if objectType == ME_VARIABLE_TYPE:
+#			IDProperty = VR_CONNECTIONLIST
+#		elif objectType == ME_PROCESS_TYPE:
+#			IDProperty = PR_CONNECTIONLIST
+#		else:
+#			return cmdList
+#		connectionList = anObject.getProperty( IDProperty )
+#
+#		for aConnection in connectionList:
+#			deleteCommand = DeleteObject( aConnection.getLayout(), aConnection.getID() )
+#			cmdList.append( deleteCommand )
 		return cmdList
 
 

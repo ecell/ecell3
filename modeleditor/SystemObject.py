@@ -15,7 +15,7 @@ class SystemObject(EditorObject):
 		self.theObjectMap = {}
 		self.thePropertyMap [ OB_SHAPE_TYPE ] = SHAPE_TYPE_SYSTEM
 		self.thePropertyMap [ OB_OUTLINE_WIDTH ] = 3
-
+		self.thePropertyMap[ OB_TYPE ] = OB_TYPE_SYSTEM
 		#default dimensions
 		self.thePropertyMap [ OB_DIMENSION_X ] = 200
 		self.thePropertyMap [ OB_DIMENSION_Y ] = 200
@@ -52,6 +52,9 @@ class SystemObject(EditorObject):
 	def registerObject( self, anObject ):
 		self.theObjectMap[anObject.getID()] = anObject
 
+
+	def unregisterObject ( self, anObjectID ):
+		self.theObjectMap.__delitem__( anObjectID )
 
 
 	def resize( self ,  deltaup, deltadown, deltaleft, deltaright  ):
@@ -117,8 +120,34 @@ class SystemObject(EditorObject):
 		return ( x+ self.theSD.insideX, y+self.theSD.insideY )
 
 
-	def outlineDragged( self, deltax, deltay, absx, absy ):
+	def getCursorType( self, aFunction, x, y, buttonPressed ):
+		aCursorType = EditorObject.getCursorType( self, aFunction, x, y, buttonPressed )
+		if aFunction == SD_SYSTEM_CANVAS and self.theLayout.getPaletteButton() != PE_SELECTOR:
+			aCursorType = CU_ADD
+		elif aFunction == SD_OUTLINE:
 
+			direction = self.getDirection( x, y )
+
+			if direction == DIRECTION_UP | DIRECTION_LEFT:
+				aCursorType = CU_RESIZE_TOP_LEFT
+			elif direction == DIRECTION_UP:
+				aCursorType = CU_RESIZE_LEFT
+			elif direction == DIRECTION_UP | DIRECTION_RIGHT:
+				aCursorType = CU_RESIZE_TOP_RIGHT
+			elif direction == DIRECTION_RIGHT:
+				aCursorType = CU_RESIZE_BOTTOM
+			elif direction == DIRECTION_LEFT:
+				aCursorType = CU_RESIZE_TOP
+			elif direction == DIRECTION_DOWN:
+				aCursorType = CU_RESIZE_RIGHT
+			elif direction == DIRECTION_DOWN | DIRECTION_RIGHT:
+				aCursorType = CU_RESIZE_BOTTOM_RIGHT
+			elif direction == DIRECTION_DOWN | DIRECTION_LEFT:
+				aCursorType = CU_RESIZE_BOTTOM_LEFT
+		return aCursorType
+
+
+	def getDirection( self, absx, absy ):
 		olw = self.getProperty( OB_OUTLINE_WIDTH )
 		width = self.getProperty( OB_DIMENSION_X )
 		height = self.getProperty( OB_DIMENSION_Y )
@@ -127,29 +156,38 @@ class SystemObject(EditorObject):
 		y = absy - offsety
 
 		direction = 0
-		deltaup = 0
-		deltadown = 0
-		deltaleft = 0
-		deltaright = 0
 		#upwards direction:
 		if x <= olw:
 			direction |= DIRECTION_UP
-			deltaleft = -deltax
 
 		# downwards direction
 		elif x>= width -olw:
 			direction |= DIRECTION_DOWN
-			deltaright = deltax
 
 
 		# leftwise direction
 		if y <= olw:
 			direction |= DIRECTION_LEFT
-			deltaup = - deltay
 
 		# rightwise direction
 		elif y>= height - olw:
 			direction |= DIRECTION_RIGHT
+		return direction
+
+
+	def outlineDragged( self, deltax, deltay, absx, absy ):
+		deltaup = 0
+		deltadown = 0
+		deltaleft = 0
+		deltaright = 0
+		direction = self.getDirection( absx, absy )
+		if direction & DIRECTION_UP == DIRECTION_UP:
+			deltaleft = -deltax
+		elif direction & DIRECTION_DOWN == DIRECTION_DOWN:
+			deltaright = deltax
+		if direction & DIRECTION_LEFT == DIRECTION_LEFT:
+			deltaup = - deltay
+		elif direction & DIRECTION_RIGHT == DIRECTION_RIGHT:
 			deltadown = deltay
 
 		if direction != 0:

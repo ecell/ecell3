@@ -17,9 +17,7 @@ class LayoutManager:
 
 	def createLayout( self, aLayoutName ):
 		# create and show
-		print ''
-		print 'LayoutManager createLayout'
-		print aLayoutName
+
 		if aLayoutName in self.theLayoutMap.keys():
 			raise Exception("Layout %s already exists!"%aLayoutName )
 		newLayout = Layout ( self, aLayoutName )
@@ -28,7 +26,6 @@ class LayoutManager:
 
 
 	def deleteLayout( self, aLayoutName ):
-		print 'Layout Manager deleteLayout'
 		aLayout = self.theLayoutMap[ aLayoutName ]
 		editorWindow = aLayout.getCanvas().getParentWindow()
 		aLayout.detachFromCanvas()
@@ -64,9 +61,7 @@ class LayoutManager:
 		if tryThisName == None:
 			tryThisName = 'Layout'
 		nameList = self.theLayoutMap.keys()
-		print ''
-		print nameList
-		print 'LayoutManager getUniqueLayoutName'
+
 		counter = 0
 		layoutName = tryThisName
 		while layoutName in nameList:
@@ -115,7 +110,7 @@ class ObjectIterator:
 	def reset( self ):
 		self.layoutList = self.theLayoutManager.getLayoutNameList()
 		self.objectList = []
-		self.currentLayoutID = None
+		self.currentLayout = None
 		self.currentObjectID = None
 	
 
@@ -124,19 +119,19 @@ class ObjectIterator:
 		self.reset()
 	
 	def filterByFullID( self, aFullID ):
-		filterList.append( [ "FULLID", aFullID ] )
+		self.filterList.append( [ "FULLID", aFullID ] )
 		
 	def filterByProperty( self, aPropertyName, aPropertyValue ):
-		filterList.append( [ "CUSTOMPROPERTY", aPropertyName, aPropertyValue ] )
+		self.filterList.append( [ "CUSTOMPROPERTY", aPropertyName, aPropertyValue ] )
 	
 	def filterByID( self, objectID ):
-		filterList.append( "ID", objectID )
+		self.filterList.append( "ID", objectID )
 
 
 	def getNextObject( self ):
 		# return first matching object self
-		while self.__getNextObject != None:
-			theLayout = self.theLayoutManager.getLayout( self.currentLayoutID )
+		while self.__getNextObject() != None:
+			theLayout = self.theLayoutManager.getLayout( self.currentLayout )
 			theObject = theLayout.getObject( self.currentObjectID )
 			if self.doesComply( theObject ):
 				return theObject	
@@ -163,7 +158,7 @@ class ObjectIterator:
 	def __getNextObject( self ):
 		# if no objectlist or currentobject at the end of objectlist, get next layout
 		if self.objectList != []:
-			curpos = self.objectList.find( currentObject ) 
+			curpos = self.objectList.index( self.currentObjectID ) 
 			if curpos != len( self.objectList ) - 1:
 				curpos += 1
 				self.currentObjectID = self.objectList[ curpos ]
@@ -185,14 +180,14 @@ class ObjectIterator:
 		if self.layoutList == []:
 			self.currentLayout = None
 			return None
-		if self.currentLayoutID == None:
+		if self.currentLayout == None:
 			curpos = 0
 		else:
-			curpos = self.layoutList.find( self.currentLayoutID )
+			curpos = self.layoutList.index( self.currentLayout )
 			curpos += 1
 		while curpos < len( self.layoutList ):
-			self.currentLayoutID = self.layoutList[0]
-			layout = self.theLayoutManager.getLayout( self.currentLayoutID )
+			self.currentLayout = self.layoutList[0]
+			layout = self.theLayoutManager.getLayout( self.currentLayout )
 			self.objectList = layout.getObjectList()
 			if self.objectList != []:
 				return None

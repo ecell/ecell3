@@ -110,7 +110,14 @@ class Layout:
 
 
 	def deleteObject( self, anObjectID ):
-		pass
+		#unselect
+		if self.theSelectedObjectID == anObjectID:
+			self.theSelectedObjectID = None
+		anObject = self.getObject( anObjectID )
+		aParent = anObject.getParent()
+		anObject.destroy()
+		aParent.unregisterObject( anObjectID )
+		self.theObjectMap.__delitem__( anObjectID )
 
 
 	def getObjectList( self, anObjectType = None ):

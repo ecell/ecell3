@@ -102,7 +102,8 @@ class PathwayEditor( ListWindow ):
 		# Sets the return PaletteButton value
 		self.__CurrPaletteButton = PE_SELECTOR
 		self.__OldPaletteButton = None
-		
+
+
 
 	def update( self, arg1 = None, arg2 = None):
 		if not self.exists():

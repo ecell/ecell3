@@ -246,7 +246,7 @@ class DeleteObject(LayoutCommand):
 
 	def do(self):
 		objectBuffer = self.theReceiver.theLayoutBufferFactory.createObjectBuffer( self.theReceiver.getName(), self.objectID )
-		self.theReverseCommandList = [ PasteObject( self.theReceiver, objectBuffer, None, None, None ) ]
+		self.theReverseCommandList = [ UndeleteObject( self.theReceiver, objectBuffer, None, None, None ) ]
 		
 		self.theReceiver.deleteObject(self.objectID)
 		return True
@@ -357,11 +357,47 @@ class PasteObject(LayoutCommand):
 
 
 	def createReverseCommand( self ):
-		self.theReverseCommandList = [ DeleteObject( self.theReceiver, self.objectID ) ]
+		self.theReverseCommandList = [ DeleteObject( self.theReceiver, self.theBuffer.getID() ) ]
 
 
 	def getAffected( self ):
 		return (self.RECEIVER, self.theReceiver )
+
+
+class UndeleteObject(LayoutCommand):
+	"""
+	args: objectid
+	"""
+	RECEIVER = 'Layout'
+	ARGS_NO = 4
+	BUFFER = 0
+	X = 1 # if None, get it from buffer
+	Y = 2 # if None get it from buffer
+	PARENT = 3 # cannot be None
+
+
+	def checkArgs( self ):
+		# no argument check - suppose call is right
+		self.theBuffer = self.theArgs[ self.BUFFER ]
+		self.x = self.theArgs[ self.X ]
+		self.y = self.theArgs[ self.Y ]
+		self.theParent = self.theArgs[ self.PARENT ]
+		self.theBuffer.undoFlag = True
+		return True
+
+
+	def do(self):
+		self.theReceiver.theLayoutBufferPaster.pasteObjectBuffer( self.theReceiver.getName(), self.theBuffer, self.x, self.y, self.theParent )
+		return True
+
+
+	def createReverseCommand( self ):
+		self.theReverseCommandList = [ ]
+
+
+	def getAffected( self ):
+		return (self.RECEIVER, self.theReceiver )
+
 
 
 class MoveObject(LayoutCommand):

@@ -1,4 +1,5 @@
 from gnome.canvas import *
+import gtk.gdk
 
 class PathwayCanvas( Canvas ):
 	
@@ -12,6 +13,22 @@ class PathwayCanvas( Canvas ):
 		whiteColor = aColorMap.alloc_color("white")
 		aStyle.bg[0] = whiteColor
 		aCanvas.set_style( aStyle )
+		self.theCursorList = [ \
+					gtk.gdk.Cursor( gtk.gdk.TOP_LEFT_ARROW ),
+					gtk.gdk.Cursor( gtk.gdk.FLEUR ),
+					gtk.gdk.Cursor( gtk.gdk.PLUS ),
+					gtk.gdk.Cursor( gtk.gdk.TOP_LEFT_CORNER ),
+					gtk.gdk.Cursor( gtk.gdk.TOP_SIDE ),
+					gtk.gdk.Cursor( gtk.gdk.TOP_RIGHT_CORNER ),
+					gtk.gdk.Cursor( gtk.gdk.RIGHT_SIDE ),
+					gtk.gdk.Cursor( gtk.gdk.BOTTOM_RIGHT_CORNER ),
+					gtk.gdk.Cursor( gtk.gdk.BOTTOM_SIDE ),
+					gtk.gdk.Cursor( gtk.gdk.BOTTOM_LEFT_CORNER ),
+					gtk.gdk.Cursor( gtk.gdk.LEFT_SIDE ) ]
+
+	def setCursor( self, aCursorType ):
+		aCursor = self.theCursorList[ aCursorType ]
+		self.theCanvas.window.set_cursor( aCursor )
 
 		
 	def getParentWindow( self ):

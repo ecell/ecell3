@@ -38,7 +38,11 @@ class ComplexShape:
 
 
 	def delete( self ):
-		pass
+		
+		for aShapeName in self.shapeMap.keys():
+			self.shapeMap[ aShapeName ].destroy()
+		
+			
 
 	def selected( self ):
 		self.isSelected = True
@@ -292,9 +296,14 @@ class ComplexShape:
 			self.parentObject.doSelect()
 
 
-	def rightClick ( self, shapeName, x, y ):
+		if self.getShapeDescriptor(shapeName)[SD_FUNCTION] == SD_FILL:
+			self.changeCursor( shapeName, x, y, True )
+
+
+	def rightClick ( self, shapeName, x, y, anEvent ):
 		# usually show menu
-		self.parentObject.showMenu()
+		self.parentObject.doSelect()
+		self.parentObject.showMenu( anEvent)
 
 
 	def mouseDrag( self, shapeName, deltax, deltay, origx, origy ):
@@ -317,6 +326,16 @@ class ComplexShape:
 	def addHandlers( self, canvasObject, aName ):
 		canvasObject.connect('event', self.rect_event, aName )
 
+	def releaseButton( self, shapeName, x, y ):
+		self.changeCursor( shapeName, x, y, False )
+
+	def mouseEntered( self, shapeName, x, y ):
+		self.changeCursor( shapeName, x, y )
+
+	def changeCursor( self, shapeName, x, y, buttonpressed  = False):
+		aFunction = self.getShapeDescriptor(shapeName)[SD_FUNCTION]
+		aCursorType = self.parentObject.getCursorType( aFunction, x, y , buttonpressed)
+		self.theCanvas.setCursor( aCursorType )
 
 
 	def rect_event( self, *args ):
@@ -333,11 +352,12 @@ class ComplexShape:
 
 				self.leftClick( shapeName, event.x, event.y )
 			elif event.button == 3:
-				self.rightClick(shapeName, event.x, event.y )
+				self.rightClick(shapeName, event.x, event.y, event )
 
 		elif event.type == gtk.gdk.BUTTON_RELEASE:
 			if event.button == 1:
 				self.buttonpressed = False
+				self.releaseButton(shapeName, event.x, event.y )
 
 		elif event.type == gtk.gdk.MOTION_NOTIFY:
 			if not self.buttonpressed:
@@ -353,4 +373,7 @@ class ComplexShape:
 		elif event.type == gtk.gdk._2BUTTON_PRESS:
 			if event.button == 1:
 				self.doubleClick( shapeName )
+
+		elif event.type == gtk.gdk.ENTER_NOTIFY:
+			self.mouseEntered( shapeName, event.x, event.y )
 

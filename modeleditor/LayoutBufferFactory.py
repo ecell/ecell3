@@ -31,10 +31,10 @@ class LayoutBufferFactory:
 			aLayoutBuffer.getSystemObjectListBuffer().addObjectBuffer( systemBuffer )
 
 		# copy all connections
-		connectionList = aLayout.getObjectList( OB_TYPE_CONNECTION )
-		for connectionID in connectionList:
-			connectionBuffer = self.createObjectBuffer( connectionID )
-			aLayoutBuffer.getConnectionObjectListBuffer().addObjectBuffer( connectionBuffer )
+		#connectionList = aLayout.getObjectList( OB_TYPE_CONNECTION )
+		#for connectionID in connectionList:
+		#	connectionBuffer = self.createObjectBuffer( connectionID )
+		#	aLayoutBuffer.getConnectionObjectListBuffer().addObjectBuffer( connectionBuffer )
 		# copy all textboxes whose parent is layout
 		textList = aLayout.getObjectList( OB_TYPE_TEXT )
 		for textID in connectionList:
@@ -47,7 +47,6 @@ class LayoutBufferFactory:
 
 
 	def createObjectBuffer( self, aLayoutName, anObjectID ):
-		# DONOT COPY CONNECTIONS!!! Multiplexing will take care of that
 		# but copy underlying entity
 		aLayout = self.theLayoutManager.getLayout( aLayoutName )
 		anObject = aLayout.getObject( anObjectID )
@@ -62,15 +61,17 @@ class LayoutBufferFactory:
 	def __createObjectBuffer ( self, anObject ):
 		# TEXT, VARIABLE, PROCESS
 		aType = anObject.getProperty( OB_TYPE )
+		aParent = anObject.getParent()
 		if aType == OB_TYPE_SYSTEM:
-			aBuffer = aBuffer = SystemObjectBuffer( aSystemObject.getID() )
+			aBuffer = SystemObjectBuffer( anObject.getID())
 		else:
 			aBuffer = ObjectBuffer( anObject.getID() )
+		aBuffer.theParent = aParent
 		propertyBuffer = aBuffer.getPropertyBuffer()
 		propertyList = anObject.getPropertyList()
 		for aProperty in propertyList:
 			aValue = anObject.getProperty( aProperty )
-			# block connection copying
+			# FIXME copy connections!
 			if aProperty in [ VR_CONNECTIONLIST, PR_CONNECTIONLIST ]:
 				continue
 			propertyBuffer.createProperty( aProperty, aValue )
@@ -129,50 +130,56 @@ class LayoutBufferPaster:
 		for aProperty in aPropertyList:
 			aValue = aBuffer.getProperty()
 			aLayout.setProperty( aProperty, aValue )
-		
+		translationList = []
 		# paste systemlistbuffer
-		self.__pasteObjectListBuffer( aBuffer.getSystemObjectListBuffer(), aLayout, newName )
-		self.__pasteObjectListBuffer( aBuffer.getTextObjectListBuffer(), aLayout, newName )
-		self.__pasteObjectListBuffer( aBuffer.getConnectionObjectListBuffer(), aLayout, newName )
+		self.__pasteObjectListBuffer( aBuffer.getSystemObjectListBuffer(), aLayout, newName, translationList )
+		#self.__pasteObjectListBuffer( aBuffer.getTextObjectListBuffer(), aLayout, newName )
+		#self.__pasteObjectListBuffer( aBuffer.getConnectionObjectListBuffer(), aLayout, newName )
 		
 
 	
-	def __pasteObjectListBuffer( self, listBuffer, aParent, aLayoutName ):
+	def __pasteObjectListBuffer( self, listBuffer, aParent, aLayoutName, translationList = None ):
 		objectList = listBuffer.getObjectBufferList()
+		aLayout = self.theLayoutManager.getLayout( aLayoutName )
 		for anObjectID in objectList:
 			aBuffer = listBuffer.getObjectBuffer( anObjectID )
-			self.pasteObjectBuffer( aLayoutName, aBuffer, None, None, aParent )
+			self.pasteObjectBuffer( aLayout, aBuffer, None, None, aParent, translationList = None)
 		
 		
 	
-	def pasteObjectBuffer( self, aLayoutName, aBuffer, x = None, y = None, theParent = '/' ):
+	def pasteObjectBuffer( self, aLayoutName, aBuffer, x = None, y = None, theParent = '/', translationList = None):
 		# dont create connections and entities
 		aLayout = self.theLayoutManager.getLayout( aLayoutName )
 		aType = aBuffer.getProperty( OB_TYPE )
+		if translationList != None:
+			translationList = []
 		if aType == OB_TYPE_SYSTEM:
-			self.__pasteSystemObjectBuffer( aLayout, aType, aBuffer, x, y, theParent )
-		elif aType == OB_TYPE_CONNECTION:
-			self.__pasteConnectionObjectBuffer( aLayout, aBuffer )
+			self.__pasteSystemObjectBuffer( aLayout, aType, aBuffer, x, y, theParent, translationList )
 		else:
-			self.__pasteObjectBuffer( aLayout, aType, aBuffer, x, y, theParent )
+			self.__pasteObjectBuffer( aLayout, aType, aBuffer, x, y, theParent, translationList )
+		self.__pasteObjectConnections( aLayout, aBuffer, theParent, translationList )
 
 
 
-	def __pasteObjectBuffer( self, aLayout, aType, aBuffer, x, y, theParent ):
+	def __pasteObjectBuffer( self, aLayout, aType, aBuffer, x, y, theParent, translationList ):
+
 		if x == None:
 			x = aBuffer.getProperty( OB_POS_X )
 		if y == None:
 			y = aBuffer.getProperty( OB_POS_Y )
-
 		aFullID = None
 		if aBuffer.getProperty( OB_HASFULLID ):
 			aFullID = aBuffer.getProperty( OB_FULLID )
+
 		# get ID
-		anID = aBuffer.getID()
-		if anID in aLayout.getObjectList( aType ):
-			anID = aLayout.getUniqueObjectID()
-		aLayout.createObject( anID, aType, aFullID, x, y, theParent  )
-		anObject = aLayout.getObject( anID )
+		oldID = aBuffer.getID()
+		if aBuffer.undoFlag:
+			newID = oldID
+			theParent = aBuffer.theParent
+		else:
+			newID = aLayout.getUniqueObjectID( aType )
+		aLayout.createObject( newID, aType, aFullID, x, y, theParent  )
+		anObject = aLayout.getObject( newID )
 		propertyList = aBuffer.getPropertyList()
 		for aProperty in propertyList:
 			aValue = aBuffer.getProperty( aProperty )
@@ -181,28 +188,44 @@ class LayoutBufferPaster:
 
 		
 
-	def __pasteSystemObjectBuffer( self,  aLayout, aType, aBuffer, x, y, theParent ):
-		aSystem = self.__pasteObjectBuffer( aLayout, aType, aBuffer, x, y, theParent )
+	def __pasteSystemObjectBuffer( self,  aLayout, aType, aBuffer, x, y, theParent, translationList ):
+		aSystem = self.__pasteObjectBuffer( aLayout, aType, aBuffer, x, y, theParent, translationList )
 		aLayoutName = aLayout.getName( )
+		self.__pasteObjectListBuffer(  aBuffer.getSingleObjectListBuffer(), aSystem, aLayoutName, translationList )
+		self.__pasteObjectListBuffer(  aBuffer.getSystemObjectListBuffer(), aSystem, aLayoutName, translationList )
 		
-		self.__pasteObjectListBuffer( self, aBuffer.getSingleObjectListBuffer, aSystem, aLayoutName )
-		self.__pasteObjectListBuffer( self, aBuffer.getSystemObjectListBuffer, aSystem, aLayoutName )
 		
-		
-	def __pasteConnectionObjectBuffer( self, aLayout, aBuffer ):
-		# makes sense only when copying layouts
-		anID = aBuffer.getID()
-		if anID in aLayout.getObjectList( OB_TYPE_CONNECTION ):
-			anID = aLayout.getUniqueObjectID()
-		processID = aBuffer.getProperty( CO_PROCESS_ATTACHED ).getID()
-		variableID = aBuffer.getProperty( CO_VARIABLE_ATTACHED ).getID()
-		processRing = aBuffer.getProperty( CO_PROCESS_RING )
-		variableRing = aBuffer.getProperty( CO_VARIABLE_RING )
-		aVarrefName = aBuffer.getProperty( CO_NAME )
-		direction = aBuffer.getProperty( CO_DIRECTION )
-		aLayout.createConnectionObject( anID, processID , variableID,  processRing, variableRing, direction, aVarrefName )
-		anObject = aLayout.getObject( anID )
-		propertyList = aBuffer.getPropertyList()
-		for aProperty in propertyList:
-			aValue = aBuffer.getProperty( aProperty )
-			anObject.setProperty( aProperty, aValue )
+#	def __pasteConnectionObjectBuffer( self, aLayout, aBuffer ):
+#		# makes sense only when copying layouts
+#		anID = aBuffer.getID()
+#		if anID in aLayout.getObjectList( OB_TYPE_CONNECTION ):
+#			anID = aLayout.getUniqueObjectID()
+#		processID = aBuffer.getProperty( CO_PROCESS_ATTACHED ).getID()
+#		variableID = aBuffer.getProperty( CO_VARIABLE_ATTACHED ).getID()
+#		processRing = aBuffer.getProperty( CO_PROCESS_RING )
+#		variableRing = aBuffer.getProperty( CO_VARIABLE_RING )
+#		aVarrefName = aBuffer.getProperty( CO_NAME )
+#		direction = aBuffer.getProperty( CO_DIRECTION )
+#		aLayout.createConnectionObject( anID, processID , variableID,  processRing, variableRing, direction, aVarrefName )
+#		anObject = aLayout.getObject( anID )
+#		propertyList = aBuffer.getPropertyList()
+#		for aProperty in propertyList:
+#			aValue = aBuffer.getProperty( aProperty )
+#			anObject.setProperty( aProperty, aValue )
+
+	def __pasteObjectConnections( self, aLayout, aBuffer, theParent, translationList, pastedList = [] ):
+		pass
+		# FIXME!!!
+		# if system:
+			# get singleobjectlist cycle through it, call self
+
+			# get systemobjectlist, cycle through it, call self
+
+
+		# if process or variable
+			# get connectionlist
+				# get connectionID
+				# if on pastedList skip
+				# get process or variableid
+				# if not on translationlist and not none skip
+				# paste connection buffer

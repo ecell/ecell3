@@ -1,6 +1,8 @@
 from ComplexShape import *
 from Constants import *
 from LayoutCommand import *
+import gtk
+from EntityCommand import *
 
 class EditorObject:
 
@@ -13,6 +15,7 @@ class EditorObject:
 		self.thePropertyMap[ OB_POS_X ] = x
 		self.thePropertyMap[ OB_POS_Y ] = y
 		self.thePropertyMap[ OB_HASFULLID ] = False
+
 		self.theCanvas = None
 		self.theShape = None
 		# default colors
@@ -28,7 +31,8 @@ class EditorObject:
 
 
 	def destroy(self):
-		pass
+		if self.theShape != None:
+			self.theShape.delete()
 
 	def hide( self ):
 		# deletes it from canvas
@@ -53,10 +57,22 @@ class EditorObject:
 
 
 
-	def showMenu( self ):
-		print "object rightclicked"
-		pass
-	
+	def showMenu( self, anEvent ):
+		aMenuDict = self.getMenuItems()
+		if aMenuDict.keys() == []:
+			return
+		aMenu = gtk.Menu()
+
+		for aMenuName in aMenuDict.keys():
+			menuItem = gtk.MenuItem( aMenuName )
+			menuItem.connect( 'activate', aMenuDict[ aMenuName ] )
+			aMenu.add(menuItem)
+		self.theMenu = aMenu
+		aMenu.show_all()
+		aMenu.popup(None, None, None, anEvent.button, anEvent.time)
+
+
+
 	def outlineDragged( self, deltax, deltay, x, y ):
 		# in most of the cases object are not resizeable, only system is resizeable and it will override this
 		self.objectDragged( )
@@ -102,13 +118,8 @@ class EditorObject:
 
 
 	def show( self ):
-
 		self.theShape = ComplexShape( self, self.theCanvas, self.thePropertyMap[ OB_POS_X ], self.thePropertyMap[ OB_POS_Y ], self.thePropertyMap[ OB_DIMENSION_X ], self.thePropertyMap[ OB_DIMENSION_Y ] )
 		self.theShape.show()
-
-
-	def setDetailMode( self, aDetailMode ):
-		pass
 
 
 	def setProperty( self, aPropertyName, aPropertyValue ):
@@ -120,11 +131,11 @@ class EditorObject:
 		if aPropertyName in self.thePropertyMap.keys():
 			return self.thePropertyMap[aPropertyName]
 		else:
-			raise Exception("Unknown property %s for object %s"%(self.theName, self.theID ) )
+			raise Exception("Unknown property %s for object %s"%(aPropertyName, self.theID ) )
 
 
 	def getPropertyList( self ):
-		pass
+		return self.thePropertyMap.keys()
 
 
 	def getAbsolutePosition( self ):
@@ -132,19 +143,11 @@ class EditorObject:
 		return ( xpos + self.thePropertyMap[ OB_POS_X ], ypos + self.thePropertyMap[ OB_POS_Y ] )
 
 
-	def getSize( self ):
-		pass
-
-
-	def getRelativePosition( self ):
-		pass
-
-
 	def getPropertyMap( self ):
-		pass
+		return self.thePropertyMap
 
 	def setPropertyMap( self, aPropertyMap ):
-		pass
+		self.thePropertyMap = aPropertyMap
 
 	def getID( self ):
 		return self.theID
@@ -154,7 +157,7 @@ class EditorObject:
 
 
 	def getParent( self ):
-		return self.parentObject()
+		return self.parentSystem
 
 	def getGraphUtils( self ):
 		return self.theLayout.graphUtils()
@@ -162,7 +165,38 @@ class EditorObject:
 	def getModelEditor( self ):
 		return self.theLayout.theLayoutManager.theModelEditor
 
+	def getCursorType( self, aFunction, x, y, buttonPressed ):
+		if aFunction in [ SD_FILL, SD_TEXT ] and buttonPressed:
+			return CU_MOVE
+		elif aFunction  in [ SD_FILL, SD_TEXT ] and not buttonPressed:
+			return CU_POINTER
+		return CU_POINTER
+
 	def move( self, deltax, deltay ):
 		self.thePropertyMap[ OB_POS_X ] += deltax
 		self.thePropertyMap[ OB_POS_Y ] += deltay
 		self.theShape.move( deltax, deltay )
+
+	def getMenuItems( self, aSubMenu = None ):
+		menuDict = {}
+		if self.parentSystem.__class__.__name__ != 'Layout':
+			menuDict [ 'delete from layout'] = self.__userDeleteObject 
+			if self.getProperty( OB_HASFULLID ):
+				menuDict['delete_from_model'] = self.__userDeleteEntity 
+		return menuDict
+
+	def __userDeleteObject( self, *args ):
+		self.theMenu.destroy()
+		aCommand = DeleteObject( self.theLayout, self.theID )
+		self.theLayout.passCommand( [ aCommand ] )
+
+
+	def __userDeleteEntity ( self, *args ):
+
+		self.theMenu.destroy()
+		aModelEditor = self.theLayout.theLayoutManager.theModelEditor
+		aFullID = self.getProperty( OB_FULLID )
+		aCommand = DeleteEntityList( aModelEditor, [aFullID ] )
+		self.theLayout.passCommand( [ aCommand ] )
+
+

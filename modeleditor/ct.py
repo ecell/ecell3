@@ -33,29 +33,46 @@ def rect_event( *args ):
 		item.move(deltax,deltay)
 		
 	elif event.type == gtk.gdk._2BUTTON_PRESS:
-		gdkc = item.get_property("fill_color_gdk")
 
-		newgdkc = gdkc.copy()
-		newgdkc.red= gdkc.red+10000
-		newgdkc.green= gdkc.green+20000
-		newgdkc.blue= gdkc.blue+40000
+#		myobj.buttonpressed = False
+#		item.destroy()
+#		pass
+#		gdkc = item.get_property("fill_color_gdk")
+
+#		newgdkc = gdkc.copy()
+#		newgdkc.red= gdkc.red+10000
+#		newgdkc.green= gdkc.green+20000
+#		newgdkc.blue= gdkc.blue+40000
 		
-		item.set_property("fill_color_gdk", newgdkc)
-		x2 = item.get_property("x2" )
-		y2 = item.get_property("y2")
-		x2+=3
-		y2+=5
-		item.set_property("x2", x2)
-		item.set_property("y2", y2)
+#		item.set_property("fill_color_gdk", newgdkc)
+#		x2 = item.get_property("x2" )
+#		y2 = item.get_property("y2")
+#		x2+=3
+#		y2+=5
+#		item.set_property("x2", x2)
+#		item.set_property("y2", y2)
 
 
-#		myobj.c_size += 0.5
+		myobj.c_size += 0.5
 #		pangosize = 1024 * myobj.c_size
 #		myobj.pgfd.set_size( pangosize )
-#		canv.set_pixels_per_unit(myobj.c_size)
+		canv.set_pixels_per_unit(myobj.c_size)
 #		print myobj.pgfd.get_size()
 #		print myobj.pgfd.to_string()
 #		myobj.text.set_property('font-desc', myobj.pgfd )
+	elif event.type == gtk.gdk.ENTER_NOTIFY:
+		print "enter window", event.x, event.y
+
+def canv_event(  *args ):
+	pass
+	event = args[1]
+	item = args[0]
+	if event.type == gtk.gdk.ENTER_NOTIFY:
+		print "enter canvas ", event.x, event.y
+
+		
+
+
 
 def setup_canvas( myobj ):
 	canv.set_scroll_region(0,0,200,200)
@@ -67,7 +84,7 @@ def setup_canvas( myobj ):
 	myobj.text = rt.add( gnome.canvas.CanvasText, x=30, y=30, text="anyad!", fill_color="red", scale = 4, scale_set= True )
 	myobj.pgfd = myobj.text.get_property("font-desc").copy()
 	#rect.move(100,100)0,200)
-	canv.set_pixels_per_unit(0.5)
+
 	rect.connect('event', rect_event, myobj)
 	line.connect('event', rect_event, myobj)
 	#rt.connect('event', rect_event)
@@ -86,6 +103,7 @@ class myclass:
 		self.pgfd = None
 
 w= gtk.Window()
+
 w.set_title("Test gnome canvas")
 w.connect("delete-event", window_deleted)
 v=gtk.VBox()
@@ -108,5 +126,7 @@ color = colormap.alloc_color("white")
 color.red =1000
 style2.bg[0] = color
 canv.set_style(style2)
-
+canv.connect('leave-notify-event', canv_event )
+canv.connect('enter-notify-event', canv_event )
+canv.window.set_cursor( gtk.gdk.Cursor(gtk.gdk.FLEUR ) )
 gtk.mainloop()

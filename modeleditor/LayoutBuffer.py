@@ -7,6 +7,8 @@ class ObjectBuffer:
 		self.theID = anID
 		self.thePropertyBuffer = PropertyListBuffer()
 		self.theEntityBuffer = None
+		self.theParent = None
+		self.undoFlag = False
 
 	def getID( self ):
 		return self.theID
@@ -51,6 +53,7 @@ class ObjectListBuffer:
 class SystemObjectBuffer(ObjectBuffer):
 
 	def __init__( self, anID ):
+		ObjectBuffer.__init__( self, anID )
 		self.theSingleObjectListBuffer = ObjectListBuffer()
 		self.theSystemObjectListBuffer = ObjectListBuffer()
 
