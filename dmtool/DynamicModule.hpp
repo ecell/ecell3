@@ -57,11 +57,16 @@ public:
     ; // do nothing
   }
 
+  ~DMException() throw()
+  {
+    ; // do nothing
+  }
+
   /**
      Get dynamically created exception message.
    */
 
-  const char* what() const
+  const char* what() const throw()
   { 
     return theMessage.c_str(); 
   }
