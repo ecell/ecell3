@@ -170,10 +170,10 @@ namespace libemc
   }
 
   const libecs::Polymorph LocalSimulatorImplementation::
-  getEntityList( libecs::Int anEntityTypeNumber,
+  getEntityList( libecs::StringCref anEntityTypeString,
 		 libecs::StringCref aSystemPathString ) const
   {
-    const libecs::EntityType anEntityType( anEntityTypeNumber );
+    const libecs::EntityType anEntityType( anEntityTypeString );
     const libecs::SystemPath aSystemPath( aSystemPathString );
 
     if( aSystemPath.size() == 0 )

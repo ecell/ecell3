@@ -453,9 +453,7 @@ class EntityListWindow(OsogoWindow):
 	# create list of Entity tree
 	def listEntity( self, aEntityTypeString, aSystemFullID ):
 
-		aListPN = aEntityTypeString + 'List'
-		aListFullPN = convertFullIDToFullPN( aSystemFullID, aListPN )
-		aEntityList = self.theMainWindow.theSession.theSimulator.getEntityProperty( createFullPNString( aListFullPN ) )
+		aEntityList = self.theMainWindow.theSession.getEntityList( aEntityTypeString, createSystemPathFromFullID( aSystemFullID ) )
 
 		if aEntityTypeString == 'Variable':
 			aEntityType = VARIABLE

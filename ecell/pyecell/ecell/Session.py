@@ -507,9 +507,9 @@ class Session:
     
     def __saveEntity( self, anEml, aSystemPath='/' ):
 
-        aVariableList = self.getEntityList(  2, aSystemPath )
-        aProcessList   = self.getEntityList( 3, aSystemPath )
-        aSubSystemList = self.getEntityList( 4, aSystemPath )
+        aVariableList = self.getEntityList(  'Variable', aSystemPath )
+        aProcessList   = self.getEntityList( 'Process', aSystemPath )
+        aSubSystemList = self.getEntityList( 'System', aSystemPath )
         
         self.__saveEntityList( anEml, 'System',   aSystemPath, aSubSystemList )
         self.__saveEntityList( anEml, 'Variable', aSystemPath, aVariableList )
@@ -536,9 +536,12 @@ class Session:
         # the default of aSystemPath is empty because
         # unlike __loadEntity() this starts with the root system
 
-        aVariableList  = self.theSimulator.getEntityList( 2,  aSystemPath )
-        aProcessList   = self.theSimulator.getEntityList( 3,  aSystemPath )
-        aSubSystemList = self.theSimulator.getEntityList( 4,  aSystemPath )
+        aVariableList  = self.theSimulator.getEntityList( 'Variable',\
+                                                          aSystemPath )
+        aProcessList   = self.theSimulator.getEntityList( 'Process',\
+                                                          aSystemPath )
+        aSubSystemList = self.theSimulator.getEntityList( 'System',\
+                                                          aSystemPath )
 
         self.__savePropertyList( anEml, 'Variable', \
                                  aSystemPath, aVariableList )

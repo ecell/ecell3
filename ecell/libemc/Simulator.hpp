@@ -245,10 +245,10 @@ namespace libemc
     */
 
     const libecs::Polymorph 
-    getEntityList( libecs::Int anEntityTypeNumber,
+    getEntityList( libecs::StringCref anEntityTypeString,
 		   libecs::StringCref aSystemPathString ) const
     {
-      return theSimulatorImplementation->getEntityList( anEntityTypeNumber,
+      return theSimulatorImplementation->getEntityList( anEntityTypeString,
 							aSystemPathString );
     }
 

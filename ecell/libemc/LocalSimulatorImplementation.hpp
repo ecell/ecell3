@@ -87,7 +87,7 @@ namespace libemc
     virtual void deleteEntity( libecs::StringCref aFullIDString );
 
     virtual const libecs::Polymorph 
-    getEntityList( libecs::Int anEntityTypeNumber,
+    getEntityList( libecs::StringCref anEntityTypeString,
 		   libecs::StringCref aSystemPathString ) const;
 
     virtual const libecs::Polymorph 
