@@ -1,7 +1,5 @@
 %Id: README,v 1.0 2002/10/18 17:34 yoyo Exp %
 
-
-
 === About ===
 
 This is a model of the oscillating Drosophila period protein(PER),
@@ -30,7 +28,7 @@ Drosophila.em:  Model file(em file) for this model
 
 2. Compile .cpp files.
 
-   Run emtool -a for each .cpp file.
+   Run ecell3-dmc for each .cpp file.
 
    % ecell3-dmc ...cpp
 
