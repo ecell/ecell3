@@ -122,19 +122,19 @@ class MainWindow(Window):
         mainQuit()
 
     def startSimulation( self, a ) :
-        self.printMessage( "start\n" )
+        self.printMessage( "Start\n" )
         self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.updateByTimeOut, 0)
         self.theSimulator.run()
         self.update()
 
     def stopSimulation( self, a ) :
-        self.printMessage( "stop\n" )
+        self.printMessage( "Stop\n" )
         self.theSimulator.stop()
         self.update()
         gtk.timeout_remove(self.theTimer)
 
     def stepSimulation( self, a ) : 
-        self.printMessage( "step\n" )
+        self.printMessage( "Step\n" )
         self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.updateByTimeOut, 0 )
         self.theSimulator.run( self.theStepSize )
         self.update()
@@ -142,6 +142,9 @@ class MainWindow(Window):
 
     def setStepSize( self, obj ):
         self.theStepSize =  string.atoi( obj.get_text() )
+        self.printMessage( 'Step Size -> ' )
+        self.printMessage( str(self.theStepSize) )
+        self.printMessage( '\n' )
 
     def updateByTimeOut( self, a ):
         gtk.timeout_remove( self.theTimer )
