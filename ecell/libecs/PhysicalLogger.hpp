@@ -42,9 +42,13 @@ namespace libecs
 {
 
 
-  /** \addtogroup logging
+  /** @addtogroup logging
    *@{
   */
+
+  /** @file */
+
+
 
   class PhysicalLogger
   {

@@ -42,12 +42,13 @@
 namespace libecs
 {
 
-  /** \defgroup property The Inter-object Communication.
+  /** @addtogroup property The Inter-object Communication.
    *  The Interobject Communication.
    *@{
+
   */
 
-
+  /** @file */
   
   DECLARE_MAP( const String, PropertySlotPtr, 
 	       std::less<const String>, PropertySlotMap );
@@ -55,14 +56,14 @@ namespace libecs
   /**
      Common base class for classes which receive Messages.
 
-     \note  Subclasses of PropertyInterface MUST call their own makeSlots()
+     @note  Subclasses of PropertyInterface MUST call their own makeSlots()
      to create their property slots in their constructors.
      (virtual functions don't work in constructors)
 
-     \todo class-static slots?
+     @todo class-static slots?
 
-     \see Message
-     \see PropertySlot
+     @see Message
+     @see PropertySlot
 
   */
 
@@ -85,8 +86,8 @@ namespace libecs
     /**
        Send a message to this object via a PropertySlot.
 
-       \param aMessage a Message object
-       \throw NoSlot 
+       @param aMessage a Message object
+       @throw NoSlot 
     */
 
     void setMessage( MessageCref aMessage );
@@ -94,9 +95,9 @@ namespace libecs
     /**
        Get a message from this object via a PropertySlot.
 
-       \param aPropertyName a name of the PropertySlot.
-       \return the Message from this object.
-       \throw NoSlot
+       @param aPropertyName a name of the PropertySlot.
+       @return the Message from this object.
+       @throw NoSlot
     */
 
     const Message getMessage( StringCref aPropertyName ) const;
@@ -105,9 +106,9 @@ namespace libecs
     /**
        Get a PropertySlot by name.
 
-       \param aPropertyName the name of the PropertySlot.
+       @param aPropertyName the name of the PropertySlot.
 
-       \return a borrowed pointer to the PropertySlot with the name.
+       @return a borrowed pointer to the PropertySlot with the name.
     */
 
     virtual PropertySlotPtr getPropertySlot( StringCref aPropertyName )
@@ -144,7 +145,7 @@ namespace libecs
 
 
 
-    /// \internal 
+    /// @internal 
 
     //FIXME: can be protected?
 
@@ -158,7 +159,7 @@ namespace libecs
     virtual StringLiteral getClassName() const { return "PropertyInterface"; }
 
 
-    /// \internal
+    /// @internal
 
     template <typename Type>
     void nullSet( const Type& )
@@ -166,7 +167,7 @@ namespace libecs
       THROW_EXCEPTION( AttributeError, "Not setable." );
     }
 
-    /// \internal
+    /// @internal
 
     template <typename Type>
     const Type nullGet() const

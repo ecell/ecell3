@@ -37,9 +37,11 @@ namespace libecs
 {
 
 
-  /** \addtogroup util
+  /** @addtogroup util
    *@{
    */
+
+  /** @file */
 
 
   /**

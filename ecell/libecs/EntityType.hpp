@@ -33,12 +33,16 @@
 
 #include "libecs.hpp"
 
+
 namespace libecs
 {
 
-  /** \addtogroup entities
+  /** @addtogroup identifier
+   *
    *@{
    */
+
+  /** @file */
 
 
   /**

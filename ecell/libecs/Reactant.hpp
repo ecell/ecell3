@@ -37,10 +37,12 @@
 namespace libecs
 {
 
-  /** \addtogroup entities
+  /** @addtogroup entities
    *@{
    */
 
+
+  /** @file */
 
   class Reactant
   {

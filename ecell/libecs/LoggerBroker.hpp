@@ -41,10 +41,11 @@
 namespace libecs
 {
 
-  /** \addtogroup logging
+  /** @addtogroup logging
    *@{
    */
 
+  /** @file */
 
   /**
      LoggerBroker creates and administrates Loggers in a model.
@@ -52,8 +53,8 @@ namespace libecs
      This class creates, holds in a map which associates FullPN with a Logger,
      and responds to requests to Loggers.
 
-     \see FullPN
-     \see Logger
+     @see FullPN
+     @see Logger
 
   */
 
@@ -80,9 +81,9 @@ namespace libecs
 
        FIXME: doc for interval needed
 
-       \param aFullPN     a FullPN of the requested FullPN
-       \param anInterval  a logging interval
-       \return a borrowed pointer to the Logger
+       @param aFullPN     a FullPN of the requested FullPN
+       @param anInterval  a logging interval
+       @return a borrowed pointer to the Logger
        
     */
 
@@ -107,7 +108,7 @@ namespace libecs
        Use this method for const operations such as LoggerMap::size() 
        and LoggerMap::begin().
 
-       \return a const reference to the LoggerMap.
+       @return a const reference to the LoggerMap.
     */
 
     LoggerMapCref getLoggerMap() const

@@ -39,9 +39,12 @@
 namespace libecs
 {
 
-  /** \addtogroup logging
+  /** @addtogroup logging
    *@{
    */
+
+  /** @file */
+
 
   DECLARE_TYPE( size_t, DataPointVectorIterator );
 

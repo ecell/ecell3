@@ -44,16 +44,18 @@
 namespace libecs
 {
 
-  /** \addtogroup property
+  /** @addtogroup property
    *@{
    */
+
+  /** @file */
 
   /**
      A data packet for communication among C++ objects consisting
      of a keyword and a body. The body is a list of UVariables.
 
-     \see PropertyInterface
-     \see PropertySlot
+     @see PropertyInterface
+     @see PropertySlot
 
   */
 

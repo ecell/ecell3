@@ -37,11 +37,13 @@
 namespace libecs
 {
 
-  /* *defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
+  /** @defgroup libecs The Libecs library
+   * The libecs library
    * @{ 
    */ 
   
+  /** @file */
+
   // Declarations to be exported
 
 
@@ -115,7 +117,7 @@ namespace libecs
   DECLARE_RCPTR( UVariableVector );
   DECLARE_RCPTR( DataPointVector );
   
-  /** @} */ //end of libecs_module 
+  /** @} */ 
 
 } // namespace libecs
 

@@ -40,14 +40,21 @@
 #include "PhysicalLogger.hpp"
 #include "DataPointVector.hpp"
 
+
 namespace libecs
 {
 
 
-  /** \defgroup logging The Data Logging Module.
-   * The Data Logging Module.
-   * @{ 
+  /** @addtogroup logging The Data Logging Module.
+      The Data Logging Module.
+
+      @ingroup libecs
+      
+      @{ 
    */ 
+
+  /** @file */
+
 
 
   /**
@@ -90,7 +97,7 @@ namespace libecs
     /**
 
 
-    \note It is assumed for both following getData methods that the
+    @note It is assumed for both following getData methods that the
        Time values returned by GetCurrentTime method are monotonously
        increasing, therefore
        - a newer theTime is always greater than previous
@@ -156,7 +163,7 @@ namespace libecs
 
     /**
 
-    \internal
+    @internal
 
     */
 

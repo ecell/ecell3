@@ -12,10 +12,17 @@ namespace libecs
 {
 
 
-  /** \addtogroup property
+  /** @addtogroup property
    *@{
    */
 
+  /** @file */
+
+  /**
+
+
+     @internal
+  */
 
   class PropertySlotMaker
   {

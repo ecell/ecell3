@@ -41,9 +41,11 @@
 namespace libecs
 {
 
-  /** \addtogroup entities
+  /** @addtogroup entities
    *@{
    */
+
+  /** @file */
 
 
   DECLARE_ASSOCVECTOR( String, Reactant, std::less< const String >, 

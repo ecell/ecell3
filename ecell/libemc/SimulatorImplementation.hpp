@@ -40,11 +40,11 @@
 namespace libemc
 {
 
-  /** @defgroup libemc_module The Libemc Module 
-   * This is the libemc module 
+  /** @addtogroup libemc_module 
    * @{ 
    */ 
-  
+
+  /** @file */
 
   class EventHandler
     :

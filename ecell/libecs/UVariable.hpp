@@ -39,10 +39,14 @@
 namespace libecs
 {
 
-  /** \defgroup uvariable The UVariable.
-   * The UVariable
-   * @{ 
+  /** @addtogroup uvariable The UVariable.
+   The UVariable
+
+   @ingroup libecs
+   @{ 
    */ 
+
+  /** @file */
   
   DECLARE_CLASS( UVariableData );
   DECLARE_CLASS( UVariableStringData );

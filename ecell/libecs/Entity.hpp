@@ -39,10 +39,17 @@
 namespace libecs
 {
 
-  /** \defgroup entities The Entities.
-   * Entities.
-   * @{ 
+  /** @addtogroup entities The Entities.
+      Entities.
+      
+      @ingroup libecs
+
+   
+      @{ 
    */ 
+
+  /** @file */
+
   
   /**
      Entity class is a base class for all components in the cell model.
@@ -63,7 +70,7 @@ namespace libecs
     /**
        Get a System to which this Entity belongs.
 
-       \return a borrowed pointer to the super system.
+       @return a borrowed pointer to the super system.
     */
 
     SystemPtr getSuperSystem() const 
@@ -75,7 +82,7 @@ namespace libecs
     /**
        Get a FullID of this Entity.
 
-       \return a FullID of this Entity.
+       @return a FullID of this Entity.
     */
 
     const FullID getFullID() const;
@@ -86,8 +93,8 @@ namespace libecs
 
        This method is overridden in Substance, Reactor and System classes.
 
-       \return EntityType of this Entity object.
-       \see EntityType
+       @return EntityType of this Entity object.
+       @see EntityType
     */
 
     virtual const EntityType getEntityType() const
@@ -99,7 +106,7 @@ namespace libecs
     /**
        Get a Model object to which this Entity belongs.
 
-       \return a borrowed pointer to the Model.
+       @return a borrowed pointer to the Model.
     */
 
     ModelPtr getModel() const
@@ -111,10 +118,10 @@ namespace libecs
     /**
        Get a SystemPath of this Entity.
 
-       \note The SystemPath doesn't include ID of this Entity even if 
+       @note The SystemPath doesn't include ID of this Entity even if 
        this Entity is a System.
 
-       \return a SystemPath of this Entity.
+       @return a SystemPath of this Entity.
     */
 
     virtual const SystemPath getSystemPath() const;
@@ -127,7 +134,7 @@ namespace libecs
        pointer to a Stepper as its member variable, thus this method
        returns the variable in System class.
 
-       \return A pointer to a Stepper object that this Entity belongs or
+       @return A pointer to a Stepper object that this Entity belongs or
        NULLPTR if it is not set.
     */
 
@@ -140,7 +147,7 @@ namespace libecs
     /**
        Set an identifier of this Entity.
 
-       \param anID an id of this Entry.
+       @param anID an id of this Entry.
     */
 
     void setID( StringCref anID ) 
@@ -151,7 +158,7 @@ namespace libecs
     /**
        Get an id string of this Entity.
 
-       \return an id of this Entity.
+       @return an id of this Entity.
     */
 
     const String getID() const
@@ -162,7 +169,7 @@ namespace libecs
     /**
        Set name of this Entity.
 
-       \param aName a name of this Entity.
+       @param aName a name of this Entity.
     */
 
     void setName( StringCref aName ) 
@@ -173,7 +180,7 @@ namespace libecs
     /**
        Get a name of this Entity.
 
-       \return a name of this Entity.
+       @return a name of this Entity.
     */
 
     const String getName() const 
@@ -184,10 +191,10 @@ namespace libecs
     /**
        Get a FullID of this Entity as String.
 
-       \note Property name for this method is 'getFullID', not
+       @note Property name for this method is 'getFullID', not
        'getFullIDString.'
 
-       \return a FullID string of this Entity.
+       @return a FullID string of this Entity.
     */
 
     const String getFullIDString() const;
@@ -200,8 +207,8 @@ namespace libecs
 
        FIXME: should be abstract
 
-       \return activity value per step interval of this Entity
-       \see getActivityPerSecond()
+       @return activity value per step interval of this Entity
+       @see getActivityPerSecond()
     */
 
     virtual const Real getActivity() const;
@@ -214,8 +221,8 @@ namespace libecs
 
        FIXME: should be abstract
 
-       \param anActivity activity of this Entity
-       \see   getActivity(), getActivityPerSecond()
+       @param anActivity activity of this Entity
+       @see   getActivity(), getActivityPerSecond()
     */
 
     virtual void setActivity( RealCref anActivity ) 
@@ -229,7 +236,7 @@ namespace libecs
        Default action of this method is to return getActivity() / step
        interval, but this action can be changed in subclasses.
 
-       \return activity of this Entity per second
+       @return activity of this Entity per second
     */
 
     virtual const Real getActivityPerSecond() const;
@@ -238,14 +245,14 @@ namespace libecs
 
 
     /**
-       \internal
+       @internal
 
        Set a supersystem of this Entity.  
 
        Usually no need to set this manually because a System object does
        this when an Entity is added to the System.
 
-       \param supersystem a pointer to a System to which this object belongs.
+       @param supersystem a pointer to a System to which this object belongs.
     */
 
     void setSuperSystem( SystemPtr const supersystem ) 
@@ -254,7 +261,7 @@ namespace libecs
     }
 
     /**
-       \internal
+       @internal
     */
 
     void setModel( ModelPtr const aModel )
@@ -263,7 +270,7 @@ namespace libecs
     }
 
 
-    /// \internal
+    /// @internal
 
     virtual PropertySlotPtr getPropertySlot( StringCref aPropertyName, 
 					     EntityCptr aRequester );

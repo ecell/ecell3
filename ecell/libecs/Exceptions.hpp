@@ -39,9 +39,11 @@
 namespace libecs
 {
 
-  /** \defgroup exception The Exceptions
-   * The exceptions.
-   * @{
+  /** @defgroup exception The Exceptions
+      The exceptions.
+
+      @ingroup libecs
+      @{
   */ 
   
 
@@ -98,7 +100,7 @@ if( ! ( EXPRESSION ) )\
 
   /**
 
-  \internal
+  @internal
   */
 
 #define DEFINE_EXCEPTION( CLASSNAME, BASECLASS )\

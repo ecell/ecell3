@@ -43,10 +43,15 @@
 namespace libecs
 {
 
-  /** \defgroup util The Utilities.
-   * Utilities.
-   * @{ 
+  /** @addtogroup util The Utilities.
+   Utilities.
+
+   @ingroup libecs
+   @{ 
    */ 
+
+  /** @file */
+
   
   typedef ::korandom_d_c  RandomNumberGenerator;
 

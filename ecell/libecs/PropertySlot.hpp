@@ -44,9 +44,13 @@ namespace libecs
 {
 
 
-  /** \addtogroup property
-   *@{
-   */
+  /** @addtogroup property
+      
+  @ingroup libecs
+  @{
+  */
+
+  /** @file */
 
   template< typename FromType, typename ToType >
   ToType convertTo( const FromType& aValue )
@@ -157,7 +161,7 @@ namespace libecs
   /**
      Base class for PropertySlot classes.
 
-     \see PropertyInterface
+     @see PropertyInterface
   */
 
   class PropertySlot

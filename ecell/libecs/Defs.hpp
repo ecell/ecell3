@@ -143,7 +143,7 @@ namespace libecs
      
      taken from loki library.
 
-     \ingroup util
+     @ingroup util
   */
 
   template <typename T>

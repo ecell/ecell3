@@ -42,10 +42,15 @@
 namespace libecs
 {
 
-  /** \defgroup model The Model.
-   * The model.
-   * @{ 
+  /** @addtogroup model The Model.
+
+      The model.
+
+      @ingroup libecs
+      @{ 
    */ 
+
+  /** @file */
 
 
   DECLARE_MAP( const String, StepperPtr, std::less< const String >,
@@ -95,7 +100,7 @@ namespace libecs
     void initialize();
 
     /**
-       Conducts a step of the simulation.
+       Conduct a step of the simulation.
 
        This method picks a Stepper on the top of theScheduleQueue,
        calls sync(), step(), and push() of the Stepper, and
@@ -109,7 +114,7 @@ namespace libecs
     /**
        Returns the current time.
 
-       \return time elasped since start of the simulation.
+       @return time elasped since start of the simulation.
     */
 
     const Real getCurrentTime() const
@@ -122,9 +127,9 @@ namespace libecs
        Creates a new Entity object and register it in an appropriate System
        in  the Model.
 
-       \param aClassname
-       \param aFullID
-       \param aName
+       @param aClassname
+       @param aFullID
+       @param aName
     */
 
     void createEntity( StringCref aClassname,
@@ -135,8 +140,8 @@ namespace libecs
     /**
        This method finds an Entity object pointed by the FullID.
 
-       \param aFullID a FullID of the requested Entity.
-       \return A borrowed pointer to an Entity specified by the FullID.
+       @param aFullID a FullID of the requested Entity.
+       @return A borrowed pointer to an Entity specified by the FullID.
     */
 
     EntityPtr getEntity( FullIDCref aFullID );
@@ -145,8 +150,8 @@ namespace libecs
        This method finds a System object pointed by the SystemPath.  
 
 
-       \param aSystemPath a SystemPath of the requested System.
-       \return A borrowed pointer to a System.
+       @param aSystemPath a SystemPath of the requested System.
+       @return A borrowed pointer to a System.
     */
 
 
@@ -156,11 +161,11 @@ namespace libecs
     /**
        Create a stepper with an ID and a classname. 
 
-       \param aClassname  a classname of the Stepper to create.  
+       @param aClassname  a classname of the Stepper to create.  
 
-       \param anID        a Stepper ID string of the Stepper to create.  
+       @param anID        a Stepper ID string of the Stepper to create.  
 
-       \param aParameters a UVariableVector of parameters to give to
+       @param aParameters a UVariableVector of parameters to give to
        the created Stepper.
     */
 
@@ -173,8 +178,8 @@ namespace libecs
     /**
        Get a stepper by an ID.
 
-       \param anID a Stepper ID string of the Stepper to get.
-       \return a borrowed pointer to the Stepper.
+       @param anID a Stepper ID string of the Stepper to get.
+       @return a borrowed pointer to the Stepper.
     */
 
     StepperPtr getStepper( StringCref anID );
@@ -195,7 +200,7 @@ namespace libecs
     /**
        Get the RootSystem.
 
-       \return a borrowed pointer to the RootSystem.
+       @return a borrowed pointer to the RootSystem.
     */
 
     SystemPtr getRootSystem() const
@@ -207,7 +212,7 @@ namespace libecs
     /**
        Get the LoggerBroker.
 
-       \return a borrowed pointer to the LoggerBroker.
+       @return a borrowed pointer to the LoggerBroker.
     */
 
     LoggerBrokerRef getLoggerBroker()
@@ -216,23 +221,23 @@ namespace libecs
     }
 
 
-    /// \internal
+    /// @internal
 
     StepperMakerRef     getStepperMaker()     { return theStepperMaker; }
 
-    /// \internal
+    /// @internal
 
     ReactorMakerRef     getReactorMaker()     { return theReactorMaker; }
 
-    /// \internal
+    /// @internal
 
     SubstanceMakerRef   getSubstanceMaker()   { return theSubstanceMaker; }
 
-    /// \internal
+    /// @internal
 
     SystemMakerRef      getSystemMaker()      { return theSystemMaker; }
 
-    /// \internal
+    /// @internal
 
     AccumulatorMakerRef getAccumulatorMaker() { return theAccumulatorMaker; }
 
@@ -246,9 +251,9 @@ namespace libecs
        This method checks recursively if all systems have Steppers
        connected.
 
-       \param aSystem a root node to start recursive search.
+       @param aSystem a root node to start recursive search.
        
-       \throw InitializationFailed if the check failed.
+       @throw InitializationFailed if the check failed.
     */
 
     void checkStepper( SystemCptr aSystem );

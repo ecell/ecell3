@@ -122,7 +122,7 @@ namespace libecs
     
     /**
 
-     \note each stepper class defines this
+     @note each stepper class defines this
 
     */
 
@@ -132,7 +132,7 @@ namespace libecs
 
     /**
 
-    \param aParameterList
+    @param aParameterList
     */
 
     virtual void setParameterList( UVariableVectorCref aParameterList );
@@ -141,7 +141,7 @@ namespace libecs
     /**
 
 
-       \param aSystem
+       @param aSystem
     */
 
     void registerSystem( SystemPtr aSystem );
@@ -149,7 +149,7 @@ namespace libecs
     /**
 
 
-       \param aSystem
+       @param aSystem
     */
 
     void removeSystem( SystemPtr aSystem );
@@ -161,7 +161,7 @@ namespace libecs
        The current time is defined as a next scheduled point in time
        of this Stepper.
 
-       \return the current time in Real.
+       @return the current time in Real.
     */
 
     RealCref getCurrentTime() const
@@ -184,7 +184,7 @@ namespace libecs
        The step interval is a length of time that this Stepper proceeded
        in the last step.
        
-       \return the step interval of this Stepper
+       @return the step interval of this Stepper
     */
 
     RealCref getStepInterval() const
@@ -202,7 +202,7 @@ namespace libecs
        it is pre-calculated when the setStepInterval() is called.
 
 
-       \return the number of steps per a second. (== 1.0 / getStepInterval )
+       @return the number of steps per a second. (== 1.0 / getStepInterval )
     */
 
     RealCref getStepsPerSecond() const

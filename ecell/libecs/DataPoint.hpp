@@ -39,9 +39,13 @@
 namespace libecs
 {
 
-  /** \addtogroup logging
+  /** @addtogroup logging
    *@{
    */
+
+  /** \file */
+
+
 
   class DataPoint
   {
@@ -189,7 +193,7 @@ namespace libecs
 
   /**
 
-  \internal 
+  @internal 
 
   */
 

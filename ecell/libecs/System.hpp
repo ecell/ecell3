@@ -40,11 +40,13 @@
 namespace libecs
 {
 
-  /** \addtogroup entities
+  /** @addtogroup entities
    *@{
    */
 
-  // Tree data structures used for entry lists
+  /** @file */
+
+  // Maps used for entry lists
   DECLARE_MAP( const String, SubstancePtr, 
 	       std::less<const String>, SubstanceMap );
   DECLARE_MAP( const String, ReactorPtr,   

@@ -42,9 +42,12 @@
 namespace libecs
 {
 
-  /** \addtogroup logging
+  /** @addtogroup logging
    *@{
    */
+
+  /** @file */
+
 
   DECLARE_CLASS(DataPointStlVector);
   DECLARE_TYPE(DataPoint,Containee);

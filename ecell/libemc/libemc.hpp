@@ -39,11 +39,12 @@
 namespace libemc
 {
 
-  /** @defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
+  /** @addtogroup libemc_module The E-CELL Micro Core Interface (libemc)
+   * EMC module.
    * @{ 
    */ 
   
+  /** @file */
 
   DECLARE_CLASS( PendingEventChecker );
   DECLARE_CLASS( EventHandler );
@@ -52,7 +53,7 @@ namespace libemc
   DECLARE_CLASS( SimulatorImplementation );
   DECLARE_CLASS( EmcLogger );
 
-  /** @} */ //end of libecs_module 
+  /** @} */ //end of libemc_module 
 
 } // namespace libemc
 

@@ -39,11 +39,17 @@
 namespace libecs
 {
 
-  /** \defgroup identifier The FullID, FullPN and SystemPath.
-   * The FullID, FullPN and SystemPath.
-   * @{ 
+  /** @addtogroup identifier The FullID, FullPN and SystemPath.
+   The FullID, FullPN and SystemPath.
+   
+
+   @ingroup libecs
+   @{ 
    */ 
   
+  /** @file */
+
+
   /** 
       SystemPath 
   */
