@@ -61,7 +61,7 @@ class GtkSessionMonitor(Session):
 #
 #	GtkSessionMonitor class functions
 #
-
+	
 	# ==========================================================================
 	def __init__(self, aSimulator = None ):
 		"""sets up the osogo session, creates Mainwindow and other fundamental
@@ -306,20 +306,19 @@ class GtkSessionMonitor(Session):
 		"""creates and returns an EntityListWindow
 		"""
 		anEntityListWindow = None
+
 		# when Model is already loaded.
 		if len(self.theModelName) > 0:
 			# creates new EntityListWindow instance
 			anEntityListWindow = EntityListWindow.EntityListWindow( self )
-			anEntityListWindow.openWindow()
-			# saves the instance into map
-			self.theEntityListInstanceMap[ anEntityListWindow ] = None
-		
-			# updates all fundamental windows
-			self.updateFundamentalWindows()
-
 		else:
 			anEntityListWindow = EntityListWindow.EntityListWindow( None )
-			anEntityListWindow.openWindow()
+			
+		anEntityListWindow.openWindow()
+		# saves the instance into map
+		self.theEntityListInstanceMap[ anEntityListWindow ] = None
+		# updates all fundamental windows
+		self.updateFundamentalWindows()
 
 		return anEntityListWindow
 
