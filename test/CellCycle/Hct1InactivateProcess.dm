@@ -9,6 +9,9 @@ PROTECTED_AUX = '''
   VariableReference C1;
   VariableReference C2;
   VariableReference C3;
+
+  ProcessPtr theActivateProcess;
+
 '''
 
 defineMethod( 'initialize', '''
@@ -17,6 +20,9 @@ defineMethod( 'initialize', '''
   C1 = getVariableReference( "C1" );
   C2 = getVariableReference( "C2" );
   C3 = getVariableReference( "C3" );
+
+  theActivateProcess = getSuperSystem()->getProcess( "Hct1act" );
+
 ''' )
 
 defineMethod( 'process', '''
@@ -29,8 +35,29 @@ defineMethod( 'process', '''
   v *= k2;
   v += k1;
   Real V( v * S ); 
-  V /= J + S;
-  V += getSuperSystem()->getVolume() * N_A;
+  V /= J + S; // conc
+  V += getSuperSystem()->getVolume() * N_A; // conc -> quantity
+
+
+  // limit so that S0 is always >= 0
+
+//  std::cerr << "A: " << ActivateActivity;
+//  std::cerr << "V: " << V;
+  Real S0ValuePerSec( S0.getVariable()->getValue() 
+                      / getStepper()->getStepInterval() );
+
+
+  const Real ActivateActivity( theActivateProcess->getActivity() );
+
+  if( S0ValuePerSec - V + ActivateActivity < 0 ) 
+//  if( S0ValuePerSec - V < 0 )
+  {
+    // calculate the point where S0 = 0
+    V = S0ValuePerSec + ActivateActivity - 10E-6;
+  //  std::cerr << "limited V: " << V << std::endl;
+  } 
+
+
 
   setFlux( V );
 ''' )
