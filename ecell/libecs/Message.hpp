@@ -41,8 +41,8 @@
 #include <vector>
 #include "Exceptions.h"
 #include "Defs.h"
-#include "StringList.h"
 
+class StringList;
 class AbstractMessageCallback;
 
 typedef pair<string,string> StringPair;

@@ -38,6 +38,7 @@ char const Message_C_rcsid[] = "$Id$";
 #include <strstream>
 #include <stdio.h>
 #include "Message.h"
+#include "StringList.h"
 //FIXME: #include "ecell/MessageWindow.h"
 
 ////////////////////// Message
@@ -120,7 +121,7 @@ const string Message::body(int n) const
 }
 
 //FIXME:
-/*
+
 ///////////////////////////// MessageInterface
 
 MessageInterface::MessageInterface()
@@ -140,8 +141,8 @@ void MessageInterface::appendSlot(const string& keyword,
 //  cerr << keyword << endl;
   if(_slotMap.find(keyword) != _slotMap.end())
     {
-      *theMessageWindow << "MessageSlot: appendSlot(): slot for keyword [" 
-	<< keyword << "] already exists. Taking later one.\n";
+      //      *theMessageWindow << "MessageSlot: appendSlot(): slot for keyword [" 
+      //	<< keyword << "] already exists. Taking later one.\n";
       delete _slotMap[keyword];
       _slotMap.erase(keyword);
     }
@@ -152,8 +153,8 @@ void MessageInterface::deleteSlot(const string& keyword)
 {
   if(_slotMap.find(keyword) == _slotMap.end())
     {
-      *theMessageWindow << "MessageSlot: deleteSlot(): no slot for keyword [" 
-	<< keyword << "] found.\n";
+      //      *theMessageWindow << "MessageSlot: deleteSlot(): no slot for keyword [" 
+      //	<< keyword << "] found.\n";
       return;
     }
   delete _slotMap[keyword];
@@ -177,14 +178,14 @@ throw(NoSuchSlot)
   }
   catch(Exception& e)
     {
-      *theMessageWindow << className() << ": Callback has failed (keyword = [" 
-	<< message.keyword() << "]):\n\t" << e.message() << "\n";
+      //      *theMessageWindow << className() << ": Callback has failed (keyword = [" 
+      //	<< message.keyword() << "]):\n\t" << e.message() << "\n";
       return;
     }
   catch(...)
     {
-      *theMessageWindow << __PRETTY_FUNCTION__ << ": " 
-	<< "callback has failed.(keyword = [" << message.keyword() << "])\n";
+      //      *theMessageWindow << __PRETTY_FUNCTION__ << ": " 
+      //<< "callback has failed.(keyword = [" << message.keyword() << "])\n";
       return;
     }
 
@@ -203,14 +204,14 @@ throw(NoSuchSlot)
   }
   catch(Exception& e)
     {
-      *theMessageWindow << className() << ": Callback has failed (keyword = [" 
-	<< keyword << "]):\n\t" << e.message() << "\n";
+      //      *theMessageWindow << className() << ": Callback has failed (keyword = [" 
+      //	<< keyword << "]):\n\t" << e.message() << "\n";
       return Message(keyword,"");
     }
   catch(...)
     {
-      *theMessageWindow << __PRETTY_FUNCTION__ << ": " 
-	<< "callback has failed.(keyword = [" << keyword << "])\n";
+      //      *theMessageWindow << __PRETTY_FUNCTION__ << ": " 
+      //	<< "callback has failed.(keyword = [" << keyword << "])\n";
       return Message(keyword,"");
     }
 }
@@ -222,7 +223,7 @@ StringList MessageInterface::slotList()
     sl.insert(sl.end(),i->first);
   return sl;
 }
-*/
+
 
 void debugPrint(FILE * pf, const string & str)
 {
