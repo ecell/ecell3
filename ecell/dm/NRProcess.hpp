@@ -171,7 +171,7 @@ public:
     Real aMuV( aMu );
     if( getOrder() == 2 )
       {
-	aMuV /= getSuperSystem()->getVolume();
+	aMuV /= getSuperSystem()->getVolume() * N_A;
       }
 
     const Real a( - 1 / aMuV );
