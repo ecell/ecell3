@@ -31,13 +31,16 @@
 #ifndef __PROPERTYINTERFACE_HPP
 #define __PROPERTYINTERFACE_HPP
 
-#include <map>
+//#include <map>
+
+#include "AssocVector.h"
 
 #include "dmtool/DMObject.hpp"
 
 #include "libecs.hpp"
 #include "Defs.hpp"
 #include "Exceptions.hpp"
+
 
 namespace libecs
 {
@@ -50,10 +53,11 @@ namespace libecs
 
   /** @file */
   
-
   // probably better to replace by AssocVector.
-  DECLARE_MAP( const String, PropertySlotPtr, 
-	       std::less<const String>, PropertySlotMap );
+  //  DECLARE_MAP( const String, PropertySlotPtr, 
+  //	       std::less<const String>, PropertySlotMap );
+  DECLARE_ASSOCVECTOR( String, PropertySlotPtr, 
+		       std::less<const String>, PropertySlotMap );
 
   /**
      Common base class for classes with PropertySlots.

@@ -202,13 +202,13 @@ namespace libecs
 
 	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
 
-	const Real theta( ( aTimeInterval + aTimeInterval - anInterval )
+	const Real theta( FMA( aTimeInterval, 2.0, - anInterval )
 			  / anOriginalStepInterval );
 
-	const Real k1 = theStepper.getK1()[ theIndex ];
-	const Real k2 = theStepper.getVelocityBuffer()[ theIndex ];
+	const Real k1( theStepper.getK1()[ theIndex ] );
+	const Real k2( theStepper.getVelocityBuffer()[ theIndex ] );
 
-	return ( ( k1 + ( k2 - k1 ) * theta ) * anInterval );
+	return ( FMA( theta, ( k2 - k1 ), k1 ) * anInterval );
       }
 
     protected:
