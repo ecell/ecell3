@@ -107,8 +107,8 @@ namespace libecs
     aNewLogger->log( getModel().getCurrentTime() );
     aNewLogger->flush();
 
-	// set logger policy
-	aNewLogger->setLoggerPolicy( aParamList );
+    // set logger policy
+    aNewLogger->setLoggerPolicy( aParamList );
 
 
     return aNewLogger;

@@ -72,9 +72,31 @@ namespace libecs
 
     void push( DataPointLongCref  );
 
-	void setEndPolicy( Integer );
+    void aggregate( DataPointCref );
 
-	void setMaxSize( iterator );
+    void aggregate( DataPointLongCref );
+
+    void flushAggregate();
+
+    DataPointLongCref getAggregate()
+    {
+      return theAggregator.getData();
+    }
+
+    int getElementCount()
+    {
+      return theElementCount;
+    }
+
+    void resetElementCount()
+    {
+      theElementCount = 0;
+    }
+
+    void setEndPolicy( Integer );
+
+    void setMaxSize( iterator );
+
 
     iterator lower_bound( const iterator& start,
 			  const iterator& end,
@@ -85,33 +107,33 @@ namespace libecs
 			  const Real time ) const;
 
     iterator lower_bound_linear( const iterator& start,
-			  const iterator& end,
-			  const Real time ) const;
+				 const iterator& end,
+				 const Real time ) const;
 
     iterator upper_bound_linear( const iterator& start,
-			  const iterator& end,
-			  const Real time ) const;
+				 const iterator& end,
+				 const Real time ) const;
 
     iterator lower_bound_linear_backwards( const iterator& start,
-			  const iterator& end,
-			  const Real time ) const;
+					   const iterator& end,
+					   const Real time ) const;
 
     iterator lower_bound_linear_estimate( const iterator& start,
-			  const iterator& end,
-			  const Real time,
-			  const Real time_per_step ) const;
+					  const iterator& end,
+					  const Real time,
+					  const Real time_per_step ) const;
 
     iterator upper_bound_linear_estimate( const iterator& start,
-			  const iterator& end,
-			  const Real time,
-			  const Real time_per_step ) const;
-
+					  const iterator& end,
+					  const Real time,
+					  const Real time_per_step ) const;
+    
     iterator next_index( const iterator& start) const;
 
     void getItem( const iterator&, DataPointPtr ) const;
     
     DataPointVectorSharedPtr getVector( const iterator& start,
-				    const iterator& end ) const;
+					const iterator& end ) const;
 
     size_type size() const;
 
@@ -124,18 +146,21 @@ namespace libecs
     iterator begin() const;
 
     iterator end() const;
-  
-    Real get_avg_interval() const;
+
+    Real getAverageInterval() const;
 
     DataPointLong at( const iterator& ) const;
 
   private:
-    iterator theCurrentPosition;
-    DataPoint anEmptyDataPoint;
+    iterator            theCurrentPosition;
+    DataPoint           anEmptyDataPoint;
+
     // this mutable can be removed if vvector supports const operations
-    mutable Vector theVector;
-    mutable VectorLong theVectorLong;
-    Integer PointSize;
+    mutable Vector      theVector;
+    mutable VectorLong  theVectorLong;
+    Integer             PointSize;
+    DataPointAggregator theAggregator;
+    int                 theElementCount;
     
   };
 

@@ -30,170 +30,201 @@
 
 
 
-
+#include <stdio.h>
 #include "DataPoint.hpp"
 
 namespace libecs
 {
-
   
-    DataPoint& DataPoint::operator = ( const DataPointLong& dpt5 )
-	{
-
-		setTime( dpt5.getTime() );
-		setValue ( dpt5.getValue() );
-	}
-
-
-	DataPointAggregator::DataPointAggregator()
-	:
-	Accumulator( -1.0, 0.0 ),
-	Collector ( -1.0, 0.0 ),
-	PreviousPoint( 1.0, 0.0 )
-
-	{
-		; //do nothing
-	}
-
-	DataPointAggregator::DataPointAggregator( const DataPointLong& dpt )
-
-	{
-	store( dpt );
-	}
-
-	DataPointAggregator::~DataPointAggregator(){}
-
-
-	void DataPointAggregator::store( const DataPointLong& dpt )
-	{
-	Accumulator = dpt;
-	PreviousPoint = dpt;
-	Collector.setTime( -1.0 );
-	}
-
-
-	bool DataPointAggregator::stockpile( DataPointLong& Target, const DataPointLong& NewPoint )
-	{
-	//if target empty, simply store
-	//return true
-	if ( Target.getTime() == -1.0 )
-	{
-		Target = NewPoint;
-		return true;
-	}
-
-	// if target not empty and time is the same
-	// calculate MinMax, store Avg
-	//return true
-	if ( Target.getTime() == NewPoint.getTime() )
-	{
-		calculateMinMax( Target, NewPoint );
-		Target.setAvg( NewPoint.getAvg() );
-		Target.setValue( NewPoint.getValue() );
-		return true;
-	}
-
-	//if target time is below newtime
-	//return false
-	else
-	{
-		return false;
-	}
-
-	}
-
-
-	void DataPointAggregator::aggregate( const DataPointLong& NewPoint )
-	{
-	// first try to put it into accumulator
-	if ( ! stockpile( Accumulator, NewPoint ) )
-	{
-
-		// then try to put it into collector
-		if (! stockpile( Collector, NewPoint ) )
-		{
-			// then calculate
-			calculate( NewPoint );
-			Collector = NewPoint;
-			calculateMinMax( Accumulator, Collector );
-
-		
-		}
-		else
-		{
-			calculateMinMax( Accumulator, Collector );
-		}
-	}
-
-	}
-
-
-	const DataPointLong& DataPointAggregator::getData()
-	{
-
-	// return Accumulator
-
-	return Accumulator;
-	}
-
-
-	void DataPointAggregator::calculateMinMax( DataPointLong& Target, const DataPointLong& NewPoint)
-	{
-	// accu min
-
-
-	if ( Target.getMin() > NewPoint.getMin() )
-		{
-		Target.setMin ( NewPoint.getMin() );
-		}
-
-	// accu max
-	if ( Target.getMax() < NewPoint.getMax() )
-		{
-
-		Target.setMax ( NewPoint.getMax() );
-		}
-
-	}
-
-
-	void DataPointAggregator::calculate( const DataPointLong& NewPoint )
-	{
-
-	// accu avg
-	Accumulator.setAvg ( ( Collector.getAvg() *
-		( NewPoint.getTime() - Collector.getTime() ) +
-		Accumulator.getAvg() * ( Collector.getTime() -
-		Accumulator.getTime() ) ) /
-		( NewPoint.getTime() - Accumulator.getTime() ) );
-	}
-
-	void DataPointAggregator::beginNextPoint()
-	{
-//	Accumulator = PreviousPoint;
-//	PreviousPoint = Collector;
+  
+  DataPointRef DataPoint::operator = ( DataPointLongCref aDataPointLong )
+  {
+    setTime( aDataPointLong.getTime() );
+    setValue ( aDataPointLong.getValue() );
+  }
+  
+  
+  DataPointAggregator::DataPointAggregator()
+    :
+    theAccumulator( -1.0, 0.0 ),
+    theCollector ( -1.0, 0.0 ),
+    thePreviousPoint( 1.0, 0.0 )
+    
+  {
+    ; //do nothing
+  }
+  
+  DataPointAggregator::DataPointAggregator( DataPointLongCref aDataPoint )
+    
+  {
+    store( aDataPoint );
+  }
+  
+  DataPointAggregator::~DataPointAggregator(){}
+  
+  
+  void DataPointAggregator::store( DataPointLongCref aDataPoint )
+  {
+    theAccumulator = aDataPoint;
+    thePreviousPoint = aDataPoint;
+    theCollector.setTime( -1.0 );
+  }
+  
+  
+  bool DataPointAggregator::stockpile( DataPointLongRef aTarget, DataPointLongCref aNewPoint )
+  {
+    //if target empty, simply store
+    //return true
+    if ( aTarget.getTime() == -1.0 )
+      {
+	aTarget = aNewPoint;
+	return true;
+      }
+    
+    // if target not empty and time is the same
+    // calculate MinMax, store Avg
+    //return true
+    if ( aTarget.getTime() == aNewPoint.getTime() )
+      {
+	calculateMinMax( aTarget, aNewPoint );
+	aTarget.setAvg( aNewPoint.getAvg() );
+	aTarget.setValue( aNewPoint.getValue() );
+	return true;
+      }
+    
+    //if target time is below newtime
+    //return false
+    else
+      {
+	return false;
+      }
+    
+  }
+  
+  
+  void DataPointAggregator::aggregate( DataPointLongCref aNewPoint )
+  {
+    // first try to put it into accumulator
+    if ( ! stockpile( theAccumulator, aNewPoint ) )
+      {
 	
-	store( Collector );
-	}
-
-
-	DataPointLong DataPointAggregator::getLastPoint()
-	{
-	//if collector empty return Accu
-	if (Collector.getTime() == -1.0 )
-	{
-		return Accumulator;
-	}
+	// then try to put it into collector
+	if (! stockpile( theCollector, aNewPoint ) )
+	  {
+	    // then calculate
+	    calculate( aNewPoint );
+	    theCollector = aNewPoint;
+	    calculateMinMax( theAccumulator, theCollector );
+	    
+	    
+	  }
 	else
-	{
-		return Collector;
-	}
+	  {
+	    calculateMinMax( theAccumulator, theCollector );
+	  }
+      }
+    else
+      {
+	;
+      }
+  }
+  
+  
+  DataPointLongCref DataPointAggregator::getData()
+  {
+    
+    // return theAccumulator
+    
+    return theAccumulator;
+  }
+  
+  
+  void DataPointAggregator::calculateMinMax( DataPointLongRef aTarget,  DataPointLongCref aNewPoint)
+  {
+    // accu min
+    
+    
+    if ( aTarget.getMin() > aNewPoint.getMin() )
+      {
+	aTarget.setMin ( aNewPoint.getMin() );
+      }
+    
+    // accu max
+    if ( aTarget.getMax() < aNewPoint.getMax() )
+      {
 	
-
-	}
-
-
-
+	aTarget.setMax ( aNewPoint.getMax() );
+      }
+    
+  }
+  
+  
+  void DataPointAggregator::calculate( DataPointLongCref aNewPoint )
+  {
+    
+    // accu avg
+    theAccumulator.setAvg ( ( theCollector.getAvg() *
+			      ( aNewPoint.getTime() - theCollector.getTime() ) +
+			      theAccumulator.getAvg() * ( theCollector.getTime() -
+							  theAccumulator.getTime() ) ) /
+			    ( aNewPoint.getTime() - theAccumulator.getTime() ) );
+  }
+  
+  void DataPointAggregator::beginNextPoint()
+  {
+    //	theAccumulator = thePreviousPoint;
+    //	thePreviousPoint = theCollector;
+    
+    store( theCollector );
+  }
+  
+  
+  DataPointLong DataPointAggregator::getLastPoint()
+  {
+    //if collector empty return Accu
+    if (theCollector.getTime() == -1.0 )
+      {
+	return theAccumulator;
+      }
+    else
+      {
+	return theCollector;
+      }
+    
+    
+  }
+  
+  
+  
 } // namespace libecs
 
 
+#if defined(STANDALONE_TEST)
+
+using namespace libecs;
+void agr( Real aTime, Real aValue, DataPointAggregator* dpa)
+{
+  DataPointLong pa;
+  DataPoint dp;
+  dp.setTime(aTime);
+  dp.setValue(aValue);
+  dpa->aggregate(dp);
+  pa=dpa->getData();
+  printf("aggregating time %f, value %f, results:  avg %f\n",  aTime,aValue, pa.getAvg() );
+
+}
+
+int main()
+{
+  DataPointAggregator dpa;
+
+  agr(3,4,&dpa);
+  agr(5,6,&dpa);
+  agr(7,8,&dpa);
+  agr(9,6,&dpa);
+  agr(11,4,&dpa);
+  agr(13,6,&dpa);
+  
+}
+
+#endif /* End of test script*/

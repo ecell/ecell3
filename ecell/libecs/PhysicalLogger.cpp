@@ -42,44 +42,45 @@ namespace libecs
     theVector(),
     theVectorLong()
   {
-
+    
     if (PointSize==2)
-	{
-		theVector.clear ( );
-	} 
-     else
-	{
-		theVectorLong.clear ( );
-	}
+      {
+	theVector.clear ( );
+      } 
+    else
+      {
+	theVectorLong.clear ( );
+      }
   }
-
-	void PhysicalLogger::setMaxSize( iterator aMaxSize){
-
+  
+  void PhysicalLogger::setMaxSize( iterator aMaxSize){
+    
     if (PointSize==2)
-	{
-		theVector.setMaxSize ( aMaxSize );
-	} 
-     else
-	{
-		theVectorLong.setMaxSize ( aMaxSize );
-	}
-
-	}
-
-
-	void PhysicalLogger::setEndPolicy( Integer anEndPolicy)
-	{
-
+      {
+	theVector.setMaxSize ( aMaxSize );
+      } 
+    else
+      {
+	theVectorLong.setMaxSize ( aMaxSize );
+      }
+    
+  }
+  
+  
+  void PhysicalLogger::setEndPolicy( Integer anEndPolicy)
+  {
+    
     if (PointSize==2)
-	{
-		theVector.setEndPolicy ( anEndPolicy );
-	} 
-     else
-	{
-		theVectorLong.setEndPolicy ( anEndPolicy );
-	}	}
-
-
+      {
+	theVector.setEndPolicy ( anEndPolicy );
+      } 
+    else
+      {
+	theVectorLong.setEndPolicy ( anEndPolicy );
+      }	
+  }
+  
+  
   PhysicalLoggerIterator 
   PhysicalLogger::lower_bound( PhysicalLoggerIteratorCref start,
 			       PhysicalLoggerIteratorCref end,
@@ -94,7 +95,7 @@ namespace libecs
 	i_start=end;
 	i_end=start;
       }
-
+    
     while( ( i_start + 1 ) < i_end )
       {
 	if ( at( iterator ).getTime() <= time )
@@ -105,58 +106,58 @@ namespace libecs
 	  {
 	    i_end = iterator;
 	  }
-
+	
 	iterator = ( i_start + i_end ) / 2;
 	
       }
     
     if ( at( i_end ).getTime() == time )
-	{
-	    i_start=i_end;
-	}
+      {
+	i_start=i_end;
+      }
     
     return i_start;
   }
-
+  
   PhysicalLoggerIterator 
   PhysicalLogger::upper_bound( PhysicalLoggerIteratorCref start,
 			       PhysicalLoggerIteratorCref end,
 			       const Real time ) const
-
+    
   {
     PhysicalLoggerIterator result( lower_bound( start, end, time ) );
-
+    
     if ( ( result < size() - 1 ) && ( at( result ).getTime() != time ) )
       {
 	++result;
       }
-
+    
     return result;
   }
-
+  
   PhysicalLoggerIterator 
   PhysicalLogger::next_index( PhysicalLoggerIteratorCref start ) const
-
+    
   {
     PhysicalLoggerIterator result( start );
-
+    
     if ( result < size() - 1 ) 
       {
 	++result;
       }
-
+    
     return result;
   }
-
+  
   PhysicalLoggerIterator 
   PhysicalLogger::lower_bound_linear_backwards( PhysicalLoggerIteratorCref start,
-			       PhysicalLoggerIteratorCref end,
-			       const Real time ) const
-    {
+						PhysicalLoggerIteratorCref end,
+						const Real time ) const
+  {
     PhysicalLoggerIterator i_start( start );
     PhysicalLoggerIterator i_end( end );
     Real aTime;
-
+    
     if ( start > end )
       {
 	i_start=end;
@@ -165,69 +166,69 @@ namespace libecs
     PhysicalLoggerIterator iterator( i_end );
     
     while ( (iterator>i_start) && ( at ( iterator ).getTime() > time ) )
-	{
+      {
 	iterator--;
-	}
+      }
     return iterator;
-    }
-
+  }
+  
   PhysicalLoggerIterator 
   PhysicalLogger::lower_bound_linear_estimate( PhysicalLoggerIteratorCref start,
-			       PhysicalLoggerIteratorCref end,
-			       const Real time,
-			       const Real time_per_step ) const
-    {
+					       PhysicalLoggerIteratorCref end,
+					       const Real time,
+					       const Real time_per_step ) const
+  {
     //if time_per_step is zero fall back to stepwise linear search
     if ( time_per_step == 0 )
-    {
-    return lower_bound_linear( start, end, time);
-    }
+      {
+	return lower_bound_linear( start, end, time);
+      }
     Real theStartTime( at( start ).getTime() );
     PhysicalLoggerIterator iterator;
 
     iterator = static_cast<PhysicalLoggerIterator> ( (time - theStartTime ) 
-					/ time_per_step ) + start;
+						     / time_per_step ) + start;
     if ( iterator > end ) { iterator = end;}
     if ( at (iterator).getTime() < time )
-	{
-	    return lower_bound_linear( iterator, end, time);
-	}
-	
+      {
+	return lower_bound_linear( iterator, end, time);
+      }
+    
     if ( at (iterator).getTime() > time )
-	{
-	    return lower_bound_linear_backwards( start, iterator, time );
-	}
+      {
+	return lower_bound_linear_backwards( start, iterator, time );
+      }
     
     return iterator;
-    }
-
+  }
+  
   PhysicalLoggerIterator 
   PhysicalLogger::upper_bound_linear_estimate( PhysicalLoggerIteratorCref start,
-			       PhysicalLoggerIteratorCref end,
-			       const Real time,
-			       const Real time_per_step ) const
-    {
+					       PhysicalLoggerIteratorCref end,
+					       const Real time,
+					       const Real time_per_step ) const
+  {
     PhysicalLoggerIterator result( lower_bound_linear_estimate( start, end, 
-							time, time_per_step ) );
-
+								time, time_per_step ) );
+    
     if ( ( result < size() - 1 ) && ( at ( result ).getTime() != time ) )
       {
 	++result;
       }
-
+    
     return result;
     
-    }
-    
+  }
+  
   PhysicalLoggerIterator 
   PhysicalLogger::lower_bound_linear( PhysicalLoggerIteratorCref start,
-			       PhysicalLoggerIteratorCref end,
-			       const Real time ) const
+				      PhysicalLoggerIteratorCref end,
+				      const Real time ) const
   {
     PhysicalLoggerIterator i_start( start );
     PhysicalLoggerIterator i_end( end );
     Real aTime;
-
+    
     if ( start > end )
       {
 	i_start=end;
@@ -235,43 +236,42 @@ namespace libecs
       }
     PhysicalLoggerIterator iterator( i_start );
     PhysicalLoggerIterator return_value( i_start );
-
-	
+    
     do
       {
-	  aTime =at( iterator ).getTime();
-	    if ( aTime <= time )
-		{
-		return_value=iterator;
-		}
-	    
-	  ++iterator;
+	aTime =at( iterator ).getTime();
+	if ( aTime <= time )
+	  {
+	    return_value=iterator;
+	  }
+	
+	++iterator;
 	
       }
-	while ( ( iterator <= i_end ) && ( aTime < time ) );
-
+    while ( ( iterator <= i_end ) && ( aTime < time ) );
+    
     return return_value;
   }
-
-
-
+  
+  
+  
   PhysicalLoggerIterator 
   PhysicalLogger::upper_bound_linear( PhysicalLoggerIteratorCref start,
-			       PhysicalLoggerIteratorCref end,
-			       const Real time ) const
+				      PhysicalLoggerIteratorCref end,
+				      const Real time ) const
   {
     PhysicalLoggerIterator result( lower_bound_linear( start, end, time ) );
-
+    
     if ( ( result < size() - 1 ) && ( at ( result ).getTime() != time ) )
       {
 	++result;
       }
-
+    
     return result;
   }
-
-
-
+  
+  
+  
   void PhysicalLogger::getItem( PhysicalLoggerIteratorCref where,
 				DataPointPtr what ) const
   {
@@ -283,25 +283,25 @@ namespace libecs
     
     *what = at( awhere );
   }
-
-
+  
+  
   DataPointVectorSharedPtr 
   PhysicalLogger::getVector( PhysicalLoggerIteratorCref start,
 			     PhysicalLoggerIteratorCref end ) const
   {
     PhysicalLoggerIterator i_start ( start );
     PhysicalLoggerIterator i_end ( end );
-
+    
     if ( start > end )
       {
 	i_start = end;
 	i_end = start;
       }
-
+    
     PhysicalLoggerIterator counter ( start );
-
+    
     DataPointVectorPtr aVector;
-
+    
     //	assert((start>=0)&&(end<=size()));
     if ( empty() )
       {
@@ -310,135 +310,154 @@ namespace libecs
     else
       {
 	aVector = new DataPointVector ( end - start + 1, PointSize );
-
+	
 	do 
 	  {
-	if (PointSize==2)
-		{
+	    if (PointSize==2)
+	      {
 		( *aVector ).asShort( counter - start ) = at( counter );
-		}
-	else
-		{
+	      }
+	    else
+	      {
 		( *aVector ).asLong( counter - start ) = at( counter );
-		}
+	      }
 	    ++counter;
 	  }
-	  while ( counter <= end );
+	while ( counter <= end );
       }
-
+    
     return DataPointVectorSharedPtr( aVector );
   }
     
-
-
-    PhysicalLogger::size_type PhysicalLogger::size() const
-    {
-	if (PointSize == 2)
-		{
-		return theVector.size();
-		}
-	return theVectorLong.size();
-    }
-
-
-
-    bool PhysicalLogger::empty() const
-    {
-      return ( size() == 0 );
-    }
-
-
-    PhysicalLogger::iterator PhysicalLogger::begin() const
-    {
-      return 0;
-    }
-
-
-
-    PhysicalLogger::iterator PhysicalLogger::end() const
-    {
-       if ( size() > 0 )
-        {
-    	    return size() - 1;
-	}
-       else
-        {
-	    return 0;
-	}
-    }
-
-
-    DataPointLong PhysicalLogger::at( const iterator& index) const
-	{
-	if (PointSize == 2)
-		{
-		return theVector[ index ];
-		}
-	return theVectorLong[ index ];
-
-	}
-
-    DataPointLong PhysicalLogger::front() const
-	{
-      if ( empty ( ) )
-        {
-    	    return anEmptyDataPoint;
-	}
-	return at( 0 );
-
-	}
-
-    DataPointLong PhysicalLogger::back() const
-	{
-      if ( empty ( ) )
-        {
-    	    return anEmptyDataPoint;
-	}
-	return at( end() );
-
-	}
-
-	
-    void PhysicalLogger::push( DataPointCref aDataPoint )
-    {
-      if (PointSize == 2)
-	{
-	theVector.push_back( aDataPoint );
-	}
-      else
-	{
-	theVectorLong.push_back( aDataPoint );
-	}
-    }
-
-
-    void PhysicalLogger::push( DataPointLongCref aDataPoint )
-    {
-      if (PointSize == 2)
-	{
-	theVector.push_back( aDataPoint );
-	}
-      else
-	{
-	theVectorLong.push_back( aDataPoint );
-	}
-    }
   
-
-   Real PhysicalLogger::get_avg_interval() const
-   {
-   if (size()<2)
-     {
-       return 0.0;
-     }
-   else
-     {
-       return (back().getTime()-front().getTime())/(size()-1);
-     }
-   }
-
-
-
+  
+  PhysicalLogger::size_type PhysicalLogger::size() const
+  {
+    if (PointSize == 2)
+      {
+	return theVector.size();
+      }
+    return theVectorLong.size();
+  }
+  
+  
+  
+  bool PhysicalLogger::empty() const
+  {
+    return ( size() == 0 );
+  }
+  
+  
+  PhysicalLogger::iterator PhysicalLogger::begin() const
+  {
+    return 0;
+  }
+  
+  
+  
+  PhysicalLogger::iterator PhysicalLogger::end() const
+  {
+    if ( size() > 0 )
+      {
+	return size() - 1;
+      }
+    else
+      {
+	return 0;
+      }
+  }
+  
+  
+  DataPointLong PhysicalLogger::at( const iterator& index) const
+  {
+    if (PointSize == 2)
+      {
+	return theVector[ index ];
+      }
+	return theVectorLong[ index ];
+	
+  }
+  
+  DataPointLong PhysicalLogger::front() const
+	{
+	  if ( empty ( ) )
+	    {
+	      return anEmptyDataPoint;
+	    }
+	  return at( 0 );
+	  
+	}
+  
+  DataPointLong PhysicalLogger::back() const
+  {
+    if ( empty ( ) )
+      {
+	return anEmptyDataPoint;
+      }
+    return at( end() );
+    
+  }
+  
+  
+  void PhysicalLogger::push( DataPointCref aDataPoint )
+  {
+    if (PointSize == 2)
+      {
+	theVector.push_back( aDataPoint );
+      }
+    else
+      {
+	theVectorLong.push_back( aDataPoint );
+      }
+  }
+  
+  
+  void PhysicalLogger::push( DataPointLongCref aDataPoint )
+  {
+    if (PointSize == 2)
+      {
+	theVector.push_back( aDataPoint );
+      }
+    else
+      {
+	theVectorLong.push_back( aDataPoint );
+      }
+  }
+  
+  Real PhysicalLogger::getAverageInterval() const
+  {
+    if (size()<2)
+      {
+	return 0.0;
+      }
+    else
+      {
+	return ( back().getTime() - front().getTime() ) / ( size() - 1 );
+      }
+  }
+  
+  void PhysicalLogger::aggregate( DataPointCref aDataPoint )
+  {
+    theAggregator.aggregate( aDataPoint ); 
+  }
+  
+  
+  void PhysicalLogger::aggregate( DataPointLongCref aDataPointLong )
+  {
+    theAggregator.aggregate( aDataPointLong );
+    theElementCount++;
+  }
+  
+  
+  void PhysicalLogger::flushAggregate()
+  {
+    push( theAggregator.getData() );
+    theAggregator.beginNextPoint();
+    resetElementCount();
+  }
+  
+  
+  
 
 } // namespace libecs
 

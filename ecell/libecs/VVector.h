@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.17  2004/07/04 10:36:15  bgabor
+ :	Code cleanup.
+ :
  :	Revision 1.16  2004/06/14 17:53:15  bgabor
  :	Bugfixing in LogginPolicy
- :
+ :	
  :	Revision 1.15  2004/06/10 14:29:11  bgabor
  :	New logger policy API introduced.
  :	Logger policy is now four element long.
@@ -303,61 +306,83 @@ template<class T> void vvector<T>::setMaxSize( int aMaxSize )
 template<class T> void vvector<T>::push_back(const T & x)
 {
     ssize_t red_bytes; 
-    if(VVECTOR_WRITE_CACHE_SIZE <= _cacheWNum){ 
-	      THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. \n");
-  }
-
-  _cacheWV[_cacheWNum] = x;
-  	if (_cacheWNum==0){_cacheWI[0]=_size;}
-  	_cacheWI[1] = _size;
-  if (size_fixed){
+    bool write_successful;
+    if(VVECTOR_WRITE_CACHE_SIZE <= _cacheWNum)
+      { 
+	THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. \n");
+      }
+    
+    _cacheWV[_cacheWNum] = x;
+    if (_cacheWNum==0)
+      {
+	_cacheWI[0]=_size;
+      }
+    _cacheWI[1] = _size;
+    if (size_fixed)
+      {
 	_cacheWI[0]--;
-	}
-  if ((VVECTOR_WRITE_CACHE_SIZE <= ++_cacheWNum)) {
+      }
+    else
+      {
+	_size++;
+      }
+    _cacheWNum++;
+
+    if ( VVECTOR_WRITE_CACHE_SIZE <= _cacheWNum )  
+      {
 	// first try to append
-	if (!size_fixed){
-    	if ( ( (red_bytes=write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE) )
-		!= sizeof(T) * VVECTOR_WRITE_CACHE_SIZE) || (_size+1==max_size) )
-		{
+	if (!size_fixed)
+	  {
+	    red_bytes = write( _fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
+	    write_successful = ( red_bytes == sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
 
-			if (end_policy == 0)
-				{
-				if (_size>0)
-					{
-	    		  	THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly disk or allocated space is full.\n");
-					}
-				else{
-		    		  THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly IO or permission error.\n");
-					}
-				}
-			else 
-			{
-				size_fixed=true;
-				_size-=VVECTOR_WRITE_CACHE_SIZE-1;
-
-			}
-		}// if of write statment
-	} //if of append condition
-
+	    if ( (!write_successful )  || ( _size == max_size ) )
+	      {
+		if (end_policy == 0)
+		  {
+		    if (_size>0)
+		      {
+			THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly disk or allocated space is full.\n");
+		      }
+		    else{
+		      THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly IO or permission error.\n");
+		    }
+		  }
+		else 
+		  {
+		    size_fixed=true;
+		    if ( !write_successful )
+		      {
+			_size-=VVECTOR_WRITE_CACHE_SIZE;
+		      }
+		    
+		  }
+	      }// if of write statment
+	  } //if of append condition
+	
 	if (size_fixed){
-	//try to seek start offset
-
-	  if (lseek(_fdw, static_cast<off_t>((start_offset) * sizeof(T)), SEEK_SET) == static_cast<off_t>(-1)) {
-		THROW_EXCEPTION( libecs::Exception, "Write() failed in VVector. Seek error.\n");
-		}
+	  //try to seek start offset
+	  
+	  if (lseek(_fdw, static_cast<off_t>((start_offset) * sizeof(T)), SEEK_SET) == static_cast<off_t>(-1)) 
+	    {
+	      THROW_EXCEPTION( libecs::Exception, "Write() failed in VVector. Seek error.\n");
+	    }
 	  if (write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE)
-		!= sizeof(T) * VVECTOR_WRITE_CACHE_SIZE) {
+	      != sizeof(T) * VVECTOR_WRITE_CACHE_SIZE) 
+	    {
 	      THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly IO error.\n");
-		}
-	start_offset+=VVECTOR_WRITE_CACHE_SIZE;
-	if (start_offset >= _size){ start_offset = 0;}
-
-
-    }
-    _cacheWNum = 0;
-
-  }
-	if (!size_fixed){  _size++; }
+	    }
+	  start_offset += VVECTOR_WRITE_CACHE_SIZE;
+	  if (start_offset >= _size)
+	    { 
+	      start_offset -= _size;
+	    }
+	  
+	  
+	}
+	_cacheWNum = 0;
+	
+      }
 }
 
 

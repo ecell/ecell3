@@ -133,12 +133,12 @@ namespace libecs
   DECLARE_CLASS( DataPoint );
   DECLARE_CLASS( DataPointLong );
   DECLARE_CLASS( DataPointAggregator );
-
+  DECLARE_CLASS ( PhysicalLogger );
   DECLARE_CLASS( DataPointVector );
 
 
   // containers
-
+  DECLARE_VECTOR( PhysicalLoggerPtr, PhysicalLoggerVector );
   DECLARE_VECTOR( Polymorph,    PolymorphVector );
   DECLARE_VECTOR( VariablePtr,  VariableVector );
   DECLARE_VECTOR( ProcessPtr,   ProcessVector );

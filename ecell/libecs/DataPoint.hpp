@@ -145,7 +145,7 @@ namespace libecs
       return 2;
     }
    
-    DataPoint& operator = ( const DataPointLong& dpt5 );
+    DataPointRef operator = ( DataPointLongCref );
 
   protected:
 
@@ -197,49 +197,49 @@ namespace libecs
     }
 
 
-    DataPointLong( const DataPoint& dpt) // constructor from DP2
-	{
-	
-	
-		theTime = dpt.getTime() ;
-		theValue = dpt.getValue() ;
-		theAvg = dpt.getAvg() ;
-		theMin = dpt.getMin() ;
-		theMax = dpt.getMax() ;
-	
-
-	}
-
-
-    DataPointLong& operator = ( const DataPoint& dpt )
-	{
-		setTime( dpt.getTime() );
-		setValue ( dpt.getValue() );
-		setAvg ( dpt.getAvg() );
-		setMin ( dpt.getMin() );
-		setMax ( dpt.getMax() );
-	}
-
+    DataPointLong( DataPointCref aDataPoint) // constructor from DP2
+    {
+      
+      
+      theTime = aDataPoint.getTime() ;
+      theValue = aDataPoint.getValue() ;
+      theAvg = aDataPoint.getAvg() ;
+      theMin = aDataPoint.getMin() ;
+      theMax = aDataPoint.getMax() ;
+      
+      
+    }
+    
+    
+    DataPointLongRef operator = ( DataPointCref aDataPoint )
+    {
+      setTime( aDataPoint.getTime() );
+      setValue ( aDataPoint.getValue() );
+      setAvg ( aDataPoint.getAvg() );
+      setMin ( aDataPoint.getMin() );
+      setMax ( aDataPoint.getMax() );
+    }
+    
     ~DataPointLong()
     {
       ; // do nothing
     }
-
+    
     const Real getTime() const
     {
       return theTime;
     }
-
+    
     const Real getValue() const
     {
       return theValue;
     }
-
+    
     const Real getAvg() const
     {
       return theAvg;
     }
-
+    
     const Real getMin() const
     {
       return theMin;
@@ -297,45 +297,42 @@ namespace libecs
 
 
 
- class DataPointAggregator
-	{
-
-	public:
-
-	DataPointAggregator();
-
-	DataPointAggregator( const DataPointLong& );
-
-
-	~DataPointAggregator();
-
-	void aggregate( const DataPointLong& );
-
-	const DataPointLong& getData();
-
-	void beginNextPoint();
-
-	DataPointLong getLastPoint();
-
-	private:
-	void store( const DataPointLong& );
-
-	bool stockpile( DataPointLong&, const DataPointLong& );
-	void calculate( const DataPointLong& );
-	void calculateMinMax( DataPointLong&, const DataPointLong& );
-
-	DataPointLong Accumulator;
-	DataPointLong Collector;
-	DataPointLong PreviousPoint;
-
-	public:
-	void printDP( const DataPointLong& );
-	void printDP(  );
-	};
-
-
+  class DataPointAggregator
+  {
+    
+  public:
+    
+    DataPointAggregator();
+    
+    DataPointAggregator( DataPointLongCref );
+    
+    
+    ~DataPointAggregator();
+    
+    void aggregate( DataPointLongCref );
+    
+    DataPointLongCref getData();
+    
+    void beginNextPoint();
+    
+    DataPointLong getLastPoint();
+    
+  private:
+    void store( DataPointLongCref );
+    
+    bool stockpile( DataPointLongRef, DataPointLongCref );
+    void calculate( DataPointLongCref );
+    void calculateMinMax( DataPointLongRef, DataPointLongCref );
+    
+    DataPointLong theAccumulator;
+    DataPointLong theCollector;
+    DataPointLong thePreviousPoint;
+    
+  };
+  
+  
   //@}
-
+  
 } // namespace libecs
 
 

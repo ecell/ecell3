@@ -34,6 +34,7 @@
 #if !defined(__LOGGER_HPP)
 #define __LOGGER_HPP
 
+#include <vector>
 #include "libecs.hpp"
 #include "LoggerAdapter.hpp"
 #include "PhysicalLogger.hpp"
@@ -45,18 +46,6 @@ namespace libecs
 
 
   
-  const Integer   _LOGGER_MAX_PHYSICAL_LOGGERS = 5;
-  const Integer   _LOGGER_DIVIDE_STEP = 200;
-  
-  // enumeration for logging policy
-  enum  
-    {
-      _STEP_SIZE,
-      _TIME_INTERVAL,
-      _END_POLICY,
-      _MAX_SPACE
-    };
-
 
 
   /** @addtogroup logging The Data Logging Module.
@@ -78,11 +67,20 @@ namespace libecs
   class Logger
   {
 
-
+    
   public:
-
-    typedef DataPointVectorIterator const_iterator;
-    typedef PhysicalLogger::iterator phys_iterator;
+    
+    static const int LOGGER_DIVIDE_STEP = 200;
+    static const int MAX_SUBLOGGER_NUMBER = 4;
+    
+    // enumeration for logging policy
+    enum  Policy
+      {
+	STEP_SIZE = 0,
+	TIME_INTERVAL,
+	END_POLICY,
+	MAX_SPACE
+      };
 
 
   public:
@@ -192,7 +190,7 @@ namespace libecs
 
     const int getSize() const
     {
-      return thePhysicalLoggers[0]->size();
+      return thePrimaryPhysicalLogger.size();
     }
 
     /**
@@ -212,12 +210,6 @@ namespace libecs
     }
 
 
-    /**
-       Writes data (aTime, aValue ) onto the logger
-    */
-
-    void appendData( RealParam aTime, RealParam aValue );
-
 
     /**
        Forces logger to write data even if mimimuminterval or
@@ -235,15 +227,22 @@ namespace libecs
 
     */
 
-    const_iterator binary_search( const_iterator begin,
-				  const_iterator end,
+    DataPointVectorIterator binary_search( DataPointVectorIterator begin,
+				  DataPointVectorIterator end,
 				  RealParam t ) 
     {
-      return thePhysicalLoggers[0]->lower_bound( thePhysicalLoggers[0]->begin(), 
-						 thePhysicalLoggers[0]->end(), 
+      return thePrimaryPhysicalLogger.lower_bound( thePrimaryPhysicalLogger.begin(), 
+						 thePrimaryPhysicalLogger.end(), 
 						 t );
     }
     
+
+    /**
+       Writes data (aTime, aValue ) onto the logger
+    */
+
+    void appendData( RealParam aTime, RealParam aValue );
+
 
   private:
     
@@ -255,13 +254,15 @@ namespace libecs
 
     /// Assignment operator is hidden
   
-    Logger& operator=( const Logger& );
+    LoggerRef operator=(  LoggerCref );
 
     /// no default constructor
 
     Logger( void );
   
+    void aggregate( DataPointLongCref , int );
 
+    void setSubLoggerPolicy( int );
 
 
   private:
@@ -269,17 +270,15 @@ namespace libecs
     /// Data members
 
     //    PropertySlotRef      thePropertySlot;
-    void aggregate( DataPointLong , int );
-
-    LoggerAdapterPtr     theLoggerAdapter;
-    PhysicalLogger*	 thePhysicalLoggers[_LOGGER_MAX_PHYSICAL_LOGGERS];
-    DataPointAggregator* theDataAggregators;
-    Real                 theLastTime;
-    const_iterator       theStepCounter;
-    Integer              theMinimumStep; //0-minimum step, 1 minimum time 3 end policy 4 max space available in kbytes
-    Real                 theMinimumInterval;
-    Integer              theSizeArray[_LOGGER_MAX_PHYSICAL_LOGGERS];
-    Polymorph	         theLoggingPolicy;
+    LoggerAdapterPtr          theLoggerAdapter;
+    PhysicalLogger            thePrimaryPhysicalLogger;
+    PhysicalLoggerVector      theSubPhysicalLoggerArray;
+    Real                      theLastTime;
+    PhysicalLoggerIterator    theStepCounter;
+    Integer                   theMinimumStep; //0-minimum step, 1 minimum time 3 end policy 4 max space available in kbytes
+    Real                      theMinimumInterval;
+    Polymorph	              theLoggingPolicy;
+    PhysicalLoggerIterator    thePrimaryMaxSize;
   };
 
 
