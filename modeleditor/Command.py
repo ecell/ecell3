@@ -33,6 +33,7 @@ class Command:
 			if self.do():
 				self.executed = True
 			else:
+				raise Exception("%s command failed.\n Arguments: %s"%(self.__class__.__name__, self.thaArgs) )
 				self.theReverseCommandList = None
 
 
@@ -96,6 +97,7 @@ class ModelCommand( Command ):
 	"""
 
 	def checkArgs( self ):
+
 		if not Command.checkArgs(self):
 
 			return False
@@ -103,6 +105,8 @@ class ModelCommand( Command ):
 		if type( self.theReceiver) == type(self):
 
 			if self.theReceiver.__class__.__name__ == 'ModelEditor':
+
+
 				self.theModel = self.theReceiver.getModel()
 				self.theBufferFactory = BufferFactory ( self.theModel )
 				self.theBufferPaster = BufferPaster ( self.theModel )

@@ -485,7 +485,7 @@ class ModelEditor:
 			self.theFullIDBrowser.update( aType,anID )
 		if self.theMainWindow.exists():
 			self.theMainWindow.update()
-		self.theLayoutManager.update( aType, anID )
+		#self.theLayoutManager.update( aType, anID )
 
 
 	def __closeModel ( self ):

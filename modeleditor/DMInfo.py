@@ -13,14 +13,16 @@ class DMInfo:
 		self.theSimulator = ecell._ecs.Simulator()
 		
 		# create system and variables
-		self.theSimulator.createEntity(DM_SYSTEM_CLASS, 'System:/:System' )
+		self.theSimulator.createEntity(DM_SYSTEM_CLASS, 'System:/:'+DM_SYSTEM_CLASS )
+		self.theSimulator.createEntity(DM_SYSTEM_CLASS_OLD, 'System:/:'+DM_SYSTEM_CLASS_OLD )
+
 		self.theSimulator.createEntity(DM_VARIABLE_CLASS, 'Variable:/:Variable' )
 
 
 
 	def getClassList( self, aType ):
 		if aType == ME_SYSTEM_TYPE:
-			return [DM_SYSTEM_CLASS ]
+			return [DM_SYSTEM_CLASS, DM_SYSTEM_CLASS_OLD ]
 		if aType == ME_VARIABLE_TYPE:
 			return [DM_VARIABLE_CLASS ]
 

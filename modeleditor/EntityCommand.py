@@ -65,6 +65,7 @@ class DeleteEntityList(ModelCommand):
 
 			self.theModel.deleteEntity( anID )
 
+
 			aParentSys = convertSysIDToSysPath ( getParentSystemOfFullID( anID ) )
 
 			if self.theAffectedPath == None:
@@ -235,23 +236,31 @@ class CutEntityList(ModelCommand):
 	def do( self ):
 		# create copy buffer
 		self.theReceiver.setCopyBuffer ( self.theBufferFactory.createEntityListBuffer( self.__theType, self.__theIDList ) )
-		
+		self.theAffectedPath = None
 		# delete list
+		reverseBuffer = self.theBufferFactory.createEntityListBuffer( self.__theType, self.__theIDList )
+
 		for anID in self.__theIDList:
-			try:
-				self.theModel.deleteEntity( anID )
-			except Exception:
-				pass
+			self.theModel.deleteEntity( anID )
+			aParentSys = convertSysIDToSysPath ( getParentSystemOfFullID( anID ) )
+
+			if self.theAffectedPath == None:
+				self.theAffectedPath = aParentSys
+			else:
+				self.theAffectedPath = getMinPath( self.theAffectedPath, aParentSys )
+
+		self.theReverseCommandList = [ PasteEntityList( self.theReceiver, reverseBuffer, aParentSys ) ]
+
 		return True
 
 
 	def createReverseCommand( self ):
-		reverseBuffer = self.theBufferFactory.createEntityListBuffer( self.__theType, self.__theIDList )
-		self.theReverseCommandList = [ PasteEntityList( self.theReceiver, reverseBuffer ) ]
+		#reverse commandlist is created throughout do command
+		self.theReverseCommandList = None
 
 
 	def getAffected( self ):
-		return (self.__theType, getParentSystemOfFullID( self.__theIDList[0] ) )
+		return (self.__theType, convertSysPathToSysID( self.theAffectedPath ) )
 
 
 
@@ -264,14 +273,17 @@ class PasteEntityList(ModelCommand):
 	ARGS_NO = 2
 
 	def checkArgs( self ):
+
 		if not ModelCommand.checkArgs(self):
 			return False
+
 		self.__theBuffer = self.theArgs[ self.BUFFER ]
 		self.__theSysPath = self.theArgs[ self.SYSPATH ]
 		self.__theType = self.__theBuffer.getType()
 
 		if not self.theModel.isEntityExist( convertSysPathToSysID( self.__theSysPath ) ):
 			return False
+
 		return True
 
 

@@ -252,7 +252,7 @@ class SystemTree(ViewComponent):
 		newID = ME_SYSTEM_TYPE + ':' + aPath + ':' + newName
 
 		# call addnew in modeleditor
-		aCommand = CreateEntity( self.theModelEditor, newID, ME_SYSTEM_TYPE )
+		aCommand = CreateEntity( self.theModelEditor, newID, DM_SYSTEM_CLASS )
 		self.theSelection = [ newID ]
 		self.__unselectRows()
 		self.theModelEditor.doCommandList ( [ aCommand ] )
