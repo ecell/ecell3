@@ -99,10 +99,6 @@ class MainWindow(OsogoWindow):
 		messageWindowSize=self.theMessageWindow.getActualSize()
 		self.theMessageWindow['scrolledwindow1'].set_size_request(\
 		    messageWindowSize[0], messageWindowSize[1] )
-                self['messagehandlebox'].connect('child-attached',\
-                                            self.__MessageWindowAttached)
-                self['messagehandlebox'].connect('child-detached',\
-                                            self.__MessageWindowDetached)
 
 		# -------------------------------------
 		# append signal handlers
@@ -116,7 +112,7 @@ class MainWindow(OsogoWindow):
                     'message_window_menu_activate': self.__toggleMessageWindow,
                     'interface_window_menu_activate'
                     : self.__displayWindow ,
-                    'create_new_entity_list_menu_activate'
+                    'entity_list_menu_activate'
                     : self.__createEntityListWindow ,
                     'logger_window_menu_activate' : self.__displayWindow,
                     'stepper_window_menu_activate': self.__displayWindow,
@@ -160,8 +156,8 @@ class MainWindow(OsogoWindow):
 
 
 		self.theMessageWindowVisible = True
-		#self['message_togglebutton'].set_active(TRUE)
-		#self['message_window_menu'].set_active(TRUE)
+		self['message_togglebutton'].set_active(TRUE)
+		self['message_window_menu'].set_active(TRUE)
 
 
 		# display MainWindow
@@ -184,7 +180,10 @@ class MainWindow(OsogoWindow):
 		# creates EntityListWindow 
 		# -------------------------------------
 
-                self.theEntityListWindow = self.theSession.createEntityListWindow()
+                self.theEntityListWindow = self.theSession.createEntityListWindow( 'top_frame' )
+                self['entitylistarea'].add( self.theEntityListWindow['top_frame'] )
+
+
 
 	def __expose( self, *arg ):
 		"""expose
@@ -222,9 +221,9 @@ class MainWindow(OsogoWindow):
 		self['start_button'].set_sensitive(aDataLoadedStatus)
 		self['stop_button'].set_sensitive(aDataLoadedStatus)
 		self['step_button'].set_sensitive(aDataLoadedStatus)
-#		self['entitylist_button'].set_sensitive(aDataLoadedStatus)
-#		self['logger_button'].set_sensitive(aDataLoadedStatus)
-#		self['stepper_button'].set_sensitive(aDataLoadedStatus)
+		self['entitylist_button'].set_sensitive(aDataLoadedStatus)
+		self['logger_button'].set_sensitive(aDataLoadedStatus)
+		self['stepper_button'].set_sensitive(aDataLoadedStatus)
 #		self['interface_button'].set_sensitive(aDataLoadedStatus)
 #		self['board_button'].set_sensitive(aDataLoadedStatus)
 
@@ -233,12 +232,13 @@ class MainWindow(OsogoWindow):
 		self['load_script_menu'].set_sensitive(not aDataLoadedStatus)
 		self['save_model_menu'].set_sensitive(aDataLoadedStatus)
 
-		# view menu
+		# window menu
+#		self['none'].set_sensitive(0)
 		self['logger_window_menu'].set_sensitive(aDataLoadedStatus)
 		self['stepper_window_menu'].set_sensitive(aDataLoadedStatus)
 		self['interface_window_menu'].set_sensitive(aDataLoadedStatus)
 		self['board_window_menu'].set_sensitive(aDataLoadedStatus)
-		self['create_new_entity_list_menu'].set_sensitive(aDataLoadedStatus)
+		self['entity_list_menu'].set_sensitive(aDataLoadedStatus)
 		self['save_model_menu'].set_sensitive(aDataLoadedStatus)
 
 
@@ -371,6 +371,7 @@ class MainWindow(OsogoWindow):
 			self.theSession.theSimulator.initialize()
                         self.theEntityListWindow.setSession( self.theSession )
 
+
 		except:
 
 			# expants message window, when it is folded.
@@ -478,6 +479,10 @@ class MainWindow(OsogoWindow):
 		""" restores message method and closes window """
 
 		self.theSession.restoreMessageMethod()
+
+                if len( self.theSession.theModelName ) > 0:
+                    self.theEntityListWindow.update()                    
+
 		OsogoWindow.close( self )
 
 
@@ -548,11 +553,12 @@ class MainWindow(OsogoWindow):
 
 	def setStepSize( self, num ):
 		""" sets Stepsize entry box to num """
+
 		self['sec_step_entry'].set_text( str (num) )
 		self.__setStepSizeOrSec( self, None )
 
 	def __setStepSizeOrSec( self, *arg ):
-
+        
 		# gets the inputerd characters from the GtkEntry. 
 		aNewValue = string.strip( self['sec_step_entry'].get_text() )
 
@@ -644,7 +650,7 @@ class MainWindow(OsogoWindow):
 		else:
 			flag = gtk.FALSE
 		self['logger_window_menu'].set_active( flag )
-#		self['logger_button'].set_active(flag)
+		self['logger_button'].set_active(flag)
 			
 		# interface window:
 		if self.theSession.doesExist('InterfaceWindow' ):
@@ -660,7 +666,7 @@ class MainWindow(OsogoWindow):
 		else:
 			flag = gtk.FALSE
 		self['stepper_window_menu'].set_active( flag )
-#		self['stepper_button'].set_active(flag)
+		self['stepper_button'].set_active(flag)
 
 
 	
@@ -670,7 +676,7 @@ class MainWindow(OsogoWindow):
 		else:
 			flag = gtk.FALSE
 		self['message_window_menu'].set_active(flag)
-#		self['message_togglebutton'].set_active( flag )
+		self['message_togglebutton'].set_active( flag )
 
 
 		self.__button_update = False
@@ -716,13 +722,13 @@ class MainWindow(OsogoWindow):
 			self.theSession.toggleWindow('StepperWindow')
 
 		# When InterfaceWindow is selected
-		elif arg[0] == self['interface_button'] or \
-		     arg[0] == self['interface_window_menu']:
+#		elif arg[0] == self['interface_button'] or \
+                elif arg[0] == self['interface_window_menu']:
 			self.theSession.toggleWindow('InterfaceWindow')
 
 		# When BoardWindow is selected
-		elif arg[0] == self['board_button'] or \
-		     arg[0] == self['board_window_menu']:
+#		elif arg[0] == self['board_button'] or \
+		elif arg[0] == self['board_window_menu']:
 			self.theSession.toggleWindow('BoardWindow')
 
 		self.update()
@@ -732,12 +738,12 @@ class MainWindow(OsogoWindow):
 	def hideMessageWindow( self ):            
             
                 self[ 'messagehandlebox' ].hide()
-#		self['message_togglebutton'].set_active(gtk.FALSE)
+		self['message_togglebutton'].set_active(gtk.FALSE)
 
 
 	def showMessageWindow( self ):
 		self[ 'messagehandlebox' ].show()
-#		self['message_togglebutton'].set_active(gtk.TRUE)
+		self['message_togglebutton'].set_active(gtk.TRUE)
 
 
         def __toggleMessageWindow( self, *arg ) :
@@ -764,28 +770,6 @@ class MainWindow(OsogoWindow):
 			self.__resizeVertically(0)
 
 		self.updateButtons()
-
-
-        def __MessageWindowAttached(self,obj,obj2):
-               """
-               This handler is called when the MessageWindow is attached
-               to the MainWindow.
-               """
-
-               self.theMessageWindow.updateSize()
-
-               self.__resizeVertically(\
-                   self.theMessageWindow.getActualSize()[1] )
-
-        def __MessageWindowDetached(self,obj,obj2):
-               """
-               This handler is called when the MessageWindow is dettached
-               from the MainWindow.
-               """
-
-               self.theMessageWindow.updateSize()
-               
-               self.__resizeVertically(0)
 
 
 	def __displayAbout ( self, *args ):
