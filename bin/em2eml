@@ -1,8 +1,7 @@
 #!/usr/bin/env python2
 
 from spark import *
-import sys
-import string 
+import sys , string , getopt , tempfile
 import eml
 
 class Token:
@@ -13,7 +12,7 @@ class Token:
 		
 	def __cmp__(self, o):
 		return cmp(self.type, o)
-        ###
+
         def __repr__(self):
                 return str(self.type)
 
@@ -314,37 +313,83 @@ def sortSystemID( aList ):
 	aSortList = aHightList + aLowList
 	return aSortList
 
+def usage():
+	sys.stderr.write("""\
+Usage: pem.py [options] <filename>...
+       default automatic rename mode (*.em -> *.eml) 
+
+Valid options:
+  -f      stdout mode
+""")
+	
 if __name__ == '__main__':
-	aFilename = sys.argv[1]
-	aFile = open( aFilename )
+	try:
+		opts , args = getopt.getopt(sys.argv[1:] , 'fD')
+	except:
+		usage()
+		sys.exit(0)
+		
+	mode = ''
+	for (opt , value ) in opts:
+		if opt == '-D':
+			mode = 'debug'
+		if opt == '-f':
+			mode = 'stdout'
+	if not args:
+		args.append('-')
+	for filename in args:
+		if filename == '-':
+			anEmFile = sys.stdin
+		else:
+			anEmFilename = filename
+			anEmFile = open( anEmFilename, 'r')
+
 	aScanner = ErScanner()
-	aTokenList = aScanner.tokenize( aFile.read() )
-#	print aTokenList
+	aTokenList = aScanner.tokenize( anEmFile.read() )
+	if mode is 'debug':
+		print aTokenList
 	aParser = ErParser()
 	anAst = aParser.parse( aTokenList )
+	if mode == 'debug':
+		print anAst
 
-	aFileObject = open('minimum.eml')
-	anEml = eml.Eml( aFileObject )
-	anEml.entity = []
+	# template EmlFile generate
+	tempFilename = tempfile.mktemp()
+	tempFile = open(tempFilename, 'w')
+	tempFile.write('<?xml version="1.0" ?><eml><stepperlist/></eml>')
+	tempFile.close()
+	
+	anEml = eml.Eml( open(tempFilename) )
+	anEml.entity   = []
 	anEml.property = []
-	anEml.queue = []
+	anEml.queue    = []
 	
 	aInterpreter = Interpret( anAst )
 
 	anEml.queue = []
-
 	anEml.entity = sortSystemID(anEml.entity)
 
 	for i in anEml.entity:
 		(aClass, aFullID) = i
-#		print "createEntity( %s, %s)" % (aClass, aFullID)
+		if mode == 'debug':
+        		print "createEntity( %s, %s)" % (aClass, aFullID)
 		anEml.createEntity(aClass, aFullID)
 
 	for j in anEml.property:
 		(aFullID, aPropertyName, aValueList) = j
-#		print "setEntityProperty(%s, %s, %s)" % (aFullID, aPropertyName, aValueList)
+		if mode == 'debug':
+        		print "setEntityProperty(%s, %s, %s)" % (aFullID, aPropertyName, aValueList)
 		anEml.setEntityProperty(aFullID, aPropertyName, aValueList)
+		
+       	aString = anEml.asString()
+
+	if mode == 'stdout' or mode == 'debug':
+		print aString
+	else:
+		anOutputFilename =  string.join(string.split(anEmFilename, '.em'), '.eml')
+		anOutput = open(anOutputFilename, 'w')
+		anOutput.write(aString)
+		anOutput.close()
+		
+
 	
-	string = anEml.asString()
-	print string
-#	print anAst
