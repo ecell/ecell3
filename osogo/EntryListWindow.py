@@ -69,6 +69,7 @@ class EntryListWindow(Window):
     def constructTree( self, aParentTree, aSystemFullID ):
         aLeaf = gtk.GtkTreeItem( label=aSystemFullID[ID] )
         aLeaf.set_data( 'FULLID', aSystemFullID )
+        aLeaf.connect( 'select', self.selectSystem )
         aParentTree.append( aLeaf )
         aLeaf.show()
 
@@ -152,6 +153,16 @@ class EntryListWindow(Window):
             self.theSelectedFullPNList.append( aFullPN )
         self.updateStatusBar()
         
+    def selectSystem( self, aTreeItemObj ):
+        aFullID = aTreeItemObj.get_data('FULLID')
+        aFullPN = convertFullIDToFullPN( aFullID )
+        self.theSelectedFullPNList = [ aFullPN ]
+
+        self.thePropertyWindow.theRawFullPNList = self.theSelectedFullPNList
+        self.thePropertyWindow.setFullPNList()
+        
+        self.updateStatusBar()
+
     def updateStatusBar( self ):
         aStatusString = 'Selected: '
         for aFullPN in self.theSelectedFullPNList:
