@@ -28,44 +28,95 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#ifndef __INTERPOLATOR_HPP
-#define __INTERPOLATOR_HPP
+#ifndef __VARIABLEPROXY_HPP
+#define __VARIABLEPROXY_HPP
 
 #include "libecs.hpp"
 
 namespace libecs
 {
 
-  class Interpolator
+  class VariableProxy
   {
     friend class libecs::Stepper;
 
 
   public:
 
-    virtual ~Interpolator()
+    class VariablePtrCompare
     {
-      ; // do nothing
-    }
-    
+    public:
+      bool operator()( VariableProxyCptr const aLhs, 
+		       VariableProxyCptr const aRhs ) const
+      {
+	return compare( aLhs->getVariable(), aRhs->getVariable() );
+      }
+
+      bool operator()( VariableProxyCptr const aLhs,
+		       VariableCptr const aRhs ) const
+      {
+	return compare( aLhs->getVariable(), aRhs );
+      }
+
+      bool operator()( VariableCptr const aLhs, 
+		       VariableProxyCptr const aRhs ) const
+      {
+	return compare( aLhs, aRhs->getVariable() );
+      }
+
+    private:
+
+      // if statement can be faster than returning an expression directly
+      inline static bool compare( VariableCptr const aLhs, 
+				  VariableCptr const aRhs )
+      {
+	if( aLhs < aRhs )
+	  {
+	    return true;
+	  }
+	else
+	  {
+	    return false;
+	  }
+      }
+
+
+    };
+
+
+
+
+    VariableProxy( VariablePtr const aVariable );
+
+    virtual ~VariableProxy();
     
     virtual const Real getVelocity( RealCref aTime )
     {
       return 0.0;
     }
     
-    
-  protected:
-    
-    Interpolator();
+    VariablePtr const getVariable() const
+    {
+      return theVariable;
+    }
+
+    void integrate();
+
+
+  private:
+
+    VariablePtr const theVariable;
     
   };
+
+
+  DECLARE_VECTOR( VariableProxyPtr, VariableProxyVector );
 
 }
 
 
 
-#endif /* __INTERPOLATOR_HPP */
+#endif /* __VARIABLEPROXY_HPP */
 
 
 

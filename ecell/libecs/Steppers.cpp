@@ -48,9 +48,7 @@ namespace libecs
 
   void FixedEuler1Stepper::step()
   {
-    const UnsignedInt aSize( theWriteVariableVector.size() );
-
-    integrate();
+    const UnsignedInt aSize( theVariableProxyVector.size() );
 
     processNegative();
     log();
@@ -62,12 +60,13 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 
 	theVelocityBuffer[ c ] = aVariable->getVelocity();
 
 	// avoid negative value
-	while( aVariable->checkRange( getStepInterval() ) == false )
+	while( aVariable->checkRange( getCurrentTime() + getStepInterval() ) 
+	       == false )
 	  {
 	    // don't use setStepInterval()
 	    loadStepInterval( getStepInterval() * 0.5 );
@@ -95,9 +94,6 @@ namespace libecs
 
   void FixedRungeKutta4Stepper::step()
   {
-    // integrate phase first
-    integrate();
-
     processNegative();
 
     log();
@@ -108,10 +104,10 @@ namespace libecs
     // ========= 1 ===========
     processNormal();
 
-    const UnsignedInt aSize( theWriteVariableVector.size() );
+    const UnsignedInt aSize( theVariableProxyVector.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 
 	// get k1
 	Real aVelocity( aVariable->getVelocity() );
@@ -131,7 +127,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	const Real aVelocity( aVariable->getVelocity() );
 	theVelocityBuffer[ c ] += aVelocity + aVelocity;
 
@@ -148,7 +144,7 @@ namespace libecs
     processNormal();
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	const Real aVelocity( aVariable->getVelocity() );
 	theVelocityBuffer[ c ] += aVelocity + aVelocity;
 
@@ -166,7 +162,7 @@ namespace libecs
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	const Real aVelocity( aVariable->getVelocity() );
 
 	// restore x (original value)
@@ -196,8 +192,6 @@ namespace libecs
 
   void Euler1Stepper::step()
   {
-    integrate();
-
     processNegative();
 
     log();
@@ -213,7 +207,7 @@ namespace libecs
 
   bool Euler1Stepper::calculate()
   {
-    const UnsignedInt aSize( theWriteVariableVector.size() );
+    const UnsignedInt aSize( theVariableProxyVector.size() );
 
     // don't expect too much from euler
     const Real eps_rel( getTolerance() );
@@ -226,7 +220,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	
 	const Real aVelocity( aVariable->getVelocity() );
 
@@ -248,7 +242,7 @@ namespace libecs
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 
 	// get k2 = f(x+h/2, y+k1*h/2)
 	const Real aVelocity( aVariable->getVelocity() );
@@ -338,16 +332,13 @@ namespace libecs
   {
     DifferentialStepper::initialize();
 
-    const UnsignedInt aSize( theWriteVariableVector.size() );
+    const UnsignedInt aSize( theVariableProxyVector.size() );
 
     theK1.resize( aSize );
   }
 
   void Midpoint2Stepper::step()
   {
-    // integrate phase first
-    integrate();
-
     processNegative();
 
     log();
@@ -365,7 +356,7 @@ namespace libecs
 
   bool Midpoint2Stepper::calculate()
   {
-    const UnsignedInt aSize( theWriteVariableVector.size() );
+    const UnsignedInt aSize( theVariableProxyVector.size() );
 
     const Real eps_rel( getTolerance() );
     const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
@@ -377,7 +368,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	    
 	// get k1
 	const Real aVelocity( aVariable->getVelocity() );
@@ -396,7 +387,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	    
 	// get k2
 	const Real aVelocity( aVariable->getVelocity() );
@@ -423,7 +414,7 @@ namespace libecs
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	
 	const Real aVelocity( aVariable->getVelocity() );
 	
@@ -511,7 +502,7 @@ namespace libecs
   {
     DifferentialStepper::initialize();
 
-    const UnsignedInt aSize( theWriteVariableVector.size() );
+    const UnsignedInt aSize( theVariableProxyVector.size() );
 
     theK1.resize( aSize );
     theK2.resize( aSize );
@@ -525,9 +516,6 @@ namespace libecs
   
   void CashKarp4Stepper::step()
   {
-    // integrate phase first
-    integrate();
-
     processNegative();
 
     log();
@@ -545,7 +533,7 @@ namespace libecs
 
   bool CashKarp4Stepper::calculate()
   {
-    const UnsignedInt aSize( theWriteVariableVector.size() );
+    const UnsignedInt aSize( theVariableProxyVector.size() );
 
     const Real eps_rel( getTolerance() );
     const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
@@ -557,7 +545,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	    
 	// get k1
 	theK1[ c ] = aVariable->getVelocity();
@@ -581,7 +569,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	
 	theK2[ c ] = aVariable->getVelocity();
 	    
@@ -605,7 +593,7 @@ namespace libecs
 	
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	
 	theK3[ c ] = aVariable->getVelocity();
 	
@@ -630,7 +618,7 @@ namespace libecs
     
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	
 	theK4[ c ] = aVariable->getVelocity();
 	
@@ -656,7 +644,7 @@ namespace libecs
 	
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	
 	theK5[ c ] = aVariable->getVelocity();
 	    
@@ -690,7 +678,7 @@ namespace libecs
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	
 	theK6[ c ] = aVariable->getVelocity();
 
@@ -768,7 +756,7 @@ namespace libecs
   {
     DifferentialStepper::initialize();
 
-    const UnsignedInt aSize( theWriteVariableVector.size() );
+    const UnsignedInt aSize( theVariableProxyVector.size() );
 
     theK1.resize( aSize );
     theK2.resize( aSize );
@@ -783,8 +771,6 @@ namespace libecs
 
   void DormandPrince547MStepper::step()
   {
-    integrate();
-
     processNegative();
 
     log();
@@ -800,7 +786,7 @@ namespace libecs
 
   bool DormandPrince547MStepper::calculate()
   {
-    const UnsignedInt aSize( theWriteVariableVector.size() );
+    const UnsignedInt aSize( theVariableProxyVector.size() );
 
     // don't expect too much from euler
     const Real eps_rel( getTolerance() );
@@ -813,7 +799,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	
 	// get k1
 	theK1[ c ] = aVariable->getVelocity();
@@ -835,7 +821,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	
 	// get k2
 	theK2[ c ] = aVariable->getVelocity();
@@ -860,7 +846,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	
 	// get k3
 	theK3[ c ] = aVariable->getVelocity();
@@ -886,7 +872,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	
 	// get k4
 	theK4[ c ] = aVariable->getVelocity();
@@ -912,7 +898,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	
 	// get k5
 	theK5[ c ] = aVariable->getVelocity();
@@ -939,7 +925,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 	
 	// get k6
 	theK6[ c ] = aVariable->getVelocity();
@@ -970,7 +956,7 @@ namespace libecs
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 
 	// get k7
 	theK7[ c ] = aVariable->getVelocity();

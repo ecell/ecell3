@@ -28,22 +28,33 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "VariableMaker.hpp"
+#include "Variable.hpp"
+
+#include "VariableProxy.hpp"
 
 
 namespace libecs
 {
-
-  void VariableMaker::makeClassList()
+  
+  VariableProxy::VariableProxy( VariablePtr const aVariable )
+    :
+    theVariable( aVariable )
   {
-    // temporary workaround
-    //    addClass( new Module( "Variable", PlainVariable::createInstance ) );
-
-    NewVariableModule( Variable );
-    //    NewVariableModule( PositiveVariable );
+    theVariable->registerStepper( this );
   }
 
-} // namespace libecs
+
+  VariableProxy::~VariableProxy()
+  {
+    ; // do nothing
+  }
+
+  void VariableProxy::integrate()
+  {
+    theVariable->integrate( this );
+  }
+
+}
 
 /*
   Do not modify

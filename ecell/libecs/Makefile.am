@@ -28,6 +28,7 @@ Variable.cpp\
 VariableMaker.cpp\
 Stepper.cpp\
 Steppers.cpp\
+VariableProxy.cpp\
 Model.cpp\
 Scheduler.cpp\
 EntityType.cpp\
@@ -59,7 +60,7 @@ Variable.hpp\
 VariableMaker.hpp\
 Stepper.hpp\
 Steppers.hpp\
-Interpolator.hpp\
+VariableProxy.hpp\
 Model.hpp\
 Scheduler.hpp\
 EntityType.hpp\

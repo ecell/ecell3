@@ -164,7 +164,7 @@ namespace libecs
     //    clearEntityListChanged();
     //      }
 
-    const Int aSize( theWriteVariableVector.size() );
+    const Int aSize( theVariableProxyVector.size() );
 
     theValueBuffer.resize( aSize );
     theVelocityBuffer.resize( aSize );
@@ -204,15 +204,17 @@ namespace libecs
     // (1) for each Variable which is included in the VariableReferenceVector
     //     of the Processes of this Stepper,
     // (2) if the Variable is mutable, 
-    //           put it into theWriteVariableVector, 
+    //           put it into theVariableProxyVector, 
     //       and register this Stepper to the StepperList of the Variable.
     // (3) if the Variable is accessible,
     //           puto it into theReadVariableVector
-    // (4) sort theReadVariableVector and theWriteVariableVector by 
+    // (4) sort theReadVariableVector and theProxyVariableVector by 
     //     memory address.
-    theWriteVariableVector.clear();
+    theVariableProxyVector.clear();
     theReadVariableVector.clear();
     // for all the processs
+
+    VariableVector aVariableVector;
     for( ProcessVectorConstIterator i( theProcessVector.begin());
 	 i != theProcessVector.end() ; ++i )
       {
@@ -231,11 +233,11 @@ namespace libecs
 	      {
 		// prevent duplication
 
-		if( std::find( theWriteVariableVector.begin(), 
-			       theWriteVariableVector.end(),
-			       aVariablePtr ) == theWriteVariableVector.end() )
+		if( std::find( aVariableVector.begin(), 
+			       aVariableVector.end(),
+			       aVariablePtr ) == aVariableVector.end() )
 		  {
-		    theWriteVariableVector.push_back( aVariablePtr );
+		    aVariableVector.push_back( aVariablePtr );
 		  }
 	      }
 
@@ -255,16 +257,18 @@ namespace libecs
       }
 
     std::sort( theReadVariableVector.begin(), theReadVariableVector.end() );
-    std::sort( theWriteVariableVector.begin(), theWriteVariableVector.end() );
+    std::sort( aVariableVector.begin(), aVariableVector.end() );
 
-		    
-    for( VariableVectorConstIterator i( theWriteVariableVector.begin() );
-	 i != theWriteVariableVector.end(); ++i )
+    for( VariableVectorIterator i( aVariableVector.begin() );
+	 i != aVariableVector.end(); ++i )
       {
 	VariablePtr aVariablePtr( *i );
-	aVariablePtr->registerStepper( this );
+	theVariableProxyVector.
+	  push_back( createVariableProxy( aVariablePtr ) );
       }
 
+
+		    
   }
 
   void Stepper::updateDependentStepperVector()
@@ -292,10 +296,10 @@ namespace libecs
 	// For efficiency, binary_search should be done for possibly longer
 	// vector, and linear iteration for possibly shorter vector.
 	//
-	for( VariableVectorConstIterator j( theWriteVariableVector.begin() );
-	     j != theWriteVariableVector.end(); ++j )
+	for( VariableProxyVectorConstIterator j( theVariableProxyVector.begin() );
+	     j != theVariableProxyVector.end(); ++j )
 	  {
-	    VariablePtr aVariablePtr( *j );
+	    VariablePtr aVariablePtr( (*j)->getVariable() );
 
 	    if( std::binary_search( aTargetVector.begin(), aTargetVector.end(),
 				    aVariablePtr ) )
@@ -447,12 +451,12 @@ namespace libecs
   const Polymorph Stepper::getWriteVariableList() const
   {
     PolymorphVector aVector;
-    aVector.reserve( theWriteVariableVector.size() );
+    aVector.reserve( theVariableProxyVector.size() );
     
-    for( VariableVectorConstIterator i( theWriteVariableVector.begin() );
-	 i != theWriteVariableVector.end() ; ++i )
+    for( VariableProxyVectorConstIterator i( theVariableProxyVector.begin() );
+	 i != theVariableProxyVector.end() ; ++i )
       {
-	aVector.push_back( (*i)->getFullID().getString() );
+	aVector.push_back( (*i)->getVariable()->getFullID().getString() );
       }
     
     return aVector;
@@ -487,48 +491,39 @@ namespace libecs
   }
   
   const UnsignedInt 
-  Stepper::getWriteVariableIndex( VariableCptr const aVariable )
+  Stepper::getVariableProxyIndex( VariableCptr const aVariable )
   {
-    VariableVectorConstIterator
-      anIterator( std::lower_bound( theWriteVariableVector.begin(), 
-				    theWriteVariableVector.end(), 
-				    aVariable ) );
+    VariableProxyVectorConstIterator
+      anIterator( std::lower_bound( theVariableProxyVector.begin(), 
+				    theVariableProxyVector.end(), 
+				    aVariable, 
+				    VariableProxy::VariablePtrCompare() ) );
 
-    DEBUG_EXCEPTION( *anIterator == aVariable , NotFound, 
+    DEBUG_EXCEPTION( (*anIterator)->getVariable() == aVariable , NotFound, 
 		     "This should not occur.  Must be a bug." );
 
-    return anIterator - theWriteVariableVector.begin();
+    return anIterator - theVariableProxyVector.begin();
   }
+
 
   void Stepper::clear()
   {
     //
     // Variable::clear()
     //
-    const UnsignedInt aSize( theWriteVariableVector.size() );
+    const UnsignedInt aSize( theVariableProxyVector.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
 
 	// save original value values
-	theValueBuffer[ c ] = aVariable->saveValue();
+	theValueBuffer[ c ] = aVariable->getValue();
 
 	// clear phase is here!
 	aVariable->clear();
       }
 
-
-    //    FOR_ALL( WriteVariableVector, theWriteVariableVector, clear );
-      
-    //
-    // Process::clear() ?
-    //
-    //    FOR_ALL( ,, clear );
-      
-    //
-    // System::clear() ?
-    //
-    //    FOR_ALL( ,, clear );
+    //    FOR_ALL( VariableProxyVector, theVariableProxyVector, clear );
   }
 
   void Stepper::process()
@@ -554,29 +549,26 @@ namespace libecs
     //
     // Variable::integrate()
     //
-    const UnsignedInt aSize( theWriteVariableVector.size() );
-
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
-      {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
-
-	aVariable->integrate( getCurrentTime() );
-      }
+    std::for_each( theVariableProxyVector.begin(),
+		   theVariableProxyVector.end(), 
+		   std::mem_fun( &VariableProxy::integrate ) );
   }
 
 
   void Stepper::reset()
   {
-    const UnsignedInt aSize( theWriteVariableVector.size() );
+    // clear velocity buffer
+    theVelocityBuffer.assign( theVelocityBuffer.size(), 0.0 );
+
+    const UnsignedInt aSize( theVariableProxyVector.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theWriteVariableVector[ c ] );
+	VariablePtr const aVariable( theVariableProxyVector[ c ]->
+				     getVariable() );
 
-	// restore x (original value)
+	// restore x (original value) and clear velocity
+	//FIXME: should go into VariableProxy:::reset()?
 	aVariable->setValue( theValueBuffer[ c ] );
-
-	// clear velocity
-	theVelocityBuffer[ c ] = 0.0;
 	aVariable->setVelocity( 0.0 );
       }
   }

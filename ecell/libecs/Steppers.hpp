@@ -32,7 +32,7 @@
 #define __STEPPERS_HPP
 
 #include "Stepper.hpp"
-#include "Interpolator.hpp"
+#include "VariableProxy.hpp"
 
 namespace libecs
 {
@@ -43,61 +43,19 @@ namespace libecs
     :
     public DifferentialStepper
   {
-  protected:
-
-    class Interpolator
-      :
-      public libecs::Interpolator
-    {
-    public:
-      Interpolator( FixedEuler1StepperRef aStepper, UnsignedInt anIndex )
-	:
-	theStepper( aStepper ),
-	theIndex( anIndex )
-      {
-	; // do nothing
-      }
-
-      virtual const Real getVelocity( RealCref aTime )
-      {
-	return theStepper.getVelocityBuffer()[ theIndex ] 
-	  * ( aTime - theStepper.getCurrentTime() );
-      }
-      
-    protected:
-
-      FixedEuler1StepperRef theStepper;
-      UnsignedInt           theIndex;
-
-    };
-
 
   public:
     
     FixedEuler1Stepper();
     virtual ~FixedEuler1Stepper() {}
 
-    static StepperPtr createInstance() { return new FixedEuler1Stepper; }
-    
     virtual void step();
 
 
-    virtual InterpolatorPtr createInterpolator( UnsignedInt anIndex )
-    {
-      return new Interpolator( *this, anIndex );
-    }
-
-
-    virtual const Real getContinuousVelocity( RealCref aTime, 
-					      UnsignedInt anIndex )
-    {
-      return 0.0;
-    }
+    static StepperPtr createInstance() { return new FixedEuler1Stepper; }
 
     virtual StringLiteral getClassName() const { return "FixedEuler1Stepper"; }
 
-
-  protected:
   };
 
 
@@ -114,11 +72,6 @@ namespace libecs
 
     virtual void step();
 
-    virtual const Real getContinuousVelocity( RealCref aTime, 
-					     UnsignedInt anIndex )
-    {
-      return 0;
-    }
 
     virtual StringLiteral getClassName() const { return "FixedRungeKutta4Stepper"; }
 
@@ -144,11 +97,6 @@ namespace libecs
 
     bool calculate();
 
-    virtual const Real getContinuousVelocity( RealCref aTime, 
-					     UnsignedInt anIndex )
-    {
-      return 0;
-    }
 
     virtual StringLiteral getClassName() const { return "Euler1Stepper"; }
 
@@ -173,12 +121,6 @@ namespace libecs
     virtual void step();
 
     bool calculate();
-
-    virtual const Real getContinuousVelocity( RealCref aTime, 
-					     UnsignedInt anIndex )
-    {
-      return 0;
-    }
 
     virtual StringLiteral getClassName() const { return "Midpoint2Stepper"; }
 
@@ -205,12 +147,6 @@ namespace libecs
     virtual void step();
  
     bool calculate();
-
-    virtual const Real getContinuousVelocity( RealCref aTime, 
-					     UnsignedInt anIndex )
-    {
-      return 0;
-    }
 
     virtual StringLiteral getClassName() const { return "CashKarp4Stepper"; }
 
@@ -244,12 +180,6 @@ namespace libecs
     virtual void step();
  
     bool calculate();
-
-    virtual const Real getContinuousVelocity( RealCref aTime, 
-					     UnsignedInt anIndex )
-    {
-      return 0;
-    }
 
     virtual StringLiteral getClassName() const
     { 

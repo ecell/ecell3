@@ -32,12 +32,14 @@
 #define __VARIABLE_HPP
 
 #include <utility>
+#include <iostream>
 
 #include "libecs.hpp"
 #include "EntityType.hpp"
 #include "Entity.hpp"
+#include "VariableProxy.hpp"
 #include "System.hpp"
-
+#include "Model.hpp"
 
 namespace libecs
 {
@@ -59,11 +61,6 @@ namespace libecs
     : 
     public Entity
   {
-
-    DECLARE_VECTOR( RealCptr, RealPtrVector);
-
-    DECLARE_VECTOR( InterpolatorPtr, InterpolatorVector );
-
 
   public:
 
@@ -105,37 +102,37 @@ namespace libecs
 	integrate phase
     */
 
-    virtual void integrate( RealCref aTime )
+    virtual void integrate( VariableProxyPtr anVariableProxy )
     {
       if( isFixed() == false )
 	{
-	  updateValue( aTime );
+	  updateValue( anVariableProxy );
 	}
     }
 
-
-    const Real calculateTotalVelocity() const
+    const Real calculateTotalVelocity( RealCref aCurrentTime ) const
     {
       Real aVelocitySum( 0.0 );
-      for( RealPtrVectorConstIterator i( theVelocityVector.begin() ); 
-	   i != theVelocityVector.end(); ++i )
+      for( VariableProxyVectorConstIterator 
+	     i( theVariableProxyVector.begin() );
+	   i != theVariableProxyVector.end(); ++i )
 	{
-	  aVelocitySum += **i;
+	  VariableProxyPtr const anVariableProxyPtr( *i );
+	  aVelocitySum += anVariableProxyPtr->getVelocity( aCurrentTime );
 	}
 
       return aVelocitySum;
     }
 
-    void updateValue( RealCref aTime )
+    void updateValue( VariableProxyPtr anVariableProxy )
     {
-      const Real aDeltaT( aTime - theLastTime );
+      const Real aTime( getModel()->getCurrentTime() );
 
-      theTotalVelocity = calculateTotalVelocity();
-      const Real aTotalVelocityPerDeltaT( theTotalVelocity * aDeltaT );
+      const Real aVelocity( anVariableProxy->getVelocity( aTime ) );
+      loadValue( getValue() + aVelocity );
 
-      loadValue( getValue() + aTotalVelocityPerDeltaT );
-
-      theLastTime = aTime;
+      //FIXME:
+      theTotalVelocity = calculateTotalVelocity( aTime ) - aVelocity;
     }
 
 
@@ -179,12 +176,12 @@ namespace libecs
 
     const Real getValue() const
     { 
-      return theValue; 
+      return theValue + theTotalVelocity; 
     }
 
-    virtual const Real saveValue()
+    const Real saveValue() const
     {
-      return getValue();
+      return theValue;
     }
 
 
@@ -249,7 +246,7 @@ namespace libecs
       return getValue() / ( getSuperSystem()->getVolume() * N_A );
     }
 
-    void registerStepper( StepperPtr aStepperPtr );
+    void registerStepper( VariableProxyPtr anVariableProxy );
 
     static VariablePtr createInstance() { return new Variable; }
 
@@ -259,6 +256,8 @@ namespace libecs
 
     void makeSlots();
 
+    void clearVariableProxyVector();
+
   protected:
 
     Real theValue;
@@ -266,14 +265,13 @@ namespace libecs
 
     Real theTotalVelocity;
 
-    Real theLastTime;
+    VariableProxyVector theVariableProxyVector;
 
-    StepperVector theStepperVector;
+    //    StepperVector theStepperVector;
     // this is a list of indices of Steppers' VariableCache of this Variable.
-    RealPtrVector theVelocityVector;
+    //    RealPtrVector theVelocityVector;
 
     bool theFixed;
-
   };
 
 
@@ -301,11 +299,11 @@ namespace libecs
 	integrate phase
     */
 
-    virtual void integrate( RealCref aTime );
+    virtual void integrate( VariableProxyPtr anVariableProxy );
 
-    virtual const bool checkRange( RealCref aStepInterval ) const
+    virtual const bool checkRange( RealCref aTime ) const
     {
-      const Real aPutativeVelocity( calculateTotalVelocity() * aStepInterval );
+      const Real aPutativeVelocity( calculateTotalVelocity( aTime ) );//* aStepInterval );
       const Real aPutativeValue( getValue() + aPutativeVelocity );
 
       if( aPutativeValue >= 0 )
@@ -323,9 +321,6 @@ namespace libecs
     virtual StringLiteral getClassName() const { return "PositiveVariable"; }
 
   };
-
-
-
 
 
 #if 0 // unmaintained

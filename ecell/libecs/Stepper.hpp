@@ -34,13 +34,13 @@
 #include <vector>
 #include <algorithm>
 #include <utility>
-
+#include <iostream>
 
 #include "libecs.hpp"
 
 #include "Util.hpp"
 #include "Polymorph.hpp"
-#include "Interpolator.hpp"
+#include "VariableProxy.hpp"
 #include "PropertyInterface.hpp"
 #include "System.hpp"
 
@@ -61,7 +61,9 @@ namespace libecs
 
 
   /**
-     Stepper class defines and governs computation unit in a model.
+     Stepper class defines and governs a computation unit in a model.
+
+     The computation unit is defined as a set of Process objects.
 
   */
 
@@ -201,8 +203,6 @@ namespace libecs
       return theStepInterval;
     }
 
-    virtual const Real getContinuousVelocity( RealCref aTime, 
-					      UnsignedInt anIndex ) = 0;
 
     void registerLoggedPropertySlot( PropertySlotPtr );
 
@@ -275,9 +275,9 @@ namespace libecs
       return theProcessVector;
     }
 
-    VariableVectorCref getWriteVariableVector() const
+    VariableProxyVectorCref getVariableProxyVector() const
     {
-      return theWriteVariableVector;
+      return theVariableProxyVector;
     }
 
     VariableVectorCref getReadVariableVector() const
@@ -300,15 +300,7 @@ namespace libecs
       return theVelocityBuffer;
     }
 
-
-
-    const UnsignedInt getWriteVariableIndex( VariableCptr const aVariable );
-
-    RealCptr getVelocityBufferElementPtr( UnsignedInt anIndex )
-    {
-      return &theVelocityBuffer[ anIndex ];
-    }
-
+    const UnsignedInt getVariableProxyIndex( VariableCptr const aVariable );
 
     /**
        Update theProcessVector and theFirstNormalProcess iterator.
@@ -319,7 +311,7 @@ namespace libecs
 
 
     /**
-       Update theReadVariableVector and theWriteVariableVector.
+       Update theReadVariableVector and theVariableProxyVector.
 
     */
 
@@ -350,9 +342,9 @@ namespace libecs
     const Polymorph getDependentStepperList() const;
 
 
-    virtual InterpolatorPtr createInterpolator( VariablePtr aVariablePtr )
+    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariablePtr )
     {
-      return new Interpolator();
+      return new VariableProxy( aVariablePtr );
     }
 
 
@@ -372,7 +364,8 @@ namespace libecs
     StepIntervalConstraintMap theStepIntervalConstraintMap;
 
     VariableVector        theReadVariableVector;
-    VariableVector        theWriteVariableVector;
+
+    VariableProxyVector   theVariableProxyVector;
 
     ProcessVector         theProcessVector;
     ProcessVectorIterator theFirstNormalProcess;
@@ -406,10 +399,46 @@ namespace libecs
 
   */
 
+  DECLARE_CLASS( DifferentialStepper );
+
   class DifferentialStepper
     :
     public Stepper
   {
+
+
+  public:
+
+    class VariableProxy
+      :
+      public libecs::VariableProxy
+    {
+    public:
+      VariableProxy( DifferentialStepperRef aStepper, 
+		    VariablePtr const aVariablePtr )
+	:
+	libecs::VariableProxy( aVariablePtr ),
+	theStepper( aStepper ),
+	theIndex( theStepper.getVariableProxyIndex( aVariablePtr ) )
+      {
+	; // do nothing
+      }
+
+      virtual const Real getVelocity( RealCref aTime )
+      {
+	return theStepper.getVelocityBuffer()[ theIndex ]
+	  * ( aTime - theStepper.getCurrentTime() );
+      }
+      
+
+    protected:
+
+      DifferentialStepperRef theStepper;
+      UnsignedInt            theIndex;
+
+    };
+
+
   public:
 
     DifferentialStepper();
@@ -498,11 +527,16 @@ namespace libecs
 
     virtual void initialize();
 
+
+    virtual VariableProxyPtr createVariableProxy( VariablePtr aVariable )
+    {
+      return new VariableProxy( *this, aVariable );
+    }
+
     virtual StringLiteral getClassName() const 
     { 
       return "DifferentialStepper";
     }
-
 
   protected:
 

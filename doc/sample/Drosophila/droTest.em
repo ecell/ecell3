@@ -3,8 +3,9 @@
 # from file: droTest.eml, date: Sun Oct 13 15:04:54 2002
 #
 
-Stepper FixedEuler1Stepper( SRM_01 )
+#Stepper FixedEuler1Stepper( SRM_01 )
 #Stepper Midpoint2Stepper( SRM_01 )
+Stepper DormandPrince547MStepper( SRM_01 )
 {
 	# no property
 }

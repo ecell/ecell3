@@ -76,7 +76,6 @@ namespace libecs
 				      Type2Type<Real>(),
 				      NULLPTR,
 				      &Variable::getConcentration ) );
-
   }
 
 
@@ -85,7 +84,6 @@ namespace libecs
     theValue( 0.0 ),  
     theVelocity( 0.0 ),
     theTotalVelocity( 0.0 ),
-    theLastTime( 0.0 ),
     theFixed( false )
   {
     makeSlots();
@@ -93,15 +91,27 @@ namespace libecs
 
   Variable::~Variable()
   {
-    ; // do nothing
+    clearVariableProxyVector();
   }
 
 
   void Variable::initialize()
   {
-    theVelocityVector.clear();
-    theStepperVector.clear();
+    clearVariableProxyVector();
   }
+
+  void Variable::clearVariableProxyVector()
+  {
+    for( VariableProxyVectorIterator i( theVariableProxyVector.begin() );
+	 i != theVariableProxyVector.end(); ++i )
+      {
+	VariableProxyPtr anVariableProxyPtr( *i );
+	delete anVariableProxyPtr;
+      }
+
+    theVariableProxyVector.clear();
+  }
+
 
   void Variable::setFixed( IntCref aValue )
   { 
@@ -114,33 +124,19 @@ namespace libecs
     return theFixed;
   }
 
-  void Variable::registerStepper( StepperPtr aStepperPtr )
+  void Variable::registerStepper( VariableProxyPtr anVariableProxyPtr )
   {
-    // prevent duplication
-    if( std::find( theStepperVector.begin(), 
-		   theStepperVector.end(),
-		   aStepperPtr )  != theStepperVector.end() )
-      {
-	return;
-      }
-
-
-    theStepperVector.push_back( aStepperPtr );
-
-    const UnsignedInt anIndex( aStepperPtr->
-			       getWriteVariableIndex( this ) );
-    theVelocityVector.push_back( aStepperPtr->
-				 getVelocityBufferElementPtr( anIndex ) );
+    theVariableProxyVector.push_back( anVariableProxyPtr );
   }
 
 
   ///////////////////////// PositiveVariable
 
-  void PositiveVariable::integrate( RealCref aTime )
+  void PositiveVariable::integrate( VariableProxyPtr anVariableProxy )
   {
     if( isFixed() == false )
       {
-	updateValue( aTime );
+	updateValue( anVariableProxy );
       }
     
     if( getValue() < DBL_EPSILON )
