@@ -2,6 +2,7 @@
 <!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
 
 <glade-interface>
+<requires lib="gnome"/>
 
 <widget class="GtkWindow" id="MainWindow">
   <property name="visible">True</property>
@@ -48,7 +49,7 @@
 			  <accelerator key="o" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 			  <child internal-child="image">
-			    <widget class="GtkImage" id="image207">
+			    <widget class="GtkImage" id="image235">
 			      <property name="visible">True</property>
 			      <property name="stock">gtk-open</property>
 			      <property name="icon_size">1</property>
@@ -70,7 +71,7 @@
 			  <accelerator key="o" modifiers="GDK_CONTROL_MASK | GDK_SHIFT_MASK" signal="activate"/>
 
 			  <child internal-child="image">
-			    <widget class="GtkImage" id="image208">
+			    <widget class="GtkImage" id="image236">
 			      <property name="visible">True</property>
 			      <property name="stock">gtk-execute</property>
 			      <property name="icon_size">1</property>
@@ -92,7 +93,7 @@
 			  <accelerator key="s" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 			  <child internal-child="image">
-			    <widget class="GtkImage" id="image209">
+			    <widget class="GtkImage" id="image237">
 			      <property name="visible">True</property>
 			      <property name="stock">gtk-save</property>
 			      <property name="icon_size">1</property>
@@ -146,86 +147,46 @@
 		      </child>
 
 		      <child>
-			<widget class="GtkImageMenuItem" id="logger_window_menu">
+			<widget class="GtkCheckMenuItem" id="logger_window_menu">
 			  <property name="visible">True</property>
 			  <property name="label" translatable="yes">_Logger Window</property>
 			  <property name="use_underline">True</property>
+			  <property name="active">False</property>
 			  <signal name="activate" handler="logger_window_menu_activate"/>
 			  <accelerator key="L" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-
-			  <child internal-child="image">
-			    <widget class="GtkImage" id="image210">
-			      <property name="visible">True</property>
-			      <property name="pixbuf">icon_logger.xpm</property>
-			      <property name="xalign">0.5</property>
-			      <property name="yalign">0.5</property>
-			      <property name="xpad">0</property>
-			      <property name="ypad">0</property>
-			    </widget>
-			  </child>
 			</widget>
 		      </child>
 
 		      <child>
-			<widget class="GtkImageMenuItem" id="stepper_window_menu">
+			<widget class="GtkCheckMenuItem" id="stepper_window_menu">
 			  <property name="visible">True</property>
 			  <property name="label" translatable="yes">_Stepper Window</property>
 			  <property name="use_underline">True</property>
+			  <property name="active">False</property>
 			  <signal name="activate" handler="stepper_window_menu_activate"/>
 			  <accelerator key="T" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-
-			  <child internal-child="image">
-			    <widget class="GtkImage" id="image211">
-			      <property name="visible">True</property>
-			      <property name="pixbuf">icon_stepper.xpm</property>
-			      <property name="xalign">0.5</property>
-			      <property name="yalign">0.5</property>
-			      <property name="xpad">0</property>
-			      <property name="ypad">0</property>
-			    </widget>
-			  </child>
 			</widget>
 		      </child>
 
 		      <child>
-			<widget class="GtkImageMenuItem" id="interface_window_menu">
+			<widget class="GtkCheckMenuItem" id="interface_window_menu">
 			  <property name="visible">True</property>
 			  <property name="label" translatable="yes">_Interface Window</property>
 			  <property name="use_underline">True</property>
+			  <property name="active">False</property>
 			  <signal name="activate" handler="interface_window_menu_activate"/>
 			  <accelerator key="I" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-
-			  <child internal-child="image">
-			    <widget class="GtkImage" id="image212">
-			      <property name="visible">True</property>
-			      <property name="pixbuf">icon_interface.xpm</property>
-			      <property name="xalign">0.5</property>
-			      <property name="yalign">0.5</property>
-			      <property name="xpad">0</property>
-			      <property name="ypad">0</property>
-			    </widget>
-			  </child>
 			</widget>
 		      </child>
 
 		      <child>
-			<widget class="GtkImageMenuItem" id="board_window_menu">
+			<widget class="GtkCheckMenuItem" id="board_window_menu">
 			  <property name="visible">True</property>
 			  <property name="label" translatable="yes">_Board Window</property>
 			  <property name="use_underline">True</property>
+			  <property name="active">False</property>
 			  <signal name="activate" handler="board_window_menu_activate" last_modification_time="Wed, 02 Apr 2003 17:51:25 GMT"/>
 			  <accelerator key="B" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-
-			  <child internal-child="image">
-			    <widget class="GtkImage" id="image213">
-			      <property name="visible">True</property>
-			      <property name="pixbuf">icon_stepper.xpm</property>
-			      <property name="xalign">0.5</property>
-			      <property name="yalign">0.5</property>
-			      <property name="xpad">0</property>
-			      <property name="ypad">0</property>
-			    </widget>
-			  </child>
 			</widget>
 		      </child>
 		    </widget>
@@ -257,29 +218,6 @@
 	      </child>
 
 	      <child>
-		<widget class="GtkMenuItem" id="setting_menu">
-		  <property name="visible">True</property>
-		  <property name="label" translatable="yes">_Settings</property>
-		  <property name="use_underline">True</property>
-
-		  <child>
-		    <widget class="GtkMenu" id="setting_menu_menu">
-
-		      <child>
-			<widget class="GtkMenuItem" id="preferences_menu">
-			  <property name="visible">True</property>
-			  <property name="label" translatable="yes">gtk-preferences</property>
-			  <property name="use_underline">True</property>
-			  <signal name="activate" handler="preferences_menu_activate"/>
-			  <accelerator key="P" modifiers="GDK_CONTROL_MASK" signal="activate"/>
-			</widget>
-		      </child>
-		    </widget>
-		  </child>
-		</widget>
-	      </child>
-
-	      <child>
 		<widget class="GtkMenuItem" id="help_menu">
 		  <property name="visible">True</property>
 		  <property name="label" translatable="yes">_Help</property>
@@ -297,7 +235,7 @@
 			  <accelerator key="A" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 			  <child internal-child="image">
-			    <widget class="GtkImage" id="image214">
+			    <widget class="GtkImage" id="image242">
 			      <property name="visible">True</property>
 			      <property name="stock">gnome-stock-about</property>
 			      <property name="icon_size">1</property>
@@ -896,13 +834,17 @@
 				      </child>
 
 				      <child>
-					<widget class="GtkButton" id="logger_button">
+					<widget class="GtkToggleButton" id="logger_button">
 					  <property name="visible">True</property>
+					  <property name="can_focus">True</property>
 					  <property name="relief">GTK_RELIEF_NORMAL</property>
-					  <signal name="clicked" handler="on_logger_button_clicked" last_modification_time="Wed, 02 Apr 2003 02:10:31 GMT"/>
+					  <property name="active">False</property>
+					  <property name="inconsistent">False</property>
+					  <signal name="toggled" handler="on_logger_button_toggled" last_modification_time="Fri, 03 Oct 2003 11:13:45 GMT"/>
 
 					  <child>
 					    <widget class="GtkVBox" id="vbox69">
+					      <property name="width_request">45</property>
 					      <property name="visible">True</property>
 					      <property name="homogeneous">False</property>
 					      <property name="spacing">0</property>
@@ -948,16 +890,19 @@
 					</widget>
 					<packing>
 					  <property name="padding">0</property>
-					  <property name="expand">True</property>
-					  <property name="fill">True</property>
+					  <property name="expand">False</property>
+					  <property name="fill">False</property>
 					</packing>
 				      </child>
 
 				      <child>
-					<widget class="GtkButton" id="stepper_button">
+					<widget class="GtkToggleButton" id="stepper_button">
 					  <property name="visible">True</property>
+					  <property name="can_focus">True</property>
 					  <property name="relief">GTK_RELIEF_NORMAL</property>
-					  <signal name="clicked" handler="on_stepper_button_clicked" last_modification_time="Wed, 02 Apr 2003 02:20:15 GMT"/>
+					  <property name="active">False</property>
+					  <property name="inconsistent">False</property>
+					  <signal name="toggled" handler="on_stepper_button_toggled" last_modification_time="Fri, 03 Oct 2003 11:15:23 GMT"/>
 
 					  <child>
 					    <widget class="GtkVBox" id="vbox70">
@@ -1006,16 +951,19 @@
 					</widget>
 					<packing>
 					  <property name="padding">0</property>
-					  <property name="expand">True</property>
-					  <property name="fill">True</property>
+					  <property name="expand">False</property>
+					  <property name="fill">False</property>
 					</packing>
 				      </child>
 
 				      <child>
-					<widget class="GtkButton" id="interface_button">
+					<widget class="GtkToggleButton" id="interface_button">
 					  <property name="visible">True</property>
+					  <property name="can_focus">True</property>
 					  <property name="relief">GTK_RELIEF_NORMAL</property>
-					  <signal name="clicked" handler="on_interface_button_clicked" last_modification_time="Wed, 02 Apr 2003 02:18:53 GMT"/>
+					  <property name="active">False</property>
+					  <property name="inconsistent">False</property>
+					  <signal name="toggled" handler="on_interface_button_toggled" last_modification_time="Fri, 03 Oct 2003 11:16:40 GMT"/>
 
 					  <child>
 					    <widget class="GtkVBox" id="vbox71">
@@ -1064,16 +1012,20 @@
 					</widget>
 					<packing>
 					  <property name="padding">0</property>
-					  <property name="expand">True</property>
-					  <property name="fill">True</property>
+					  <property name="expand">False</property>
+					  <property name="fill">False</property>
 					</packing>
 				      </child>
 
 				      <child>
-					<widget class="GtkButton" id="board_button">
+					<widget class="GtkToggleButton" id="board_button">
+					  <property name="width_request">55</property>
 					  <property name="visible">True</property>
+					  <property name="can_focus">True</property>
 					  <property name="relief">GTK_RELIEF_NORMAL</property>
-					  <signal name="clicked" handler="on_board_button_clicked" last_modification_time="Wed, 02 Apr 2003 02:18:41 GMT"/>
+					  <property name="active">False</property>
+					  <property name="inconsistent">False</property>
+					  <signal name="toggled" handler="on_board_button_toggled" last_modification_time="Fri, 03 Oct 2003 11:17:36 GMT"/>
 
 					  <child>
 					    <widget class="GtkVBox" id="vbox72">
@@ -1122,8 +1074,8 @@
 					</widget>
 					<packing>
 					  <property name="padding">0</property>
-					  <property name="expand">True</property>
-					  <property name="fill">True</property>
+					  <property name="expand">False</property>
+					  <property name="fill">False</property>
 					</packing>
 				      </child>
 				    </widget>

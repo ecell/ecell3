@@ -104,7 +104,7 @@ class MainWindow(OsogoWindow):
 		# calls superclass's method
 		OsogoWindow.openWindow(self)
 
-
+		self.__button_update = False
 		
 		# -------------------------------------
 		# creates MessageWindow 
@@ -139,7 +139,7 @@ class MainWindow(OsogoWindow):
 			'logger_window_menu_activate'          : self.__displayWindow ,
 			'stepper_window_menu_activate'         : self.__displayWindow ,
 			'board_window_menu_activate'           : self.__displayWindow ,
-			'preferences_menu_activate'            : self.openPreferences ,
+			#'preferences_menu_activate'            : self.openPreferences ,
 			'about_menu_activate'                  : self.openAbout ,
 
 			# toolbars
@@ -150,11 +150,11 @@ class MainWindow(OsogoWindow):
 			'on_sec_step_entry_activate'           : self.__setStepSizeOrSec ,
 
 			'on_entitylist_button_clicked'         : self.__createEntityListWindow ,
-			'on_logger_button_clicked'             : self.__displayWindow,
+			'on_logger_button_toggled'             : self.__displayWindow,
 			'on_message_togglebutton_toggled'      : self.__toggleMessageWindow ,
-			'on_stepper_button_clicked'            : self.__displayWindow,
-			'on_interface_button_clicked'          : self.__displayWindow,
-			'on_board_button_clicked'              : self.__displayWindow,
+			'on_stepper_button_toggled'            : self.__displayWindow,
+			'on_interface_button_toggled'          : self.__displayWindow,
+			'on_board_button_toggled'              : self.__displayWindow,
 			'logo_button_clicked'                  : self.openAbout,
 			'on_scrolledwindow1_expose_event'	: self.__expose
 		}
@@ -169,8 +169,10 @@ class MainWindow(OsogoWindow):
 
 		# toggles message window menu and button
 		# At first message window is expanded, so the toggle button and menu are active.
-		self['message_togglebutton'].set_active(TRUE)
-		self['message_window_menu'].set_active(TRUE)
+		self.theMessageWindowVisible = True
+		#self['message_togglebutton'].set_active(TRUE)
+		#self['message_window_menu'].set_active(TRUE)
+
 
 		# display MainWindow
 		self[self.__class__.__name__].show_all()
@@ -381,7 +383,7 @@ class MainWindow(OsogoWindow):
 			if self.exists():
 				if self['message_togglebutton'].get_active() == FALSE:
 					self['message_togglebutton'].set_active(TRUE)
-					self.__toggleMessageWindow( self['message_togglebutton'] ) 
+					#self.__toggleMessageWindow( self['message_togglebutton'] ) 
 
 			# displays confirm window
 			aMessage = 'Can\'t load [%s]\nSee MessageWindow for details.' %aFileName
@@ -434,7 +436,7 @@ class MainWindow(OsogoWindow):
 			# expants message window, when it is folded.
 			if self['message_togglebutton'].get_active() == FALSE:
 				self['message_togglebutton'].set_active(TRUE)
-				self.__toggleMessageWindow( self['message_togglebutton'] ) 
+				#self.__toggleMessageWindow( self['message_togglebutton'] ) 
 
 			# displays confirm window
 			aMessage = 'Can\'t save [%s]\nSee MessageWindow for details.' %aFileName
@@ -647,19 +649,56 @@ class MainWindow(OsogoWindow):
 		""" updates Buttons and menus with 
 		latest FundamentalWindow status
 		"""
-		pass
 		
-		#if self.exists():
+		if not self.exists():
+			return
 
+		self.__button_update = True
+
+		# boardwindow:
+		if self.theSession.doesExist('BoardWindow' ):
+			flag = gtk.TRUE
+		else:
+			flag = gtk.FALSE
+		self['board_window_menu'].set_active( flag )
+		self['board_button'].set_active(flag)
+
+		# Loggerwindow:
+		if self.theSession.doesExist('LoggerWindow' ):
+			flag = gtk.TRUE
+		else:
+			flag = gtk.FALSE
+		self['logger_window_menu'].set_active( flag )
+		self['logger_button'].set_active(flag)
+			
+		# interface window:
+		if self.theSession.doesExist('InterfaceWindow' ):
+			flag = gtk.TRUE
+		else:
+			flag = gtk.FALSE
+		self['interface_window_menu'].set_active( flag )
+		self['interface_button'].set_active(flag)
+
+		# stepperwindow:
+		if self.theSession.doesExist('StepperWindow' ):
+			flag = gtk.TRUE
+		else:
+			flag = gtk.FALSE
+		self['stepper_window_menu'].set_active( flag )
+		self['stepper_button'].set_active(flag)
+
+
+	
 		#MessageWindow
-		#	if self.__theMessageWindow.exists():
-		#		flag = gtk.TRUE
-		#	else:
-		#		flag = gtk.FALSE
-		#		self['message_window_menu'].activate()
-		#
-		#	self['message_togglebutton'].set_active( flag )
+		if self.theMessageWindowVisible:
+			flag = gtk.TRUE
+		else:
+			flag = gtk.FALSE
+		self['message_window_menu'].set_active(flag)
+		self['message_togglebutton'].set_active( flag )
 
+
+		self.__button_update = False
 
 	# ==========================================================================
 	def __displayWindow( self, *arg ):
@@ -667,6 +706,10 @@ class MainWindow(OsogoWindow):
 		arg[0]   ---  menu or button
 		Returns None
 		"""
+		if self.__button_update:
+			return
+
+
 
 		# checks the length of argument, but this is verbose
 		if len( arg ) < 1:
@@ -678,35 +721,37 @@ class MainWindow(OsogoWindow):
 		# When LoggerWindow is selected
 		if arg[0] == self['logger_button'] or \
 		   arg[0] == self['logger_window_menu']:
-			self.theSession.displayWindow('LoggerWindow')
+			self.theSession.toggleWindow('LoggerWindow')
 
 		# When StepperWindow is selected
 		elif arg[0] == self['stepper_button'] or \
 		     arg[0] == self['stepper_window_menu']:
-			self.theSession.displayWindow('StepperWindow')
+			self.theSession.toggleWindow('StepperWindow')
 
 		# When InterfaceWindow is selected
 		elif arg[0] == self['interface_button'] or \
 		     arg[0] == self['interface_window_menu']:
-			self.theSession.displayWindow('InterfaceWindow')
+			self.theSession.toggleWindow('InterfaceWindow')
 
 		# When BoardWindow is selected
 		elif arg[0] == self['board_button'] or \
 		     arg[0] == self['board_window_menu']:
-			self.theSession.displayWindow('BoardWindow')
+			self.theSession.toggleWindow('BoardWindow')
+
+		self.update()
 
 
 
 	# ==========================================================================
 	def hideMessageWindow( self ):
 		self['message_togglebutton'].set_active(gtk.FALSE)
-		self.__toggleMessageWindow( self['message_togglebutton'] ) 
+		#self.__toggleMessageWindow( self['message_togglebutton'] ) 
 
 
 	# ==========================================================================
 	def showMessageWindow( self ):
 		self['message_togglebutton'].set_active(gtk.TRUE)
-		self.__toggleMessageWindow( self['message_togglebutton'] ) 
+		#self.__toggleMessageWindow( self['message_togglebutton'] ) 
 
 	# ==========================================================================
 	def __toggleMessageWindow( self, *arg ) :
@@ -714,6 +759,8 @@ class MainWindow(OsogoWindow):
 		arg[0]   ---  self['message_togglebutton'] or self['message_window_menu']
 		Returns None
 		"""
+		if self.__button_update:
+			return
 
 		# checks the length of argument, but this is verbose
 		if len(arg) < 1 :
@@ -721,7 +768,7 @@ class MainWindow(OsogoWindow):
 
 		# When Message is required to be expanded.
 		if arg[0].get_active() == TRUE:
-
+			self.theMessageWindowVisible = True
 			self['handlebox24'].show()
 			if self.__MessageWindow_attached:
 				self.__resizeVertically(self.__MWactualSize[1])
@@ -730,11 +777,12 @@ class MainWindow(OsogoWindow):
 
 		# When Message is required to be folded.
 		else:
-
+			self.theMessageWindowVisible = False
 			# hide handlebox, resize window
 			self['handlebox24'].hide()
 			self.__resizeVertically(0)
-			self['message_togglebutton'].set_active(FALSE)
+		self.updateButtons()
+
 
 
 	# ==========================================================================

@@ -122,7 +122,7 @@ class LoggerWindow(OsogoWindow):
 	  			'on_time_checkbox_toggled' : self.updateStartEnd,
 
 				# window event
-		 		'on_exit_activate' : self.closeWindow,
+		 		#'on_exit_activate' : self.closeWindow,
 
 				# popup
 				'button_press_event'  : self.popupMenu,
@@ -132,6 +132,15 @@ class LoggerWindow(OsogoWindow):
 
 	# end of openWindow
 
+	def close( self ):
+
+		self.theEntryList = None
+
+		OsogoWindow.close(self)
+
+
+	def closeWindow( self, *args ):
+		self.close()
 
 	# ---------------------------------------------------------------
 	# initializer
@@ -391,14 +400,6 @@ class LoggerWindow(OsogoWindow):
 	# update
 
 
-	# ---------------------------------------------------------------
-	# Closes this window
-	# return -> None
-	# ---------------------------------------------------------------
-	def closeWindow ( self, obj ):
-		self[self.__class__.__name__].iconify()
-		
-	# closeWindow
 
 	# ---------------------------------------------------------------
 	# popupMenu

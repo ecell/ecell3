@@ -71,6 +71,10 @@ class InterfaceWindow( OsogoWindow ):
 		                    'DeleteButton_clicked'     : self.deleteWindow } )
 		self.update()
 
+	def close( self ):
+		self.theInterfaceListWidget = None
+		OsogoWindow.close(self )
+
 	# ==========================================================================
 	def update( self ):
 		"""overwrites superclass's method

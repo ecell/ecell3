@@ -72,17 +72,21 @@ class StepperWindow(OsogoWindow):
 
 		self.theSession = aSession
 
+
+
+	# ==========================================================================
+	def openWindow(self):
+
+
+
+		OsogoWindow.openWindow(self)
+
 		# initializes attributes
 		self.theSelectedStepperID = None  # selected stepperID (str)
 		self.theFirstPropertyIter = {}    # key:iter(TreeIter)  value:None
 		self.theSelectedPath = {}         # key:aStepperID(str)  value:Path
 		self.thePropertyMap = {}
 
-
-	# ==========================================================================
-	def openWindow(self):
-
-		OsogoWindow.openWindow(self)
 		aListStore = gtk.ListStore( gobject.TYPE_STRING )
 		self['stepper_id_list'].set_model( aListStore )
 		column=gtk.TreeViewColumn('Stepper',gtk.CellRendererText(),text=0)
@@ -136,6 +140,11 @@ class StepperWindow(OsogoWindow):
 
 		self['stepper_id_list'].get_selection().select_iter(aFirstIter)
 		self.__selectStepperID(None)
+
+	def close( self ):
+		self.theSelectedPath = {}
+		OsogoWindow.close(self)
+
 
 	# ==========================================================================
 	def selectStepperID( self, aStepperID ):

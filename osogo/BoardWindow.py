@@ -96,6 +96,21 @@ class BoardWindow(OsogoWindow):
 		for anEntityWindow in self.theSession.getWindow('EntityListWindow'):
 			anEntityWindow.checkBoardExists()
 
+
+	def close( self ):
+		# delete all pluginwindows
+		for aPlugin in self.thePluginMap.keys():
+			self.deletePluginWindowByTitle( self.thePluginMap[aPlugin].getTitle() )
+
+		# delete all references to widgets:
+		self.theScrolledWindow = None
+		self.theViewPort = None
+
+		
+		# call bas class
+		OsogoWindow.close( self )
+
+
 	def displayScroll(self):
 		if self.theViewPort.get_child() == None:
 			board_table=self['vbox3']
@@ -113,10 +128,6 @@ class BoardWindow(OsogoWindow):
 
 	# end of openWindow
 
-	#def hide( self, *arg ):
-	#	print "hide---------------------"
-	#	self[self.__class__.__name__].hide()
-	#	return TRUE
 
 	def addPluginWindows( self, aPluginWindowType, aRawFullPNList ):
 		if aPluginWindowType == 'TracerWindow':
@@ -155,6 +166,9 @@ class BoardWindow(OsogoWindow):
 			self['title_entry'].set_text('')
 			self.thePluginManager.removeInstanceByTitle(aTitle)
 			self.updatePositions()
+
+
+
 
 	def deletePluginWindowByTitle( self, aTitle ):
 		if self.exists() == TRUE:

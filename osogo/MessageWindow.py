@@ -76,7 +76,8 @@ class MessageWindow:
 		# -------------------------------------------------------
 		# If messge is list or touple, then print out each line.
 		# -------------------------------------------------------
-		#if type(aMessage) == type([]) or type(aMessage) == type(()) :  
+		iter = self.theMessageBufferList.get_iter_at_mark ( self.EndMark )
+
 		if type(aMessage) == list:  
 			
 			# If first string is not '\n', add it.
@@ -87,7 +88,7 @@ class MessageWindow:
 			# print message list
 			for aLine in aMessage:
 				aString = str( aLine )
-				self.theMessageBufferList.insert_at_cursor( aString, len(aString) )
+				self.theMessageBufferList.insert( iter, aString, len(aString) )
 
 
 		# -------------------------------------------------------
@@ -97,7 +98,7 @@ class MessageWindow:
 			aString = str( aMessage )
 			if string.find(aString,'\n') != 0:
 				aString = '\n' + aString
-			self.theMessageBufferList.insert_at_cursor( aString ,len(aString) )
+			self.theMessageBufferList.insert( iter, aString ,len(aString) )
 		
 		self.theMessageBox.scroll_to_mark(self.EndMark,0)
 

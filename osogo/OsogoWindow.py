@@ -155,7 +155,7 @@ class OsogoWindow(Window):
 		"""
 
 		# iconizes this window
-		self[self.__class__.__name__].iconify()
+		self.close()
 
 		# does not widgets
 		return TRUE
@@ -196,10 +196,11 @@ class OsogoWindow(Window):
 	# ========================================================================
 	def close ( self ):
 		""" destroys Widgets and sets __theExist FALSE """
-		if self.exists:
+		if self.exists():
 			self[self.__class__.__name__].destroy()
 			self.__theExist = gtk.FALSE
-			self.theSession.theMainWindow.update()
+			self.widgets = None
+			self.theSession.updateFundamentalWindows()
 
 # end of OsogoWindow
 
