@@ -10,7 +10,7 @@ dnl AC_SUBST(VERSION)
 dnl AC_SUBST(PACKAGE)
 
 AC_INIT(libecs/Entity.hpp)
-AM_INIT_AUTOMAKE(ecell,3.0.4)
+AM_INIT_AUTOMAKE(ecell,3.0.5)
 
 AM_SANITY_CHECK
 

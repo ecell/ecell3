@@ -6,7 +6,7 @@ dnl
 dnl 
 dnl 
 AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE(ecell,"3.0.4" , do-not-define)
+AM_INIT_AUTOMAKE(ecell,"3.0.5" , do-not-define)
 AC_PROG_MAKE_SET
 dnl
 dnl
