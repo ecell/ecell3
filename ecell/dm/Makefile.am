@@ -49,8 +49,6 @@ ESSYNSStepper.cpp\
 GMAProcess.cpp\
 SSystemProcess.cpp\
 FluxDistributionStepper.cpp\
-FluxDistributionProcess.cpp\
-QuasiDynamicFluxProcess.cpp\
 PythonFluxProcess.cpp\
 PythonProcess.cpp\
 ExpressionFluxProcess.cpp\
@@ -73,7 +71,6 @@ ODE23Stepper.hpp\
 ODEStepper.hpp\
 DAEStepper.hpp\
 FluxDistributionStepper.hpp\
-QuasiDynamicFluxProcess.hpp\
 TauLeapProcess.hpp\
 TauLeapStepper.hpp\
 ODE45Stepper.hpp
@@ -89,7 +86,6 @@ ExpressionAlgebraicProcess.desc\
 ExpressionFluxProcess.desc\
 FixedDAE1Stepper.desc\
 FixedODE1Stepper.desc\
-FluxDistributionProcess.desc\
 FluxDistributionStepper.desc\
 GillespieProcess.desc\
 GMAProcess.desc\
@@ -105,7 +101,6 @@ OrderedBiUniFluxProcess.desc\
 OrderedUniBiFluxProcess.desc\
 PythonFluxProcess.desc\
 PythonProcess.desc\
-QuasiDynamicFluxProcess.desc\
 RandomBiBiFluxProcess.desc\
 RandomBiUniFluxProcess.desc\
 RandomUniBiFluxProcess.desc\

@@ -36,8 +36,14 @@
 
 LIBECS_DM_INIT( FluxDistributionStepper, Stepper );
 
-
 FluxDistributionStepper::FluxDistributionStepper()
+  :
+  theMatrixSize( 0 ),
+  theUnknownMatrix( NULLPTR ),
+  theInverseMatrix( NULLPTR ),
+  theVariableVelocityVector( NULLPTR ),
+  theFluxVector( NULLPTR ),
+  Epsilon( 1e-6 )
 {
   // gcc3 doesn't currently support numeric_limits::infinity.
   // using max() instead.
@@ -45,12 +51,124 @@ FluxDistributionStepper::FluxDistributionStepper()
 			 std::numeric_limits<Real>::max() );
 
   initializeStepInterval( anInfinity );
+}
 
+FluxDistributionStepper::~FluxDistributionStepper()
+{
+  gsl_matrix_free( theUnknownMatrix );
+  gsl_matrix_free( theInverseMatrix );
+  gsl_vector_free( theVariableVelocityVector );
+  gsl_vector_free( theFluxVector );
 }
 
 void FluxDistributionStepper::initialize()
 {
+
   DifferentialStepper::initialize();
+
+  std::map< VariablePtr, Integer > aVariableMap;
+
+  VariableVector::size_type aVariableVectorSize( theVariableVector.size() );  
+  for( VariableVector::size_type i( 0 ); i < aVariableVectorSize; i++ )
+    { 
+      aVariableMap.insert( std::pair< VariablePtr, Integer >( theVariableVector[i], i ) );
+    }
+  
+  //
+  // gsl Matrix & Vector allocation
+  //
+
+  if( theProcessVector.size() > theVariableVector.size() )
+    {
+      theMatrixSize = theProcessVector.size();
+    }
+  else
+    {
+      theMatrixSize = theVariableVector.size(); 
+    }
+
+  if( theUnknownMatrix != NULLPTR )
+    { 
+      gsl_matrix_free( theUnknownMatrix );
+      gsl_vector_free( theVariableVelocityVector );
+      gsl_vector_free( theFluxVector );
+    }
+  
+  theUnknownMatrix         = gsl_matrix_calloc( theMatrixSize, theMatrixSize );
+  theVariableVelocityVector = gsl_vector_calloc( theMatrixSize );
+  theFluxVector             = gsl_vector_calloc( theMatrixSize );
+
+  //
+  // generate theUnknownMatrix
+  //
+  
+  ProcessVector::size_type aProcessVectorSize( theProcessVector.size() );  
+  for( ProcessVector::size_type i( 0 ); i < aProcessVectorSize; i++ )
+    {    
+      VariableReferenceVector aVariableReferenceVector( theProcessVector[i]->getVariableReferenceVector() );  
+      
+      VariableReferenceVector::size_type aVariableReferenceVectorSize( aVariableReferenceVector.size() );  
+      for( VariableReferenceVector::size_type j( 0 ); j < aVariableReferenceVectorSize; j++ )
+	{
+	  gsl_matrix_set( theUnknownMatrix, aVariableMap.find( aVariableReferenceVector[j].getVariable() )->second, i, aVariableReferenceVector[j].getCoefficient() );
+	}
+    }
+
+  //
+  // generate inverse matrix
+  //
+
+  if( theInverseMatrix != NULLPTR )
+    { 
+      gsl_matrix_free( theInverseMatrix );
+    }
+
+  theInverseMatrix = generateInverse( theUnknownMatrix , theMatrixSize );
+  
 }
 
-
+gsl_matrix* FluxDistributionStepper::generateInverse(gsl_matrix *m_unknown, 
+						     Integer matrix_size)
+{      
+  gsl_matrix *m_tmp1, *m_tmp2, *m_tmp3;
+  gsl_matrix *inv;
+  gsl_matrix *V; 
+  gsl_vector *S, *work;
+  
+  m_tmp1 = gsl_matrix_calloc(matrix_size,matrix_size);
+  m_tmp2 = gsl_matrix_calloc(matrix_size,matrix_size);
+  m_tmp3 = gsl_matrix_calloc(matrix_size,matrix_size);
+  inv = gsl_matrix_calloc(matrix_size,matrix_size);
+  
+  V = gsl_matrix_calloc (matrix_size,matrix_size); 
+  S = gsl_vector_calloc (matrix_size);             
+  work = gsl_vector_calloc (matrix_size);          
+      
+  gsl_matrix_memcpy(m_tmp1,m_unknown);
+  gsl_linalg_SV_decomp(m_tmp1,V,S,work);
+      
+  //generate Singular Value Matrix
+  
+  for(int i=0;i<matrix_size;i++){
+    Real singular_value = gsl_vector_get(S,i);
+    if(singular_value > Epsilon){
+      gsl_matrix_set(m_tmp2,i,i,1/singular_value);
+    }
+    else
+      {
+	gsl_matrix_set(m_tmp2,i,i,0.0);
+      }
+  }
+  
+  gsl_blas_dgemm(CblasNoTrans,CblasTrans,1.0,m_tmp2,m_tmp1,0.0,m_tmp3);
+  gsl_blas_dgemm(CblasNoTrans,CblasNoTrans,1.0,V,m_tmp3,0.0,inv);
+  
+  gsl_matrix_free(m_tmp1);
+  gsl_matrix_free(m_tmp2);
+  gsl_matrix_free(m_tmp3);
+  gsl_matrix_free(V);
+  gsl_vector_free(S);
+  gsl_vector_free(work);
+  
+  return inv;  
+}
