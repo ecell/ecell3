@@ -11,6 +11,7 @@ from ecell.ecssupport import *
 #LoggerMinimumInterval=1
 import ConfirmWindow
 from OsogoPluginWindow import *
+from ConfirmWindow import *
 
 COL_LOG=2
 COL_PIX=1
@@ -180,6 +181,7 @@ class TracerWindow( OsogoPluginWindow ):
 		return return_list
 			
 
+	# ========================================================================
 	def haslogger(self, aFullPNString):
 		#called from the plotinstance
 		#to be implemeted, needs to call LoggerWindow or new
@@ -187,6 +189,7 @@ class TracerWindow( OsogoPluginWindow ):
 		loggerlist=self.theSession.theSimulator.getLoggerList()
 		return loggerlist.__contains__(aFullPNString)
 
+	# ========================================================================
 	def check_history_button(self):
 	    history_button=self['togglebutton3']
 	    if len(self.displayedFullPNStringList)==0:
@@ -199,17 +202,20 @@ class TracerWindow( OsogoPluginWindow ):
 	    history_button.set_sensitive(gtk.TRUE)      
 
 
+	# ========================================================================
 	def getloggerstart(self,aFullPNString):
 		#called from the plotinstance
 		lstart=self.theSession.theSimulator.getLoggerStartTime(aFullPNString)
 		return lstart
 		
+	# ========================================================================
 	def getloggerend(self, aFullPNString):
 		#called from the plotinstance
 		lend=self.theSession.theSimulator.getLoggerEndTime(aFullPNString)
 		return lend 
 		
 
+	# ========================================================================
 	def appendRawFullPNList( self, aRawFullPNList ):
 		"""overwrites superclass method
 		aRawFullPNList  -- a RawFullPNList to append (RawFullPNList) 
@@ -235,6 +241,7 @@ class TracerWindow( OsogoPluginWindow ):
 
 			
 		
+	# ========================================================================
 	def refresh_loggers(self):
 	    #refreshes loggerlist
 	    iter=self.ListStore.get_iter_first()
@@ -248,7 +255,7 @@ class TracerWindow( OsogoPluginWindow ):
 		iter=self.ListStore.iter_next(iter)
 
 
-
+	# ========================================================================
 	def addtrace_to_plot(self,aFullPNList):
 		#checks that newpn has logger if mode is history
 		#calls superclass
@@ -286,11 +293,13 @@ class TracerWindow( OsogoPluginWindow ):
 	    	self.check_history_button()
 	    	self.check_remove_button()	    
 	    
+	# ========================================================================
 	def getlatestdata(self,fpn):
 	    value=self.theSession.theSimulator.getEntityProperty(fpn)
 	    time=self.theSession.theSimulator.getCurrentTime()
 	    return [time,value, value, value, value]
 	    
+	# ========================================================================
 	def check_remove_button(self):
 	    remove_button=self['button9']
 	    if len(self.displayedFullPNStringList)>1:
@@ -299,20 +308,26 @@ class TracerWindow( OsogoPluginWindow ):
 		remove_button.set_sensitive(gtk.FALSE)
 
 
+	# ========================================================================
 	def getselected(self):
 	    self.selection_list=[]
 	    self.ListSelection.selected_foreach(self.selection_function)
 	    return self.selection_list
 	    #se;ection list, [0]=text, [1], iter
 	    
+
+	# ========================================================================
 	def selection_function(self,model,path,iter):
 		text=self.ListStore.get_value(iter,COL_TXT)
 		self.selection_list.append([text,iter])
 	    
+
+	# ========================================================================
 	def set_scale_button(self,text):
 	    self['button12'].set_label(text)
 
 
+	# ========================================================================
 	def add_trace_to_list(self,added_list):
 	    for added_item in added_list:
 		iter=self.ListStore.append()
@@ -320,6 +335,7 @@ class TracerWindow( OsogoPluginWindow ):
 		self.ListStore.set_value(iter,COL_TXT,added_item[0]) #set text
 		self.ListStore.set_value(iter,COL_ON,gtk.TRUE) #trace is on by default
 
+	# ========================================================================
 	def change_trace_color(self):
 	    selected_list=self.getselected()
 	    if len(selected_list)>0:
@@ -338,6 +354,7 @@ class TracerWindow( OsogoPluginWindow ):
 
 	
 	
+	# ========================================================================
 	def maximize(self):
 		if self['vbox1'] != self['scrolledwindow1'].get_parent():
 			self['vbox1'].add(self['scrolledwindow1'])
@@ -361,6 +378,7 @@ class TracerWindow( OsogoPluginWindow ):
 		self.getParent().shrink_to_fit()
 
 
+	# ========================================================================
 	def minimize(self):
 		self.thePlotInstance.minimize()
 		if not self.isStandAlone() or self.min_button_clicked:
@@ -382,6 +400,7 @@ class TracerWindow( OsogoPluginWindow ):
 		self.thePlotInstance.printTraceLabels()
 
 
+	# ========================================================================
 	def __get_frame8_space (self):
 		aSizeAlloc=self['frame8'].get_allocation()
 		return_width = aSizeAlloc[2] - 4
@@ -504,6 +523,15 @@ class TracerWindow( OsogoPluginWindow ):
 		"""doesn't change Plot size, but hides GUI components """
 		self.minimize()
 
+	# ========================================================================
+	def checkRun( self ):
+		if self.theSession.isRunning():
+			# displays a Confirm Window.
+			aMessage = "Cannot create new logger, because simulation is running.\n"
+			aMessage += "Please stop simulation if you want to create a logger" 
+			aDialog = ConfirmWindow(OK_MODE,aMessage,'Warning!')
+			return False
+		return True
 
 
 #----------------------------------------------
@@ -558,6 +586,10 @@ class TracerWindow( OsogoPluginWindow ):
 	#---------------------------------------------------------
 
 	def toggle_pressed(self,cell,path,model):
+
+	    if not self.checkRun():
+		return
+
 	    iter=model.get_iter((int (path),))
 	    fixed=model.get_value(iter,COL_LOG)
 	    text=self.ListStore.get_value(iter,COL_TXT)
@@ -607,6 +639,8 @@ class TracerWindow( OsogoPluginWindow ):
 	#---------------------------------------------------------
 
 	def __createlogger_pressed(self,obj):
+	    if not self.checkRun():
+		return
 	    #creates logger in simulator for all FullPNs 
 	    self.create_logger(self.displayedFullPNStringList)		
 	    self.refresh_loggers()

@@ -562,6 +562,8 @@ class MainWindow(OsogoWindow):
 	# ==========================================================================
 	def getStepSize( self ):
 		""" returns user or script specifid step size """
+		self.__setStepSizeOrSec( self, None )
+	
 		return self.theStepSizeOrSec
 
 	# ==========================================================================

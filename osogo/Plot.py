@@ -620,9 +620,10 @@ class Plot:
 		
 	    for fpn in self.data_list:
 		self.data_stack[fpn].append(pointmap[fpn]) #latest value
-	    self.reframey() 
+	    self.reframey()
 	    #reframey
 	    self.drawall()
+	    self.definemeasures()
 	    self.strip_mode='strip'
 	    self.zoomlevel=0
 	    self.zoombuffer=[]
@@ -712,6 +713,7 @@ class Plot:
 		#get all data
 		for fpn in self.data_list:
 			self.data_stack[fpn]=self.getxframe_from_logger(fpn)
+			
 		#getminmax
 		self.reframey()
 		    
@@ -781,7 +783,7 @@ class Plot:
 		if self.trace_onoff.has_key(fpn):
 		    self.trace_onoff.__delitem__(fpn)
 	    self.reframey()
-	    self.drawall()
+
 	    self.definemeasures()
 
 	
@@ -992,7 +994,7 @@ class Plot:
 	    for fpn in self.data_list:
 		if self.trace_onoff[fpn]:
 		    self.drawtrace(fpn)
-
+		
 	    self. printTraceLabels()
 
 	

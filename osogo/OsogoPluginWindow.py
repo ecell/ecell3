@@ -208,7 +208,7 @@ class OsogoPluginWindow(PluginWindow):
 			elif aFullPN[TYPE] == PROCESS :
 				aPropertyName = 'Activity'
 			elif aFullPN[TYPE] == SYSTEM :
-				aPropertyName = 'Volume'
+				aPropertyName = 'Size'
 			aNewFullPN = convertFullIDToFullPN( convertFullPNToFullID(aFullPN), aPropertyName )
 			return aNewFullPN
 
