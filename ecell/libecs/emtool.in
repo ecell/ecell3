@@ -192,6 +192,7 @@ if [ $DO_COMPILE  ] ; then
 #	exit 0
 #    fi
 
+    touch $base.so
     run_command "$DMCOMPILE $base.cpp -I $ECELL_INCLUDE -I $EMTOOL_INCLUDE -I . -I .." 
 
 fi
