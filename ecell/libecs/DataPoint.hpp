@@ -47,11 +47,26 @@ namespace libecs
 
 
 
+  /**
+
+  */
+
   class DataPoint
   {
 
 
   public:
+
+    enum 
+      {  
+	TIME_OFFSET = 0,
+	VALUE_OFFSET,
+	AVG_OFFSET,
+	MIN_OFFSET,
+	MAX_OFFSET,
+	DATAPOINT_LENGTH 
+      };
+
 
     DataPoint()
       :
@@ -132,36 +147,6 @@ namespace libecs
       theMax = aReal;
     }
 
-
-    /*
-
-    no need to define these; default methods should be most efficient
-
-    DataPoint( DataPointCref aDataPoint )
-    {
-      copy( aDataPoint );
-    }
-
-    DataPoint( DataPointRef aDataPoint )
-    {
-      copy( aDataPoint );
-    }
-
-    DataPointRef operator=( DataPointCref aDataPoint )
-    {
-      copy( aDataPoint );
-
-      return *this;
-    }
-
-    DataPointRef operator=( DataPointRef aDataPoint )
-    {
-      copy( aDataPoint );
-
-      return *this;
-    } 
-    */ 
-	
     static const size_t getElementSize()
     {
       return sizeof( Real );
@@ -174,19 +159,6 @@ namespace libecs
     Real theAvg;
     Real theMin;
     Real theMax;
-
-  public:
-
-    enum 
-      {  
-	TIME_OFFSET = 0,
-	VALUE_OFFSET,
-	AVG_OFFSET,
-	MIN_OFFSET,
-	MAX_OFFSET,
-	DATAPOINT_LENGTH 
-      };
-
 
   };
 
@@ -205,7 +177,7 @@ namespace libecs
     DataInterval() 
       : 
       theDataPoint(),
-      theInterval( -1 )
+      theInterval( -1.0 )
     {
       ; //do nothing
     }
@@ -220,7 +192,7 @@ namespace libecs
       return theDataPoint;
     }
 
-    Real getInterval() const
+    RealCref getInterval() const
     {
       return theInterval;
     }
