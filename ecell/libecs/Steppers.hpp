@@ -136,19 +136,18 @@ namespace libecs
 	; // do nothing
       }
 
-      /* FIXME: should be updated
       virtual const Real getDifference( RealCref aTime, RealCref anInterval )
       {
-	const Real theta( ( aTime - theStepper.getCurrentTime() )
-			  / theStepper.getStepInterval() );
+	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
+
+	const Real theta( ( aTimeInterval + aTimeInterval - anInterval )
+			   / theStepper.getStepInterval() );
 
 	const Real k1 = theStepper.getK1()[ theIndex ];
 	const Real k2 = theStepper.getVelocityBuffer()[ theIndex ];
 
-	return ( k1 + ( k2 - k1 ) * theta )
-	  * ( aTime - theStepper.getCurrentTime() );
+	return ( ( k1 + ( k2 - k1 ) * theta ) * anInterval );
       }
-      */
 
     protected:
 

@@ -33,7 +33,6 @@
 
 #include "Steppers.hpp"
 
-
 namespace libecs
 {
 
@@ -206,7 +205,7 @@ namespace libecs
 	//			      << ' ' << getStepInterval() 
 	//			      << std::endl;
       }
-    
+
     const Real maxError( getMaxErrorRatio() );
 
     if( maxError < 0.5 )
@@ -216,11 +215,6 @@ namespace libecs
 	
 	Real aNewStepInterval( getStepInterval() 
 			       * pow(maxError, -0.5) * safety );
-	
-	if( aNewStepInterval >= getMaxInterval() )
-	  {
-	    aNewStepInterval = getStepInterval();
-	  }
 	
 	//	    	    std::cerr << "g " << getCurrentTime() << ' ' 
 	//	    		      << aStepInterval << std::endl;
@@ -346,10 +340,50 @@ namespace libecs
 
 	setStepInterval( getStepInterval() * 0.5 );
 
-	//		    std::cerr << "s " << getCurrentTime() 
-	//			      << ' ' << getStepInterval()
-	//			      << std::endl;
+	//	std::cerr << "s " << getCurrentTime() 
+	//		  << ' ' << getStepInterval()
+	//		  << std::endl;
       }
+
+    /**
+       this does not work
+
+    const Real anAdaptedStepInterval( getStepInterval() );
+    Real aValue( 0.0 );
+    Real aVelocity( 0.0 );
+
+    const UnsignedInt aSize( getReadOnlyVariableOffset() );
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	VariablePtr const aVariable( theVariableVector[ c ] );
+
+	aValue = fabs( aVariable->getValue() );
+	aVelocity = theVelocityBuffer[ c ];
+
+	if ( aVelocity > 0 )
+	  {
+	    aValue += 0.1 ;
+	  }
+	else
+	  {
+	    aValue += std::numeric_limits<Real>::min() * 100.0;
+	    aVelocity = aVelocity * ( -1.0 );
+	  }
+
+	if ( aVelocity * getStepInterval() > aValue * 0.1  )
+	  {
+	    setStepInterval( aValue / ( 10.0 * aVelocity ) );
+	  }
+      }
+
+    if ( anAdaptedStepInterval > getStepInterval() )
+      {
+	if ( !calculate() )
+	  {
+	    // do nothing
+	  }
+      }
+    */
 
     const Real maxError( getMaxErrorRatio() );
 
@@ -358,15 +392,10 @@ namespace libecs
       {
 	Real aNewStepInterval( getStepInterval() * pow(maxError , -0.5)
 			       * safety );
-	//  	    Real aNewStepInterval( getStepInterval() * 2.0 );
+	//	Real aNewStepInterval( getStepInterval() * 2.0 );
 
-	if( aNewStepInterval >= getMaxInterval() )
-	  {
-	    aNewStepInterval = getStepInterval();
-	  }
-
-	//	    std::cerr << "g " << getCurrentTime() << ' ' 
-	//		      << getStepInterval() << std::endl;
+	//	std::cerr << "g " << getCurrentTime() << ' ' 
+	//		  << getStepInterval() << std::endl;
 	setNextStepInterval( aNewStepInterval );
       }
     else 
@@ -526,11 +555,6 @@ namespace libecs
       {
 	Real aNewStepInterval( getStepInterval() 
 			       * pow(maxError , -0.25) * safety );
-	    
-	if( aNewStepInterval >= getMaxInterval() )
-	  {
-	    aNewStepInterval = getStepInterval();
-	  }
 	    	    
 	setNextStepInterval( aNewStepInterval );
       }
@@ -781,14 +805,9 @@ namespace libecs
       {
 	// grow it if error is 50% less than desired
 	//	    Real aNewStepInterval( getStepInterval() * 2.0 );
-	
+
 	Real aNewStepInterval( getStepInterval() 
 			       * pow(maxError, -0.2) * safety );
-	
-	if( aNewStepInterval >= getMaxInterval() )
-	  {
-	    aNewStepInterval = getStepInterval();
-	  }
 	
 	//	    	    std::cerr << "g " << getCurrentTime() << ' ' 
 	//	    		      << aStepInterval << std::endl;
