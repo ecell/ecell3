@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-import string
+from config import *
+
+import os
 
 import gtk
 import gnome.ui
@@ -17,7 +19,14 @@ class Window:
         if gladefile == None:
             gladefile = self.__class__.__name__ + ".glade"
 
-        self.widgets = libglade.GladeXML( filename=gladefile, root=root )
+
+        gladefile = GLADEFILE_PATH + "/" + gladefile
+
+        if os.access( gladefile, os.R_OK ):
+            self.widgets = libglade.GladeXML( filename=gladefile, root=root )
+        else:
+            print "Window: can't read %s." % gladefile
+            #FIXME: exception?
 
     def addHandlers( self, handlers ):
         self.widgets.signal_autoconnect( handlers )
