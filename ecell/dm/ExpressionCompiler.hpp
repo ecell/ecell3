@@ -1,24 +1,24 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-//        This file is part of E-CELL Simulation Environment package
+//        This file is part of E-Cell Simulation Environment package
 //
 //                Copyright (C) 2004 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
-// E-CELL is free software; you can redistribute it and/or
+// E-Cell is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
-// E-CELL is distributed in the hope that it will be useful,
+// E-Cell is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public
-// License along with E-CELL -- see the file COPYING.
+// License along with E-Cell -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
@@ -28,7 +28,7 @@
 //     Kouichi Takahashi
 //     Tatsuya Ishida
 //
-// E-CELL Project, Lab. for Bioinformatics, Keio University.
+// E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
 #ifndef __EXPRESSIONCOMPILER_HPP
@@ -152,9 +152,6 @@ namespace libecs
 
     DECLARE_ASSOCVECTOR
     ( String, SystemMethodPtr, std::less<const String>, SystemMethodMap );
-    DECLARE_ASSOCVECTOR
-    ( String, InstructionAppender,
-      std::less<const String>, BooleanFunctionMap );
 
 
     enum Opcode// the order of items is optimized. don't change.
@@ -177,16 +174,6 @@ namespace libecs
 	, VARREF_REAL_METHOD //VariableReferencePtr, VariableReferenceMethodPtr
 	, PUSH_INTEGER // Integer
 	, PUSH_POINTER // Pointer
-	, EQ     // no arg
-	, NEQ    // no arg
-	, GT     // no arg
-	, LT     // no arg
-	, GEQ    // no arg
-	, LEQ    // no arg
-	, AND    // no arg
-	, OR     // no arg
-	, XOR    // no arg
-	, NOT    // no arg
 	, SYSTEM_FUNC  // 
 	, PROCESS_METHOD // ProcessPtr, ProcessMethodPtr
 	, VARREF_INTEGER_METHOD // VariableReferenceIntegerMethodPtr
@@ -329,7 +316,7 @@ namespace libecs
 	{
 	  GROUP = 1,
 	  INTEGER,
-	  FLOATING,
+	  FLOAT,
 	  NEGATIVE,
 	  EXPONENT,
 	  FACTOR,
@@ -464,7 +451,7 @@ namespace libecs
 	rule<ScannerT, PARSER_CONTEXT, parser_tag<TERM> >         term;
 	rule<ScannerT, PARSER_CONTEXT, parser_tag<POWER> >        power;
 	rule<ScannerT, PARSER_CONTEXT, parser_tag<FACTOR> >       factor;
-	rule<ScannerT, PARSER_CONTEXT, parser_tag<FLOATING> >     floating;
+	rule<ScannerT, PARSER_CONTEXT, parser_tag<FLOAT> >     floating;
 	rule<ScannerT, PARSER_CONTEXT, parser_tag<EXPONENT> >     exponent;
 	rule<ScannerT, PARSER_CONTEXT, parser_tag<INTEGER> >      integer;
 	rule<ScannerT, PARSER_CONTEXT, parser_tag<NEGATIVE> >     negative;
@@ -491,8 +478,7 @@ namespace libecs
     {
       if( theConstantMap.empty() == true ||
 	  theFunctionMap1.empty() == true ||
-	  theSystemMethodMap.empty() == true ||
-	  theBooleanFunctionMap.empty() == true )
+	  theSystemMethodMap.empty() == true )
 	{
 	  fillMap();
 	}
@@ -522,11 +508,11 @@ namespace libecs
       new (&aCode[aCodeSize]) INSTRUCTION( anInstruction );
     }
 
-    template < Opcode OPCODE >
+    /**template < Opcode OPCODE >
     static void appendSimpleInstruction( Code& aCode )
     {
       appendInstruction( aCode, Instruction<OPCODE>() );
-    }
+      }*/
 
     void 
     appendVariableReferenceMethodInstruction( Code& aCode,
@@ -550,7 +536,6 @@ namespace libecs
     static FunctionMap2       theFunctionMap2;
 
     static SystemMethodMap    theSystemMethodMap;
-    static BooleanFunctionMap theBooleanFunctionMap;
 
   }; // ExpressionCompiler
 
@@ -626,16 +611,6 @@ namespace libecs
   DEFINE_OPCODE2INSTRUCTION( MUL );
   DEFINE_OPCODE2INSTRUCTION( DIV );
   DEFINE_OPCODE2INSTRUCTION( POW );
-  DEFINE_OPCODE2INSTRUCTION( EQ );
-  DEFINE_OPCODE2INSTRUCTION( NEQ );
-  DEFINE_OPCODE2INSTRUCTION( GT );
-  DEFINE_OPCODE2INSTRUCTION( LT );
-  DEFINE_OPCODE2INSTRUCTION( GEQ );
-  DEFINE_OPCODE2INSTRUCTION( LEQ );
-  DEFINE_OPCODE2INSTRUCTION( AND );
-  DEFINE_OPCODE2INSTRUCTION( OR );
-  DEFINE_OPCODE2INSTRUCTION( XOR );
-  DEFINE_OPCODE2INSTRUCTION( NOT );
   DEFINE_OPCODE2INSTRUCTION( LOAD_REAL );
   //DEFINE_OPCODE2INSTRUCTION( CALL_FUNC0 );
   DEFINE_OPCODE2INSTRUCTION( CALL_FUNC1 );
@@ -681,18 +656,6 @@ namespace libecs
 
   void libecs::ExpressionCompiler::fillMap()
   {
-    // set BooleanFunctionMap
-    theBooleanFunctionMap["not"] = appendSimpleInstruction<NOT>;
-    theBooleanFunctionMap["eq"]  = appendSimpleInstruction<EQ>;
-    theBooleanFunctionMap["neq"] = appendSimpleInstruction<NEQ>;
-    theBooleanFunctionMap["gt"]  = appendSimpleInstruction<GT>;
-    theBooleanFunctionMap["lt"]  = appendSimpleInstruction<LT>;
-    theBooleanFunctionMap["geq"] = appendSimpleInstruction<GEQ>;
-    theBooleanFunctionMap["leq"] = appendSimpleInstruction<LEQ>;
-    theBooleanFunctionMap["and"] = appendSimpleInstruction<AND>;
-    theBooleanFunctionMap["or"]  = appendSimpleInstruction<OR>;
-    theBooleanFunctionMap["xor"] = appendSimpleInstruction<XOR>;
-      
 
     // set ConstantMap
     theConstantMap["true"]  = 1.0;
@@ -737,10 +700,21 @@ namespace libecs
     theFunctionMap1["sec"]   = sec;
     theFunctionMap1["csc"]   = csc;
     theFunctionMap1["cot"]   = cot;
+    theFunctionMap1["not"]   = Not;
 
 
     // set FunctionMap2
     theFunctionMap2["pow"]   = pow;
+    theFunctionMap2["and"]   = And;
+    theFunctionMap2["or"]    = Or;
+    theFunctionMap2["xor"]   = Xor;
+    theFunctionMap2["eq"]    = eq;
+    theFunctionMap2["neq"]   = neq;
+    theFunctionMap2["gt"]    = gt;
+    theFunctionMap2["lt"]    = lt;
+    theFunctionMap2["geq"]   = geq;
+    theFunctionMap2["leq"]   = leq;
+
 
     // set SystemMethodMap
     theSystemMethodMap["Size"]    = &libecs::System::getSize;
@@ -834,16 +808,16 @@ namespace libecs
 	   Floating Grammar compile
 	*/
 
-      case CompileGrammar::FLOATING :
+      case CompileGrammar::FLOAT :
 	{
 	  assert( aTreeIterator->children.size() == 0 );
 
-	  const String aString( aTreeIterator->value.begin(),
-				aTreeIterator->value.end() );
-
-	  const Real value = stringCast<Real>( aString );
+	  const String aFloatString( aTreeIterator->value.begin(),
+				     aTreeIterator->value.end() );
 	  
-	  appendInstruction( aCode, Instruction<PUSH_REAL>( value ) );
+	  const Real aFloatValue = stringCast<Real>( aFloatString );
+	  
+	  appendInstruction( aCode, Instruction<PUSH_REAL>( aFloatValue ) );
 	  
 	  return;
 	}
@@ -856,17 +830,17 @@ namespace libecs
 	{	
 	  assert( aTreeIterator->children.size() == 0 );
 	  
-	  const String aString( aTreeIterator->value.begin(),
-				aTreeIterator->value.end() );
+	  const String anIntegerString( aTreeIterator->value.begin(),
+					aTreeIterator->value.end() );
 
-	  const Real value = stringCast<Real>( aString );
+	  const Real anIntegerValue = stringCast<Real>( anIntegerString );
 	  
-	  appendInstruction( aCode, Instruction<PUSH_REAL>( value ) );
+	  appendInstruction( aCode, Instruction<PUSH_REAL>( anIntegerValue ) );
 
 	  return; 
 	
 	}
-	
+      
       /**
 	 Grammar compile
       */
@@ -876,36 +850,40 @@ namespace libecs
 	  assert( *aTreeIterator->value.begin() == 'E' || 
 		  *aTreeIterator->value.begin() == 'e' );
 
-	  const String aString1( aTreeIterator->children.begin()->
-				 value.begin(),
-				 aTreeIterator->children.begin()->
-				 value.end() );
+	  TreeIterator const& 
+	    aChildTreeIterator( aTreeIterator->children.begin() );
 
-	  const String aString2( ( aTreeIterator->children.begin() + 1)->
-				 value.begin(),
-				 ( aTreeIterator->children.begin() + 1)->
-				 value.end() );
+	  const String aBaseString( aChildTreeIterator->value.begin(),
+				 aChildTreeIterator->value.end() );
 
-	  const Real value1 = stringCast<Real>( aString1 );
+	  const String 
+	    anExponentString( ( aChildTreeIterator + 1 )->value.begin(),
+			      ( aChildTreeIterator + 1 )->value.end() );
+
+	  const Real aBaseValue = stringCast<Real>( aBaseString );
 	  
-	  if( aString2 != "-")
+	  if( anExponentString != "-")
 	    {
-	      const Real value2 = stringCast<Real>( aString2 );
+	      const Real 
+		anExponentValue = stringCast<Real>( anExponentString );
 	      
 	      appendInstruction
-		( aCode, Instruction<PUSH_REAL>( value1 * pow(10, value2) ) );
+		( aCode, Instruction<PUSH_REAL>
+		  ( aBaseValue * pow(10, anExponentValue ) ) );
 	    }
 	  else
 	    {
-	      const String aString3( ( aTreeIterator->children.begin() + 2)->
-				     value.begin(),
-				     ( aTreeIterator->children.begin() + 2)->
-				     value.end() );
+	      const String 
+		anExponentString1( ( aChildTreeIterator + 2)->value.begin(),
+				  ( aChildTreeIterator + 2)->value.end() );
 	      
-	      const Real value2 = stringCast<Real>( aString3 );
+	      const Real 
+		anExponentValue = stringCast<Real>( anExponentString1 );
 	      
 	      appendInstruction
-		( aCode, Instruction<PUSH_REAL>( value1 * pow(10, -value2) ) );
+		( aCode, 
+		  Instruction<PUSH_REAL>
+		  ( aBaseValue * pow( 10, -anExponentValue ) ) );
 	    }
 	  
 	  return; 
@@ -919,112 +897,104 @@ namespace libecs
 
       case CompileGrammar::CALL_FUNC :
 	{
-	  FunctionMap1Iterator aFunctionMap1Iterator;
-	  FunctionMap2Iterator aFunctionMap2Iterator;
-	  BooleanFunctionMapIterator aBooleanFunctionMapIterator;
-	    
 
-	  assert( aTreeIterator->children.size() != 0 );
-	
-	  const String aString1( aTreeIterator->value.begin(),
-				 aTreeIterator->value.end() );
+	  Integer aChildTreeSize( aTreeIterator->children.size() );
+	  
+	  const String aFunctionString( aTreeIterator->value.begin(),
+					aTreeIterator->value.end() );
 
-	  aBooleanFunctionMapIterator = 
-	    theBooleanFunctionMap.find( aString1 );
 
-	  if( aTreeIterator->children.size() == 1 )
+	  assert( aChildTreeSize != 0 );
+
+	  if( aChildTreeSize == 1 )
 	    {
 
-	      if( aBooleanFunctionMapIterator !=
-		  theBooleanFunctionMap.end() )
-		{
-		  (aBooleanFunctionMapIterator->second)( aCode );
-		}
+	      FunctionMap1Iterator aFunctionMap1Iterator;
 
-	      else
-		{
-		  aFunctionMap1Iterator = theFunctionMap1.find( aString1 );
+	      aFunctionMap1Iterator = 
+		theFunctionMap1.find( aFunctionString );
 		
-		  if( aTreeIterator->children.begin()->value.id() ==
-		      CompileGrammar::INTEGER ||
-		      aTreeIterator->children.begin()->value.id() ==
-		      CompileGrammar::FLOATING  )
-		    {
-		      const String aString2( aTreeIterator->children.begin()->
-					     value.begin(),
-					     aTreeIterator->children.begin()->
-					     value.end() );
-		    
-		      const Real value1 = stringCast<Real>( aString2 );
-		
-		      if( aFunctionMap1Iterator != theFunctionMap1.end() )
-			{
-			  appendInstruction
-			    ( aCode, Instruction<PUSH_REAL>
-			      ( (*aFunctionMap1Iterator->second)
-				( value1 ) ) );
-			}
-		      else
-			{
-			  THROW_EXCEPTION( NoSlot, 
-					   aString1 +
-					   String( " : No such function." ) );
-			}
-		    }
-		  else
-		    {
-		      compileTree( aTreeIterator->children.begin(), aCode );	  
-		    
-		      if( aFunctionMap1Iterator != theFunctionMap1.end() )
-			{
-			  appendInstruction
-			    ( aCode, Instruction<CALL_FUNC1>
-			      ( aFunctionMap1Iterator->second ) );
-			}
-		      else
-			{
-			  THROW_EXCEPTION( NoSlot, 
-					   aString1 +
-					   String( " : No such function." ) );
-			}
-		    }
-		}
-	    }
-	  else if( aTreeIterator->children.size() == 2 )
-	    {
-	      compileTree( aTreeIterator->children.begin(), aCode );	  
-	      compileTree( aTreeIterator->children.begin()+1, aCode );
-		
-	      
-	      if( aBooleanFunctionMapIterator !=
-		  theBooleanFunctionMap.end() )
-		{	
-		  (aBooleanFunctionMapIterator->second)( aCode );
-		}
+	      TreeIterator const& 
+		aChildTreeIterator( aTreeIterator->children.begin() );
 
-	      else
+
+	      if( aChildTreeIterator->value.id() == CompileGrammar::INTEGER
+		  ||
+		  aChildTreeIterator->value.id() == CompileGrammar::FLOAT )
 		{
-		  aFunctionMap2Iterator = theFunctionMap2.find( aString1 );
+		  const String 
+		    anArgumentString( aChildTreeIterator->value.begin(),
+				      aChildTreeIterator->value.end() );
+		    
+		  const Real 
+		    anArgumentValue = stringCast<Real>( anArgumentString );
 		
-		  if( aFunctionMap2Iterator != theFunctionMap2.end() )
+		  if( aFunctionMap1Iterator != theFunctionMap1.end() )
 		    {
 		      appendInstruction
-			( aCode, Instruction<CALL_FUNC2>
-			  ( aFunctionMap2Iterator->second ) );
+			( aCode, Instruction<PUSH_REAL>
+			  ( (*aFunctionMap1Iterator->second)
+			    ( anArgumentValue ) ) );
 		    }
 		  else
 		    {
 		      THROW_EXCEPTION( NoSlot, 
-				       aString1 +
+				       aFunctionString +
+				       String( " : No such function." ) );
+		    }
+		}
+	      else
+		{
+		  compileTree( aChildTreeIterator, aCode );
+		    
+		  if( aFunctionMap1Iterator != theFunctionMap1.end() )
+		    {
+		      appendInstruction
+			( aCode, Instruction<CALL_FUNC1>
+			  ( aFunctionMap1Iterator->second ) );
+		    }
+		  else
+		    {
+		      THROW_EXCEPTION( NoSlot, 
+				       aFunctionString +
 				       String( " : No such function." ) );
 		    }
 		}
 	    }
+
+	  else if( aChildTreeSize == 2 )
+	    {
+
+	      TreeIterator const& 
+		aChildTreeIterator( aTreeIterator->children.begin() );
+
+	      compileTree( aChildTreeIterator, aCode );
+	      compileTree( aChildTreeIterator+1, aCode );
+		
+	      
+	      FunctionMap2Iterator aFunctionMap2Iterator;
+
+	      aFunctionMap2Iterator =
+		theFunctionMap2.find( aFunctionString );
+		
+	      if( aFunctionMap2Iterator != theFunctionMap2.end() )
+		{
+		  appendInstruction
+		    ( aCode, Instruction<CALL_FUNC2>
+		      ( aFunctionMap2Iterator->second ) );
+		}
+	      else
+		{
+		  THROW_EXCEPTION( NoSlot, 
+				   aFunctionString +
+				   String( " : No such function." ) );
+		}
+	    }
+
 	  else
 	    {
-	      THROW_EXCEPTION( NoSlot,
-			       aString1 + 
-			       String(" : No such function.") );
+	      THROW_EXCEPTION( UnexpectedError,
+			       " : Too many arguments" );
 	    }
 
 	  return;
@@ -1037,62 +1007,55 @@ namespace libecs
 
       case CompileGrammar::SYSTEM_FUNC :
 	{
-	  String aString1, aString2, aString3;
-	  FunctionMap2Iterator aFunctionMap2Iterator;
-	  SystemMethodMapIterator aSystemMethodMapIterator;
-	  
-	  for( CharVectorIterator aCharVectorIterator = aTreeIterator->children.begin()->value.begin();
-	       aCharVectorIterator != aTreeIterator->children.begin()->value.end();
-	       ++aCharVectorIterator )
-	    {
-	      aString1 += *aCharVectorIterator;
-	    }
+	  TreeIterator const& 
+	    aChildTreeIterator( aTreeIterator->children.begin() );
 
-	  for( CharVectorIterator aCharVectorIterator = ( aTreeIterator->children.begin()+1 )->value.begin();
-	       aCharVectorIterator != ( aTreeIterator->children.begin()+1 )->value.end();
-	       ++aCharVectorIterator )
-	    {
-	      aString2 += *aCharVectorIterator;
-	    }
-	
+	  const String aClassString( aChildTreeIterator->value.begin(),
+				     aChildTreeIterator->value.end() );
+
+	  const String
+	    aClassMethodString( ( aChildTreeIterator+1 )->value.begin(),
+				  ( aChildTreeIterator+1 )->value.end() );
+	  
+
 	  assert( *aTreeIterator->value.begin() == '.' );
 	
-	  if( aString1 == "self" )
+
+	  if( aClassString == "self" )  // Process Class
 	    {
 	      appendInstruction
 		( aCode, Instruction<PUSH_POINTER>( theProcessPtr ) );
 	      
 
-	      if( aString2 == "getSuperSystem" )
+	      if( aClassMethodString == "getSuperSystem" )
 		{
 		  appendInstruction
 		    ( aCode, Instruction<PROCESS_TO_SYSTEM_METHOD>
 		      ( &libecs::Process::getSuperSystem ) );		  
 		  
+		  const String 
+		    aSystemMethodString
+		    ( ( aChildTreeIterator+2 )->value.begin(),
+		      ( aChildTreeIterator+2 )->value.end() );
 
-		  for( CharVectorIterator aCharVectorIterator = ( aTreeIterator->children.begin()+2 )->value.begin();
-		       aCharVectorIterator != ( aTreeIterator->children.begin()+2 )->value.end();
-		       ++aCharVectorIterator )
-		    {
-		      aString3 += *aCharVectorIterator;
-		    }
-		  
 
-		  aSystemMethodMapIterator = 
-		    theSystemMethodMap.find( aString3 );
+		  SystemMethodMapIterator aSystemMethodMapIterator;
+	  
+		  aSystemMethodMapIterator =
+		    theSystemMethodMap.find( aSystemMethodString );
 
 	
 		  if( aSystemMethodMapIterator != theSystemMethodMap.end() )
 		    {
 		      appendInstruction
 			( aCode, Instruction<SYSTEM_TO_REAL_METHOD>
-			  ( theSystemMethodMap[aString3] ) );
+			  ( theSystemMethodMap[aSystemMethodString] ) );
 		    }
 
 		  else
 		    {
 		      THROW_EXCEPTION( NoSlot,
-				       aString3 + 
+				       aSystemMethodString + 
 				       String
 				       (" : No such System method.") );
 		    }
@@ -1100,51 +1063,52 @@ namespace libecs
 	      else
 		{
 		  THROW_EXCEPTION( NoSlot,
-				   aString2 + 
+				   aClassMethodString + 
 				   String
 				   ( " : No such Process method." ) );
 		}
 	    }		  		
-	  else
+	  else // VariableReference Class
 	    {
 	      VariableReferenceCref
 		aVariableReference( theProcessPtr->
-				    getVariableReference( aString1 ) );
+				    getVariableReference( aClassString ) );
 	      
 	      appendInstruction
 		( aCode, Instruction<PUSH_POINTER>
 		  ( const_cast<VariableReference*>( &aVariableReference ) ) );
 	      
 
-	      if( aString2 == "getSuperSystem" )
+	      if( aClassMethodString == "getSuperSystem" )
 		{
 		  appendInstruction
 		    ( aCode, Instruction<VARREF_TO_SYSTEM_METHOD>
 		      ( &libecs::VariableReference::getSuperSystem ) );
 
-		  for( CharVectorIterator aCharVectorIterator = ( aTreeIterator->children.begin()+2 )->value.begin();
-		       aCharVectorIterator != ( aTreeIterator->children.begin()+2 )->value.end();
-		       ++aCharVectorIterator )
-		    {
-		      aString3 += *aCharVectorIterator;
-		    }
 		  
+		  const String 
+		    aSystemMethodString
+		    ( ( aChildTreeIterator+2 )->value.begin(),
+		      ( aChildTreeIterator+2 )->value.end() );
 
+		  
+		  SystemMethodMapIterator aSystemMethodMapIterator;
+	  
 		  aSystemMethodMapIterator = 
-		    theSystemMethodMap.find( aString3 );
+		    theSystemMethodMap.find( aSystemMethodString );
 		  
 		  
 		  if( aSystemMethodMapIterator != theSystemMethodMap.end() )
 		    {
 		      appendInstruction
 			( aCode, Instruction<SYSTEM_TO_REAL_METHOD>
-			  ( theSystemMethodMap[aString3] ) );
+			  ( theSystemMethodMap[aSystemMethodString] ) );
 		    }
 		  
 		  else
 		    {
 		      THROW_EXCEPTION( NoSlot,
-				       aString3 + 
+				       aSystemMethodString + 
 				       String
 				       (" : No such System method.") );
 		    } 
@@ -1152,7 +1116,7 @@ namespace libecs
 	      else
 		{
 		  THROW_EXCEPTION( NoSlot,
-				   aString2 + 
+				   aClassMethodString + 
 				   String
 				   ( " : No such Process method." ) );
 		}
@@ -1167,32 +1131,29 @@ namespace libecs
 
       case CompileGrammar::VARIABLE :
 	{
-	  String aString1, aString2;
-	  
 	  assert( *aTreeIterator->value.begin() == '.' );
 
-	  for( CharVectorIterator aCharVectorIterator = aTreeIterator->children.begin()->value.begin();
-	       aCharVectorIterator != aTreeIterator->children.begin()->value.end();
-	       ++aCharVectorIterator )
-	    {
-	      aString1 += *aCharVectorIterator;
-	    }
+	  TreeIterator const& 
+	    aChildTreeIterator( aTreeIterator->children.begin() );
 
-	  for( CharVectorIterator aCharVectorIterator = ( aTreeIterator->children.begin()+1 )->value.begin();
-	       aCharVectorIterator != ( aTreeIterator->children.begin()+1 )->value.end();
-	       ++aCharVectorIterator )
-	    {
-	      aString2 += *aCharVectorIterator;
-	    }
+	  const String
+	    aVariableReferenceString( aChildTreeIterator->value.begin(),
+				      aChildTreeIterator->value.end() );
+
+	  const String 
+	    aVariableReferenceMethodString
+	    ( ( aChildTreeIterator+1 )->value.begin(),
+	      ( aChildTreeIterator+1 )->value.end() );
       	
 	  VariableReferenceCref
-	    aVariableReference( theProcessPtr->
-				getVariableReference( aString1 ) );
+	    aVariableReference
+	    ( theProcessPtr->
+	      getVariableReference( aVariableReferenceString ) );
 	  
 	  appendVariableReferenceMethodInstruction
 	    ( aCode,
 	      const_cast<VariableReference*>( &aVariableReference ),
-	      aString2 );
+	      aVariableReferenceMethodString );
 
 	  return;
 	
@@ -1206,21 +1167,20 @@ namespace libecs
 
       case CompileGrammar::IDENTIFIER :
 	{
-	  String aString1;
+	  assert( aTreeIterator->children.size() == 0 );
+	
+	  const String anIdentifierString( aTreeIterator->value.begin(),
+					   aTreeIterator->value.end() );
+
 	  ConstantMapIterator aConstantMapIterator;
 	  PropertyMapIterator aPropertyMapIterator;
 
-	  assert( aTreeIterator->children.size() == 0 );
+	  aConstantMapIterator = 
+	    theConstantMap.find( anIdentifierString );
+	  aPropertyMapIterator =
+	    thePropertyMapPtr->find( anIdentifierString );
 	
-	  for( CharVectorIterator aCharVectorIterator = aTreeIterator->value.begin();
-	       aCharVectorIterator != aTreeIterator->value.end(); ++aCharVectorIterator )
-	    {
-	      aString1 += *aCharVectorIterator;
-	    }
 
-	  aConstantMapIterator = theConstantMap.find( aString1 );
-	  aPropertyMapIterator = thePropertyMapPtr->find( aString1 );
-	
 	  if( aConstantMapIterator != theConstantMap.end() )
 	    {
 	      appendInstruction
@@ -1238,7 +1198,7 @@ namespace libecs
 	  else
 	    {
 	      THROW_EXCEPTION( NoSlot,
-			       aString1 +
+			       anIdentifierString +
 			       String( " : No such Property slot." ) );
 	    }
 	
@@ -1253,28 +1213,27 @@ namespace libecs
     
       case CompileGrammar::NEGATIVE :
 	{
-	  Real value;
-	  String aString;
-
 	  assert( *aTreeIterator->value.begin() == '-' );
 
-	  for( CharVectorIterator aCharVectorIterator = aTreeIterator->children.begin()->value.begin();
-	       aCharVectorIterator != aTreeIterator->children.begin()->value.end();
-	       ++aCharVectorIterator )
-	    {
-	      aString += *aCharVectorIterator;
-	    }
+	  TreeIterator const& 
+	    aChildTreeIterator( aTreeIterator->children.begin() );
 
-	  if( aTreeIterator->children.begin()->value.id() == CompileGrammar::INTEGER ||
-	      aTreeIterator->children.begin()->value.id() == CompileGrammar::FLOATING  )
+
+	  if( aChildTreeIterator->value.id() == CompileGrammar::INTEGER ||
+	      aChildTreeIterator->value.id() == CompileGrammar::FLOAT )
 	    {
-	      value = stringCast<Real>( aString );
+	      const String 
+		aValueString( aChildTreeIterator->value.begin(),
+				   aChildTreeIterator->value.end() );
+
+	      const Real 
+		value = stringCast<Real>( aValueString );
 
 	      appendInstruction( aCode, Instruction<PUSH_REAL>( -value ) );
 	    }
 	  else
 	    {
-	      compileTree(aTreeIterator->children.begin(), aCode );
+	      compileTree( aChildTreeIterator, aCode );
 
 	      appendInstruction( aCode, Instruction<NEG>() );
 	    }
@@ -1291,43 +1250,41 @@ namespace libecs
 
       case CompileGrammar::POWER :
 	{
-	  Real value1, value2;
-	  String aString1, aString2;
-
 	  assert(aTreeIterator->children.size() == 2);
 
-	  if( ( aTreeIterator->children.begin()->value.id() == CompileGrammar::INTEGER ||
-		aTreeIterator->children.begin()->value.id() == CompileGrammar::FLOATING ) 
-	      && 
-	      ( ( aTreeIterator->children.begin()+1 )->value.id() ==
-		CompileGrammar::INTEGER ||
-		( aTreeIterator->children.begin()+1 )->value.id() ==
-		CompileGrammar::FLOATING ) )
+	  TreeIterator const& 
+	    aChildTreeIterator( aTreeIterator->children.begin() );
+
+
+	  if( ( aChildTreeIterator->value.id() == CompileGrammar::INTEGER ||
+		aChildTreeIterator->value.id() == CompileGrammar::FLOAT ) && 
+	      ( (aChildTreeIterator+1)->value.id() ==CompileGrammar::INTEGER ||
+		(aChildTreeIterator+1)->value.id() == CompileGrammar::FLOAT ) )
 	    {
-	      for( CharVectorIterator aCharVectorIterator = aTreeIterator->children.begin()->value.begin();
-		   aCharVectorIterator != aTreeIterator->children.begin()->value.end();
-		   ++aCharVectorIterator )
-		{
-		  aString1 += *aCharVectorIterator;
-		}
 
-	      for( CharVectorIterator aCharVectorIterator = ( aTreeIterator->children.begin()+1 )->value.begin();
-		   aCharVectorIterator != ( aTreeIterator->children.begin()+1 )->value.end();
-		   ++aCharVectorIterator )
-		{
-		  aString2 += *aCharVectorIterator;
-		}
+	      const String 
+		anArgumentString1( aChildTreeIterator->value.begin(),
+				   aChildTreeIterator->value.end() );
 
-	      value1 = stringCast<Real>( aString1 );
-	      value2 = stringCast<Real>( aString2 );	  
+	      const String 
+		anArgumentString2( ( aChildTreeIterator+1 )->value.begin(),
+				   ( aChildTreeIterator+1 )->value.end() );
+
+	      const Real 
+		anArgumentValue1 = stringCast<Real>( anArgumentString1 );
+	      const Real 
+		anArgumentValue2 = stringCast<Real>( anArgumentString2 );
+
 
 	      if( *aTreeIterator->value.begin() == '^' )
 		{
 		  appendInstruction
-		    ( aCode, Instruction<PUSH_REAL>( pow( value1, value2 ) ) );
+		    ( aCode, Instruction<PUSH_REAL>
+		      ( pow( anArgumentValue1, anArgumentValue2 ) ) );
 		}
 
 	      else
+
 		THROW_EXCEPTION( UnexpectedError,
 				 String( "Invalid operation" ) );
 
@@ -1344,6 +1301,7 @@ namespace libecs
 		}
 
 	      else
+
 		THROW_EXCEPTION( UnexpectedError,
 				 String( "Invalud operation" ) );
 
@@ -1362,46 +1320,45 @@ namespace libecs
 
       case CompileGrammar::TERM :
 	{
-	  Real value1, value2;
-	  String aString1, aString2;
 
 	  assert(aTreeIterator->children.size() == 2);
 
-	  if( ( aTreeIterator->children.begin()->value.id() == CompileGrammar::INTEGER ||
-		aTreeIterator->children.begin()->value.id() == CompileGrammar::FLOATING ) && 
-	      ( ( aTreeIterator->children.begin()+1 )->value.id() ==
-		CompileGrammar::INTEGER ||
-		( aTreeIterator->children.begin()+1 )->value.id() ==
-		CompileGrammar::FLOATING ) )
+
+	  TreeIterator const& 
+	    aChildTreeIterator( aTreeIterator->children.begin() );
+
+
+	  if( ( aChildTreeIterator->value.id() == CompileGrammar::INTEGER ||
+		aChildTreeIterator->value.id() == CompileGrammar::FLOAT ) && 
+	      ( (aChildTreeIterator+1)->value.id() ==CompileGrammar::INTEGER ||
+		(aChildTreeIterator+1)->value.id() == CompileGrammar::FLOAT ) )
 	    {
-	      for( CharVectorIterator aCharVectorIterator = aTreeIterator->children.begin()->value.begin();
-		   aCharVectorIterator != aTreeIterator->children.begin()->value.end();
-		   ++aCharVectorIterator )
-		{
-		  aString1 += *aCharVectorIterator;
-		}
 
-	      for( CharVectorIterator aCharVectorIterator = ( aTreeIterator->children.begin()+1 )->value.begin();
-		   aCharVectorIterator != ( aTreeIterator->children.begin()+1 )->value.end();
-		   ++aCharVectorIterator )
-		{
-		  aString2 += *aCharVectorIterator;
-		}
+	      const String aTerm1String( aChildTreeIterator->value.begin(),
+					 aChildTreeIterator->value.end() );
 
-	      value1 = stringCast<Real>( aString1 );
-	      value2 = stringCast<Real>( aString2 );	  
+	      const String 
+		aTerm2String( ( aChildTreeIterator+1 )->value.begin(),
+			      ( aChildTreeIterator+1 )->value.end() );
+
+	      const Real aTerm1Value = stringCast<Real>( aTerm1String );
+	      const Real aTerm2Value = stringCast<Real>( aTerm2String );
 
 
 	      if (*aTreeIterator->value.begin() == '*')
 		{
 		  appendInstruction
-		    ( aCode, Instruction<PUSH_REAL>( value1 * value2 ) );
+		    ( aCode, 
+		      Instruction<PUSH_REAL>( aTerm1Value * aTerm2Value ) );
 		}	
+
 	      else if (*aTreeIterator->value.begin() == '/')
 		{
 		  appendInstruction
-		    ( aCode, Instruction<PUSH_REAL>( value1 / value2 ) );
+		    ( aCode, 
+		      Instruction<PUSH_REAL>( aTerm1Value / aTerm2Value ) );
 		}
+
 	      else
 		THROW_EXCEPTION( UnexpectedError,
 				 String( "Invalid operation" ) );
@@ -1410,8 +1367,8 @@ namespace libecs
 	    }
 	  else
 	    {
-	      compileTree( aTreeIterator->children.begin(), aCode );
-	      compileTree( aTreeIterator->children.begin()+1, aCode );
+	      compileTree( aChildTreeIterator, aCode );
+	      compileTree( aChildTreeIterator+1, aCode );
 	    
 	      if (*aTreeIterator->value.begin() == '*')
 		{
@@ -1422,6 +1379,7 @@ namespace libecs
 		{
 		  appendInstruction( aCode, Instruction<DIV>() );
 		}
+
 	      else
 		THROW_EXCEPTION( UnexpectedError,
 				 String( "Invalid operation" ) );
@@ -1441,69 +1399,63 @@ namespace libecs
 
       case CompileGrammar::EXPRESSION :
 	{
-	  Real value1, value2;
-	  String aString1, aString2;
 
 	  assert(aTreeIterator->children.size() == 2);
 	
-	  if( ( aTreeIterator->children.begin()->value.id() == CompileGrammar::INTEGER ||
-		aTreeIterator->children.begin()->value.id() == CompileGrammar::FLOATING ) &&
-	      ( ( aTreeIterator->children.begin()+1 )->value.id() ==
-		CompileGrammar::INTEGER ||
-		( aTreeIterator->children.begin()+1 )->value.id() ==
-		CompileGrammar::FLOATING ) )
+	  TreeIterator const& 
+	    aChildTreeIterator( aTreeIterator->children.begin() );
+
+
+	  if( ( aChildTreeIterator->value.id() == CompileGrammar::INTEGER ||
+		aChildTreeIterator->value.id() == CompileGrammar::FLOAT ) &&
+	      ( (aChildTreeIterator+1)->value.id() ==CompileGrammar::INTEGER ||
+		(aChildTreeIterator+1)->value.id() == CompileGrammar::FLOAT ) )
 	    {
-	      for( CharVectorIterator 
-		     aCharVectorIterator( aTreeIterator->children.begin()->
-					  value.begin() );
-		   aCharVectorIterator != 
-		     aTreeIterator->children.begin()->value.end();
-		   ++aCharVectorIterator )
-		{
-		  aString1 += *aCharVectorIterator;
-		}
+	      const String aTerm1String( aChildTreeIterator->value.begin(),
+					 aChildTreeIterator->value.end() );
+	      
+	      const String 
+		aTerm2String( ( aChildTreeIterator+1 )->value.begin(),
+			      ( aChildTreeIterator+1 )->value.end() );
 
-	      for( CharVectorIterator 
-		     aCharVectorIterator( ( aTreeIterator->children.begin()+1 )
-					  ->value.begin() );
-		   aCharVectorIterator != 
-		     ( aTreeIterator->children.begin()+1 )->value.end();
-		   ++aCharVectorIterator )
-		{
-		  aString2 += *aCharVectorIterator;
-		}
-
-	      value1 = stringCast<Real>( aString1 );
-	      value2 = stringCast<Real>( aString2 );	  
+	      const Real aTerm1Value = stringCast<Real>( aTerm1String );
+	      const Real aTerm2Value = stringCast<Real>( aTerm2String );
 
 
 	      if (*aTreeIterator->value.begin() == '+')
 		{
 		  appendInstruction
-		    ( aCode, Instruction<PUSH_REAL>( value1 + value2 ) );
+		    ( aCode, 
+		      Instruction<PUSH_REAL>( aTerm1Value + aTerm2Value ) );
 		}	
+
 	      else if (*aTreeIterator->value.begin() == '-')
 		{
 		  appendInstruction
-		    ( aCode, Instruction<PUSH_REAL>( value1 - value2 ) );
+		    ( aCode, 
+		      Instruction<PUSH_REAL>( aTerm1Value - aTerm2Value ) );
 		}
+
 	      else
 		THROW_EXCEPTION( UnexpectedError,
 				 String( "Invalid operation" ) );
 	    }
 	  else
 	    {
-	      compileTree( aTreeIterator->children.begin(), aCode );
-	      compileTree( aTreeIterator->children.begin()+1, aCode );
+	      compileTree( aChildTreeIterator, aCode );
+	      compileTree( aChildTreeIterator+1, aCode );
 		
+
 	      if (*aTreeIterator->value.begin() == '+')
 		{
 		  appendInstruction( aCode, Instruction<ADD>() );
 		}
+
 	      else if (*aTreeIterator->value.begin() == '-')
 		{
 		  appendInstruction( aCode, Instruction<SUB>() );
 		}
+
 	      else
 		THROW_EXCEPTION( UnexpectedError,
 				 String( "Invalid operation" ) );
@@ -1512,7 +1464,6 @@ namespace libecs
 	  return;
 
 	}
-
 	
       default :
 	THROW_EXCEPTION( UnexpectedError, String( "No such syntax" ) );
@@ -1530,8 +1481,6 @@ namespace libecs
   //  ExpressionCompiler::VariableReferenceMethodProxyMap
   //  ExpressionCompiler::theVariableReferenceMethodProxyMap;  
   ExpressionCompiler::SystemMethodMap ExpressionCompiler::theSystemMethodMap;
-  ExpressionCompiler::BooleanFunctionMap 
-  ExpressionCompiler::theBooleanFunctionMap;
 
 } // namespace libecs
 
