@@ -44,8 +44,6 @@ class MainWindow(Window):
               'palette_togglebutton_toggled'   : self.togglePaletteWindow ,
               'Message_togglebutton_toggled'   : self.toggleMessageWindow ,
               'Interface_togglebutton_toggled' : self.toggleInterfaceListWindow ,
-
-              'logo_button_clicked' : self.goTestMode
               }
         self.addHandlers( self.theHandlerMap )
 
@@ -69,39 +67,11 @@ class MainWindow(Window):
         #### create Palette Window ####
         self.thePaletteWindow = PaletteWindow.PaletteWindow()
 
-        #######################
-        #### For Test Mode ####
-        #######################
+        #### ######## ####
+        #### FOR TEST ####
+        #### ######## ####
+        self.theSimulator = simulator()
 
-        self.theTestModeWindow = GtkWindow( title='test mode window' )
-
-        aVBox = GtkVBox()
-        self.theTestModeWindow.add( aVBox )
-        
-        aButton = GtkButton( label = 'open interface' )
-        aButton.connect( 'clicked', self.openInterfaceTest )
-        aVBox.add( aButton )
-
-        ##### modified by zhaiteng (9/5) ####
-
-        aButton = GtkButton( label = 'update interface' )
-        aButton.connect( 'clicked', self.updateInterfaceTest )
-        aVBox.add( aButton )
-
-        #####################################
-
-        aToolbar = GtkToolbar( ORIENTATION_VERTICAL, TOOLBAR_TEXT )
-        aVBox.add( aToolbar )
-        
-        aFirstButton = GtkRadioButton( label = 'ATP' )
-        aToolbar.append_widget( aFirstButton, '', '' )
-        self.theTestModeWindow.set_data( 'ATP', aFirstButton )
-        aButton = GtkRadioButton( aFirstButton, label = 'ADP' )
-        aToolbar.append_widget( aButton, '', '' )
-        self.theTestModeWindow.set_data( 'ADP', aButton )
-        aButton = GtkRadioButton( aFirstButton, label = 'AMP' )
-        aToolbar.append_widget( aButton, '', '' )
-        self.theTestModeWindow.set_data( 'AMP', aButton )
 
     ###### window operation ####
     def closeParentWindow( self, button_obj):
@@ -160,58 +130,6 @@ class MainWindow(Window):
     def openAbout( self ) : pass
     #### these method is not supported in summer GUI project
 
-    #######################
-    #### For Test Mode ####
-    #######################
-    def goTestMode( self, button_obj ) :
-
-        print 'go test mode ...'
-#          self.theSimulator = ecs.Simulator()
-
-#          self.theSimulator.createEntity('Substance','Substance:/:A','substance A')
-#          self.theSimulator.createEntity('Substance','Substance:/:B','substance B')
-#          self.theSimulator.createEntity('Substance','Substance:/:C','substance C')
-
-#          self.theSimulator.setProperty( 'Substance:/:A', 'Quantity', (15,) )
-#          self.theSimulator.setProperty( 'Substance:/:B', 'Quantity', (30,) )
-#          self.theSimulator.setProperty( 'Substance:/:C', 'Quantity', (40,) )
-
-#          print 'initialize()...'
-#          self.theSimulator.initialize()
-
-        self.theSimulator = simulator()
-
-        print 
-        print 'now the simulator has created'
-        print 
-
-        self.theTestModeWindow.show_all()
-
-    def openInterfaceTest( self, button_obj ) :
-        
-        aPluginList = self.thePaletteWindow.get_data( 'plugin_list' )
-
-        for plugin_name in aPluginList :
-            aButton = self.thePaletteWindow.get_data( plugin_name )
-            if aButton.get_active() :
-                aPluginName = plugin_name
-
-        aSubstanceIDList = [ 'ATP', 'ADP', 'AMP' ]
-
-        for id in aSubstanceIDList :
-            aButton = self.theTestModeWindow.get_data( id )
-            if aButton.get_active() :
-                aSelectedID = id
-
-        aFullPN = (SUBSTANCE, '/CELL/CYTOPLASM', aSelectedID, 'Quantity' )
-        aFullPNList = ( aFullPN, )
-
-        self.thePluginManager.createInstance( aPluginName, self.theSimulator, aFullPNList)
-          
-    def updateInterfaceTest( self, button_obj ):
-
-        self.thePluginManager.updateAllPluginWindow()
-    
 if __name__ == "__main__":
 
     def mainLoop():
