@@ -69,6 +69,7 @@ class TracerWindow( PlotterPluginWindow ):
 	def createlogger_pressed(self,obj):
 		#creates logger in simulator for all FullPNs 
 	    self.create_logger(self.displayedFullPNStringList)
+		
 	    self.refresh_loggers()
 	    
 	def create_logger(self,fpnlist):
@@ -76,9 +77,14 @@ class TracerWindow( PlotterPluginWindow ):
 		LoggerMinimumInterval=float(self.theSession.theMainWindow.get_parameter('logger_min_interval'))
 		for fpn in fpnlist:
 		    if not self.haslogger(fpn):
-			self.theSession.theSimulator.createLogger(fpn)
-			self.theSession.theSimulator.setLoggerMinimumInterval(fpn,LoggerMinimumInterval)
-			self.theSession.message("Logger created for "+fpn)
+			try:
+			    self.theSession.theSimulator.createLogger(fpn)
+			except:
+			    self.theSession.theMainWindow.printMessage('Error while creating logger\n logger for '+ fpn + ' not created\n')
+			else:
+			    self.theSession.theSimulator.setLoggerMinimumInterval(fpn,LoggerMinimumInterval)
+			    self.theSession.message("Logger created for "+fpn)
+		self.check_history_button()
 		self.thePluginManager.theMainWindow.theLoggerWindow.update()
 			
 	def recache(self, aFullPNString, value_from, value_to, interval):
@@ -100,6 +106,17 @@ class TracerWindow( PlotterPluginWindow ):
 		#function in the Simulator
 		loggerlist=self.theSession.theSimulator.getLoggerList()
 		return loggerlist.__contains__(aFullPNString)
+
+	def check_history_button(self):
+	    history_button=self['togglebutton3']
+	    if len(self.displayedFullPNStringList)==0:
+		history_button.set_sensitive(gtk.FALSE)
+		return None	
+	    for fpn in self.displayedFullPNStringList:
+		if not self.haslogger(fpn):
+			history_button.set_sensitive(gtk.FALSE)
+			return None	
+	    history_button.set_sensitive(gtk.TRUE)      
 		
 	def getloggerstart(self,aFullPNString):
 		#called from the plotinstance
@@ -149,11 +166,7 @@ class TracerWindow( PlotterPluginWindow ):
 		    self.theSession.message("Enter a valid number, please.")
 		    self['entry1'].set_text(str(self.thePlotInstance.getstripinterval()))
 		else:
-			#                 if a>1:
-			self.thePlotInstance.setstripinterval(a)
-			#                 else:
-			#                     self.theSession.printMessage("Enter a valid number, please.")
-			#                     self['entry1'].set_text(str(self.thePlotInstance.getstripinterval()))
+		    self.thePlotInstance.setstripinterval(a)
 
 			
 		

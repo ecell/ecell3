@@ -60,6 +60,7 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 		    'on_button9_clicked' : self.remove_trace,\
 		    'on_button12_clicked'  : self.change_scale})
 		aWindowWidget.show_all()
+		self['button12'].set_label('Log10 Scale')
 
 		self.thePluginManager.appendInstance( self )                    
 		#init clist
@@ -115,9 +116,10 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 		    else:
 			self.theSession.message('%s cannot be displayed, because it is not numeric\n' % aFullPNString)
 	    added_list=self.thePlotInstance.addtrace(pass_list)
-	    
 	    self.add_trace_to_list(added_list)
-	
+	    self.check_history_button()
+	    self.check_remove_button()	    
+	    
 	def getlatestdata(self,fpn):
 	    value=self.theSession.theSimulator.getEntityProperty(fpn)
 	    time=self.theSession.theSimulator.getCurrentTime()
@@ -125,27 +127,36 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 	    
 	def remove_trace(self, obj):
 	    #identify selected FullPNs
+	    fpnlist=[]	    
 	    selected_list=self.getselected()
 	    for aselected in selected_list:
     		#remove from fullpnlist
+		if len(self.displayedFullPNStringList)==1:
+		    break
 		FullPNList=self.theRawFullPNList[:]
 		for afullpn in FullPNList:
 		    if aselected[0]==createFullPNString( afullpn):
 			self.theRawFullPNList.remove(afullpn)
-			break
-		    
-		#remove from displaylist
+			break	    
+	    #remove from displaylist
 		self.displayedFullPNStringList.remove(aselected[0])
-	    #remove from plotinstance
-	    fpnlist=[]
-	    for aselected in selected_list:
 		fpnlist.append(aselected[0])
+		self.ListStore.remove(aselected[1])	    
+	    #remove from plotinstance
+		
 	    self.thePlotInstance.remove_trace(fpnlist)
 	    #delete selected from list
-	    sel=self.getselected()
-	    for selected in sel:
-		    self.ListStore.remove(selected[1])	    
-	
+	    self.check_history_button()
+	    self.check_remove_button()
+
+	def check_remove_button(self):
+	    remove_button=self['button9']
+	    if len(self.displayedFullPNStringList)>1:
+		remove_button.set_sensitive(gtk.TRUE)
+	    else:
+		remove_button.set_sensitive(gtk.FALSE)
+
+
 	def getselected(self):
 	    self.selection_list=[]
 	    self.ListSelection.selected_foreach(self.selection_function)
@@ -164,7 +175,9 @@ class PlotterPluginWindow( OsogoPluginWindow ):
 	def change_scale(self,obj):  #this is a buttonhandler
 	    #simply calls plotinstance.change_scale
 	    self.thePlotInstance.change_scale()
-
+	
+	def set_scale_button(self,text):
+	    self['button12'].set_label(text)
 ##
 ##
 ##	Private functions

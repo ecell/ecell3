@@ -269,13 +269,14 @@ class Plot:
 		    if self.minmax[0]==0:
 			self.minmax[1]=1
 		    else:
-			self.minmax[1]=self.minmax[0]*2
+			self.minmax[1]=self.minmax[0]+abs(self.minmax[0])
 		#calculate yframemin, max
 		if self.scale_type=='linear':
 		    yrange=(self.minmax[1]-self.minmax[0])/(self.yframemax_when_rescaling-self.yframemin_when_rescaling)
 		    self.yframe[1]=self.minmax[1]+(1-self.yframemax_when_rescaling)*yrange
 		    self.yframe[0]=self.minmax[0]-(self.yframemin_when_rescaling*yrange)
 		    if self.yframe[0]==self.yframe[1]:self.yframe[1]=self.yframe[0]
+		    
 		    exponent=pow(10,floor(log10(self.yframe[1]-self.yframe[0])))
 		    mantissa1=ceil(self.yframe[1]/exponent)
 		    mantissa0=floor(self.yframe[0]/exponent)
@@ -297,11 +298,11 @@ class Plot:
 		    if self.minmax[0]<0 or self.minmax[1]<=0:
 			self.theOwner.theSession.message("negative value in data, fallback to linear scale!\n")
 			self.change_scale()
+			return
 		    if self.minmax[0]==0:
 			miny=self.minmax[4]/10
 		    else:
 			miny=self.minmax[0]
-			
 		    self.zerovalue=pow(10,floor(log10(miny)))
 		    self.yframe[1]=pow(10,ceil(log10(self.minmax[1])))
 		    self.yframe[0]=pow(10,floor(log10(miny)))	    
@@ -353,6 +354,7 @@ class Plot:
 		    else:
 			self.theOwner.theSession.printMessage("negative value in range, falling back to linear scale")		
 			self.change_scale()
+			return
 	    self.reframey2()
 #	    self.yframe0max=self.yframe[0]+(self.yframe[1]-self.yframe[0])*self.yvaluemin_trigger_rescale
 #	    self.yframe1min=self.yframe[0]+(self.yframe[1]-self.yframe[0])*self.yvaluemax_trigger_rescale
@@ -374,16 +376,17 @@ class Plot:
 
 	def change_scale(self):
     	    #change variable
-	    if self.scale_type=='linear':
+	    if self.scale_type=='linear': 
 		self.scale_type='log10'
 	    else:
 		self.scale_type='linear'
 	    self.reframey()
 	    self.drawall()
-	    #reframey
-	    #printlabels
-	    #drawall
-
+	    if self.scale_type=='linear':
+		self.theOwner.set_scale_button( 'Log10 Scale')
+	    else:
+		self.theOwner.set_scale_button('Linear Scale')
+	    	    
 	def reprint_ylabels(self):
 	    #clears ylabel area
 	    self.clearylabelarea()
