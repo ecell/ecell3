@@ -130,17 +130,36 @@ class MainWindow(OsogoWindow):
 		self.SimulationButton = SimulationButton()
 		self['SimulationButton'].add( self.SimulationButton.getCurrentImage() )
 		self['SimulationButtonLabel'].set_text('Start')
+
+
+                # --------------------------
+                # initialize time entry
+                # --------------------------
+
+                self['sec_step_entry'].set_property( 'xalign', 1 )
+                self['time_entry'].set_property( 'xalign', 1 )
+                
+
+                # ------------------------
+                # initialize Statusbar
+                # ------------------------
+                
+		self['statusbar_menu'].set_active(TRUE)
+                self.theStatusbarVisible = True
+
+
 		# -------------------------------------
 		# creates MessageWindow 
 		# -------------------------------------
 		self.theMessageWindow.openWindow()
                 self['messagearea'].add(self.theMessageWindow['top_frame'])
                 
-		self.theSession.setMessageMethod( self.__printMessage )                
+                self.theSession.setMessageMethod( self.__printMessage )
 		self.__expose(None,None)
 		messageWindowSize=self.theMessageWindow.getActualSize()
 		self.theMessageWindow['scrolledwindow1'].set_size_request(\
 		    messageWindowSize[0], messageWindowSize[1] )
+
 		# -------------------------------------
 		# append signal handlers
 		# -------------------------------------
@@ -151,6 +170,7 @@ class MainWindow(OsogoWindow):
                     'save_model_menu_activate'    : self.__openFileSelection,
                     'exit_menu_activate'          : self.__deleted,
                     'message_window_menu_activate': self.__toggleMessageWindow,
+                    'entitylist_window_menu_activate': self.__toggleEntityListWindow,
                     'interface_window_menu_activate'
                     : self.__displayWindow ,
                     'entity_list_menu_activate'
@@ -166,6 +186,10 @@ class MainWindow(OsogoWindow):
                     'step_button_clicked'         : self.__stepSimulation,
                     
                     'on_sec_step_entry_activate'  : self.__setStepSizeOrSec,
+
+                    'on_load_model_button_clicked' : self.__openFileSelection,
+                    'on_load_script_button_clicked' : self.__openFileSelection,
+                    'on_save_model_button_clicked' : self.__openFileSelection,
                     
                     'on_entitylist_button_clicked'
                     : self.__createEntityListWindow,
@@ -173,11 +197,13 @@ class MainWindow(OsogoWindow):
                     'on_message_togglebutton_toggled'
                     : self.__toggleMessageWindow,
                     'on_stepper_button_toggled'   : self.__displayWindow,
-#                    'on_interface_button_toggled' : self.__displayWindow,
-#                    'on_board_button_toggled'     : self.__displayWindow,
+                    'on_interface_button_toggled' : self.__displayWindow,
+                    'on_board_button_toggled'     : self.__displayWindow,
                     'logo_button_clicked'         : self.__displayAbout,
                     'on_scrolledwindow1_expose_event'
                     : self.__expose,
+                    'on_toolbar_menu_activate'        : self.__displayToolbar,
+                    'on_statusbar_menu_activate'        : self.__displayStatusbar,
                     'on_logging_policy1_activate' : self.__openLogPolicy
                     }
                 
@@ -186,6 +212,7 @@ class MainWindow(OsogoWindow):
                     os.environ['OSOGOPATH'] + os.sep + "ecell.png",
                     os.environ['OSOGOPATH'] + os.sep + "ecell32.png" )
                 
+
 		self.__setMenuAndButtonsStatus( FALSE )
 		#self.theSession.updateFundamentalWindows()
 
@@ -197,6 +224,7 @@ class MainWindow(OsogoWindow):
 		self.theMessageWindowVisible = True
 		self['message_togglebutton'].set_active(TRUE)
 		self['message_window_menu'].set_active(TRUE)
+
 
 		# display MainWindow
 		self[self.__class__.__name__].show_all()
@@ -217,10 +245,19 @@ class MainWindow(OsogoWindow):
 		# creates EntityListWindow 
 		# -------------------------------------
 
-		self.theEntityListWindow = self.theSession.createEntityListWindow( 'top_frame', self['statusbar'] )
-		self['entitylistarea'].add( self.theEntityListWindow['top_frame'] )
+                self.theEntityListWindow = self.theSession.createEntityListWindow( 'top_frame', self['statusbar'] )
+                self['entitylistarea'].add( self.theEntityListWindow['top_frame'] )
+                self.theEntityListWindowVisible = True
+		self['entitylist_window_menu'].set_active(TRUE)
 
-        
+
+                # ------------------------
+                # hide Tool bar
+                # ------------------------
+                
+                # tool bar of default setting is "hide"
+                self['toolbar'].hide()
+                self.theToolbarVisible = False
 
 
 	def __expose( self, *arg ):
@@ -230,7 +267,7 @@ class MainWindow(OsogoWindow):
                 pass
 
 
-	def __resizeVertically( self, msg_height ): #gets messagebox height
+	def __resizeVertically( self, height ): #gets entitylistarea or messagebox height
 		"""__resizeVertically
 		Return None
 		"""
@@ -243,7 +280,7 @@ class MainWindow(OsogoWindow):
 		window_width=self['MainWindow'].get_size()[0]
 
 		# resizes
-		window_height=menu_height+toolbar_height+msg_height
+		window_height=menu_height+toolbar_height+height
 		self['MainWindow'].resize(window_width,window_height)
 	
 
@@ -257,11 +294,14 @@ class MainWindow(OsogoWindow):
 		# toolbar
 		self['simulation_button'].set_sensitive(aDataLoadedStatus)
 		self['step_button'].set_sensitive(aDataLoadedStatus)
+		self['load_model_button'].set_sensitive(not aDataLoadedStatus)
+		self['load_script_button'].set_sensitive(not aDataLoadedStatus)
+		self['save_model_button'].set_sensitive(aDataLoadedStatus)
 		self['entitylist_button'].set_sensitive(aDataLoadedStatus)
 		self['logger_button'].set_sensitive(aDataLoadedStatus)
 		self['stepper_button'].set_sensitive(aDataLoadedStatus)
-#		self['interface_button'].set_sensitive(aDataLoadedStatus)
-#		self['board_button'].set_sensitive(aDataLoadedStatus)
+		self['interface_button'].set_sensitive(aDataLoadedStatus)
+		self['board_button'].set_sensitive(aDataLoadedStatus)
 
 		# file menu
 		self['load_model_menu'].set_sensitive(not aDataLoadedStatus)
@@ -276,7 +316,12 @@ class MainWindow(OsogoWindow):
 		self['entity_list_menu'].set_sensitive(aDataLoadedStatus)
 		self['save_model_menu'].set_sensitive(aDataLoadedStatus)
 
-
+                # view menu
+		self['entitylist_window_menu'].set_sensitive(aDataLoadedStatus)
+		self['message_window_menu'].set_sensitive(aDataLoadedStatus)
+		self['toolbar_menu'].set_sensitive(aDataLoadedStatus)
+		self['statusbar_menu'].set_sensitive(aDataLoadedStatus)
+                
 
 
 	def __openFileSelection( self, *arg ) :
@@ -295,15 +340,18 @@ class MainWindow(OsogoWindow):
 			return None
 
 		# when 'Load Model' is selected
-		if arg[0] == self['load_model_menu']:
+		if arg[0] == self['load_model_menu'] or \
+                   arg[0] == self['load_model_button']:
 			self.openFileSelection('Load','Model')
 
 		# when 'Load Script' is selected
-		elif arg[0] == self['load_script_menu']:
+		elif arg[0] == self['load_script_menu'] or \
+                     arg[0] == self['load_script_button']:
 			self.openFileSelection('Load','Script')
 
 		# when 'Save Model' is selected
-		elif arg[0] == self['save_model_menu']:
+		elif arg[0] == self['save_model_menu'] or \
+                     arg[0] == self['save_model_button']:
 			self.openFileSelection('Save','Model')
 
 
@@ -678,7 +726,7 @@ class MainWindow(OsogoWindow):
 		else:
 			flag = gtk.FALSE
 		self['board_window_menu'].set_active( flag )
-#		self['board_button'].set_active(flag)
+		self['board_button'].set_active(flag)
 
 		# Loggerwindow:
 		if self.theSession.doesExist('LoggerWindow' ):
@@ -694,7 +742,7 @@ class MainWindow(OsogoWindow):
 		else:
 			flag = gtk.FALSE
 		self['interface_window_menu'].set_active( flag )
-#		self['interface_button'].set_active(flag)
+		self['interface_button'].set_active(flag)
 
 		# stepperwindow:
 		if self.theSession.doesExist('StepperWindow' ):
@@ -730,6 +778,29 @@ class MainWindow(OsogoWindow):
 			# save logpolicy
 			self.theSession.setLogPolicyParameters( newLogPolicy )
 
+
+        def __displayToolbar( self, *arg ):
+            # show Tool bar
+
+            if self.theToolbarVisible:
+                self['toolbar'].hide()
+                self.theToolbarVisible = False
+            else:
+                self['toolbar'].show()
+                self.theToolbarVisible = True
+                
+
+        def __displayStatusbar( self, *arg ):
+            # show Tool bar
+
+            if self.theStatusbarVisible:
+                self['statusbar'].hide()
+                self.theStatusbarVisible = False
+            else:
+                self['statusbar'].show()
+                self.theStatusbarVisible = True
+                
+                
 	def __displayWindow( self, *arg ):
 		"""This method is called, when the menu or buttons on MainWindow is pressed.
 		arg[0]   ---  menu or button
@@ -758,13 +829,13 @@ class MainWindow(OsogoWindow):
 			self.theSession.toggleWindow('StepperWindow')
 
 		# When InterfaceWindow is selected
-#		elif arg[0] == self['interface_button'] or \
-                elif arg[0] == self['interface_window_menu']:
+		elif arg[0] == self['interface_button'] or \
+                     arg[0] == self['interface_window_menu']:
 			self.theSession.toggleWindow('InterfaceWindow')
 
 		# When BoardWindow is selected
-#		elif arg[0] == self['board_button'] or \
-		elif arg[0] == self['board_window_menu']:
+		elif arg[0] == self['board_button'] or \
+		     arg[0] == self['board_window_menu']:
 			self.theSession.toggleWindow('BoardWindow')
 
 		self.update()
@@ -794,18 +865,32 @@ class MainWindow(OsogoWindow):
 		if len(arg) < 1 :
                     return None
 
+
                 # show
 		if arg[0].get_active() == TRUE:
 			self.theMessageWindowVisible = True
 			self.showMessageWindow() 
-                        self.__resizeVertically(self.theMessageWindow.getActualSize()[1])
+                        self.__resizeVertically( self.theMessageWindow.getActualSize()[1] )
                 # hide
 		else:
 			self.theMessageWindowVisible = False
-			self.hideMessageWindow() 
-			self.__resizeVertically(0)
+			self.hideMessageWindow()                         
+			self.__resizeVertically( self['entitylistarea'].get_allocation()[3] )
 
 		self.updateButtons()
+
+
+        def __toggleEntityListWindow( self, *arg ):
+
+            if arg[0].get_active() == TRUE:
+                self.theEntityListWindowVisible = True
+                self['entitylistarea'].show()
+                self.__resizeVertically( self['entitylistarea'].get_allocation()[3] )
+            else:
+                self.theEntityListWindowVisible = False
+                self['entitylistarea'].hide()
+
+                self.__resizeVertically( self.theMessageWindow.getActualSize()[1] )
 
 
 	def __displayAbout ( self, *args ):
