@@ -36,7 +36,7 @@
 
 #ifndef ___SUBSTANCE_H___
 #define ___SUBSTANCE_H___
-#include <math.h>
+#include <cmath>
 #include <errno.h>
 #include <iostream.h>
 #include "Defs.h"

@@ -35,7 +35,7 @@ char const Accumulators_C_rcsid[] = "$Id$";
 
 
 
-#include <math.h>
+#include <cmath>
 
 #include "Accumulators.h"
 #include "AccumulatorMaker.h"
