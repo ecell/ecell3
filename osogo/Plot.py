@@ -44,6 +44,7 @@ class Plot:
 	    self.plotaread=[self.plotarea[0],self.plotarea[1],\
 		self.plotarea[2]+self.plotarea[0],\
 		self.plotarea[3]+self.plotarea[1]]
+	    
 	    self.ylabelsarea=[0,0,self.origo[0]-1,self.origo[1]+5]
 	    self.xlabelsarea=[self.plotarea[0]-30,self.origo[1]+5,\
 		    self.plotwidth-self.plotarea[0]+30,25]
@@ -226,12 +227,12 @@ class Plot:
 	    #save plotarea
 	    self.pm2.draw_drawable(self.pm2.new_gc(),self.pm,self.origo[0]+realshift,
 			self.plotarea[1],0,0,self.plotarea[2]-realshift,
-			self.plotarea[3])
+			self.plotarea[3]+1)
 	    self.clearplotarea()
 	    #paste
 	    self.pm.draw_drawable(self.pm.new_gc(),self.pm2,0,0,self.origo[0],
 			self.plotarea[1],self.plotarea[2]-realshift,
-			self.plotarea[3])
+			self.plotarea[3]+1)
 	    self.theWidget.queue_draw()
 	    
 	def printxlabel(self, num):
@@ -287,25 +288,43 @@ class Plot:
 		if self.scale_type=='linear':
 		    yrange=(self.minmax[1]-self.minmax[0])/(self.yframemax_when_rescaling-self.yframemin_when_rescaling)
 		    self.yframe[1]=self.minmax[1]+(1-self.yframemax_when_rescaling)*yrange
-		    self.yframe[0]=self.minmax[0]-(self.yframemin_when_rescaling*yrange)
+		    if self.minmax[0]<0:
+			self.yframe[0]=self.minmax[0]-(self.yframemin_when_rescaling*yrange)
+		    else: self.yframe[0]=0
 		    if self.yframe[0]==self.yframe[1]:self.yframe[1]=self.yframe[0]
-		    
 		    exponent=pow(10,floor(log10(self.yframe[1]-self.yframe[0])))
 		    mantissa1=ceil(self.yframe[1]/exponent)
-		    mantissa0=floor(self.yframe[0]/exponent)
-		    ticks=mantissa1-mantissa0
-		    if ticks>10:
-			mantissa0=floor(mantissa0/2)*2	
-			mantissa1=ceil(mantissa1/2)*2
-			ticks=(mantissa1-mantissa0)/2
-		    elif ticks<5:
-			ticks*=2
-		    self.yticks_no=ticks
-
-
+		    mantissa0=abs(floor(self.yframe[0]/exponent))
+		    if mantissa1<=1.0:mantissa1=1.0
+		    elif mantissa1<=2.0:mantissa1=2.0
+		    elif mantissa1<=5.0:mantissa1=5.0
+		    else: mantissa1=10.0
+		    
+		    self.yticks_no=10
+		    if self.yframe[0]<0:
+			if mantissa0<=1.0:mantissa0=1.0
+			elif mantissa0<=2.0:mantissa0=2.0
+			elif mantissa0<=5.0:mantissa0=5.0
+			else: mantissa0=10.0
+			
+			if mantissa1>mantissa0:
+			    lesser=mantissa0
+			    bigger=mantissa1
+			else:
+			    lesser=mantissa1
+			    bigger=mantissa0
+			tick_step=bigger/5.0
+			lesser_step_no=ceil(lesser/tick_step)
+			lesser=tick_step*float(lesser_step_no)
+			lesser=int(lesser*1000)
+			lesser/=1000.0
+			self.yticks_no=5+lesser_step_no
+			if mantissa0<mantissa1:
+			    mantissa0=lesser
+			else:
+			    mantissa1=lesser    
 		    self.yframe[1]=mantissa1*exponent
-		    self.yframe[0]=mantissa0*exponent
-		
+		    self.yframe[0]=(-1)*(mantissa0*exponent)
 		    self.yticks_step=(self.yframe[1]-self.yframe[0])/self.yticks_no
 		else:
 		    if self.minmax[0]<0 or self.minmax[1]<=0:
@@ -909,7 +928,7 @@ class TracerPlot(Plot):
 
 	def withinframes(self,point):
 	    return point[0]<self.plotaread[2] and point[0]>self.plotaread[0] and\
-		   point[1]<self.plotaread[3] and point[1]>self.plotaread[1]
+		   point[1]<=self.plotaread[3] and point[1]>=self.plotaread[1]
 	
 	def drawpoint(self, aFullPNString, datapoint):
 	    #get datapoint x y values
