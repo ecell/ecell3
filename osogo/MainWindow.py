@@ -75,8 +75,8 @@ class MainWindow(Window):
         self.theMessageWindowWindow.hide()
 
         ### initialize for run() method ###
-        self.theSimulator.setPendingEventChecker( gtk.events_pending )
-        self.theSimulator.setEventHandler( gtk.mainiteration  )
+        #self.theSimulator.setPendingEventChecker( gtk.events_pending )
+        #self.theSimulator.setEventHandler( gtk.mainiteration  )
         #self.theSimulator.run()
 
     ###### window operation ####
