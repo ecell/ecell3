@@ -182,6 +182,24 @@ namespace libecs
   System::~System()
   {
     delete theStepper;
+    
+    for( ReactorMapIterator i( theReactorMap.begin() );
+	 i != theReactorMap.end() ; ++i )
+      {
+	delete i->second;
+      }
+
+    for( SubstanceMapIterator i( theSubstanceMap.begin() );
+	 i != theSubstanceMap.end() ; ++i )
+      {
+	delete i->second;
+      }
+
+    for( SystemMapIterator i( theSystemMap.begin() );
+	 i != theSystemMap.end() ; ++i )
+      {
+	delete i->second;
+      }
   }
 
   void System::setSuperSystem( SystemPtr const supersystem )
