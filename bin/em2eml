@@ -5,9 +5,10 @@ import sys , os ,string , getopt , tempfile
 import eml
 
 class Token:
-	def __init__(self, type, attr=None, lineno='???'):
+	def __init__(self, type, attr=None, filename="?" , lineno='???'):
                 self.type = type
                 self.attr = attr
+		self.filename = filename
                 self.lineno = lineno
 		
 	def __cmp__(self, o):
@@ -15,12 +16,18 @@ class Token:
 
         def __repr__(self):
                 return str(self.type)
-
+	
+	def info(self):
+		return "File " + repr(self.filename) + ", line " + repr(self.lineno)
+	def error(self):
+		print "Error token", self, "(", self.info(), ")"
+		raise SystemExit, 1
 
 class AST:
-        def __init__(self, type, left=None, right=None):
+        def __init__(self, type, left=None, right=None , property=None):
                 self.type = type.type
                 self.attr = type.attr
+		self.property = property
                 self._kids = []
                 self.left = left
                 self.right = right
@@ -46,7 +53,7 @@ class EmScanner( GenericScanner , object ):
 		return self.rv
 
 	def t_keywords( self, s ):
-		r' Reactor | Reactant | Substance | Stepper | System | root '
+		r' Reactor | ReactantList | Substance | Stepper | System | Reactant'
 		self.rv.append( Token( type=s, attr=s ) )
 
 	def t_symbols( self, s ):
@@ -69,10 +76,11 @@ class EmScanner( GenericScanner , object ):
 		r' \# [^\n]* '
 		pass
 #		self.rv.append( Token( type='comment', attr=s ) )
-		
+
 	def t_nl( self, s ):
-		r'\n'
+		r' \n '
 		self.lineno = self.lineno + 1
+		pass
     
 	def t_whitespace( self, s ):
 		r' [\s|\t]+ '
@@ -111,14 +119,11 @@ class EmParser( GenericParser ):
 		'''
 		return AST( type=args[0] , right=args[1] )
 
-	def p_entity_tpye_ste( self, args ):
+	def p_entity_tpye( self, args ):
 		'''
-		entity_type ::= Stepper
-		entity_type ::= System
-		entity_type ::= Substance
-		entity_type ::= Reactor
+		entity_type ::= class
 		'''
-		return AST( type=args[0] )
+		return args[0]
 	
 	def p_entity_stepper ( self, args ):
 		'''
@@ -132,12 +137,18 @@ class EmParser( GenericParser ):
 		'''
 		return AST( type=args[1] , left=args[0], right=args[2] )
 
-	def p_systembase_1 ( self, args ):
+#	def p_systembase_1 ( self, args ):
+#		'''
+#		systembase ::= systemidandinfo ) { propertylist }
+#		'''
+#		return AST( type=args[2], left=args[0], right=args[3] )
+
+        def p_systembase ( self, args ):
 		'''
-		systembase ::= systemidandinfo ) { propertylist }
+		systembase ::= systemid ) { propertylist }
 		'''
 		return AST( type=args[2], left=args[0], right=args[3] )
-
+	
 	def p_systemidandinfo ( self, args ):
 		'''
 		systemidandinfo ::= systemid , info
@@ -204,11 +215,17 @@ class EmParser( GenericParser ):
 	
 	def p_property_1( self, args ):
 		'''
-		property ::= propertyname valuelist
+		property ::= propertyname valuelist 
 		'''
 		return AST( type=args[0] , right=args[1] )
-	
+
 	def p_property_2( self, args ):
+		'''
+		property ::= propertyname reactantlist 
+		'''
+		return AST( type=args[0] , right=args[1] )
+
+	def p_property_3( self, args ):
 		'''
 		property ::= property ;
 		'''
@@ -218,21 +235,39 @@ class EmParser( GenericParser ):
 		'''
 		propertyname ::= name
 		propertyname ::= Stepper
+		propertyname ::= ReactantList
 		propertyname ::= Reactant
 		'''
 		return AST( type=args[0] )
 	
 	def p_valuelist_1( self, args ):
 		'''
-		valuelist ::= value valuelist
+		valuelist ::= value , valuelist
 		'''
-		return AST( type=args[0] , right=args[1] )
+		return AST( type=args[0] , right=args[2] )
 
 	def p_valuelist_2( self, args ):
 		'''
 		valuelist ::= value
 		'''
-		return AST( type=args[0] )
+		return args[0]
+	def p_reactantlist_1( self, args ):
+		'''
+		reactantlist ::= reactant , reactantlist
+		'''
+		return AST( type=args[1] , left=args[0], right=args[2] )
+
+	def p_reactantlist_2( self, args ):
+		'''
+		reactantlist ::= reactant
+		'''
+		return args[0] 
+	
+	def p_reactant( self, args ):
+		'''
+		reactant ::= ( valuelist )
+		'''
+		return args[1]
 	
 	def p_value( self, args ):
 		'''
@@ -286,9 +321,27 @@ class Interpret(GenericASTTraversal):
 			aList = [node.value] + node.right.value
 			self.queue.append(aList)
 		
-	def n_Reactant( self, node):
+	def n_ReactantList( self, node):
 		node.value = node.attr
-		
+		nodekid = node.right
+		aPropertyList = []
+		aList = []
+		while hasattr(nodekid, 'value'):
+			if nodekid.type != ',':
+				aList.append(nodekid.value)
+				delattr(nodekid, 'value')
+			else:
+				aPropertyList.append(nodekid.value)
+				delattr(nodekid, 'value')
+			nodekid = nodekid.right
+		aPropertyList.append(tuple(aList))
+		nodekid = node.right
+		for i in aPropertyList:
+			nodekid.value = i
+			nodekid = nodekid.right
+		#node.value = tuple(aList)
+		node.value = node.attr
+
 	def default( self, node):
 #               left  = node.left.value
 #		right = node.right.value
@@ -298,12 +351,12 @@ class Interpret(GenericASTTraversal):
 			if node.left.type == 'name' and node.right.type == 'name':
 				anID = node.right.value
 			else:
-				aSystemID = node.right.left.left.value
+				aSystemID = node.right.left.value
                                 anID = aSystemID			
 			node.value = [aClass, anID, node.right.value]
 
 		elif ( node.type == '{' ):
-			aSystemID = node.left.left.value
+                        aSystemID = node.left.value
 			aPropertyList = []
 			nodekid = node.right
 			while nodekid.type == ';':
@@ -312,7 +365,12 @@ class Interpret(GenericASTTraversal):
 			node.value = aPropertyList
 			
 		elif ( node.type == ',' ):
-			node.value = node.attr
+			aList = []
+			nodekid = node.left
+			while hasattr(nodekid, 'right'):
+				aList.append(nodekid.value)
+				nodekid = nodekid.right
+                        node.value = tuple(aList)
 				
 		elif ( node.type == ';' ):
 			aValueList = []
@@ -338,28 +396,36 @@ def convertEm2Eml( anEmFileObject , mode='' ):
 	# Scanning
 	aScanner = EmScanner()
 	aTokenList = aScanner.tokenize( anEmFileObject.read() )
+	if mode == 'debug':print aTokenList
 
 	# Parsing 
 	aParser = EmParser()
 	anAst = aParser.parse( aTokenList )
+	if mode == 'debug':print 'AST:', anAst
 
 	# Generating
 	anInterpreter = Interpret( anAst )
 	aQueueList = sortSystemID(anInterpreter.queue)
+	if mode == 'debug':print aQueueList
 
 	for part in aQueueList:
-                (aType, aClass, anID, aPropertyList) = part[0], part[1], part[2], part[3:]
+		(aType, aClass, anID, aPropertyList) = part[0], part[1], part[2], part[3:]
 		aFullID = convert2FullID(anEml, aType,  anID)
 		if aType == 'Stepper':
 			anEml.createStepper(aClass, aFullID)
+			if mode == 'debug':print "createStepper(%s, %s)" % (aClass, aFullID)
 			continue
 		else:
 			anEml.createEntity(aClass, aFullID)
+			if mode == 'debug':print "createEntity(%s, %s)" % (aClass, aFullID)
 
 		for i in aPropertyList:
 			for j in i:
-				(aPropertyName, aValueList) = j[0], j[1:]
+				(aPropertyName, aValueList) = j[0], j[1]
+				if mode == 'debug':print "\tsetEntityProperty(%s, %s, %s)" % (aFullID, aPropertyName, aValueList)
 				anEml.setEntityProperty(aFullID, aPropertyName, aValueList)
+
+
 
 	aString = anEml.asString()
 	    
