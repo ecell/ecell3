@@ -44,7 +44,7 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
   == Operating Systems ==
 
-  Starting from version 3.1.1, the primary target of ecell3 
+  Starting from version 3.1.2, the primary target of ecell3 
   is RedHat Linux 8.x.
 
   We've tested with RedHat Linux 8.0 on i386 platform.
