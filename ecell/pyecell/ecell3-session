@@ -16,17 +16,29 @@ def usage():
 
 Usage:
 
-       %s [-f] [-f emlfile]          : load model and invoke ecell3 intract mode
-       %s [essfile] [-e essfile]     : run ess file
-       %s                            : invoke ecell3 intract mode
+       %s [-f] [-f emlfile]          : Load eml file 
+				       and invoke ecell3 intract mode
+       %s [essfile] [-e essfile]     : Run ess file
+       %s                            : Invoke ecell3 intract mode
        %s [-h]                       : Print this message
        
 Options:
+
         -e or --exec=[.ess file]  :  load script (.ess) file
         -f or --file=[.eml file]  :  load model (.eml) file
 	-h or --help              :  Print this message.
 
         Do not use -e and -f at same time.
+
+Configurations:
+
+	If the environment variable ECELL3_DM_PATH is set to a colon (:) 
+        separated directory path, it loads dynamic modules from there.
+	
+	example: 
+        
+	ECELL3_DM_PATH=/home/user/dm:/home/user/dm_other ecell3-session
+
 '''% ( aProgramName, aProgramName, aProgramName, aProgramName, aProgramName )
 
 def main():

@@ -37,6 +37,14 @@ Options:
 
 	Do not use -e and -f at same time.
 
+Configurations:
+
+	If the environment variable ECELL3_DM_PATH is set to a colon (:) 
+        separated directory path, it loads dynamic modules from there.
+	
+	example: 
+        
+	ECELL3_DM_PATH=/home/user/dm:/home/user/dm_other gecell
 ''' % ( aProgramName, aProgramName )
 
 
