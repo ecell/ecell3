@@ -145,8 +145,6 @@ AC_CHECK_SIZEOF(long long)
 ICE_CXX_PRETTY_FUNCTION
 ICE_CXX_STD_EXCEPTIONS
 ICE_CXX_TYPEINFO
-INCLUDES=-I/home/shafi/wrk/STLport-4.0/stlport -I/usr/local/include/g++-3
-AC_SUBST(INCLUDES)
 
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
