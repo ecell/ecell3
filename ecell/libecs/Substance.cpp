@@ -45,6 +45,24 @@ namespace libecs
   void Substance::makeSlots()
   {
     registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Quantity",*this,
+				      Type2Type<Real>(),
+				      &Substance::setQuantity,
+				      &Substance::getQuantity ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Velocity",*this,
+				      Type2Type<Real>(),
+				      &Substance::addVelocity,
+				      &Substance::getVelocity ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "Fixed",*this,
+				      Type2Type<Int>(),
+				      &Substance::setFixed,
+				      &Substance::getFixed ) );
+
+    registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "Concentration", *this,
 				      Type2Type<Real>(),
 				      NULLPTR,
@@ -54,6 +72,10 @@ namespace libecs
 
 
   Substance::Substance()
+    : 
+    theQuantity( 0.0 ),  
+    theVelocity( 0.0 ),
+    theFixed( false )
   {
     makeSlots();
   } 
@@ -69,101 +91,28 @@ namespace libecs
 
   }
 
-  const Real Substance::getActivity()
-  {
-    return getVelocity();
-  }
-
-
-
-
-  void PlainSubstance::makeSlots()
-  {
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Quantity",*this,
-				      Type2Type<Real>(),
-				      &PlainSubstance::setQuantity,
-				      &PlainSubstance::getQuantity ) );
-
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Velocity",*this,
-				      Type2Type<Real>(),
-				      &PlainSubstance::addVelocity,
-				      &PlainSubstance::getVelocity ) );
-
-
-    registerSlot( getPropertySlotMaker()->
-		  createPropertySlot( "Fixed",*this,
-				      Type2Type<Real>(),
-				      &PlainSubstance::setFixed,
-				      &PlainSubstance::getFixed ) );
-  }
-
-
-
-  PlainSubstance::PlainSubstance()
-    : 
-    theQuantity( 0.0 ),  
-    theVelocity( 0.0 ),
-    theFixed( false )
-  {
-    makeSlots();
-  } 
-
-  PlainSubstance::~PlainSubstance()
-  {
-    ; // do nothing
-  }
-
-
-  void PlainSubstance::initialize()
-  {
-    ; // do nothing
-  }
-
-
-  void PlainSubstance::loadQuantity( RealCref aQuantity )
-  {
-    theQuantity = aQuantity;
-  }
-
-  void PlainSubstance::setFixed( RealCref aValue )
+  void Substance::setFixed( IntCref aValue )
   { 
-    if( aValue == 0.0 )
-      {
-	theFixed = false;
-      }
-    else
-      {
-	theFixed = true;
-      }
+    theFixed = static_cast<bool>( aValue );
   }
 
 
-  const Real PlainSubstance::getFixed() const                         
+  const Int Substance::getFixed() const                         
   { 
-    if( isFixed() == false )
-      {
-	return 0.0;
-      }
-    else
-      {
-	return 1.0;
-      }
+    return theFixed;
   }
 
 
 
 
-  //  const String SRMSubstance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "ReserveAccumulator";
+    const String SRMSubstance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "ReserveAccumulator";
 
-  const String SRMSubstance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "SimpleAccumulator";
+  //  const String SRMSubstance::SYSTEM_DEFAULT_ACCUMULATOR_NAME = "SimpleAccumulator";
 
 
   SRMSubstance::SRMSubstance()
     : 
     theAccumulator( NULLPTR ),
-    theIntegrator( NULLPTR ),
     theFraction( 0 )
   {
     makeSlots();
@@ -173,7 +122,6 @@ namespace libecs
 
   SRMSubstance::~SRMSubstance()
   {
-    delete theIntegrator;
     delete theAccumulator;
   }
 
@@ -226,7 +174,7 @@ namespace libecs
 
   void SRMSubstance::loadQuantity( RealCref aQuantity )
   {
-    theQuantity = aQuantity;
+    Substance::loadQuantity( aQuantity );
     theAccumulator->update();
   }
 
@@ -235,7 +183,7 @@ namespace libecs
   { 
     if( isFixed() == false ) 
       {
-	theIntegrator->integrate();
+	Substance::integrate();
 
 	theAccumulator->accumulate();
   

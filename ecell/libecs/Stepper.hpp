@@ -31,10 +31,15 @@
 #ifndef ___STEPPER_H___
 #define ___STEPPER_H___
 
+#define GSL_RANGE_CHECK_OFF
+
 #include <vector>
 #include <map>
 #include <algorithm>
 #include <utility>
+#include <valarray>
+
+#include <gsl/gsl_vector.h>
 
 #include "libecs.hpp"
 
@@ -60,10 +65,10 @@ namespace libecs
 
   /** @file */
 
-  
+  DECLARE_TYPE( std::valarray<Real>, RealValarray );
+
   DECLARE_CLASS( Euler1Stepper );
   DECLARE_CLASS( RungeKutta4Stepper );
-  DECLARE_CLASS( PropertySlotVectorImplementation );
 
   DECLARE_VECTOR( SubstancePtr, SubstanceVector );
   DECLARE_VECTOR( ReactorPtr,   ReactorVector );
@@ -72,65 +77,6 @@ namespace libecs
   DECLARE_VECTOR( StepperPtr, StepperVector );
 
   DECLARE_VECTOR( PropertySlotPtr, PropertySlotVector );
-
-
-  template< class Base_, class Derived_ = Base_ >
-  class EntityCache
-    :
-    public std::vector<Derived_*>
-  {
-
-  public:
-
-    DECLARE_TYPE( Base_, Base );
-    DECLARE_TYPE( Derived_, Derived );
-
-    typedef std::vector<DerivedPtr> DerivedVector_;
-    DECLARE_TYPE( DerivedVector_, DerivedVector );
-
-    EntityCache()
-    {
-      ; // do nothing
-    }
-
-    ~EntityCache() {}
-
-
-    /**
-       Update the cache.
-
-    */
-
-    void update( SystemVectorCref aSystemVector )
-    {
-      clear();
-
-      for( SystemVectorConstIterator i( aSystemVector.begin() );
-	   i != aSystemVector.end() ; ++i )
-	{
-	  const SystemCptr aSystem( *i );
-
-	  typedef std::map<const String,BasePtr> BaseMap;
-	  typedef typename BaseMap::const_iterator BaseMapConstIterator; 
-
-	  for( BaseMapConstIterator 
-		 j( aSystem->System::getMap<Base>().begin() );
-	       j != aSystem->System::getMap<Base>().end(); j++ )
-	    {
-	      BasePtr aBasePtr( (*j).second );
-
-	      DerivedPtr aDerivedPtr( dynamic_cast<DerivedPtr>( aBasePtr ) );
-	      if( aDerivedPtr != NULLPTR )
-		{
-		  push_back( aDerivedPtr );
-		}
-	    }
-	}
-
-    }
-
-  };
-
 
 
   /**
@@ -427,9 +373,10 @@ namespace libecs
   {
   public:
 
-    typedef std::vector<SubstancePtr> SubstanceCache;
-    typedef EntityCache<Reactor,SRMReactor> ReactorCache;
-    //    typedef EntityCache<Reactor,Reactor> ReactorCache;
+
+    DECLARE_TYPE( SubstanceVector, SubstanceCache );
+    //    DECLARE_TYPE( ReactorVector,   ReactorCache );
+    DECLARE_VECTOR( SRMReactorPtr, ReactorCache );
 
     SRMStepper();
     virtual ~SRMStepper() {}
@@ -457,15 +404,9 @@ namespace libecs
 
   protected:
 
-    Integrator::AllocatorFuncPtr theIntegratorAllocator;
-
     SubstanceCache        theSubstanceCache;
     ReactorCache          theReactorCache;
     ReactorCache          theRuleReactorCache;
-
-  private:
-
-    virtual void distributeIntegrator( Integrator::AllocatorFuncPtr );
 
   };
 
@@ -484,10 +425,6 @@ namespace libecs
 
     virtual StringLiteral getClassName() const  { return "Euler1SRMStepper"; }
  
-  protected:
-
-    static IntegratorPtr newIntegrator( SRMSubstanceRef substance );
-
   };
 
 
@@ -503,14 +440,17 @@ namespace libecs
 
     static StepperPtr createInstance() { return new RungeKutta4SRMStepper; }
 
+    virtual void initialize();
     virtual void step();
 
     virtual StringLiteral getClassName() const 
     { return "RungeKutta4SRMStepper"; }
 
-  private:
 
-    static IntegratorPtr newIntegrator( SRMSubstanceRef substance );
+  protected:
+
+    RealValarray theQuantityBuffer;
+    RealValarray theK;
 
   };
 

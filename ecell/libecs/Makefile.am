@@ -2,6 +2,7 @@ libdir=@libdir@
 
 SUBDIRS = dmtemplates
 
+GSL_LIBADD = -lgsl -lgslcblas
 DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
 KORANDOM_DIR=@KORANDOM_DIR@
 KORANDOM_INCLUDE=-I${KORANDOM_DIR}
@@ -18,7 +19,7 @@ lib_LTLIBRARIES = libecs.la
 CXXFLAGS= @CXXFLAGS@ # -D_REENTRANT
 
 libecs_la_LDFLAGS= -version-info 0:1:0 #-rpath ${libdir}
-libecs_la_LIBADD= ${LIBLTDL} -L${KORANDOM_DIR}/korandom/ -lkorandom -lstdc++
+libecs_la_LIBADD= ${LIBLTDL} -L${KORANDOM_DIR}/korandom/ -lkorandom ${GSL_LIBADD}
 libecs_la_SOURCES=\
 Util.cpp\
 Polymorph.cpp\
@@ -29,7 +30,6 @@ AccumulatorMaker.cpp\
 ReactorMaker.cpp\
 Substance.cpp\
 Accumulators.cpp\
-Integrators.cpp\
 SubstanceMaker.cpp\
 Stepper.cpp\
 Model.cpp\
@@ -62,7 +62,6 @@ AccumulatorMaker.hpp\
 ReactorMaker.hpp\
 Substance.hpp\
 Accumulators.hpp\
-Integrators.hpp\
 SubstanceMaker.hpp\
 Stepper.hpp\
 Model.hpp\

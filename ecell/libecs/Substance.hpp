@@ -91,142 +91,26 @@ namespace libecs
        Clear phase.
     */
 
-    virtual void clear() 
-    {
-      ; // do nothing
-    }
-
-    virtual void turn()
-    {
-      ; // do nothing
-    }
-
-    virtual void integrate()
-    {
-      ; // do nothing
-    }
-
-    /**
-       @return the quantity of this substance.
-    */
-
-    virtual const Real getQuantity() const = 0;
-
-
-    /**
-       @param aQuantity the quantity of this substance.
-    */
-
-    virtual void setQuantity( RealCref aQuantity ) = 0;
-
-
-    /**
-       Returns the concentration of this Substance.
-
-       @return Concentration in M (mol/L).
-    */
-
-    const Real getConcentration() const
-    {
-      return getQuantity() / ( getSuperSystem()->getVolume() * N_A );
-    }
-
-
-    virtual void setVelocity( RealCref aVelocity ) = 0;
-
-    /**
-       @return current velocity value in (number of molecules)/(step)
-    */
-
-    virtual const Real getVelocity() const = 0;
-
-    /**
-       @param v velocity in number of molecules to be added.
-    */
-
-    virtual void addVelocity( RealCref aVelocity ) = 0;
-
-    /**
-       Returns activity value of a Substance object.
-       The activity is current velocity.
-       @see getActivityPerSecond
-       @return activity value of Substance in Real.
-    */
-
-    virtual const Real getActivity();
-
-    virtual StringLiteral getClassName() const { return "Substance"; }
-
-  protected:
-
-    void makeSlots();
-
-  };
-
-
-
-  class PlainSubstance 
-    : 
-    public Substance
-  {
-
-  public:
-
-    PlainSubstance();
-    virtual ~PlainSubstance();
-
-    static SubstancePtr createInstance() { return new PlainSubstance; }
-
-    /**
-       @return the number of molecules.
-    */
-    virtual const Real getQuantity() const
-    { 
-      return theQuantity; 
-    }
-
-    /**
-       Initializes this substance. 
-       Called at startup.
-    */
-    virtual void initialize();
-
-
-    /**
-       Clear phase.
-    */
-
     virtual void clear()
     { 
       theVelocity = 0.0; 
     }
 
-    virtual void turn()
-    {
-      //      theVelocity = 0.0;
-    }
+    /** 
+	integrate phase
+    */
 
     virtual void integrate()
     {
-      // PlainSubstance doesn't currently support integration
-      //      theQuantity += theVelocity;
+      if( isFixed() == false )
+	{
+	  theQuantity += theVelocity;
+	}
     }
 
-    /**
-       Set a quantity with no check. (i.e. isFixed() is ignored.)
-
-       Use setQuantity() for usual purposes.
-
-       This updates the accumulator immediately.
-
-       @see setQuantity
-    */
-
-    virtual void loadQuantity( RealCref aQuantity );
 
     /**
        This simply set the quantity of this Substance if getFixed() is false.
-       This updates the accumulator immediately.
 
        @see getFixed()
     */
@@ -239,7 +123,24 @@ namespace libecs
 	}
     }
 
-    virtual void setVelocity( RealCref aVelocity )
+    virtual void loadQuantity( RealCref aQuantity )
+    {
+      theQuantity = aQuantity;
+    }
+
+    const Real getQuantity() const
+    { 
+      return theQuantity; 
+    }
+
+    virtual const Real saveQuantity()
+    {
+      return getQuantity();
+    }
+
+
+
+    void setVelocity( RealCref aVelocity )
     {
       theVelocity = aVelocity;
     }
@@ -248,7 +149,7 @@ namespace libecs
        @return current velocity value in (number of molecules)/(step)
     */
 
-    virtual const Real getVelocity() const
+    const Real getVelocity() const
     { 
       return theVelocity; 
     }
@@ -257,17 +158,11 @@ namespace libecs
        @param v velocity in number of molecules to be added.
     */
 
-    virtual void addVelocity( RealCref aVelocity ) 
+    void addVelocity( RealCref aVelocity ) 
     {
       theVelocity += aVelocity; 
     }
 
-
-    /**
-       Get a quantity via save() method of the Accumulator.
-    */
-
-    const Real saveQuantity();
 
     void setFixed( const bool aValue )
     {
@@ -284,13 +179,27 @@ namespace libecs
     }
 
 
+    // wrappers to expose is/setFixed as PropertySlots 
+    //FIXME: should be Int
+    void setFixed( IntCref aValue );
+    const Int getFixed() const;
 
-    // wrappers to expose is/setFixed as PropertySlots
-    void setFixed( RealCref aValue );
-    const Real getFixed() const;
+
+    /**
+       Returns the concentration of this Substance.
+
+       @return Concentration in M (mol/L).
+    */
+
+    const Real getConcentration() const
+    {
+      return getQuantity() / ( getSuperSystem()->getVolume() * N_A );
+    }
 
 
-    virtual StringLiteral getClassName() const { return "PlainSubstance"; }
+    static SubstancePtr createInstance() { return new Substance; }
+
+    virtual StringLiteral getClassName() const { return "Substance"; }
 
   protected:
 
@@ -314,7 +223,7 @@ namespace libecs
 
   class SRMSubstance 
     : 
-    public PlainSubstance
+    public Substance
   {
     //FIXME: for Accumulators:: to be deleted
     friend class Accumulator;
@@ -336,36 +245,12 @@ namespace libecs
 
     static SubstancePtr createInstance() { return new SRMSubstance; }
 
-    void setIntegrator( IntegratorPtr anIntegrator ) 
-    { 
-      delete theIntegrator;
-      theIntegrator = anIntegrator; 
-    }
-
-
     /**
        Initializes this substance. 
        Called at startup.
     */
     virtual void initialize();
 
-    /**
-       Clear phase.
-       Then call clear() of the integrator.
-    */
-    virtual void clear()
-    { 
-      PlainSubstance::clear();
-      theIntegrator->clear();
-    }
-
-    /**
-       This is called one or several times in react phase.
-    */
-    void turn()
-    {
-      theIntegrator->turn();
-    }
 
     /**
        integrate phase.
@@ -390,7 +275,7 @@ namespace libecs
        Get a quantity via save() method of the Accumulator.
     */
 
-    const Real saveQuantity();
+    virtual const Real saveQuantity();
 
 
     virtual StringLiteral getClassName() const { return "SRMSubstance"; }
@@ -398,7 +283,6 @@ namespace libecs
   protected:
 
     void setAccumulator( AccumulatorPtr anAccumulator );
-
 
     virtual void makeSlots();
 
@@ -413,7 +297,6 @@ namespace libecs
 
 
     AccumulatorPtr theAccumulator;
-    IntegratorPtr theIntegrator;
 
     Real theFraction;
 

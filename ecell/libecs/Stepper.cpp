@@ -32,6 +32,10 @@
 #include <algorithm>
 #include <limits>
 
+#include <gsl/gsl_vector.h>
+#include <gsl/gsl_blas.h>
+
+
 #include "Util.hpp"
 #include "Substance.hpp"
 #include "Reactor.hpp"
@@ -266,8 +270,6 @@ namespace libecs
   ////////////////////////// SRMStepper
 
   SRMStepper::SRMStepper()
-    :
-    theIntegratorAllocator( NULLPTR )
   {
     makeSlots();
   }
@@ -345,13 +347,42 @@ namespace libecs
     //    if( isEntityListChanged() )
     //      {
 
-    theReactorCache.update( theSystemVector );
+    //
+    // update theReactorCache
+    //
+    theReactorCache.clear();
+    for( SystemVectorConstIterator i( theSystemVector.begin() );
+	 i != theSystemVector.end() ; ++i )
+	{
+	  const SystemCptr aSystem( *i );
+
+	  for( ReactorMapConstIterator 
+		 j( aSystem->getReactorMap().begin() );
+	       j != aSystem->getReactorMap().end(); j++ )
+	    {
+	      ReactorPtr aReactorPtr( (*j).second );
+
+	      SRMReactorPtr aSRMReactorPtr( dynamic_cast<SRMReactorPtr>
+					    ( aReactorPtr ) );
+
+	      if( aSRMReactorPtr != NULLPTR )
+		{
+		  theReactorCache.push_back( aSRMReactorPtr );
+		}
+	    }
+	}
+
+    // sort by Reactor priority
     std::sort( theReactorCache.begin(), theReactorCache.end(),
 	       SRMReactor::PriorityCompare() );
 
+
+    //
+    // Update theSubstanceCache
+    //
+
     // get all the substances which are reactants of the Reactors
     theSubstanceCache.clear();
-
     // for all the reactors
     for( ReactorCache::const_iterator i( theReactorCache.begin());
 	 i != theReactorCache.end() ; ++i )
@@ -368,12 +399,15 @@ namespace libecs
 	    if( std::find( theSubstanceCache.begin(), theSubstanceCache.end(),
 			   aSubstancePtr ) == theSubstanceCache.end() )
 	      {
-		// add this substance to the cache
 		theSubstanceCache.push_back( aSubstancePtr );
 	      }
 	  }
       }
 
+
+    //
+    // Update theRuleReactorCache
+    //
 
     // move RuleReactors from theReactorCache to theRuleReactorCache
     theRuleReactorCache.clear();
@@ -383,12 +417,10 @@ namespace libecs
     std::remove_if( theReactorCache.begin(), theReactorCache.end(),
 		    RuleSRMReactor::IsRuleReactor() );
 
-
-    distributeIntegrator( theIntegratorAllocator );
-
+    
     //    clearEntityListChanged();
     //      }
-
+    
   }
 
 
@@ -417,10 +449,6 @@ namespace libecs
     //
     FOR_ALL( ReactorCache, theReactorCache, react );
 
-    //
-    // Substance::turn()
-    //
-    FOR_ALL( SubstanceCache, theSubstanceCache, turn );    
   }
 
   inline void SRMStepper::integrate()
@@ -451,67 +479,127 @@ namespace libecs
   }
 
 
-
-
-  void SRMStepper::distributeIntegrator( Integrator::AllocatorFuncPtr
-					 anAllocator )
-  {
-    for( SubstanceCache::const_iterator s( theSubstanceCache.begin() );
-	 s != theSubstanceCache.end() ; ++s )
-      {
-	SRMSubstancePtr 
-	  aSRMSubstancePtr( dynamic_cast<SRMSubstancePtr>( *s ) );
-
-	if( aSRMSubstancePtr != NULLPTR )
-	  {
-	    (* anAllocator )(*aSRMSubstancePtr);
-	  }
-      }
-  }
-
-
-
   ////////////////////////// Euler1SRMStepper
 
   Euler1SRMStepper::Euler1SRMStepper()
   {
-    theIntegratorAllocator = &Euler1SRMStepper::newIntegrator;
-  }
-
-  IntegratorPtr Euler1SRMStepper::newIntegrator( SRMSubstanceRef substance )
-  {
-    return new Euler1Integrator( substance );
+    ; // do nothing
   }
 
   ////////////////////////// RungeKutta4SRMStepper
 
   RungeKutta4SRMStepper::RungeKutta4SRMStepper()
   {
-    theIntegratorAllocator = &RungeKutta4SRMStepper::newIntegrator; 
+    ; // do nothing
   }
 
-  IntegratorPtr RungeKutta4SRMStepper::
-  newIntegrator( SRMSubstanceRef aSubstance )
+  void RungeKutta4SRMStepper::initialize()
   {
-    return new RungeKutta4Integrator( aSubstance );
-  }
+    SRMStepper::initialize();
 
+    Int aSize( theSubstanceCache.size() );
+
+    theQuantityBuffer.resize( aSize );
+    theK.resize( aSize );
+  }
+  
 
   void RungeKutta4SRMStepper::step()
   {
-    clear();
-    
+    const UnsignedInt aSize( theSubstanceCache.size() );
+
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+
+	// save original quantity values
+	theQuantityBuffer[ c ] = aSubstance->saveQuantity();
+
+	// clear phase is here!
+	aSubstance->clear();
+      }
+
+    // ========= 1 ===========
     react();
+
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+
+	// get k1
+	Real aVelocity( aSubstance->getVelocity() );
+
+	// restore k1 / 2 + x
+	aSubstance->loadQuantity( aVelocity * .5 + theQuantityBuffer[ c ] );
+
+	theK[ c ] = aVelocity;
+
+	// clear velocity
+	aSubstance->setVelocity( 0 );
+      }
+
+    // ========= 2 ===========
     react();
+
+
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+	const Real aVelocity( aSubstance->getVelocity() );
+	theK[ c ] += aVelocity + aVelocity;
+
+	// restore k2 / 2 + x
+	aSubstance->loadQuantity( aVelocity * .5 + theQuantityBuffer[ c ] );
+
+
+	// clear velocity
+	aSubstance->setVelocity( 0 );
+      }
+
+
+    // ========= 3 ===========
     react();
+
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+	const Real aVelocity( aSubstance->getVelocity() );
+	theK[ c ] += aVelocity + aVelocity;
+
+	// restore k3 + x
+	aSubstance->loadQuantity( aVelocity + theQuantityBuffer[ c ] );
+
+
+	// clear velocity
+	aSubstance->setVelocity( 0 );
+      }
+
+
+    // ========= 4 ===========
     react();
-    
-    integrate();
+
+    // restore theQuantityBuffer
+    for( UnsignedInt c( 0 ); c < aSize; ++c )
+      {
+	SubstancePtr const aSubstance( theSubstanceCache[ c ] );
+	const Real aVelocity( aSubstance->getVelocity() );
+
+	// restore x (original value)
+	aSubstance->loadQuantity( theQuantityBuffer[ c ] );
+
+	//// x(n+1) = x(n) + 1/6 * (k1 + k4 + 2 * (k2 + k3)) + O(h^5)
+
+	aSubstance->setVelocity( ( theK[ c ] + aVelocity ) * ( 1.0 / 6.0 ) );
+
+	// integrate phase here!!
+	aSubstance->integrate();
+      }
     
     rule();
-
+    
     Stepper::step();
   }
+
 
 
 } // namespace libecs

@@ -67,13 +67,11 @@ namespace libecs
     PropertySlot( StringCref aName )
       :
       theName( aName ),
-      //      // FIXME: dummyLogger ?
       theLogger( NULLPTR )
     {
       ; // do nothing
     }
     
-    //    virtual ~PropertySlotBase()
     virtual ~PropertySlot()
     {
       ; // do nothing
@@ -90,9 +88,6 @@ namespace libecs
 
     virtual const bool isSetable() const = 0;
     virtual const bool isGetable() const = 0;
-
-
-    virtual void push() = 0;
 
     StringCref getName() const
     {
@@ -244,12 +239,6 @@ namespace libecs
     {
       return getImpl<String>();
     }
-
-    virtual void push() 
-    {
-
-    }
-
 
     virtual const bool isSetable() const
     {

@@ -77,14 +77,14 @@ namespace libecs
       ; // do nothing
     }
 
-    void setPriority( RealCref aValue )
+    void setPriority( IntCref aValue )
     {
-      thePriority = static_cast<Int>( aValue );
+      thePriority = aValue;
     }
 
-    const Real getPriority() const
+    const Int getPriority() const
     {
-      return static_cast<Real>( thePriority );
+      return thePriority;
     }
 
 
@@ -104,7 +104,7 @@ namespace libecs
   {
     registerSlot( getPropertySlotMaker()->
 		  createPropertySlot( "Priority", *this, 
-				      Type2Type<Real>(), // Int?
+				      Type2Type<Int>(),
 				      &SRMReactor::setPriority,
 				      &SRMReactor::getPriority ) );
   }
