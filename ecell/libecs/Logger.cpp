@@ -46,17 +46,18 @@ namespace libecs
   Logger::Logger( void )
     :
     theMinimumInterval( 0.0 ),
-    theCurrentInterval( 0.0 )
+    theCurrentInterval( 0.0 ),
+    theMessageSlot( NULLPTR )
   {
-    theMessageSlotCptr = 0;
+    ;
   } 
 
   // Constructor
 
 
-  Logger::Logger( AbstractMessageSlotCptr aMessageSlotPtr )
+  Logger::Logger( const ProxyMessageSlot& aMessageSlot )
     :
-    theMessageSlotCptr( aMessageSlotPtr ),
+    theMessageSlot( aMessageSlot ),
     theMinimumInterval( 0.0 ),
     theCurrentInterval( 0.0 )
   {
@@ -68,7 +69,7 @@ namespace libecs
   Logger::Logger( LoggerCref logger )
     :
     theDataPointVector( logger.getDataPointVector() ),
-    theMessageSlotCptr( logger.getMessageSlotCptr() ),
+    theMessageSlot( logger.getMessageSlot() ),
     theMinimumInterval( logger.getMinInterval() ),
     theCurrentInterval( logger.getCurrentInterval() )
   {
@@ -252,11 +253,13 @@ main()
 
 
   Logger<Real,Real> lg = Logger<Real,Real>(op);
+  /*
   lg.update(d1);
   lg.update(d2);
   lg.update(d3);
   lg.update(d4);
   lg.update(d5);
+  */
 
 
   Logger<Real,Real> lg_clone = Logger<Real,Real>(lg);

@@ -53,10 +53,6 @@ namespace libecs
   class DataPoint;
   class Logger;
 
-  typedef const Real& (*const DataFuncCptr)( ); // FIXME:temp 
-
-  typedef const Real& (*const funcptr)();
-
 
 
   /**
@@ -84,6 +80,8 @@ namespace libecs
     typedef DataPointVector::iterator iterator;
     typedef DataPointVector::size_type size_type;
 
+  typedef AbstractMessageSlot::ProxyMessageSlot ProxyMessageSlot;
+
   
   public:
 
@@ -97,7 +95,7 @@ namespace libecs
        Constructor
     */
   
-    Logger( AbstractMessageSlotCptr );
+    Logger( const ProxyMessageSlot& );
   
     /**
        Copy constructor
@@ -137,16 +135,19 @@ namespace libecs
 
      */
 
-    void update( void );
+    /*    void update( void ); */
   
     /**
 
      */
     //FIXME temp
+
+    /*
     void update( containee_type& dp )
     {
       appendData(dp);
     }
+    */
 
 
     /**
@@ -180,14 +181,7 @@ namespace libecs
       return theCurrentInterval;
     }
 
-    /**
 
-     */
-
-    void setMessageSlot( AbstractMessageSlotCptr aMessageSlot )
-    {
-      theMessageSlotCptr = aMessageSlot;
-    }
 
   protected:
 
@@ -195,9 +189,9 @@ namespace libecs
 
      */
 
-    AbstractMessageSlotCptr getMessageSlotCptr( void ) const
+    const ProxyMessageSlot& getMessageSlot( void ) const
     {
-      return theMessageSlotCptr;
+      return theMessageSlot;
     }
   
   
@@ -255,7 +249,7 @@ namespace libecs
     /// Data members
 
     DataPointVector             theDataPointVector;
-    AbstractMessageSlotCptr theMessageSlotCptr;
+    const ProxyMessageSlot      theMessageSlot;
     Real                        theMinimumInterval;
     Real                        theCurrentInterval;
 

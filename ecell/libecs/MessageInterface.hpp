@@ -36,6 +36,7 @@
 #include "libecs.hpp"
 
 #include "Message.hpp"
+#include "RCPtr.hpp"
 
 namespace libecs
 {
@@ -61,11 +62,80 @@ namespace libecs
     virtual void set( MessageCref message ) = 0;
     virtual const Message get( StringCref keyword ) = 0;
 
+
     virtual void operator()( MessageCref message ) 
     { set( message ); }
     virtual const Message operator()( StringCref keyword ) 
     { return get(keyword); }
+
+    class ProxyMessageSlot
+    {
+      DECLARE_TYPE( RCPtr<AbstractMessageSlotPtr>, RCMessageSlotPtr );
+      
+    public:
+      
+      ProxyMessageSlot( AbstractMessageSlotPtr aMessageSlot )
+	:
+	theMessageSlot( aMessageSlot ),
+	theLogger( NULLPTR )
+      {
+	;
+      }
+
+      
+      ProxyMessageSlot( RCMessageSlotPtr aRCMessageSlotPtr )
+	:
+	theMessageSlot( aRCMessageSlotPtr ),
+	theLogger( NULLPTR )
+      {
+	;
+      }
+
+      ProxyMessageSlot( ProxyMessageSlot& rhs )
+	:
+	theMessageSlot( rhs.theMessageSlot ),
+	theLogger( NULLPTR )
+      {
+	;
+      }
+
+      ProxyMessageSlot( const ProxyMessageSlot& rhs )
+	:
+	theMessageSlot( rhs.theMessageSlot ),
+	theLogger( NULLPTR )
+      {
+	;
+      }
+
+
+      void setLogger( LoggerPtr aLogger )
+      {
+	theLogger = aLogger;
+      }
+      
+
+      
+    private:
+      
+      ProxyMessageSlot( void );
+      
+    private:    
+      RCMessageSlotPtr theMessageSlot;
+      LoggerPtr        theLogger;
+
+    
+    
+    };
+
+    virtual ProxyMessageSlot* getProxy( void ) = 0;
+
+
+
+
   };
+
+
+
 
 
   /**
@@ -88,17 +158,21 @@ namespace libecs
 
   public:
 
+
+
+
     MessageSlot( T& object, const SetMessageFunc setmethod,
-		     const GetMessageFunc getmethod )
+		 const GetMessageFunc getmethod )
       : 
       theObject( object ), 
       theSetMethod( setmethod ), 
-      theGetMethod( getmethod )
-      //      theLogger( 0 )
+      theGetMethod( getmethod ),
+      theProxy( this )
     {
       ; // do nothing
     }
   
+
     virtual void set( MessageCref message ) 
     {
       if( theSetMethod == NULLPTR )
@@ -118,20 +192,22 @@ namespace libecs
 	}
       return ( ( theObject.*theGetMethod )( keyword ));
     }
-    /*
-    virtual void setLogger( LoggerRef logger )
+
+    ProxyMessageSlot* getProxy( void )
     {
-      theLogger = &logger;
+      return new ProxyMessageSlot( theProxy );
     }
-    */
+
 
   private:
 
     T& theObject;
+    ProxyMessageSlot theProxy;
     const SetMessageFunc theSetMethod;
     const GetMessageFunc theGetMethod;
-    //    LoggerPtr theLogger;
   };
+
+
 
   /**
      Common base class for classes which receive Messages.

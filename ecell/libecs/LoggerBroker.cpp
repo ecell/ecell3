@@ -33,6 +33,7 @@
 
 #include "LoggerBroker.hpp"
 #include "Logger.hpp"
+#include "MessageInterface.hpp"
 #include "PrimitiveType.hpp"
 #include "FQPI.hpp"
 #include "RootSystem.hpp"
@@ -62,7 +63,7 @@ namespace libecs
     String aSystemPathString( aFQPI.getSystemPathString() );
     SystemPtr aSystemPtr = theRootSystem->getSystem( aSystemPathString );
 
-    MessageInterfacePtr aMessageInterfacePtr = 0;
+    MessageInterfacePtr aMessageInterfacePtr = NULLPTR;
 
     switch( aFQPI.getPrimitiveType() )
       {
@@ -76,8 +77,16 @@ namespace libecs
 	break;
       }
     PropertyMapIterator pmitr( aMessageInterfacePtr->getMessageSlot( property_name ) );
-    LoggerPtr aNewLoggerPtr = new Logger( pmitr->second );
+    LoggerPtr aNewLoggerPtr = new Logger( *pmitr->second->getProxy() );
   }
   
 
 } // namespace libecs
+
+
+
+
+
+
+
+
