@@ -33,16 +33,14 @@ class SubstanceWindow(PluginWindow):
                              'input_concentration': self.inputConcentration
                              } )
 
-        self.theFullPropertyName = data[0]
-        self.theFullID = convertFullPNToFullID( self.theFullPropertyName )
-        aFullPropertyName = convertFullIDToFullPN(self.theFullID,
+        aPropertyListFullPN = convertFullIDToFullPN(self.theFullID(),
                                                   'PropertyList')
         aPropertyList =\
-        list( self.theSimulator.getProperty( aFullPropertyName ) )
-        aAttributeList = convertFullIDToFullPN(self.theFullID,
+        list( self.theSimulator.getProperty( aPropertyListFullPN ) )
+        aAttributeListFullPN = convertFullIDToFullPN(self.theFullID(),
                                                   'PropertyAttributes')
         aAttributeList =\
-        list(self.theSimulator.getProperty( aAttributeList ))
+        list(self.theSimulator.getProperty( aAttributeListFullPN ))
         num = 0
 
         for aProperty in aPropertyList:
@@ -57,17 +55,18 @@ class SubstanceWindow(PluginWindow):
             else :
                 pass
             num += 1
-        self.initialize( self.theFullPropertyName )
+        self.initialize( self.theFullPN() )
         
     def initialize( self, fpn ):
         
-        self.theFPNQuantity = tuple( convertFullIDToFullPN( self.theFullID, 'Quantity' ) )
-        self.theFPNConcentration = tuple(convertFullIDToFullPN( self.theFullID, 'Concentration' ))
-        self.theType = str( self.theFullID[TYPE] )
-        self.theID   = str( self.theFullID[ID] )
-        self.thePath = str( self.theFullID[SYSTEMPATH] )
+        self.theFPNQuantity = tuple( convertFullIDToFullPN( self.theFullID(), 'Quantity' ) )
+        self.theFPNConcentration = tuple(convertFullIDToFullPN( self.theFullID(), 'Concentration' ))
+
+        self.theType = str( self.theFullID()[TYPE] )
+        self.theID   = str( self.theFullID()[ID] )
+        self.thePath = str( self.theFullID()[SYSTEMPATH] )
         
-        aFullIDString = getFullIDString( self.theFullID )
+        aFullIDString = getFullIDString( self.theFullID() )
         self["id_label"].set_text( aFullIDString )
 
         self.update()
