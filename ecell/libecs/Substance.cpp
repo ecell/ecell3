@@ -88,7 +88,14 @@ namespace libecs
 
   const Message Substance::getConcentration( StringCref keyword )
   {
-    return Message( keyword, getConcentration() );
+    if( haveConcentration() )
+      {
+	return Message( keyword, getConcentration() );
+      }
+    else
+      {
+	return Message( keyword );
+      }
   }
 
   const Message Substance::getAccumulatorClass( StringCref keyword )

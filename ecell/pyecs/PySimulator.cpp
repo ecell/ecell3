@@ -136,19 +136,19 @@ Object PySimulator::getProperty( const Py::Tuple& args )
   const String anID         ( static_cast<Py::String>( aFullPN[2] ) );
   const String aPropertyName( static_cast<Py::String>( aFullPN[3] ) );
 
-  UConstantVector aVector( Simulator::getProperty( aType,
-						   aPath,
-						   anID,
-						   aPropertyName ) );
+  UConstantVectorRCPtr aVectorPtr( Simulator::getProperty( aType,
+							   aPath,
+							   anID,
+							   aPropertyName ) );
 
-  UConstantVector::size_type aSize( aVector.size() );
+  cerr << "got" << endl;
+  UConstantVector::size_type aSize( aVectorPtr->size() );
 
   Py::Tuple aTuple( aSize );
 
   for( UConstantVector::size_type i( 0 ) ; i < aSize ; ++i )
     {
-      PyUConstant aPyUConstant( aVector[i] );
-      aTuple[i] = aPyUConstant.asPyObject();
+      aTuple[i] = ( PyUConstant( (*aVectorPtr)[i] ) ).asPyObject();
     }
 
   return aTuple;

@@ -45,7 +45,7 @@ namespace libemc
   LocalSimulatorImplementation::LocalSimulatorImplementation()
     :
     theRootSystem( *new RootSystem ),
-    theLoggerBroker( *new LoggerBroker( &theRootSystem ) )
+    theLoggerBroker( *new LoggerBroker( theRootSystem ) )
   {
     ;
   }
@@ -72,16 +72,16 @@ namespace libemc
 						  StringCref    systempath,
 						  StringCref    id,
 						  StringCref    property,
-						  UConstantVectorCref data )
+						  UConstantVectorRef data )
   {
     EntityPtr anEntityPtr( getRootSystem().getEntity( FullID( type, 
 							      systempath, 
 							      id ) ) );
-    anEntityPtr->set( Message( property, data ) );
+    anEntityPtr->set( Message( property, new UConstantVector( data ) ) );
   }
 
 
-  const UConstantVector 
+  const UConstantVectorRCPtr
   LocalSimulatorImplementation::getProperty( PrimitiveType type,
 					     StringCref    systempath,
 					     StringCref    id,

@@ -62,7 +62,7 @@ namespace libecs
 
   void LoggerBroker::appendLogger( FullPNCref fpn )
   {
-    EntityPtr anEntityPtr = theRootSystem->getEntity( fpn.getFullID() );
+    EntityPtr anEntityPtr( theRootSystem.getEntity( fpn.getFullID() ) );
 
     String aPropertyName( fpn.getPropertyName() );
 

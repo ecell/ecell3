@@ -31,6 +31,8 @@
 #ifndef __LIBECS_HPP
 #define __LIBECS_HPP
 #include "Defs.hpp"
+#include "RCPtr.hpp"
+
 
 namespace libecs
 {
@@ -93,6 +95,10 @@ namespace libecs
   DECLARE_CLASS( InvalidPrimitiveType );
 
 
+
+  // reference counted pointer types
+
+  DECLARE_RCPTR( UConstantVector );
 
 } // namespace libecs
 

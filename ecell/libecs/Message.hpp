@@ -34,6 +34,7 @@
 
 #include "libecs.hpp"
 #include "Defs.hpp" 
+#include "RCPtr.hpp"
 
 #include "Exceptions.hpp"
 #include "UVariable.hpp"
@@ -55,14 +56,10 @@ namespace libecs
 
   public:
 
-    Message( StringCref keyword )
-      :
-      theKeyword( keyword )
-    {
-      ; // do nothing
-    }
-
+    Message( StringCref keyword );
+    Message( StringCref keyword, const UConstantVector* uvl ); 
     Message( StringCref keyword, UConstantVectorCref uvl ); 
+    Message( StringCref keyword, UConstantVectorRCPtr uvl ); 
     Message( StringCref keyword, UConstantCref uv ); 
 
     // copy procedures
@@ -82,30 +79,30 @@ namespace libecs
     /**
        @return 
     */
-    UConstantVectorRef getBody()
+    UConstantVectorRCPtr getBody()
     {
       return theBody;
     }
 
-    UConstantVectorCref getBody() const
+    const UConstantVectorRCPtr getBody() const
     {
       return theBody;
     }
 
     UConstantRef operator[]( int i )
     {
-      return theBody.operator[]( i );
+      return theBody->operator[]( i );
     }
 
     UConstantCref operator[]( int i ) const
     {
-      return theBody.operator[]( i );
+      return theBody->operator[]( i );
     }
 
   private:
 
-    String theKeyword;
-    UConstantVector theBody;
+    String               theKeyword;
+    UConstantVectorRCPtr theBody;
 
   };
 

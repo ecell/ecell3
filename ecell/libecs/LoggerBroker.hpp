@@ -44,9 +44,9 @@ namespace libecs
   class LoggerBroker
   {
   public:
-    LoggerBroker( RootSystemPtr aRootSystemPtr )
+    LoggerBroker( RootSystemRef aRootSystem )
       :
-      theRootSystem( aRootSystemPtr )
+      theRootSystem( aRootSystem )
     {
       ; // do nothing
     }
@@ -60,7 +60,6 @@ namespace libecs
     
     void appendLogger( FullPNCref );
     
-    
   private:
 
     LoggerBroker( LoggerBrokerCref );
@@ -69,7 +68,7 @@ namespace libecs
   private:
 
     LoggerMap     theLoggerMap;
-    RootSystemPtr theRootSystem;
+    RootSystemRef theRootSystem;
     
   };
   

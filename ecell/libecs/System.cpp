@@ -132,24 +132,29 @@ namespace libecs
 
   const Message System::getVolumeIndex( StringCref keyword )
   {
-    if( ! haveVolumeIndex() )
+    if( haveVolumeIndex() )
+      {
+	return Message( keyword, 
+			UConstant( getVolumeIndex()->
+				   getFullID().getString() ) );
+      }
+    else
       {
 	return Message( keyword );
       }
-
-    return Message( keyword, 
-		    UConstant( getVolumeIndex()->getFullID().getString() ) );
   }
 
   const Message System::getVolume( StringCref keyword )
   {
     if( haveVolumeIndex() )
       {
+	cerr << "y" << endl;
 	return Message( keyword, 
-			UConstant( getVolume() ) ) ;
+ 			UConstant( getVolume() ) ) ;
       }
     else
       {
+	cerr << "n" << endl;
 	return Message( keyword );
       }
   }

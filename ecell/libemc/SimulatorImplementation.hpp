@@ -33,6 +33,7 @@
 #define __SIMULATORIMPLEMENTATION_HPP
 
 #include "libecs/libecs.hpp"
+#include "libecs/Message.hpp"
 
 namespace libemc
 {
@@ -62,9 +63,9 @@ namespace libemc
 			      libecs::StringCref          systempath,
 			      libecs::StringCref          id,
 			      libecs::StringCref          propertyname,
-			      libecs::UConstantVectorCref data ) = 0;
+			      libecs::UConstantVectorRef data ) = 0;
 
-    virtual const libecs::UConstantVector 
+    virtual const libecs::UConstantVectorRCPtr
     getProperty( libecs::PrimitiveType type,
 		 libecs::StringCref    systempath,
 		 libecs::StringCref    id,
