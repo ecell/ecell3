@@ -87,7 +87,7 @@ namespace libemc
 					 libecs::StringCref    id,
 					 libecs::StringCref    propertyname );
 
-    virtual libecs::StringVector getLoggerList();
+    virtual libecs::StringVectorRCPtr getLoggerList();
 
     virtual void run();
 

@@ -83,9 +83,6 @@ namespace libecs
 
   DECLARE_TYPE( std::string, String );
 
-  DECLARE_LIST  ( String, StringList );
-  DECLARE_VECTOR( String, StringVector );
-
   // Numeric types
 
   // FIXME: use numeric_limits

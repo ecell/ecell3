@@ -41,6 +41,13 @@ namespace libecs
   // Declarations to be exported
 
 
+  DECLARE_LIST  ( String, StringList );
+  DECLARE_VECTOR( String, StringVector );
+
+  DECLARE_RCPTR( StringList );
+  DECLARE_RCPTR( StringVector );
+
+
   // classes
 
   DECLARE_CLASS( System );

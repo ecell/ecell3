@@ -206,13 +206,13 @@ Object PySimulator::getLoggerList( const Py::Tuple& args )
   ECS_TRY;
   args.verify_length( 0 );
 
-  libecs::StringVector aLoggerList( Simulator::getLoggerList() );
+  libecs::StringVectorRCPtr aLoggerListPtr( Simulator::getLoggerList() );
 
-  Py::Tuple aTuple( aLoggerList.size() );
+  Py::Tuple aTuple( aLoggerListPtr->size() );
 
-  for( StringVector::size_type i( 0 ) ; i < aLoggerList.size() ; ++i )
+  for( StringVector::size_type i( 0 ) ; i < aLoggerListPtr->size() ; ++i )
     {
-      aTuple[i] = Py::String( aLoggerList[i] );
+      aTuple[i] = Py::String( (*aLoggerListPtr)[i] );
     }
 
   return aTuple;

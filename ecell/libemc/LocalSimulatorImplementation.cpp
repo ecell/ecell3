@@ -120,20 +120,20 @@ namespace libemc
 					      propertyname ) );
   }
 
-  StringVector LocalSimulatorImplementation::getLoggerList()
+  StringVectorRCPtr LocalSimulatorImplementation::getLoggerList()
   {
-    StringVector aLoggerList;
-    aLoggerList.reserve( theLoggerBroker.getLoggerMap().size() );
+    StringVectorRCPtr aLoggerListPtr( new StringVector );
+    aLoggerList->reserve( theLoggerBroker.getLoggerMap().size() );
 
     LoggerBroker::LoggerMapCref aLoggerMap( theLoggerBroker.getLoggerMap() );
 
     for( LoggerBroker::LoggerMapConstIterator i( aLoggerMap.begin() );
 	 i != aLoggerMap.end(); ++i )
       {
-	aLoggerList.push_back( i->first );
+	aLoggerListPtr->push_back( i->first );
       }
 
-    return aLoggerList;
+    return aLoggerListPtr;
   }
 
 
