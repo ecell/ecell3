@@ -129,7 +129,7 @@ gtk.main()\n\
             os.remove( testOutFile )
             os.remove( testPyFile )
 
-            os.killProcess( pid)            
+            self.killProcess( pid)            
             return False
                 
         loadedTime = time.time()
@@ -145,7 +145,7 @@ gtk.main()\n\
 
         if len(a)<4:
             # hanging or segfault
-            os.killProcess( pid )
+            self.killProcess( pid )
 
             return False
         else:
