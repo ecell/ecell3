@@ -130,11 +130,13 @@ case ${host_os} in
 esac
 AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
 
-AC_CHECK_LIB(gslcblas,main)
-AC_CHECK_LIB(gsl,main)
 
-AM_CHECK_PYMOD(Numeric,,,[AC_MSG_ERROR([could not find Numeric module])])
-AM_CHECK_PYMOD(xml,,,[AC_MSG_ERROR([could not find xml module])])
+AC_CHECK_LIB(gslcblas,cblas_dgemm,,[AC_MSG_ERROR([The libgslcblas (part of GNU Scientific Library) could not be found.])])
+
+AC_CHECK_LIB(gsl,gsl_block_alloc,,[AC_MSG_ERROR([The libgsl (GNU Scientific Library) could not be found.])])
+
+AM_CHECK_PYMOD(Numeric,,,[AC_MSG_ERROR([could not find Python Numeric module])])
+AM_CHECK_PYMOD(xml,,,[AC_MSG_ERROR([could not find Python xml module])])
 
 dnl Checks for header files.
 

@@ -39,38 +39,34 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
   == Operating Systems ==
 
-  Starting from version 3.1.102, the primary target of ecell3 
-  is Fedora Core 2.
-
-  We've tested the system with Fedora Core 2 on i386 platform.
+  Starting from version 3.1.103, the primary target of ecell3 
+  is Fedora Core 3.
 
 
   == Compilers ==
 
-  gcc-3.3 or later.
+  gcc-3.4 or later.
 
+  == Notes for Fedora Core 2 users ==
 
-  == Note for Fedora Core 2 users ==
-
-  If you are using Fedora Core 2, you need some additional packages to 
+  If you are using Fedora Core 3, you need some additional packages to 
   successfully build and run E-Cell 3.
 
-  1. Numeric Python for python2.  (Version 23.0 or later)
+  1. Numeric Python.
        http://numpy.sf.net
 
-     Get RPM files, or build it from tarball.
+     Get the RPM package (python-numeric) from Fedora.us, 
+     or build it from tarball.
 
-
-  2. Boost C++ Libraries.  (Version 1.31 or later)
+  2. Boost C++ Libraries.
        http://www.boost.org
 
-  3. To run the model editor (ecell3-model-editor), gnome-python2-2.0.2
-     and related packages must be installed as well.
+     Boost is now part of Fedora core.
 
+  3. GNU Scientific Library (GSL)
 
-  RPM packages of Numeric Python and Boost can be found here:
-
-       http://ecell.sourceforge.net/additional-packages/
+     GSL is part of Fedora core, but may not be installed by default
+     depending on your installation option.
 
 
   == Build ecell3 without GUI ==
