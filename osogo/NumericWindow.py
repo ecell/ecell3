@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-from ecellgui import *
-import string
+from Interface import *
 
 #TARGET_STRING = 0
 #TARGET_ROOTWIN = 1
