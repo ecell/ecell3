@@ -10,7 +10,7 @@ PRIVATE_AUX= ''
 
 def fileincludes():
     for i in INCLUDE_FILES:
-        print '#include "%s"' % i
+        print '#include %s' % i
 
 def propertyvariabledecls():
     for i in PROPERTIES:
