@@ -47,79 +47,60 @@ class MainWindow(Window):
         
         
         
-        #    def setName( self ):
-        #        MainWindow.thePropertyEntity.set_text('EntytyName')
-        #    setName( self )
         
         
+    def update( self, aMainValueList, namePropertyList ):
+        self.thePropertyClist.clear()
         
-    def update( self ):
-        aPropertyList = list( tmpget( 'PropertyList' ) )
-        bPropertyList = testdic['Name'][0]
-        #        aFQPP = list( FQPP )
+        
+        self.theTypeEntry.set_text( toString( FQPPList.getType() ) )
+        self.theIDEntry.set_text( toString( FQPPList.getID() ) )
+        self.thePathEntry.set_text( toString( FQPPList.getSystemPath() ) )
+        self.theNameEntry.set_text( namePropertyList )
+        for a in aMainValueList:
+            self.thePropertyClist.append( a )
+
+
+        
+    def makeValueList( self ):
+        self.MainValueList = []
+        
+
+        aPropertyList = list( getKeyandList( 'PropertyList' ) )
+        self.bPropertyList = testdic['Name'][0] 
+        
         
         # remove keyword
         aPropertyList = aPropertyList[1:] 
         # remove PropertyList itself
         aPropertyList.remove( 'PropertyList' )
-        
         aPropertyList.remove( 'Name' )
-        
-        self.thePropertyClist.clear()
-        #        self.thePropertyListA.clear()
-        #        self.thePropertyListB.clear()
-        #        self.thePropertyListC.clear()
-        
-        
-        #        print FQPPList[0]
-        
-        #        aFQPP = getFQPP()
-        
-        self.theTypeEntry.set_text(toString(FQPPList.getType()))
-        self.theIDEntry.set_text(toString(FQPPList.getID()))
-        self.thePathEntry.set_text(toString(FQPPList.getSystemPath()))
-        self.theNameEntry.set_text(bPropertyList)
 
-        m=1
+        
+        
         for x in aPropertyList:
-            
+            aValueList = getKeyandList( x )
+            aValueList = aValueList[1:]
+            num_list = len( aValueList )
             r=1
-            #            if x=='Substrate' or x=='Product' :
-            aValueList=tmpget(x)
-            aValueList=aValueList[1:]
-            num_list=len(aValueList)
             if  num_list > 1 :
                 for y in aValueList :
-                    dValueList=[x,r,y]
-                    dValueList = map( toString, dValueList )
-                    self.thePropertyClist.append( dValueList ) 
+                    
+                    aSubstanceList = [ x,r,y ]
+                    aSubstanceList = map( toString, aSubstanceList )
+                    self.MainValueList.append( aSubstanceList ) 
                     r=r+1
-                    #position =self.thePropertyClist.get_row_data(m)
-                    theDataSet = self.thePropertyClist.get_row_data(5)
-                    print theDataSet
-                    #           else:
-                    #              aValueList = tmpget( x )
-                    #             aValueList = map( toString, aValueList )
-                    #            self.thePropertyClist.append( aValueList )
-                    m=m+1
+                
+                
             else:
                 for y in aValueList :
-                    dValueList=[x,'',y]
-                    dValueList = map( toString, dValueList )
-                    self.thePropertyClist.append( dValueList ) 
-                    #position =self.thePropertyClist.get_row_data(m)
-                    #print position
-#                    theDataSet = self.thePropertyClist.get_row_data(5)
- #                   print theDataSet
-                    m=m+1
-        #for x in aPropertyList:
-            #print x
-            #aValueList = list( tmpget( x ) )
-            #aValueList = map( toString, aValueList )
+                    aParameterList = [ x,'',y ]
+                    aParameterList = map( toString, aParameterList )
+                    self.MainValueList.append( aParameterList ) 
+                    
+        return self.MainValueList, self.bPropertyList
             
-            #self.thePropertyClist.append( aValueList) 
-            
-            
+
 def toString( object ):
     return str( object )
     
@@ -133,8 +114,9 @@ def mainLoop():
 
 def main():
     aMainWindow = MainWindow( 'PropertyWindow.glade' )
-    aMainWindow.addHandler( 'gtk_main_quit', mainQuit )    
-    aMainWindow.update()
+    aMainWindow.addHandler( 'gtk_main_quit', mainQuit )
+    aMainWindow.makeValueList()
+    aMainWindow.update( aMainWindow.MainValueList, aMainWindow.bPropertyList )
     mainLoop()
 
 #this data should be written in an other file.
@@ -164,11 +146,12 @@ FQPPList = propertyname.FullPropertyName('Reactor:/CELL/CYTOPLASM:MichaMen:Prope
 #the ending of data area
 
 
-def getFQPP():
-    return FQPPList
-def tmpget( name ):
-    aList = list(testdic[name])
-    aList.insert( 0, name )
+#def getFQPP():
+#    return FQPPList
+
+def getKeyandList( key ):
+    aList = list(testdic[key])
+    aList.insert( 0, key )
     return tuple( aList )
 
 if __name__ == "__main__":
