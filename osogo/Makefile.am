@@ -22,8 +22,6 @@ OsogoPluginWindow.py\
 StepperWindow.glade\
 StepperWindow.py\
 OsogoUtil.py\
-PaletteWindow.glade\
-PaletteWindow.py\
 PluginWindowPopupMenu.glade\
 PlotterPluginWindow.py\
 Plot.py\
