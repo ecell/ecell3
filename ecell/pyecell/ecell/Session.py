@@ -16,6 +16,13 @@ import ecell.ECDDataFile
 #from ecell.util import *
 #from ecell.ECS import *
 
+BANNERSTRING =\
+'''ecell3-session [ for E-Cell SE Version 3, on Python Version %d.%d.%d ]
+Copyright (C) 1996-2002 Keio University.
+Written by Kouichi Takahashi <shafi@e-cell.org>'''\
+% ( sys.version_info[0], sys.version_info[1], sys.version_info[2] )
+
+
 class Session:
     'Session class'
 
@@ -25,6 +32,8 @@ class Session:
 
         self.theMessageMethod = self.__plainMessageMethod
         self.theSimulator = aSimulator
+
+        self.theModelName = ''
 
 
     #
@@ -44,16 +53,26 @@ class Session:
         import readline # to provide convenient commandline editing :)
         import code
         anInterpreter = code.InteractiveConsole( aContext )
-        anInterpreter.interact( 'ecell3-session' )
+
+        self._prompt = self._session_prompt( self )
+        anInterpreter.runsource( 'import sys; sys.ps1=theSession._prompt' )
+
+        anInterpreter.interact( BANNERSTRING )
 
 
-    def loadModel( self, aFile ):
-        if type( aFile ) == str:
-            aFileObject = open( aFile )
+    def loadModel( self, aModel ):
+        if type( aModel ) == type( eml.Eml ):
+            anEml = aModel
+            aModelName = '<eml.Eml>'  # what should this be?
+        elif type( aModel ) == str:
+            aFileObject = open( aModel )
+            aModelName = aModel
+            anEml = eml.Eml( aFileObject )
         else:
-            aFileObject = aFile
+            aFileObject = aModel
+            aModelName = aModel.name
+            anEml = eml.Eml( aFileObject )
 
-        anEml = eml.Eml( aFileObject )
 
         self.__loadStepper( anEml )
 
@@ -62,6 +81,8 @@ class Session:
         self.__loadEntityPropertyList( anEml, 'System::/', aPropertyList )
 
         self.__loadEntity( anEml )
+
+        self.theModelName = aModelName
 
         self.theSimulator.initialize()
 
@@ -266,13 +287,13 @@ class Session:
         aProcessList   = anEml.getEntityList( 'Process',   aSystemPath )
         aSubSystemList = anEml.getEntityList( 'System',    aSystemPath )
 
-        self.__loadEntityList( 'Variable', aSystemPath, aVariableList )
-        self.__loadEntityList( 'Process',   aSystemPath, aProcessList )
-        self.__loadEntityList( 'System',    aSystemPath, aSubSystemList )
+        self.__loadEntityList( anEml, 'Variable', aSystemPath, aVariableList )
+        self.__loadEntityList( anEml, 'Process',  aSystemPath, aProcessList )
+        self.__loadEntityList( anEml, 'System',   aSystemPath, aSubSystemList )
 
         for aSystem in aSubSystemList:
             aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
-            self.__loadEntity( aSubSystemPath )
+            self.__loadEntity( anEml, aSubSystemPath )
 
 
     def __loadEntityList( self, anEml, anEntityTypeString, aSystemPath, anIDList ):
@@ -285,7 +306,7 @@ class Session:
 
             aPropertyList = anEml.getEntityPropertyList( aFullID )
 
-            self.__loadEntityPropertyList( aFullID, aPropertyList )
+            self.__loadEntityPropertyList( anEml, aFullID, aPropertyList )
 
 
     def __loadEntityPropertyList( self, anEml, aFullID, aPropertyList ):
@@ -313,6 +334,17 @@ class Session:
 
         return aContext
 
+    class _session_prompt:
+        def __init__( self, aSession ):
+            self.theSession = aSession
+
+        def __str__( self ):
+            if self.theSession.theModelName == '':
+                return 'ecell3-session>>> '
+            else:
+                return '<%s, t=%g>>> ' %\
+                       ( self.theSession.theModelName,\
+                         self.theSession.getCurrentTime() )
 
 if __name__ == "__main__":
     pass
