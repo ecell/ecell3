@@ -180,6 +180,9 @@ namespace libecs
   void Logger::flush()
   {
     // gabor? please.
+
+    // dummy.
+    thePhysicalLogger.push( theDataInterval.getDataPoint() );
   }
 
   //

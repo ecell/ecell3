@@ -31,8 +31,7 @@
 #if !defined(__PHYSICALLOGGER_HPP)
 #define __PHYSICALLOGGER_HPP
 
-#include <iostream>
-
+#include "Exceptions.hpp"
 #include "VVector.h"
 #include "DataPoint.hpp"
 
@@ -102,8 +101,8 @@ namespace libecs
     DataPoint back()
     {
       // danger!!  undefined behavior with vvector if size() == 0 - sha
-        assert ( size() > 0 ); // i don't know what sort of exception should be thrown
-        return theVector[ size() - 1 ];
+      DEBUG_EXCEPTION( size() > 0, AssertionFailed, "" );
+      return theVector[ size() - 1 ];
     }
 
 
