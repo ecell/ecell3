@@ -78,9 +78,6 @@
 		      <property name="has_frame">True</property>
 		      <property name="invisible_char" translatable="yes">*</property>
 		      <property name="activates_default">False</property>
-		      <signal name="copy_clipboard" handler="on_entry_NAME_copy_clipboard"/>
-		      <signal name="cut_clipboard" handler="on_entry_NAME_cut_clipboard"/>
-		      <signal name="paste_clipboard" handler="on_entry_NAME_paste_clipboard"/>
 		    </widget>
 		    <packing>
 		      <property name="left_attach">1</property>
@@ -126,9 +123,6 @@
 		      <property name="has_frame">True</property>
 		      <property name="invisible_char" translatable="yes">*</property>
 		      <property name="activates_default">False</property>
-		      <signal name="copy_clipboard" handler="on_entry_PATH_copy_clipboard"/>
-		      <signal name="cut_clipboard" handler="on_entry_PATH_cut_clipboard"/>
-		      <signal name="paste_clipboard" handler="on_entry_PATH_paste_clipboard"/>
 		    </widget>
 		    <packing>
 		      <property name="left_attach">1</property>
@@ -174,9 +168,6 @@
 		      <property name="has_frame">True</property>
 		      <property name="invisible_char" translatable="yes">*</property>
 		      <property name="activates_default">False</property>
-		      <signal name="copy_clipboard" handler="on_entry_ID_copy_clipboard"/>
-		      <signal name="cut_clipboard" handler="on_entry_ID_cut_clipboard"/>
-		      <signal name="paste_clipboard" handler="on_entry_ID_paste_clipboard"/>
 		    </widget>
 		    <packing>
 		      <property name="left_attach">1</property>
@@ -198,9 +189,6 @@
 		      <property name="has_frame">True</property>
 		      <property name="invisible_char" translatable="yes">*</property>
 		      <property name="activates_default">False</property>
-		      <signal name="copy_clipboard" handler="on_entry_TYPE_copy_clipboard"/>
-		      <signal name="cut_clipboard" handler="on_entry_TYPE_cut_clipboard"/>
-		      <signal name="paste_clipboard" handler="on_entry_TYPE_paste_clipboard"/>
 		    </widget>
 		    <packing>
 		      <property name="left_attach">1</property>

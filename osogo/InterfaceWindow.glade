@@ -11,7 +11,6 @@
   <property name="modal">False</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
-  <signal name="destroy" handler="destroy"/>
 
   <child>
     <widget class="GtkFixed" id="fixed1">
