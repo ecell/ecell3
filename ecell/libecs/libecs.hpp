@@ -76,7 +76,7 @@ DECLARE_CLASS( AbstractMessageSlot )
 DECLARE_CLASS( MessageSlot )
 DECLARE_CLASS( MessageInterface );
 DECLARE_CLASS( UniversalVariable );
-
+DECLARE_CLASS( LoggerBroker );
 
 // exceptions
 

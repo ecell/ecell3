@@ -1,6 +1,8 @@
 #if !defined(__DATAPOINT_HPP)
 #define __DATAPOINT_HPP
 
+#include "libecs.hpp"
+
 
 /*
 
@@ -11,10 +13,13 @@
  */
 
 
+// DECLARE_TYPE( DataPoint<Float,Float>, FloatDataPoint );
+
 template <class T, class V>
 class DataPoint
 {
 
+  DECLARE_CLASS( DataPoint );
 
 public:
 
@@ -32,7 +37,7 @@ public:
      @param Object constant reference
    */
 
-  DataPoint( const DataPoint& );
+  DataPoint( DataPointCref );
 
 
   /// Destructor
@@ -49,28 +54,26 @@ public:
      @return DataPoint reference
   */
 
-  DataPoint& operator=( const DataPoint& );
+  DataPointRef operator=( DataPointCref );
 
 
-  bool operator<(const DataPoint& second)
+  bool operator<( DataPointCref second )
   {
-    if(this->getTime() < second.getTime())
+    if( getTime() < second.getTime() )
       {
 	return true;
       }
     return false;
-    
   }
 
 
   bool operator>(const DataPoint& second)
   {
-    if(this->getTime() > second.getTime())
+    if( getTime() > second.getTime() )
       {
 	return true;
       }
     return false;
-    
   }
 
 
@@ -104,8 +107,6 @@ private:
   /// Default constructor prohibited to public use
 
   DataPoint( void );
-
-
 
   /**
 

@@ -1,5 +1,38 @@
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//        This file is part of E-CELL Simulation Environment package
+//
+//                Copyright (C) 2000-2001 Keio University
+//
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//
+// E-CELL is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public
+// License as published by the Free Software Foundation; either
+// version 2 of the License, or (at your option) any later version.
+// 
+// E-CELL is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public
+// License along with E-CELL -- see the file COPYING.
+// If not, write to the Free Software Foundation, Inc.,
+// 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+// 
+//END_HEADER
+//
+// written by Masayuki Okayama <smash@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
+
+
 #if !defined(__LOGGER_HPP)
 #define __LOGGER_HPP
+
+#include "libecs.hpp"
 
 
 /*
@@ -19,6 +52,8 @@ typedef double ValueType; // FIXME : temporary use
 
 typedef const Float& (*const funcptr)();
 
+DECLARE_CLASS( Object );
+
 class Object
 {
 public:
@@ -32,7 +67,7 @@ public:
   funcptr fptr;
 };
 
-typedef Object* ObjectPtr; // FIXME : temp 
+
 
 
 #if defined(STLDATAPOINTVECTOR)
@@ -48,15 +83,17 @@ typedef Object* ObjectPtr; // FIXME : temp
 template <class T, class V>
 class Logger
 {
+
+  DECLARE_CLASS( Logger );
+
 public:
 #if defined(STLDATAPOINTVECTOR)
   typedef StlDataPointVector<T,V> DataPointVector;
 #endif /* END OF STLDATAPOINTVECTOR */
 
 #if defined(VVECTOR)
-  typedef VVector DataPointVector;
+  DECLARE_TYPE( VVector, DataPointVector );
 #endif /* END OF VVECTOR */ 
-
 
   typedef typename DataPointVector::containee_type containee_type;
   typedef typename DataPointVector::const_iterator const_iterator;
@@ -76,7 +113,7 @@ public:
      Copy constructor
   */
   
-  Logger( const Logger& );
+  Logger( LoggerCref );
 
 
   /// Destructor
@@ -88,7 +125,8 @@ public:
 
    */
 
-  const DataPointVector& getData( const T&, const T&, const T& ) const;
+  const DataPointVector& getData( const T& first, const T& last, 
+			       const T& interval ) const;
 
 
   void update( void );
@@ -99,34 +137,29 @@ public:
     appendData(dp);
   }
 
-
-  void push(const containee_type& x)
+  void push( const containee_type& x )
   {
-    theDataPointVector.push(x);
+    theDataPointVector.push( x );
   }
 
-  void push(const T& t, const V& v)
+  void push( const T& t, const V& v )
   {
-    theDataPointVector.push(t,v);
+    theDataPointVector.push( t, v );
   }
 
-  const_iterator binary_search(const_iterator it1, const_iterator it2, const T& t) const
+  const_iterator binary_search( const_iterator begin, const_iterator end,
+				const T& t ) const
   {
-    return theDataPointVector.binary_search(it1,it2,t);
+    return theDataPointVector.binary_search( begin, end, t );
   }
 
-  const_iterator binary_search(size_type s1, size_type s2, const T& t) const
+  const_iterator binary_search( size_type begin, size_type end, 
+				const T& t ) const
   {
-    return theDataPointVector.binary_search(s1,s2,t);
+    return theDataPointVector.binary_search( begin, end, t);
   }
 
 
-
-
-
-  //
-  // Protected and Private methods follow
-  //
 
 protected:
   
@@ -147,7 +180,7 @@ private:
 
   /// Assignment operator is hidden
   
-  Logger<T, V>& operator=( const Logger<T,V>& );
+  Logger& operator=( const Logger<T,V>& );
   
 
   /**
@@ -180,7 +213,7 @@ private:
   /// Data members
 
   DataPointVector theDataPointVector;
-  DataFuncCptr theDataFuncCptr;
+  DataFuncCptr    theDataFuncCptr;
 
 
 };

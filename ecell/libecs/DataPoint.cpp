@@ -28,10 +28,10 @@ DataPoint<T,V>::DataPoint( const T& t, const V& v )
 // Copy constructor 
 
 template <class T, class V>
-DataPoint<T,V>::DataPoint( const DataPoint& d )
+DataPoint<T,V>::DataPoint( DataPointCref datapoint )
   :
-  theTime(d.getTime()),
-  theValue(d.getValue())
+  theTime( datapoint.getTime() ),
+  theValue( datapoint.getValue() )
 {
   ; // do nothing
 }
@@ -41,12 +41,15 @@ DataPoint<T,V>::DataPoint( const DataPoint& d )
 // Assignment operator from another DataPoint
 
 template <class T, class V>
-DataPoint<T,V>& DataPoint<T,V>::operator=( const DataPoint<T,V>& rhs )
+DataPoint<T,V>& DataPoint<T,V>::operator=( DataPointCref rhs )
 {
-  if(this == &rhs) return *this;
+  if( this == &rhs )
+    {
+      return *this;
+    }
 
-  theTime = rhs.theTime;
-  theValue = rhs.theValue;
+  theTime  = rhs.getTime();
+  theValue = rhs.getValue();
 
   return *this;
 }

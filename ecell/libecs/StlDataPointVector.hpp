@@ -2,16 +2,22 @@
 #define __STL_DATAPOINTVECTOR
 
 #include <vector>
+
+#include "libecs.hpp"
+
 #include "DataPoint.hpp"
+
 
 /**
 
  */
 
 
-template<class T, class V, class Containee = DataPoint<T,V>, class Container = vector<Containee*> >
+template<class T, class V, class Containee = DataPoint<T,V>,
+	 class Container = vector<Containee*> >
 class StlDataPointVector
 {
+
 public:
   typedef Containee containee_type;
   typedef typename Container::value_type value_type;
@@ -23,34 +29,38 @@ public:
 
 
 public:
-  explicit StlDataPointVector(const Container& vect = Container())
-    :
-    theContainer(vect)
+
+  explicit StlDataPointVector()
   {
     ; // do nothing
   }
 
-  StlDataPointVector(const StlDataPointVector&);
-
-  StlDataPointVector(size_type sz)
+  explicit StlDataPointVector( const Container& vect )
+    :
+    theContainer( vect )
   {
-    theContainer = Container(sz);
+    ; // do nothing
+  }
+
+  StlDataPointVector( const StlDataPointVector& );
+
+  StlDataPointVector( size_type sz )
+  {
+    theContainer = Container( sz );
   }
 
   ~StlDataPointVector(void);
 
-  reference operator[] (size_type sz)
+  reference operator[] ( size_type sz )
   {
-    return *(theContainer.begin() + sz);
+    return *(theContainer[sz]);
   }
 
 
-  const_reference operator[] (size_type sz) const
+  const_reference operator[] ( size_type sz ) const
   {
-    return *(theContainer.begin() + sz);
+    return *(theContainer[sz]);
   }
-
-  
 
   bool empty() const
   {
@@ -82,15 +92,17 @@ public:
     return theContainer.end();
   }
 
-  void push(const containee_type& x);
+  void push( const containee_type& x );
 
-  void push(const T&, const V&);
+  void push( const T&, const V& );
 
-  const_iterator binary_search(const_iterator, const_iterator, const T&) const;
+  const_iterator binary_search( const_iterator first, const_iterator last,
+				const T&) const;
 
   /*  const_iterator binary_search(size_type, size_type, const T&) const; */
 
-protected:
+private:
+
   Container theContainer;
 
 };

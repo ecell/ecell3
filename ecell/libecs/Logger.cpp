@@ -1,3 +1,35 @@
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//        This file is part of E-CELL Simulation Environment package
+//
+//                Copyright (C) 2000-2001 Keio University
+//
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//
+// E-CELL is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public
+// License as published by the Free Software Foundation; either
+// version 2 of the License, or (at your option) any later version.
+// 
+// E-CELL is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public
+// License along with E-CELL -- see the file COPYING.
+// If not, write to the Free Software Foundation, Inc.,
+// 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+// 
+//END_HEADER
+//
+// written by Masayuki Okayama <smash@e-cell.org> at
+// E-CELL Project, Lab. for Bioinformatics, Keio University.
+//
+
+
+
 /*
 
  */
@@ -11,10 +43,9 @@
 
 
 template <class T, class V>
-Logger<T, V>::Logger(ObjectPtr optr)
+Logger<T, V>::Logger( ObjectPtr optr )
   :
-  theDataPointVector(*(new DataPointVector())),
-  theDataFuncCptr(optr->fptr)
+  theDataFuncCptr( optr->fptr )
 {
   ; // do nothing
 } 
@@ -22,10 +53,10 @@ Logger<T, V>::Logger(ObjectPtr optr)
 // Copy Constructor
 
 template <class T, class V>
-Logger<T, V>::Logger(const Logger& lg)
+Logger<T, V>::Logger( LoggerCref logger )
   :
-  theDataPointVector(lg.getDataPointVector()),
-  theDataFuncCptr(lg.getDataFuncCptr())
+  theDataPointVector( logger.getDataPointVector() ),
+  theDataFuncCptr( logger.getDataFuncCptr() )
 {
   ; // do nothing
 }
@@ -34,43 +65,42 @@ Logger<T, V>::Logger(const Logger& lg)
 // Destructor
 
 template <class T, class V>
-Logger<T,V>::~Logger(void)
+Logger<T,V>::~Logger( void )
 {
-  ;
-  //  delete theDataPointVectorPtr;
+  ; // do nothing
 }
 
 //
 
 
 template <class T, class V>
-const Logger<T,V>::DataPointVector& Logger<T,V>::getData( const T& first ,
-							  const T& last ,
-							  const T& interval ) const
+const Logger<T,V>::DataPointVector&
+Logger<T,V>::getData( const T& first,
+		      const T& last,
+		      const T& interval ) const
 {
   
-  DataPointVector* aDataPointVectorPtr = new DataPointVector();
+  DataPointVector* aDataPointVectorPtr( new DataPointVector() );
   
   const_iterator itr_1 = theDataPointVector.begin();
   const_iterator itr_2 = theDataPointVector.end();
   
-  const_iterator firstItr = binary_search(itr_1, itr_2, first);
-  const_iterator lastItr = binary_search(itr_1, itr_2, last);
+  const_iterator firstItr = binary_search( itr_1, itr_2, first );
+  const_iterator lastItr  = binary_search( itr_1, itr_2, last );
 
   const_iterator i = firstItr;
-  T time = first;
-  while(time < (*lastItr)->getTime())
+  T aTime( first );
+  while( aTime < (*lastItr)->getTime())
     {
       const_iterator n = 
 	theDataPointVector.binary_search( i,
 					  lastItr,
-					  time+interval );
-      aDataPointVectorPtr->push(**n);
-      time = (*n)->getTime();
+					  aTime + interval );
+      aDataPointVectorPtr->push( **n );
+      aTime = (*n)->getTime();
       i = n;
     }
 
-  
   return *aDataPointVectorPtr;
 }
 
@@ -80,8 +110,7 @@ const Logger<T,V>::DataPointVector& Logger<T,V>::getData( const T& first ,
 template <class T, class V>
 void Logger<T, V>::update( void )
 {
-  containee_type* cptr = new containee_type((*theDataFuncCptr)(), (*theDataFuncCptr)());
-  appendData(*cptr);
+  appendData( containee_type( (*theDataFuncCptr)(), (*theDataFuncCptr)() ) );
 }
 
 
@@ -103,7 +132,6 @@ void Logger<T, V>::appendData(const containee_type& dp )
 #include <iostream>
 #include "DataPoint.cpp"
 #include "StlDataPointVector.cpp"
-typedef double Float;
 
 const Float& func(void)
 {

@@ -15,12 +15,14 @@
 
 
 template <class T, class V> class DataPoint;
-template <class T, class V, class Containee, class Container> class StlDataPointVector;
+template <class T, class V, class Containee, class Container> 
+class StlDataPointVector;
 
 template <class T, class V, class Containee, class Container>
-StlDataPointVector<T,V,Containee,Container>::StlDataPointVector(const StlDataPointVector& dpv)
+StlDataPointVector<T,V,Containee,Container>::
+StlDataPointVector( const StlDataPointVector& datapointvector )
   :
-  theContainer(dpv.theContainer)
+  theContainer( datapointvector.theContainer )
 {
   ; // do nothing
 }
@@ -30,10 +32,9 @@ StlDataPointVector<T,V,Containee,Container>::StlDataPointVector(const StlDataPoi
 // Destructor
 
 template <class T, class V, class Containee, class Container>
-StlDataPointVector<T,V,Containee,Container>::~StlDataPointVector(void)
+StlDataPointVector<T,V,Containee,Container>::~StlDataPointVector( void )
 {
-  iterator i;
-  for(i = begin(); i < end(); i++)
+  for( iterator i( begin() ) ; i < end(); i++ )
     {
       delete *i;
     }
@@ -44,24 +45,26 @@ StlDataPointVector<T,V,Containee,Container>::~StlDataPointVector(void)
 template <class T, class V, class Containee, class Container>
 void StlDataPointVector<T,V,Containee,Container>::push(const T& t, const V& val)
 {
-  theContainer.push_back(new Containee(t,val));
+  theContainer.push_back( new Containee( t, val ) );
 }
 
 template <class T, class V, class Containee, class Container>
 void StlDataPointVector<T,V,Containee,Container>::push(const Containee& x)
 {
-  theContainer.push_back(new Containee(x));
+  theContainer.push_back( new Containee( x ) );
 }
 
 //
 
 
 template <class T, class V, class Containee, class Container>
-StlDataPointVector<T,V,Containee,Container>::const_iterator StlDataPointVector<T,V,Containee,Container>::binary_search(const_iterator first, const_iterator last, const T& val) const
+StlDataPointVector<T,V,Containee,Container>::const_iterator 
+StlDataPointVector<T,V,Containee,Container>::
+binary_search(const_iterator first, const_iterator last, const T& val) const
 {
   V v;
   DataPoint<T,V> dp(val,v);
-  const_iterator itr = lower_bound(first,last,&dp);
+  const_iterator itr = lower_bound( first, last, &dp );
   return itr;
 
 }
