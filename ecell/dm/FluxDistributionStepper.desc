@@ -18,6 +18,6 @@ ProcessList,NESTED_LIST,[],0100
 RngSeed,STRING,"",1010
 ReadVariableList,NESTED_LIST,[],0100
 StepInterval, FLOAT, 1.79769313486e+308, 1111
-SystemVariableList,NESTED_LIST,[],0100
+SystemList,NESTED_LIST,[],0100
 WriteVariableList,NESTED_LIST,[],0100
 END
