@@ -109,6 +109,8 @@ namespace libecs
 
   Stepper::Stepper() 
     :
+    theFirstReadWriteVariableIterator( theVariableVector.end() ),
+    theFirstReadOnlyVariableIterator( theVariableVector.end() ),
     theModel( NULLPTR ),
     theSchedulerIndex( -1 ),
     theCurrentTime( 0.0 ),
@@ -131,17 +133,18 @@ namespace libecs
 
 
     //
-    // Update theWriteVariableVector and theReadVariableVector
+    // Update theVariableVector.  This also calls updateVariableProxyVector.
     //
-    updateVariableVectors();
+    updateVariableVector();
+
+    createVariableProxies();
 
 
     //    clearEntityListChanged();
     //      }
 
-    const Int aSize( theVariableProxyVector.size() );
-
-    theValueBuffer.resize( aSize );
+    // size of the value buffer == the number of *write* variables.
+    theValueBuffer.resize( getFirstReadOnlyVariableIndex() );
 
     updateLoggedPropertySlotVector();
   }
@@ -149,48 +152,23 @@ namespace libecs
  
   void Stepper::updateProcessVector()
   {
-    /*
-    theProcessVector.clear();
-    for( SystemVectorConstIterator i( theSystemVector.begin() );
-	 i != theSystemVector.end() ; ++i )
-	{
-	  const SystemCptr aSystem( *i );
-
-	  for( ProcessMapConstIterator 
-		 j( aSystem->getProcessMap().begin() );
-	       j != aSystem->getProcessMap().end(); ++j )
-	    {
-	      ProcessPtr aProcessPtr( (*j).second );
-
-	      theProcessVector.push_back( aProcessPtr );
-	    }
-	}
-    */
-
     // sort by memory address. this is an optimization.
     std::sort( theProcessVector.begin(), theProcessVector.end() );
 
-    // sort by Process priority
+    // sort by Process priority, conserving the partial order in memory
     std::stable_sort( theProcessVector.begin(), theProcessVector.end(),
 		      Process::PriorityCompare() );
 
   }
 
-  void Stepper::updateVariableVectors()
+  void Stepper::updateVariableVector()
   {
-    // (1) for each Variable which is included in the VariableReferenceVector
-    //     of the Processes of this Stepper,
-    // (2) if the Variable is mutable, 
-    //           put it into theVariableProxyVector, 
-    //       and register this Stepper to the StepperList of the Variable.
-    // (3) if the Variable is accessible,
-    //           puto it into theReadVariableVector
-    // (4) sort theReadVariableVector and theProxyVariableVector by 
-    //     memory address.
-    theReadVariableVector.clear();
-    // for all the processs
 
-    VariableVector aVariableVector;
+    DECLARE_MAP( VariablePtr, VariableReference, std::less<VariablePtr>,
+		 PtrVariableReferenceMap );
+
+    PtrVariableReferenceMap aPtrVariableReferenceMap;
+
     for( ProcessVectorConstIterator i( theProcessVector.begin());
 	 i != theProcessVector.end() ; ++i )
       {
@@ -202,58 +180,90 @@ namespace libecs
 	       j( aVariableReferenceVector.begin() );
 	     j != aVariableReferenceVector.end(); ++j )
 	  {
-	    VariableReferenceCref aVariableReference( *j );
-	    VariablePtr aVariablePtr( aVariableReference.getVariable() );
+	    VariableReferenceCref aNewVariableReference( *j );
+	    VariablePtr aVariablePtr( aNewVariableReference.getVariable() );
 
-	    if( aVariableReference.isMutator() )
+	    PtrVariableReferenceMapIterator 
+	      anIterator( aPtrVariableReferenceMap.find( aVariablePtr ) );
+
+	    if( anIterator == aPtrVariableReferenceMap.end() )
 	      {
-		// prevent duplication
-
-		if( std::find( aVariableVector.begin(), 
-			       aVariableVector.end(),
-			       aVariablePtr ) == aVariableVector.end() )
-		  {
-		    aVariableVector.push_back( aVariablePtr );
-		  }
+		aPtrVariableReferenceMap.
+		  insert( PtrVariableReferenceMap::
+			  value_type( aVariablePtr, aNewVariableReference ) );
 	      }
-
-	    if( aVariableReference.isAccessor() )
+	    else
 	      {
-		// prevent duplication
+		VariableReferenceRef aVariableReference( anIterator->second );
 
-		if( std::find( theReadVariableVector.begin(), 
-			       theReadVariableVector.end(),
-			       aVariablePtr ) == theReadVariableVector.end() )
-		  {
-		    theReadVariableVector.push_back( aVariablePtr );
-		  }
+		aVariableReference.
+		  setIsAccessor( aVariableReference.isAccessor() |
+				 aNewVariableReference.isAccessor() );
+		
+		aVariableReference.
+		  setCoefficient( aVariableReference.getCoefficient() +
+				  aNewVariableReference.getCoefficient() );
 	      }
-
 	  }
       }
 
-    // sort by memory address. this is an optimization.
-    std::sort( theReadVariableVector.begin(), theReadVariableVector.end() );
-    std::sort( aVariableVector.begin(), aVariableVector.end() );
+    VariableReferenceVector aVariableReferenceVector;
+    aVariableReferenceVector.reserve( aPtrVariableReferenceMap.size() );
 
-
-    theVariableProxyVector.clear();
-    for( VariableProxyVectorIterator i( theVariableProxyVector.begin() );
-	 i != theVariableProxyVector.end(); ++i )
+    // I want select2nd... but use a for loop for portability.
+    for( PtrVariableReferenceMapConstIterator 
+	   i( aPtrVariableReferenceMap.begin() );
+	 i != aPtrVariableReferenceMap.end() ; ++i )
       {
-	VariableProxyPtr anVariableProxyPtr( *i );
-	delete anVariableProxyPtr;
+	aVariableReferenceVector.push_back( i->second );
       }
+    
+    VariableReferenceVectorIterator aFirstReadOnlyVariableReferenceIterator = 
+      std::partition( aVariableReferenceVector.begin(),
+		      aVariableReferenceVector.end(),
+		      std::mem_fun_ref( &VariableReference::isMutator ) );
 
+    VariableReferenceVectorIterator aFirstReadWriteVariableReferenceIterator = 
+      std::partition( aVariableReferenceVector.begin(),
+		      aFirstReadOnlyVariableReferenceIterator,
+		      std::not1
+		      ( std::mem_fun_ref( &VariableReference::isAccessor ) )
+		      );
+
+    theVariableVector.clear();
+    theVariableVector.reserve( aVariableReferenceVector.size() );
+
+    std::transform( aVariableReferenceVector.begin(),
+		    aVariableReferenceVector.end(),
+		    std::back_inserter( theVariableVector ),
+		    std::mem_fun_ref( &VariableReference::getVariable ) );
+
+    theFirstReadWriteVariableIterator = 
+      theVariableVector.begin() + ( aFirstReadWriteVariableReferenceIterator 
+				    - aVariableReferenceVector.begin() );
+
+    theFirstReadOnlyVariableIterator = 
+      theVariableVector.begin() + ( aFirstReadOnlyVariableReferenceIterator 
+				    - aVariableReferenceVector.begin() );
+
+    // For each part of the vector, sort by memory address. 
+    // This is an optimization.
+    std::sort( theVariableVector.begin(), theFirstReadWriteVariableIterator );
+    std::sort( theFirstReadWriteVariableIterator,
+	       theFirstReadOnlyVariableIterator );
+    std::sort( theFirstReadOnlyVariableIterator, theVariableVector.end() );
+  }
+
+
+  void Stepper::createVariableProxies()
+  {
     // create VariableProxies.
-    for( VariableVectorIterator i( aVariableVector.begin() );
-	 i != aVariableVector.end(); ++i )
+    for( VariableVectorIterator i( theVariableVector.begin() );
+	 i != theFirstReadOnlyVariableIterator; ++i )
       {
 	VariablePtr aVariablePtr( *i );
-	theVariableProxyVector.
-	  push_back( createVariableProxy( aVariablePtr ) );
+	aVariablePtr->registerProxy( createVariableProxy( aVariablePtr ) );
       }
-
   }
 
 
@@ -263,18 +273,24 @@ namespace libecs
 
     EntityVector anEntityVector;
     anEntityVector.reserve( theProcessVector.size() + 
-			    theVariableProxyVector.size() +
+			    getFirstReadOnlyVariableIndex() +
 			    theSystemVector.size() );
 
+    // copy theProcessVector
     std::copy( theProcessVector.begin(), theProcessVector.end(),
 	       std::back_inserter( anEntityVector ) );
 
-    for( VariableProxyVectorConstIterator i( theVariableProxyVector.begin() );
-	 i != theVariableProxyVector.end(); ++i )
-      {
-	anEntityVector.push_back( (*i)->getVariable() );
-      }
+    // append theVariableVector
+    std::copy( theVariableVector.begin(), 
+	       theFirstReadOnlyVariableIterator,
+	       std::back_inserter( anEntityVector ) );
+
+    // append theSystemVector
+    std::copy( theSystemVector.begin(), theSystemVector.end(),
+	       std::back_inserter( anEntityVector ) );
 		   
+
+    // Scan all the relevant Entities, and find logged PropertySlots.
     for( EntityVectorConstIterator i( anEntityVector.begin() );
 	 i != anEntityVector.end() ; ++i )
       {
@@ -311,28 +327,41 @@ namespace libecs
 	    continue;
 	  }
 
-	VariableVectorCref aTargetVector( aStepperPtr->
-					  getReadVariableVector() );
+	VariableVectorCref aTargetVector( aStepperPtr->getVariableVector() );
 
-	// This search assumes both vectors are sorted by pointer addresses.
-	//
+	VariableVectorConstIterator aFirstReadWriteTargetVariableIterator
+	  ( aTargetVector.begin() + 
+	    aStepperPtr->getFirstReadWriteVariableIndex() );
+
+	VariableVectorConstIterator aFirstReadOnlyTargetVariableIterator
+	  ( aTargetVector.begin() +
+	    aStepperPtr->getFirstReadOnlyVariableIndex() );
+
 	// For efficiency, binary_search should be done for possibly longer
 	// vector, and linear iteration for possibly shorter vector.
 	//
-	for( VariableProxyVectorConstIterator j( theVariableProxyVector.begin() );
-	     j != theVariableProxyVector.end(); ++j )
-	  {
-	    VariablePtr aVariablePtr( (*j)->getVariable() );
 
-	    if( std::binary_search( aTargetVector.begin(), aTargetVector.end(),
+	// if one Variable in this::readlist appears in the target::write list
+	for( VariableVectorConstIterator j( theVariableVector.begin() );
+	     j != theFirstReadOnlyVariableIterator; ++j )
+	  {
+	    VariablePtr const aVariablePtr( *j );
+
+	    // search in target::readwrite and target::read list.
+	    if( std::binary_search( aFirstReadWriteTargetVariableIterator,
+				    aFirstReadOnlyTargetVariableIterator,
+				    aVariablePtr ) ||
+		std::binary_search( aFirstReadOnlyTargetVariableIterator,
+				    aTargetVector.end(),
 				    aVariablePtr ) )
 	      {
 		theDependentStepperVector.push_back( aStepperPtr );
 		break;
 	      }
 	  }
+
       }
-    
+
     // optimization: sort by memory address.
     std::sort( theDependentStepperVector.begin(), 
 	       theDependentStepperVector.end() );
@@ -520,12 +549,12 @@ namespace libecs
   const Polymorph Stepper::getWriteVariableList() const
   {
     PolymorphVector aVector;
-    aVector.reserve( theVariableProxyVector.size() );
-    
-    for( VariableProxyVectorConstIterator i( theVariableProxyVector.begin() );
-	 i != theVariableProxyVector.end() ; ++i )
+    aVector.reserve( theVariableVector.size() );
+
+    for( VariableVectorConstIterator i( theVariableVector.begin() );
+	 i != theFirstReadOnlyVariableIterator; ++i )
       {
-	aVector.push_back( (*i)->getVariable()->getFullID().getString() );
+	aVector.push_back( (*i)->getFullID().getString() );
       }
     
     return aVector;
@@ -534,10 +563,10 @@ namespace libecs
   const Polymorph Stepper::getReadVariableList() const
   {
     PolymorphVector aVector;
-    aVector.reserve( theReadVariableVector.size() );
+    aVector.reserve( theVariableVector.size() );
     
-    for( VariableVectorConstIterator i( theReadVariableVector.begin() );
-	 i != theReadVariableVector.end() ; ++i )
+    for( VariableVectorConstIterator i( theFirstReadWriteVariableIterator );
+	 i != theVariableVector.end() ; ++i )
       {
 	aVector.push_back( (*i)->getFullID().getString() );
       }
@@ -559,20 +588,17 @@ namespace libecs
     return aVector;
   }
   
-  const UnsignedInt 
-  Stepper::getVariableProxyIndex( VariableCptr const aVariable )
+  const UnsignedInt Stepper::getVariableIndex( VariableCptr const aVariable )
   {
-    VariableProxyVectorConstIterator
-      anIterator( std::lower_bound( theVariableProxyVector.begin(), 
-				    theVariableProxyVector.end(), 
-				    aVariable, 
-				    VariableProxy::VariablePtrCompare() ) );
+    VariableVectorConstIterator
+      anIterator( std::find( theVariableVector.begin(), 
+			     theVariableVector.end(), 
+			     aVariable ) ); 
 
-    // This may be called before push_back() function.
-//     DEBUG_EXCEPTION( (*anIterator)->getVariable() == aVariable , NotFound, 
-// 		     "This should not occur.  Must be a bug." );
+    DEBUG_EXCEPTION( anIterator != theVariableVector.end() , NotFound, 
+ 		     "Variable not found." );
 
-    return anIterator - theVariableProxyVector.begin();
+    return anIterator - theVariableVector.begin();
   }
 
 
@@ -581,10 +607,10 @@ namespace libecs
     //
     // Variable::clear()
     //
-    const UnsignedInt aSize( theVariableProxyVector.size() );
+    const UnsignedInt aSize( theVariableVector.size() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 
 	// save original value values
 	theValueBuffer[ c ] = aVariable->getValue();
@@ -593,7 +619,6 @@ namespace libecs
 	aVariable->clear();
       }
 
-    //    FOR_ALL( VariableProxyVector, theVariableProxyVector, clear );
   }
 
   void Stepper::process()
@@ -608,23 +633,20 @@ namespace libecs
     //
     // Variable::integrate()
     //
-    std::for_each( theVariableProxyVector.begin(),
-		   theVariableProxyVector.end(), 
-		   std::bind2nd( std::mem_fun( &VariableProxy::integrate ),
+    std::for_each( theVariableVector.begin(), theVariableVector.end(), 
+		   std::bind2nd( std::mem_fun( &Variable::integrate ),
 				 getCurrentTime() ) );
   }
 
 
   void Stepper::reset()
   {
-    const UnsignedInt aSize( theVariableProxyVector.size() );
-    for( UnsignedInt c( 0 ); c < aSize; ++c )
+    // restore original values and clear velocity of all the *write* variables.
+    for( UnsignedInt c( 0 ); c < getFirstReadOnlyVariableIndex(); ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 
 	// restore x (original value) and clear velocity
-	//FIXME: should go into VariableProxy:::reset()?
 	aVariable->setValue( theValueBuffer[ c ] );
 	aVariable->setVelocity( 0.0 );
       }
@@ -693,7 +715,8 @@ namespace libecs
   {
     Stepper::initialize();
 
-    theVelocityBuffer.resize( theVariableProxyVector.size() );
+    // size of the velocity buffer == the number of *write* variables.
+    theVelocityBuffer.resize( getFirstReadOnlyVariableIndex() );
 
     // should create another method for property slot ?
     //    setNextStepInterval( getStepInterval() );
@@ -717,12 +740,12 @@ namespace libecs
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
 
-	// no!! theValueVector and theReadVariableVector holds completely
+	// no!! theValueVector and theVariableVector holds completely
 	// different sets of Variables
 	const Real anOriginalValue( theValueVector[ c ] + 
 				    numeric_limit<Real>::epsilon() );
 
-	const Real aCurrentValue( theReadVariableVector[ c ]->getValue() );
+	const Real aCurrentValue( theVariableVector[ c ]->getValue() );
 
 	const Real anRelativeError( fabs( aCurrentValue - anOriginalValue ) 
 				    / anOriginalValue );

@@ -313,15 +313,21 @@ namespace libecs
       return theProcessVector;
     }
 
-    VariableProxyVectorCref getVariableProxyVector() const
+    VariableVectorCref getVariableVector() const
     {
-      return theVariableProxyVector;
+      return theVariableVector;
     }
 
-    VariableVectorCref getReadVariableVector() const
+    const VariableVector::size_type getFirstReadWriteVariableIndex()
     {
-      return theReadVariableVector;
+      return theFirstReadWriteVariableIterator - theVariableVector.begin();
     }
+
+    const VariableVector::size_type getFirstReadOnlyVariableIndex()
+    {
+      return theFirstReadOnlyVariableIterator - theVariableVector.begin();
+    }
+
 
     StepperVectorCref getDependentStepperVector() const
     {
@@ -334,41 +340,7 @@ namespace libecs
     }
 
 
-    const UnsignedInt getVariableProxyIndex( VariableCptr const aVariable );
-
-    /**
-       Update theProcessVector and theFirstNormalProcess iterator.
-
-    */
-
-    void updateProcessVector();
-
-
-    /**
-       Update theReadVariableVector and theVariableProxyVector.
-
-    */
-
-    void updateVariableVectors();
-
-    void updateLoggedPropertySlotVector();
-
-    /**
-
-	Definition of the Stepper dependency:
-	Stepper A depends on Stepper B 
-	if:
-	- A and B share at least one Variable, AND
-	- A reads AND B writes (changes) the Variable.
-
-	See VariableReference class about the definitions of
-	Variable 'read' and 'write'.
-
-
-	@see Process, VariableReference
-    */
-
-    void updateDependentStepperVector();
+    const UnsignedInt getVariableIndex( VariableCptr const aVariable );
 
 
     virtual void dispatchInterruptions();
@@ -380,6 +352,23 @@ namespace libecs
     const Polymorph getProcessList()          const;
     const Polymorph getSystemList()           const;
     const Polymorph getDependentStepperList() const;
+
+    /**
+
+	Definition of the Stepper dependency:
+	Stepper A depends on Stepper B 
+	if:
+	- A and B share at least one Variable, AND
+	- A reads AND B writes on (changes) the same Variable.
+
+	See VariableReference class about the definitions of
+	Variable 'read' and 'write'.
+
+
+	@see Process, VariableReference
+    */
+
+    void updateDependentStepperVector();
 
 
     virtual VariableProxyPtr createVariableProxy( VariablePtr aVariablePtr )
@@ -395,6 +384,54 @@ namespace libecs
 
     virtual StringLiteral getClassName() const  { return "Stepper"; }
 
+
+  protected:
+
+    /**
+       Update theProcessVector.
+
+    */
+
+    void updateProcessVector();
+
+
+    /**
+       Update theVariableVector and theVariableProxyVector.
+
+       This method makes the following data structure:
+    
+       In theVariableVector, Variables are sorted in this order:
+     
+       | Write-Only | Read-Write.. | Read-Only.. |
+    
+    */
+
+    void updateVariableVector();
+
+    /**
+       Create VariableProxy objects and distribute the objects to 
+       write Variables.
+
+       Ownership of the VariableProxy objects are given away to the Variables.
+
+       @see Variable::registerVariableProxy()
+    */
+
+    void createVariableProxies();
+
+    /**
+       Scan all the relevant Entity objects to this Stepper and construct
+       the list of logged PropertySlots.
+
+       The list, theLoggedPropertySlotVector, is used when in log() method.
+
+    */
+
+    void updateLoggedPropertySlotVector();
+
+
+
+
   protected:
 
     SystemVector        theSystemVector;
@@ -403,15 +440,17 @@ namespace libecs
 
     //    StepIntervalConstraintMap theStepIntervalConstraintMap;
 
-    VariableVector        theReadVariableVector;
-
-    VariableProxyVector   theVariableProxyVector;
+    VariableVector         theVariableVector;
+    VariableVectorIterator theFirstReadWriteVariableIterator;
+    VariableVectorIterator theFirstReadOnlyVariableIterator;
 
     ProcessVector         theProcessVector;
 
     StepperVector         theDependentStepperVector;
 
     RealVector theValueBuffer;
+
+
 
   private:
 
@@ -423,7 +462,6 @@ namespace libecs
     Real                theCurrentTime;
 
     Real                theStepInterval;
-    Real                theStepsPerSecond;
 
     Real                theUserMinInterval;
     Real                theUserMaxInterval;
@@ -459,7 +497,7 @@ namespace libecs
 	:
 	libecs::VariableProxy( aVariablePtr ),
 	theStepper( aStepper ),
-	theIndex( theStepper.getVariableProxyIndex( aVariablePtr ) )
+	theIndex( theStepper.getVariableIndex( aVariablePtr ) )
       {
 	; // do nothing
       }

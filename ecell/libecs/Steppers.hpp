@@ -131,7 +131,7 @@ namespace libecs
 	:
 	libecs::VariableProxy( aVariablePtr ),
 	theStepper( aStepper ),
-	theIndex( theStepper.getVariableProxyIndex( aVariablePtr ) )
+	theIndex( theStepper.getVariableIndex( aVariablePtr ) )
       {
 	; // do nothing
       }
@@ -240,7 +240,7 @@ namespace libecs
 	:
 	libecs::VariableProxy( aVariablePtr ),
 	theStepper( aStepper ),
-	theIndex( theStepper.getVariableProxyIndex( aVariablePtr ) )
+	theIndex( theStepper.getVariableIndex( aVariablePtr ) )
       {
 	; // do nothing
       }

@@ -48,7 +48,7 @@ namespace libecs
 
   void FixedEuler1Stepper::step()
   {
-    const UnsignedInt aSize( theVariableProxyVector.size() );
+    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
 
     clear();
 
@@ -58,8 +58,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 
 	theVelocityBuffer[ c ] = aVariable->getVelocity();
 
@@ -98,11 +97,10 @@ namespace libecs
     // ========= 1 ===========
     process();
 
-    const UnsignedInt aSize( theVariableProxyVector.size() );
+    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 
 	// get k1
 	Real aVelocity( aVariable->getVelocity() );
@@ -122,8 +120,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 
 	const Real aVelocity( aVariable->getVelocity() );
 	theVelocityBuffer[ c ] += aVelocity + aVelocity;
@@ -141,8 +138,7 @@ namespace libecs
     process();
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 
 	const Real aVelocity( aVariable->getVelocity() );
 	theVelocityBuffer[ c ] += aVelocity + aVelocity;
@@ -161,8 +157,7 @@ namespace libecs
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 
 	const Real aVelocity( aVariable->getVelocity() );
 
@@ -239,7 +234,7 @@ namespace libecs
 
   bool Euler1Stepper::calculate()
   {
-    const UnsignedInt aSize( theVariableProxyVector.size() );
+    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
 
     // don't expect too much from euler
     const Real eps_rel( getTolerance() );
@@ -252,8 +247,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	const Real aVelocity( aVariable->getVelocity() );
 
@@ -275,8 +269,7 @@ namespace libecs
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 
 	// get k2 = f(x+h/2, y+k1*h/2)
 	const Real aVelocity( aVariable->getVelocity() );
@@ -333,7 +326,8 @@ namespace libecs
   {
     DifferentialStepper::initialize();
 
-    const UnsignedInt aSize( theVariableProxyVector.size() );
+    // the number of write variables
+    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
 
     theK1.resize( aSize );
   }
@@ -386,7 +380,7 @@ namespace libecs
 
   bool Midpoint2Stepper::calculate()
   {
-    const UnsignedInt aSize( theVariableProxyVector.size() );
+    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
 
     const Real eps_rel( getTolerance() );
     const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
@@ -398,8 +392,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	    
 	// get k1
 	const Real aVelocity( aVariable->getVelocity() );
@@ -418,8 +411,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	    
 	// get k2
 	const Real aVelocity( aVariable->getVelocity() );
@@ -446,8 +438,7 @@ namespace libecs
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	const Real aVelocity( aVariable->getVelocity() );
 	
@@ -505,7 +496,7 @@ namespace libecs
   {
     DifferentialStepper::initialize();
 
-    const UnsignedInt aSize( theVariableProxyVector.size() );
+    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
 
     theK1.resize( aSize );
     theK2.resize( aSize );
@@ -556,7 +547,7 @@ namespace libecs
 
   bool CashKarp4Stepper::calculate()
   {
-    const UnsignedInt aSize( theVariableProxyVector.size() );
+    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
 
     const Real eps_rel( getTolerance() );
     const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
@@ -568,8 +559,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	    
 	// get k1
 	theK1[ c ] = aVariable->getVelocity();
@@ -593,8 +583,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	theK2[ c ] = aVariable->getVelocity();
 	    
@@ -618,8 +607,7 @@ namespace libecs
 	
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	theK3[ c ] = aVariable->getVelocity();
 	
@@ -644,8 +632,7 @@ namespace libecs
     
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	theK4[ c ] = aVariable->getVelocity();
 	
@@ -671,8 +658,7 @@ namespace libecs
 	
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	theK5[ c ] = aVariable->getVelocity();
 	    
@@ -706,8 +692,7 @@ namespace libecs
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	theK6[ c ] = aVariable->getVelocity();
 
@@ -762,7 +747,7 @@ namespace libecs
   {
     DifferentialStepper::initialize();
 
-    const UnsignedInt aSize( theVariableProxyVector.size() );
+    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
 
     theK1.resize( aSize );
     theK2.resize( aSize );
@@ -824,7 +809,7 @@ namespace libecs
 
   bool DormandPrince547MStepper::calculate()
   {
-    const UnsignedInt aSize( theVariableProxyVector.size() );
+    const UnsignedInt aSize( getFirstReadOnlyVariableIndex() );
 
     const Real eps_rel( getTolerance() );
     const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
@@ -836,8 +821,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	// get k1
 	theK1[ c ] = aVariable->getVelocity();
@@ -861,8 +845,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	// get k2
 	theK2[ c ] = aVariable->getVelocity();
@@ -889,8 +872,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	// get k3
 	theK3[ c ] = aVariable->getVelocity();
@@ -918,8 +900,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	// get k4
 	theK4[ c ] = aVariable->getVelocity();
@@ -947,8 +928,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	// get k5
 	theK5[ c ] = aVariable->getVelocity();
@@ -977,8 +957,7 @@ namespace libecs
 
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 	
 	// get k6
 	theK6[ c ] = aVariable->getVelocity();
@@ -1011,8 +990,7 @@ namespace libecs
     // restore theValueBuffer
     for( UnsignedInt c( 0 ); c < aSize; ++c )
       {
-	VariablePtr const aVariable( theVariableProxyVector[ c ]->
-				     getVariable() );
+	VariablePtr const aVariable( theVariableVector[ c ] );
 
 	// get k7
 	theK7[ c ] = aVariable->getVelocity();
@@ -1022,15 +1000,13 @@ namespace libecs
 	// k7 * 183/100000 for Yn+.5
 	theMidVelocityBuffer[ c ] += theK7[ c ] * ( 183.0 / 100000.0 );
 
-	const Real 
-	  aTolerance( eps_rel * 
-		      ( a_y * fabs( theValueBuffer[ c ] ) 
-			+ a_dydt * fabs( theVelocityBuffer[ c ] ) )
-		      + eps_abs );
+	const Real aTolerance( eps_rel * 
+			       ( a_y * fabs( theValueBuffer[ c ] ) 
+				 + a_dydt * fabs( theVelocityBuffer[ c ] ) )
+			       + eps_abs );
 
-	const Real
-	  anError( fabs( ( theVelocityBuffer[ c ] 
-			   - theErrorEstimate[ c ] ) / aTolerance ) );
+	const Real anError( fabs( ( theVelocityBuffer[ c ] 
+				    - theErrorEstimate[ c ] ) / aTolerance ) );
 
 	if( anError > maxError )
 	  {

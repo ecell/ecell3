@@ -93,6 +93,12 @@ namespace libecs
 
   void Variable::clearVariableProxyVector()
   {
+    for( VariableProxyVectorIterator i( theVariableProxyVector.begin() );
+	   i != theVariableProxyVector.end(); ++i )
+      {
+	delete (*i);
+      }
+
     theVariableProxyVector.clear();
   }
 
@@ -108,15 +114,22 @@ namespace libecs
     return theFixed;
   }
 
-  void Variable::registerProxy( VariableProxyPtr anVariableProxyPtr )
+  void Variable::registerProxy( VariableProxyPtr const anVariableProxyPtr )
   {
     theVariableProxyVector.push_back( anVariableProxyPtr );
   }
 
+  //  void Variable::removeProxy( VariableProxyPtr const anVariableProxyPtr )
+  //  {
+  //    theVariableProxyVector.erase( std::remove( theVariableProxyVector.begin(),
+  //					       theVariableProxyVector.end(),
+  //					       anVariableProxyPtr ) );
+  //  }
+
 
   ///////////////////////// PositiveVariable
 
-  void PositiveVariable::integrate( RealCref aTime )
+  void PositiveVariable::integrate( const Real aTime )
   {
     Variable::integrate( aTime );
 

@@ -102,7 +102,7 @@ namespace libecs
 	integrate phase
     */
 
-    virtual void integrate( RealCref aTime )
+    virtual void integrate( const Real aTime )
     {
       if( isFixed() == false )
 	{
@@ -258,7 +258,8 @@ namespace libecs
       return getValue() / ( getSuperSystem()->getVolume() * N_A );
     }
 
-    void registerProxy( VariableProxyPtr anVariableProxy );
+    void registerProxy( VariableProxyPtr const anVariableProxy );
+    //    void removeProxy( VariableProxyPtr const anVariableProxy );
 
     static VariablePtr createInstance() { return new Variable; }
 
@@ -314,7 +315,7 @@ namespace libecs
 	integrate phase
     */
 
-    virtual void integrate( RealCref aTime );
+    virtual void integrate( const Real aTime );
 
     virtual const bool checkRange( RealCref anInterval ) const
     {
@@ -384,7 +385,7 @@ namespace libecs
        Perform integration by a result calculated by integrator.
     */
 
-    virtual void integrate( RealCref aTime );
+    virtual void integrate( const Real aTime );
 
     /**
        Set a value with no check. (i.e. isFixed() is ignored.)

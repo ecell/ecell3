@@ -4,8 +4,8 @@
 #
 
 #Stepper Euler1Stepper( DE_1 )
-Stepper Midpoint2Stepper( DE_1 )
-#Stepper CashKarp4Stepper( DE_1 )
+#Stepper Midpoint2Stepper( DE_1 )
+Stepper CashKarp4Stepper( DE_1 )
 #Stepper FixedRungeKutta4Stepper( DE_1 )
 {
 	# no property

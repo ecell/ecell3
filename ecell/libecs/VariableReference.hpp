@@ -154,7 +154,7 @@ namespace libecs
       return theVariablePtr; 
     }
 
-    void setCoeffieicnt( IntCref aCoefficient )
+    void setCoefficient( IntCref aCoefficient )
     {
       theCoefficient = aCoefficient;
     }

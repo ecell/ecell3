@@ -98,10 +98,6 @@ namespace libecs
       return theVariable;
     }
 
-    //FIXME: should be inlined for performance
-    void integrate( const Real aTime );
-
-
   private:
 
     VariablePtr const theVariable;

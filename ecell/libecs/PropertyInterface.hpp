@@ -50,6 +50,8 @@ namespace libecs
 
   /** @file */
   
+
+  // probably better to replace by AssocVector.
   DECLARE_MAP( const String, PropertySlotPtr, 
 	       std::less<const String>, PropertySlotMap );
 

@@ -40,18 +40,16 @@ namespace libecs
     :
     theVariable( aVariable )
   {
-    theVariable->registerProxy( this );
+    //    theVariable->registerProxy( this );
   }
 
 
   VariableProxy::~VariableProxy()
   {
-    ; // do nothing
-  }
-
-  void VariableProxy::integrate( const Real aTime )
-  {
-    theVariable->integrate( aTime );
+    //    if( theVariable != NULLPTR )
+    //      {
+    //	theVariable->removeProxy( this );
+    //      }
   }
 
 }
