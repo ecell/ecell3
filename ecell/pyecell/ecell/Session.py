@@ -122,12 +122,14 @@ class Session:
         
         for aStepperProperty in aStepperPropertyList:
 
+            print 'DEBUG:', aStepperProperty ##DebugMessage
+
             self.theSimulator.setProperty( str( aStepperProperty[ 'FullPn' ] ), \
-                                           aStepperProperty[ 'StepperList' ] )
+                                           aStepperProperty[ 'StepperId' ] )
 
             ## Debug for Output -----------------------------------------------------------
             #script = "self.theSimulator.setProperty( '" + aStepperProperty[ 'FullPn' ] + "', " +\
-            #         str( aStepperProperty[ 'StepperList' ] ) + ')'
+            #         str( aStepperProperty[ 'StepperId' ] ) + ')'
             #print script
             ##=============================================================================        
             
