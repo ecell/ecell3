@@ -22,6 +22,12 @@ from ecell.eml import *
 #        asystemID = aPathToSystem + '/' +aSystemSimpleID
 #    return aSystemID
 
+def replaceProhibitLetter( aString ):
+    firstChecked = string.replace( aString, '-', '_' )
+    replacedString = string.replace(firstChecked , '.', '_' )
+    return replacedString
+
+
 if __name__ == '__main__':
 
 
@@ -126,21 +132,27 @@ Options:
                 aSystemFullID = 'System::/'
 #                print aSystemFullID
             else:
-                aSystemFullID = 'System:' +anEriLine[2]
-
+#                aSystemID = replaceProhibitLetter( anEriLine[2] )
+#                print aSystemID
+                aSystemFullID = 'System:' +anEriLine[2]                
             anEml.createEntity( 'System', aSystemFullID )
             anEml.setEntityProperty( aSystemFullID, 'StepperID', ['SRM_01'] )
-            anEml.setEntityProperty( aSystemFullID, 'Name', anEriLine[3:4] )        
+            anEml.setEntityProperty( aSystemFullID, 'Name', anEriLine[3:4] )
+            
         elif ( anEriLine[0] == 'SUBSTANCE' ):
-            aSystemFullID = 'Variable:' +anEriLine[2]
+            aSystemID = replaceProhibitLetter( anEriLine[2] )
+#            print aSystemID
+            aSystemFullID = 'Variable:' +aSystemID
             anEriChunk = anEriLine[4].split()
             anEml.createEntity( 'Variable', aSystemFullID )
 #            anEml.setEntityProperty( aSystemFullID, anEriChunk[0], anEriChunk[1:] )
             anEml.setEntityProperty( aSystemFullID, 'Value', anEriChunk[1:] )
+#            print anEriLine[3:4]
             anEml.setEntityProperty( aSystemFullID, 'Name', anEriLine[3:4] )
         
         elif ( anEriLine[0] == 'REACTOR' ):
-            aSystemFullID = 'Process:' +anEriLine[2]
+            aSystemID = replaceProhibitLetter( anEriLine[2] )
+            aSystemFullID = 'Process:' +aSystemID
             if ( anEriLine[1] == 'ConstantParameterReactor' ): # set Volume of the System.
                 aSystemID = anEriLine[2].split(':')[0]
                 if ( aSystemID == '/ENVIRONMENT'):
