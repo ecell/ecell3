@@ -83,10 +83,10 @@ SystemPtr RootSystem::getSystem( SystemPathCref systempath )
 		   systempath.getString() + "].");
     }
    
-  SystemPath next = systempath.next();
+  SystemPath next( systempath.next() );
 
   // the root System(this!) is requested.
-  if( next.SystemPath::getString() == "" )
+  if( next.getSystemPathString() == "" )
     {
       return this;
     }
@@ -95,13 +95,13 @@ SystemPtr RootSystem::getSystem( SystemPathCref systempath )
 }
 
 #if 0
-Primitive RootSystem::getPrimitive( FQPICref fqpi ) 
+EntityPtr RootSystem::getEntity( FQPICref fqpi ) 
   throw( InvalidPrimitiveType, NotFound )
 {
-  // FIXME: handle exceptions
+  // FIXME: handle exceptions?
 
-  SystemPtr sys = getSystem( fqpi.SystemPath::getString() );
-  return sys->getPrimitive( fqpi.getType(), fqpi.getId() );
+  SystemPtr sys = getSystem( fqpi.getSystemPathString() );
+  return sys->getEntity( fqpi.getPrimitiveType(), fqpi.getIdString() );
 }
 #endif /* 0 */
 

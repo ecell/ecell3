@@ -125,7 +125,11 @@ void System::setVolumeIndex( FQIDCref volumeindex )
 
 void System::initialize()
 {
-  assert(theStepper);
+  if( theStepper == NULL )
+    {
+      //FIXME: make this default user customizable
+      setStepper( "Eular1Stepper" );
+    }
 
   try{
     if( theVolumeIndexName != NULL )
@@ -250,16 +254,13 @@ void System::addReactor( ReactorPtr reactor )
 
   if( containsReactor( reactor->getId() ) )
     {
-      //FIXME: *theMessageWindow << "multiple definition of reactor [" 
-	//FIXME: << reactor->getId() << "] on [" << getId() << 
-	  //FIXME: "], later one discarded.\n";
-
+      delete reactor;
       //FIXME: throw exception
       return;
     }
 
   theReactorList[ reactor->getId() ] = reactor;
-  return;
+  reactor->setSuperSystem( this );
 }
 
 ReactorPtr System::getReactor( StringCref id ) throw( NotFound )
@@ -277,19 +278,12 @@ void System::addSubstance( SubstancePtr newone )
 {
   if( containsSubstance( newone->getId() ) )
     {
-//FIXME:       *theMessageWindow << "multiple definition of substance [" 
-//FIXME: 	<< newone->getId() << "] on [" << getId() << 
-//FIXME: 	  "], name and quantity overwrote.\n";
-      theSubstanceList[ newone->getId() ]->setName( newone->getName() );
-      Message aMessage( "Quantity", newone->getQuantity() );
-      theSubstanceList[ newone->getId() ]->set(aMessage);
       delete newone;
       //FIXME: throw exception
       return;
     }
   theSubstanceList[ newone->getId() ] = newone;
   newone->setSuperSystem( this );
-
 }
 
 SubstancePtr System::getSubstance( StringCref id ) throw( NotFound )
@@ -309,15 +303,13 @@ void System::addSystem( SystemPtr system )
 {
   if( containsSystem( system->getId() ) )
     {
-//FIXME:       *theMessageWindow << "multiple definition of system [" 
-//FIXME: 	<< system->getId() << "] on [" << getId() << 
-//FIXME: 	  "], later one discarded.\n";
       delete system;
       //FIXME: throw exception
       return;
     }
 
   theSubsystemList[ system->getId() ] = system;
+  system->setSuperSystem( this );
 
 }
 
