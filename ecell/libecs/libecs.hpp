@@ -75,13 +75,15 @@ DECLARE_CLASS( SystemMaker );
 
 DECLARE_CLASS( Exception );
 DECLARE_CLASS( UnexpectedError );
-DECLARE_CLASS( CantOpenFile );
+DECLARE_CLASS( NotFound );
+DECLARE_CLASS( CantOpen );
 DECLARE_CLASS( BadID );
 DECLARE_CLASS( MessageException );
-DECLARE_CLASS( BadMessage );
 DECLARE_CLASS( CallbackFailed );
+DECLARE_CLASS( BadMessage );
 DECLARE_CLASS( NoMethod );
 DECLARE_CLASS( NoSlot );
+DECLARE_CLASS( InvalidPrimitiveType );
 
 
 #endif // __KOYURUGI_H
