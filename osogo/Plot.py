@@ -30,13 +30,13 @@ class Plot:
 			    "brown","white","purple","black",
 			    "green", "orange","blue","red"]
 	    self.mes_dict = \
-		[['System', 'Size' , '??'],
-		['Variable', 'MolarConc', 'mol/l' ],
-		['Variable', 'NumberConc', '1/l' ],
-		['Variable', 'TotalVelocity', '??' ],
-		['Variable', 'Value', 'no. of molecules'],
-		['Variable', 'Velocity', '??' ],
-		['Process', 'Activity', '??'  ]]
+		[['System', 'Size' , 'size'],
+		['Variable', 'MolarConc', 'molar conc.' ],
+		['Variable', 'NumberConc', 'number conc.' ],
+		['Variable', 'TotalVelocity', 'total velocity' ],
+		['Variable', 'Value', 'value'],
+		['Variable', 'Velocity', 'velocity' ],
+		['Process', 'Activity', 'activity'  ]]
 
 	    self.xmes=''
 	    self.ymes=''
