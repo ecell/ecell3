@@ -73,10 +73,18 @@ LIBECS_DM_CLASS( ExpressionAssignmentProcess, ExpressionProcessBase )
   virtual void initialize()
     {
       ExpressionProcessBase::initialize();
-
-      theVariableReference = getVariableReference( theVariable );
+      
+      for( VariableReferenceVectorConstIterator
+	     i( getVariableReferenceVector().begin() );
+	   i != getVariableReferenceVector().end(); ++i )
+	{
+	  if( i->getCoefficient() != 0 )
+	    {
+	      theVariableReference = *i; 
+	    }
+	}
     }
-
+  
   virtual void fire()
     { 
       theVariableReference.setValue
