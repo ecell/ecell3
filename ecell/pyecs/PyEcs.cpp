@@ -30,6 +30,7 @@
 
 #include "libemc/libemc.hpp"
 #include "libemc/Simulator.hpp"
+#include "libecs/Exceptions.hpp"
 
 #include "PyEcs.hpp"
 
@@ -37,16 +38,31 @@ using namespace libemc;
 using namespace libecs;
 
 
+
+// exception translators
+
+//void translateException( libecs::ExceptionCref anException )
+//{
+//  PyErr_SetString( PyExc_RuntimeError, anException.what() );
+//}
+
+void translateException( const std::exception& anException )
+{
+  PyErr_SetString( PyExc_RuntimeError, anException.what() );
+}
+
+
 BOOST_PYTHON_MODULE( _ecs )
 {
+  using namespace boost::python;
 
   // pyecs uses Numeric module
   import_array();
 
 
   // PySimulator class
-  python::class_<Simulator>( "Simulator" )
-    .def( python::init<>() )
+  class_<Simulator>( "Simulator" )
+    .def( init<>() )
 
     // Stepper-related methods
     .def( "createStepper",                &Simulator::createStepper )
@@ -112,13 +128,16 @@ BOOST_PYTHON_MODULE( _ecs )
 
 
 
-  python::to_python_converter< Polymorph, Polymorph_to_python >();
-  python::to_python_converter< DataPointVectorRCPtr, 
+  to_python_converter< Polymorph, Polymorph_to_python >();
+  to_python_converter< DataPointVectorRCPtr, 
     DataPointVectorRCPtr_to_python >();
 
   register_Polymorph_from_python();
   register_EventCheckerRCPtr_from_python();
   register_EventHandlerRCPtr_from_python();
+
+  register_exception_translator<Exception>     ( &translateException );
+  register_exception_translator<std::exception>( &translateException );
 
 }
 
