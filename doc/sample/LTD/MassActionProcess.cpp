@@ -12,6 +12,7 @@
 #include "ecell3_dm.hpp"
 
 #define ECELL3_DM_TYPE Process
+#define ECELL3_DM_CLASSNAME MassActionProcess
 
 USE_LIBECS;
 
@@ -26,15 +27,15 @@ ECELL3_DM_CLASS
   
   ECELL3_DM_CLASSNAME()
     {
-      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, K );
+      ECELL3_CREATE_PROPERTYSLOT_SET_GET( Real, k );
     }
   
-  SIMPLE_SET_GET_METHOD( Real, K );
+  SIMPLE_SET_GET_METHOD( Real, k );
   
   virtual void process()
   {
     
-    Real velocity( K * N_A );
+    Real velocity( k * N_A );
     velocity *= getSuperSystem()->getVolume();
 
     for( VariableReferenceVectorConstIterator 
@@ -64,7 +65,7 @@ ECELL3_DM_CLASS
 
  protected:
   
-  Real K;
+  Real k;
     
 };
 
