@@ -56,6 +56,12 @@ namespace libemc
     delete &theModel;
   }
 
+  inline LoggerPtr LocalSimulatorImplementation::
+  getLogger( libecs::StringCref aFullPNString ) const
+  {
+    return getModel().getLoggerBroker().getLogger( aFullPNString );
+  }
+
   void LocalSimulatorImplementation::
   createStepper( libecs::StringCref          aClassname, 
 		 libecs::StringCref          anId )
@@ -171,10 +177,7 @@ namespace libemc
   const libecs::DataPointVectorRCPtr LocalSimulatorImplementation::
   getLoggerData( libecs::StringCref aFullPNString ) const
   {
-    LoggerCptr aLoggerPtr( getModel().getLoggerBroker().
-			   getLogger( aFullPNString ) );
-
-    return aLoggerPtr->getData();
+    return getLogger( aFullPNString )->getData();
   }
 
   const libecs::DataPointVectorRCPtr LocalSimulatorImplementation::
@@ -182,10 +185,7 @@ namespace libemc
 		 libecs::RealCref aStartTime, 
 		 libecs::RealCref anEndTime ) const
   {
-    LoggerCptr aLoggerPtr( getModel().getLoggerBroker().
-			   getLogger( aFullPNString ) );
-
-    return aLoggerPtr->getData( aStartTime, anEndTime );
+    return getLogger( aFullPNString )->getData( aStartTime, anEndTime );
   }
 
 
@@ -195,47 +195,33 @@ namespace libemc
 		 libecs::RealCref anEndTime,
 		 libecs::RealCref anInterval ) const
   {
-    LoggerCptr aLoggerPtr( getModel().getLoggerBroker().
-			   getLogger( aFullPNString ) );
-
-    return aLoggerPtr->getData( aStartTime, anEndTime, anInterval );
+    return getLogger( aFullPNString )->getData( aStartTime, anEndTime, 
+						anInterval );
   }
 
   const libecs::Real LocalSimulatorImplementation::
   getLoggerStartTime( libecs::StringCref aFullPNString ) const
   {
-    LoggerCptr aLoggerPtr( getModel().getLoggerBroker().
-			   getLogger( aFullPNString ) );
-
-    aLoggerPtr->getStartTime();
+    return getLogger( aFullPNString )->getStartTime();
   }
 
   const libecs::Real LocalSimulatorImplementation::
   getLoggerEndTime( libecs::StringCref aFullPNString ) const
   {
-    LoggerCptr aLoggerPtr( getModel().getLoggerBroker().
-			   getLogger( aFullPNString ) );
-
-    aLoggerPtr->getEndTime();
+    return getLogger( aFullPNString )->getEndTime();
   }
 
   const libecs::Real LocalSimulatorImplementation::
   getLoggerMinimumInterval( libecs::StringCref aFullPNString ) const
   {
-    LoggerCptr aLoggerPtr( getModel().getLoggerBroker().
-			   getLogger( aFullPNString ) );
-
-    aLoggerPtr->getMinimumInterval();
+    return getLogger( aFullPNString )->getMinimumInterval();
   }
 
 
   const libecs::Int LocalSimulatorImplementation::
   getLoggerSize( libecs::StringCref aFullPNString ) const
   {
-    LoggerCptr aLoggerPtr( getModel().getLoggerBroker().
-			   getLogger( aFullPNString ) );
-
-    aLoggerPtr->getSize();
+    return getLogger( aFullPNString )->getSize();
   }
 
 

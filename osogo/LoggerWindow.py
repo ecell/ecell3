@@ -242,11 +242,11 @@ class LoggerWindow(OsogoWindow):
 
 		# [1-2] interval must be > 0
 		# If interval is 0, exit this method.
-		aInterval = -1
+		anInterval = -1
 		if not self['datainterval_checkbox'].get_active():
-			aInterval = self['datainterval_spinbutton'].get_value()
+			anInterval = self['datainterval_spinbutton'].get_value()
 
-			if aInterval==0:
+			if anInterval==0:
 				self["statusbar"].push(1,'Set interval > 0.')
 				aErrorMessage='Interval must be > 0.!\n'
 				aWarningWindow = ConfirmWindow(0,aErrorMessage)
@@ -268,12 +268,12 @@ class LoggerWindow(OsogoWindow):
 		# [1-4] start < end
 		# If start >= end, exit this method.
 		aStartTime=-1
-		aEndTime=-1
+		anEndTime=-1
 		if not self['time_checkbox'].get_active():
 			aStartTime = self['start_spinbutton'].get_value()
-			aEndTime = self['end_spinbutton'].get_value()
+			anEndTime = self['end_spinbutton'].get_value()
 
-			if aStartTime >= aEndTime:
+			if aStartTime >= anEndTime:
 				self["statusbar"].push(1,'Set start time < end time.')
 				aErrorMessage='Start time must be < end time.!\n'
 				aWarningWindow = ConfirmWindow(0,aErrorMessage)
@@ -341,27 +341,36 @@ class LoggerWindow(OsogoWindow):
 				# -------------------------------------------------
 				# Gets logger
 				# -------------------------------------------------
-				aLogger = self.theSession.theSimulator.getLogger( aFullPNString )
-				if aStartTime == -1 or aEndTime == -1:
+#                               need check if the logger exists
+				aLoggerStub = LoggerStub( theSimulator, aFullPNString )
+				if not aLoggerStub.isExist():
+					aErrorMessage='\nLogger doesn\'t exist.!\n'
+					aWarningWindow = ConfirmWindow(0,aErrorMessage)
+					return None
+
+                                aLoggerStartTime= aLoggerStub.getStartTime()
+				aLoggerEndTime= aLoggerStub.getEndTime()
+
+				if aStartTime == -1 or anEndTime == -1:
 					# gets start time and end time from logger
-					aStartTime= aLogger.getStartTime()
-					aEndTime  = aLogger.getEndTime()
+					aStartTime = aLoggerStartTime
+					anEndTime = aLoggerEndTime
 				else:
 					# checks the value
-					if not (aLogger.getStartTime() < aStartTime < aLogger.getEndTime()):
-						aStartTime = aLogger.getStartTime()
-					if not (aLogger.getStartTime() < aEndTime < aLogger.getEndTime()):
-						aEndTime = aLogger.getEndTime()
+					if not ( aLoggerStartTime < aStartTime < aLoggerEndTime ):
+						aStartTime = aLoggerStartTime
+					if not ( aLoggerStartTime < anEndTime < aLoggerEndTime ):
+						anEndTime = aLoggerEndTime
 
 				# -------------------------------------------------
 				# gets the matrix data from logger.
 				# -------------------------------------------------
-				if aInterval == -1:
+				if anInterval == -1:
 					# gets data with specifing interval 
-					aMatrixData = aLogger.getData(aStartTime,aEndTime)
+					aMatrixData = aLoggerStub.getDataWithStartEnd( aStartTime, anEndTime )
 				else:
 					# gets data without specifing interval 
-					aMatrixData = aLogger.getData(aStartTime,aEndTime,aInterval)
+					aMatrixData = aLoggerStub.getDataWithStartEndInterval( aStartTime, anEndTime, anInterval )
 
 
 				# sets data name 
@@ -448,12 +457,12 @@ class LoggerWindow(OsogoWindow):
 
 		for aFullPNString in self.theFullPNList :
 
-			aLogger = self.theSession.getLogger( aFullPNString )
-			start = str( aLogger.getStartTime() )
+			aLoggerStub = LoggerStub( self.theSession.theSimulator, aFullPNString )
+			start = str( aLoggerStub.getStartTime() )
 			if self.theMainWindow.theRunningFlag:
 				end = 'running'
 			else:
-				end = str( aLogger.getEndTime() )
+				end = str( aLoggerStub.getEndTime() )
 			aList = [ aFullPNString, start, end ]
 			self.theList.append( aList )
 

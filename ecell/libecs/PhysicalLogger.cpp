@@ -58,9 +58,7 @@ namespace libecs
 
     while( i_start < ( i_end - 1 ) )
       {
-	// this can be removed if VVector's operator[] is a const method
-	Vector& aVector( const_cast<Vector&>( theVector ) );
-	if ( aVector[ iterator ].getTime() < time )
+	if ( theVector[ iterator ].getTime() < time )
 	  {
 	    i_start = iterator;
 	  }
@@ -101,8 +99,7 @@ namespace libecs
 	awhere = theVector.size(); 
       }
     
-    // this const_cast can be removed if vvector supports this const operation
-    *what = const_cast<Vector&>( theVector ) [ awhere ];
+    *what = theVector[ awhere ];
   }
 
   DataPointVectorRCPtr 
@@ -138,9 +135,7 @@ namespace libecs
 	  }
       }
 
-    DataPointVectorRCPtr aRCPtr( aVector );
-
-    return aRCPtr;
+    return DataPointVectorRCPtr( aVector );
   }
 
 

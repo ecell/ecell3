@@ -35,10 +35,7 @@ class Session:
                 self.theSimulator.step()
 
     def createLogger( self,fullpn ):
-        self.theSimulator.getLogger( fullpn )
-
-    def getLogger( self, fullpn ):
-        return self.theSimulator.getLogger( fullpn )
+        self.theSimulator.createLogger( fullpn )
 
     def getLoggerList( self ):
         return self.theSimulator.getLoggerList()

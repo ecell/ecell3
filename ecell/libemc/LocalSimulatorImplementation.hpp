@@ -141,6 +141,8 @@ namespace libemc
       return theModel; 
     }
 
+    libecs::LoggerPtr getLogger( libecs::StringCref aFullPNString ) const;
+
   private:
 
     void runWithEvent( libecs::Real aDuration );

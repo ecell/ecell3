@@ -169,7 +169,8 @@ class TracerWindow( OsogoPluginWindow ):
 
 			ID = fpn[2]
 			aFullPNString = createFullPNString( fpn )
-			self.theLoggerList.append(self.theSession.getLogger( aFullPNString ))
+			self.theSession.createLogger( aFullPNString )
+			self.theLoggerList.append( aFullPNString )
 			label = "label%d"%(n)
 			self[label].set_text(ID)
 			n += 1
@@ -194,8 +195,9 @@ class TracerWindow( OsogoPluginWindow ):
 	def updateLoggerDataList(self):
 		self.LoggerDataList =[]
 		for aLogger in self.theLoggerList:
-			aEndTime = aLogger.getEndTime()
-			self.LoggerDataList.append( aLogger.getData(self.StartTime, aEndTime, 1) )
+			aLoggerStub = LoggerStub( self.theSession.theSimulator, aLogger )
+			aEndTime = aLoggerStub.getEndTime()
+			self.LoggerDataList.append( aLoggerStub.getDataWithStartEndInterval(self.StartTime, aEndTime, 1) )
 
 		self.StartTime = aEndTime
 #            print aLogger.getData()[0]

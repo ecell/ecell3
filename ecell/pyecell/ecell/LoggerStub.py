@@ -70,11 +70,11 @@ class LoggerStub( PropertyInterfaceStub ):
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
 
-	def getLogger( self ):
+	def createLogger( self, anInterval=0.0 ):
 
-		self.theLogger = self.theSimulator.getLogger( self.theFullPNString )
+		self.theLogger = self.theSimulator.createLogger( self.theFullPNString, anInterval )
 
-	# end of getEntity
+	# end of createLogger
 
 
 	# ---------------------------------------------------------------
@@ -106,26 +106,16 @@ class LoggerStub( PropertyInterfaceStub ):
 	# This method can throw exceptions.
 	# ---------------------------------------------------------------
 
-	def getData( self ):
+	def getData( self, aStartTime=None, anEndTime=None, anInterval=None ):
 
-		return self.theLogger.getData()
+		if aStartTime == None or anEndTime == None:
+			return self.theSimulator.getLoggerData( self.theFullPNString )
+		elif anInterval == None:
+			return self.getDataWithStartEnd( aStartTime, anEndTime )
+		else:
+			return self.getDataWithStartEndInterval( aStartTime, anEndTime, anInterval )
 
-	# end of isExist
-
-
-	# ---------------------------------------------------------------
-	# getData
-	#
-	# return -> data (matrix of double)
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def getData( self ):
-
-		return self.theLogger.getData()
-
-	# end of isExist
-
+	# end of getData
 
 	# ---------------------------------------------------------------
 	# getDataWithStartEnd
@@ -139,7 +129,7 @@ class LoggerStub( PropertyInterfaceStub ):
 
 	def getDataWithStartEnd( self, aStartTime, anEndTime ):
 
-		return self.theLogger.getData( aStartTime, anEndTime )
+		return self.theSimulator.getLoggerData( self.theFullPNString, aStartTime, anEndTime )
 
 	# end of isExist
 
@@ -157,7 +147,7 @@ class LoggerStub( PropertyInterfaceStub ):
 
 	def getDataWithStartEndInterval( self, aStartTime, anEndTime, anInterval ):
 
-		return self.theLogger.getData( aStartTime, anEndTime, anInterval )
+		return self.theSimulator.getLoggerData( self.theFullPNString, aStartTime, anEndTime, anInterval )
 
 	# end of getDataWithStartEndInterval
 
@@ -171,7 +161,7 @@ class LoggerStub( PropertyInterfaceStub ):
 
 	def getStartTime( self ):
 
-		return self.theLogger.getStartTime()
+		return self.theSimulator.getLoggerStartTime( self.theFullPNString )
 
 	# end of getStartTime
 
@@ -185,7 +175,7 @@ class LoggerStub( PropertyInterfaceStub ):
 
 	def getEndTime( self ):
 
-		return self.theLogger.getEndTime()
+		return self.theSimulator.getLoggerEndTime( self.theFullPNString )
 
 	# end of getEndTime
 
@@ -199,7 +189,7 @@ class LoggerStub( PropertyInterfaceStub ):
 
 	def getSize( self ):
 
-		return self.theLogger.getSize()
+		return self.theSimulator.getLoggerSize( self.theFullPNString )
 
 	# end of getSize
 
@@ -213,26 +203,9 @@ class LoggerStub( PropertyInterfaceStub ):
 
 	def getMinimumInterval( self ):
 
-		return self.theLogger.getInterval()
+		return self.theSimulator.getLoggerMinimumInterval( self.theFullPNString )
 
 	# end of getInterval
-
-
-	# ---------------------------------------------------------------
-	# appendData
-	#
-	# Data -> data to set
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def appendData( self, Data ):
-
-		self.theLogger.appendData( Data )
-
-	# end of appendData
-
 
 # end of LoggerStub
 
