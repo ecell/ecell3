@@ -1,29 +1,26 @@
-#include "Simulator.h"
-#include "StepCommand.h"
+#include "Simulator.hpp"
 
 Simulator::Simulator()
 {
   theSimulatorImplementation = new SimulatorImplementation();
 }
 
-void Simulator::pushCommand( Command* command )
+void Simulator::makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name )
 {
-  theSimulatorImplementation->pushCommand( command );
+  theSimulatorImplementation->makePrimitive( classname, fqpn, name );
 }
 
-void Simulator::popCommand()
+void Simulator::sendMessage( FQPNCref fqpn, Message message )
 {
-  theSimulatorImplementation->popCommand();
+  theSimulatorImplementation->sendMessage( fqpn, message );
 }
 
-void Simulator::test()
+Message Simulator::getMessage( FQPNCref fqpn, StringCref propertyName )
 {
-  Command* command = new StepCommand();
-  theSimulatorImplementation->pushCommand( command );
+  theSimulatorImplementation->sendMessage( fqpn, message );
 }
 
-
-
-
-
-
+void Simulator::step()
+{
+  theSimulatorImplementation->step();
+}

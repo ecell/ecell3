@@ -1,10 +1,8 @@
 #include <iostream>
 
-#include "PyEcs.h"
-#include "PySimulator.h"
-#include "Simulator.h"
-#include "StepCommand.h"
-#include "MakeSystemCommand.h"
+#include "PyEcs.hpp"
+#include "PySimulator.hpp"
+#include "Simulator.hpp"
 
 //-----------------//
 // PyEcs class     //
@@ -14,53 +12,55 @@ PyEcs::PyEcs()
   :
   Py::ExtensionModule<PyEcs>("ecs")
 {
-  add_varargs_method( "simulator", &PyEcs::simulator );
+  add_varargs_method( "makeSimulator", &PyEcs::makeSimulator );
+  add_varargs_method( "makePrimitive", &PyEcs::makePrimitive );
+  add_varargs_method( "sendMessage", &PyEcs::sendMessage );
+  add_varargs_method( "getMessage", &PyEcs::getMessage );
   add_varargs_method( "step", &PyEcs::step );
-  add_varargs_method( "makeSystem", &PyEcs::makeSystem );
   initialize();
 }
 
-Py::Object PyEcs::simulator( const Py::Tuple& args )
+Py::Object PyEcs::makeSimulator( const Py::Tuple& args )
 {
-  cout<<"this is PyEcs::simulator module."<<endl;
-  PySimulator* simulator = new PySimulator();
-  return Py::asObject( simulator );
+  cout<<"this is PyEcs::makeSimulator module."<<endl;
+  PySimulator* pySimulator = new PySimulator();
+  return Py::asObject( pySimulator );
 }
 
 Py::Object PyEcs::step( const Py::Tuple& args )
 {
   cout<<"this is PyEcs::step module."<<endl;
-
-  //  Command* command = new StepCommand();
-  //  simulator.pushCommand( command );
-  //  simulator.Simulator::pushCommand( command );
-  //(PySimulator&)args[0].test( Py::Tuple() );
-  //  PySimulator& simulator = ( PySimulator& )args[0];
-  //  simulator.test( Py::Tuple() );
-  //  ( ( PySimulator& )args[0] ).test( Py::Tuple() );
-  //  simulator.test( Py::Tuple() );
-  //  PySimulator* simulator = ((PySimulator&)args[0]).getPySimulatorPtr();
   Simulator* simulator = ((PySimulator&)args[0]).getSimulatorPtr();
-  simulator->test();
+  simulator->step();
 
   return Py::Object();
 }
 
-Py::Object PyEcs::makeSystem( const Py::Tuple& args )
+Py::Object PyEcs::makePrimitive( const Py::Tuple& args )
 {
-  cout<<"this is PyEcs::makeSystem module."<<endl;
+  cout<<"this is PyEcs::makePrimitive module."<<endl;
 
   const string classname = (string)(Py::String)args[1];
   const string fqen = (string)(Py::String)args[2];
   const string name = (string)(Py::String)args[3];
 
-  PySimulator& simulator = (PySimulator&)args[0]; 
-  Command* command = new MakeSystemCommand( classname, fqen, name );
-  simulator.pushCommand( command );
+  //  PySimulator& simulator = (PySimulator&)args[0]; 
 
   return Py::Object();
 }
   
+Py::Object PyEcs::sendMessage( const Py::Tuple& args )
+{
+  cout<<"this is PyEcs::sendMessage module."<<endl;
+  return Py::Object();
+}
+
+Py::Object PyEcs::getMessage( const Py::Tuple& args )
+{
+  cout<<"this is PyEcs::getMessage module."<<endl;
+  return Py::Object();
+}
+
 void initecs()
 {
   static PyEcs* ecs = new PyEcs();

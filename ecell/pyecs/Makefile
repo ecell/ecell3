@@ -12,8 +12,7 @@ LIBKORANDOM=$(ECELLDIR)/korandom/libkorandom.a
 G++ = /usr/local/bin/g++
 #G++ = /usr/bin/g++
 
-#all:	PyEcs.o	PySimulator.o SimulatorImplementation.o  Command.o StepCommand.o MakeSystemCommand.o Simulator.o PyEcs.so
-all:	PyEcs.o	PySimulator.o SimulatorImplementation.o  Command.o StepCommand.o Simulator.o PyEcs.so
+all:	SimulatorImplementation.o Simulator.o PyEcs.o PySimulator.o PyEcs.so
 
 PyEcs.o:	PyEcs.hpp PyEcs.cpp 
 	$(G++) -I$(CXX) -I$(PYLIB) $(ECELL_INCLUDE) -c PyEcs.cpp
@@ -27,18 +26,8 @@ SimulatorImplementation.o: SimulatorImplementation.hpp SimulatorImplementation.c
 Simulator.o:	Simulator.hpp	Simulator.cpp
 	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c Simulator.cpp
 
-Command.o:	Command.cpp Command.hpp
-	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c Command.cpp
-
-StepCommand.o:	StepCommand.cpp	StepCommand.hpp
-	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c StepCommand.cpp
-
-MakeSystemCommand.o:	MakeSystemCommand.cpp	MakeSystemCommand.hpp
-	$(G++) $(ECELL_INCLUDE) $(THREAD_OPTION) -c MakeSystemCommand.cpp
-
-#PyEcs.so: PyEcs.o PySimulator.o Simulator.o SimulatorImplementation.o Command.o StepCommand.o MakeSystemCommand.o  Makefile
-PyEcs.so: PyEcs.o PySimulator.o Simulator.o SimulatorImplementation.o Command.o StepCommand.o Makefile
-	$(G++) --shared $(CXXO)/*.o StepCommand.o Command.o Simulator.o SimulatorImplementation.o PySimulator.o PyEcs.o $(LIBECSCORE) $(LIBKORANDOM) $(LIBUTIL) $(COMMON_CPP)/*.a -o ecs.so
+PyEcs.so: PyEcs.o PySimulator.o Simulator.o SimulatorImplementation.o Makefile
+	$(G++) --shared $(CXXO)/*.o Simulator.o SimulatorImplementation.o PySimulator.o PyEcs.o $(LIBECSCORE) $(LIBKORANDOM) $(LIBUTIL) $(COMMON_CPP)/*.a -o ecs.so
 
 clean:
 	rm -f *.o *~ *.so core

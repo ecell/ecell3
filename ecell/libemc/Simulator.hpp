@@ -1,9 +1,7 @@
 #ifndef ___SIMULATOR_H___
 #define ___SIMULATOR_H___
 
-#include "SimulatorImplementation.h"
-
-#include <string>
+#include "SimulatorImplementation.hpp"
 
 class Simulator
 {
@@ -15,19 +13,10 @@ public:
   Simulator();
   ~Simulator(){};
 
-  void pushCommand( Command* );
-  void popCommand();
-  void test();
+  void makePrimitive( StringCref, FQPNCref, StringCref );
+  void sendMessage( FQPNCref, Message );
+  Message getMessage( FQPNCref, StringCref );
+  void step();
 };
 
 #endif   /* ___SIMULATOR_H___ */
-
-
-
-
-
-
-
-
-
-

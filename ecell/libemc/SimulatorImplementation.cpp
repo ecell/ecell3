@@ -1,4 +1,4 @@
-#include "SimulatorImplementation.h"
+#include "SimulatorImplementation.hpp"
 
 RootSystem* theRootSystem = new RootSystem();
 
@@ -6,17 +6,22 @@ SimulatorImplementation::SimulatorImplementation()
 {
 }
 
-void SimulatorImplementation::pushCommand( Command* command )
+void SimulatorImplementation::makePrimitive( StringCref classname, FQPNCref fqpn, StringCref name )
 {
-  cout << "this is SimulatorImplementation::pushCommand()." << endl;
-  theCommandQueue.push( command );
 }
 
-void SimulatorImplementation::popCommand()
+void SimulatorImplementation::sendMessage( FQPNCref fqpn, MessageCref message )
 {
-  cout << "this is SimulatorImplementation::popCommand()." << endl;
-  theCommandQueue.front()->setRootSystem( getRootSystemPtr() );
-  theCommandQueue.front()->doit();
-  theCommandQueue.pop();
 }
+
+Message SimulatorImplementation::getMessage( FQPNCref fqpn, StringCref propertyName )
+{
+}
+
+void SimulatorImplementation::step()
+{
+  //  theRootSystem->getStepperLeader().step();  
+}
+
+
 

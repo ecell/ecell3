@@ -1,5 +1,5 @@
-#ifndef ___PYECS_HPP___
-#define ___PYECS_HPP___
+#ifndef ___PYECS_H___
+#define ___PYECS_H___
 
 #include "CXX/Extensions.hxx"
 
@@ -15,9 +15,11 @@ public:
  
   static void init_type();
   
-  Py::Object simulator( const Py::Tuple& args );
+  Py::Object makeSimulator( const Py::Tuple& args );
+  Py::Object makePrimitive( const Py::Tuple& args );
+  Py::Object sendMessage( const Py::Tuple& args );
+  Py::Object getMessage( const Py::Tuple& args );
   Py::Object step( const Py::Tuple& args );
-  Py::Object makeSystem( const Py::Tuple& args );
 
 private:
 
@@ -25,7 +27,7 @@ private:
 
 extern "C" void initecs();
 
-#endif   /* ___PYECS_HPP___ */
+#endif   /* ___PYECS_H___ */
 
 
 
