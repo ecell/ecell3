@@ -305,6 +305,8 @@ class SessionProxy:
 		extrafilelist(list of str)  -- extra file list
 		Return None
 		''' 
+		if type(extrafilelist) != list:
+			extrafilelist = [extrafilelist]
 
 		# set the extra file list
 		self.__theExtraFileList = extrafilelist
@@ -488,7 +490,12 @@ class SessionProxy:
 		'''
 
 		# return job directory
-		return self.__theJobDirectory
+		# if self.__theJobDirectory does notend with os.sep
+		# append os.sep
+		if self.__theJobDirectory[-1] != os.sep:
+			return self.__theJobDirectory + os.sep
+		else:
+			return self.__theJobDirectory
 
 
 	def clearJobDirectory(self):
