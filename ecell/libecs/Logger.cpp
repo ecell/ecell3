@@ -41,7 +41,17 @@
 namespace libecs
 {
 
-// Constructor
+  // Default Constructor
+
+  Logger::Logger( void )
+    :
+    theMinimumInterval( 0.0 ),
+    theCurrentInterval( 0.0 )
+  {
+    theMessageCallbackCptr = 0;
+  } 
+
+  // Constructor
 
 
   Logger::Logger( AbstractMessageCallbackCptr aMessageCallbackPtr )

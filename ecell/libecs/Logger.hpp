@@ -88,6 +88,12 @@ namespace libecs
   public:
 
     /**
+       Default constructor
+    */
+  
+    Logger( void );
+
+    /**
        Constructor
     */
   
@@ -174,6 +180,15 @@ namespace libecs
       return theCurrentInterval;
     }
 
+    /**
+
+     */
+
+    void setMessageCallback( AbstractMessageCallbackCptr aMessageCallback )
+    {
+      theMessageCallbackCptr = aMessageCallback;
+    }
+
   protected:
 
     /**
@@ -219,10 +234,6 @@ namespace libecs
 
   private:
 
-
-    /// Default constructor is hidden
-  
-    Logger( void );
 
     /// Assignment operator is hidden
   
