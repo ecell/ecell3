@@ -45,15 +45,14 @@ namespace libecs
 
   /** \file */
 
+  class LongDataPoint;
+  class DataPoint;
+
 
 
   /**
 
   */
-
-  class DataPointLong;
-  class DataPoint;
-// two element size datapoint
 
   class DataPoint 
   {
@@ -145,7 +144,11 @@ namespace libecs
       return 2;
     }
    
-    DataPointRef operator = ( DataPointLongCref );
+    DataPointRef operator = ( LongDataPointCref )
+    {
+      setTime( aLongDataPoint.getTime() );
+      setValue ( aLongDataPoint.getValue() );
+    }
 
   protected:
 
@@ -156,71 +159,58 @@ namespace libecs
 
 
 
-  class DataPointLong :
-	public DataPoint
+  class LongDataPoint 
+    :
+    public DataPoint
   {
-
 
   public:
 
-    DataPointLong() //constructor with no arguments
-     
+    LongDataPoint() //constructor with no arguments
+      :
+    theAvg( 0.0 ),
+    theMax( 0.0 ),
+    theMin( 0.0 )
     {
-      theTime = 0.0 ;
-      theValue = 0.0 ;
-      theAvg = 0.0 ;
-      theMax = 0.0 ;
-      theMin = 0.0 ;
-
+      ; // do nothing
     }
 
 
-    DataPointLong( RealParam aTime, RealParam aValue ) //constructor with 2 args
-    
+    LongDataPoint( RealParam aTime, RealParam aValue )//constructor with 2 args
+      :
+    DataPoint( aTime, aValue ),
+    theAvg( aValue ),
+    theMax( aValue ),
+    theMin( aValue )
     {
-      theTime = aTime ;
-      theValue = aValue ;
-      theAvg = aValue ;
-      theMax = aValue ;
-      theMin = aValue ;
+      ; // do nothing
     }
 
-    DataPointLong( RealParam aTime, RealParam aValue, RealParam anAvg,
-		RealParam aMax, RealParam aMin ) //constructor with 5 args
-
+    LongDataPoint( RealParam aTime, RealParam aValue, 
+		   RealParam anAvg,
+		   RealParam aMax, 
+		   RealParam aMin ) //constructor with 5 args
+      :
+    DataPoint( aTime, aValue ),
+    theAvg( anAvg ),
+    theMin( aMin ),
+    theMax( aMax )
     {
-      theTime = aTime ;
-      theValue = aValue ;
-      theAvg = anAvg ;
-      theMax = aMax ;
-      theMin = aMin ;
+      ; // do nothing
     }
 
 
-    DataPointLong( DataPointCref aDataPoint) // constructor from DP2
+    LongDataPoint( DataPointCref aDataPoint ) // constructor from DP2
+      :
+    DataPoint( aDataPoint ),
+    theAvg( aDataPoint.getAvg() ),
+    theMin( aDataPoint.getMin() ),
+    theMax( aDataPoint.getMax() )
     {
-      
-      
-      theTime = aDataPoint.getTime() ;
-      theValue = aDataPoint.getValue() ;
-      theAvg = aDataPoint.getAvg() ;
-      theMin = aDataPoint.getMin() ;
-      theMax = aDataPoint.getMax() ;
-      
-      
+      ; // do nothing
     }
     
-    
-    DataPointLongRef operator = ( DataPointCref aDataPoint )
-    {
-      setTime( aDataPoint.getTime() );
-      setValue ( aDataPoint.getValue() );
-      setAvg ( aDataPoint.getAvg() );
-      setMin ( aDataPoint.getMin() );
-      setMax ( aDataPoint.getMax() );
-    }
-    
-    ~DataPointLong()
+    ~LongDataPoint()
     {
       ; // do nothing
     }
@@ -279,7 +269,7 @@ namespace libecs
 
     static const size_t getElementSize()
     {
-      return sizeof( Real);
+      return sizeof( Real );
     }
 
     static const int getElementNumber()
@@ -290,8 +280,8 @@ namespace libecs
   protected:
 
     Real theAvg;
-    Real theMax;
     Real theMin;
+    Real theMax;
 
   };
 
@@ -304,29 +294,29 @@ namespace libecs
     
     DataPointAggregator();
     
-    DataPointAggregator( DataPointLongCref );
+    DataPointAggregator( LongDataPointCref );
     
     
     ~DataPointAggregator();
     
-    void aggregate( DataPointLongCref );
+    void aggregate( LongDataPointCref );
     
-    DataPointLongCref getData();
+    LongDataPointCref getData();
     
     void beginNextPoint();
     
-    DataPointLong getLastPoint();
+    LongDataPoint getLastPoint();
     
   private:
-    void store( DataPointLongCref );
+    void store( LongDataPointCref );
     
-    bool stockpile( DataPointLongRef, DataPointLongCref );
-    void calculate( DataPointLongCref );
-    void calculateMinMax( DataPointLongRef, DataPointLongCref );
+    bool stockpile( LongDataPointRef, LongDataPointCref );
+    void calculate( LongDataPointCref );
+    void calculateMinMax( LongDataPointRef, LongDataPointCref );
     
-    DataPointLong theAccumulator;
-    DataPointLong theCollector;
-    DataPointLong thePreviousPoint;
+    LongDataPoint theAccumulator;
+    LongDataPoint theCollector;
+    LongDataPoint thePreviousPoint;
     
   };
   

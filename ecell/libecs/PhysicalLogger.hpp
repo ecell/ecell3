@@ -31,11 +31,12 @@
 #if !defined(__PHYSICALLOGGER_HPP)
 #define __PHYSICALLOGGER_HPP
 
-#include "Exceptions.hpp"
-#include "VVector.h"
-#include "DataPoint.hpp"
-
 #include "libecs.hpp"
+
+#include "VVector.h"
+
+#include "Exceptions.hpp"
+#include "DataPoint.hpp"
 #include "DataPointVector.hpp"
 
 namespace libecs
@@ -44,128 +45,155 @@ namespace libecs
 
   /** @addtogroup logging
    *@{
-  */
+   */
 
   /** @file */
-
 
 
   class PhysicalLogger
   {
 
+    //    DECLARE_TYPE( _DATAPOINT, DATAPOINT );
+    //    typedef vvector<DATAPOINT> Vector;
+
     typedef vvector<DataPoint> Vector;
-    typedef vvector<DataPointLong> VectorLong;
     
   public:
 
-    DECLARE_TYPE( Vector::size_type, iterator );
+    DECLARE_TYPE( Vector::size_type, VectorIterator );
     DECLARE_TYPE( Vector::size_type, size_type );
 
-    PhysicalLogger(int );
+    PhysicalLogger()
+    {
+      setMaxSize( 0 ); // no limit
+    }
 
     virtual ~PhysicalLogger()
     {
       ; // do nothing
     }
 	
-    void push( DataPointCref  );
-
-    void push( DataPointLongCref  );
-
-    void aggregate( DataPointCref );
-
-    void aggregate( DataPointLongCref );
-
-    void flushAggregate();
-
-    DataPointLongCref getAggregate()
+    void push( DataPointCref aDataPoint )
     {
-      return theAggregator.getData();
+      theVector.push_back( aDataPoint );
     }
 
-    int getElementCount()
+    void setEndPolicy( Integer anEndPolicy )
     {
-      return theElementCount;
+      theVector.setEndPolicy ( anEndPolicy );
     }
 
-    void resetElementCount()
+    int getEndPolicy() const
     {
-      theElementCount = 0;
+      return theVector.getEndPolicy();
     }
 
-    void setEndPolicy( Integer );
+    /// set max storage size in Kbytes.
 
-    void setMaxSize( iterator );
+    void setMaxSize( size_type aMaxSize )
+    {
+      theMaxSize = aMaxSize;
+      theVector.setMaxSize( ( theMaxSize * 1024 ) / 
+			    sizeof( DataPoint ) );
+    }
 
+    size_type getMaxSize() const
+    {
+      return theMaxSize;
+    }
 
-    iterator lower_bound( const iterator& start,
-			  const iterator& end,
-			  const Real time ) const;
+    size_type lower_bound( const size_type start,
+			   const size_type end,
+			   const Real time ) const;
 
-    iterator upper_bound( const iterator& start,
-			  const iterator& end,
-			  const Real time ) const;
+    size_type upper_bound( const size_type start,
+			   const size_type end,
+			   const Real time ) const;
 
-    iterator lower_bound_linear( const iterator& start,
-				 const iterator& end,
-				 const Real time ) const;
+    size_type lower_bound_linear( const size_type start,
+				  const size_type end,
+				  const Real time ) const;
 
-    iterator upper_bound_linear( const iterator& start,
-				 const iterator& end,
-				 const Real time ) const;
+    size_type upper_bound_linear( const size_type start,
+				  const size_type end,
+				  const Real time ) const;
 
-    iterator lower_bound_linear_backwards( const iterator& start,
-					   const iterator& end,
-					   const Real time ) const;
+    size_type lower_bound_linear_backwards( const size_type start,
+					    const size_type end,
+					    const Real time ) const;
 
-    iterator lower_bound_linear_estimate( const iterator& start,
-					  const iterator& end,
-					  const Real time,
-					  const Real time_per_step ) const;
+    size_type lower_bound_linear_estimate( const size_type start,
+					   const size_type end,
+					   const Real time,
+					   const Real time_per_step ) const;
 
-    iterator upper_bound_linear_estimate( const iterator& start,
-					  const iterator& end,
-					  const Real time,
-					  const Real time_per_step ) const;
+    size_type upper_bound_linear_estimate( const size_type start,
+					   const size_type end,
+					   const Real time,
+					   const Real time_per_step ) const;
     
-    iterator next_index( const iterator& start) const;
-
-    void getItem( const iterator&, DataPointPtr ) const;
-    
-    DataPointVectorSharedPtr getVector( const iterator& start,
-					const iterator& end ) const;
+    DataPointVectorSharedPtr getVector( const size_type start,
+					const size_type end ) const;
 
     size_type size() const;
 
     bool empty() const;
 
-    DataPointLong front() const;
 
-    DataPointLong back() const;
+    LongDataPoint at( size_type index) const
+    {
+      return theVector[ index ];
+    }
+    
+    size_type begin() const
+    {
+      return 0;
+    }
+    
+    
+    size_type end() const
+    {
+      if ( size() > 0 )
+	{
+	  return size() - 1;
+	}
+      else
+	{
+	  return 0;
+	}
+    }
 
-    iterator begin() const;
 
-    iterator end() const;
-
+    LongDataPoint front() const
+    {
+      if ( empty() )
+	{
+	  return DataPoint();
+	}
+      
+      return at( begin() );
+    }
+    
+    LongDataPoint back() const
+    {
+      if ( empty() )
+	{
+	  return DataPoint();
+	}
+      
+      return at( end() );
+    }
+  
     Real getAverageInterval() const;
 
-    DataPointLong at( const iterator& ) const;
-
   private:
-    iterator            theCurrentPosition;
-    DataPoint           anEmptyDataPoint;
 
     // this mutable can be removed if vvector supports const operations
     mutable Vector      theVector;
-    mutable VectorLong  theVectorLong;
-    Integer             PointSize;
-    DataPointAggregator theAggregator;
-    int                 theElementCount;
-    
+
+    size_type      theMaxSize;
+
   };
-
-
-  DECLARE_TYPE( PhysicalLogger::iterator, PhysicalLoggerIterator );
 
 
   //@}

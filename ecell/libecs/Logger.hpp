@@ -2,7 +2,7 @@
 //
 //        This file is part of E-Cell Simulation Environment package
 //
-//                Copyright (C) 2000-2001 Keio University
+//                Copyright (C) 2000-2004 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -28,6 +28,7 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 // modified by Gabor Bereczki <gabor.bereczki@talk21.com>
+// modified by Kouichi Takahashi <shafi@e-cell.org>
 
 
 
@@ -35,6 +36,9 @@
 #define __LOGGER_HPP
 
 #include <vector>
+
+#include <boost/utility.hpp>
+
 #include "libecs.hpp"
 #include "LoggerAdapter.hpp"
 #include "PhysicalLogger.hpp"
@@ -43,9 +47,6 @@
 
 namespace libecs
 {
-
-
-  
 
 
   /** @addtogroup logging The Data Logging Module.
@@ -65,16 +66,16 @@ namespace libecs
   */
 
   class Logger
+    :
+    private boost::noncopyable
   {
 
-    
   public:
-    
-    static const int LOGGER_DIVIDE_STEP = 200;
-    static const int MAX_SUBLOGGER_NUMBER = 4;
+
+    DECLARE_TYPE( PhysicalLogger::size_type, size_type );
     
     // enumeration for logging policy
-    enum  Policy
+    enum Policy
       {
 	STEP_SIZE = 0,
 	TIME_INTERVAL,
@@ -86,13 +87,13 @@ namespace libecs
   public:
 
     /**
-       Constructor
+       Constructor.
+
+       Takes up the ownership of the given LoggerAdapter.
 
     */
   
-    //    explicit Logger( ModelCref aModel, PropertySlotRef aPropertySlot );
-    //    explicit Logger( PropertySlotRef aPropertySlot );
-    explicit Logger( LoggerAdapterPtr aLoggerAdapter );
+    Logger( LoggerAdapterPtr aLoggerAdapter );
   
     /// Destructor
 
@@ -102,12 +103,22 @@ namespace libecs
     /**
     
     Sets logging policy that is a vector of 4 numerical values. 
-    0 - minimum step size between logs
-    1 - minimum time interval between logs
-    2 - action to be taken when disk space runs out
-    3 - user set max disk space, if 0 nothing 
+    0 (int)  - minimum step size between logs
+    1 (real) - minimum time interval between logs
+    2 (int) - action to be taken when disk space runs out
+    3 (int) - user set max disk space, if 0 nothing 
     
+    */
 
+    void setLoggerPolicy( IntegerParam aMinimumStep,
+			  RealParam    aMinimumTimeInterval,
+			  IntegerParam anEndPolicy,
+			  IntegerParam aMaxSpace );
+
+    /**
+    
+    Sets logging policy as a PolymorphVector of 4 numerical values. 
+    
     */
 
     void setLoggerPolicy( PolymorphCref aParamList );
@@ -119,56 +130,40 @@ namespace libecs
 
     */
 
-    PolymorphCref getLoggerPolicy( void )
-    {
-
-      return theLoggingPolicy;
-    }
-
+    const Polymorph getLoggerPolicy( void );
 
     /**
 
-      Log current value of logger FullPN
+      Log current value that theLoggerAdapter gives with aTime.
 
     */
 
-
-    void log( RealParam aTime )
-
-    {
-      appendData( aTime, theLoggerAdapter->getValue() );
-    }
+    void log( RealParam aTime );
 
 
     /**
-
-    Returns contents of the whole logger.
+       Returns contents of the whole logger.
 
     */
 
     DataPointVectorSharedPtr getData( void ) const;
 
     /**
+       Returns a slice of the data from aStartTime to anEndTime.
 
-
-    @note It is assumed for both following getData methods that the
-       Time values returned by GetCurrentTime method are monotonously
-       increasing, therefore
-       - a newer theTime is always greater than previous
-       - no 2 theTime values are the same 
-    */
-
-    DataPointVectorSharedPtr getData( RealParam aStartTine,
-				  RealParam anEndTime ) const;
-
-    /**
-    Returns a summary of the data from aStartTime to anEndTime with at least 
-    intervals anInterval between data elements
     */
 
     DataPointVectorSharedPtr getData( RealParam aStartTime,
-				  RealParam anEndTime, 
-				  RealParam anInterval ) const;
+				      RealParam anEndTime ) const;
+
+    /**
+       Returns a summary of the data from aStartTime to anEndTime with
+       intervals anInterval between data elements.
+    */
+
+    DataPointVectorSharedPtr getData( RealParam aStartTime,
+				      RealParam anEndTime, 
+				      RealParam anInterval ) const;
     
 
 
@@ -176,21 +171,21 @@ namespace libecs
        Returns time of the first element  in Logger.
     */
 
-    Real getStartTime( void ) const;
+    const Real getStartTime( void ) const;
 
     /**
        Returns time of the last element in Logger
     */
 
-    Real getEndTime( void ) const;
+    const Real getEndTime( void ) const;
 
     /**
       Returns size of logger
     */
 
-    const int getSize() const
+    const size_type getSize() const
     {
-      return thePrimaryPhysicalLogger.size();
+      return thePhysicalLogger.size();
     }
 
     /**
@@ -212,11 +207,13 @@ namespace libecs
 
 
     /**
-       Forces logger to write data even if mimimuminterval or
-       step count has not been exceeded.
+       This method does nothing as of version 3.1.103.
     */
 
-    void flush();
+    void flush()
+    {
+      ; // do nothing
+    }
 
 
   protected:
@@ -228,57 +225,47 @@ namespace libecs
     */
 
     DataPointVectorIterator binary_search( DataPointVectorIterator begin,
-				  DataPointVectorIterator end,
-				  RealParam t ) 
+					   DataPointVectorIterator end,
+					   RealParam t ) 
     {
-      return thePrimaryPhysicalLogger.lower_bound( thePrimaryPhysicalLogger.begin(), 
-						 thePrimaryPhysicalLogger.end(), 
-						 t );
+      return thePhysicalLogger.lower_bound( thePhysicalLogger.begin(), 
+					    thePhysicalLogger.end(), 
+					    t );
     }
     
+  protected:
 
     /**
        Writes data (aTime, aValue ) onto the logger
     */
 
-    void appendData( RealParam aTime, RealParam aValue );
+    void pushData( RealParam aTime, RealParam aValue )
+    {
+      thePhysicalLogger.push( DataPoint( aTime, aValue ) );
+    }
 
+    static DataPointVectorSharedPtr createEmptyVector();
 
   private:
-    
-    DataPointVectorSharedPtr anEmptyVector(void) const;
-
-    // no copy constructor
-  
-    Logger( LoggerCref );
-
-    /// Assignment operator is hidden
-  
-    LoggerRef operator=(  LoggerCref );
 
     /// no default constructor
-
     Logger( void );
-  
-    void aggregate( DataPointLongCref , int );
-
-    void setSubLoggerPolicy( int );
 
 
   private:
 
     /// Data members
 
-    //    PropertySlotRef      thePropertySlot;
-    LoggerAdapterPtr          theLoggerAdapter;
-    PhysicalLogger            thePrimaryPhysicalLogger;
-    PhysicalLoggerVector      theSubPhysicalLoggerArray;
-    Real                      theLastTime;
-    PhysicalLoggerIterator    theStepCounter;
-    Integer                   theMinimumStep; //0-minimum step, 1 minimum time 3 end policy 4 max space available in kbytes
-    Real                      theMinimumInterval;
-    Polymorph	              theLoggingPolicy;
-    PhysicalLoggerIterator    thePrimaryMaxSize;
+    PhysicalLogger              thePhysicalLogger;
+
+    LoggerAdapterPtr                     theLoggerAdapter;
+
+    PhysicalLogger::size_type   theStepCounter;
+    Integer                              theMinimumStep; 
+
+    Real                                 theLastTime;
+    Real                                 theMinimumInterval;
+
   };
 
 

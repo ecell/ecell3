@@ -37,33 +37,29 @@ namespace libecs
 {
   
   
-  DataPointRef DataPoint::operator = ( DataPointLongCref aDataPointLong )
-  {
-    setTime( aDataPointLong.getTime() );
-    setValue ( aDataPointLong.getValue() );
-  }
-  
-  
   DataPointAggregator::DataPointAggregator()
     :
     theAccumulator( -1.0, 0.0 ),
     theCollector ( -1.0, 0.0 ),
     thePreviousPoint( 1.0, 0.0 )
-    
   {
     ; //do nothing
   }
   
-  DataPointAggregator::DataPointAggregator( DataPointLongCref aDataPoint )
-    
+
+  DataPointAggregator::DataPointAggregator( LongDataPointCref aDataPoint )
   {
     store( aDataPoint );
   }
   
-  DataPointAggregator::~DataPointAggregator(){}
+
+  DataPointAggregator::~DataPointAggregator()
+  {
+    ; // do nothing
+  }
   
   
-  void DataPointAggregator::store( DataPointLongCref aDataPoint )
+  void DataPointAggregator::store( LongDataPointCref aDataPoint )
   {
     theAccumulator = aDataPoint;
     thePreviousPoint = aDataPoint;
@@ -71,11 +67,12 @@ namespace libecs
   }
   
   
-  bool DataPointAggregator::stockpile( DataPointLongRef aTarget, DataPointLongCref aNewPoint )
+  bool DataPointAggregator::stockpile( LongDataPointRef aTarget, 
+				       LongDataPointCref aNewPoint )
   {
     //if target empty, simply store
     //return true
-    if ( aTarget.getTime() == -1.0 )
+    if( aTarget.getTime() == -1.0 )
       {
 	aTarget = aNewPoint;
 	return true;
@@ -84,7 +81,7 @@ namespace libecs
     // if target not empty and time is the same
     // calculate MinMax, store Avg
     //return true
-    if ( aTarget.getTime() == aNewPoint.getTime() )
+    if( aTarget.getTime() == aNewPoint.getTime() )
       {
 	calculateMinMax( aTarget, aNewPoint );
 	aTarget.setAvg( aNewPoint.getAvg() );
@@ -94,20 +91,15 @@ namespace libecs
     
     //if target time is below newtime
     //return false
-    else
-      {
-	return false;
-      }
-    
+    return false;
   }
   
   
-  void DataPointAggregator::aggregate( DataPointLongCref aNewPoint )
+  void DataPointAggregator::aggregate( LongDataPointCref aNewPoint )
   {
     // first try to put it into accumulator
     if ( ! stockpile( theAccumulator, aNewPoint ) )
       {
-	
 	// then try to put it into collector
 	if (! stockpile( theCollector, aNewPoint ) )
 	  {
@@ -115,59 +107,49 @@ namespace libecs
 	    calculate( aNewPoint );
 	    theCollector = aNewPoint;
 	    calculateMinMax( theAccumulator, theCollector );
-	    
-	    
 	  }
 	else
 	  {
 	    calculateMinMax( theAccumulator, theCollector );
 	  }
       }
-    else
-      {
-	;
-      }
   }
   
   
-  DataPointLongCref DataPointAggregator::getData()
+  LongDataPointCref DataPointAggregator::getData()
   {
-    
-    // return theAccumulator
-    
     return theAccumulator;
   }
   
   
-  void DataPointAggregator::calculateMinMax( DataPointLongRef aTarget,  DataPointLongCref aNewPoint)
+  void DataPointAggregator::calculateMinMax( LongDataPointRef aTarget,  
+					     LongDataPointCref aNewPoint)
   {
     // accu min
     
-    
-    if ( aTarget.getMin() > aNewPoint.getMin() )
+    if( aTarget.getMin() > aNewPoint.getMin() )
       {
 	aTarget.setMin ( aNewPoint.getMin() );
       }
     
     // accu max
-    if ( aTarget.getMax() < aNewPoint.getMax() )
+    if( aTarget.getMax() < aNewPoint.getMax() )
       {
-	
 	aTarget.setMax ( aNewPoint.getMax() );
       }
     
   }
   
   
-  void DataPointAggregator::calculate( DataPointLongCref aNewPoint )
+  void DataPointAggregator::calculate( LongDataPointCref aNewPoint )
   {
-    
     // accu avg
-    theAccumulator.setAvg ( ( theCollector.getAvg() *
-			      ( aNewPoint.getTime() - theCollector.getTime() ) +
-			      theAccumulator.getAvg() * ( theCollector.getTime() -
-							  theAccumulator.getTime() ) ) /
-			    ( aNewPoint.getTime() - theAccumulator.getTime() ) );
+    theAccumulator.setAvg
+      ( ( theCollector.getAvg() *
+	  ( aNewPoint.getTime() - theCollector.getTime() ) +
+	  theAccumulator.getAvg() * 
+	  ( theCollector.getTime() - theAccumulator.getTime() ) ) 
+	/ ( aNewPoint.getTime() - theAccumulator.getTime() ) );
   }
   
   void DataPointAggregator::beginNextPoint()
@@ -179,7 +161,7 @@ namespace libecs
   }
   
   
-  DataPointLong DataPointAggregator::getLastPoint()
+  LongDataPoint DataPointAggregator::getLastPoint()
   {
     //if collector empty return Accu
     if (theCollector.getTime() == -1.0 )
@@ -190,8 +172,6 @@ namespace libecs
       {
 	return theCollector;
       }
-    
-    
   }
   
   
@@ -204,7 +184,7 @@ namespace libecs
 using namespace libecs;
 void agr( Real aTime, Real aValue, DataPointAggregator* dpa)
 {
-  DataPointLong pa;
+  LongDataPoint pa;
   DataPoint dp;
   dp.setTime(aTime);
   dp.setValue(aValue);

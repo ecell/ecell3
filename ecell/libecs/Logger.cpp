@@ -1,7 +1,7 @@
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
 //        This file is part of E-Cell Simulation Environment package
 //
-//                Copyright (C) 2000-2001 Keio University
+//                Copyright (C) 2000-2004 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -28,16 +28,12 @@
 //
 // modified by Gabor Bereczki <gabor.bereczki@talk21.com>
 // 14/04/2002
+//
+// modified by Kouichi Takahashi <shafi@e-cell.org>
 
-
-#include <cmath>
-#include <assert.h>
-
-#include <stdio.h>
-
-#include "PropertySlotProxy.hpp"
-
+#include "libecs.hpp"
 #include "Polymorph.hpp"
+
 #include "Logger.hpp"
 
 namespace libecs
@@ -45,114 +41,80 @@ namespace libecs
 
 
   // Constructor
-  Logger::Logger( LoggerAdapterPtr aLoggerAdapter)
+  Logger::Logger( LoggerAdapterPtr aLoggerAdapter )
     :
     theLoggerAdapter( aLoggerAdapter ),
     theMinimumInterval( 0.0 ),
-    theLastTime( 0.0 ) ,
+    theLastTime( 0.0 ),
     theStepCounter( 0 ),
-    theMinimumStep ( 1 ),
-    thePrimaryPhysicalLogger( 2 ),
-    thePrimaryMaxSize( 0 )
+    theMinimumStep( 1 )
   {
-    PolymorphVector aPolymorphVector;
-    aPolymorphVector.push_back( static_cast<Integer> ( 1 ) );
-    aPolymorphVector.push_back( static_cast<Real> ( 0.0 ) );
-    aPolymorphVector.push_back( static_cast<Integer> ( 0 ) );
-    aPolymorphVector.push_back( static_cast<Integer> ( 0 ) );
-    theLoggingPolicy = aPolymorphVector;
+    setLoggerPolicy( 1, 0.0, 0, 0 );
   }
 
 
   //Destructor
   Logger::~Logger()
   {
-
-    for ( int i=0; i < theSubPhysicalLoggerArray.size(); i++ )
-      {
-	delete theSubPhysicalLoggerArray[ i ];
-      }
-    
     delete theLoggerAdapter;
   }
   
 
+  void Logger::setLoggerPolicy( IntegerParam aMinimumStep,
+				RealParam    aMinimumTimeInterval,
+				IntegerParam anEndPolicy,
+				IntegerParam aMaxSpace )
+  {
+    if( aMinimumStep < 0 || aMinimumTimeInterval < 0 )
+      {
+	THROW_EXCEPTION( ValueError, 
+			 "The minimum step and the minimum time interval "
+			 "must be positive numbers." );
+      }
 
+    theMinimumStep     = aMinimumStep;
+    theMinimumInterval = aMinimumTimeInterval;
+
+    thePhysicalLogger.setEndPolicy( anEndPolicy );
+    thePhysicalLogger.setMaxSize( aMaxSpace );
+  }
+				
+  
   void Logger::setLoggerPolicy( PolymorphCref aParamList )
   {
-
-    Integer userSpecifiedLimit( 0 );
-    if ( aParamList.asPolymorphVector().size() != 4)
+    if ( aParamList.asPolymorphVector().size() != 4 )
       {
-	THROW_EXCEPTION( libecs::Exception, "Logger policy array should be 4 element long.\n" );
+	THROW_EXCEPTION( libecs::Exception, 
+			 "Logger policy array should be 4 element long.\n" );
       }
 
-    theLoggingPolicy = aParamList;
-    theMinimumStep = theLoggingPolicy.asPolymorphVector()[ STEP_SIZE ].asInteger();
-    theMinimumInterval = theLoggingPolicy.asPolymorphVector()[ TIME_INTERVAL ].asReal();
-    userSpecifiedLimit = theLoggingPolicy.asPolymorphVector()[ MAX_SPACE ].asInteger();
-
-    //calculate maximum size of logger from user specified limit in Kbytes
-    if ( userSpecifiedLimit > 0 )
-      {
-	Real theLoggerRatio( 1.0 / LOGGER_DIVIDE_STEP );
-
-	// calculating sum for 1/(1-x) to estimate how many additional logs are performed for one ordinary log
-	Real estimatedSecondaryLoggerAbundance( 1.0 / ( 1.0 - theLoggerRatio ) );
-
-	Real theAverageDataPointSize( static_cast<Real>( sizeof( DataPoint ) ) + 
-				 static_cast<Real>( sizeof( DataPointLong ) ) * estimatedSecondaryLoggerAbundance );
-
-	// make our estimate a bit conservative
-	theAverageDataPointSize *= 1.02;
-	
-	thePrimaryMaxSize = static_cast<PhysicalLoggerIterator>( static_cast<Real>( userSpecifiedLimit * 1024 )
-						 / theAverageDataPointSize );
-      }
-    thePrimaryPhysicalLogger.setEndPolicy( theLoggingPolicy.asPolymorphVector()[ END_POLICY ].asInteger() );
-    thePrimaryPhysicalLogger.setMaxSize( thePrimaryMaxSize );
-
-    for ( int i = 0; i < theSubPhysicalLoggerArray.size(); ++i )
-      {
-	setSubLoggerPolicy( i );
-      }
-    
+    setLoggerPolicy( aParamList.asPolymorphVector()[ STEP_SIZE ].asInteger(),
+		     aParamList.asPolymorphVector()[ TIME_INTERVAL ].asReal(),
+		     aParamList.asPolymorphVector()[ MAX_SPACE ].asInteger(),
+		     aParamList.asPolymorphVector()[ END_POLICY ].asInteger() 
+		     );
   }
 
-  void Logger::setSubLoggerPolicy ( int anIndex )
+  const Polymorph Logger::getLoggerPolicy( void )
   {
-    PhysicalLoggerPtr aPhysicalLoggerPtr = theSubPhysicalLoggerArray[ anIndex ];
-    aPhysicalLoggerPtr -> setEndPolicy( theLoggingPolicy.asPolymorphVector()[ END_POLICY ].asInteger() );
-
-
-    if ( thePrimaryMaxSize > 0 )
-      {
-	PhysicalLoggerIterator aMaxSize =  thePrimaryMaxSize; 
-	for ( int i = 0; i < anIndex; i++ )
-	  {
-	    aMaxSize /= LOGGER_DIVIDE_STEP;
-	  }
-	
-	aPhysicalLoggerPtr -> setMaxSize( aMaxSize );
-      }
-    else
-      {
-	aPhysicalLoggerPtr -> setMaxSize( 0 );
-	
-      }
-    
+    PolymorphVector aPolymorphVector;
+    aPolymorphVector.push_back( Integer( theMinimumStep ) );
+    aPolymorphVector.push_back( Real( theMinimumInterval ) );
+    aPolymorphVector.push_back( Integer( thePhysicalLogger.getEndPolicy() ) );
+    aPolymorphVector.push_back( Integer( thePhysicalLogger.getMaxSize() ) );
+    return aPolymorphVector;
   }
 
 
   DataPointVectorSharedPtr Logger::getData( void ) const
   {
-    if (thePrimaryPhysicalLogger.empty())
+    if( thePhysicalLogger.empty() )
       {
-	return anEmptyVector();
+	return createEmptyVector();
       }
     
-    return thePrimaryPhysicalLogger.getVector( thePrimaryPhysicalLogger.begin(),
-					       thePrimaryPhysicalLogger.end() );
+    return thePhysicalLogger.getVector( thePhysicalLogger.begin(),
+					thePhysicalLogger.end() );
   }
 
   
@@ -160,36 +122,33 @@ namespace libecs
   DataPointVectorSharedPtr Logger::getData( RealParam aStartTime,
 					    RealParam anEndTime ) const
   {
-    if (thePrimaryPhysicalLogger.empty())
+    if( thePhysicalLogger.empty() )
       {
-	return anEmptyVector();
+	return createEmptyVector();
       }
     
-    PhysicalLoggerIterator 
-      topIterator( thePrimaryPhysicalLogger.upper_bound( thePrimaryPhysicalLogger.begin(),
-							 thePrimaryPhysicalLogger.end(), 
-							 anEndTime ) );
+    PhysicalLogger::size_type 
+      topIterator( thePhysicalLogger.upper_bound
+		   ( thePhysicalLogger.begin(),
+		     thePhysicalLogger.end(), 
+		     anEndTime ) );
     
-    PhysicalLoggerIterator 
-      bottomIterator( thePrimaryPhysicalLogger.lower_bound( thePrimaryPhysicalLogger.begin(),
-							    topIterator,
-							    aStartTime ) );
+    PhysicalLogger::size_type 
+      bottomIterator( thePhysicalLogger.lower_bound( thePhysicalLogger.begin(),
+						     topIterator,
+						     aStartTime ) );
 
-    return thePrimaryPhysicalLogger.getVector( bottomIterator, topIterator );
+    return thePhysicalLogger.getVector( bottomIterator, topIterator );
   }
-
 
  
 
-  DataPointVectorSharedPtr Logger::anEmptyVector(void) const
-  
+  DataPointVectorSharedPtr Logger::createEmptyVector()
   {
+    DataPointVectorSharedPtr aDataPointVector( new DataPointVector ( 0, 2 ) );
 
-    DataPointVectorSharedPtr aDataPointVector( new DataPointVector (0,2) );
     return aDataPointVector;
-
   }
-  
   
 
   void Logger::setMinimumInterval( RealParam anInterval )
@@ -203,139 +162,37 @@ namespace libecs
     theMinimumInterval = anInterval;
   }
 
-
-  void Logger::appendData( RealParam aTime, RealParam aValue )
+  void Logger::log( RealParam aTime )
   {
-    
-    const Real       aCurrentInterval( aTime - theLastTime );
-    DataPoint        aDataPoint;
-    DataPointLong    aDataPointLong;
-    bool             theLogCondition( true );
-    bool             theStepCondition( false );
-    bool             theTimeCondition( false );
+    ++theStepCounter;
 
-
-    aDataPoint.setTime( aTime );
-    aDataPoint.setValue( aValue );
-    thePrimaryPhysicalLogger.aggregate( aDataPoint ); 
-
-	if ( ( theMinimumStep > 0 ) || ( theMinimumInterval >= 0 ) ) 
-	  {
-	    
-	    if ( theMinimumStep > 0 )
-	      {
-		theStepCounter++;
-		theStepCondition = ( theStepCounter >= static_cast<PhysicalLoggerIterator>( theMinimumStep ) );
-	      }
-	    else
-	      {
-		; //do nothing
-	      }
-	    
-	    if ( theMinimumInterval > 0 )
-	      {
-		theTimeCondition = ( theMinimumInterval <= aCurrentInterval );
-	      }
-	    else
-	      {
-		; // do nothing
-	      }
-
-	    theLogCondition = theTimeCondition || theStepCondition;
-	  }
-	else
-	  {
-	    ; //do nothing
-	  }
-
-
-    if ( theLogCondition )
+    if( ( theStepCounter >= theMinimumStep ) 	 // step condition
+	|| ( theMinimumInterval > 0 &&           // OR time condition
+	     theMinimumInterval <= ( aTime - theLastTime ) ) )
       {
-
-	flush();
-	
+	pushData( aTime, theLoggerAdapter->getValue() );
 	
 	theLastTime = aTime;
 	theStepCounter = 0;
-	
       }
-    else
-      {
-	; // do nothing
-      }
-  
   }
 
 
-
-  void Logger::aggregate( DataPointLongCref aDataPointLong, int aPhysicalLoggerIndex )
-  {
-    
-    DataPointLong aDataPointLongAggregator;
-    
-    if ( theSubPhysicalLoggerArray.size() == MAX_SUBLOGGER_NUMBER ) 
-      { 
-	return;
-      }
-    if ( aPhysicalLoggerIndex == theSubPhysicalLoggerArray.size() )
-      {
-	// create new logger
-	theSubPhysicalLoggerArray.push_back( new PhysicalLogger( 5 ) );
-
-	// set max size, endpolicy for new logger
-	setSubLoggerPolicy( aPhysicalLoggerIndex );
-
-      }
-    
-    //aggregate
-    PhysicalLoggerPtr aPhysicalLoggerPtr = theSubPhysicalLoggerArray[ aPhysicalLoggerIndex ];
-    aPhysicalLoggerPtr -> aggregate( aDataPointLong );
-    
-    // if psize is turning point
-
-    if ( aPhysicalLoggerPtr -> getElementCount() == LOGGER_DIVIDE_STEP )
-      {
-	aPhysicalLoggerPtr -> flushAggregate();
-
-	//aggregate highlevel
-	aggregate( aDataPointLongAggregator, aPhysicalLoggerIndex + 1 );
-
-      }
-    
-  }
-
-
-  void Logger::flush()
-  {
-    // preventaDataPointLong flushing it twice
-    // if min ingterval is zero there is no point in flushing
-    
-    //aggregate highlevel
-    DataPointLongCref aDataPointLong = thePrimaryPhysicalLogger.getAggregate();
-    if ( aDataPointLong.getTime() >= 0.0 )
-      {
-	aggregate( aDataPointLong , 0 );
-    
-	thePrimaryPhysicalLogger.flushAggregate();
-      }
-
-  }
-  
   //
   
-  Real Logger::getStartTime( void ) const
+  const Real Logger::getStartTime( void ) const
   {
-    return  thePrimaryPhysicalLogger.front().getTime();
+    return  thePhysicalLogger.front().getTime();
     
   }
   
 
   //
 
-  Real Logger::getEndTime( void ) const
+  const Real Logger::getEndTime( void ) const
   {
     
-    return thePrimaryPhysicalLogger.back().getTime();
+    return thePhysicalLogger.back().getTime();
   }
   
   
@@ -343,125 +200,92 @@ namespace libecs
 
 
   DataPointVectorSharedPtr Logger::getData( RealParam aStartTime,
-					RealParam anEndTime,
-					RealParam anInterval ) const
+					    RealParam anEndTime,
+					    RealParam anInterval ) const
   {
-    if ( thePrimaryPhysicalLogger.empty() )
-	{
-	return anEmptyVector();
-	}
-
-	
-    //choose appropriate physlogger
-    int aPhysicalLoggerVectorIndex = theSubPhysicalLoggerArray.size();
+    if ( thePhysicalLogger.empty() )
+      {
+	return createEmptyVector();
+      }
 
     // set up output vector
     DataPointVectorIterator 
-      thePhysicalRange( static_cast<DataPointVectorIterator>
-	     ( ( anEndTime - aStartTime ) / anInterval ) );
+      aPhysicalRange( static_cast<size_type>
+		      ( ( anEndTime - aStartTime ) / anInterval ) );
 
     //this is a technical adjustment, because I realized that sometimes
     //conversion from real is flawed: rounding error
-    Real theEstimatedRange( ( anEndTime - aStartTime ) / anInterval );
+    Real anEstimatedRange( ( anEndTime - aStartTime ) / anInterval );
 
-    if ( ( static_cast<Real>(thePhysicalRange) ) + 0.9999 < theEstimatedRange ) 
+    if ( ( static_cast<Real>(aPhysicalRange) ) + 0.9999 
+	 < anEstimatedRange ) 
       {
-	thePhysicalRange++;
+	++aPhysicalRange;
       }
     
-    thePhysicalRange++;
+    ++aPhysicalRange;
+
+    Real aTimeGap( ( thePhysicalLogger.back().getTime() 
+		     - thePhysicalLogger.front().getTime() ) /
+		   thePhysicalLogger.size() );
+
+
+    DataPointVectorPtr 
+      aDataPointVector( new DataPointVector( aPhysicalRange, 5 ) );
+
+    // set up iterators
     
-    Real theAverageTimeInterval( 0.0 );
-    PhysicalLoggerPtr aPhysicalLoggerPtr = NULL;
-    bool isFitForExtraction = false;
-    do
-      {
-	--aPhysicalLoggerVectorIndex;
-	aPhysicalLoggerPtr = theSubPhysicalLoggerArray[ aPhysicalLoggerVectorIndex ];
-	theAverageTimeInterval = aPhysicalLoggerPtr ->getAverageInterval();
-	isFitForExtraction = ( ( theAverageTimeInterval < ( anInterval / 3 ) ) && 
-			       ( theAverageTimeInterval != 0.0 ) && 
-			       ( aPhysicalLoggerPtr -> size() > thePhysicalRange ) );
+    PhysicalLogger::size_type 
+      anIterationEnd( thePhysicalLogger.
+		       upper_bound_linear_estimate
+		       ( thePhysicalLogger.begin(),
+			 thePhysicalLogger.end(),
+			 anEndTime,
+			 aTimeGap ) );
+    
+    PhysicalLogger::size_type 
+      anIterationStart( thePhysicalLogger.
+			lower_bound_linear_estimate
+			( thePhysicalLogger.begin(),
+			  anIterationEnd,
+			  aStartTime,
+			  aTimeGap ) );
+
+    // start from vectorslice start to vectorslice end, 
+    // scan through all datapoints
+    size_type aCounter( anIterationStart );
 	
-      } 
-    while (  ( !isFitForExtraction ) && ( aPhysicalLoggerVectorIndex > 0 ) ) ;
-      
-    if ( !isFitForExtraction )
-      {
-	aPhysicalLoggerPtr = const_cast<PhysicalLoggerPtr>( &thePrimaryPhysicalLogger );
-      }
-    else
-      {
-	;// do nothing
-      }
-    
-    
-    Real theStartTime ( aPhysicalLoggerPtr ->front().getTime() );
-    Real theEndTime ( aPhysicalLoggerPtr->back().getTime() );
-    Real theRealTimeGap( ( theEndTime - theStartTime ) /
-			 ( aPhysicalLoggerPtr->end() - aPhysicalLoggerPtr->begin() ) );
-
-    theStartTime = aStartTime;
-    theEndTime = anEndTime;
-
-
-
-
-    DataPointVectorPtr aDataPointVector( new DataPointVector( thePhysicalRange, 5 ) );
-
-    //set uo iterators
-    
-    PhysicalLoggerIterator 
-      theIterationEnd( aPhysicalLoggerPtr->upper_bound_linear_estimate
-		       ( aPhysicalLoggerPtr->begin(),
-			 aPhysicalLoggerPtr->end(),
-			 theEndTime,
-			 theRealTimeGap ) );
-    
-    PhysicalLoggerIterator 
-      theIterationStart( aPhysicalLoggerPtr->lower_bound_linear_estimate( 
-									 aPhysicalLoggerPtr->begin(),
-									 theIterationEnd,
-									 theStartTime,
-									 theRealTimeGap ) );
-    // start from vectorslice start to vectorslice end, scan through all datapoints
-	
-    PhysicalLoggerIterator loggerCounter( theIterationStart );	
-    Real targetTime( theStartTime + anInterval );
-    DataPointLong readDpl( aPhysicalLoggerPtr->at( loggerCounter ) );
-    //DataPointLong dp1;
+    Real aTargetTime( aStartTime + anInterval );
+    LongDataPoint aLongDataPoint( thePhysicalLogger.at( aCounter ) );
     
     DataPointAggregator anAggregator;
-    anAggregator.aggregate( readDpl );
-    for ( DataPointVectorIterator elementCount = 0; elementCount < thePhysicalRange; elementCount++ )
-      {
+    anAggregator.aggregate( aLongDataPoint );
 
+    for( DataPointVectorIterator anElementCount( 0 ); 
+	 anElementCount < aPhysicalRange; ++anElementCount )
+      {
 	do 
 	  {
-	    
-	    if ( ( loggerCounter < theIterationEnd ) && ( readDpl.getTime() < targetTime ) )
+	    if( ( aCounter < anIterationEnd ) && 
+		 ( aLongDataPoint.getTime() < aTargetTime ) )
 	      { 
-		loggerCounter++;
-		readDpl = aPhysicalLoggerPtr->at( loggerCounter );
-		
-		
+		++aCounter;
+		aLongDataPoint = thePhysicalLogger.at( aCounter );
 	      }
-	    anAggregator.aggregate( readDpl );
-	    
+
+	    anAggregator.aggregate( aLongDataPoint );
 	  }
-	while( ( readDpl.getTime() < targetTime ) && (loggerCounter < theIterationEnd ) );
+	while( ( aLongDataPoint.getTime() < aTargetTime ) && 
+	       ( aCounter < anIterationEnd ) );
 	
-	
-	aDataPointVector->asLong(elementCount) = anAggregator.getData();
-	
+	aDataPointVector->asLong( anElementCount ) = anAggregator.getData();
 	anAggregator.beginNextPoint();
 	
-	targetTime += anInterval;
+	aTargetTime += anInterval;
       }
     
     
-    return DataPointVectorSharedPtr( aDataPointVector );
-    
+    return DataPointVectorSharedPtr( aDataPointVector );    
   }
   
 

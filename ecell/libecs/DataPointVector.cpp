@@ -62,7 +62,7 @@ namespace libecs
       }
     else
       {
-	theRawArrayLong = new DataPointLong[ aLength ];
+	theRawArrayLong = new LongDataPoint[ aLength ];
       }
   }
 
@@ -73,7 +73,7 @@ namespace libecs
       {
 	return sizeof(DataPoint);
       }
-    return sizeof(DataPointLong);
+    return sizeof(LongDataPoint);
   }
 
 
@@ -93,14 +93,14 @@ namespace libecs
     return theRawArray[ aPosition ];
   }
 
-  DataPointLongRef DataPointVector::asLong( DataPointVectorIterator aPosition )
+  LongDataPointRef DataPointVector::asLong( DataPointVectorIterator aPosition )
   {
     assert (thePointSize == 5);
     return theRawArrayLong[ aPosition ];
   }
 
 
-  DataPointLongCref 
+  LongDataPointCref 
   DataPointVector::asLong( DataPointVectorIterator aPosition ) const
   {
     assert (thePointSize == 5);

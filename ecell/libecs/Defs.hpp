@@ -31,23 +31,19 @@
 
 #ifndef __DEFS_HPP
 #define __DEFS_HPP
+#include "ecell/config.h"
 
 #include <stdint.h>
 #include <float.h>
 #include <string>
 #include <list>
 #include <vector>
+#include <map>
 
 #include <boost/call_traits.hpp>
 #include <boost/smart_ptr.hpp>
 
-#include "ecell/config.h"
-
-
-
-
-#define DEBUG
-
+#define DEBUG 1
 
 // stringifiers.  see preprocessor manual
 #define XSTR( S ) STR( S )

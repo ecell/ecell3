@@ -40,14 +40,17 @@
 //	and/or <http://www.e-cell.org/>.
 //END_V2_HEADER
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
- */
+*/
 /*
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.18  2004/07/13 18:29:34  shafi
+ :	extensive logger code cleanup. remaining things are: replace DataPointVector with boost::multi_array, and understand, reconsider and rename getData( s,e,i )
+ :
  :	Revision 1.17  2004/07/04 10:36:15  bgabor
  :	Code cleanup.
- :
+ :	
  :	Revision 1.16  2004/06/14 17:53:15  bgabor
  :	Bugfixing in LogginPolicy
  :	
@@ -126,7 +129,7 @@
  :	Revision 1.1  2000/12/30 15:09:46  naota
  :	Initial revision
  :
-//END_RCS_HEADER
+ //END_RCS_HEADER
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  */
 
@@ -170,11 +173,11 @@ const unsigned int VVECTOR_READ_CACHE_INDEX_SIZE = 2;
 const unsigned int VVECTOR_WRITE_CACHE_INDEX_SIZE = 2;
 
 class vvectorbase {
-// types
-public:
+  // types
+ public:
   typedef void (*cbfp_t)(); // pointer to call back function
-// private valiables
-private:
+  // private valiables
+ private:
   static int _serialNumber;
   static char const *_defaultDirectory;
   static int _directoryPriority;
@@ -188,25 +191,25 @@ private:
   static cbfp_t _cb_error;
   static long _margin;
 
-// protected variables
-protected:
+  // protected variables
+ protected:
   int _myNumber;
   char *_file_name;
   int _fdr,_fdw;
   void unlinkfile();
 
-// protected methods
+  // protected methods
   void initBase(char const * const dirname);
   void my_open_to_append();
   void my_open_to_read(off_t offset);
   void my_close();
 
-// constructor, destructor
-public:
+  // constructor, destructor
+ public:
   vvectorbase();
   ~vvectorbase();
 
-// other public method
+  // other public method
   static void setTmpDir(char const * const dirname, int);
   static void removeTmpFile();
   static void setCBFull(cbfp_t __c) { _cb_full = __c; };
@@ -218,13 +221,13 @@ public:
 
 
 template<class T> class vvector : public vvectorbase {
-// types
-public:
+  // types
+ public:
   typedef T value_type;
   typedef size_t size_type;
 
-// private valiables
-private:
+  // private valiables
+ private:
   size_type _size;
   value_type _buf;
   value_type _cacheRV[VVECTOR_READ_CACHE_SIZE];
@@ -238,15 +241,15 @@ private:
   size_type start_offset;
 
 
-libecs::Real LastTime, diff, lastRead;
+  libecs::Real LastTime, diff, lastRead;
 
-// constructor, destructor
-public:
+  // constructor, destructor
+ public:
   vvector();
   ~vvector();
 
-// other public methods
-public:
+  // other public methods
+ public:
   void push_back(const value_type & x);
   value_type const & operator [] (size_type i);
   value_type const & at(size_type i);
@@ -254,6 +257,7 @@ public:
   void clear();
   static void setDiskFullCB(void(*)());
   void setEndPolicy( int );
+  int  getEndPolicy();
   void vvector<T>::setMaxSize( int aMaxSize );
 };
 
@@ -265,7 +269,7 @@ public:
 
 template<class T> vvector<T>::vvector()
 {
- size_fixed = false;
+  size_fixed = false;
   end_policy = 0;
   max_size = 0;
   start_offset = 0;
@@ -289,194 +293,199 @@ template<class T> vvector<T>::~vvector()
 }
 
 template<class T> void vvector<T>::setEndPolicy( int anEndPolicy)
-  {
-    end_policy=anEndPolicy;
-  }
+{
+  end_policy=anEndPolicy;
+}
+
+template<class T> int vvector<T>::getEndPolicy()
+{
+  return end_policy;
+}
 
 template<class T> void vvector<T>::setMaxSize( int aMaxSize )
-  {
-	if (aMaxSize == 0) {
-		max_size = 0;
-		}
-	else{
-    max_size = ((aMaxSize/VVECTOR_WRITE_CACHE_SIZE)+1)*VVECTOR_WRITE_CACHE_SIZE;
-	}
+{
+  if (aMaxSize == 0) {
+    max_size = 0;
   }
+  else{
+    max_size = ((aMaxSize/VVECTOR_WRITE_CACHE_SIZE)+1)*VVECTOR_WRITE_CACHE_SIZE;
+  }
+}
 
 template<class T> void vvector<T>::push_back(const T & x)
 {
-    ssize_t red_bytes; 
-    bool write_successful;
-    if(VVECTOR_WRITE_CACHE_SIZE <= _cacheWNum)
-      { 
-	THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. \n");
-      }
+  ssize_t red_bytes; 
+  bool write_successful;
+  if(VVECTOR_WRITE_CACHE_SIZE <= _cacheWNum)
+    { 
+      THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. \n");
+    }
     
-    _cacheWV[_cacheWNum] = x;
-    if (_cacheWNum==0)
-      {
-	_cacheWI[0]=_size;
-      }
-    _cacheWI[1] = _size;
-    if (size_fixed)
-      {
-	_cacheWI[0]--;
-      }
-    else
-      {
-	_size++;
-      }
-    _cacheWNum++;
+  _cacheWV[_cacheWNum] = x;
+  if (_cacheWNum==0)
+    {
+      _cacheWI[0]=_size;
+    }
+  _cacheWI[1] = _size;
+  if (size_fixed)
+    {
+      _cacheWI[0]--;
+    }
+  else
+    {
+      _size++;
+    }
+  _cacheWNum++;
 
-    if ( VVECTOR_WRITE_CACHE_SIZE <= _cacheWNum )  
-      {
-	// first try to append
-	if (!size_fixed)
-	  {
-	    red_bytes = write( _fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
-	    write_successful = ( red_bytes == sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
+  if ( VVECTOR_WRITE_CACHE_SIZE <= _cacheWNum )  
+    {
+      // first try to append
+      if (!size_fixed)
+	{
+	  red_bytes = write( _fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
+	  write_successful = ( red_bytes == sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
 
-	    if ( (!write_successful )  || ( _size == max_size ) )
-	      {
-		if (end_policy == 0)
-		  {
-		    if (_size>0)
-		      {
-			THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly disk or allocated space is full.\n");
-		      }
-		    else{
-		      THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly IO or permission error.\n");
+	  if ( (!write_successful )  || ( _size == max_size ) )
+	    {
+	      if (end_policy == 0)
+		{
+		  if (_size>0)
+		    {
+		      THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly disk or allocated space is full.\n");
 		    }
+		  else{
+		    THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly IO or permission error.\n");
 		  }
-		else 
-		  {
-		    size_fixed=true;
-		    if ( !write_successful )
-		      {
-			_size-=VVECTOR_WRITE_CACHE_SIZE;
-		      }
+		}
+	      else 
+		{
+		  size_fixed=true;
+		  if ( !write_successful )
+		    {
+		      _size-=VVECTOR_WRITE_CACHE_SIZE;
+		    }
 		    
-		  }
-	      }// if of write statment
-	  } //if of append condition
+		}
+	    }// if of write statment
+	} //if of append condition
 	
-	if (size_fixed){
-	  //try to seek start offset
+      if (size_fixed){
+	//try to seek start offset
 	  
-	  if (lseek(_fdw, static_cast<off_t>((start_offset) * sizeof(T)), SEEK_SET) == static_cast<off_t>(-1)) 
-	    {
-	      THROW_EXCEPTION( libecs::Exception, "Write() failed in VVector. Seek error.\n");
-	    }
-	  if (write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE)
-	      != sizeof(T) * VVECTOR_WRITE_CACHE_SIZE) 
-	    {
-	      THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly IO error.\n");
-	    }
-	  start_offset += VVECTOR_WRITE_CACHE_SIZE;
-	  if (start_offset >= _size)
-	    { 
-	      start_offset -= _size;
-	    }
+	if (lseek(_fdw, static_cast<off_t>((start_offset) * sizeof(T)), SEEK_SET) == static_cast<off_t>(-1)) 
+	  {
+	    THROW_EXCEPTION( libecs::Exception, "Write() failed in VVector. Seek error.\n");
+	  }
+	if (write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE)
+	    != sizeof(T) * VVECTOR_WRITE_CACHE_SIZE) 
+	  {
+	    THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly IO error.\n");
+	  }
+	start_offset += VVECTOR_WRITE_CACHE_SIZE;
+	if (start_offset >= _size)
+	  { 
+	    start_offset -= _size;
+	  }
 	  
 	  
-	}
-	_cacheWNum = 0;
-	
       }
+      _cacheWNum = 0;
+	
+    }
 }
 
 
 template<class T>  T const & vvector<T>::operator [] (size_type i)
 {
-return at(i);
+  return at(i);
 }
 
 
 template<class T>  T const & vvector<T>::at(size_type i)
 {
-//  assert(i < _size);
-/*
+  //  assert(i < _size);
+  /*
   //check whether i is in range of _cacheRI[0],_cacheRI[1]
   if ((i>=_cacheRI[0])&&(_cacheRI[1]>=i)){
   //calculate i's position
-    return _cacheRV[i-_cacheRI[0]];
+  return _cacheRV[i-_cacheRI[0]];
   }
   if ((i>=_cacheWI[0])&&(_cacheWI[1]>=i)){
   //calculate i's position
-    return _cacheWV[i-_cacheWI[0]];
+  return _cacheWV[i-_cacheWI[0]];
   }
   
   my_open_to_read(static_cast<off_t>((i) * sizeof(T)));
   size_type num_to_read = _size - i;
   if (VVECTOR_READ_CACHE_SIZE < num_to_read) {
-    num_to_read = VVECTOR_READ_CACHE_SIZE;
+  num_to_read = VVECTOR_READ_CACHE_SIZE;
   }
   ssize_t num_red = read(_fdr, _cacheRV, num_to_read * sizeof(T));
   if (num_red < 0) {
-    fprintf(stderr, "read() failed in VVector. i=%ld, _size=%ld, n=%ld\n",
-	    (long)i, (long)_size, (long)num_to_read);
-    cbError();
+  fprintf(stderr, "read() failed in VVector. i=%ld, _size=%ld, n=%ld\n",
+  (long)i, (long)_size, (long)num_to_read);
+  cbError();
   }
   num_red /= sizeof(T);
   _cacheRI[0]=i;
   _cacheRI[1]=i+num_red-1;
   
   _buf = _cacheRV[0];
-//  my_close();
+  //  my_close();
   return _buf;
-*/
+  */
 
   assert(i < _size);
-// read cache only makes sense when not fixed size
-if (!size_fixed){
-  if (( i >= _cacheRI[0])&&(_cacheRI[1]>=i)){
-  //calculate i's position
-    return _cacheRV[i-_cacheRI[0]];
-  }
+  // read cache only makes sense when not fixed size
+  if (!size_fixed){
+    if (( i >= _cacheRI[0])&&(_cacheRI[1]>=i)){
+      //calculate i's position
+      return _cacheRV[i-_cacheRI[0]];
+    }
   }
 
   if ((i>=_cacheWI[0])&&(_cacheWI[1]>=i)){
-  //calculate i's position
+    //calculate i's position
 
     return _cacheWV[i-_cacheWI[0]];
   }
   size_type i2=i; //forward sequential read assumed
   size_type log_read_start, phys_read_start;
-   size_t half_size,read_interval;
+  size_t half_size,read_interval;
   read_interval=VVECTOR_READ_CACHE_SIZE;
   
   // detect sequential read ( only in case of not fixed read )
-if (!size_fixed){
-  if ((i+1)==_cacheRI[0])
-    {
-       if (_cacheRI[0]>=read_interval)
+  if (!size_fixed){
+    if ((i+1)==_cacheRI[0])
+      {
+	if (_cacheRI[0]>=read_interval)
           {
             i2=_cacheRI[0]-read_interval;
           }
-       else 
+	else 
           {
             i2=0; 
           }
-    }
+      }
     else if((_cacheRI[1]+1)!=i){ //not forward sequential, therefore random access
-    half_size=read_interval/2;
-    if (i>half_size){i2=(i-half_size);} else {i2=0;}
+      half_size=read_interval/2;
+      if (i>half_size){i2=(i-half_size);} else {i2=0;}
     }
-}
+  }
   ssize_t num_red;
   size_type num_to_read = _size - i2 ;
   if (VVECTOR_READ_CACHE_SIZE < num_to_read) {
     num_to_read = VVECTOR_READ_CACHE_SIZE;
   }
-log_read_start=i2;
+  log_read_start=i2;
   if (size_fixed){
     phys_read_start=(i2+start_offset+_cacheWNum);
-	if (phys_read_start>=_size){ phys_read_start-=_size;}
+    if (phys_read_start>=_size){ phys_read_start-=_size;}
   }
-	else{
-	phys_read_start=i2;
-}
-  my_open_to_read(static_cast<off_t>((phys_read_start) * sizeof(T)));
+  else{
+    phys_read_start=i2;
+  }
+  my_open_to_read( off_t( phys_read_start * sizeof(T) ));
 
   num_red = read(_fdr, _cacheRV, num_to_read * sizeof(T));
   if (num_red < 0) {
@@ -494,7 +503,7 @@ log_read_start=i2;
 
 template<class T> void vvector<T>::clear()
 {
-    unlinkfile();
+  unlinkfile();
 }
 
 

@@ -63,9 +63,9 @@ namespace libecs
 
     DataPointCref asShort( DataPointVectorIterator aPosition ) const;
 
-    DataPointLongRef asLong( DataPointVectorIterator aPosition );
+    LongDataPointRef asLong( DataPointVectorIterator aPosition );
 
-    DataPointLongCref asLong( DataPointVectorIterator aPosition ) const;
+    LongDataPointCref asLong( DataPointVectorIterator aPosition ) const;
 
     DataPointVectorIterator getSize() const
     {
@@ -94,7 +94,7 @@ namespace libecs
     
     DataPoint* theRawArray;
 
-    DataPointLong* theRawArrayLong;
+    LongDataPoint* theRawArrayLong;
 
   };
 
