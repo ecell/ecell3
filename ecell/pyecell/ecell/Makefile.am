@@ -9,7 +9,8 @@ ecs.py\
 Session.py\
 ecssupport.py\
 FullID.py\
-Driver.py
+RecordingSimulator.py\
+util.py
 
 
 EXTRA_DIST=${pyecell_DATA}

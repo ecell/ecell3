@@ -1,32 +1,43 @@
 #! /usr/bin/env python
 
-import Driver
-
-def plainPrintMethod( aMessage ):
-    print aMessage
-    
         
 class Session:
 
-    def __init__( self, aDriver ):
+    def __init__( self, aSimulator ):
 
-        self.thePrintMethod = plainPrintMethod
-        self.theDriver = aDriver
+        self.thePrintMethod = self.plainPrintMethod
+        self.theSimulator = aSimulator
 
     def run( self , time='' ):
-        self.theDriver.run( time )
-
-    def stop( self ):
-        self.theDriver.stop()
+        if not time:
+            self.theSimulator.run()
+        else:
+            self.theSimulator.run( time )
 
     def step( self, num='' ):
-        self.theDriver.step( num )
+        if not num:
+            self.theSimulator.step()
+        else:
+            for i in range(num):
+                self.theSimulator.step()
 
     def getLoggerList( self ):
-        return self.theDriver.getLoggerList()
+        return self.theSimulator.getLoggerList()
 
     def getLogger( self, fullpn ):
-        return self.theDriver.getLogger( fullpn )
+        return self.theSimulator.getLogger( fullpn )
+
+    def setPendingEventChecker( self, event ):
+
+        self.theSimulator.setPendingEventChecker( event )
+
+    def setEventHandler( self, event ):
+
+        self.theSimulator.setEventHandler( event )
+
+    def getCurrentTime( self ):
+
+        return self.theSimulator.getCurrentTime()
 
     def setPrintMethod( self, aMethod ):
         self.thePrintMethod = aMethod
@@ -40,74 +51,11 @@ class Session:
     def saveModel( self ):
         pass
 
+    def plainPrintMethod( aMessage ):
+        print aMessage
 
 
 
-#FIXME: below are obsolete. should be removed.
-
-class SingleSession( Session ):
-
-    def __init__(self, srfilename ):
-
-        Session.__init__( self, srfilename )
-        self.theCondition = 0
-
-    def evaluate(self):
-
-        pass
-
-
-class OsogoSession( SingleSession ):
-
-    def __init__(self, aMessageWindow, srfilename):
-
-        self.theDriver = Driver.OsogoDriver( srfilename )
-        self.theModelInterpreter = ModelInterpreter.ModelInterpreter( self.theDriver )
-        self.theMessageWindow = aMessageWindow
-        self.theRunningFlag = 0
-
-
-    def printMessage( self, aMessageString ):
-
-        self.theMessageWindow.printMessage( aMessageString )
-
-
-
-
-class LoopSession( Session ):
-
-    def __init__(self):
-
-        Session.__init__( self )
-        self.condition = 0
-
-    def repeat(self):
-
-        while(self.condition):
-
-            self.run
-
-    def run(self):
-
-        pass
-
-    def evaluate(self):
-
-        pass
-
-
-class TuningSession( LoopSession ):
-
-    def modifyRule( self ):
-
-        pass
-
-
-class ParallelTuningSession( TuningSession ):
-
-    def parallelize( self ):
-
-        pass
 
 
 
