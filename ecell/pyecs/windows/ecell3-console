@@ -43,6 +43,22 @@ os.environ['PATH']=\
 		os.path.join( gtk_prefix, 'lib' ),
 		os.environ['PATH']
 	])
+
+# PYTHONDIR contains E-Cell python modules
+# PYTHONDIR is used by dmgen
+os.environ['PYTHONDIR']=\
+	os.path.join( prefix, 'lib', 'python' + sys.winver, 'site-packages' )
+
+# Include E-Cell, pygtk, and Numeric python module locations in
+# Python module search path
+os.environ['PYTHONPATH']=\
+	os.pathsep.join([
+		os.environ['PYTHONDIR'],
+		os.path.join( os.environ['PYTHONDIR'], 'Numeric'),
+		os.path.join( os.environ['PYTHONDIR'], 'libsbml'),
+		os.path.join( os.environ['PYTHONDIR'], 'gtk-2.0')
+	])
+
 os.chdir( prefix )
 os.popen('start "E-Cell Console"' )
 os.environ['PATH'] = pathSaved

@@ -40,6 +40,7 @@ os.environ['PYTHONPATH']=\
 	os.pathsep.join([
 		os.environ['PYTHONDIR'],
 		os.path.join( os.environ['PYTHONDIR'], 'Numeric'),
+		os.path.join( os.environ['PYTHONDIR'], 'libsbml'),
 		os.path.join( os.environ['PYTHONDIR'], 'gtk-2.0')
 	])
 	

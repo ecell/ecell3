@@ -54,8 +54,8 @@ UninstallDisplayName=E-Cell Simulation Environment {#Version}
 ChangesAssociations=yes
 OutputBaseFilename=ecell-{#Version}{#Filename}.{#Arch}
 OutputDir=.
-;Compression=none
-Compression=lzma/ultra
+Compression=none
+;Compression=lzma/ultra
 WizardSmallImageFile=installer_header.bmp
 WizardImageFile=installer_intro.bmp
 WizardImageStretch=no
@@ -490,7 +490,6 @@ begin
             CheckListBox.Flat := True;
             CheckListBox.Top := CompLabel.Top + CompLabel.Height + 10;
             CheckListBox.Width := WizardForm.ScriptDlgPanel.Width;
-            {CheckListBox.ExtendedSelect := True;}
             CheckListBox.Parent := WizardForm.ScriptDlgPanel;
 
             PythonCheck := CheckListBox.AddCheckBox('Python version ' + PYTHON_VERSION + PythonRequired, '', 0, not PythonExists, True, False, True, nil);
