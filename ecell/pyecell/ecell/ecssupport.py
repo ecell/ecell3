@@ -4,13 +4,13 @@
 
 
 import string
-
+from ECS import *
 
 def createFullID( fullidstring ):
 
     aFullID = string.split( fullidstring, ':' )
     try:
-        aFullID[0] = PrimitiveTypeDictionary[aFullID[0]]
+        aFullID[0] = PRIMITIVETYPE_DICT[aFullID[0]]
     except IndexError:
         raise ValueError( "Invalid PrimitiveType string (%s)." % aFullID[0] )
     validateFullID( aFullID )
@@ -21,7 +21,7 @@ def createFullPN( fullpnstring ):
 
     aFullPN = string.split( fullpnstring, ':' )
     try:
-        aFullPN[0] = PrimitiveTypeDictionary[aFullPN[0]]
+        aFullPN[0] = PRIMITIVETYPE_DICT[aFullPN[0]]
     except IndexError:
         raise ValueError( "Invalid PrimitiveType string (%s)." %\
                           aFullPN[0] )
@@ -32,14 +32,14 @@ def createFullPN( fullpnstring ):
 def createFullIDString( fullid ):
 
     validateFullID( fullid )
-    aTypeString = PrimitiveTypeString[int(fullid[0])]
+    aTypeString = PRIMITIVETYPE_STRING_LIST[int(fullid[0])]
     return aTypeString + ':' + string.join( fullid[1:], ':' )
 
 
 def createFullPNString( fullpn ):
 
     validateFullPN( fullpn )
-    aTypeString = PrimitiveTypeString[fullpn[0]]
+    aTypeString = PRIMITIVETYPE_STRING_LIST[fullpn[0]]
     return aTypeString + ':' + string.join( fullpn[1:], ':' )
 
 
