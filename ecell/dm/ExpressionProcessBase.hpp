@@ -445,9 +445,11 @@ namespace libecs
 			    | root_node_d[ lexeme_d[ str_p("floor")] ]
 			    | root_node_d[ lexeme_d[ str_p("ceil")] ]
 			    | root_node_d[ lexeme_d[ str_p("fact")] ]
+#ifndef __MINGW32__			    
 			    | root_node_d[ lexeme_d[ str_p("asinh")] ]
 			    | root_node_d[ lexeme_d[ str_p("acosh")] ]
 			    | root_node_d[ lexeme_d[ str_p("atanh")] ]
+#endif			    
 			    | root_node_d[ lexeme_d[ str_p("asech")] ]
 			    | root_node_d[ lexeme_d[ str_p("acsch")] ]
 			    | root_node_d[ lexeme_d[ str_p("acoth")] ]
@@ -602,8 +604,10 @@ namespace libecs
     aFunctionMap["exp"] = exp;       aFunctionMap["log10"] = log10;
     aFunctionMap["log"] = log;       aFunctionMap["floor"] = floor;
     aFunctionMap["ceil"] = ceil;     //aFunctionMap["fact"] = fact;
+#ifndef __MINGW32__	    
     aFunctionMap["asinh"] = asinh;   aFunctionMap["acosh"] = acosh;
     aFunctionMap["atanh"] = atanh;   //aFunctionMap["asech"] = ?;
+#endif
     //aFunctionMap["acsch"] = ?;     //aFunctionMap["acoth"] = ?;
     aFunctionMap["sinh"] = sinh;     aFunctionMap["cosh"] = cosh;
     aFunctionMap["tanh"] = tanh;     //aFunctionMap["sech"] = ?;
