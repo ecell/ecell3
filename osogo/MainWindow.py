@@ -50,7 +50,7 @@ import GTK
 
 import MessageWindow
 import PaletteWindow 
-import EntryListWindow
+import EntityListWindow
 import LoggerWindow
 import InterfaceWindow 
 import StepperWindow 
@@ -157,7 +157,7 @@ class MainWindow(OsogoWindow):
 		self.thePaletteWindow = PaletteWindow.PaletteWindow( self )
 		self.thePaletteWindow.setPluginList( self.thePluginManager.thePluginMap )
 
-		self.theEntryChecker = 0
+		self.theEntityChecker = 0
 		self.theStepperChecker = 0
 
 		self.theUpdateInterval = 150
@@ -172,7 +172,7 @@ class MainWindow(OsogoWindow):
 		self.theStepperWindow.openWindow()
 
 
-		self.theEntryListWindowList = []
+		self.theEntityListWindowList = []
 
 		self.theHandlerMap = \
 		  { 'load_rule_menu_activate'                  : self.openRuleFileSelection ,
@@ -183,7 +183,7 @@ class MainWindow(OsogoWindow):
 			'message_window_menu_activate'         : self.toggleMessageWindowByMenu ,
 			'interface_window_menu_activate'       : self.toggleInterfaceWindowByMenu ,
 			'palette_window_menu_activate'         : self.togglePaletteWindowByMenu ,
-			'create_new_entry_list_menu_activate'  : self.clickEntryListWindow ,
+			'create_new_entity_list_menu_activate'  : self.clickEntityListWindow ,
 			'logger_window_menu_activate'          : self.toggleLoggerWindowByMenu ,
 			'stepper_window_menu_activate'         : self.toggleStepperWindowByMenu ,
 			'preferences_menu_activate'            : self.openPreferences ,
@@ -193,7 +193,7 @@ class MainWindow(OsogoWindow):
 			'step_button_clicked'                  : self.stepSimulation ,
 			'input_step_size'                      : self.setStepSize ,
 			'step_sec_toggled'                     : self.changeStepType ,
-			'entrylist_clicked'                    : self.clickEntryListWindow ,
+			'entitylist_clicked'                    : self.clickEntityListWindow ,
 			'logger_togglebutton_toggled'          : self.toggleLoggerWindowByButton ,
 			'palette_togglebutton_toggled'         : self.togglePaletteWindowByButton ,
 			'message_togglebutton_toggled'         : self.toggleMessageWindowByButton ,
@@ -245,7 +245,7 @@ class MainWindow(OsogoWindow):
 		self['start_button'].set_sensitive(0)
 		self['stop_button'].set_sensitive(0)
 		self['step_button'].set_sensitive(0)
-		self['entrylist'].set_sensitive(0)
+		self['entitylist'].set_sensitive(0)
 		self['palette_togglebutton'].set_sensitive(0)
 		self['palette_window_menu'].set_sensitive(0)
 		self['create_new_entry_list_menu'].set_sensitive(0)
@@ -332,7 +332,7 @@ class MainWindow(OsogoWindow):
 			self['start_button'].set_sensitive(1)
 			self['stop_button'].set_sensitive(1)
 			self['step_button'].set_sensitive(1)
-			self['entrylist'].set_sensitive(1)
+			self['entitylist'].set_sensitive(1)
 			self['palette_togglebutton'].set_sensitive(1)
 			self['palette_window_menu'].set_sensitive(1)
 			self['create_new_entry_list_menu'].set_sensitive(1)
@@ -394,7 +394,7 @@ class MainWindow(OsogoWindow):
 			self['start_button'].set_sensitive(1)
 			self['stop_button'].set_sensitive(1)
 			self['step_button'].set_sensitive(1)
-			self['entrylist'].set_sensitive(1)
+			self['entitylist'].set_sensitive(1)
 			self['palette_togglebutton'].set_sensitive(1)
 			self['create_new_entry_list_menu'].set_sensitive(1)
 			self['load_rule_menu'].set_sensitive(0)
@@ -658,7 +658,7 @@ class MainWindow(OsogoWindow):
 
     
 	# ---------------------------------------------------------------
-	# clickEntryListWindow
+	# clickEntityListWindow
 	#
 	# button_obj : button
 	# *objects : button
@@ -666,20 +666,20 @@ class MainWindow(OsogoWindow):
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def clickEntryListWindow( self, *objects ):
+	def clickEntityListWindow( self, *objects ):
 
 		#fix me: this part is Root System's bug.
-		#if self.theStepperChecker == 1 and self.theEntryChecker == 0:
+		#if self.theStepperChecker == 1 and self.theEntityChecker == 0:
 		if self.theStepperChecker == 1:
 
-			anEntryListWindow = EntryListWindow.EntryListWindow( self )
-			self.theEntryListWindowList.append(anEntryListWindow)
-			self.theEntryChecker = 1
+			anEntityListWindow = EntityListWindow.EntityListWindow( self )
+			self.theEntityListWindowList.append(anEntityListWindow)
+			self.theEntityChecker = 1
 		
 		self.updateFundamentalWindows()
 
 
-	# end of toggleEntryList
+	# end of toggleEntityList
 
 
 	# ---------------------------------------------------------------
@@ -1276,8 +1276,8 @@ class MainWindow(OsogoWindow):
 		self.theStepperWindow.update()
 
 
-		for anEntryListWindow in self.theEntryListWindowList:
-			anEntryListWindow.update()
+		for anEntityListWindow in self.theEntityListWindowList:
+			anEntityListWindow.update()
 
 		# -------------------------------------------
 		# checks buttons  ane menus

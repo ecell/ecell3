@@ -5,8 +5,8 @@ SUBDIRS = plugins
 osogodir=${pkglibdir}
 osogo_DATA=\
 ConfirmWindow.py\
-EntryListWindow.glade\
-EntryListWindow.py\
+EntityListWindow.glade\
+EntityListWindow.py\
 InterfaceWindow.py\
 InterfaceWindow.glade\
 LoggerWindow.glade\
@@ -35,7 +35,7 @@ samplerule.py\
 sample-script.py\
 icon_down.xpm\
 icon_ecelllogo.xpm\
-icon_entry.xpm\
+icon_entity.xpm\
 icon_interface.xpm\
 icon_logger.xpm\
 icon_message.xpm\

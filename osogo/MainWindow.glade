@@ -646,14 +646,14 @@
 	      <widget>
 		<class>GtkButton</class>
 		<child_name>Toolbar:button</child_name>
-		<name>entrylist</name>
+		<name>entitylist</name>
 		<signal>
 		  <name>clicked</name>
-		  <handler>entrylist_clicked</handler>
-		  <last_modification_time>Fri, 13 Sep 2002 00:57:46 GMT</last_modification_time>
+		  <handler>entitylist_clicked</handler>
+		  <last_modification_time>Fri, 13 Sep 2002 02:42:15 GMT</last_modification_time>
 		</signal>
-		<label>EntryList</label>
-		<icon>icon_entry.xpm</icon>
+		<label>EntityList</label>
+		<icon>icon_entity.xpm</icon>
 	      </widget>
 
 	      <widget>
