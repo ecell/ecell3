@@ -6,7 +6,7 @@
 #                                                                            #
 #       written by Yusuke Saito at Keio University Bioinformatics lab.       #
 #                                                                            #
-#      Copyright 1998-1999 by Yusuke Saito (t96406ys@sfc.keio.ac.jp)         #
+#      Copyright 1998-2000 by Yusuke Saito (zhaiteng@sfc.keio.ac.jp)         #
 #                          All Rights Reserved                               #
 #                                                                            #
 ##############################################################################
@@ -15,8 +15,10 @@
 $output_directory = ".";
 $default_template_directory = "@DM_SHARE_DIR@/template/reactor";
 
+&init;
 &search_template;
 &option;
+
 &check_filename;
 &template_file;
 
@@ -36,6 +38,24 @@ close(RD);
 &close_h;
 
 ############################# subroutine ###################################
+
+sub init{
+
+    if($#ARGV==-1){
+	&help;
+	exit;
+    }
+    
+    $verbose = 0;
+    
+    sub message{
+	if($verbose){
+	    print "$_[0]\n";
+	}
+    }
+
+}
+
 sub search_template{
     if (-e 'template') {
 	if (-d 'template') {
@@ -55,6 +75,10 @@ sub option{
 	if($ARGV[$i] eq "-h"){
 	    &help;
 	}
+	elsif($ARGV[$i] eq "-v"){
+	    $ARGV2[$i] =  "";
+	    $verbose = 1;
+	}
 	elsif($ARGV[$i] eq "-d"){
 	    $output_directory = $ARGV[$i+1];
 	    $ARGV2[$i] =  "";
@@ -72,13 +96,13 @@ sub option{
 	    $k++;
 	}
     }
-    print "template_directory: $template_directory\n";
-    print "output_directory: $output_directory\n";
+    &message("template_directory: $template_directory");
+    &message("output_directory: $output_directory");
 }
 
 sub help{
-    print "\n<rd2ch version 1\.1>\n";
-    print "written by Yusuke Saito \(t96406ys\@sfc\.keio\.ac\.jp\)\n\n";   
+    print "\n<rd2ch version 2\.0>\n";
+    print "written by Yusuke Saito \(zhaiteng\@sfc\.keio\.ac\.jp\)\n\n";   
     print "usage: rd2ch filename\.rd\n\n";
     print "option:     -d  output_directory\n";
     print "            -t  template_directory\n";
@@ -181,7 +205,7 @@ sub read_rd{
             $keynum++;
 	}
     }
-    print "loaded $keynum keys from $input_file[0].\n";
+    message("loaded $keynum keys from $input_file[0].");
     #counting the number of loaded keyword
     $map{'@VERSION'} = $property{'%VERSION',1,1};
 }
@@ -281,7 +305,7 @@ sub write_c{
 	    print COUT "$line_cin";
 	}
     }
-    print "writing $c_file ...\n";
+    message("writing $c_file ...");
 }
 
 sub close_c{
@@ -354,7 +378,7 @@ sub write_h{
 	    print HOUT "$line_hin";
 	}
     }
-    print "writing $h_file ...\n";
+    message("writing $h_file ...");
 }
 
 sub close_h{
