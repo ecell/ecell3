@@ -44,7 +44,13 @@ class Session:
         self.theSimulator.initialize()
 
     def createLogger( self,fullpn ):
-        self.theSimulator.getLogger( fullpn )
+        #self.theSimulator.getLogger( fullpn )
+
+	for aLogger in self.theSimulator.getLoggerList():
+		if aLogger == fullpn:
+			return None
+
+        self.theSimulator.createLogger( fullpn )
 
     def getLogger( self, fullpn ):
         return self.theSimulator.getLogger( fullpn )
