@@ -460,6 +460,13 @@ namespace libemc
 
   void LocalSimulatorImplementation::step( const libecs::Integer aNumSteps )
   {
+    if( aNumSteps <= 0 )
+      {
+	THROW_EXCEPTION( libecs::Exception,
+			 "step( n ): n must be 1 or greater. (" +
+			 libecs::stringCast( aNumSteps ) + " given.)" );
+      }
+
     getModel().initialize();  
 
     theRunningFlag = true;
@@ -506,8 +513,6 @@ namespace libemc
 
   void LocalSimulatorImplementation::run()
   {
-    getModel().initialize();
-
     if( ! ( typeid( *theEventChecker ) != 
 	    typeid( DefaultEventChecker ) && 
 	    theEventHandler.get() != NULLPTR ) )
@@ -516,6 +521,8 @@ namespace libemc
 			 "Both EventChecker and EventHandler must be "
 			 "set before run without duration." ) ;
       }
+
+    getModel().initialize();
 
     theRunningFlag = true;
 
