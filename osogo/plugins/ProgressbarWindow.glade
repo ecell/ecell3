@@ -97,6 +97,7 @@
 	<class>GtkHBox</class>
 	<name>hbox13</name>
 	<width>194</width>
+	<height>16</height>
 	<homogeneous>False</homogeneous>
 	<spacing>0</spacing>
 	<child>
@@ -174,9 +175,9 @@
 	    <class>GtkEntry</class>
 	    <name>multiplier_entry</name>
 	    <x>34</x>
-	    <y>5</y>
+	    <y>2</y>
 	    <width>21</width>
-	    <height>13</height>
+	    <height>14</height>
 	    <can_focus>True</can_focus>
 	    <signal>
 	      <name>activate</name>
@@ -194,7 +195,7 @@
       <widget>
 	<class>GtkHBox</class>
 	<name>hbox14</name>
-	<height>12</height>
+	<height>9</height>
 	<homogeneous>True</homogeneous>
 	<spacing>0</spacing>
 	<child>
@@ -245,7 +246,6 @@
 	<class>GtkProgressBar</class>
 	<name>progressbar</name>
 	<width>20</width>
-	<height>22</height>
 	<value>0</value>
 	<lower>0</lower>
 	<upper>1000</upper>
@@ -255,7 +255,7 @@
 	<show_text>True</show_text>
 	<format></format>
 	<text_xalign>0.5</text_xalign>
-	<text_yalign>0.41</text_yalign>
+	<text_yalign>0.37</text_yalign>
 	<child>
 	  <padding>0</padding>
 	  <expand>False</expand>
