@@ -6,9 +6,9 @@ import gtk.gdk
 import re
 import string
 import operator
-from PlotterPluginWindow import *
 from Plot import *
 from ecell.ecssupport import *
+from OsogoPluginWindow import *
 
 class BargraphWindow( OsogoPluginWindow ):
 

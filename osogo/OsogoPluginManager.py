@@ -78,7 +78,6 @@ class OsogoPluginManager(PluginManager):
 		aParent     --- ParentWindow (Window)          # NOT gtk.Window
 		Returns a PluginWindow instance (PluginWindow)
 		"""
-		print data
 		if self.thePluginMap.has_key( aClassname ):
 			pass
 		else:

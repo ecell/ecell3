@@ -27,7 +27,6 @@ OsogoUtil.py\
 PluginInstanceSelection.glade\
 PluginInstanceSelection.py\
 PluginWindowPopupMenu.glade\
-PlotterPluginWindow.py\
 Plot.py\
 board.glade\
 config.py\

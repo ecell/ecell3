@@ -101,7 +101,7 @@ class TracerWindow( OsogoPluginWindow ):
 		self.addHandlers({\
 		    'on_button9_clicked' : self.remove_trace,\
 		    'on_button12_clicked'  : self.change_scale,\
-		    'on___minimize_clicked'  : self.__minimize_clicked})
+		    'on_minimize_clicked'  : self.__minimize_clicked})
 		self.ListWindow.connect("button-press-event",self.button_pressed_on_list)
 		self['button12'].set_label('Log10 Scale')
 
