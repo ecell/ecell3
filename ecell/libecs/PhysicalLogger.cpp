@@ -53,6 +53,20 @@ namespace libecs
 	}
   }
 
+	void PhysicalLogger::setMaxSize( iterator aMaxSize){
+
+    if (PointSize==2)
+	{
+		theVector.setMaxSize ( aMaxSize );
+	} 
+     else
+	{
+		theVectorLong.setMaxSize ( aMaxSize );
+	}
+
+	}
+
+
 	void PhysicalLogger::setEndPolicy( Integer anEndPolicy)
 	{
 

@@ -45,6 +45,14 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.15  2004/06/10 14:29:11  bgabor
+ :	New logger policy API introduced.
+ :	Logger policy is now four element long.
+ :	First: minimum step between logs (0-no lag )
+ :	Second: mimimum interval between logs ( 0-no logs )
+ :	Third: policy at end of disk space or available space ( 0- throw ex, 1 overwrite old data )
+ :	Fourth: available space for the logger in kbytes ( 0- no limit )
+ :
  :	Revision 1.14  2004/05/29 11:54:51  bgabor
  :	Introducing logger policy .
  :	User cen set and get the policy for a certain logger either when the logger is creater or anytime later.
@@ -56,7 +64,7 @@
  :			0-throw exception when disk space is used up
  :			1-start overwriting earliest data
  :	third element:	x parameter for minimum step or time interval for first element
- :
+ :	
  :	Revision 1.13  2004/03/14 19:19:54  satyanandavel
  :	minor fix
  :	
@@ -220,6 +228,7 @@ private:
   size_type _cacheWNum;
   bool size_fixed;
   int end_policy;
+  size_type max_size;
   size_type start_offset;
 
 
@@ -239,6 +248,7 @@ public:
   void clear();
   static void setDiskFullCB(void(*)());
   void setEndPolicy( int );
+  void vvector<T>::setMaxSize( int aMaxSize );
 };
 
 
@@ -251,6 +261,7 @@ template<class T> vvector<T>::vvector()
 {
  size_fixed = false;
   end_policy = 0;
+  max_size = 0;
   start_offset = 0;
   initBase(NULL);
   int counter = VVECTOR_READ_CACHE_INDEX_SIZE;
@@ -272,17 +283,21 @@ template<class T> vvector<T>::~vvector()
 }
 
 template<class T> void vvector<T>::setEndPolicy( int anEndPolicy)
-{
-end_policy=anEndPolicy;
-}
+  {
+    end_policy=anEndPolicy;
+  }
 
+template<class T> void vvector<T>::setMaxSize( int aMaxSize )
+  {
+    max_size = ((aMaxSize/VVECTOR_WRITE_CACHE_SIZE)+1)*VVECTOR_WRITE_CACHE_SIZE;
+  }
 
 template<class T> void vvector<T>::push_back(const T & x)
 {
-ssize_t red_bytes; 
-if(VVECTOR_WRITE_CACHE_SIZE <= _cacheWNum){ 
+    ssize_t red_bytes; 
+    if(VVECTOR_WRITE_CACHE_SIZE <= _cacheWNum){ 
 	      THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. \n");
-}
+  }
 
   _cacheWV[_cacheWNum] = x;
   	if (_cacheWNum==0){_cacheWI[0]=_size;}
@@ -290,18 +305,18 @@ if(VVECTOR_WRITE_CACHE_SIZE <= _cacheWNum){
   if (size_fixed){
 	_cacheWI[0]--;
 	}
-  if (VVECTOR_WRITE_CACHE_SIZE <= ++_cacheWNum) {
+  if ((VVECTOR_WRITE_CACHE_SIZE <= ++_cacheWNum)) {
 	// first try to append
 	if (!size_fixed){
-    	if ((red_bytes=write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE))
-		!= sizeof(T) * VVECTOR_WRITE_CACHE_SIZE) 
+    	if ( ( (red_bytes=write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE) )
+		!= sizeof(T) * VVECTOR_WRITE_CACHE_SIZE) || (_size+1==max_size) )
 		{
 
 			if (end_policy == 0)
 				{
 				if (_size>0)
 					{
-	    		  	THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly disk full.\n");
+	    		  	THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly disk or allocated space is full.\n");
 					}
 				else{
 		    		  THROW_EXCEPTION( libecs::Exception,  "Write() failed in VVector. Possibly IO or permission error.\n");

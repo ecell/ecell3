@@ -74,6 +74,8 @@ namespace libecs
 
 	void setEndPolicy( Integer );
 
+	void setMaxSize( iterator );
+
     iterator lower_bound( const iterator& start,
 			  const iterator& end,
 			  const Real time ) const;

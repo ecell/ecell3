@@ -56,8 +56,7 @@ namespace libecs
     theLoggerAdapter( aLoggerAdapter ),
     theMinimumInterval( 0.0 ),
     theLastTime( 0.0 ) ,
-	theStepCounter( 0 ), 
-	theLogPolicy(0)
+	theStepCounter( 0 )
   {
 	// init physicallogers, the first 2 element, the others five element ones
 	thePhysicalLoggers[0] = new PhysicalLogger(2);
@@ -84,18 +83,30 @@ namespace libecs
   
   void Logger::setLoggerPolicy( PolymorphCref aParamList )
   {
-	if (aParamList.asPolymorphVector().size()!=3){
-		THROW_EXCEPTION( libecs::Exception, "Logger policy array should be 3 element long.\n" );
+	if (aParamList.asPolymorphVector().size()!=4){
+		THROW_EXCEPTION( libecs::Exception, "Logger policy array should be 4 element long.\n" );
 }
 	loggingPolicy = aParamList;
-	theLogPolicy = loggingPolicy.asPolymorphVector()[0];
-	theMinimumInterval = loggingPolicy.asPolymorphVector()[2];
-
+	theMinimumStep = static_cast<Integer>(loggingPolicy.asPolymorphVector()[0]);
+	theMinimumInterval = static_cast<Real>(loggingPolicy.asPolymorphVector()[1]);
+	phys_iterator theMaxSize;
+	//calculate maxsize from available Kbytes
+	if (loggingPolicy.asPolymorphVector()[3].asInteger()>0){
+		Real lds_inv( 1.0/_LOGGER_DIVIDE_STEP );
+		Real longdp_part( lds_inv * ( static_cast<Real>(powf(static_cast<float>(lds_inv), static_cast<float>
+		(_LOGGER_MAX_PHYSICAL_LOGGERS)-1.0))-1.0)/(lds_inv-1.0));
+		Real avg_datapoint_size( static_cast<Real>(sizeof(DataPoint)) + 
+			static_cast<Real>(sizeof(DataPointLong))*longdp_part );
+		avg_datapoint_size*=1.02;
+		theMaxSize = static_cast<phys_iterator>(static_cast<Real>(loggingPolicy.asPolymorphVector()[3].asInteger())*1024.0/avg_datapoint_size );
+	}
 	for (int i=0;i<_LOGGER_MAX_PHYSICAL_LOGGERS;i++)
 	{
-	    thePhysicalLoggers[i]->setEndPolicy( loggingPolicy.asPolymorphVector()[1]);
+	    thePhysicalLoggers[i]->setMaxSize( theMaxSize);
+	    thePhysicalLoggers[i]->setEndPolicy( loggingPolicy.asPolymorphVector()[2]);
+		theMaxSize/=_LOGGER_DIVIDE_STEP;
 	}
-	
+
   }
 
 
@@ -163,26 +174,25 @@ namespace libecs
     const Real aCurrentInterval( aTime - theLastTime );
     DataPoint dp;
     DataPointLong dpl;
-	bool logcondition;
+	bool logcondition(true);
+	bool stepcondition(false);
+	bool timecondition(false);
     dp.setTime( aTime);
     dp.setValue( aValue);
 
     theDataAggregators[0].aggregate( dp ); 
-	switch(theLogPolicy){
-	case 1:
+	if ((theMinimumStep>0)||(theMinimumInterval>=0)){
+
+	if (theMinimumStep>0){
 		theStepCounter++;
-		logcondition = ( theStepCounter >= static_cast<const_iterator>(theMinimumInterval) );
-	break;
-	case 2:
-		logcondition = ( theMinimumInterval <= aCurrentInterval );
-	break;
-	default:
-		logcondition=true;
-	break;
-
+		stepcondition = ( theStepCounter >= static_cast<const_iterator>(theMinimumStep) );
+		}
+	if (theMinimumInterval>0){
+		timecondition = ( theMinimumInterval <= aCurrentInterval );
+		}
+	logcondition=timecondition||stepcondition;
 	}
-
-    if (logcondition )
+    if ( logcondition )
       {
 
 		//getdata
@@ -313,7 +323,6 @@ namespace libecs
     --log_no;
     avg_interval=thePhysicalLoggers[log_no]->get_avg_interval();
 
-//	printf("iteration log_no %i, avg_interval %f, size %i, range %i\n", log_no, avg_interval,thePhysicalLoggers[log_no]->size(), range);
 
 	}
     while (((avg_interval>(anInterval/3))||(avg_interval==0.0)||(thePhysicalLoggers[log_no]->size()<range))&&
@@ -325,7 +334,6 @@ namespace libecs
     Real time_per_step( ( theEndTime - theStartTime ) /
 		    ( thePhysicalLoggers[log_no]->end() - thePhysicalLoggers[log_no]->begin() ) );
 
-//	printf("loggerstartime %f, loggerendtime %f, time_per_step %f\n", theStartTime, theEndTime,time_per_step );	
 
 	theStartTime = aStartTime;
 	theEndTime = anEndTime;
@@ -352,7 +360,6 @@ namespace libecs
 						   vectorslice_end,
 						   theStartTime,
 						   time_per_step ) );
-//printf("vectorslice start %i, vectorslice start %i\n", vectorslice_start , vectorslice_end );
 
 	// start from vectorslice start to vectorslice end, scan through all datapoints
 	
@@ -379,7 +386,6 @@ namespace libecs
 
 			}
 		while((readDpl.getTime() < targetTime ) && (loggerCounter < vectorslice_end));
-//	printf(" readDpl.getTime() %f, targetTime %f, loggerCounter%i, elementCount%i\n", readDpl.getTime(), targetTime, loggerCounter, elementCount );
 		aDataPointVector->asLong(elementCount) = theAggregator.getData();
 
 

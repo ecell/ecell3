@@ -227,7 +227,7 @@ class LoggerStub( ObjectStub ):
 	# ---------------------------------------------------------------
 
 	def setMinimumInterval( self, anInterval ):
-
+		print "setMinimumInterval will be deprecated. use setLoggerPolicy instead."
 		return self.theSimulator.setLoggerMinimumInterval( self.theFullPNString, anInterval )
 
 	# end of setMinimumInterval
@@ -241,10 +241,39 @@ class LoggerStub( ObjectStub ):
 	# ---------------------------------------------------------------
 
 	def getMinimumInterval( self ):
-
+		print "getMinimumInterval will be deprecated. use getLoggerPolicy instead."
 		return self.theSimulator.getLoggerMinimumInterval( self.theFullPNString )
 
 	# end of getMinimumInterval
+
+	# ---------------------------------------------------------------
+	# getLoggerPolicy
+	#
+	# return -> the logger policy
+	# This method can throw exceptions.
+	# ---------------------------------------------------------------
+
+	def getLoggerPolicy( self ):
+		return self.theSimulator.getLoggerPolicy( self.theFullPNString )
+
+	#end of getLoggerPolicy
+
+	# ---------------------------------------------------------------
+	# setLoggerPolicy
+	#
+	# return -> the logger policy
+	# tuple of 4 numbers 
+	# first number : minimum step count
+	# second number : minimum time interval
+	# third number : policy when disk space or allocataed storage is used up : 0 throw exeption, 1 overwrite old data
+	# fourth number : max allocated space by logger in kilobytes.
+	# This method can throw exceptions.
+	# ---------------------------------------------------------------
+
+	def setLoggerPolicy( self, aLoggingPolicy ):
+		return self.theSimulator.setLoggerPolicy( self.theFullPNString, aLoggingPolicy)
+
+	#end of setLoggerPolicy
 
 # end of LoggerStub
 

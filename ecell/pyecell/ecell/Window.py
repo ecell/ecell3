@@ -67,7 +67,8 @@ class Window:
 
 	# ==============================================================
 	def openWindow( self ):
-		"""loads Glade file
+		"""
+		loads Glade file
 		Returns None
 		[Note]:If IOError happens during reading Glade file,
 		       throws an exception.

@@ -64,6 +64,7 @@ namespace libecs
   public:
 
     typedef DataPointVectorIterator const_iterator;
+	typedef PhysicalLogger::iterator phys_iterator;
 
 
   public:
@@ -222,8 +223,10 @@ namespace libecs
     DataPointAggregator* theDataAggregators;
     Real                 theLastTime;
 	const_iterator       theStepCounter;
-	Integer              theLogPolicy; //0-no minimum interval, 1 by step 2 by time
+	Integer              theMinimumStep; //0-minimum step, 1 minimum time 3 end policy 4 max space available in kbytes
     Real                 theMinimumInterval;
+
+	
 	Integer sizeArray[_LOGGER_MAX_PHYSICAL_LOGGERS];
 	Polymorph 			 loggingPolicy;
   };

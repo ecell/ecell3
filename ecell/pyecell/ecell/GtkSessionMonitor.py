@@ -49,6 +49,9 @@ import InterfaceWindow
 import StepperWindow 
 import BoardWindow 
 import ConfigParser
+import LoggingPolicy
+import os.path
+import os
 
 from ConfirmWindow import *
 
@@ -65,14 +68,24 @@ class GtkSessionMonitor(Session):
 		windows but doesn't show them"""
 
 		#calls superclass
-	
 		Session.__init__(self, aSimulator )
 
 		# -------------------------------------
 		# reads defaults from osogo.ini 
 		# -------------------------------------
 		self.theConfigDB=ConfigParser.ConfigParser()
-    		self.theConfigDB.read(OSOGO_PATH+os.sep+'osogo.ini')
+
+		self.theIniFileName = GUI_HOMEDIR + os.sep + 'osogo.ini'
+		theDefaultIniFileName = OSOGO_PATH + os.sep + 'osogo.ini'
+		if not os.path.isfile( self.theIniFileName ):
+			# get from default
+	   		self.theConfigDB.read(theDefaultIniFileName)
+			# try to write into home dir
+	   		self.saveParameters()
+		else:
+			# read from default
+	   		self.theConfigDB.read(self.theIniFileName)
+
 
 		self.theUpdateInterval = 150
 		self.stuckRequests = 0
@@ -262,7 +275,7 @@ class GtkSessionMonitor(Session):
 
 
 	# ==========================================================================
-	def openConfirmWindow(self,  aMessage, aTitle ):
+	def openConfirmWindow(self,  aMessage, aTitle, isCancel = 1 ):
 		""" pops up a modal dialog window
 			with aTitle (str) as its title
 			and displaying aMessage as its message
@@ -271,10 +284,23 @@ class GtkSessionMonitor(Session):
 			True if Ok button is pressed
 			False if cancel button is pressed
 		"""
-		aConfirmWindow = ConfirmWindow(1, aMessage, aTitle )
+		aConfirmWindow = ConfirmWindow(isCancel, aMessage, aTitle )
 		return aConfirmWindow.return_result() == OK_PRESSED
 
-
+	# ==========================================================================
+	def openLogPolicyWindow(self,  aLogPolicy, aTitle ="Set log policy" ):
+		""" pops up a modal dialog window
+			with aTitle (str) as its title
+			and displaying loggingpolicy
+			and with an OK and a Cancel button
+			users can set logging policy
+			returns:
+			logging policy if OK is pressed
+			None if cancel is pressed
+		"""
+		aLogPolicyWindow = LoggingPolicy.LoggingPolicy( self, aLogPolicy, aTitle )
+		return aLogPolicyWindow.return_result()
+		
 	# ==========================================================================
 	def createEntityListWindow( self ):
 		"""creates and returns an EntityListWindow
@@ -325,10 +351,12 @@ class GtkSessionMonitor(Session):
 			self.updateWindows()
 			if self.stuckRequests > 0:
 				self.stuckRequests -= 1
+			elif self.theUpdateInterval >300:
+				self.theUpdateInterval /=2
 		else:
 			self.stuckRequests +=1
 			if self.stuckRequests >20:
-				self.theUpdateInterval *= 2		
+				self.theUpdateInterval *= 2
 		self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.__updateByTimeOut, 0 )
 
 
@@ -441,6 +469,56 @@ class GtkSessionMonitor(Session):
 			# sets it in default
 			self.theConfigDB.set('DEFAULT',aParameter, str(aValue))
 
+	# ==========================================================================
+	def saveParameters( self ):
+		"""tries to save all parameters into a config file in home directory
+		"""
+		try:
+			fp = open( self.theIniFileName, 'w' )
+			self.theConfigDB.write( fp )
+		except:
+			self.message("Couldnot save preferences into file %s.\n Please check permissions for home directory.\n"%self.theIniFileName)
+			
+	#-------------------------------------------------------------------
+	def createLoggerWithPolicy( self, fullpn, logpolicy = None ):
+		"""creates logger for fullpn with logpolicy. if logpolicy parameter is not given, gets parameters from 
+		config database		
+		"""
+		# if logpolicy is None get it from parameters
+		if logpolicy == None:
+			logpolicy = self.getLogPolicyParameters()
+		self.theSimulator.createLogger( fullpn, logpolicy )
+
+	#-------------------------------------------------------------------
+	def changeLoggerPolicy( self, fullpn, logpolicy ):
+		"""changes logging policy for a given logger
+		"""
+		self.theSimulator.setLoggerPolicy( fullpn, logpolicy )
+		
+	#-------------------------------------------------------------------
+	def getLogPolicyParameters( self ):
+		"""
+		gets logging policy from config database
+		"""
+		logPolicy = []
+		logPolicy.append ( int( self.getParameter( 'logger_min_step' ) ) )
+		logPolicy.append ( float ( self.getParameter( 'logger_min_interval' ) ) )
+		logPolicy.append ( int( self.getParameter( 'end_policy' ) ) )
+		logPolicy.append ( int (self.getParameter( 'available_space' ) ) )
+		return logPolicy
+
+	#-------------------------------------------------------------------
+	def setLogPolicyParameters( self, logPolicy ):
+		"""
+		saves logging policy into config database
+		"""
+
+		self.setParameter( 'logger_min_step', logPolicy[0] )
+		self.setParameter( 'logger_min_interval', logPolicy[1] ) 
+		self.setParameter( 'end_policy' , logPolicy[2] )
+		self.setParameter( 'available_space' ,logPolicy[3] )
+		self.saveParameters()
+
 
 #------------------------------------------------------------------------
 #IMPORTANT!
@@ -450,7 +528,7 @@ class GtkSessionMonitor(Session):
 
 	#-------------------------------------------------------------------
 	def loadScript( self, ecs, parameters={} ):
-		self.__readIni( ecs )
+		#self.__readIni( ecs )
 		Session.loadScript (self, ecs, parameters )
 
 	#-------------------------------------------------------------------
@@ -459,7 +537,7 @@ class GtkSessionMonitor(Session):
 
 	#-------------------------------------------------------------------
 	def loadModel( self, aModel ):
-		self.__readIni( aModel )
+		#self.__readIni( aModel )
 		Session.loadModel( self, aModel )
 
 	#-------------------------------------------------------------------
@@ -485,28 +563,29 @@ class GtkSessionMonitor(Session):
 			set up a timeout rutin and Running Flag 
 		"""
 
-		if self.theRunningFlag == TRUE:
+		if self.theRunningFlag == True:
 			return
 
 		if time == '' and not self.doesExist('MainWindow'):
 			self.openWindow('MainWindow')
 
 		try:
-			self.theRunningFlag = TRUE
+			self.theRunningFlag = True
+			self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.__updateByTimeOut, FALSE)
 			# this can fail if the simulator is not ready
-			self.theSimulator.initialize()
 
 			aCurrentTime = self.getCurrentTime()
 			self.message("%15s"%aCurrentTime + ":Start\n" )
-			self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.__updateByTimeOut, FALSE)
+			self.theSimulator.initialize()
 			Session.run( self, time )
-			self.theRunningFlag = FALSE
+			self.theRunningFlag = False
 			self.__removeTimeOut()
 
 		except:
 			anErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
 			self.message(anErrorMessage)
-			self.theRunningFlag = 0
+			self.theRunningFlag = False
+			self.__removeTimeOut()
 
 		self.updateWindows()
 
@@ -517,13 +596,13 @@ class GtkSessionMonitor(Session):
 
 
 		try:
-			if self.theRunningFlag == TRUE:
+			if self.theRunningFlag == True:
 				Session.stop( self )
 
 				aCurrentTime = self.getCurrentTime()
 				self.message( ("%15s"%aCurrentTime + ":Stop\n" ))
 				self.__removeTimeOut()
-				self.theRunningFlag = FALSE
+				self.theRunningFlag = False
 
 		except:
 			anErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
@@ -612,6 +691,8 @@ class GtkSessionMonitor(Session):
 	def createLogger( self, fullpn ):
 		Session.createLogger( self, fullpn )
 #FIXME		#remember refresh Tracer and Loggerwindows!!!
+
+
 
 	#-------------------------------------------------------------------
 	def createLoggerStub( self, fullpn ):

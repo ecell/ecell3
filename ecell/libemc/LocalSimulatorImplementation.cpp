@@ -310,6 +310,7 @@ namespace libemc
   {
    libecs::PolymorphVector aVector;
    aVector.push_back(Integer(0));
+   aVector.push_back(Real(0.0));
    aVector.push_back(Integer(0));
    aVector.push_back(Integer(0));
 	createLogger( aFullPNString, libecs::Polymorph(aVector) );
