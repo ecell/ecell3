@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 import sys
+import os
 import string 
 import getopt
 import tempfile
@@ -167,6 +168,7 @@ class EmParser( GenericParser ):
 	def p_object_decl( self, args ):
 		'''
 		object_decl ::= name ( name )
+		object_decl ::= Variable ( name )
 		'''
 		return AST ( Token( 'object_decl' ), ( args[0], args[2] ) )
 
@@ -347,7 +349,6 @@ class Interpret(GenericASTTraversal):
 			aValueList = []
 			for j in aValueNodeList:
 				aValueList.append( j )
-			print aPropertyName, aValueList
 			self.eml.setEntityProperty( anID, aPropertyName,\
 						     aValueList )
 		
@@ -393,51 +394,88 @@ def convert2FullID( anEml, aType, aSystemID ):
     
     
 def usage():
-	sys.stderr.write("""\
-Usage: em2eml.py [options] <filename>
+	aProgramName = os.path.basename( sys.argv[0] )
+	print '''
+%s -- convert em to eml
+
+Usage: %s [-h] [-f] [-o outfile] infile
        default automatic rename mode (*.em -> *.eml) 
 
-Valid options:
-  -f      stdout mode
-  -E      preprocessing only. implies -f.
-""")
+Options:
+        -h or --help    :  Print this message.
+        -f or --force   :  Force overwrite even if outfile already exists.
+        -o or --outfile=:  Specify output file name.  '-' means stdout.
+        -E or --execute=:  Preprocessing only. implies -.
+''' % ( aProgramName, aProgramName )
+	
 if __name__ == '__main__':
 
-	import os
 	import ecell.em
 	em = ecell.em ; del ecell.em
 
 
 	try:
-		opts , args = getopt.getopt(sys.argv[1:] , 'fED')
+		opts , args = getopt.getopt( sys.argv[1:] , 'DEhfo:',
+					     ["help", "force", "outfile="])
 	except:
 		usage()
-		sys.exit(0)
-		
-	stdout = 0
+		sys.exit(1)
+
+	anEmlFileName = None
+	aForceFlag = 0
 	debug = 0
 	preprocessing_only = 0
-	for (opt , value ) in opts:
-		if opt == '-D':
-			debug = 1
-		if opt == '-f':
-			stdout = 1
-		if opt == '-E':
-			preprocessing_only = 1
-			stdout = 1
+	for anOption, anArg in opts:
+		if anOption in ( "-h", '--help' ):
+			usage()
+			sys.exit(0)
 			
-	if not args:
-		args.append('-')
-	for filename in args:
-		if filename == '-':
-			anEmFile = sys.stdin
+		if anOption in ( "-D", '--debug' ):
+			debug = 1
+			
+		if anOption in ( "-f", '--force' ):
+			aForceFlag = 1
+
+		if anOption in ( "-o", '--outfile'):
+		        anEmlFileName = anArg
+
+		if anOption in ( "-E", '--execute'):
+			preprocessing_only = 1
+                        anEmlFileName = '-'			
+
+        if len( args ) == 0:
+		sys.stderr.write( "No input file.\n" )
+		sys.exit( 1 )
+
+	if args[0] == '-':
+		anEmlFileName = '-'
+		anEmFileName = args[1]
+	else:
+		anEmFileName = args[0]
+		anEmFile = open( anEmFileName, 'r' )
+
+	aBaseName = os.path.basename( anEmFileName )
+	aBaseName, anExt = os.path.splitext( aBaseName )
+
+	if anEmlFileName == None:
+		if anExt == '.em':
+			anExt = '.eml'
 		else:
-			anEmFilename = filename
-			anEmFile = open( anEmFilename, 'r')
+			anExt += '.eml'
+
+		anEmlFileName = aBaseName + anExt
+
+	if anEmlFileName == '-':
+		anEmlFile = sys.stdout
+	else:
+		if os.path.isfile( anEmlFileName ) and aForceFlag == 0:
+			sys.stderr.write( "Output file %s exists. Use -f to overwrite.\n"
+					  % anEmlFileName )
+			sys.exit( 1 )
 
 
 	aTempFileName = tempfile.mktemp()
-	em.invoke( ( "-o", aTempFileName, anEmFilename ) )
+	em.invoke( ( "-o", aTempFileName, anEmFileName ) )
 
 	aTempFile = open( aTempFileName, 'r' )
 	
@@ -445,20 +483,19 @@ if __name__ == '__main__':
 		print string.join( aTempFile.readlines() )
 		sys.exit(0)
 
-	anEmlObject = convertEm2Eml(aTempFile, anEmFilename, debug)
+	anEmlObject = convertEm2Eml(aTempFile, anEmFileName, debug)
 
 	aTempFile.close()
 	os.unlink( aTempFileName )
 
 	aString = anEmlObject.asString()
 	
-	if stdout != 0 or debug != 0:
+        if anEmlFileName == '-' or debug !=0 :
 		print aString
 	else:
-		anOutputFilename =  string.join(string.split(anEmFilename, '.em'), '.eml')
-		anOutput = open(anOutputFilename, 'w')
-		anOutput.write(aString)
-		anOutput.close()
+		anEmlFile = open(anEmlFileName, 'w')
+		anEmlFile.write(aString)
+		anEmlFile.close()
 		
 
 		
