@@ -4,7 +4,7 @@ import sys
 import string
 import os
 import time
-import pprint
+import getopt
 
 from ecell.ecssupport import *
 from ecell.eml import *
@@ -134,8 +134,56 @@ def createSystemList( anEml, aSystemPath='' ):
 
 if __name__ == '__main__':
 
-    # need commandline processing
-    anEmlFileName = sys.argv[1]
+
+    def usage():
+        aProgramName = os.path.basename( sys.argv[0] )
+
+        print '''
+%s -- convert eml to em
+        
+Usage:
+        %s [-h] [-f] [-o outfile] infile
+
+        
+Options:
+        -h or --help    :  Print this message.
+        -f or --force   :  Force overwrite even if outfile already exists.
+        -o or --outfile=:  Specify output file name.  '-' means stdout.
+        
+''' % ( aProgramName, aProgramName )
+
+
+
+
+
+    # commandline processing
+    try:
+        opts, args = getopt.getopt( sys.argv[1:], "hfo:",
+                                    ["help","force", "outfile="] )
+    except getopt.GetoptError:
+        usage()
+        sys.exit( 1 )
+
+    anEmFileName = None
+    aForceFlag = 0
+
+    for anOption, anArg in opts:
+        if anOption in ( "-h", '--help' ):
+            usage()
+            sys.exit( 0 )
+
+        if anOption in ( "-f", '--force' ):
+            aForceFlag = 1            
+
+        if anOption in ( "-o", "--outfile" ):
+            anEmFileName = anArg
+            
+    if len( args ) == 0:
+        sys.stderr.write( "No input file.\n" )
+        sys.exit( 1 )
+
+    anEmlFileName = args[0]
+
     anEmlFile = open( anEmlFileName )
     anEml = Eml( anEmlFile )
     anEmlFile.close()
@@ -143,14 +191,24 @@ if __name__ == '__main__':
     aBaseName = os.path.basename( anEmlFileName )
     aBaseName, anExt = os.path.splitext( aBaseName )
 
-    if anExt == '.eml' or anExt == '.xml':
-        anExt = '.em'
+    if anEmFileName == None:
+        if anExt == '.eml' or anExt == '.xml':
+            anExt = '.em'
+        else:
+            anExt += '.em'
+
+        anEmFileName = aBaseName + anExt
+
+    if anEmFileName == '-':
+        anEmFile = sys.stdout
     else:
-        anExt += '.em'
+        if os.path.isfile( anEmFileName ) and aForceFlag == 0:
+            sys.stderr.write( "Output file %s exists. Use -f to overwrite.\n"
+                              % anEmFileName )
+            sys.exit( 1 )
 
-    anEmFileName = aBaseName + anExt
-
-    anEmFile = open( anEmFileName, 'w' )
+        anEmFile = open( anEmFileName, 'w' )
+            
 
     aHeader = '''
 # created by eml2em program

@@ -454,6 +454,8 @@ class Eml:
             if aChildNode.tagName == 'value':
 
                 aPropertyValueList.append( self.__createValueList( aChildNode ) )
+
+
         return aPropertyValueList
                 
 
