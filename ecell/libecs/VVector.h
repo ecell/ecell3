@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.3  2003/02/23 15:17:40  shafi
+ :	Logger::getData performance tuning by gabor
+ :
  :	Revision 1.2  2003/02/03 15:31:56  shafi
  :	changed vvector cache sizes to 1024
- :
+ :	
  :	Revision 1.1  2002/04/30 11:21:53  shafi
  :	gabor's vvector logger patch + modifications by shafi
  :	
@@ -86,7 +89,9 @@
 typedef int ssize_t;
 #endif /* __BORLANDC__ */
 const unsigned int VVECTOR_READ_CACHE_SIZE = 1024;
-const unsigned int VVECTOR_WRITE_CACHE_SIZE = 1024;
+const unsigned int VVECTOR_WRITE_CACHE_SIZE = 2048;
+const unsigned int VVECTOR_READ_CACHE_INDEX_SIZE = 2;
+const unsigned int VVECTOR_WRITE_CACHE_INDEX_SIZE = 2;
 
 
 class vvectorbase {
@@ -144,9 +149,9 @@ private:
   size_type _size;
   value_type _buf;
   value_type _cacheRV[VVECTOR_READ_CACHE_SIZE];
-  size_type _cacheRI[VVECTOR_READ_CACHE_SIZE];
+  size_type _cacheRI[VVECTOR_READ_CACHE_INDEX_SIZE];
   value_type _cacheWV[VVECTOR_WRITE_CACHE_SIZE];
-  size_type _cacheWI[VVECTOR_WRITE_CACHE_SIZE];
+  size_type _cacheWI[VVECTOR_WRITE_CACHE_INDEX_SIZE];
   size_type _cacheWNum;
 
 // constructor, destructor
@@ -185,11 +190,11 @@ public:
 template<class T> vvector<T>::vvector()
 {
   initBase(NULL);
-  int counter = VVECTOR_READ_CACHE_SIZE;
+  int counter = VVECTOR_READ_CACHE_INDEX_SIZE;
   do {
     _cacheRI[counter] = -1;
   } while (0 <= --counter);
-  counter = VVECTOR_WRITE_CACHE_SIZE;
+  counter = VVECTOR_WRITE_CACHE_INDEX_SIZE;
   do {
     _cacheWI[counter] = -1;
   } while (0 <= --counter);
@@ -207,7 +212,8 @@ template<class T> vvector<T>::~vvector()
 template<class T> void vvector<T>::push_back(const T & x)
 {
   _cacheWV[_cacheWNum] = x;
-  _cacheWI[_cacheWNum] = _size;
+  if (_cacheWNum==0){_cacheWI[0]=_size;}
+  _cacheWI[1] = _size;
   if (VVECTOR_WRITE_CACHE_SIZE <= ++_cacheWNum) {
     my_open_to_append();
     if (write(_fd, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE)
@@ -225,7 +231,7 @@ template<class T> void vvector<T>::push_back(const T & x)
 template<class T>  T const & vvector<T>::operator [] (size_type i)
 {
   assert(i < _size);
-  int counter = VVECTOR_READ_CACHE_SIZE - 1;
+/*  int counter = VVECTOR_READ_CACHE_SIZE - 1;
   do {
     if (_cacheRI[counter] == i) {
       return _cacheRV[counter];
@@ -236,7 +242,16 @@ template<class T>  T const & vvector<T>::operator [] (size_type i)
     if (_cacheWI[counter] == i) {
       return _cacheWV[counter];
     }
-  } while (0 <= --counter);
+  } while (0 <= --counter);*/
+  if (( i >= _cacheRI[0])&&(_cacheRI[1]>=i)){
+  //calculate i's position
+    return _cacheRV[i-_cacheRI[0]];
+  }
+  if ((i>=_cacheWI[0])&&(_cacheWI[1]>=i)){
+  //calculate i's position
+    return _cacheWV[i-_cacheWI[0]];
+  }
+  
   my_open_to_read(static_cast<off_t>(i * sizeof(T)));
   size_type num_to_read = _size - i;
   if (VVECTOR_READ_CACHE_SIZE < num_to_read) {
@@ -249,9 +264,12 @@ template<class T>  T const & vvector<T>::operator [] (size_type i)
     cbError();
   }
   num_red /= sizeof(T);
-  for (ssize_t tmp_index = 0; tmp_index < num_red; tmp_index++) {
+/*  for (ssize_t tmp_index = 0; tmp_index < num_red; tmp_index++) {
     _cacheRI[tmp_index] = i + tmp_index;
-  }
+  }*/
+  _cacheRI[0]=i;
+  _cacheRI[1]=i+num_red-1;
+  
   _buf = _cacheRV[0];
   my_close();
   return _buf;
@@ -261,7 +279,7 @@ template<class T>  T const & vvector<T>::operator [] (size_type i)
 template<class T>  T const & vvector<T>::at(size_type i)
 {
   assert(i < _size);
-  int counter = VVECTOR_READ_CACHE_SIZE - 1;
+/*  int counter = VVECTOR_READ_CACHE_SIZE - 1;
   do {
     if (_cacheRI[counter] == i) {
       return _cacheRV[counter];
@@ -272,7 +290,17 @@ template<class T>  T const & vvector<T>::at(size_type i)
     if (_cacheWI[counter] == i) {
       return _cacheWV[counter];
     }
-  } while (0 <= --counter);
+  } while (0 <= --counter);*/
+  //check whether i is in range of _cacheRI[0],_cacheRI[1]
+  if ((i>=_cacheRI[0])&&(_cacheRI[1]>=i)){
+  //calculate i's position
+    return _cacheRV[i-_cacheRI[0]];
+  }
+  if ((i>=_cacheWI[0])&&(_cacheWI[1]>=i)){
+  //calculate i's position
+    return _cacheWV[i-_cacheWI[0]];
+  }
+  
   my_open_to_read(static_cast<off_t>(i * sizeof(T)));
   size_type num_to_read = _size - i;
   if (VVECTOR_READ_CACHE_SIZE < num_to_read) {
@@ -285,9 +313,12 @@ template<class T>  T const & vvector<T>::at(size_type i)
     cbError();
   }
   num_red /= sizeof(T);
-  for (ssize_t tmp_index = 0; tmp_index < num_red; tmp_index++) {
+/*  for (ssize_t tmp_index = 0; tmp_index < num_red; tmp_index++) {
     _cacheRI[tmp_index] = i + tmp_index;
-  }
+  }*/
+  _cacheRI[0]=i;
+  _cacheRI[1]=i+num_red-1;
+  
   _buf = _cacheRV[0];
   my_close();
   return _buf;

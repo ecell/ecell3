@@ -80,6 +80,26 @@ namespace libecs
 			  const iterator& end,
 			  RealCref time ) const;
 
+    iterator lower_bound_linear( const iterator& start,
+			  const iterator& end,
+			  RealCref time ) const;
+
+    iterator upper_bound_linear( const iterator& start,
+			  const iterator& end,
+			  RealCref time ) const;
+
+    iterator lower_bound_search( const iterator& start,
+			  const iterator& end,
+			  RealCref time,
+			  bool isLinearSearch ) const;
+
+    iterator upper_bound_search( const iterator& start,
+			  const iterator& end,
+			  RealCref time,
+			  bool isLinearSearch ) const;
+
+    iterator next_index( const iterator& start) const;
+
     void getItem( const iterator&, DataPointPtr ) const;
 
     DataPointVectorRCPtr getVector( const iterator& start,
@@ -143,7 +163,6 @@ namespace libecs
 
     iterator theCurrentPosition;
     DataPoint anEmptyDataPoint;
-
     // this mutable can be removed if vvector supports const operations
     mutable Vector theVector;
     

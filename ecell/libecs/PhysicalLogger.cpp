@@ -58,7 +58,7 @@ namespace libecs
 
     while( ( i_start + 1 ) < i_end )
       {
-	if ( theVector[ iterator ].getTime() < time )
+	if ( theVector[ iterator ].getTime() <= time )
 	  {
 	    i_start = iterator;
 	  }
@@ -70,7 +70,12 @@ namespace libecs
 	iterator = ( i_start + i_end ) / 2;
 	
       }
-
+    
+    if ( theVector[ i_end ].getTime() == time )
+	{
+	    i_start=i_end;
+	}
+    
     return i_start;
   }
 
@@ -82,13 +87,110 @@ namespace libecs
   {
     PhysicalLoggerIterator result( lower_bound( start, end, time ) );
 
-    if ( ( result < size() - 1 ) && ( result != time ) )
+    if ( ( result < size() - 1 ) && ( theVector [ result ].getTime() != time ) )
       {
 	++result;
       }
 
     return result;
   }
+
+  PhysicalLoggerIterator 
+  PhysicalLogger::next_index( PhysicalLoggerIteratorCref start ) const
+
+  {
+    PhysicalLoggerIterator result( start );
+
+    if ( result < size() - 1 ) 
+      {
+	++result;
+      }
+
+    return result;
+  }
+
+
+  PhysicalLoggerIterator 
+  PhysicalLogger::lower_bound_linear( PhysicalLoggerIteratorCref start,
+			       PhysicalLoggerIteratorCref end,
+			       RealCref time ) const
+  {
+    PhysicalLoggerIterator i_start( start );
+    PhysicalLoggerIterator i_end( end );
+    Real aTime;
+
+    if ( start > end )
+      {
+	i_start=end;
+	i_end=start;
+      }
+    PhysicalLoggerIterator iterator( i_start );
+    PhysicalLoggerIterator return_value( i_start );
+
+	
+    do
+      {
+	  aTime =theVector[ iterator ].getTime();
+	    if ( aTime <= time )
+		{
+		return_value=iterator;
+		}
+	    
+	  ++iterator;
+	
+      }
+	while ( ( iterator <= i_end ) && ( aTime < time ) );
+
+    return return_value;
+  }
+
+  PhysicalLoggerIterator 
+  PhysicalLogger::upper_bound_linear( PhysicalLoggerIteratorCref start,
+			       PhysicalLoggerIteratorCref end,
+			       RealCref time ) const
+
+  {
+    PhysicalLoggerIterator result( lower_bound_linear( start, end, time ) );
+
+    if ( ( result < size() - 1 ) && ( theVector [ result ].getTime() != time ) )
+      {
+	++result;
+      }
+
+    return result;
+  }
+
+  PhysicalLoggerIterator 
+  PhysicalLogger::upper_bound_search( PhysicalLoggerIteratorCref start,
+			       PhysicalLoggerIteratorCref end,
+			       RealCref time,
+			       bool isLinearSearch ) const
+    {
+	if (isLinearSearch)
+	    {
+	    return upper_bound_linear( start, end, time);
+	    }	
+	else
+	    {
+	    return upper_bound ( start, end, time );
+	    }
+    }
+
+  PhysicalLoggerIterator 
+  PhysicalLogger::lower_bound_search( PhysicalLoggerIteratorCref start,
+			       PhysicalLoggerIteratorCref end,
+			       RealCref time,
+			       bool isLinearSearch ) const
+    {
+	if (isLinearSearch)
+	    {
+	    return lower_bound_linear( start, end, time);
+	    }	
+	else
+	    {
+	    return lower_bound ( start, end, time );
+	    }
+    }
 
   void PhysicalLogger::getItem( PhysicalLoggerIteratorCref where,
 				DataPointPtr what ) const

@@ -31,7 +31,10 @@
 
 
 #include "Logger.hpp"
+#include <cmath>
+#include <assert.h>
 
+#include <stdio.h>
 namespace libecs
 {
 
@@ -109,146 +112,123 @@ namespace libecs
 	theEndTime = anEndTime;
       }
   
-    PhysicalLoggerIterator theMaxSize ( thePhysicalLogger.end() );  
+//    PhysicalLoggerIterator theMaxSize ( thePhysicalLogger.end() );  
+// set up output vector
     DataPointVectorIterator 
       range( static_cast<DataPointVectorIterator>
-	     ( ( theEndTime - theStartTime ) / anInterval ) + 1 );
+	     ( ( theEndTime - theStartTime ) / anInterval ) );
+    //this is a technical adjustment, because I realized that sometimes
+    //conversion from real is flawed, maybe because after some divisions
+    //the real value is not exactly an integer value
+    Real range_pre( ( theEndTime - theStartTime ) / anInterval );
+
+    if ( ( static_cast<Real>(range) ) + 0.9999 < range_pre ) 
+	{
+	    range++;
+	}
+	
+    range++;
+
+    DataPointVectorPtr aDataPointVector( new DataPointVector( range ) );
     DataPointVectorIterator counter( 0 );
 
+//set uo iterators
     PhysicalLoggerIterator 
-      top( thePhysicalLogger.upper_bound( thePhysicalLogger.begin(),
+      vectorslice_end( thePhysicalLogger.upper_bound( thePhysicalLogger.begin(),
 					  thePhysicalLogger.end(),
 					  theEndTime ) );
     
-    
     PhysicalLoggerIterator 
-      current_item( thePhysicalLogger.lower_bound( thePhysicalLogger.begin(),
-						   top,
+      vectorslice_start( thePhysicalLogger.lower_bound( thePhysicalLogger.begin(),
+						   vectorslice_end,
 						   theStartTime ) );
-
-    Real rcounter( theStartTime );
-    Real rtarget( theStartTime );
-    DataPointVectorPtr aDataPointVector( new DataPointVector( range ) );
-    DataPoint aDataPoint;
-    DataPoint nextDataPoint;
-    Real interval( 0.0 );
-    DataInterval aDataInterval;
+//decide on applied method
     
-    PhysicalLoggerIterator it;
+    Real vectorslice_length( 
+		    ( vectorslice_end - vectorslice_start ) );
 
-    thePhysicalLogger.getItem( current_item, &aDataPoint );
-    if (current_item<theMaxSize)
+    Real linear_step_estimate( vectorslice_length / range );
+    Real logarythmic_step_estimate ( log2( vectorslice_length ) );
+    
+//    bool isLinearSearch( (logarythmic_step_estimate > linear_step_estimate) );
+    bool isLinearSearch ( true );
+//initialize iterator indexes    
+    PhysicalLoggerIterator
+	lowerbound_index (vectorslice_start);
+	
+    PhysicalLoggerIterator
+	upperbound_index ( thePhysicalLogger.next_index( lowerbound_index ) ) ;
+				
+//initializa DP-s
+    DataPoint current_DP;
+    DataPoint lower_DP;
+    DataPoint upper_DP;
+    Real currentTime( theStartTime );
+    thePhysicalLogger.getItem( lowerbound_index, &lower_DP );
+    thePhysicalLogger.getItem( upperbound_index, &upper_DP );
+    Real lowerbound_time( lower_DP.getTime() );
+    Real upperbound_time( upper_DP.getTime() );
+    Real lowerbound_value( lower_DP.getValue() );
+    Real upperbound_value( upper_DP.getValue() );
+    
+    
+    do 
 	{
-	    ++current_item;
-	    thePhysicalLogger.getItem( current_item,&nextDataPoint);
-	}
-    else
-	{
-	nextDataPoint=aDataPoint;
-	nextDataPoint.setTime (rtarget);
-	}
-    Real dptime( aDataPoint.getTime() );
-    Real nextdptime ( nextDataPoint.getTime() );
 
-    aDataInterval.beginNewInterval();
-    do
-	{
-	    if ( nextdptime >= rtarget )
-		{		
-		    interval = rtarget - rcounter;
-		    aDataPoint=nextDataPoint;
-		    aDataPoint.setTime( rtarget );
-		    aDataInterval.aggregatePoint(aDataPoint, interval);
-    		    ( *aDataPointVector )[counter] = aDataInterval.getFinalDataPoint();
-		    rtarget += anInterval;
-		    ++counter;
-		    aDataInterval.beginNewInterval();
-		    rcounter+=interval;
-		    if (rcounter==nextdptime)
-			{
-			    aDataPoint=nextDataPoint;
-
-			    if (current_item<theMaxSize)
-    				{
-				    ++current_item;
-				    thePhysicalLogger.getItem( current_item,
-								&nextDataPoint);
-				}
-			    else
-				{
-				    nextDataPoint=aDataPoint;
-				    nextDataPoint.setTime (rtarget);
-				}
-
-			    nextdptime=nextDataPoint.getTime();
-
-			}
-		}
-	    else //nextdptime<rtarget(aggregate and get new data)
+	    assert ( lowerbound_time <= currentTime );//this would be a serious algorythmical error
+	    //if upperbound.time>=currenttime, then it is within interval
+	    //value can be calculated and stored
+	    if ( upperbound_time>= currentTime )
 		{
-
-		    interval = nextdptime - rcounter;
-		    rcounter = nextdptime;
-		    aDataInterval.aggregatePoint ( nextDataPoint, interval );
-
-
-		    aDataPoint=nextDataPoint;
-
-		    if ( current_item < theMaxSize )
-    			{
-			    ++current_item;
-			    thePhysicalLogger.getItem( current_item, 
-							&nextDataPoint);
-			}
-		    else
+		//decide whether there is need to interpolate
+		if ( lowerbound_time == currentTime )
+		    {
+		    current_DP.setValue ( lowerbound_value );
+		    }
+		else
+		    {
+		    if (upperbound_time == currentTime )
 			{
-			    nextDataPoint=aDataPoint;
-			    nextDataPoint.setTime (rtarget);
+			current_DP.setValue ( upperbound_value );
 			}
-
-		    nextdptime = nextDataPoint.getTime();
+		    else //interpolate
+			{
+			current_DP.setValue( ( 
+			    ( upperbound_value - lowerbound_value ) /
+			    ( upperbound_time - lowerbound_time ) ) *
+			    ( currentTime - lowerbound_time ) +
+			    lowerbound_value );
+			}
+		    }
+		// store currentDP
+	    	current_DP.setTime( currentTime );
+    		( *aDataPointVector )[counter] = current_DP;
+		counter++;
+		currentTime+=anInterval;
+		if ( currentTime > theEndTime ) 
+		    {
+		    currentTime = theEndTime;
+		    }		
 		}
-    
+	    else //upperbound_time<current_time
+	    //else get new value
+		{
+		lowerbound_index=thePhysicalLogger.lower_bound_search(
+		    upperbound_index, vectorslice_end, currentTime,
+		    isLinearSearch );
+
+		upperbound_index=thePhysicalLogger.next_index( lowerbound_index );
+		thePhysicalLogger.getItem( lowerbound_index, &lower_DP );
+		thePhysicalLogger.getItem( upperbound_index, &upper_DP );
+		lowerbound_time=lower_DP.getTime();
+		upperbound_time=upper_DP.getTime();
+		lowerbound_value=lower_DP.getValue();
+		upperbound_value=upper_DP.getValue();
+		}
+	
 	}
     while ( counter < range );
     
-/*    
-    while( counter < range )
-      {
-	aDataInterval.beginNewInterval();
-	
-        do 
-	{
-	  if ( dptime <= rcounter ) 
-	    {
-	      thePhysicalLogger.getItem( current_item , &aDataPoint );
-	      ++current_item;	
-	      dptime=aDataPoint.getTime();
-	    }
-
-          if ( dptime > rtarget ) 
-	    { 
-	      interval = rtarget - rcounter;
-	    }
-	  else 
-	    { 
-	      interval = dptime - rcounter;
-	    }
-
-	  aDataInterval.aggregatePoint( aDataPoint, interval );
-	    rcounter += interval;
-
-        } while ( ( rcounter < rtarget ) && ( theMaxSize>=current_item ) );
-
-        ( *aDataPointVector )[counter] = aDataInterval.getFinalDataPoint();
-	rtarget += anInterval;
-	if ( rtarget > theEndTime )
-	{
-	    rtarget = theEndTime;	
-	}
-	++counter;
-*/	
-      
 
     return DataPointVectorRCPtr( aDataPointVector );
   }
