@@ -46,5 +46,5 @@ MichaelisUniUniProcess.dm: Process file(dm file) for this model
        gecell, File->loadModel and load the simple.eml file.
 
    Script mode:
-       ecell3-session run-simple.ecs
+       ecell3-session run-simple.ess
 
