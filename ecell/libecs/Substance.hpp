@@ -32,6 +32,7 @@
 #define ___SUBSTANCE_H___
 #include "libecs.hpp"
 #include "PrimitiveType.hpp"
+#include "Integrators.hpp"
 #include "Entity.hpp"
 
 
@@ -50,7 +51,7 @@ namespace libecs
 
   public: // message slots
 
-    void setAccumulatorClass( UVariableVectorCref message );
+    void setAccumulatorClass( UVariableVectorCref aMessage );
     const UVariableVectorRCPtr getAccumulatorClass() const;
 
   public:
@@ -75,12 +76,21 @@ namespace libecs
     }
 
     /**
-       Fixes or unfixes this Substance.
-       @param f Boolean value. true -> fix, false -> unfix.
+       Fix quantity of this Substance.
     */
-    void fix( bool f )                           
+
+    void setFixed()
     { 
-      theFixed = f; 
+      theFixed = true;
+    }
+
+    /**
+       Unfix quantity of this Substance.
+    */
+
+    void clearFixed()
+    { 
+      theFixed = false;
     }
 
     /**
@@ -104,6 +114,7 @@ namespace libecs
        Invalid if haveConcentration() is false.
        @return Concentration in M (mol/L).
     */
+
     const Real getConcentration() const
     {
       if ( theConcentration < 0 ) 
@@ -124,19 +135,31 @@ namespace libecs
        Clear phase.
        Then call clear() of the integrator.
     */
-    void clear();
+    void clear()
+    { 
+      theVelocity = 0; 
+      theIntegrator->clear();
+    }
 
     /**
        This is called one or several times in react phase.
        Time of call is determined by the type of the integrator.
     */
-    void turn();
+    void turn()
+    {
+      theIntegrator->turn();
+    }
 
     /**
        integrate phase.
        Perform integration by a result calculated by integrator.
     */
     void integrate();
+
+    void setVelocity( RealCref aVelocity )
+    {
+      theVelocity = aVelocity;
+    }
 
     /**
        @return current velocity value in (number of molecules)/(step)
@@ -149,9 +172,9 @@ namespace libecs
     /**
        @param v velocity in number of molecules to be added.
     */
-    void addVelocity( Real velocity ) 
+    void addVelocity( RealCref aVelocity ) 
     {
-      theVelocity += velocity; 
+      theVelocity += aVelocity; 
     }
 
     /**
@@ -169,7 +192,7 @@ namespace libecs
 
        @see setQuantity
     */
-    void loadQuantity( Real q );
+    void loadQuantity( RealCref aQuantity );
 
     /**
        This simply set the quantity of this Substance with check of isFixed().
@@ -177,11 +200,11 @@ namespace libecs
 
        @see isFixed
     */
-    void setQuantity( const Real quantity )
+    void setQuantity( RealCref aQuantity )
     { 
       if( !isFixed() ) 
 	{
-	  loadQuantity( quantity ); 
+	  loadQuantity( aQuantity ); 
 	}
     }
 
@@ -189,7 +212,7 @@ namespace libecs
     /**
        Get a quantity via save() method of the Accumulator.
     */
-    Real saveQuantity();
+    const Real saveQuantity();
 
 
     virtual StringLiteral getClassName() const { return "Substance"; }
@@ -212,11 +235,11 @@ namespace libecs
 
   protected:
 
-    void setAccumulator( StringCref classname );
-    void setAccumulator( AccumulatorPtr accumulator );
-    void setIntegrator( IntegratorPtr integrator ) 
+    void setAccumulator( StringCref anAccumulatorClassname );
+    void setAccumulator( AccumulatorPtr anAccumulator );
+    void setIntegrator( IntegratorPtr anIntegrator ) 
     { 
-      theIntegrator = integrator; 
+      theIntegrator = anIntegrator; 
     }
 
     void makeSlots();
@@ -224,9 +247,9 @@ namespace libecs
   private:
 
     void calculateConcentration() const;
-    void mySetQuantity( Real q ) 
+    void mySetQuantity( RealCref aQuantity ) 
     { 
-      theQuantity = q; 
+      theQuantity = aQuantity; 
       theConcentration = -1; 
     }
 

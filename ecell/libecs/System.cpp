@@ -113,10 +113,10 @@ namespace libecs
   }
 
 
-  void System::setStepperClass( UVariableVectorCref uvector )
+  void System::setStepperClass( UVariableVectorCref aMessage )
   {
     //FIXME: range check
-    setStepperClass( uvector[0].asString() );
+    setStepperClass( aMessage[0].asString() );
   }
 
   const UVariableVectorRCPtr System::getStepperClass() const
@@ -161,23 +161,23 @@ namespace libecs
       }
   }
 
-  void System::setSuperSystem( SystemPtr const supersystem )
+  void System::setSuperSystem( SystemPtr aSystem )
   {
-    Entity::setSuperSystem( supersystem );
+    Entity::setSuperSystem( aSystem );
     theRootSystem = getSuperSystem()->getRootSystem();
   }
 
-  void System::setStepperClass( StringCref classname )
+  void System::setStepperClass( StringCref aClassname )
   {
     StepperPtr aStepper( getRootSystem()->
-			 getStepperMaker().make( classname ) );
+			 getStepperMaker().make( aClassname ) );
     aStepper->setOwner( this );
 
     theStepper = aStepper;
     theStepper->initialize();
   }
 
-  void System::setStepInterval( const Real aStepInterval )
+  void System::setStepInterval( RealCref aStepInterval )
   {
     theStepper->setStepInterval( aStepInterval );
   }
@@ -233,118 +233,122 @@ namespace libecs
       }
   }
 
-  void System::registerReactor( ReactorPtr reactor )
+  void System::registerReactor( ReactorPtr aReactor )
   {
-    if( getReactorMap().find( reactor->getID() ) != getReactorMap().end() )
+    if( getReactorMap().find( aReactor->getID() ) != getReactorMap().end() )
       {
-	delete reactor;
+	delete aReactor;
 	//FIXME: throw exception
 	return;
       }
 
-    theReactorMap[ reactor->getID() ] = reactor;
-    reactor->setSuperSystem( this );
+    theReactorMap[ aReactor->getID() ] = aReactor;
+    aReactor->setSuperSystem( this );
 
     notifyChangeOfEntityList();
   }
 
-  ReactorPtr System::getReactor( StringCref id ) 
+  ReactorPtr System::getReactor( StringCref anID ) 
   {
-    ReactorMapConstIterator i( getReactorMap().find( id ) );
+    ReactorMapConstIterator i( getReactorMap().find( anID ) );
     if( i == getReactorMap().end() )
       {
 	throw NotFound( __PRETTY_FUNCTION__, "[" + getFullID().getString() + 
-			"]: Reactor [" + id + "] not found in this System." );
+			"]: Reactor [" + anID + 
+			"] not found in this System." );
       }
     return i->second;
   }
 
-  void System::registerSubstance( SubstancePtr newone )
+  void System::registerSubstance( SubstancePtr aSubstance )
   {
-    if( getSubstanceMap().find( newone->getID() ) != getSubstanceMap().end() )
+    if( getSubstanceMap().find( aSubstance->getID() ) 
+	!= getSubstanceMap().end() )
       {
-	delete newone;
+	delete aSubstance;
 	//FIXME: throw exception
 	return;
       }
-    theSubstanceMap[ newone->getID() ] = newone;
-    newone->setSuperSystem( this );
+    theSubstanceMap[ aSubstance->getID() ] = aSubstance;
+    aSubstance->setSuperSystem( this );
 
     notifyChangeOfEntityList();
   }
 
-  SubstancePtr System::getSubstance( StringCref id ) 
+  SubstancePtr System::getSubstance( StringCref anID ) 
   {
-    SubstanceMapConstIterator i( getSubstanceMap().find( id ) );
+    SubstanceMapConstIterator i( getSubstanceMap().find( anID ) );
     if( i == getSubstanceMap().end() )
       {
 	throw NotFound(__PRETTY_FUNCTION__, "[" + getFullID().getString() + 
-		       "]: Substance [" + id + "] not found in this System.");
+		       "]: Substance [" + anID + 
+		       "] not found in this System.");
       }
 
     return i->second;
   }
 
 
-  void System::registerSystem( SystemPtr system )
+  void System::registerSystem( SystemPtr aSystem )
   {
-    if( getSystemMap().find( system->getID() ) != getSystemMap().end() )
+    if( getSystemMap().find( aSystem->getID() ) != getSystemMap().end() )
       {
-	delete system;
+	delete aSystem;
 	//FIXME: throw exception
 	return;
       }
 
-    theSystemMap[ system->getID() ] = system;
-    system->setSuperSystem( this );
+    theSystemMap[ aSystem->getID() ] = aSystem;
+    aSystem->setSuperSystem( this );
 
     notifyChangeOfEntityList();
   }
 
-  SystemPtr System::getSystem( SystemPathCref systempath )
+  SystemPtr System::getSystem( SystemPathCref aSystemPath )
   {
-    if( systempath.empty() )
+    if( aSystemPath.empty() )
       {
 	return this;
       }
 
-    SystemPath aSystemPath( systempath );
+
+    SystemPath aSystemPathCopy( aSystemPath );
     SystemPtr aSystem( this );
 
     // looping is faster than recursive search
     do
       {
-	aSystem = aSystem->getSystem( aSystemPath.front() );
-	aSystemPath.pop_front();
+	aSystem = aSystem->getSystem( aSystemPathCopy.front() );
+	aSystemPathCopy.pop_front();
       }
-    while( ! aSystemPath.empty() );
+    while( ! aSystemPathCopy.empty() );
 
     return aSystem;  
   }
 
-  SystemPtr System::getSystem( StringCref id ) 
+  SystemPtr System::getSystem( StringCref anID ) 
   {
-    SystemMapConstIterator i( getSystemMap().find( id ) );
+    SystemMapConstIterator i( getSystemMap().find( anID ) );
     if( i == getSystemMap().end() )
       {
 	throw NotFound( __PRETTY_FUNCTION__, "[" + getFullID().getString() + 
-			"]: System [" + id + "] not found in this System." );
+			"]: System [" + anID + "] not found in this System." );
       }
     return i->second;
   }
 
-  EntityPtr System::getEntity( FullIDCref fullid )
+  EntityPtr System::getEntity( FullIDCref aFullID )
   {
-    SystemPtr aSystem ( getSystem( fullid.getSystemPath() ) );
+    SystemPtr aSystem ( getSystem( aFullID.getSystemPath() ) );
 
-    switch( fullid.getPrimitiveType() )
+    switch( aFullID.getPrimitiveType() )
       {
       case PrimitiveType::SUBSTANCE:
-	return aSystem->getSubstance( fullid.getID() );
+	return aSystem->getSubstance( aFullID.getID() );
       case PrimitiveType::REACTOR:
-	return aSystem->getReactor( fullid.getID() );
+	return aSystem->getReactor( aFullID.getID() );
       case PrimitiveType::SYSTEM:
-	return aSystem->getSystem( fullid.getID() );
+	return aSystem->getSystem( aFullID.getID() );
       default:
 	throw InvalidPrimitiveType( __PRETTY_FUNCTION__, 
 				    "bad PrimitiveType specified." );
@@ -355,34 +359,35 @@ namespace libecs
   }
 
 
-  void System::createEntity( StringCref classname,
-			     FullIDCref fullid, 
-			     StringCref name )
+  void System::createEntity( StringCref aClassname,
+			     FullIDCref aFullID,
+			     StringCref aName )
   {
-    SystemPtr aSuperSystemPtr( getSystem( fullid.getSystemPath() ) );
+    SystemPtr aSuperSystemPtr( getSystem( aFullID.getSystemPath() ) );
 
     ReactorPtr   aReactorPtr  ( NULLPTR );
     SystemPtr    aSystemPtr   ( NULLPTR );
     SubstancePtr aSubstancePtr( NULLPTR );
 
-    switch( fullid.getPrimitiveType() )
+    switch( aFullID.getPrimitiveType() )
       {
       case PrimitiveType::SUBSTANCE:
-	aSubstancePtr = getRootSystem()->getSubstanceMaker().make( classname );
-	aSubstancePtr->setID( fullid.getID() );
-	aSubstancePtr->setName( name );
+	aSubstancePtr = getRootSystem()->
+	  getSubstanceMaker().make( aClassname );
+	aSubstancePtr->setID( aFullID.getID() );
+	aSubstancePtr->setName( aName );
 	aSuperSystemPtr->registerSubstance( aSubstancePtr );
 	break;
       case PrimitiveType::REACTOR:
-	aReactorPtr = getRootSystem()->getReactorMaker().make( classname );
-	aReactorPtr->setID( fullid.getID() );
-	aReactorPtr->setName( name );
+	aReactorPtr = getRootSystem()->getReactorMaker().make( aClassname );
+	aReactorPtr->setID( aFullID.getID() );
+	aReactorPtr->setName( aName );
 	aSuperSystemPtr->registerReactor( aReactorPtr );
 	break;
       case PrimitiveType::SYSTEM:
-	aSystemPtr = getRootSystem()->getSystemMaker().make( classname );
-	aSystemPtr->setID( fullid.getID() );
-	aSystemPtr->setName( name );
+	aSystemPtr = getRootSystem()->getSystemMaker().make( aClassname );
+	aSystemPtr->setID( aFullID.getID() );
+	aSystemPtr->setName( aName );
 	aSuperSystemPtr->registerSystem( aSystemPtr );
 	break;
 

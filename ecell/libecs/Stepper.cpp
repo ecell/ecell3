@@ -30,6 +30,7 @@
 
 #include <functional>
 
+#include "Substance.hpp"
 #include "Integrators.hpp"
 #include "RootSystem.hpp"
 #include "Util.hpp"

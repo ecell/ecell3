@@ -51,7 +51,9 @@ namespace libecs
 
   typedef SystemPtr (*SystemAllocatorFunc)();
 
-  class System : public Entity
+  class System 
+    : 
+    public Entity
   {
 
   public: 
@@ -79,9 +81,9 @@ namespace libecs
 
        @return the pointer to the RootSystem.
     */
-    void setRootSystem( RootSystemPtr rootsystem ) 
+    void setRootSystem( RootSystemPtr aRootSystem ) 
     { 
-      theRootSystem = rootsystem; 
+      theRootSystem = aRootSystem; 
     }
 
     /**
@@ -100,7 +102,7 @@ namespace libecs
 
        @param supersystem a pointer to a System to which this object belongs.
     */
-    void setSuperSystem( SystemPtr const supersystem );
+    void setSuperSystem( SystemPtr aSystem );
 
     /**
        @return A pointer to a Stepper object that this System has or
@@ -115,7 +117,7 @@ namespace libecs
 
        @param classname Classname of the Stepper that this System may have.
     */
-    void setStepperClass( StringCref classname );
+    void setStepperClass( StringCref aClassname );
 
     /**
        @return Volume of this System. Unit is [L].
@@ -129,9 +131,9 @@ namespace libecs
        Set a new volume for this System. 
        Make the new volume effective from beginning of next time step.
      */
-    void setVolume( const Real volume )
+    void setVolume( RealCref aVolume )
     {
-      theVolumeBuffer = volume;
+      theVolumeBuffer = aVolume;
     }
 
 
@@ -154,7 +156,7 @@ namespace libecs
     /**
        Register a Reactor object in this System.
     */
-    void registerReactor( ReactorPtr const newone );
+    void registerReactor( ReactorPtr aReactor );
   
     /**
        Find a Reactor with given id. Unlike getReactorIterator(), this 
@@ -162,12 +164,12 @@ namespace libecs
 
        @return An pointer to a Reactor object in this System named @a id.
     */
-    ReactorPtr getReactor( StringCref id ) ;
+    ReactorPtr getReactor( StringCref anID ) ;
 
     /**
        Register a Substance object in this System.
     */
-    void registerSubstance( SubstancePtr id );
+    void registerSubstance( SubstancePtr aSubstance );
   
 
     /**
@@ -178,7 +180,7 @@ namespace libecs
     /**
        Register a System object in this System
     */
-    void registerSystem( SystemPtr );
+    void registerSystem( SystemPtr aSystem );
 
 
     /**
@@ -193,29 +195,28 @@ namespace libecs
        @return An pointer to a System object in this or subsystems of this
        System object pointed by @a SystemPath
     */
-    virtual SystemPtr getSystem( SystemPathCref systempath );
+    virtual SystemPtr getSystem( SystemPathCref aSystemPath );
 
-    virtual EntityPtr getEntity( FullIDCref fullid );
+    virtual EntityPtr getEntity( FullIDCref aFullID );
 
-    virtual void createEntity( StringCref classname,
-			       FullIDCref fullid,
-			       StringCref name );
+    virtual void createEntity( StringCref aClassname,
+			       FullIDCref aFullID,
+			       StringCref aName );
 
 
     const Real getActivityPerSecond() const;
 
-    void setStepInterval( const Real aStepInterval );
-    const Real getStepInterval() const;
+    virtual void setStepInterval( RealCref aStepInterval );
+    virtual const Real getStepInterval() const;
     const Real getStepsPerSecond() const;
 
     void notifyChangeOfEntityList();
-
 
     static SystemPtr createInstance() { return new System; }
 
   public: // property slots
 
-    void setStepperClass( UVariableVectorCref message );
+    void setStepperClass( UVariableVectorCref aMessage );
 
     const UVariableVectorRCPtr getStepperClass() const;
 

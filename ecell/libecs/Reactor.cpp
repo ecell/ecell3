@@ -66,46 +66,46 @@ namespace libecs
 			&Reactor::getInitialActivity );
   }
 
-  void Reactor::setAppendSubstrate( UVariableVectorCref uvector )
+  void Reactor::setAppendSubstrate( UVariableVectorCref aMessage )
   {
     //FIXME: range check
-    appendSubstrate( FullID( uvector[0].asString() ), uvector[1].asInt() );
+    appendSubstrate( FullID( aMessage[0].asString() ), aMessage[1].asInt() );
   }
 
-  void Reactor::setAppendProduct( UVariableVectorCref uvector )
+  void Reactor::setAppendProduct( UVariableVectorCref aMessage )
   {
     //FIXME: range check
-    appendProduct( FullID( uvector[0].asString() ), uvector[1].asInt() );
+    appendProduct( FullID( aMessage[0].asString() ), aMessage[1].asInt() );
   }
 
-  void Reactor::setAppendCatalyst( UVariableVectorCref uvector )
+  void Reactor::setAppendCatalyst( UVariableVectorCref aMessage )
   {
     //FIXME: range check
-    appendCatalyst( FullID( uvector[0].asString() ), uvector[1].asInt() );
+    appendCatalyst( FullID( aMessage[0].asString() ), aMessage[1].asInt() );
   }
 
-  void Reactor::setAppendEffector( UVariableVectorCref uvector )
+  void Reactor::setAppendEffector( UVariableVectorCref aMessage )
   {
     //FIXME: range check
-    appendEffector( FullID( uvector[0].asString() ), uvector[1].asInt() );
+    appendEffector( FullID( aMessage[0].asString() ), aMessage[1].asInt() );
   }
 
-  void Reactor::setSubstrateList( UVariableVectorCref uvector )
+  void Reactor::setSubstrateList( UVariableVectorCref aMessage )
   {
     //    cerr << "not implemented yet." << endl;
   }
 
-  void Reactor::setProductList( UVariableVectorCref uvector )
+  void Reactor::setProductList( UVariableVectorCref aMessage )
   {
     //    cerr << "not implemented yet." << endl;
   }
 
-  void Reactor::setEffectorList( UVariableVectorCref uvector )
+  void Reactor::setEffectorList( UVariableVectorCref aMessage )
   {
     //    cerr << "not implemented yet." << endl;
   }
 
-  void Reactor::setCatalystList( UVariableVectorCref uvector )
+  void Reactor::setCatalystList( UVariableVectorCref aMessage )
   {
     //    cerr << "not implemented yet." << endl;
   }
@@ -166,45 +166,45 @@ namespace libecs
     return aVectorPtr;
   }
 
-  void Reactor::appendSubstrate( FullIDCref fullid, int coefficient )
+  void Reactor::appendSubstrate( FullIDCref aFullID, IntCref aCoefficient )
   {
     SystemPtr aRootSystem( getRootSystem() );
-    SystemPtr aSystem( aRootSystem->getSystem( fullid.getSystemPath() ) );
-    SubstancePtr aSubstance( aSystem->getSubstance( fullid.getID() ) );
+    SystemPtr aSystem( aRootSystem->getSystem( aFullID.getSystemPath() ) );
+    SubstancePtr aSubstance( aSystem->getSubstance( aFullID.getID() ) );
 
-    appendSubstrate( *aSubstance, coefficient );
+    appendSubstrate( *aSubstance, aCoefficient );
   }
 
-  void Reactor::appendProduct( FullIDCref fullid, int coefficient )
+  void Reactor::appendProduct( FullIDCref aFullID, IntCref aCoefficient )
   {
     SystemPtr aRootSystem( getRootSystem() );
-    SystemPtr aSystem( aRootSystem->getSystem( fullid.getSystemPath() ) );
-    SubstancePtr aSubstance( aSystem->getSubstance( fullid.getID() ) );
+    SystemPtr aSystem( aRootSystem->getSystem( aFullID.getSystemPath() ) );
+    SubstancePtr aSubstance( aSystem->getSubstance( aFullID.getID() ) );
   
-    appendProduct( *aSubstance, coefficient );
+    appendProduct( *aSubstance, aCoefficient );
   }
 
-  void Reactor::appendCatalyst( FullIDCref fullid, int coefficient)
+  void Reactor::appendCatalyst( FullIDCref aFullID, IntCref aCoefficient)
   {
     SystemPtr aRootSystem( getRootSystem() );
-    SystemPtr aSystem( aRootSystem->getSystem( fullid.getSystemPath() ) );
-    SubstancePtr aSubstance( aSystem->getSubstance( fullid.getID() ) );
+    SystemPtr aSystem( aRootSystem->getSystem( aFullID.getSystemPath() ) );
+    SubstancePtr aSubstance( aSystem->getSubstance( aFullID.getID() ) );
   
-    appendCatalyst( *aSubstance, coefficient );
+    appendCatalyst( *aSubstance, aCoefficient );
   }
 
-  void Reactor::appendEffector( FullIDCref fullid, int coefficient )
+  void Reactor::appendEffector( FullIDCref aFullID, IntCref aCoefficient )
   {
     SystemPtr aRootSystem( getRootSystem() );
-    SystemPtr aSystem( aRootSystem->getSystem( fullid.getSystemPath() ) );
-    SubstancePtr aSubstance( aSystem->getSubstance( fullid.getID() ) );
+    SystemPtr aSystem( aRootSystem->getSystem( aFullID.getSystemPath() ) );
+    SubstancePtr aSubstance( aSystem->getSubstance( aFullID.getID() ) );
   
-    appendEffector( *aSubstance, coefficient );
+    appendEffector( *aSubstance, aCoefficient );
   }
 
-  void Reactor::setInitialActivity( const Real activity )
+  void Reactor::setInitialActivity( RealCref anActivity )
   {
-    theInitialActivity = activity;
+    theInitialActivity = anActivity;
 
     theActivity = theInitialActivity * 
       getSuperSystem()->getStepper()->getStepInterval();
@@ -245,27 +245,28 @@ namespace libecs
   }
 
 
-  void Reactor::appendSubstrate( SubstanceRef substrate, int coefficient )
+  void Reactor::appendSubstrate( SubstanceRef aSubstrate, 
+				 IntCref aCoefficient )
   {
-    ReactantPtr aReactantPtr( new Reactant( substrate, coefficient ) );
+    ReactantPtr aReactantPtr( new Reactant( aSubstrate, aCoefficient ) );
     theSubstrateList.push_back( aReactantPtr );
   }
 
-  void Reactor::appendProduct( SubstanceRef product, int coefficient )
+  void Reactor::appendProduct( SubstanceRef aProduct, IntCref aCoefficient )
   {
-    ReactantPtr aReactantPtr( new Reactant( product, coefficient ) );
+    ReactantPtr aReactantPtr( new Reactant( aProduct, aCoefficient ) );
     theProductList.push_back( aReactantPtr );
   }
 
-  void Reactor::appendCatalyst( SubstanceRef catalyst, int coefficient )
+  void Reactor::appendCatalyst( SubstanceRef aCatalyst, IntCref aCoefficient )
   {
-    ReactantPtr aReactantPtr( new Reactant( catalyst, coefficient ) );
+    ReactantPtr aReactantPtr( new Reactant( aCatalyst, aCoefficient ) );
     theCatalystList.push_back( aReactantPtr );
   }
 
-  void Reactor::appendEffector( SubstanceRef effector, int coefficient )
+  void Reactor::appendEffector( SubstanceRef anEffector, IntCref aCoefficient )
   {
-    ReactantPtr aReactantPtr( new Reactant( effector, coefficient ) );
+    ReactantPtr aReactantPtr( new Reactant( anEffector, aCoefficient ) );
     theEffectorList.push_back( aReactantPtr );
   }
 

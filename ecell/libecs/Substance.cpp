@@ -29,7 +29,6 @@
 //
 
 #include "Substance.hpp"
-#include "Integrators.hpp"
 #include "System.hpp"
 #include "RootSystem.hpp"
 #include "Accumulators.hpp"
@@ -59,28 +58,11 @@ namespace libecs
 			&Substance::getAccumulatorClass );
   }
 
-  /*
+  void Substance::setAccumulatorClass( UVariableVectorCref aMessage )
   {
     // FIXME: range check
 
-    Real aQuantity = message[0].asReal();
-
-    if( theAccumulator )
-      {
-	loadQuantity( aQuantity );
-      }
-    else
-      {
-	mySetQuantity( aQuantity );
-      }
-  }
-  */
-
-  void Substance::setAccumulatorClass( UVariableVectorCref message )
-  {
-    // FIXME: range check
-
-    setAccumulator( message[0].asString() );
+    setAccumulator( aMessage[0].asString() );
   }
 
   const UVariableVectorRCPtr Substance::getAccumulatorClass() const
@@ -116,15 +98,14 @@ namespace libecs
     delete theAccumulator;
   }
 
-  void Substance::setAccumulator( StringCref classname )
+  void Substance::setAccumulator( StringCref anAccumulatorClassname )
   {
     try {
-      AccumulatorPtr aAccumulatorPtr;
-      aAccumulatorPtr = 
-	getRootSystem()->getAccumulatorMaker().make( classname );
-      setAccumulator(aAccumulatorPtr);
+      AccumulatorPtr aAccumulatorPtr( getRootSystem()->getAccumulatorMaker()
+				      .make( anAccumulatorClassname ) );
+      setAccumulator( aAccumulatorPtr );
 
-      if( classname != userDefaultAccumulatorName() )
+      if( anAccumulatorClassname != userDefaultAccumulatorName() )
 	{
 	  //FIXME:    *theMessageWindow << "[" << fqpi() 
 	  //FIXME: << "]: accumulator is changed to: " << classname << ".\n";
@@ -143,14 +124,14 @@ namespace libecs
       }
   }
 
-  void Substance::setAccumulator( AccumulatorPtr accumulator )
+  void Substance::setAccumulator( AccumulatorPtr anAccumulator )
   {
     if( theAccumulator != NULLPTR )
       {
 	delete theAccumulator;
       }
 
-    theAccumulator = accumulator;
+    theAccumulator = anAccumulator;
     theAccumulator->setOwner( this );
     theAccumulator->update();
   }
@@ -163,7 +144,7 @@ namespace libecs
       }
 
     // if the user default is invalid fall back to the system default.
-    if( !theAccumulator )  
+    if( ! theAccumulator )  
       {               
 	//FIXME:      *theMessageWindow << "Substance: " 
 	//FIXME:	<< "falling back to the system default accumulator: " 
@@ -173,14 +154,14 @@ namespace libecs
       }
   }
 
-  Real Substance::saveQuantity()
+  const Real Substance::saveQuantity()
   {
     return theAccumulator->save();
   }
 
-  void Substance::loadQuantity( Real quantity )
+  void Substance::loadQuantity( RealCref aQuantity )
   {
-    mySetQuantity( quantity );
+    mySetQuantity( aQuantity );
     theAccumulator->update();
   }
 
@@ -201,7 +182,7 @@ namespace libecs
   { 
     theConcentration = -1;
 
-    if( ! theFixed ) 
+    if( ! isFixed() ) 
       {
 	theIntegrator->integrate();
 
@@ -214,18 +195,6 @@ namespace libecs
 	  }
       }
   }
-
-  void Substance::clear()
-  { 
-    theVelocity = 0; 
-    theIntegrator->clear();
-  }
-
-  void Substance::turn()
-  {
-    theIntegrator->turn();
-  }
-
 
 } // namespace libecs
 

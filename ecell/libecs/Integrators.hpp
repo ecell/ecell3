@@ -31,7 +31,7 @@
 
 #ifndef ___INTEGRATORS_H___
 #define ___INTEGRATORS_H___
-#include "Substance.hpp"
+#include "libecs.hpp"
 
 
 namespace libecs
@@ -61,8 +61,8 @@ namespace libecs
 
   protected:
 
-    void setQuantity( Real quantity ) { theSubstance.theQuantity = quantity; }
-    void setVelocity( Real velocity ) { theSubstance.theVelocity = velocity; }
+    //    void setQuantity( Real quantity ) { theSubstance.theQuantity = quantity; }
+    //    void setVelocity( Real velocity ) { theSubstance.theVelocity = velocity; }
 
   protected:
 

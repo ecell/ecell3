@@ -189,7 +189,7 @@ namespace libecs
     typedef void ( T::* SetUVariableVectorMethodPtr )( UVariableVectorCref );
     typedef const UVariableVectorRCPtr 
     ( T::* GetUVariableVectorMethodPtr )() const;
-    typedef void ( T::* SetRealMethodPtr )( const Real );
+    typedef void ( T::* SetRealMethodPtr )( RealCref );
     typedef const Real ( T::* GetRealMethodPtr )() const;
     typedef void ( T::* SetStringMethodPtr )( StringCref );
     typedef const String ( T::* GetStringMethodPtr )() const;

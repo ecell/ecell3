@@ -28,6 +28,8 @@
 // E-CELL Project, Lab. for Bioinformatics, Keio University.
 //
 
+#include "Substance.hpp"
+
 #include "Integrators.hpp"
 
 
@@ -97,27 +99,27 @@ namespace libecs
     ( this->*( *theTurnFuncPtr ) )();
     ++theTurnFuncPtr;
     ++theStepCounter;
-    setVelocity( 0 );
+    theSubstance.setVelocity( 0 );
   }
 
   void RungeKutta4Integrator::turn0()
   {
-    setQuantity( ( theK[0] * .5 ) + theNumberOfMoleculesCache );
+    theSubstance.loadQuantity( ( theK[0] * .5 ) + theNumberOfMoleculesCache );
   }
 
   void RungeKutta4Integrator::turn1()
   {
-    setQuantity( ( theK[1] * .5 ) + theNumberOfMoleculesCache );
+    theSubstance.loadQuantity( ( theK[1] * .5 ) + theNumberOfMoleculesCache );
   }
 
   void RungeKutta4Integrator::turn2()
   {
-    setQuantity( theK[2] + theNumberOfMoleculesCache );
+    theSubstance.loadQuantity( theK[2] + theNumberOfMoleculesCache );
   }
 
   void RungeKutta4Integrator::turn3()
   {
-    setQuantity( theNumberOfMoleculesCache );
+    theSubstance.loadQuantity( theNumberOfMoleculesCache );
   }
 
   void RungeKutta4Integrator::integrate()
@@ -138,7 +140,7 @@ namespace libecs
 
     aResult *= theOne6th;
 
-    setVelocity( aResult );
+    theSubstance.setVelocity( aResult );
   }
 
 

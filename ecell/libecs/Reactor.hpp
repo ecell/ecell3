@@ -47,7 +47,9 @@ namespace libecs
      Reactor class is used to represent chemical and other phenonema which 
      may or may not result in change in quantity of one or more Substances.
   */
-  class Reactor : public Entity
+  class Reactor 
+    : 
+    public Entity
   {
 
   public:
@@ -61,17 +63,17 @@ namespace libecs
     class isRegularReactor : public std::unary_function< ReactorCptr, bool >
     {
     public:
-      static bool isRegularName( StringCref id )
+      static bool isRegularName( StringCref anID )
       {
-	if( id[0] != '!' )
+	if( anID[0] != '!' )
 	  {
 	    return true;
 	  }
 	return false;
       }
-      bool operator() ( ReactorCptr r ) const
+      bool operator() ( ReactorCptr aReactorPtr ) const
       {
-	return isRegularName( r->getID() );
+	return isRegularName( aReactorPtr->getID() );
       }
     };
 
@@ -79,25 +81,25 @@ namespace libecs
 
     // PropertyInterfaces
 
-    void setAppendSubstrate( UVariableVectorCref message );
-    void setAppendProduct( UVariableVectorCref message );
-    void setAppendCatalyst( UVariableVectorCref message );
-    void setAppendEffector( UVariableVectorCref message );
+    void setAppendSubstrate( UVariableVectorCref aMessage );
+    void setAppendProduct( UVariableVectorCref aMessage );
+    void setAppendCatalyst( UVariableVectorCref aMessage );
+    void setAppendEffector( UVariableVectorCref aMessage );
 
-    void setSubstrateList( UVariableVectorCref message );
-    void setProductList( UVariableVectorCref message );
-    void setCatalystList( UVariableVectorCref message );
-    void setEffectorList( UVariableVectorCref message );
+    void setSubstrateList( UVariableVectorCref aMessage );
+    void setProductList( UVariableVectorCref aMessage );
+    void setCatalystList( UVariableVectorCref aMessage );
+    void setEffectorList( UVariableVectorCref aMessage );
 
     const UVariableVectorRCPtr getSubstrateList() const;
     const UVariableVectorRCPtr getProductList() const;
     const UVariableVectorRCPtr getCatalystList() const;
     const UVariableVectorRCPtr getEffectorList() const;
 
-    void appendSubstrate( FullIDCref fullid, int coefficient );
-    void appendProduct  ( FullIDCref fullid, int coefficient );
-    void appendCatalyst ( FullIDCref fullid, int coefficient );
-    void appendEffector ( FullIDCref fullid, int coefficient );
+    void appendSubstrate( FullIDCref aFullID, IntCref aCoefficient );
+    void appendProduct  ( FullIDCref aFullID, IntCref aCoefficient );
+    void appendCatalyst ( FullIDCref aFullID, IntCref aCoefficient );
+    void appendEffector ( FullIDCref aFullID, IntCref aCoefficient );
 
 
   public:
@@ -132,9 +134,9 @@ namespace libecs
        @param activity [number of molecule that this yields] / [deltaT].
        @see activity()
     */
-    void setActivity( RealCref activity ) 
+    void setActivity( RealCref anActivity ) 
     { 
-      theActivityBuffer = activity; 
+      theActivityBuffer = anActivity; 
     }
 
     /**
@@ -157,13 +159,13 @@ namespace libecs
       return theInitialActivity;
     }
 
-    void setInitialActivity( const Real activity );
+    void setInitialActivity( RealCref anActivity );
 
 
-    void appendSubstrate( SubstanceRef substrate, int coefficient );
-    void appendProduct( SubstanceRef product, int coefficient );
-    void appendCatalyst( SubstanceRef catalyst, int coefficient );
-    void appendEffector( SubstanceRef effector, int coefficient );
+    void appendSubstrate( SubstanceRef aSubstrate, IntCref aCoefficient );
+    void appendProduct(   SubstanceRef aProduct,   IntCref aCoefficient );
+    void appendCatalyst(  SubstanceRef aCatalyst,  IntCref aCoefficient );
+    void appendEffector(  SubstanceRef anEffector, IntCref aCoefficient );
 
     /**
        Returns a pointer to a Reactant of ith substrate.
@@ -172,7 +174,7 @@ namespace libecs
        @return pointer to a Reactant of the substrate.
        @see Reactant
     */
-    ReactantPtr getSubstrate( int i = 0 ) { return theSubstrateList[i]; }
+    ReactantPtr getSubstrate( Int i = 0 ) { return theSubstrateList[i]; }
 
     /**
        Returns a pointer to a Reactant of ith substrate.
@@ -180,7 +182,7 @@ namespace libecs
        @return pointer to a Reactant of the substrate.
        @see substrate
     */
-    ReactantPtr getProduct( int i = 0 ) { return theProductList[i]; }
+    ReactantPtr getProduct( Int i = 0 ) { return theProductList[i]; }
 
     /**
        Returns a pointer to Reactant of ith catalyst.
@@ -188,7 +190,7 @@ namespace libecs
        @return pointer to Reactant of the catalyst.
        @see substrate
     */
-    ReactantPtr getCatalyst( int i = 0 ) { return theCatalystList[i]; }
+    ReactantPtr getCatalyst( Int i = 0 ) { return theCatalystList[i]; }
 
     /**
        Returns a pointer to Reactant for ith effector.
@@ -196,28 +198,28 @@ namespace libecs
        @return pointer to Reactant of a effector.
        @see substrate
     */
-    ReactantPtr getEffector( int i = 0 ) { return theEffectorList[i]; }
+    ReactantPtr getEffector( Int i = 0 ) { return theEffectorList[i]; }
 
     /**
        @return the number of substrates.
     */
-    int getNumberOfSubstrates() const { return theSubstrateList.size(); }
+    const Int getNumberOfSubstrates() const { return theSubstrateList.size(); }
 
     /**
        @return the number of products.
     */
-    int getNumberOfProducts() const { return theProductList.size(); }
+    const Int getNumberOfProducts() const { return theProductList.size(); }
 
     /**
        @return the number of catalysts.
     */
 
-    int getNumberOfCatalysts() const { return theCatalystList.size(); }
+    const Int getNumberOfCatalysts() const { return theCatalystList.size(); }
 
     /**
        @return the number of effectors.
     */
-    int getNumberOfEffectors() const { return theEffectorList.size(); }
+    const Int getNumberOfEffectors() const { return theEffectorList.size(); }
 
 
   protected:
