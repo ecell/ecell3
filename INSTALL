@@ -68,7 +68,7 @@ NOTE: If you get this package via cvs, use ./autogen.sh instead of
 
   RPM packages of Numeric Python and Boost can be found here:
 
-       http://ecell.sf.net/packages/rpm/
+       http://ecell.sourceforge.net/additional-packages/
 
 
   == Build ecell3 without GUI ==
