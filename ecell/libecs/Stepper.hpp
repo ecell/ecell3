@@ -57,10 +57,11 @@ namespace libecs
 
   DECLARE_TYPE( std::valarray<Real>, RealValarray );
 
+  DECLARE_VECTOR( Real, RealVector );
+
 
   /**
      Stepper class defines and governs computation unit in a model.
-
 
   */
 
@@ -122,6 +123,7 @@ namespace libecs
 
     /**
        Update loggers.
+
     */
 
     void log();
@@ -135,12 +137,14 @@ namespace libecs
     
     /**
        @param aSystem
+
     */
 
     void registerSystem( SystemPtr aSystem );
 
     /**
        @param aSystem
+
     */
 
     void removeSystem( SystemPtr aSystem );
@@ -166,6 +170,7 @@ namespace libecs
 
     /**
        This may be overridden in dynamically scheduled steppers.
+
     */
 
     virtual void setStepInterval( RealCref aStepInterval )
@@ -219,6 +224,7 @@ namespace libecs
 
     /**
        @internal
+
     */
 
     void setModel( ModelPtr const aModel )
@@ -322,8 +328,8 @@ namespace libecs
 
     ProcessVectorIterator theFirstNormalProcess;
 
-    RealValarray theValueBuffer;
-    RealValarray theVelocityBuffer;
+    RealVector theValueBuffer;
+    RealVector theVelocityBuffer;
 
 
   private:
@@ -350,14 +356,65 @@ namespace libecs
 
   */
 
-  class DEStepper
+  class DifferentialStepper
     :
     public Stepper
   {
   public:
 
-    DEStepper();
-    virtual ~DEStepper() {}
+    DifferentialStepper();
+    virtual ~DifferentialStepper() {}
+
+    /**
+       Adaptive stepsize control.
+
+       These methods are for handling the standerd error control objects.
+    */
+
+    const Real getRelativeTorelance() const
+    {
+      return theRelativeTorelance;
+    }
+
+    void setRelativeTorelance( RealCref aValue )
+    {
+      theRelativeTorelance = aValue;
+    }
+
+    void setAbsoluteTorelance( RealCref aValue )
+    {
+      theAbsoluteTorelance = aValue;
+    }
+
+    const Real getAbsoluteTorelance() const
+    {
+      return theAbsoluteTorelance;
+    }
+
+    void setStateScalingFactor( RealCref aValue )
+    {
+      theStateScalingFactor = aValue;
+    }
+
+    const Real getStateScalingFactor() const
+    {
+      return theStateScalingFactor;
+    }
+
+    void setDerivativeScalingFactor( RealCref aValue )
+    {
+      theDerivativeScalingFactor = aValue;
+    }
+
+    const Real getDerivativeScalingFactor() const
+    {
+      return theDerivativeScalingFactor;
+    }
+
+    /**
+       Override setStepInterval() for theTolerantStepInterval.
+
+    */
 
     virtual void setStepInterval( RealCref aStepInterval )
     {
@@ -381,24 +438,42 @@ namespace libecs
       return theNextStepInterval;
     }
 
+    void initializeStepInterval( RealCref aStepInterval )
+    {
+      setStepInterval( aStepInterval );
+      setNextStepInterval( aStepInterval );
+    }
+
+    virtual void makeSlots();
+
     virtual void initialize();
 
-    virtual StringLiteral getClassName() const { return "DEStepper"; }
+    virtual StringLiteral getClassName() const 
+    { 
+      return "DifferentialStepper";
+    }
 
 
   protected:
 
+    Real safety;
+
 
   private:
 
-    Real                theTolerantStepInterval;
-    Real                theNextStepInterval;
+    Real theRelativeTorelance;
+    Real theAbsoluteTorelance;
+    Real theStateScalingFactor;
+    Real theDerivativeScalingFactor;
+
+    Real theTolerantStepInterval;
+    Real theNextStepInterval;
   };
 
 
   class FixedEuler1Stepper
     :
-    public DEStepper
+    public DifferentialStepper
   {
   public:
     
@@ -418,7 +493,7 @@ namespace libecs
 
   class FixedRungeKutta4Stepper
     : 
-    public DEStepper
+    public DifferentialStepper
   {
 
   public:
@@ -438,7 +513,7 @@ namespace libecs
 
   class Euler1Stepper
     :
-    public DEStepper
+    public DifferentialStepper
   {
 
   public:
@@ -460,7 +535,7 @@ namespace libecs
 
   class Midpoint2Stepper
     : 
-    public DEStepper
+    public DifferentialStepper
   {
 
   public:
@@ -478,13 +553,13 @@ namespace libecs
 
   protected:
 
-    RealValarray theK1;
+    RealVector theK1;
   };
 
 
   class CashKarp4Stepper
     : 
-    public DEStepper
+    public DifferentialStepper
   {
 
   public:
@@ -502,14 +577,15 @@ namespace libecs
 
   protected:
 
-    RealValarray theK1;
-    RealValarray theK2;
-    RealValarray theK3;
-    RealValarray theK4;
-    RealValarray theK5;
-    RealValarray theK6;
+    RealVector theK1;
+    RealVector theK2;
+    RealVector theK3;
+    RealVector theK4;
+    RealVector theK5;
+    RealVector theK6;
 
-    RealValarray theErrorEstimate;
+    RealVector theErrorEstimate;
+
   };
 
 } // namespace libecs

@@ -143,11 +143,6 @@ namespace libecs
   {
     FOR_ALL( SystemVector, theSystemVector, initialize );
 
-    Int aSize( theVariableCache.size() );
-
-    theValueBuffer.resize( aSize );
-    theVelocityBuffer.resize( aSize );
-
     //    if( isEntityListChanged() )
     //      {
 
@@ -215,7 +210,11 @@ namespace libecs
 
     //    clearEntityListChanged();
     //      }
-    
+
+    Int aSize( theVariableCache.size() );
+
+    theValueBuffer.resize( aSize );
+    theVelocityBuffer.resize( aSize );
   }
 
   const Polymorph Stepper::getSystemList() const
@@ -492,22 +491,66 @@ namespace libecs
   }
 
 
-  ////////////////////////// DEStepper
+  ////////////////////////// DifferentialStepper
 
 
-  DEStepper::DEStepper()
+  DifferentialStepper::DifferentialStepper()
     :
+    theRelativeTorelance( 1.0e-6 ),
+    theAbsoluteTorelance( 1.0e-6 ),
+    theStateScalingFactor( 1.0 ),
+    theDerivativeScalingFactor( 1.0 ),
+    safety( 0.9 ),
     theTolerantStepInterval( 0.001 ),
     theNextStepInterval( 0.001 )
   {
-    ; // do nothing
+    makeSlots();
   }
 
-  void DEStepper::initialize()
+  void DifferentialStepper::makeSlots()
+  {
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "StepInterval", *this,
+				      Type2Type<Real>(),
+				      &DifferentialStepper::initializeStepInterval,
+				      &DifferentialStepper::getStepInterval 
+				      ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "RelativeTorelance", *this,
+				      Type2Type<Real>(),
+				      &DifferentialStepper::setRelativeTorelance,
+				      &DifferentialStepper::getRelativeTorelance
+				      ) );
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "AbsoluteTorelance", *this,
+				      Type2Type<Real>(),
+				      &DifferentialStepper::setAbsoluteTorelance,
+				      &DifferentialStepper::getAbsoluteTorelance
+				      ) );
+ 
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "StateScalingFactor", *this,
+				      Type2Type<Real>(),
+				      &DifferentialStepper::setStateScalingFactor,
+				      &DifferentialStepper::getStateScalingFactor
+				      ) ); 
+
+    registerSlot( getPropertySlotMaker()->
+		  createPropertySlot( "DerivativeScalingFactor", *this,
+				      Type2Type<Real>(),
+				      &DifferentialStepper::setDerivativeScalingFactor,
+				      &DifferentialStepper::getDerivativeScalingFactor
+				      ) ); 
+  }
+
+  void DifferentialStepper::initialize()
   {
     Stepper::initialize();
 
-    setNextStepInterval( getStepInterval() );
+    // should create another method for property slot ?
+    //    setNextStepInterval( getStepInterval() );
   }
 
 
@@ -667,7 +710,7 @@ namespace libecs
 
   void Euler1Stepper::initialize()
   {
-    DEStepper::initialize();
+    DifferentialStepper::initialize();
   }
 
   void Euler1Stepper::step()
@@ -675,12 +718,10 @@ namespace libecs
     const UnsignedInt aSize( theVariableCache.size() );
 
     // don't expect too much from euler
-    const Real eps_abs( 1.0e-6 );
-    const Real eps_rel( 1.0e-6 );
-    const Real a_y( 1.0 );
-    const Real a_dydt( 1.0 );
-
-    const Real safety( 0.9 );
+    const Real eps_rel( getRelativeTorelance() );
+    const Real eps_abs( getAbsoluteTorelance() );
+    const Real a_y( getStateScalingFactor() );
+    const Real a_dydt( getDerivativeScalingFactor() );
 
     integrate();
     slave();
@@ -810,7 +851,7 @@ namespace libecs
 
   void Midpoint2Stepper::initialize()
   {
-    DEStepper::initialize();
+    DifferentialStepper::initialize();
 
     const UnsignedInt aSize( theVariableCache.size() );
 
@@ -821,12 +862,10 @@ namespace libecs
   {
     const UnsignedInt aSize( theVariableCache.size() );
 
-    const Real eps_abs( 1.0e-5 );
-    const Real eps_rel( 1.0e-5 );
-    const Real a_y( 1.0 );
-    const Real a_dydt( 1.0 );
-
-    const Real safety( 0.9 );
+    const Real eps_rel( getRelativeTorelance() );
+    const Real eps_abs( getAbsoluteTorelance() );
+    const Real a_y( getStateScalingFactor() );
+    const Real a_dydt( getDerivativeScalingFactor() );
 
     // integrate phase first
     integrate();
@@ -982,7 +1021,7 @@ namespace libecs
 
   void CashKarp4Stepper::initialize()
   {
-    DEStepper::initialize();
+    DifferentialStepper::initialize();
 
     const UnsignedInt aSize( theVariableCache.size() );
 
@@ -1000,12 +1039,10 @@ namespace libecs
   {
     const UnsignedInt aSize( theVariableCache.size() );
 
-    const Real eps_rel( 1.0e-6 );
-    const Real eps_abs( 1.0e-6 );
-    const Real a_y( 1.0 );
-    const Real a_dydt( 1.0 );
-
-    const Real safety( 0.9 );
+    const Real eps_rel( getRelativeTorelance() );
+    const Real eps_abs( getAbsoluteTorelance() );
+    const Real a_y( getStateScalingFactor() );
+    const Real a_dydt( getDerivativeScalingFactor() );
 
     // integrate phase first
     integrate();
@@ -1223,12 +1260,6 @@ namespace libecs
 	
 	break;
       }
-    
-    //    for( UnsignedInt c( 0 ); c < aSize; ++c )
-    //      {
-    //	std::cout << getStepInterval() << " " 
-    //		  << theVelocityBuffer[ c ] << std::endl;
-    //      }
   }
 
 
