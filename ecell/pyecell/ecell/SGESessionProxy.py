@@ -126,7 +126,7 @@ class SGESessionProxy(SessionProxy):
 			                str(self.getSessionArgument()))
 
 			# create script context
-			aScriptContext = "#!%s\nuname -a\n%s\nexit $?" \
+			aScriptContext = "#!%s\n%s\n\n" \
 				                  %(getCurrentShell(),
 				                    anArgument)
 

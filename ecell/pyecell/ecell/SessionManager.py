@@ -870,6 +870,27 @@ class SessionManager:
 
 		SessionProxy.setRetryMaxCount(limit)
 
+
+	def getStdout( self, jobid ):
+		'''return the stdout of the job
+
+		jobid(int) -- job id
+		
+		Return str : the stdout
+		'''
+		return self.__theSessionProxyDict[jobid].getStdout()
+
+
+	def getStderr( self, jobid ):
+		'''return the stderr of the job
+
+		jobid(int) -- job id
+		
+		Return str : the stderr
+		'''
+		return self.__theSessionProxyDict[jobid].getStderr()
+
+
 	# -------------------------------------------------
 	# methods for intaractive mode
 	# -------------------------------------------------

@@ -511,6 +511,22 @@ class SessionProxy:
 		else:
 			pass
 
+	def getStdout(self):
+		'''Return stdout(str)
+		'''
+
+		return string.join( open(self.getJobDirectory()+ \
+		       self.getStdoutFileName(),'r').readlines(), '\n' )
+
+
+	def getStderr(self):
+		'''Return stderr(str)
+		'''
+
+		return string.join( open(self.getJobDirectory()+ \
+		       self.getStderrFileName(),'r').readlines(), '\n' )
+
+
 
 # end of class SessionProxy
 
