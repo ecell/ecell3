@@ -298,19 +298,19 @@ Both ways, <option>-D</option> and <option>--parameters</option>, can be mixed.
 	seconds. In other words, the meaning of
 	<methodname>run</methodname>( <parameter>10</parameter> ) is
 	to run the simulation <emphasis>at least</emphasis> 10
-	seconds.  It can overrun the specified length of time if the
-	time step interval taken by </para>
+	seconds.  It always overrun the specified length of
+	time to a greater or less.</para>
 
 
-	<note>
-	  <para>The system supports <methodname>run</methodname>
-	  without an argument to run forever, only if both
+	<para>The system supports <methodname>run</methodname>
+	  without an argument to run forever, if and only if both
 	  <emphasis>event checker</emphasis> and <emphasis>event
 	  handler</emphasis> are set.  If not, it raises an exception.
 	  See <methodname>setEventChecker</methodname>() in the method
-	  list of Session class below.
+	  list of Session class. 
 	  </para>
-	</note>
+
+	
 
       </sect3>
 	

@@ -33,7 +33,7 @@ items.
 	</listitem>
 	<listitem>
 	  <para>
-              (optionally but usually) shared object files (.so in
+              (optionally) shared object files (.so in
               Linux operating system), if you are using special classes
               of object in the model file which is not provided by the system
               by default.
@@ -159,7 +159,7 @@ ecell3-dmc options:
   <sect1>
     <title>Other commands</title>
 
-    <para>eml2em, dmcompile, dmgen, eri2eml, rd2dm
+    <para>ecell3-eml2em, ecell3-dmc, eri2eml (unsupported), rd2dm (unsupported)
 
       </para>
 

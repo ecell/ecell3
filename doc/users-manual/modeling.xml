@@ -8,13 +8,24 @@
     
     <simplelist>
       <member>How an &ecell;'s simulation model is organized</member>
-      <member>How to create a model in a text &EM; format</member>
+      <member>How to create the simulation model</member
+      <member>How to write a model file in &EM; format</member>
     </simplelist>
   </highlights>
 
 
   <sect1>
     <title>Simulation Model of &ecell;</title>
+
+    <para>
+    &ecell;'s simulation model is fully object-oriented.  That is, the
+    simulation model is actually a set of <emphasis>objects</emphasis>
+    connected each other.  The objects have
+    <emphasis>properties</emphasis>, which determine characteristics
+    of the objects (such as a reaction rate constant if the object
+    represent a chemical reaction) and the relationships between
+    objects.
+    </para>
 
     <sect2>
       <title>Objects in the Model</title>
@@ -80,7 +91,12 @@ The &Entity; class has three subclasses:
     <sect2>
       <title>&Stepper; objects</title>
 
-      <para></para>
+      <para>A model must have one or more &Stepper; object(s).  </para>
+
+      <para>Each &Process; and &System; object must be connected with
+      a &Stepper; object in the same model.  In other words, &Stepper;
+      objects in the model have non-overlapping sets of &Process; and
+      &System; objects.</para>
     </sect2>
 
 
