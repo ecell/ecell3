@@ -2,13 +2,16 @@ import gnome.canvas
 from Constants import *
 from Utils import *
 from ResizeableText import *
-
+import os
+import gtk
+import gtk.gdk
 
 class ComplexShape:
 
     def __init__( self, anObject, aCanvas, x, y, width, height ):
         self.theCanvas = aCanvas
         self.parentObject = anObject
+        self.thePathwayCanvas = anObject.theLayout.getCanvas()
         self.graphUtils = self.parentObject.getGraphUtils()
         self.x = x
         self.y = y
@@ -53,6 +56,8 @@ class ComplexShape:
                 self.createLine( aDescriptor )
             elif aDescriptor[SD_TYPE] == CV_BPATH:
                 self.createBpath( aDescriptor )
+            elif aDescriptor[SD_TYPE] == CV_IMG:
+                self.createImage( aDescriptor )
         self.isSelected = False
 
 #-------------------------------------------------------------------------------------------------------------
@@ -274,6 +279,43 @@ class ComplexShape:
         textSpec = aDescriptor[SD_SPECIFIC]
         text=textSpec[SPEC_LABEL]
         self.shapeMap[ aDescriptor[ SD_NAME ] ].set_property('text', text )
+
+    def createImage( self, aDescriptor ):
+        imgSpec = aDescriptor[SD_SPECIFIC]
+        filename = SHAPE_PLUGIN_PATH +  imgSpec[IMG_FILENAME]
+        anImage = gtk.Image( )
+        anImage.set_from_file( filename )
+        aPixbuf = anImage.get_property("pixbuf")
+        aWidth = aPixbuf.get_property("width" )
+        aHeight = aPixbuf.get_property( "height" )
+        eventBox = gtk.EventBox()
+        eventBox.add( anImage )
+        eventBox.set_events( gtk.gdk.POINTER_MOTION_MASK| gtk.gdk.BUTTON_PRESS_MASK| gtk.gdk.BUTTON_RELEASE_MASK |gtk.gdk.ENTER_NOTIFY_MASK )
+        aName = aDescriptor [SD_NAME]
+        eventBox.show_all()
+        eventBox.connect( "motion-notify-event", self.img_event, aName )
+        eventBox.connect( "button-press-event", self.img_event, aName )
+        eventBox.connect( "button-release-event", self.img_event, aName )
+        eventBox.connect("enter-notify-event", self.enter_img )
+        x1,y1 = imgSpec[SPEC_POINTS]
+
+        imgShape = self.theRoot.add( gnome.canvas.CanvasWidget, x=x1, y=y1, width = aWidth, height = aHeight, widget = eventBox )
+        self.shapeMap[ aDescriptor[ SD_NAME ] ] = imgShape        
+        
+
+    def img_event( self, *args ):
+        item = args[0]
+        event = args[1]
+        groupx, groupy = self.theRoot.get_property("x") , self.theRoot.get_property("y")
+        allo = item.get_allocation()
+        (a,b,c,d,offsx, offsy)= self.theRoot.i2c_affine( (0,0,0,0,0,0))
+
+        event.x, event.y = groupx - offsx + event.x+allo.x, groupy - offsy + event.y+allo.y
+        user_data = args[2]
+        self.rect_event( item, event, user_data )
+        
+    def enter_img( self, *args ):
+        self.thePathwayCanvas.beyondcanvas = False
 
     def getGdkColor( self, aDescriptor ):
         aColorType = aDescriptor[ SD_COLOR ]

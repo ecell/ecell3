@@ -140,7 +140,8 @@ class PathwayEditor( ListWindow ):
         if not self.exists():
             return
         self.theEntry.set_text( self.theLayout.getName() )
-        self.theLabel.set_text( self.theLayout.getName() )        
+        self.theLabel.set_text( self.theLayout.getName() )
+        self.theLayout.resumeSelection()
 
 
     def deleted( self, *args ):

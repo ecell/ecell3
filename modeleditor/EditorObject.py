@@ -191,6 +191,7 @@ class EditorObject:
             self.theShape.delete()
         self.theSD = anSD
         self.thePropertyMap[OB_SHAPEDESCRIPTORLIST]=self.theSD
+        
         if self.theCanvas != None:
             self.theShape.show()
 
@@ -688,40 +689,14 @@ class EditorObject:
     def __userDeleteObject( self, *args ):
         aCommandList = []
         self.theMenu.destroy()
-        for anObjectID in self.theLayout.theSelectedObjectIDList:
-            aCommandList += [ DeleteObject( self.theLayout, anObjectID ) ]
-        self.theLayout.passCommand( aCommandList )
+        self.theLayout.deleteSelected()
 
         
         
     def __userDeleteEntity ( self, *args ):
 
         self.theMenu.destroy()
-        aModelEditor = self.theLayout.theLayoutManager.theModelEditor
-        aCommandList = []
-        if self.getProperty( OB_HASFULLID ):
-
-            for anObjectID in self.theLayout.theSelectedObjectIDList:
-                anObject = self.theLayout.getObject( anObjectID )
-                aFullID  = anObject.getProperty( OB_FULLID )
-                aCommandList += [ DeleteEntityList( aModelEditor, [ aFullID ] ) ]
-
-        elif self.getProperty( OB_TYPE )==OB_TYPE_CONNECTION:
-            connObj = self.theLayout.getObject( self.theID )
-            varreffName = connObj.getProperty(CO_NAME)
-            proID = connObj.getProperty(CO_PROCESS_ATTACHED)
-            aProcessObject = self.theLayout.getObject(proID)
-            aProcessFullID = aProcessObject.getProperty( OB_FULLID )
-            fullPN = aProcessFullID+':' +MS_PROCESS_VARREFLIST
-            aVarReffList = copyValue( aModelEditor.theModelStore.getEntityProperty( fullPN ) )[:]
-
-            for aVarref in aVarReffList:
-                if aVarref[ME_VARREF_NAME] == varreffName :
-                    aVarReffList.remove( aVarref )
-                    break
-            aCommandList = [ ChangeEntityProperty( aModelEditor, fullPN, aVarReffList ) ]
-
-        self.theLayout.passCommand(  aCommandList  )
+        self.theLayout.deleteEntities()
             
             
 
@@ -986,6 +961,7 @@ class EditorObject:
         maxShift=self.getMaxShiftPos(DIRECTION_RIGHT)
         limit=x+x2+maxShift
         self.setLabelParam(totalWidth,limit)
+        return maxShift + x2
 
 
     def truncateLabel(self,aLabel,lblWidth,dimx):

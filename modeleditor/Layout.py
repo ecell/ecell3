@@ -14,6 +14,7 @@ import gnome.canvas
 class Layout:
 
     def __init__( self, aLayoutManager, aName ):
+        self.theCounter = 0
         self.theLayoutManager = aLayoutManager
         self.theLayoutBufferFactory = self.theLayoutManager.theLayoutBufferFactory
         self.thePackingStrategy = PackingStrategy( self )
@@ -35,7 +36,7 @@ class Layout:
         self.thePathwayEditor = None
         self.theSelectedObjectIDList = []
         
-      
+
         # allways add root dir object
         anObjectID = self.getUniqueObjectID( ME_SYSTEM_TYPE )
         self.createObject( anObjectID, ME_SYSTEM_TYPE, ME_ROOTID, default_scrollregion[0], default_scrollregion[1], None )
@@ -80,6 +81,7 @@ class Layout:
             anObject = self.theObjectMap[ objectID ]
             anObject.setCanvas( self.theCanvas )
             anObject.show()
+        self.resumeSelection()
         
     def __showObject( self, anObjectID ):
         anObject = self.theObjectMap[ anObjectID ]
@@ -301,10 +303,8 @@ class Layout:
 
     def getUniqueObjectID( self, anObjectType ):
         # objectID should be string
-        counter = 0
-        while anObjectType + str( counter) in self.theObjectMap.keys():
-            counter += 1
-        return anObjectType + str( counter )
+        self.theCounter += 1
+        return anObjectType + str( self.theCounter )
 
 
     def getName( self ):
@@ -387,11 +387,49 @@ class Layout:
                 anObject.selected()
         
         if objectType == OB_TYPE_CONNECTION:
-            self.theLayoutManager.theModelEditor.createConnObjectEditorWindow( self.theName, selectedObjectID)
+            self.theLayoutManager.theModelEditor.createConnObjectEditorWindow( self.theName, selectedObjectID )
         else:
-            self.theLayoutManager.theModelEditor.createObjectEditorWindow( self.theName, selectedObjectID)
-        
-        
+            self.theLayoutManager.theModelEditor.createObjectEditorWindow( self.theName, self.theSelectedObjectIDList )
+            
+            
+    def deleteEntities( self ):
+        aModelEditor = self.theLayoutManager.theModelEditor
+        aCommandList = []
+
+        for anObjectID in self.theSelectedObjectIDList:
+            anObject = self.getObject( anObjectID )
+            if anObject.getProperty( OB_HASFULLID ):
+                aFullID  = anObject.getProperty( OB_FULLID )
+                aCommandList += [ DeleteEntityList( aModelEditor, [ aFullID ] ) ]
+
+            elif anObject.getProperty( OB_TYPE )==OB_TYPE_CONNECTION:
+                connObj = anObject
+                varreffName = connObj.getProperty(CO_NAME)
+                proID = connObj.getProperty(CO_PROCESS_ATTACHED)
+                aProcessObject = self.getObject(proID)
+                aProcessFullID = aProcessObject.getProperty( OB_FULLID )
+                fullPN = aProcessFullID+':' +MS_PROCESS_VARREFLIST
+                aVarReffList = copyValue( aModelEditor.theModelStore.getEntityProperty( fullPN ) )[:]
+
+                for aVarref in aVarReffList:
+                    if aVarref[ME_VARREF_NAME] == varreffName :
+                        aVarReffList.remove( aVarref )
+                        break
+                aCommandList = [ ChangeEntityProperty( aModelEditor, fullPN, aVarReffList ) ]
+        self.passCommand(  aCommandList  )
+
+            
+    def deleteSelected( self ):
+        aCommandList = []
+        for anObjectID in self.theSelectedObjectIDList:
+            aCommandList += [ DeleteObject( self, anObjectID ) ]
+        self.passCommand( aCommandList )
+
+                
+    def resumeSelection( self ):
+        for anID in self.theSelectedObjectIDList:
+            anObject = self.getObject( anID )
+            anObject.selected()
         
     def checkConnection( self, x, y, checkFor ):
         objectIDList = self.getObjectList( checkFor )

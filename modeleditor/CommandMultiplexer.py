@@ -47,36 +47,8 @@ class CommandMultiplexer:
                 anObject = anIterator.getNextObject()
                 if anObject == None:
                     break
+                returnCmdList += self.__relabelObject( anObject, aType, newFullID )
 
-                # estimate new textwidth that is available
-                newLabel=newFullID
-                if aType != ME_SYSTEM_TYPE:
-                    newLabel=newFullID.split(':')[2]
-                anObject.calcLabelParam(newLabel)
-                totalWidth,limit=anObject.getLabelParam()
-                
-                if totalWidth>limit:
-                    newLabel=anObject.truncateLabel(newLabel,totalWidth,limit)
-                newDimx=anObject.estLabelWidth(newLabel)
-                oldDimx=anObject.getProperty(OB_DIMENSION_X)
-                deltaWidth=newDimx-oldDimx
-                #no resize necessary for system if newDimx is smaller
-                if aType == ME_SYSTEM_TYPE:
-                    noChild=len(anObject.getObjectList())
-                    if noChild>0:
-                        largestDim=anObject.getLargestChildPosX()
-                        if largestDim>newDimx:
-                            deltaWidth=largestDim-oldDimx
-                    if deltaWidth<0:
-                        deltaWidth=0
-
-                resizeCommand = ResizeObject(anObject.getLayout(),anObject.getID(),0, 0, 0, deltaWidth )
-                renameCommand = SetObjectProperty( anObject.getLayout(), anObject.getID(), OB_FULLID, newFullID )       
-                relabelCommand = SetObjectProperty( anObject.getLayout(), anObject.getID(), OB_LABEL, newLabel )
-                
-                returnCmdList.append( relabelCommand )
-                returnCmdList.append( resizeCommand )           
-                returnCmdList.append( renameCommand )
                 if aType == ME_SYSTEM_TYPE:
                     returnCmdList.extend( self.__changeFullID( anObject, newFullID ) )
                     
@@ -169,7 +141,34 @@ class CommandMultiplexer:
             theLayout = aCmd.theReceiver
             theObject = theLayout.getObject ( chgdID )
             objectType = theObject.getProperty( OB_TYPE )
-            
+            if chgdProperty == OB_SHAPE_TYPE and objectType != OB_TYPE_CONNECTION:
+                newLabel = theObject.getProperty( OB_LABEL )
+                if theObject.getProperty( OB_HASFULLID ):
+                    aType = getFullIDType( theObject.getProperty( OB_FULLID ) )
+                else:
+                    aType = None
+                availSpace = theObject.calcLabelParam(newLabel)
+
+                newDimx, newDimy = self.theModelEditor.theShapePluginManager.getMinDims( theObject.getProperty( OB_TYPE), chgdValue, theObject.getGraphUtils(),newLabel )
+
+                if availSpace<newDimx:
+                    newLabel=theObject.truncateLabel(newLabel,newDimx,availSpace) 
+                newDimx, newDimy = self.theModelEditor.theShapePluginManager.getMinDims( theObject.getProperty( OB_TYPE), chgdValue, theObject.getGraphUtils(),newLabel )
+
+                oldDimx=theObject.getProperty(OB_DIMENSION_X)
+                deltaWidth=newDimx-oldDimx
+                #no resize necessary for system child if newDimx is smaller
+                if aType==ME_SYSTEM_TYPE:
+                    noChild=len(theObject.getObjectList())
+                    if noChild>0:
+                        largestDim=theObject.getLargestChildPosX()
+                        if largestDim>newDimx:
+                            deltaWidth=largestDim-oldDimx
+                    if deltaWidth<0:
+                        deltaWidth=0
+                resizeCommand = ResizeObject(theObject.getLayout(), chgdID,0, 0, 0, deltaWidth )
+                returnCmdList.append( resizeCommand )
+                
             if chgdProperty in GLOBALPROPERTYSET:
                 if objectType == OB_TYPE_CONNECTION:
                     aProcessID = theObject.getProperty( CO_PROCESS_ATTACHED )
@@ -732,8 +731,16 @@ class CommandMultiplexer:
             aFullID = anObject.getProperty( OB_FULLID )
             ( aType, aPath, aName ) = aFullID.split(':')
             aFullID = ':'.join( [aType, newPath, aName ] )
-            
+            returnCmdList += self.__relabelObject ( anObject, aType, aFullID )
+
+            if aType == ME_SYSTEM_TYPE:
+
+                returnCmdList.extend( self.__changeFullID( anObject, aFullID  ) )
+        return returnCmdList
+
+    def __relabelObject(  self, anObject, aType, aFullID ):
             #Label
+            returnCmdList = []
             newLabel=aFullID
             if aType != ME_SYSTEM_TYPE:
                 newLabel=newLabel.split(':')[2]
@@ -753,16 +760,18 @@ class CommandMultiplexer:
                         deltaWidth=largestDim-oldDimx
                 if deltaWidth<0:
                     deltaWidth=0
+            aLayout = anObject.getLayout()
+            anID = anObject.getID()
             resizeCommand = ResizeObject(aLayout, anID,0, 0, 0, deltaWidth )
             renameCommand = SetObjectProperty( aLayout, anID, OB_FULLID, aFullID )
             relabelCommand = SetObjectProperty( aLayout, anID,OB_LABEL, newLabel)
             returnCmdList.append( resizeCommand )
             returnCmdList.append( renameCommand )
             returnCmdList.append( relabelCommand )
-            if aType == ME_SYSTEM_TYPE:
+            return returnCmdList
 
-                returnCmdList.extend( self.__changeFullID( anObject, aFullID  ) )
-        return returnCmdList
+
+
 
     def __checkBrokenConnections(self,oldFullID, newFullID ):
         returnCmdList =[]

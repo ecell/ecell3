@@ -119,7 +119,7 @@ class EntityListTab(ListWindow):
             
         elif aType in [ ME_PROCESS_TYPE, ME_VARIABLE_TYPE ]:
             displayedType = self.__getEntityType()
-            self.theEntityList.aValue = self.theEntityEditorList.getValue()
+            #self.theEntityList.aValue = self.theEntityEditorList.getValue()
             if aType != displayedType:
                 
                 self.theEntityList.changeDisplayedType( aType )

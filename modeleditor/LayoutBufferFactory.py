@@ -69,9 +69,9 @@ class LayoutBufferFactory:
                 topleftX = left
             if ( top <= topleftY or topleftY == None ):
                 topleftY = top
-            if ( right <= bottomRightX or bottomRightX == None ): 
+            if ( right >= bottomRightX or bottomRightX == None ): 
                 bottomRightX = right
-            if ( bottom <= bottomRightY or bottomRightY == None ):
+            if ( bottom >= bottomRightY or bottomRightY == None ):
                 bottomRightY = bottom
 
             aType = anObject.getProperty( OB_TYPE )
@@ -282,7 +282,7 @@ class LayoutBufferPaster:
 
         # get ID
         oldID = aBuffer.getID()
-        if aBuffer.getUndoFlag():
+        if aBuffer.getUndoFlag() or aBuffer.noNewID:
             newID = oldID
         else:
             newID = aLayout.getUniqueObjectID( aType )

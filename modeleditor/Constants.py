@@ -1,5 +1,6 @@
-
+import os
 from ConfirmWindow import *
+SHAPE_PLUGIN_PATH=os.environ['MEPATH']+os.sep+"plugin"+os.sep
 
 ME_DESIGN_MODE = "Design"
 ME_RUN_MODE = "Run"
@@ -9,7 +10,7 @@ ME_RUN_MODE = "Run"
 #Shape Plugin Constants
 SHAPE_PLUGIN_NAME='Default Shape'
 SHAPE_PLUGIN_TYPE='Default Type'
-SHAPE_PLUGIN_PATH=os.environ['MEPATH']
+
 DEFAULT_SHAPE_NAME='Default'
 
 # object types:
@@ -355,12 +356,15 @@ SD_ARROWHEAD = 6
 SD_FIXEDLINE = 7
 SD_MOVINGLINE = 8
 
+IMG_FILENAME = 1
+
 #gnome canvasobjects:
 CV_RECT = "CanvasRect"
 CV_ELL = "CanvasEllipse"
 CV_TEXT = "CanvasText"
 CV_LINE = "CanvasLine"
 CV_BPATH = "CanvasBPath"
+CV_IMG = "CanvasWidget"
 
 # parameters for minimum SYSTEM_TYPE dimensions
 SYS_MINWIDTH=230

@@ -699,16 +699,18 @@ class SystemObject(EditorObject):
         dir=DIRECTION_BOTTOM_RIGHT
         matrix=self.getGraphUtils().calcMaxShiftPos(r1,rn,dir,rpar)
         mspace=matrix-r1
+        mshift = n.array( [-1,-1,1,1] )
+        mspace = mspace * mshift
         if len(self.maxShiftMap[dir])==1:
             listpos=self.maxShiftMap[dir]
             pos=listpos[0]
-            return abs(mspace[pos])
+            return max(0,mspace[pos])
         else:
             listpos=self.maxShiftMap[dir]
             posa=listpos[0]
             posb=listpos[1]
-            spacea=abs(mspace[posa])
-            spaceb=abs(mspace[posb])
+            spacea=max(0,mspace[posa])
+            spaceb=max(0,mspace[posb])
             return max(spacea,spaceb)
 
     ############################################### cheCk        

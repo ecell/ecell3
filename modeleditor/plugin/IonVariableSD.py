@@ -21,17 +21,19 @@ class IonVariableSD( ShapeDescriptor):
         self.thePointMatrix = nu.array([ [[1,0,0,0,0],[1,0,0,0,0]],[[1,0,4,4,1],[1,0,15,15,1]],[[1,0,4,2,0],[1,0,10,5,0]],[[1,0,4,1.25,0.5],[1,-0.65,0,1.25,0.65]],[[1,0,0,5,0.5],[1,0.25,1,-0.5,-0.15]],[[1,0,4,1.25,0.5],[1,0.45,0,1.25,3.15]],[[1,0,0,5,0.5],[1,1.05,1,0.5,2.65]],[[1,0,1,0.5,0],[1,1,-0.5,1,-0.15]],[[1,0,2,-2,0],[1,-0.1,0.25,9,0.75]],[[1,0,4,5,1],[1,1,-0.5,1,-0.15]],[[1,0,4,2.5,1],[1,-0.1,0.25,9,0.75]]])      
 
         self.theCodeMap = {\
-                    'frame' : [0,1],
+                  #  'frame' : [0,1],
                     'text' : [2],
                     RING_TOP : [3,4],
                     RING_BOTTOM : [5,6],
                     RING_LEFT : [7,8],
-                    RING_RIGHT : [9,10] 
+                    RING_RIGHT : [9,10],
+                    "image" : [0]
                     }
 
         self.theDescriptorList = {\
         #NAME, TYPE, FUNCTION, COLOR, Z, SPECIFIC, PROPERTIES 
-        'frame' : ['frame', CV_ELL, SD_FILL, SD_FILL, 7, [ [], 1 ] ],\
+#        'frame' : ['frame', CV_ELL, SD_FILL, SD_FILL, 7, [ [], 1 ] ],
+        "image" : ["image",CV_IMG, SD_FILL, SD_FILL, 3, [ [], "IonVariableSD.png" ] ],\
         'text' : ['text', CV_TEXT, SD_FILL, SD_TEXT, 5, [ [], aLabel ] ],\
         RING_TOP : [RING_TOP, CV_RECT, SD_RING, SD_OUTLINE, 3, [ [],0 ] ],\
         RING_BOTTOM : [RING_BOTTOM, CV_RECT, SD_RING, SD_OUTLINE, 3, [ [], 0] ],\

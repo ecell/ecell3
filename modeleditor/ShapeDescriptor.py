@@ -96,12 +96,12 @@ class ShapeDescriptor:
             aSpecific = aDescriptor[SD_SPECIFIC]
             aType = aDescriptor[SD_TYPE ]
             aSpecific[0] = []
-            if aType in ( CV_RECT, CV_LINE, CV_ELL, CV_TEXT ):
+            if aType in ( CV_RECT, CV_LINE, CV_ELL, CV_TEXT , CV_IMG):
                 for aPointCode in self.theCodeMap[ aShapeName]:
                     x=points[aPointCode][0]
                     y=points[aPointCode][1]
                     aSpecific[0].extend( [x,y])
-                if aType == CV_TEXT:
+                if aType == CV_TEXT and aShapeName == "text":
                     aSpecific[SPEC_LABEL] = self.theLabel
 
             elif aType == CV_BPATH:

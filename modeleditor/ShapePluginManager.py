@@ -4,7 +4,7 @@ from Constants import *
 import imp
 import os
 
-SHAPE_PLUGIN_PATH=os.environ['MEPATH']+os.sep+"plugin"+os.sep
+
 
 class ShapePluginManager:
     def __init__(self):

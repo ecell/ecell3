@@ -62,17 +62,14 @@ class ShapePropertyComponent(ViewComponent):
         # the variables
         self.ShapeName=''
         self.theShapeList=[]
-        self.theColor=None
-        self.theColorDialog=None
-        self.theDrawingArea=None
         self.theColorList=['red', 'yellow', 'green', 'brown', 'blue', 'magenta',
                  'darkgreen', 'bisque1']
-        self.theCombo=ViewComponent.getWidget(self,'shape_combo')
-        self.noUpdate=True
-        self.theObject=None
-        self.theFullId=None
-        self.theFillColor=None
-        self.theOutlineColor=None
+        self.theCombo = ViewComponent.getWidget(self,'shape_combo')
+        self.noUpdate = True
+        self.theObjectDict = {}
+
+        self.theFillColor = None
+        self.theOutlineColor = None
 
         # the handlers dictionary
         self.addHandlers({ 
@@ -155,17 +152,7 @@ class ShapePropertyComponent(ViewComponent):
     
     def __ShapeProperty_updated(self, aKey,aNewValue):
           
-        self.theObjectEditorWindow.modifyObjectProperty(aKey,aNewValue)
-        self.update=True
-        
-
-    def __ShapeProperty_displayed(self,*args):
-        keys=self.theShapeDic.keys()
-        keys.sort()
-        for aKey in keys:
-            self.theModelEditor.printMessage(aKey + ':' + str(self.theShapeDic[aKey]),ME_PLAINMESSAGE)
-            
-        self.theModelEditor.printMessage('',ME_PLAINMESSAGE)
+        self.modifyObjectProperty(aKey,aNewValue)
         
         
 
@@ -176,74 +163,80 @@ class ShapePropertyComponent(ViewComponent):
 
     
         
-    def setDisplayedShapeProperty(self ,anObject):
-        if anObject==None:
-            self.clearShapeProperty()
-            return
-        self.theObject=anObject
+    def setDisplayedShapeProperty(self ,anObjectDict, aType):
+        self.theObjectDict = anObjectDict
+        self.theType = aType
+
         self.populateComboBox()
-        self.theFillColor=self.getColorObject(self.theObject.getProperty(OB_FILL_COLOR))
-        self.theOutlineColor=self.getColorObject(self.theObject.getProperty(OB_OUTLINE_COLOR))
+        if len( self.theObjectDict.values()) > 0:
+            theObject = self.theObjectDict.values()[0]
+            self.theFillColor=self.getColorObject( theObject.getProperty(OB_FILL_COLOR) )
+            self.theOutlineColor=self.getColorObject( theObject.getProperty(OB_OUTLINE_COLOR) )
+        else:
+            self.theFillColor=self.getColorObject([65535, 65535, 65535])
+            self.theOutlineColor=self.getColorObject([0,0,0])
+
         self.updateShapeProperty()
 
 
     def updateShapeProperty(self):
-        ViewComponent.getWidget(self,'combo_entry').set_sensitive(gtk.TRUE)
-        ViewComponent.getWidget(self,'FillButton').set_sensitive(gtk.TRUE)
-        ViewComponent.getWidget(self,'OutlineButton').set_sensitive(gtk.TRUE)
-        if self.theObject.getProperty(OB_HASFULLID):
-            self.theFullId=self.theObject.getProperty(OB_FULLID)
-            self.newTuple = self.theFullId.split(':')
-            label = self.theFullId.split(':')[2]
-            ViewComponent.getWidget(self,'ent_label').set_sensitive(gtk.FALSE)
-            ViewComponent.getWidget(self,'ent_width').set_sensitive(gtk.FALSE)
-            ViewComponent.getWidget(self,'ent_height').set_sensitive(gtk.FALSE)
-            
+        if len( self.theObjectDict.values() ) > 0:
+            colorSettable = gtk.TRUE
         else:
-            label = ''
-            ViewComponent.getWidget(self,'ent_label').set_sensitive(gtk.TRUE)
-            ViewComponent.getWidget(self,'ent_width').set_sensitive(gtk.TRUE)
-            ViewComponent.getWidget(self,'ent_height').set_sensitive(gtk.TRUE)
-        
-        if self.theObject.getProperty(OB_TYPE) == OB_TYPE_SYSTEM:
-            ViewComponent.getWidget(self,'ent_width').set_sensitive(gtk.TRUE)
-            ViewComponent.getWidget(self,'ent_height').set_sensitive(gtk.TRUE)
+            colorSettable = gtk.FALSE
+        heightSensitive = gtk.FALSE
+        widthSensitive = gtk.FALSE
+        labelSensitive = gtk.FALSE
+        label = ""
+        x = ""
+        y = ""
+        if len( self.theObjectDict.keys() ) == 1:
+            theObject = self.theObjectDict.values()[0]
+            if theObject.getProperty( OB_HASFULLID ):
+                self.theFullId = theObject.getProperty(OB_FULLID)
+                label = self.theFullId.split(':')[2]
+                if theObject.getProperty(OB_TYPE) == OB_TYPE_SYSTEM:
+                    heightSensitive = gtk.TRUE
+                    widthSensitive = gtk.TRUE
+            else:
+                heightSensitive = gtk.TRUE
+                widthSensitive = gtk.TRUE
+                labelSensitive = gtk.TRUE
+
+            
+            x = str(theObject.getProperty( OB_DIMENSION_X ))
+            y = str(theObject.getProperty( OB_DIMENSION_Y ))
         
         ViewComponent.getWidget(self,'ent_label').set_text(label )
-        ViewComponent.getWidget(self,'ent_height').set_text( str(self.theObject.getProperty( OB_DIMENSION_Y ) ))
-        ViewComponent.getWidget(self,'ent_width').set_text( str(self.theObject.getProperty( OB_DIMENSION_X )) )
+        ViewComponent.getWidget(self,'ent_height').set_text( y )
+        ViewComponent.getWidget(self,'ent_width').set_text( x )
+        ViewComponent.getWidget(self,'FillButton').set_sensitive(colorSettable)
+        ViewComponent.getWidget(self,'OutlineButton').set_sensitive(colorSettable)
+        ViewComponent.getWidget(self,'ent_label').set_sensitive(labelSensitive)
+        ViewComponent.getWidget(self,'ent_width').set_sensitive(widthSensitive)
+        ViewComponent.getWidget(self,'ent_height').set_sensitive(heightSensitive)
         
         ViewComponent.getWidget(self,'da_fill').modify_bg(gtk.STATE_NORMAL,self.theFillColor)
         ViewComponent.getWidget(self,'da_out').modify_bg(gtk.STATE_NORMAL,self.theOutlineColor)
 
-
-    def clearShapeProperty(self):
-        ViewComponent.getWidget(self,'ent_label').set_text('' )
-        ViewComponent.getWidget(self,'ent_height').set_text( '')
-        ViewComponent.getWidget(self,'ent_width').set_text('')
-        ViewComponent.getWidget(self,'combo_entry').set_sensitive(gtk.FALSE)
-        self.theFillColor=self.getColorObject([65535, 65535, 65535])
-        self.theOutlineColor=self.getColorObject([0,0,0])
-        ViewComponent.getWidget(self,'da_fill').modify_bg(gtk.STATE_NORMAL,self.theFillColor)
-        ViewComponent.getWidget(self,'da_out').modify_bg(gtk.STATE_NORMAL,self.theOutlineColor)
-        ViewComponent.getWidget(self,'FillButton').set_sensitive(gtk.FALSE)
-        ViewComponent.getWidget(self,'OutlineButton').set_sensitive(gtk.FALSE)
-        
 
         
     def populateComboBox(self):
         # populate list item of combobox
-        aShapeList=self.theObject.getAvailableShapes()
-        for i in range ( len( aShapeList ) ):
-            if aShapeList[i] == self.theObject.getProperty(OB_SHAPE_TYPE):
-                temp = aShapeList[0]
-                aShapeList[0] = aShapeList[i]
-                aShapeList[i]=temp
-                break
+        if self.theType not in [ "None", "Mixed" ]:
+            comboSensitive = gtk.TRUE
+            theObject = self.theObjectDict.values()[0]
+            aShapeList = theObject.getAvailableShapes()
+            currentShape = theObject.getProperty(OB_SHAPE_TYPE)
+            aShapeList.remove( currentShape )
+            aShapeList.insert(0, currentShape )
+        else:
+            aShapeList = []
+            comboSensitive = gtk.FALSE
         self.noUpdate = True
         self.theCombo.set_popdown_strings( aShapeList )
         self.noUpdate = False
-
+        ViewComponent.getWidget(self,'combo_entry').set_sensitive( comboSensitive)
          
 
     def setColorDialog( self, *args ):
@@ -256,10 +249,7 @@ class ShapePropertyComponent(ViewComponent):
         return[aDialog,aColorSel]
         
     def setHexadecimal(self,theColor,theColorMode ):
-        self.theRed=theColor.red
-        self.theGreen=theColor.green
-        self.theBlue=theColor.blue
-        self.theHex = [self.theRed,self.theGreen,self.theBlue]
+        self.theHex = [theColor.red,theColor.green,theColor.blue]
         
 
     def getColorObject(self, anRGB):
@@ -277,6 +267,80 @@ class ShapePropertyComponent(ViewComponent):
             return False
     
 
+    # ==========================================================================
+    def modifyObjectProperty(self,aPropertyName, aPropertyValue):
+        if len( self.theObjectDict.values() ) == 0:
+            raise "There is no object, cannot change property!"
+        self.theLayout = self.theObjectEditorWindow.theLayout
+        if  aPropertyName == OB_OUTLINE_COLOR  or aPropertyName == OB_FILL_COLOR or aPropertyName == OB_SHAPE_TYPE :
+            # create commandList
+            aCommandList = []
+            for anObjectID in self.theObjectDict.keys():
+                aCommandList.append( SetObjectProperty(self.theLayout, anObjectID, aPropertyName, aPropertyValue )  )
+
+            self.theLayout.passCommand( aCommandList )
+            
+        
+        #elif aPropertyName == OB_FULLID:
+        #    if self.theObject.getProperty(OB_HASFULLID):
+        #        if isFullIDEligible( aPropertyValue ):
+        #            aCommand = RenameEntity( self.theModelEditor, self.theObject.getProperty(OB_FULLID), aPropertyValue )
+        #            if aCommand.isExecutable():
+        #                self.theModelEditor.doCommandList( [ aCommand ] )
+        #        else:
+        #            self.theModelEditor.printMessage( "Only alphanumeric characters and _ are allowed in fullid names!", ME_ERROR )
+
+        #        self.selectEntity( [self.theObject] )
+                            
+
+        #    else:
+        #        pass
+        
+        elif  aPropertyName == OB_DIMENSION_Y  :
+            if len( self.theObjectDict.values() ) != 1 :
+                raise "Cannot change dimensions of more than one object!"
+            theObjectID, theObject = self.theObjectDict.items()[0]
+            
+            objHeight = theObject.getProperty(OB_DIMENSION_Y)
+            deltaHeight = objHeight-aPropertyValue
+            maxShiftPos= theObject.getMaxShiftPos(DIRECTION_DOWN)
+            maxShiftNeg= theObject.getMaxShiftNeg(DIRECTION_DOWN) 
+            if deltaHeight>0:
+                if  maxShiftNeg > deltaHeight:
+                    # create command
+                    aCommand=ResizeObject(self.theLayout, theObjectID,0,-deltaHeight, 0, 0 )
+                    self.theLayout.passCommand( [aCommand] )
+
+            elif deltaHeight<0:
+                if  maxShiftPos > -deltaHeight:
+                    aCommand=ResizeObject(self.theLayout, theObjectID,0, -deltaHeight, 0, 0 )
+                    self.theLayout.passCommand( [aCommand] )
+                
+            self.updateShapeProperty()
+        
+        elif  aPropertyName == OB_DIMENSION_X :
+            if len( self.theObjectDict.values() ) != 1 :
+                raise "Cannot change dimensions of more than one object!"
+            theObjectID, theObject = self.theObjectDict.items()[0]
+
+            objWidth = theObject.getProperty(OB_DIMENSION_X)
+            deltaWidth = objWidth-aPropertyValue
+            maxShiftPos= theObject.getMaxShiftPos(DIRECTION_RIGHT)
+            maxShiftNeg= theObject.getMaxShiftNeg(DIRECTION_RIGHT) 
+            if deltaWidth>0:
+                if  maxShiftNeg > deltaWidth:
+                    # create command
+                    aCommand=ResizeObject(self.theLayout, theObjectID,0, 0, 0, -deltaWidth )
+                    self.theLayout.passCommand( [aCommand] )
+
+            elif deltaWidth<0:
+                if  maxShiftPos > -deltaWidth:
+                    # create command
+                    aCommand=ResizeObject(self.theLayout, theObjectID,0, 0,0, -deltaWidth )
+                    self.theLayout.passCommand( [aCommand] )
+            self.updateShapeProperty()
+
+        
 
 
 

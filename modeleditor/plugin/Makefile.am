@@ -11,6 +11,7 @@ ProteinVariableSD.py\
 RNAVariableSD.py\
 SmallMolVariableSD.py\
 IonVariableSD.py\
-OtherProcessSD.py
+OtherProcessSD.py\
+IonVariableSD.png
 EXTRA_DIST=${modeleditorplugin_DATA}
 

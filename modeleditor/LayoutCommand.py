@@ -465,7 +465,10 @@ class PasteObject(LayoutCommand):
         if anObjectBuffer.getUndoFlag():
             newID = anObjectBuffer.getID()
         else:
+            # get it from really pasted ones
             newID = self.theReceiver.getUniqueObjectID( aType )
+            anObjectBuffer.setID( newID )
+            anObjectBuffer.noNewID = True
         self.theReverseCommandList += [ DeleteObject( self.theReceiver,newID ) ]
 
 

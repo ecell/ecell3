@@ -10,6 +10,7 @@ class ObjectBuffer(Buffer):
         self.theParent = None
         self.undoFlag = False
         self.theConnectionBuffers = ObjectListBuffer()
+        self.noNewID = False
 
     def getID( self ):
         return self.theID
@@ -47,6 +48,10 @@ class ObjectBuffer(Buffer):
 
     def getUndoFlag( self ):
         return self.undoFlag
+        
+    def setID ( self, anID ):
+        self.theID = anID        
+
 
 
 

@@ -60,229 +60,85 @@ class ObjectEditorWindow :
         """
         sets up a modal dialogwindow displaying 
         the EntityEditor and the ShapeProperty
-             
+        # objectID can be None, String, list of strings
         """ 
         self.theModelEditor = aModelEditor  
-        self.isBoxShow=False
-        self.isFrameShow=False
-        self.attBox=None
-        self.frameBox=None # OB_HAS_FULLID=False
-        
-        # Create the Dialog
-#        self.win = gtk.Dialog('Object Editor Window', None)
-#        self.win.connect("destroy",self.destroy)
-
-        # Sets size and position
-#        self.win.set_border_width(2)
-#        self.win.set_default_size(300,75)
-#        self.win.set_position(gtk.WIN_POS_MOUSE)
-
-
-        # Sets title
-#        self.win.set_title("ObjectEditor")
-#        aPixbuf16 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
-#                                os.sep + "glade" + os.sep + "modeleditor.png")
-#        aPixbuf32 = gtk.gdk.pixbuf_new_from_file( os.environ['MEPATH'] +
-#                                os.sep + "glade" + os.sep + "modeleditor32.png")
-#        self.win.set_icon_list(aPixbuf16, aPixbuf32)
-
-        self.theComponent=None
-        self.theShapeProperty=None
         self.theTopFrame = gtk.VBox()
-        self.getTheObject(aLayoutName, anObjectId)
-        self.theEntityType = self.theObject.getProperty(OB_TYPE)
-        if self.theObject.getProperty(OB_HASFULLID):
-            self.createComponent()
-            self.isBoxShow=True
-            self.attBox=self.getAttachmentBox()
-            
-        elif self.theObject.getProperty(OB_TYPE)== OB_TYPE_TEXT:
-            self.theShapeProperty=ShapePropertyComponent( self, self.theTopFrame )
-            self.isFrameShow=True
-            self.frameBox=self.getAttachmentFrame()
-            
+        self.theEntityEditor = EntityEditor( self, self.theTopFrame,'Entity', True )
+        self.theShapeProperty = self.theEntityEditor.getShapeProperty()
+        self.setDisplayObjectEditorWindow(aLayoutName, anObjectId)
+    # ==========================================================================
 
-#        self.win.show_all()
+    def setDisplayObjectEditorWindow(self,aLayoutName, anObjectID):
+        self.theLayoutName = aLayoutName
+        self.theLayout =self.theModelEditor.theLayoutManager.getLayout(aLayoutName)
+        self.theObjectDict = {}
+        self.theType = "None"
+        if anObjectID == None:
+            objectIDList = []
 
-        if self.theObject.getProperty(OB_HASFULLID):
-            #self.theLastFullID = self.theObject.getProperty(OB_FULLID)
-            self.selectEntity( [self.theObject] )
-        self.update()
+        elif type(anObjectID ) == type(""):
+            objectIDList = [ anObjectID]
+        elif type( anObjectID ) == type ( [] ):
+            objectIDList = anObjectID
+            
+        for anID in objectIDList:
+            anObject = self.theLayout.getObject( anID ) 
+            self.theObjectDict[anID] = anObject 
+            aType = anObject.getProperty( OB_TYPE )
+            if self.theType == "None":
+                self.theType = aType
+            elif self.theType != aType:
+                self.theType = "Mixed"
+        if len( self.theObjectDict.values() ) == 1:
+            self.theLastFullID = self.theObjectDict.values()[0].getProperty( OB_FULLID )
+        else:
+            self.theLastFullID = None
+        self.theEntityEditor.setDisplayedEntity (self.theLastFullID)
+        self.theShapeProperty.setDisplayedShapeProperty( self.theObjectDict, self.theType )
+        self.bringToTop()
+
+    # ==========================================================================
 
 
     def bringToTop( self ):
         self.theModelEditor.theMainWindow.setSmallWindow( self.theTopFrame )
-        self.theComponent.bringToTop()
+        self.theEntityEditor.bringToTop()
 
 
-    def createComponent(self):
-        self.theComponent = EntityEditor( self, self.theTopFrame,self.theEntityType,self )
-        self.theComponent.setDisplayedEntity (self.theObject.getProperty(OB_FULLID))
-        self.theShapeProperty=self.theComponent.theShapeProperty
-        self.theComponent.update()
-        
-        
 
-    # ==========================================================================
-    def getTheObject(self,aLayoutName, anObjectId):
-        self.theLayout =self.theModelEditor.theLayoutManager.getLayout(aLayoutName)
-        self.theObjectId = anObjectId
-        self.theObject = self.theLayout.getObject(self.theObjectId)
-        
 
-    # ==========================================================================
-    def modifyObjectProperty(self,aPropertyName, aPropertyValue):
-        
-        aCommand = None
-        if  aPropertyName == OB_OUTLINE_COLOR  or aPropertyName == OB_FILL_COLOR or aPropertyName == OB_SHAPE_TYPE :
-            # create command
-            aCommand=SetObjectProperty(self.theLayout,self.theObjectId,aPropertyName, aPropertyValue )  
-            if aCommand != None:
-                self.theLayout.passCommand( [aCommand] )
-            
-        
-        elif aPropertyName == OB_FULLID:
-            if self.theObject.getProperty(OB_HASFULLID):
-                if isFullIDEligible( aPropertyValue ):
-                    aCommand = RenameEntity( self.theModelEditor, self.theObject.getProperty(OB_FULLID), aPropertyValue )
-                    if aCommand.isExecutable():
-                        self.theModelEditor.doCommandList( [ aCommand ] )
-                else:
-                    self.theModelEditor.printMessage( "Only alphanumeric characters and _ are allowed in fullid names!", ME_ERROR )
-
-                self.selectEntity( [self.theObject] )
-                            
-
-            else:
-                pass
-        
-        elif  aPropertyName == OB_DIMENSION_Y  :
-            objHeight = self.theObject.getProperty(OB_DIMENSION_Y)
-            deltaHeight = objHeight-aPropertyValue
-            maxShiftPos= self.theObject.getMaxShiftPos(DIRECTION_DOWN)
-            maxShiftNeg= self.theObject.getMaxShiftNeg(DIRECTION_DOWN) 
-            if deltaHeight>0:
-                if  maxShiftNeg > deltaHeight:
-                    # create command
-                    aCommand=ResizeObject(self.theLayout,self.theObjectId,0,-deltaHeight, 0, 0 )
-                    self.theLayout.passCommand( [aCommand] )
-                else:
-                    self.updateShapeProperty()
-            elif deltaHeight<0:
-                if  maxShiftPos > -deltaHeight:
-                    aCommand=ResizeObject(self.theLayout,self.theObjectId,0, -deltaHeight, 0, 0 )
-                    self.theLayout.passCommand( [aCommand] )
-                
-            self.update()
-        
-        elif  aPropertyName == OB_DIMENSION_X :
-            objWidth = self.theObject.getProperty(OB_DIMENSION_X)
-
-            deltaWidth = objWidth-aPropertyValue
-            maxShiftPos= self.theObject.getMaxShiftPos(DIRECTION_RIGHT)
-            maxShiftNeg= self.theObject.getMaxShiftNeg(DIRECTION_RIGHT) 
-            if deltaWidth>0:
-                if  maxShiftNeg > deltaWidth:
-                    # create command
-                    aCommand=ResizeObject(self.theLayout,self.theObjectId,0, 0, 0, -deltaWidth )
-                    self.theLayout.passCommand( [aCommand] )
-                else:
-                    self.updateShapeProperty()
-
-            elif deltaWidth<0:
-                if  maxShiftPos > -deltaWidth:
-                    # create command
-                    aCommand=ResizeObject(self.theLayout,self.theObjectId,0, 0,0, -deltaWidth )
-                    self.theLayout.passCommand( [aCommand] )
-                else:
-                    self.updateShapeProperty()
-        
-    # ==========================================================================
-    def getAttachmentBox(self):
-        childs=self.theTopFrame.get_children()
-        for obj in childs:
-            if obj.get_name()=='attachment_box':
-                return obj
-
-    def setAttachmentBox(self,action):
-        if self.attBox==None:
-            return
-        if action=='hide':
-            self.attBox.hide_all()
-            self.isBoxShow=False
-        else:
-            self.attBox.show_all()
-            self.isBoxShow=True
-
-    def getAttachmentFrame(self):
-        childs=self.theTopFrame.get_children()
-        for obj in childs:
-            if obj.get_name()=='attachment_frame':
-                return obj
-
-    def setAttachmentFrame(self,action):
-        if self.frameBox==None:
-            return
-        if action=='hide':
-            self.frameBox.hide_all()
-            self.isFrameShow=False
-        else:
-            self.frameBox.show_all()
-            self.isFrameShow=True
-    # ==========================================================================
-
-    def setDisplayObjectEditorWindow(self,aLayoutName, anObjectId):
-
-        self.getTheObject( aLayoutName, anObjectId)
-        if self.theObject.getProperty(OB_HASFULLID):
-            self.theLastFullID = self.theObject.getProperty(OB_FULLID)
-            if self.theComponent==None:
-                self.createComponent()
-                self.attBox=self.getAttachmentBox()
-            else:
-                self.setAttachmentBox('show')
-            if self.isFrameShow:
-                self.setAttachmentFrame('hide')
-
-            self.theComponent.setDisplayedEntity (self.theLastFullID)
-            self.theShapeProperty=self.theComponent.theShapeProperty
-            self.theComponent.update()
-            
-        elif self.theObject.getProperty(OB_TYPE)== OB_TYPE_TEXT:
-
-            # an OB_TYPE_TEXT is being clicked
-            if self.frameBox==None:
-                self.theShapeProperty=ShapePropertyComponent( self, self.theTopFrame )
-                self.frameBox=self.getAttachmentFrame()
-                self.isFrameShow=True
-            else:
-                self.setAttachmentFrame('show')
-            if self.isBoxShow:
-                self.setAttachmentBox('hide')   
-            
-        self.updateShapeProperty()
-        self.bringToTop()
-
-    # ==========================================================================
     
     def update(self, aType = None, aFullID = None):
-        if self.theObject !=None:
-            anObjectID = self.theObject.getID()
-            existObjectList = self.theLayout.getObjectList()
+        #if aFullID not None, see whether all objects exist
+        deletion = False
+
+        existObjectList = self.theLayout.getObjectList()
+        for anObjectID in self.theObjectDict.keys()[:]:
             if anObjectID not in existObjectList:
-                self.theObject =None
-                self.theComponent.setDisplayedEntity (None)
-        
-            else:       
-                if self.theObject.getProperty(OB_HASFULLID):
-                    self.theLastFullID = self.theObject.getProperty(OB_FULLID)
-                    if not self.theModelEditor.getModel().isEntityExist(self.theLastFullID):
-                        self.theLastFullID = None
-                    self.updatePropertyList()
-                else:
-                    self.theLastFullID = None
-                    self.updatePropertyList()
-        self.updateShapeProperty()
+                self.theObjectDict.__delitem__( anObjectID )
+                deletion = True
+        if deletion:
+            self.setDisplayObjectEditorWindow( self.theLayoutName, self.theObjectDict.keys()[:] ) 
+        else:
+            # detect deleted fullid or changed fullid
+            newFullID = None
+            if  len( self.theObjectDict.keys() ) == 1:
+                theObject = self.theObjectDict.values()[0]
+                if theObject.getProperty( OB_HASFULLID ):
+                    newFullID = theObject.getProperty( OB_FULLID )
+            if self.theLastFullID != None:
+                if not self.theModelEditor.theModelStore.isEntityExist( self.theLastFullID ):
+                    newFullID = None
+            if newFullID != None:
+                if not self.theModelEditor.theModelStore.isEntityExist( newFullID ):
+                    newFullID = None
+            if self.theLastFullID != newFullID :
+                self.theEntityEditor.setDisplayedEntity( newFullID )
+            # if nothing deleted, update windows
+            else:
+                self.updatePropertyList()
+                self.updateShapeProperty()
 
 
 
@@ -291,13 +147,13 @@ class ObjectEditorWindow :
         in: anID where changes happened
         """
         # get selected objectID
-        propertyListEntity = self.theComponent.getDisplayedEntity()
+        propertyListEntity = self.theEntityEditor.getDisplayedEntity()
         # check if displayed fullid is affected by changes
 
         if propertyListEntity != self.theLastFullID:
-            self.theComponent.setDisplayedEntity ( self.theLastFullID )
+            self.theEntityEditor.setDisplayedEntity ( self.theLastFullID )
         else:
-            self.theComponent.update()
+            self.theEntityEditor.update()
 
 
 
@@ -306,29 +162,9 @@ class ObjectEditorWindow :
     def updateShapeProperty(self):
         if self.theModelEditor.getMode() != ME_DESIGN_MODE:
             return
-        self.theShapeProperty.setDisplayedShapeProperty(self.theObject)
+        self.theShapeProperty.updateShapeProperty()
 
-    def selectEntity(self,anEntityList):
-
-        if type(anEntityList) == type(""):
-            return
-
-        self.theLastObject = anEntityList[0]
-        if self.theObject.getProperty(OB_HASFULLID):
-            self.theLastFullID = self.theObject.getProperty(OB_FULLID)
-            if not self.theModelEditor.getModel().isEntityExist(self.theLastFullID):
-                self.theLastFullID = None
-        self.theComponent.setDisplayedEntity (self.theLastFullID)
-        self.theComponent.update()
-        self.bringToTop()
         
-    # ==========================================================================
-    def return_result( self ):
-        """Returns result
-        """
-
-        return self.__value
-
 
     # ==========================================================================
     def destroy( self, *arg ):
@@ -340,7 +176,19 @@ class ObjectEditorWindow :
 
         
         
+    def selectEntity(self,anEntityList):
 
+        if type(anEntityList) == type(""):
+            return
+        if len( self.theObjectDict.keys() ) == 1:
+            theObject = self.theObjectDict.values()[0]
+            if theObject.getProperty(OB_HASFULLID):
+                self.theLastFullID = theObject.getProperty( OB_FULLID )
+                if not self.theModelEditor.getModel().isEntityExist( self.theLastFullID ):
+                    self.theLastFullID = None
+        self.theEntityEditor.setDisplayedEntity ( self.theLastFullID )
+        self.theEntityEditor.update()
+        self.bringToTop()
         
     
 

@@ -59,7 +59,7 @@ class EntityEditor(ViewComponent):
         # call superclass
         ViewComponent.__init__( self,  pointOfAttach, 'attachment_box' , 'ObjectEditor.glade' )
         
-        self.theThirdFrame=aThirdFrame
+
         self.theParentWindow = aParentWindow
         self.theModelEditor = self.theParentWindow.theModelEditor
         self.theType = anEntityType
@@ -83,7 +83,7 @@ class EntityEditor(ViewComponent):
         self.thePropertyList = PropertyList(self.theParentWindow, self['PropertyListFrame'] )
         aNoteBook=ViewComponent.getWidget(self,'editor_notebook')
 
-        if self.theThirdFrame != None:
+        if aThirdFrame != None:
             #Add the ShapePropertyComponent
             aShapeFrame=gtk.VBox()
             aShapeFrame.show()
@@ -117,7 +117,10 @@ class EntityEditor(ViewComponent):
                 
         self.setDisplayedEntity( None )
                 
-       
+
+    def getShapeProperty( self ):
+        return self.theShapeProperty
+                     
     def close( self ):
         """
         closes subcomponenets
