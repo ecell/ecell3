@@ -73,7 +73,7 @@ class ODE45Stepper
     inline static const Real interpolate( const Real k1,
 					  const Real k3__k1,
 					  const Real k1__k2_2,
-					  const Real k1_4k2k3__k4,
+					  const Real k1__4k2_4k3__k4,
 					  const Real anInterval,
 					  const Real aStepIntervalInv )
     {
@@ -85,7 +85,7 @@ class ODE45Stepper
       return anInterval * ( k1 + ( theta + theta ) * 
 			    ( theta_0_5 * k3__k1
 			      + theta_1_0 * 
-			      ( k1__k2_2 - theta_0_5 * k1_4k2k3__k4 ) ) );
+			      ( k1__k2_2 - theta_0_5 * k1__4k2_4k3__k4 ) ) );
     }
    
     virtual const Real getDifference( RealCref aTime, RealCref anInterval )
@@ -101,15 +101,15 @@ class ODE45Stepper
       register const Real k3__k1( k3 - k1 );
       const Real k1__k2( k1 - k2 );
       register const Real k1__k2_2( k1__k2 + k1__k2 );
-      const Real k2_k3( k2 + k3 );
-      const Real k2_k3_2( k2_k3 + k2_k3 );
-      register const Real k1_4k2k3__k4( ( k1 + k2_k3_2 + k2_k3_2 - k4 ) );
+      const Real k3__k2( k3 - k2 );
+      const Real k3__k2_2( k3__k2 + k3__k2 );
+      register const Real k1__4k2_4k3__k4( ( k1 + k3__k2_2 + k3__k2_2 - k4 ) );
 
       const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
 
-      const Real i1( interpolate( k1, k3__k1, k1__k2_2, k1_4k2k3__k4,
+      const Real i1( interpolate( k1, k3__k1, k1__k2_2, k1__4k2_4k3__k4,
 				  aTimeInterval, aStepIntervalInv ) );
-      const Real i2( interpolate( k1, k3__k1, k1__k2_2, k1_4k2k3__k4,
+      const Real i2( interpolate( k1, k3__k1, k1__k2_2, k1__4k2_4k3__k4,
 				  ( aTimeInterval - anInterval ), 
 				  aStepIntervalInv ) );
 
