@@ -846,7 +846,7 @@ class MainWindow(OsogoWindow):
 		self.theMessageWindow.printMessage( aMessage )
 
 	def __createEntityListWindow( self, *arg ):
-		anEntityListWindow = self.theSession.createEntityListWindow()
+		anEntityListWindow = self.theSession.createEntityListWindow( "EntityListWindow", self['statusbar'] )
 
 	def deleted( self, *arg ):
 		""" When 'delete_event' signal is chatcked( for example, [X] button is clicked ),
