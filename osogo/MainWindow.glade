@@ -645,7 +645,8 @@
 	    <handler>logo_button_clicked</handler>
 	    <last_modification_time>Fri, 17 Aug 2001 04:26:50 GMT</last_modification_time>
 	  </signal>
-	  <label>test mode</label>
+	  <label>ecell</label>
+	  <icon>icon_ecelllogo.xpm</icon>
 	</widget>
       </widget>
     </widget>
