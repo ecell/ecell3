@@ -730,8 +730,6 @@ namespace libecs
 	return;
       }
     */
-
-
 	
     const Real aCurrentTime      ( getCurrentTime() );
     const Real aCallerCurrentTime( aCaller->getCurrentTime() );
@@ -831,11 +829,11 @@ namespace libecs
     while( !calculate() )
       {
 	// shrink it if the error exceeds 110%
-	//		    setStepInterval( getStepInterval() 
-	//				     * pow(maxError, -0.5) 
-	//				     * safety );
+	setStepInterval( getStepInterval() 
+			 * pow( getMaxErrorRatio(), -1.0 / getOrder() ) 
+			 * safety );
 
-	setStepInterval( getStepInterval() * 0.5 );
+	//	setStepInterval( getStepInterval() * 0.5 );
 
 	//	std::cerr << "s " << getCurrentTime() 
 	//		  << ' ' << getStepInterval()
@@ -862,27 +860,19 @@ namespace libecs
 	  }
       }
 
-    if ( anAdaptedStepInterval > getStepInterval() )
-      {
-	reset();		
-
-	if ( !calculate() )
-	  {
-	    // do nothing
-	  }
-      }
-
     const Real maxError( getMaxErrorRatio() );
 
     // grow it if error is 50% less than desired
     if ( maxError < 0.5 )
       {
 	Real aNewStepInterval( getStepInterval() 
-			       * pow(maxError , -1.0 / getOrder()) * safety );
+			       * pow(maxError , -1.0 / ( getOrder() + 1 ) )
+			       * safety );
 	//	Real aNewStepInterval( getStepInterval() * 2.0 );
 
 	//	std::cerr << "g " << getCurrentTime() << ' ' 
 	//		  << getStepInterval() << std::endl;
+
 	setNextStepInterval( aNewStepInterval );
       }
     else 

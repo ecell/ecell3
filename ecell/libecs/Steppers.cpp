@@ -254,17 +254,6 @@ namespace libecs
 	if( anError > maxError )
 	  {
 	    maxError = anError;
-	    
-	    if( maxError > 1.1 )
-	      {
-		//		setMaxErrorRatio( maxError );
-
-		// reset the stepper current time
-		setCurrentTime( aCurrentTime );
-
-		reset();
-		return false;
-	      }
 	  }
 	
 	// restore x (original value)
@@ -278,6 +267,12 @@ namespace libecs
 
     // reset the stepper current time
     setCurrentTime( aCurrentTime );
+
+    if( maxError > 1.1 )
+      {
+	reset();
+	return false;
+      }
 
     return true;
   }
@@ -388,17 +383,6 @@ namespace libecs
 	if( anError > maxError )
 	  {
 	    maxError = anError;
-	    
-	    if( maxError > 1.1 )
-	      {
-		//		setMaxErrorRatio( maxError );
-
-		// reset the stepper current time
-		setCurrentTime( aCurrentTime );
-
-		reset();		
-		return false;
-	      }
 	  }
 
 	// restore x (original value)
@@ -412,6 +396,12 @@ namespace libecs
 
     // reset the stepper current time
     setCurrentTime( aCurrentTime );
+
+    if ( maxError > 1.1 )
+      {
+	reset();
+	return false;
+      }
 
     return true;
   }
@@ -616,17 +606,6 @@ namespace libecs
 	if( anError > maxError )
 	  {
 	    maxError = anError;
-	    
-	    if( maxError > 1.1 )
-	      {
-		//		setMaxErrorRatio( maxError );
-
-		// reset the stepper current time
-		setCurrentTime( aCurrentTime );
-
-		reset();
-		return false;
-	      }
 	  }
 
 	// restore x (original value)
@@ -640,6 +619,12 @@ namespace libecs
 
     // reset the stepper current time
     setCurrentTime( aCurrentTime );
+
+    if( maxError > 1.1 )
+      {
+	reset();
+	return false;
+      }
 
     return true;
   }
@@ -883,17 +868,6 @@ namespace libecs
 	if( anError > maxError )
 	  {
 	    maxError = anError;
-	    
-	    if( maxError > 1.1 )
-	      {
-		//		setMaxErrorRatio( maxError );
-
-		// reset the stepper current time
-		setCurrentTime( aCurrentTime );
-
-		reset();
-		return false;
-	      }
 	  }
 	
 	// restore x (original value)
@@ -907,6 +881,12 @@ namespace libecs
 
     // reset the stepper current time
     setCurrentTime( aCurrentTime );
+
+    if( maxError > 1.1 )
+      {
+	reset();
+	return false;
+      }
 
     return true;
   }
