@@ -29,16 +29,7 @@ if test "$DIE" -eq 1; then
         exit 1
 fi
 
-if [ ! -f ChangeLog ] ; then
-    touch ChangeLog
-fi
-
 libtoolize -c --force
-
-if test -z "$*"; then
-        echo "I am going to run ./configure with no arguments - if you wish "
-        echo "to pass any to it, please specify them on the $0 command line."
-fi
 
 case $CC in
 *xlc | *xlc\ * | *lcc | *lcc\ *) am_opt=--include-deps;;
@@ -52,15 +43,3 @@ do
   autoheader -f; \
   automake --add-missing --gnu $am_opt; autoconf) 
 done
-
-./configure "$@"
-
-if test "$?" -eq 0
-then
-	echo
-	echo "Now type 'make' to compile $PROJECT."
-else
-	echo
-	echo "./autogen.sh got error!. Aborted."
-fi
-

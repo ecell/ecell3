@@ -34,7 +34,7 @@
 
 #include <functional>
 
-#include "libecs/libecs.hpp"
+#include "ecell/libecs/libecs.hpp"
 
 namespace libemc
 {
