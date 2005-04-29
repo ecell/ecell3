@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.20  2005/04/29 01:38:50  shafi
+ :	for gcc4.  more necessary.
+ :
  :	Revision 1.19  2004/07/29 03:52:02  bgabor
  :	Fixing bug [ 994313 ] vvector should close files after read and write.
- :
+ :	
  :	Revision 1.18  2004/07/13 18:29:34  shafi
  :	extensive logger code cleanup. remaining things are: replace DataPointVector with boost::multi_array, and understand, reconsider and rename getData( s,e,i )
  :	
@@ -298,7 +301,7 @@ template<class T> class vvector : public vvectorbase {
   static void setDiskFullCB(void(*)());
   void setEndPolicy( int );
   int  getEndPolicy();
-  void vvector<T>::setMaxSize( int aMaxSize );
+  void setMaxSize( int aMaxSize );
 };
 
 
