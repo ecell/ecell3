@@ -8,3 +8,14 @@ libtool
 Makefile
 config.status
 libtool.cfg
+ecell3_config.h
+ecell3_config.h.in
+ecell3.doxy
+install-sh
+ltmain.sh
+missing
+py-compile
+stamp-h1
+config.guess
+config.sub
+autom4te.cache

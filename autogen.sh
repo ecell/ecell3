@@ -37,9 +37,15 @@ esac
 
 for dir in . libltdl dmtool ecell osogo bin modeleditor toollauncher
 do 
-  echo processing $dir
+  echo automake and autoconf for $dir
   (cd $dir; \
   aclocal; \
-  autoheader -f; \
   automake --add-missing --gnu $am_opt; autoconf) 
+done
+
+for dir in . libltdl dmtool ecell osogo bin
+do 
+  echo generating headers for $dir
+  (cd $dir; \
+  autoheader -f)
 done

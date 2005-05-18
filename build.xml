@@ -44,7 +44,8 @@
 		<available file="${antiauto.build}/Makefile" type="file" property="antiauto.makefiles_exist" />
 	</target>
 
-	<target name="autogen" if="antiauto.autogen_exists" unless="antiauto.configure_exists" depends="init">
+	<!--	<target name="autogen" if="antiauto.autogen_exists" unless="antiauto.configure_exists" depends="init"> -->
+	<target name="autogen" depends="init">
 		<echo message="Running autogen.sh ..." />
 		<exec dir="${antiauto.src}" executable="chmod">
 			<arg line="+x autogen.sh" />
@@ -54,7 +55,8 @@
 		</exec>
 	</target>
 
-	<target name="configure" unless="antiauto.makefiles_exist" depends="autogen">
+	<!--		<target name="configure" unless="antiauto.makefiles_exist" depends="autogen"> -->
+	<target name="configure" depends="autogen">
 		<echo message="Running configure ..." />
 		<exec dir="${antiauto.build}" executable="${basedir}/${antiauto.configure}" failonerror="true">
 			<arg line="--prefix=${basedir}/${antiauto.prefix} ${antiauto.configureflags}" />

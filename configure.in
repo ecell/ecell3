@@ -42,13 +42,13 @@ dnl
 AC_ARG_ENABLE(modeleditor,
   AC_HELP_STRING([--disable-modeleditor],
                [disable the modeleditor.]),
-  if $NOGTK == 1
+  if test $NOGTK = 1
   then
         test
   else
         [ECELL_SUBDIR="libltdl bin dmtool ecell osogo toollauncher"]
   fi,
-  if $NOGTK == 1
+  if test $NOGTK = 1
   then
         test
   else
