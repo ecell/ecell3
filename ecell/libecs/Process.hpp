@@ -379,6 +379,7 @@ namespace libecs
     {
       setActivity( aVelocity );
 
+      /**
       // Increase or decrease variables, skipping zero coefficients.
       std::for_each( theVariableReferenceVector.begin(),
 		     theZeroVariableReferenceIterator,
@@ -391,6 +392,7 @@ namespace libecs
 		     boost::bind2nd
 		     ( boost::mem_fun_ref
 		       ( &VariableReference::addFlux ), aVelocity ) );
+      */
     }
 
     /**
@@ -439,9 +441,6 @@ namespace libecs
     Integer     thePriority;
 
   };
-
-
-
 
 
   /*@}*/
