@@ -28,17 +28,12 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#include "libecs.hpp"
-#include "Util.hpp"
-#include "PropertyInterface.hpp"
-#include "FullID.hpp"
-#include "Stepper.hpp"
-
 #include <gsl/gsl_randist.h>
 
-#include "System.hpp"
-
-#include "ContinuousProcess.hpp"
+#include <libecs/libecs.hpp>
+#include <libecs/ContinuousProcess.hpp>
+#include <libecs/Stepper.hpp>
+#include <libecs/FullID.hpp>
 
 USE_LIBECS;
 
@@ -52,7 +47,7 @@ LIBECS_DM_CLASS( TauLeapProcess, ContinuousProcess )
 
   LIBECS_DM_OBJECT( TauLeapProcess, Process )
     {
-      INHERIT_PROPERTIES( Process );
+      INHERIT_PROPERTIES( ContinuousProcess );
       PROPERTYSLOT_SET_GET( Real, k );
 
       PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Propensity );
@@ -216,7 +211,7 @@ LIBECS_DM_CLASS( TauLeapProcess, ContinuousProcess )
 	  const Real aValue( theVariableReferenceVector[0].getValue() );
 	  if( aValue > 1.0 ) // there must be two or more molecules
 	    {
-	      return  ( ( 2 * k * aValue - k ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A ) ) * 2;
+	      return  ( ( 2 * k * aValue - k ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A ) );
 	    }
 	  else
 	    {

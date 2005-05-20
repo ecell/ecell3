@@ -28,47 +28,45 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
+#include <gsl/gsl_randist.h>
+
 #include "TauLeapStepper.hpp"
  
 LIBECS_DM_INIT( TauLeapStepper, Stepper );
 
-const Real TauLeapStepper::getTau( )
+void TauLeapStepper::initialize()
 {
-  const Real anA0( getTotalPropensity() );      
+  DifferentialStepper::initialize();
+      
+  theGillespieProcessVector.clear();
 
-  std::vector<TauLeapProcessPtr>::size_type aSize( theTauLeapProcessVector.size() );  
-  for( std::vector<TauLeapProcessPtr>::size_type i( 0 ); i < aSize; ++i )
+  try
     {
-      for( std::vector<TauLeapProcessPtr>::size_type j( 0 ); j < aSize; ++j )
-	{
-	  Real aFF( 0 );
-	  VariableReferenceVector aVariableReferenceVector( theTauLeapProcessVector[j]->getVariableReferenceVector() );
-	  
-	  for( VariableReferenceVectorConstIterator k( aVariableReferenceVector.begin() ); 
-	       k != aVariableReferenceVector.end(); ++k )
-	    {
-	      aFF += theTauLeapProcessVector[i]->getPD( (*k).getVariable() ) * (*k).getCoefficient();
-	    }
-	  
-	  theFFVector[j] = aFF;
-	}
-      
-      Real aMean( 0 );
-      Real aVariance( 0 );
-      
-      RealVector::size_type aFFVectorSize( theFFVector.size() );
-      for( RealVector::size_type j( 0 ); j < aFFVectorSize; ++j )
-	{
-	  aMean += theFFVector[j] * theTauLeapProcessVector[j]->getPropensity();
-	  aVariance += pow( theFFVector[j], 2 ) * theTauLeapProcessVector[j]->getPropensity();
-	}
-
-      theMeanVector[i] = Epsilon * anA0 / std::abs( aMean );
-      theVarianceVector[i] = pow( Epsilon, 2 ) * pow( anA0, 2 ) / aVariance;
-
+      std::transform( theProcessVector.begin(), theProcessVector.end(),
+		      std::back_inserter( theGillespieProcessVector ),
+		      DynamicCaster<GillespieProcessPtr,ProcessPtr>() );
     }
+  catch( const libecs::TypeError& )
+    {
+      THROW_EXCEPTION( InitializationFailed,
+		       getClassNameString() +
+		       ": Only GillespieProcesses are allowed to exist "
+		       "in this Stepper." );
+    }
+}
+
+void TauLeapStepper::step()
+{      
+  clearVariables();
+      
+  calculateTau();
+
+  initializeStepInterval( getTau() );
   
-  return std::min( *std::min_element( theMeanVector.begin(), theMeanVector.end() ), 
-		   *std::min_element( theVarianceVector.begin(), theVarianceVector.end() ) );
-  
+  FOR_ALL( GillespieProcessVector, theGillespieProcessVector )
+    {
+      (*i)->setActivity( gsl_ran_poisson( getRng(), (*i)->getPropensity() ) );
+    }
+
+  setVariableVelocity( theTaylorSeries[ 0 ] );
 }

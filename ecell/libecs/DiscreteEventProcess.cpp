@@ -39,34 +39,10 @@ namespace libecs
 
   LIBECS_DM_INIT_STATIC( DiscreteEventProcess, Process );
 
-
-  GET_METHOD_DEF( Polymorph, DependentProcessList, DiscreteEventProcess )
-  {
-    PolymorphVector aVector;
-    aVector.reserve( theDependentProcessVector.size() );
-    
-    for ( DiscreteEventProcessVectorConstIterator 
-	    i( theDependentProcessVector.begin() );
-	  i != theDependentProcessVector.end(); ++i ) 
-      {
-	DiscreteEventProcessPtr anDiscreteEventProcess( *i );
-	
-	FullIDCref aFullID( anDiscreteEventProcess->getFullID() );
-	const String aFullIDString( aFullID.getString() );
-	
-	aVector.push_back( aFullIDString );
-      }
-    
-    return aVector;
-  }
-
-
   DiscreteEventProcess::~DiscreteEventProcess()
   {
     ; // do nothing
   }
-
-
 
   const bool DiscreteEventProcess::
   checkProcessDependency( DiscreteEventProcessPtr 
@@ -102,25 +78,6 @@ namespace libecs
 
     return false;
   }
-
-  void DiscreteEventProcess::
-  addDependentProcess( DiscreteEventProcessPtr aProcessPtr )
-  {
-    if( std::find( theDependentProcessVector.begin(), 
-		   theDependentProcessVector.end(), aProcessPtr ) 
-	== theDependentProcessVector.end() )
-      {
-	theDependentProcessVector.push_back( aProcessPtr );
-
-	// optimization: sort by memory address
-	std::sort( theDependentProcessVector.begin(), 
-		   theDependentProcessVector.end() );
-      }
-
-  }
-
-
-
 
 } // namespace libecs
 

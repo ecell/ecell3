@@ -46,8 +46,6 @@ namespace libecs
   Variable::Variable()
     : 
     theValue( 0.0 ),  
-    theVelocity( 0.0 ),
-    theTotalVelocity( 0.0 ),
     theLastTime( 0.0 ),
     theFixed( false )
   {

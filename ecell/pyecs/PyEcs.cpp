@@ -112,8 +112,6 @@ BOOST_PYTHON_MODULE( _ecs )
     		   &VariableReference::isFixed )      // read-only
     .add_property( "IsAccessor",
     		   &VariableReference::isAccessor )       // read-only
-    .add_property( "TotalVelocity",
-		   &VariableReference::getTotalVelocity )
     .add_property( "Value", 
 		   &VariableReference::getValue, 
 		   &VariableReference::setValue )
@@ -121,9 +119,7 @@ BOOST_PYTHON_MODULE( _ecs )
 		   &VariableReference::getVelocity )
 
     // methods
-    .def( "addFlux",     &VariableReference::addFlux )
     .def( "addValue",    &VariableReference::addValue )
-    .def( "addVelocity", &VariableReference::addVelocity )
     .def( "getSuperSystem",  // this should be a property, but not supported
 	  &VariableReference::getSuperSystem,
 	  python::return_value_policy<python::reference_existing_object>() )

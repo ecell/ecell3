@@ -75,8 +75,6 @@ namespace libecs
 
 	PROPERTYSLOT_SET_GET( Integer,  Fixed );
 
-	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TotalVelocity );
-
 	PROPERTYSLOT_NO_LOAD_SAVE( Real, Velocity,
 				   NOMETHOD,
 				   &Variable::getVelocity );
@@ -116,12 +114,6 @@ namespace libecs
        Clear theVelocity by zero.
     */
 
-    void clearVelocity()
-    { 
-      theVelocity = 0.0; 
-    }
-
-
     virtual const bool isIntegrationNeeded() const
     {
       return ! theInterpolantVector.empty();
@@ -157,8 +149,8 @@ namespace libecs
 	
 	if ( anInterval > 0.0 )
 	  {
-	    Real aVelocitySum( calculateVelocitySum( aCurrentTime,
-						     anInterval ) );
+	    Real aVelocitySum( calculateDifferenceSum( aCurrentTime,
+						       anInterval ) );
 	    loadValue( getValue() + aVelocitySum );
 	  }
       }
@@ -202,34 +194,21 @@ namespace libecs
       return theValue;
     }
 
-    SET_METHOD( Real, Velocity )
-    {
-      theVelocity = value;
-    }
-
     /**
        @return current velocity value in (number of molecules)/(step)
     */
 
     GET_METHOD( Real, Velocity )
-    { 
-      return theVelocity; 
-    }
-
-    GET_METHOD( Real, TotalVelocity )
     {
-      return theTotalVelocity;
+      Real aVelocitySum( 0.0 );
+      FOR_ALL( InterpolantVector, theInterpolantVector )
+	{
+	  InterpolantPtr const anInterpolantPtr( *i );
+	  aVelocitySum += anInterpolantPtr->getVelocity( theLastTime );
+	}
+
+      return aVelocitySum;
     }
-
-    /**
-       @param aVelocity velocity in number of molecules to be added.
-    */
-
-    void addVelocity( RealParam aVelocity ) 
-    {
-      theVelocity += aVelocity; 
-    }
-
 
     /**
 
@@ -300,9 +279,6 @@ namespace libecs
       loadNumberConc( value * N_A );
     }
 
-
-
-
     /**
        Returns the number concentration of this Variable.
 
@@ -361,15 +337,15 @@ namespace libecs
 
   protected:
 
-    const Real calculateVelocitySum( RealParam aCurrentTime, 
-				     RealParam anInterval ) const
+    const Real calculateDifferenceSum( RealParam aCurrentTime, 
+				       RealParam anInterval ) const
     {
       Real aVelocitySum( 0.0 );
       FOR_ALL( InterpolantVector, theInterpolantVector )
 	{
 	  InterpolantPtr const anInterpolantPtr( *i );
 	  aVelocitySum += anInterpolantPtr->getDifference( aCurrentTime,
-							     anInterval );
+							   anInterval );
 	}
 
       return aVelocitySum;
@@ -385,12 +361,8 @@ namespace libecs
 	  return;
 	}
 
-      const Real aVelocitySum( calculateVelocitySum( aCurrentTime,
-						     anInterval ) );
-
-      // Give it in per second.
-      theTotalVelocity = aVelocitySum / anInterval;
-      
+      const Real aVelocitySum( calculateDifferenceSum( aCurrentTime, 
+						       anInterval ) );
       loadValue( getValue() + aVelocitySum );
 
       theLastTime = aCurrentTime;
@@ -410,10 +382,6 @@ namespace libecs
   protected:
 
     Real theValue;
-
-    Real theVelocity;
-
-    Real theTotalVelocity;
 
     Real theLastTime;
 

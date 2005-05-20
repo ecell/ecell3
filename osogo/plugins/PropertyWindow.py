@@ -133,7 +133,6 @@ class PropertyWindow(OsogoPluginWindow):
 
         self['entryVariableValue'].set_property( 'xalign', 1 )
         self['entryVariableVelocity'].set_property( 'xalign', 1 )
-        self['entryVariableTotalVelocity'].set_property( 'xalign', 1 )
         self['entryVariableMolar'].set_property( 'xalign', 1 )
         self['entryVariableNumber'].set_property( 'xalign', 1 )
 
@@ -444,7 +443,6 @@ class PropertyWindow(OsogoPluginWindow):
         aValue = str( self.thePrePropertyMap[ 'Value' ][0] )
         aNumberConc = str( self.thePrePropertyMap[ 'NumberConc' ][0] )
         aVelocity = str( self.thePrePropertyMap[ 'Velocity' ][0] )
-        aTotalVelocity = str( self.thePrePropertyMap[ 'TotalVelocity' ][0] )
         if self.thePrePropertyMap[ 'Fixed'][0]  == 1:
             aFixed = '(Fixed)'
         else:
@@ -456,7 +454,6 @@ class PropertyWindow(OsogoPluginWindow):
         self['labelVariableQuantities'].set_markup( '<b>Quantities '
                                                    + aFixed + '</b>' )
         self['entryVariableVelocity'].set_text( aVelocity )
-        self['entryVariableTotalVelocity'].set_text( aTotalVelocity )
 
         self['systemFrame'].hide()
         self['processFrame'].hide()

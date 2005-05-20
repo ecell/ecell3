@@ -66,13 +66,85 @@ namespace libecs
     Stepper::initialize();
 
     createInterpolants();
-
     theTaylorSeries.resize( boost::extents[ getStage() ][ getReadOnlyVariableOffset() ] );
+
+    initializeVariableReferenceList();
 
     // should create another method for property slot ?
     //    setNextStepInterval( getStepInterval() );
 
     //    theStateFlag = false;
+  }
+
+  void DifferentialStepper::initializeVariableReferenceList()
+  {
+    const ProcessVector::size_type 
+      aDiscreteProcessOffset( getDiscreteProcessOffset() );
+
+    theVariableReferenceListVector.resize( aDiscreteProcessOffset );
+    
+    for ( ProcessVector::size_type i( 0 ); i < aDiscreteProcessOffset; ++i )
+      {
+	ProcessPtr const aProcess( theProcessVector[ i ] );
+
+	const VariableReferenceVectorCref aVariableReferenceVector( aProcess->getVariableReferenceVector() );
+
+	VariableReferenceVector::size_type const aZeroVariableReferenceOffset( aProcess->getZeroVariableReferenceOffset() );
+	VariableReferenceVector::size_type const aPositiveVariableReferenceOffset( aProcess->getPositiveVariableReferenceOffset() );
+
+	theVariableReferenceListVector[ i ].resize( 2 * ( aVariableReferenceVector.size() - aPositiveVariableReferenceOffset + aZeroVariableReferenceOffset ) );
+
+	std::vector<Integer>::size_type j( 0 );
+	for ( VariableReferenceVectorConstIterator anIterator( aVariableReferenceVector.begin() ); anIterator < aVariableReferenceVector.begin() + aZeroVariableReferenceOffset; ++anIterator )
+	  {
+	    VariableReference const aVariableReference( *anIterator );
+
+	    theVariableReferenceListVector[ i ][ j ] = getVariableIndex( aVariableReference.getVariable() );
+	    ++j;
+	    theVariableReferenceListVector[ i ][ j ] = aVariableReference.getCoefficient();
+	    ++j;
+	  }
+
+	for ( VariableReferenceVectorConstIterator anIterator( aVariableReferenceVector.begin() + aPositiveVariableReferenceOffset ); anIterator < aVariableReferenceVector.end(); ++anIterator )
+	  {
+	    VariableReference const aVariableReference( *anIterator );
+
+	    theVariableReferenceListVector[ i ][ j ] = getVariableIndex( aVariableReference.getVariable() );
+	    ++j;
+	    theVariableReferenceListVector[ i ][ j ] = aVariableReference.getCoefficient();
+	    ++j;
+	  }
+      }
+  }
+
+  void DifferentialStepper::setVariableVelocity( boost::detail::multi_array::sub_array<Real, 1> aVelocityBuffer )
+  {
+    const ProcessVector::size_type 
+      aDiscreteProcessOffset( getDiscreteProcessOffset() );
+
+    //    aVelocityBuffer.clear();
+    //    aVelocityBuffer.resize( theVariableVector.size() );
+    for ( RealMatrix::size_type i( 0 ); i < aVelocityBuffer.size(); ++i )
+      {
+	aVelocityBuffer[ i ] = 0.0;
+      }
+
+    for ( ProcessVector::size_type i( 0 ); i < aDiscreteProcessOffset; ++i )
+      {
+	const Real anActivity( theProcessVector[ i ]->getActivity() );
+
+	for ( std::vector<Integer>::const_iterator 
+		anIterator( theVariableReferenceListVector[ i ].begin() );
+	      anIterator < theVariableReferenceListVector[ i ].end(); )
+	  {
+	    const VariableVector::size_type anIndex( *anIterator );
+	    ++anIterator;
+	    const Integer aCoefficient( *anIterator );
+	    ++anIterator;	
+	    
+	    aVelocityBuffer[ anIndex ] += aCoefficient * anActivity;
+	  }
+      }
   }
 
   void DifferentialStepper::reset()
@@ -122,7 +194,6 @@ namespace libecs
 	aVariable->loadValue( theValueBuffer[ c ] );
 	aVariable->interIntegrate( aCurrentTime );
       }
-
   }
 
   void DifferentialStepper::interrupt( StepperPtr const aCaller )
@@ -244,6 +315,9 @@ namespace libecs
 	    break;
 	  }
       }
+
+    // an extra calculation for resetting the activities of processes
+    fireProcesses();
 
     setTolerableStepInterval( getStepInterval() );
 

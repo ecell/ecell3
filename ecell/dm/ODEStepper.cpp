@@ -188,14 +188,14 @@ void ODEStepper::calculateJacobian()
       aVariable1->loadValue( theValueBuffer[ i ] + aPerturbation );
 
       fireProcesses();
-      
+      setVariableVelocity( theW[ 4 ] );
+
       for ( VariableVector::size_type j( 0 ); j < theSystemSize; ++j )
 	{
 	  const VariablePtr aVariable2( theVariableVector[ j ] );
 	  
 	  theJacobian[ j ][ i ]
-	    = - ( aVariable2->getVelocity() - theW[ 3 ][ j ] ) / aPerturbation;
-	  aVariable2->clearVelocity();
+	    = - ( theW[ 4 ][ j ] - theW[ 3 ][ j ] ) / aPerturbation;
 	}
       
       aVariable1->loadValue( aValue );
@@ -320,19 +320,16 @@ void ODEStepper::calculateRhs()
   
   setCurrentTime( aCurrentTime + aStepInterval * ( 4.0 - SQRT6 ) / 10.0 );
   fireProcesses();
+  setVariableVelocity( theW[ 4 ] );
   
   for ( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
-      const VariablePtr aVariable( theVariableVector[ c ] );
-      
       tif[ c ] 
-	= aVariable->getVelocity() * 4.3255798900631553510;
+	= theW[ 4 ][ c ] * 4.3255798900631553510;
       tif[ c + theSystemSize ] 
-	= aVariable->getVelocity() * -4.1787185915519047273;
+	= theW[ 4 ][ c ] * -4.1787185915519047273;
       tif[ c + theSystemSize*2 ]
-	= aVariable->getVelocity() * -0.50287263494578687595;
-      
-      aVariable->clearVelocity();
+	= theW[ 4 ][ c ] * -0.50287263494578687595;
       
       const Real z( theW[ 0 ][ c ] * 0.24171793270710701896
 		    + theW[ 1 ][ c ] * 0.20412935229379993199
@@ -345,19 +342,16 @@ void ODEStepper::calculateRhs()
   
   setCurrentTime( aCurrentTime + aStepInterval * ( 4.0 + SQRT6 ) / 10.0 );
   fireProcesses();
+  setVariableVelocity( theW[ 4 ] );
   
   for ( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
-      const VariablePtr aVariable( theVariableVector[ c ] );
-      
       tif[ c ] 
-	+= aVariable->getVelocity() * 0.33919925181580986954;
+	+= theW[ 4 ][ c ] * 0.33919925181580986954;
       tif[ c + theSystemSize ]
-	-= aVariable->getVelocity() * 0.32768282076106238708;
+	-= theW[ 4 ][ c ] * 0.32768282076106238708;
       tif[ c + theSystemSize*2 ]
-	+= aVariable->getVelocity() * 2.5719269498556054292;
-      
-      aVariable->clearVelocity();
+	+= theW[ 4 ][ c ] * 2.5719269498556054292;
       
       const Real z( theW[ 0 ][ c ] * 0.96604818261509293619 + theW[ 1 ][ c ] );
 
@@ -368,17 +362,16 @@ void ODEStepper::calculateRhs()
 
   setCurrentTime( aCurrentTime + aStepInterval );
   fireProcesses();
+  setVariableVelocity( theW[ 4 ] );
 
   for ( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
-      const VariablePtr aVariable( theVariableVector[ c ] );
-      
       tif[ c ]
-	+= aVariable->getVelocity() * 0.54177053993587487119;
+	+= theW[ 4 ][ c ] * 0.54177053993587487119;
       tif[ c + theSystemSize ]
-	+= aVariable->getVelocity() * 0.47662355450055045196;
+	+= theW[ 4 ][ c ] * 0.47662355450055045196;
       tif[ c + theSystemSize*2 ]
-	-= aVariable->getVelocity() * 0.59603920482822492497;
+	-= theW[ 4 ][ c ] * 0.59603920482822492497;
       
       const Real w1( theW[ 0 ][ c ] );
       const Real w2( theW[ 1 ][ c ] );
@@ -388,8 +381,6 @@ void ODEStepper::calculateRhs()
 
       GSL_SET_COMPLEX( &comp, tif[ c + theSystemSize ] - w2 * alphah + w3 * betah, tif[ c + theSystemSize*2 ] - w2 * betah - w3 * alphah );
       gsl_vector_complex_set( theVelocityVector2, c, comp );
-
-      aVariable->clearVelocity();
     }
 
   setCurrentTime( aCurrentTime );
@@ -401,7 +392,7 @@ Real ODEStepper::solve()
 		       theVelocityVector1, theSolutionVector1 );
   gsl_linalg_complex_LU_solve( theJacobianMatrix2, thePermutation2,
 			       theVelocityVector2, theSolutionVector2 );
-  
+
   Real aNorm( 0.0 );
   Real deltaW( 0.0 );
   gsl_complex comp;
@@ -410,23 +401,20 @@ Real ODEStepper::solve()
     {
       Real aTolerance2( rtoler * fabs( theValueBuffer[ c ] ) + atoler );
       aTolerance2 = aTolerance2 * aTolerance2;
-      
+
       deltaW = gsl_vector_get( theSolutionVector1, c );
       theW[ 0 ][ c ] += deltaW;
       aNorm += deltaW * deltaW / aTolerance2;
-      //      std::cout << deltaW << "\t";
       
       comp = gsl_vector_complex_get( theSolutionVector2, c );
       
       deltaW = GSL_REAL( comp );
       theW[ 1 ][ c ] += deltaW;
       aNorm += deltaW * deltaW / aTolerance2;
-      //      std::cout << deltaW << "\t";
 
       deltaW = GSL_IMAG( comp );
       theW[ 2 ][ c ] += deltaW;
       aNorm += deltaW * deltaW / aTolerance2;
-      //      std::cout << deltaW << std::endl;
     }
 
   return sqrt( aNorm / ( 3 * theSystemSize ) );
@@ -509,7 +497,6 @@ bool ODEStepper::calculateRadauIIA()
 		  aNewStepInterval = aStepInterval * 0.8 * pow( std::max( 1e-4, std::min( 20.0, anIterationError ) ) , -1.0 / ( 4 + getMaxIterationNumber() - 2 - anIterator ) );
 		  setStepInterval( aNewStepInterval );
 
-		  // std::cout << "iteration error >= 1.0" << std::endl;
 		  return false;
 		}
 	    }
@@ -517,7 +504,6 @@ bool ODEStepper::calculateRadauIIA()
 	    {
 	      setStepInterval( aStepInterval * 0.5 );
 
-	      // std::cout << anIterator << " : theta >= 0.99" << std::endl;
 	      return false;
 	    }
 	}
@@ -606,7 +592,6 @@ bool ODEStepper::calculateRadauIIA()
 	  setStepInterval( aNewStepInterval );
 	}
       
-      // std::cout << "error >= 1.0" << std::endl;
       return false;
     }
 }
@@ -655,16 +640,15 @@ Real ODEStepper::estimateLocalError()
   if ( theFirstStepFlag or theRejectedStepFlag )
     {
       fireProcesses();
-      
+      setVariableVelocity( theW[ 4 ] );
+
       for ( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
 	{
 	  gsl_vector_set( theVelocityVector1, c,
-			  theVariableVector[ c ]->getVelocity()
+			  theW[ 4 ][ c ]
 			  + theW[ 0 ][ c ] * hee1
 			  + theW[ 1 ][ c ] * hee2
 			  + theW[ 2 ][ c ] * hee3 );
-	  
-	  theVariableVector[ c ]->clearVelocity();
 	}
       
       gsl_linalg_LU_solve( theJacobianMatrix1, thePermutation1,
@@ -677,6 +661,7 @@ Real ODEStepper::estimateLocalError()
 				 + atoler );
 	  
 	  Real aDifference( gsl_vector_get( theSolutionVector1, c ) );
+
 	  aDifference /= aTolerance;
 	  
 	  anError += aDifference * aDifference;
@@ -699,12 +684,8 @@ void ODEStepper::stepRadauIIA()
   
   theRejectedStepFlag = false;
 
-  fireProcesses();  
-  for ( VariableVector::size_type i( 0 ); i < theSystemSize; ++i )
-    {
-      theW[ 3 ][ i ] = theVariableVector[ i ]->getVelocity();
-      theVariableVector[ i ]->clearVelocity();
-    }
+  fireProcesses();
+  setVariableVelocity( theW[ 3 ] );
   
   if ( theJacobianCalculateFlag )
     {
@@ -717,8 +698,11 @@ void ODEStepper::stepRadauIIA()
 	setJacobianMatrix();
     }
 
+  UnsignedInteger counter( 0 );
   while ( !calculateRadauIIA() )
     {
+      if ( counter++ > 10 ) break;
+
       theRejectedStepFlag = true;
 
       if ( !theJacobianCalculateFlag )
@@ -743,7 +727,6 @@ void ODEStepper::stepRadauIIA()
       theW[ 3 ][ c ] /= aStepInterval;
       
       theVariableVector[ c ]->loadValue( theValueBuffer[ c ] );
-      theVariableVector[ c ]->setVelocity( theW[ 3 ][ c ] );
     }
 
   for ( VariableVector::size_type c( 0 ); c < theSystemSize; c++ )
@@ -768,6 +751,9 @@ void ODEStepper::stepRadauIIA()
     }
 
   theStateFlag = true;
+
+  // an extra calculation for resetting the activities of processes
+  fireProcesses();
 }
 
 bool ODEStepper::calculate()
@@ -786,20 +772,15 @@ bool ODEStepper::calculate()
     {
       interIntegrate();
       fireProcesses();
+      setVariableVelocity( theTaylorSeries[ 0 ] );
 
       for( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
 	{
 	  VariablePtr const aVariable( theVariableVector[ c ] );
 	
-	  // get k1
-	  theTaylorSeries[ 0 ][ c ] = aVariable->getVelocity();
-	    
 	  aVariable->loadValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
 				* aStepInterval
 				+ theValueBuffer[ c ] );
-
-	  // clear velocity
-	  aVariable->clearVelocity();
 	}
     }
   else
@@ -814,9 +795,6 @@ bool ODEStepper::calculate()
 	  aVariable->loadValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
 				* aStepInterval
 				+ theValueBuffer[ c ] );
-
-	  // clear velocity
-	  aVariable->clearVelocity();
 	}	
     }
 
@@ -824,35 +802,28 @@ bool ODEStepper::calculate()
   setCurrentTime( aCurrentTime + aStepInterval * 0.2 );
   interIntegrate();
   fireProcesses();
+  setVariableVelocity( theW[ 0 ] );
 
   for( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
       VariablePtr const aVariable( theVariableVector[ c ] );
-	
-      // get k2
-      theW[ 0 ][ c ] = aVariable->getVelocity();
 
       aVariable
 	->loadValue( ( theTaylorSeries[ 0 ][ c ] * ( 3.0 / 40.0 ) 
 		       + theW[ 0 ][ c ] * ( 9.0 / 40.0 ) )
 		     * aStepInterval
 		     + theValueBuffer[ c ] );
-
-      // clear velocity
-      aVariable->clearVelocity();
     }
 
   // ========= 3 ===========
   setCurrentTime( aCurrentTime + aStepInterval * 0.3 );
   interIntegrate();
   fireProcesses();
+  setVariableVelocity( theW[ 1 ] );
 
   for( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
       VariablePtr const aVariable( theVariableVector[ c ] );
-	
-      // get k3
-      theW[ 1 ][ c ] = aVariable->getVelocity();
 
       aVariable
 	->loadValue( ( theTaylorSeries[ 0 ][ c ] * ( 44.0 / 45.0 ) 
@@ -860,22 +831,17 @@ bool ODEStepper::calculate()
 		       + theW[ 1 ][ c ] * ( 32.0 / 9.0 ) )
 		     * aStepInterval
 		     + theValueBuffer[ c ] );
-
-      // clear velocity
-      aVariable->clearVelocity();
     }
 
   // ========= 4 ===========
   setCurrentTime( aCurrentTime + aStepInterval * 0.8 );
   interIntegrate();
   fireProcesses();
+  setVariableVelocity( theW[ 2 ] );
 
   for( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
       VariablePtr const aVariable( theVariableVector[ c ] );
-	
-      // get k4
-      theW[ 2 ][ c ] = aVariable->getVelocity();
 
       aVariable
 	->loadValue( ( theTaylorSeries[ 0 ][ c ] * ( 19372.0 / 6561.0 ) 
@@ -884,22 +850,17 @@ bool ODEStepper::calculate()
 		       - theW[ 2 ][ c ] * ( 212.0 / 729.0 ) )
 		     * aStepInterval
 		     + theValueBuffer[ c ] );
-
-      // clear velocity
-      aVariable->clearVelocity();
     }
 
   // ========= 5 ===========
   setCurrentTime( aCurrentTime + aStepInterval * ( 8.0 / 9.0 ) );
   interIntegrate();
   fireProcesses();
+  setVariableVelocity( theW[ 3 ] );
 
   for( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
       VariablePtr const aVariable( theVariableVector[ c ] );
-	
-      // get k5
-      theW[ 3 ][ c ] = aVariable->getVelocity();
 
       // temporarily set Y^6
       theTaylorSeries[ 1 ][ c ]
@@ -911,9 +872,6 @@ bool ODEStepper::calculate()
 
       aVariable->loadValue( theTaylorSeries[ 1 ][ c ] * aStepInterval
 			    + theValueBuffer[ c ] );
-
-      // clear velocity
-      aVariable->clearVelocity();
     }
 
   // ========= 6 ===========
@@ -925,13 +883,11 @@ bool ODEStepper::calculate()
   setCurrentTime( aCurrentTime + aStepInterval );
   interIntegrate();
   fireProcesses();
+  setVariableVelocity( theW[ 4 ] );
 
   for( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
       VariablePtr const aVariable( theVariableVector[ c ] );
-	
-      // get k6
-      theW[ 4 ][ c ] = aVariable->getVelocity();
 
       theTaylorSeries[ 2 ][ c ]
 	= theTaylorSeries[ 0 ][ c ] * ( 35.0 / 384.0 )
@@ -946,15 +902,13 @@ bool ODEStepper::calculate()
 
       aVariable->loadValue( theTaylorSeries[ 2 ][ c ] * aStepInterval
 			    + theValueBuffer[ c ] );
-
-      // clear velocity
-      aVariable->clearVelocity();
     }
 
   // ========= 7 ===========
   setCurrentTime( aCurrentTime + aStepInterval );
   interIntegrate();
   fireProcesses();
+  setVariableVelocity( theW[ 5 ] );
 
   // evaluate error
   Real maxError( 0.0 );
@@ -962,9 +916,6 @@ bool ODEStepper::calculate()
   for( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
       VariablePtr const aVariable( theVariableVector[ c ] );
-
-      // get k7
-      theW[ 5 ][ c ] = aVariable->getVelocity();
 
       // calculate error
       const Real anEstimatedError
@@ -998,8 +949,6 @@ bool ODEStepper::calculate()
 	{
 	  maxError = anError;
 	}
-	
-      aVariable->setVelocity( theTaylorSeries[ 2 ][ c ] );
     }
 
   aSpectralRadius /= aDenominator;
@@ -1048,7 +997,6 @@ void ODEStepper::step()
 	  if ( isStiff ) setSpectralRadius( calculateJacobianNorm() );
 	  
 	  const Real lambdah( getSpectralRadius() * getStepInterval() );
-	  //      std::cout << getCurrentTime() << "\t" << lambdah << std::endl;
 
 	  if ( isStiff == ( lambdah < 3.3 * 0.8 ) )
 	    {

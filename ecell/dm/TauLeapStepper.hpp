@@ -31,17 +31,15 @@
 #ifndef __TAULEAP_HPP
 #define __TAULEAP_HPP
 
-#include "TauLeapProcess.hpp"
+#include "GillespieProcess.hpp"
 
 #include "libecs/DifferentialStepper.hpp"
 #include "libecs/libecs.hpp"
 
-#include <vector>
-
 USE_LIBECS;
 
-DECLARE_CLASS( TauLeapProcess );
-DECLARE_VECTOR( TauLeapProcessPtr, TauLeapProcessVector );
+DECLARE_CLASS( GillespieProcess );
+DECLARE_VECTOR( GillespieProcessPtr, GillespieProcessVector );
 
 LIBECS_DM_CLASS( TauLeapStepper, DifferentialStepper )
 {  
@@ -51,12 +49,15 @@ public:
   LIBECS_DM_OBJECT( TauLeapStepper, Stepper )
     {
       INHERIT_PROPERTIES( DifferentialStepper );
+
       PROPERTYSLOT_SET_GET( Real, Epsilon );
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Tau );
     }
 
   TauLeapStepper( void )
     :
-    Epsilon( 0.03 )
+    epsilon( 0.03 ),
+    tau( libecs::INF )
     {
       ; // do nothing
     }
@@ -65,73 +66,87 @@ public:
     {
       ; // do nothing
     }  
-  
-  SIMPLE_SET_GET_METHOD( Real, Epsilon );
 
-  void initialize()
+  virtual void initialize();
+  virtual void step();
+  
+  GET_METHOD( Real, Epsilon )
+  {
+    return epsilon;
+  }
+
+  SET_METHOD( Real, Epsilon )
+  {
+    epsilon = value;
+  }
+
+  GET_METHOD( Real, Tau )
+  {
+    return tau;
+  }
+
+ protected:
+
+  const Real getTotalPropensity()
     {
-      DifferentialStepper::initialize();
-      
-      theTauLeapProcessVector.clear();
-      theTauLeapProcessVector.resize( theProcessVector.size() );
-      
-      for( ProcessVector::size_type i( 0 ); i < theProcessVector.size(); ++i )
+      Real totalPropensity( 0.0 );
+      FOR_ALL( GillespieProcessVector, theGillespieProcessVector )
 	{
-	  TauLeapProcessPtr aTauLeapProcessPtr( dynamic_cast<TauLeapProcessPtr>( theProcessVector[ i ] ) );
-	  theTauLeapProcessVector[ i ] = aTauLeapProcessPtr;
+	  totalPropensity += (*i)->getPropensity();
 	}
 
-      // resize tmp vector.
-      theFFVector.clear();
-      theMeanVector.clear();
-      theVarianceVector.clear();
-      theFFVector.resize( theProcessVector.size() );
-      theMeanVector.resize( theProcessVector.size() );
-      theVarianceVector.resize( theProcessVector.size() );
-
+      return totalPropensity;
     }
 
-  void step()
-    {      
-      const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+  void TauLeapStepper::calculateTau()
+    {
+      tau = libecs::INF;
+
+      const Real totalPropensity( getTotalPropensity() );
       
-      clearVariables();
-      
-      setStepInterval( getTau() );
-      
-      fireProcesses();
-      
-      for( VariableVector::size_type c( 0 ); c < aSize; ++c )
+      const GillespieProcessVector::size_type 
+	aSize( theGillespieProcessVector.size() );  
+      for( GillespieProcessVector::size_type i( 0 ); i < aSize; ++i )
 	{
-	  VariablePtr const aVariable( theVariableVector[ c ] );
-	  theTaylorSeries[ 0 ][ c ] = aVariable->getVelocity();
+	  Real aMean( 0.0 );
+	  Real aVariance( 0.0 );
+	  
+	  for( GillespieProcessVector::size_type j( 0 ); j < aSize; ++j )
+	    {
+	      const Real aPropensity
+		( theGillespieProcessVector[ j ]->getPropensity() );
+	      VariableReferenceVectorCref aVariableReferenceVector
+		( theGillespieProcessVector[ j ]->getVariableReferenceVector() );
+	      
+	      // future works : theDependentProcessVector
+	      Real expectedChange( 0.0 );
+	      for( VariableReferenceVectorConstIterator 
+		     k( aVariableReferenceVector.begin() ); 
+		   k != aVariableReferenceVector.end(); ++k )
+		{
+		  expectedChange += theGillespieProcessVector[ i ]->getPD( (*k).getVariable() ) * (*k).getCoefficient();
+		}
+	      
+	      aMean += expectedChange * aPropensity;
+	      aVariance += expectedChange * expectedChange * aPropensity;
+	    }
+	  
+	  const Real aTolerance( epsilon * totalPropensity );
+	  const Real expectedTau
+	    ( std::min( aTolerance / std::abs( aMean ), 
+			aTolerance * aTolerance / aVariance ) );
+	  if ( expectedTau < tau )
+	    {
+	      tau = expectedTau;
+	    }
 	}
     }
 
  protected:
   
-  const Real getTotalPropensity( )
-    {
-      Real anA0( 0.0 );
-      for( std::vector<TauLeapProcessPtr>::iterator i( theTauLeapProcessVector.begin() ); 
-	   i != theTauLeapProcessVector.end(); ++i )
-	{
-	  anA0 += (*i)->getPropensity();
-	}
-      return anA0;
-    }
-
-  const Real getTau( );
-  
- protected:
-  
-  Real Epsilon;
-  std::vector< TauLeapProcessPtr > theTauLeapProcessVector;
-  
-  // tmp vectors.
-  RealVector theFFVector;
-  RealVector theMeanVector;
-  RealVector theVarianceVector;
+  Real epsilon;
+  Real tau;
+  GillespieProcessVector theGillespieProcessVector;
 
 };
 

@@ -40,64 +40,6 @@ DECLARE_VECTOR( Integer, IntVector );
 LIBECS_DM_CLASS( DAEStepper, DifferentialStepper )
 {
 
- public:
-
-  class Interpolant
-    :
-    public libecs::Interpolant
-  {
-  public:
-
-    Interpolant( DAEStepperRef aStepper, 
-		   VariablePtr const aVariablePtr )
-      :
-      libecs::Interpolant( aVariablePtr ),
-      theStepper( aStepper ),
-      theIndex( theStepper.getVariableIndex( aVariablePtr ) )
-    {
-      ; // do nothing
-    }
-
-    virtual const Real getDifference( RealParam aTime, 
-				      RealParam anInterval ) const
-    {
-     const Real sq6( 2.4494897427831779 );  // sqrt( 6.0 )      
-     const Real c1( ( 4.0 - sq6 ) / 10.0 - 1.0 );      
-     const Real c2( ( 4.0 + sq6 ) / 10.0 - 1.0 );      
-
-     if ( !theStepper.theStateFlag )      
-       { 
-         return 0.0;  
-       }  
-
-     const Real cont1( theStepper.getTaylorSeries()[ 0 ][ theIndex ] );
-     const Real cont2( theStepper.getTaylorSeries()[ 1 ][ theIndex ] );
-     const Real cont3( theStepper.getTaylorSeries()[ 2 ][ theIndex ] );
-
-     const Real aStepInterval( theStepper.getStepInterval() );
-     const Real aStepIntervalInv( 1.0 / aStepInterval );
-     const Real aTimeInterval( aTime - aStepInterval    
-			       - theStepper.getCurrentTime() ); 
-
-     const Real s1( aTimeInterval * aStepIntervalInv );
-     const Real s2( ( aTimeInterval - anInterval ) * aStepIntervalInv );
-
-     const Real 
-       i1( s1 * ( cont1 + ( s1 - c2 ) * ( cont2 + ( s1 - c1 ) * cont3 ) ) );
-     const Real 
-       i2( s2 * ( cont1 + ( s2 - c2 ) * ( cont2 + ( s2 - c1 ) * cont3 ) ) );
-
-     return ( i1 - i2 );     
-     //      return theStepper.getVelocityBuffer()[ theIndex ] * anInterval;
-    }
-
-  protected:
-
-    DAEStepperRef         theStepper;
-    UnsignedInteger       theIndex;
-
-  };
-
 public:
 
   LIBECS_DM_OBJECT( DAEStepper, Stepper )
@@ -170,6 +112,8 @@ public:
   bool calculate();
   virtual void step();
 
+  virtual void interrupt( StepperPtr aCaller );
+
   void checkDependency();
 
   Real estimateLocalError();
@@ -181,13 +125,8 @@ public:
   void calculateRhs();
   Real solve();
 
-  virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
-  {
-    return new DAEStepper::Interpolant( *this, aVariable );
-  }
-
-  //  virtual GET_METHOD( Integer, Order ) { return 4; }
-  virtual GET_METHOD( Integer, Stage ) { return 4; }
+  virtual GET_METHOD( Integer, Order ) { return 3; }
+  virtual GET_METHOD( Integer, Stage ) { return 5; }
 
 protected:
 
@@ -225,6 +164,8 @@ protected:
 
   bool    theJacobianCalculateFlag;
   Real    theJacobianRecalculateTheta;
+
+  bool    isInterrupted;
 
 };
 

@@ -53,13 +53,15 @@ void FixedODE1Stepper::step()
   setStepInterval( getNextStepInterval() );
 
   fireProcesses();
+  setVariableVelocity( theTaylorSeries[ 0 ] );
 
+  /**
   for( VariableVector::size_type c( 0 ); c < aSize; ++c )
     {
       VariablePtr const aVariable( theVariableVector[ c ] );
-
-      theTaylorSeries[ 0 ][ c ] = aVariable->getVelocity();
+      //      theTaylorSeries[ 0 ][ c ] = aVariable->getVelocity();
     }
+  */
 
   /**
      avoid negative value

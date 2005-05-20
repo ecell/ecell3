@@ -42,7 +42,6 @@ namespace libecs
 
   LIBECS_DM_INIT_STATIC( DiscreteEventStepper, Stepper );
 
-
   //////////////////// DiscreteEventStepper
 
   DiscreteEventStepper::DiscreteEventStepper()
@@ -53,7 +52,6 @@ namespace libecs
   {
     ; // do nothing
   }
-
 
   GET_METHOD_DEF( String, LastProcessName, DiscreteEventStepper )
   {
@@ -88,7 +86,7 @@ namespace libecs
 			 "in this Stepper." );
       }
 
-    if( theDiscreteEventProcessVector.empty() )
+    if ( theDiscreteEventProcessVector.empty() )
       {
 	THROW_EXCEPTION( InitializationFailed,
 			 getClassNameString() + 
@@ -99,35 +97,51 @@ namespace libecs
     // (1) check Process dependency
     // (2) update step interval of each Process
     // (3) construct the priority queue (scheduler)
+
     thePriorityQueue.clear();
+    theDependentProcessVector.resize( theDiscreteEventProcessVector.size() );
+
     const Real aCurrentTime( getCurrentTime() );
+
     for( DiscreteEventProcessVector::const_iterator 
 	   i( theDiscreteEventProcessVector.begin() );
 	 i != theDiscreteEventProcessVector.end(); ++i )
       {      
 	DiscreteEventProcessPtr anDiscreteEventProcessPtr( *i );
-	
-	// check Process dependencies
-	anDiscreteEventProcessPtr->clearDependentProcessVector();
-	// here assume aCoefficient != 0
-	for( DiscreteEventProcessVector::const_iterator 
-	       j( theDiscreteEventProcessVector.begin() );
-	     j != theDiscreteEventProcessVector.end(); ++j )
-	  {
-	    DiscreteEventProcessPtr const anDiscreteEventProcess2Ptr( *j );
-	  
-	    if( anDiscreteEventProcessPtr->
-		checkProcessDependency( anDiscreteEventProcess2Ptr ) )
-	      {
-		anDiscreteEventProcessPtr->
-		  addDependentProcess( anDiscreteEventProcess2Ptr );
-	      }
-	  }
 
 	// warning: implementation dependent
 	// here we assume size() is the index of the newly pushed element
 	const int anIndex( thePriorityQueue.size() );
 
+	DiscreteEventProcessVectorRef aDependentDiscreteEventProcessVector
+	  ( theDependentProcessVector[ anIndex ] );
+	
+	// check Process dependencies
+	// here assume aCoefficient != 0
+	aDependentDiscreteEventProcessVector.clear();
+
+	for ( DiscreteEventProcessVector::size_type c( 0 );
+	      c < theDiscreteEventProcessVector.size(); ++c )
+	  {
+	    DiscreteEventProcessPtr const 
+	      anDiscreteEventProcess2Ptr( theDiscreteEventProcessVector[ c ] );
+	  
+	    if( anDiscreteEventProcessPtr->
+		checkProcessDependency( anDiscreteEventProcess2Ptr ) )
+	      {
+		if ( std::find( aDependentDiscreteEventProcessVector.begin(),
+				aDependentDiscreteEventProcessVector.end(),
+				anDiscreteEventProcess2Ptr )
+		     == aDependentDiscreteEventProcessVector.end() )
+		  {
+		    aDependentDiscreteEventProcessVector.push_back( anDiscreteEventProcess2Ptr );
+		  }
+	      }
+	  }
+
+	std::sort( aDependentDiscreteEventProcessVector.begin(),
+		   aDependentDiscreteEventProcessVector.end() );
+	
 	anDiscreteEventProcessPtr->setIndex( anIndex );
 	anDiscreteEventProcessPtr->updateStepInterval();
 	thePriorityQueue.
@@ -145,7 +159,6 @@ namespace libecs
 
     setStepInterval( aNewTime - aCurrentTime );
     getModel()->reschedule( this );
-
   }
   
 
@@ -154,17 +167,27 @@ namespace libecs
     StepperEventCref anEvent( thePriorityQueue.top() );
 
     DiscreteEventProcessPtr const aMuProcess( anEvent.getProcess() );
-    aMuProcess->fire();
+    VariableReferenceVectorCref 
+      aVariableReferenceVector( aMuProcess->getVariableReferenceVector() );
+
+    //     aMuProcess->fire();
+    FOR_ALL( VariableReferenceVector, aVariableReferenceVector )
+      {
+        VariableReferenceCref aVariableReference( *i );
+        aVariableReference.addValue( aVariableReference.getCoefficient() );
+      }
+
     theLastProcess = aMuProcess;
 
     const Real aCurrentTime( getCurrentTime() );
 
     // Update relevant processes
-    DiscreteEventProcessVectorCref 
-      theDependentProcessVector( aMuProcess->getDependentProcessVector() );
+    DiscreteEventProcessVectorCref aDependentDiscreteEventProcessVector
+      ( theDependentProcessVector[ aMuProcess->getIndex() ] );
+
     for ( DiscreteEventProcessVectorConstIterator 
-	    i( theDependentProcessVector.begin() );
-	  i != theDependentProcessVector.end(); ++i ) 
+	    i( aDependentDiscreteEventProcessVector.begin() );
+	  i != aDependentDiscreteEventProcessVector.end(); ++i ) 
       {
 	DiscreteEventProcessPtr const anAffectedProcess( *i );
 	anAffectedProcess->updateStepInterval();
@@ -226,14 +249,12 @@ namespace libecs
     getModel()->reschedule( this );
   }
 
-
   void DiscreteEventStepper::log()
   {
     if( theLoggerVector.empty() )
       {
 	return;
       }
-
 
     // call Logger::log() of Loggers that are attached to
     // theLastProcess and Variables in its VariableReferenceVector.
@@ -245,6 +266,22 @@ namespace libecs
     FOR_ALL( LoggerVector, aProcessLoggerVector )
       {
 	(*i)->log( aCurrentTime );
+      }
+
+    DiscreteEventProcessVectorCref aDependentDiscreteEventProcessVector
+      ( theDependentProcessVector[ theLastProcess->getIndex() ] );
+
+    FOR_ALL( DiscreteEventProcessVector, 
+	     aDependentDiscreteEventProcessVector )
+      {
+	LoggerVectorCref 
+	  aDependentProcessLoggerVector( (*i)->getLoggerVector() );
+	for ( LoggerVectorConstIterator 
+		j( aDependentProcessLoggerVector.begin() ); 
+	      j != aDependentProcessLoggerVector.end(); ++j )
+	  {
+	    (*j)->log( aCurrentTime );
+	  }
       }
 
     VariableReferenceVectorCref
@@ -262,10 +299,7 @@ namespace libecs
 	    (*i)->log( aCurrentTime );
 	  }
       }
-
   }
-
-
 
 } // namespace libecs
 

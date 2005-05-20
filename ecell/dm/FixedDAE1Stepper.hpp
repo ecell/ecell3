@@ -84,30 +84,15 @@ public:
   void calculateJacobian();
 
   void checkDependency();
-  void resetVelocity();
 
   const Real solve();
-
-  /**
-     Only for debugging
-  */
-
-  void printJacobianMatrix()
-  {
-    for ( UnsignedInteger i( 0 ); i < theSystemSize; i++ )
-      for ( UnsignedInteger j( 0 ); j < theSystemSize; j++ )
-    	std::cout << "m(" << i << "," << j << ") = " 
-    		  << gsl_matrix_get( theJacobianMatrix, i, j ) 
-		  << ":" << theVariableVector[ j ]->getID() << std::endl;
-  }
 
 protected:
 
   UnsignedInteger     theSystemSize;
-  Real            thePerturbationRate;
-  Real            theTolerance;
+  Real                thePerturbationRate;
+  Real                theTolerance;
 
-  RealVector                   theEachVelocityBuffer;
   // std::vector<ProcessVector>
   std::vector<IntVector>       theDependentProcessVector;
   std::vector<IntVector>       theDependentVariableVector;
@@ -118,7 +103,7 @@ protected:
   gsl_permutation*    thePermutation;
 
   IntVector       theContinuousVariableVector;
-  RealVector      theDiscreteActivityBuffer;
+  RealVector      theActivityBuffer;
 };
 
 #endif /* __FIXEDSODE1_HPP */

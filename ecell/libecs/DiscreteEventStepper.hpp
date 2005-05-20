@@ -45,21 +45,17 @@ namespace libecs
 
   /** @file */
 
-
   /**
 
   */
-
 
   LIBECS_DM_CLASS( DiscreteEventStepper, Stepper )
   {
 
   protected:
 
-
     DECLARE_CLASS( StepperEvent );
     DECLARE_TYPE( DynamicPriorityQueue<StepperEvent>, PriorityQueue );
-
 
     // A pair of (reaction index, time) for inclusion in the priority queue.
     class StepperEvent
@@ -100,15 +96,12 @@ namespace libecs
 	  theProcess != rhs.theProcess;
       }
 
-
     private:
 
       Real       theTime;
       DiscreteEventProcessPtr theProcess;
 
-
     };
-
 
   public:
 
@@ -116,24 +109,17 @@ namespace libecs
       {
 	INHERIT_PROPERTIES( Stepper );
 
-
 	PROPERTYSLOT_SET_GET( Real, Tolerance );
-
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TimeScale );
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( String, LastProcessName );
-
       }
 
     DiscreteEventStepper();
     virtual ~DiscreteEventStepper() {}
 
-
     virtual void initialize();
-
     virtual void step();
-
     virtual void interrupt( StepperPtr const aCaller );
-
     virtual void log();
 
 
@@ -154,7 +140,6 @@ namespace libecs
 
     GET_METHOD( String, LastProcessName );
 
-
     DiscreteEventProcessPtr const getLastProcess() const
       {
 	return theLastProcess;
@@ -165,25 +150,19 @@ namespace libecs
 	return theDiscreteEventProcessVector;
       }
 
-
   protected:
 
     DiscreteEventProcessVector theDiscreteEventProcessVector;
-
     PriorityQueue thePriorityQueue;
 
-
     Real            theTimeScale;
-
     Real            theTolerance;
 
     DiscreteEventProcessPtr    theLastProcess;
 
+    std::vector<DiscreteEventProcessVector> theDependentProcessVector;
+
   };
-
-
-
-
 
 } // namespace libecs
 

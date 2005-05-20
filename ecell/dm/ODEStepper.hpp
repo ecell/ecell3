@@ -150,15 +150,15 @@ public:
     atoler = rtoler * getAbsoluteToleranceFactor();
   }
 
-  virtual GET_METHOD( Integer, Stage )
-  {
-    return 4;
-  }
-
   virtual GET_METHOD( Integer, Order )
   {
     if ( isStiff ) return 3;
     else return 4;
+  }
+
+  virtual GET_METHOD( Integer, Stage )
+  {
+    return 4;
   }
 
 protected:

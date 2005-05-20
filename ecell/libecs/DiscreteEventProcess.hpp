@@ -61,14 +61,7 @@ namespace libecs
 	INHERIT_PROPERTIES( Process );
 
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, StepInterval );
-
-	PROPERTYSLOT( Polymorph, DependentProcessList,
-		      NULLPTR,
-		      &DiscreteEventProcess::getDependentProcessList );
       }
-
-
-  public:
 
     DiscreteEventProcess()
       :
@@ -101,13 +94,6 @@ namespace libecs
 
     virtual void updateStepInterval() = 0;
 
-    void clearDependentProcessVector()
-      {
-	theDependentProcessVector.clear();
-      }
-    
-    void addDependentProcess( DiscreteEventProcessPtr aProcessPtr );
-
     /**
        Check if this Process can affect on the given Process.
 
@@ -117,29 +103,14 @@ namespace libecs
 
     virtual const bool 
       checkProcessDependency( DiscreteEventProcessPtr 
-			      anDiscreteEventProcessPtr ) const;
-
-    DiscreteEventProcessVectorCref getDependentProcessVector() const
-      {
-	return theDependentProcessVector;
-      }
-
-    GET_METHOD( Polymorph, DependentProcessList );
-
+			      aDiscreteEventProcessPtr ) const;
 
   protected:
 
-    DiscreteEventProcessVector theDependentProcessVector;
-
     Real theStepInterval;
-
     Integer Index;
 
   };
-
-
-
-
 
   /*@}*/
 

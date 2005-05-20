@@ -208,6 +208,58 @@ namespace libecs
 	return aValue1 - aValue2;
       }
       
+      virtual const Real getVelocity( RealParam aTime ) const
+      {
+        if ( !theStepper.theStateFlag )
+          {
+            return 0.0;
+          }
+
+        const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
+
+        const RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
+	RealCptr aTaylorCoefficientPtr( aTaylorSeries.origin() + theIndex );
+
+	// calculate first order.
+	// here it assumes that always aTaylorSeries.size() >= 1
+
+	// *aTaylorCoefficientPtr := aTaylorSeries[ 0 ][ theIndex ]
+	Real aValue( *aTaylorCoefficientPtr );
+
+	// check if second and higher order calculations are necessary.
+	//	const RealMatrix::size_type aTaylorSize( aTaylorSeries.size() );
+
+	const RealMatrix::size_type aTaylorSize( theStepper.getStage() );
+	if( aTaylorSize >= 2 && aTimeInterval != 0.0 )
+	  {
+	    const RealMatrix::size_type aStride( aTaylorSeries.strides()[0] );
+
+	    Real aFactorialInv( 1.0 );
+
+	    RealMatrix::size_type s( 1 );
+
+	    const Real theta( aTimeInterval 
+			      / theStepper.getTolerableStepInterval() );
+
+	    do 
+	      {
+		// main calculation for the 2+ order
+		++s;
+		
+		aTaylorCoefficientPtr += aStride;
+		const Real aTaylorCoefficient( *aTaylorCoefficientPtr );
+		
+		aFactorialInv *= theta * s;
+		
+		aValue += aTaylorCoefficient * aFactorialInv;
+		
+		// LIBECS_PREFETCH( aTaylorCoefficientPtr + aStride, 0, 1 );
+	      } while( s != aTaylorSize );
+	  }
+
+	return aValue;
+      }
+      
     protected:
 
       DifferentialStepperRef    theStepper;
@@ -249,6 +301,8 @@ namespace libecs
 
     void resetAll();
     void interIntegrate();
+    void initializeVariableReferenceList();
+    void setVariableVelocity( boost::detail::multi_array::sub_array<Real, 1> aVelocityBuffer );
  
     virtual void initialize();
 
@@ -282,7 +336,7 @@ namespace libecs
 
     RealMatrix theTaylorSeries;
 
-  protected:
+    std::vector< std::vector<Integer> > theVariableReferenceListVector;
 
     bool theStateFlag;
 
@@ -431,11 +485,6 @@ namespace libecs
     virtual GET_METHOD( Integer, Stage )
     { 
       return 2;
-    }
-
-    virtual GET_METHOD( Integer, Order )
-    { 
-      return 1; 
     }
 
   private:

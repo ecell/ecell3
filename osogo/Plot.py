@@ -44,7 +44,6 @@ theMeasureDictionary = \
                      [['System', 'Size' , 'size'],
                       ['Variable', 'MolarConc', 'molar conc.' ],
                       ['Variable', 'NumberConc', 'number conc.' ],
-                      ['Variable', 'TotalVelocity', 'total velocity' ],
                       ['Variable', 'Value', 'value'],
                       ['Variable', 'Velocity', 'velocity' ],
                       ['Process', 'Activity', 'activity'  ]]

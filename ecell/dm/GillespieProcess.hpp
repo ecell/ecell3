@@ -8,13 +8,11 @@
 #include <libecs/libecs.hpp>
 #include <libecs/DiscreteEventProcess.hpp>
 #include <libecs/Stepper.hpp>
+#include <libecs/FullID.hpp>
 #include <libecs/MethodProxy.hpp>
 
 
 USE_LIBECS;
-
-DECLARE_CLASS( GillespieProcess );
-
 
 /***************************************************************************
      GillespieProcess 
@@ -24,6 +22,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 {
   
   typedef MethodProxy<GillespieProcess,Real> RealMethodProxy;
+  typedef const Real (GillespieProcess::* PDMethodPtr)( VariablePtr ) const; 
   
  public:
   
@@ -42,10 +41,11 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
     :
     theOrder( 0 ),
     k( 0.0 ),
-    theGetPropensity_RMethodPtr( RealMethodProxy::
-				 create<&GillespieProcess::getInf>() ),
+    theGetPropensityMethodPtr( RealMethodProxy::
+			       create<&GillespieProcess::getZero>() ),
     theGetMinValueMethodPtr( RealMethodProxy::
-			     create<&GillespieProcess::getZero>() )
+			     create<&GillespieProcess::getZero>() ),
+    theGetPDMethodPtr( &GillespieProcess::getZero )
     {
       ; // do nothing
     }
@@ -60,15 +60,42 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 
   GET_METHOD( Real, Propensity )
   {
-    return 1.0 / getPropensity_R();
-  }
+    const Real aPropensity( theGetPropensityMethodPtr( this ) );
 
+    if ( aPropensity < 0.0 )
+      {
+	THROW_EXCEPTION( SimulationError, "Variable value <= -1.0" );
+	return 0.0;
+      }
+    else
+      {
+	return aPropensity;
+      }
+  }
 
   GET_METHOD( Real, Propensity_R )
   {
-    return theGetPropensity_RMethodPtr( this );
+    const Real aPropensity( getPropensity() );
+
+    if ( aPropensity > 0.0 )
+      {
+	return 1.0 / aPropensity;
+      }
+    else
+      {
+	return libecs::INF;
+      }
   }
 
+  const Real getPD( VariablePtr aVariable ) const
+  {
+    return ( this->*theGetPDMethodPtr )( aVariable );
+  }
+
+  virtual const bool isContinuous() const
+  {
+    return true;
+  }
 
   // The order of the reaction, i.e. 1 for a unimolecular reaction.
 
@@ -89,114 +116,168 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
       ( - log( gsl_rng_uniform_pos( getStepper()->getRng() ) ) );
   }
 
-
   void calculateOrder();
 
-
-  virtual void initialize();
+  virtual void initialize()
+  {
+    DiscreteEventProcess::initialize();
+    declareUnidirectional();
+  
+    calculateOrder();
+    
+    if( ! ( getOrder() == 1 || getOrder() == 2 ) )
+      {
+	THROW_EXCEPTION( ValueError, 
+			 String( getClassName() ) + 
+			 "[" + getFullID().getString() + 
+			 "]: Only first or second order scheme is allowed." );
+      }
+  }
 
   virtual void fire()
   {
-    for( VariableReferenceVectorConstIterator 
-	   i( theVariableReferenceVector.begin() );
-	 i != theVariableReferenceVector.end() ; ++i )
+    Real velocity( k * N_A );
+    velocity *= getSuperSystem()->getSize();
+
+    for( VariableReferenceVectorConstIterator
+           s( theVariableReferenceVector.begin() );
+         s != theZeroVariableReferenceIterator; ++s )
       {
-	VariableReferenceCref aVariableReference( *i );
-	aVariableReference.addValue( aVariableReference.getCoefficient() );
+        VariableReference aVariableReference( *s );
+        Integer aCoefficient( aVariableReference.getCoefficient() );
+        do {
+          ++aCoefficient;
+          velocity *= aVariableReference.getMolarConc();
+        } while( aCoefficient != 0 );
+         
       }
+     
+    setActivity( velocity );
   }
 
 
 protected:
-
-  static void checkNonNegative( const Real aValue )
-  {
-    if( aValue < 0.0 )
-      {
-	THROW_EXCEPTION( SimulationError, "Variable value <= -1.0" );
-      }
-  }
 
   const Real getZero() const
   {
     return 0.0;
   }
 
+  const Real getZero( VariablePtr aVariable ) const
+  {
+    return 0.0;
+  }
+
+  /**
   const Real getInf() const
   {
     return libecs::INF;
   }
+  */
 
-  const Real getPropensity_R_FirstOrder() const
+  /**
+     FirstOrder_OneSubstrate
+   */
+
+  const Real getPropensity_FirstOrder() const
   {
-    const Real aMultiplicity( theVariableReferenceVector[0].getValue() );
-
-    if( aMultiplicity > 0.0 )
-      {
-	return 1.0 / ( k * aMultiplicity );
-      }
-    else
-      {
-	checkNonNegative( aMultiplicity );
-
-	return libecs::INF;
-      }
-  }
-
-  const Real getPropensity_R_SecondOrder_TwoSubstrates() const
-  {
-    const Real aMultiplicity( theVariableReferenceVector[0].getValue() *
-			      theVariableReferenceVector[1].getValue() );
-
-    if( aMultiplicity > 0.0 )
-      {
-	return ( getSuperSystem()->getSizeVariable()->getValue() * N_A ) /
-	  ( k * aMultiplicity );
-      }
-    else
-      {
-	checkNonNegative( aMultiplicity );
-
-	return libecs::INF;
-      }
-  }
-
-  const Real getPropensity_R_SecondOrder_OneSubstrate() const
-  {
-    const Real aValue( theVariableReferenceVector[0].getValue() );
-
-    if( aValue >= 2.0 ) // there must be two or more molecules
-      {
-	return ( getSuperSystem()->getSizeVariable()->getValue() * N_A ) /
-	  ( k * aValue * ( aValue - 1.0 ) );
-      }
-    else
-      {
-	checkNonNegative( aValue );
-
-	return libecs::INF;
-      }
-
+    return k * theVariableReferenceVector[ 0 ].getValue();
   }
 
   const Real getMinValue_FirstOrder() const
   {
-    return theVariableReferenceVector[0].getValue();
+    return theVariableReferenceVector[ 0 ].getValue();
+  }
+
+  const Real getPD_FirstOrder( VariablePtr aVariable ) const
+    {
+      if ( theVariableReferenceVector[ 0 ].getVariable() == aVariable )
+	{
+	  return k;
+	}
+      else
+	{
+	  return 0.0;
+	}
+    }
+
+  /**
+     SecondOrder_TwoSubstrates
+   */
+
+  const Real getPropensity_SecondOrder_TwoSubstrates() const
+  {
+    return k * theVariableReferenceVector[ 0 ].getValue() * theVariableReferenceVector[ 1 ].getValue() / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
   }
 
   const Real getMinValue_SecondOrder_TwoSubstrates() const
   {
-    const Real aFirstValue( theVariableReferenceVector[0].getValue() );
-    const Real aSecondValue( theVariableReferenceVector[1].getValue() );
+    const Real aFirstValue( theVariableReferenceVector[ 0 ].getValue() );
+    const Real aSecondValue( theVariableReferenceVector[ 1 ].getValue() );
 
     return fmin( aFirstValue, aSecondValue );
   }
 
-  const Real getMinValue_SecondOrder_OneSubstrate() const
+  const Real getPD_SecondOrder_TwoSubstrates( VariablePtr aVariable ) const
+    {
+      if ( theVariableReferenceVector[ 0 ].getVariable() == aVariable )
+	{
+	  return ( k * theVariableReferenceVector[ 1 ].getValue() ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
+	}
+      else if ( theVariableReferenceVector[ 1 ].getVariable() == aVariable )
+	{
+	  return ( k * theVariableReferenceVector[ 0 ].getValue() ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
+	}
+      else
+	{
+	  return 0.0;
+	}
+    }
+  
+  /**
+     SecondOrder_OneSubstrate
+   */
+
+  const Real getPropensity_SecondOrder_OneSubstrate() const
   {
-    return theVariableReferenceVector[0].getValue() * 0.5;
+    const Real aValue( theVariableReferenceVector[ 0 ].getValue() );
+
+    if ( aValue > 1.0 ) // there must be two or more molecules
+      {
+	return k * aValue * ( aValue - 1.0 ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
+      }
+    else
+      {
+	return 0.0;
+      }
   }
 
+  const Real getMinValue_SecondOrder_OneSubstrate() const
+  {
+    return theVariableReferenceVector[ 0 ].getValue() * 0.5;
+  }
+
+  const Real getPD_SecondOrder_OneSubstrate( VariablePtr aVariable ) const
+    {
+      if( theVariableReferenceVector[ 0 ].getVariable() == aVariable )
+	{
+	  const Real aValue( theVariableReferenceVector[ 0 ].getValue() );
+
+	  if ( aValue > 0.0 ) // there must be at least one molecule
+	    {
+	      return  k * ( 2.0 * aValue - 1.0 ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
+	    }
+	  else
+	    {
+	      return 0.0;
+	    }
+	}
+      else
+	{
+	  return 0.0;
+	}
+    }
+  
 
 protected:
 
@@ -204,13 +285,11 @@ protected:
 
   Integer theOrder;
 
-  RealMethodProxy theGetPropensity_RMethodPtr;
-  
+  RealMethodProxy theGetPropensityMethodPtr;  
   RealMethodProxy theGetMinValueMethodPtr;
+  PDMethodPtr     theGetPDMethodPtr; // this should be MethodProxy
 
 };
-
-
 
 
 #endif /* __NRPROCESS_HPP */

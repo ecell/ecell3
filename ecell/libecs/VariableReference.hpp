@@ -282,21 +282,9 @@ namespace libecs
       return theVariablePtr->getNumberConc();
     }
 
-    const Real getTotalVelocity() const
-    {
-      return theVariablePtr->getTotalVelocity();
-    }
-
-    // be careful.. you may mean getTotalVelocity(), not getVelocity()
     const Real getVelocity() const
     {
       return theVariablePtr->getVelocity();
-    }
-
-    // before trying this consider addFlux() below.
-    void addVelocity( RealParam aValue ) const
-    {
-      theVariablePtr->addVelocity( aValue );
     }
 
     const bool isFixed() const
@@ -307,12 +295,6 @@ namespace libecs
     void setFixed( const bool aValue ) const
     {
       theVariablePtr->setFixed( aValue );
-    }
-
-
-    void addFlux( RealParam aVelocity ) const
-    {
-      theVariablePtr->addVelocity( aVelocity * theCoefficient );
     }
 
     SystemPtr getSuperSystem() const

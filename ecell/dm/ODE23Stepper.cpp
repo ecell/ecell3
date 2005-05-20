@@ -79,68 +79,44 @@ bool ODE23Stepper::calculate()
 
   theStateFlag = true;
 
-  for ( RealMatrix::size_type s( 0 ); s < theTaylorSeries.size(); ++s )
-    for ( RealVector::size_type c( 0 ); c < theTaylorSeries[ s ].size(); ++c )
-      {
-	theTaylorSeries[ s ][ c ] = 0.0;
-      }
+  theTaylorSeries.reindex( 0 );
 
   // ========= 1 ===========
   interIntegrate2();
   fireProcesses();
-
-  for( VariableVector::size_type c( 0 ); c < aSize; ++c )
-    {
-      VariablePtr const aVariable( theVariableVector[ c ] );
-      
-      // get k1
-      const Real aVelocity( aVariable->getVelocity() );
-      theTaylorSeries[ 0 ][ c ] = aVelocity;
-      
-      // clear velocity
-      aVariable->clearVelocity();
-    }
+  setVariableVelocity( theTaylorSeries[ 0 ] );
 
   // ========= 2 ===========
   setCurrentTime( aCurrentTime + getStepInterval() );
   interIntegrate2();
   fireProcesses();
+  setVariableVelocity( theTaylorSeries[ 1 ] );
 
   for( VariableVector::size_type c( 0 ); c < aSize; ++c )
     {
-      VariablePtr const aVariable( theVariableVector[ c ] );
-      
-      // get k2
-      const Real aVelocity( aVariable->getVelocity() );
-      theTaylorSeries[ 1 ][ c ] =  aVelocity - theTaylorSeries[ 0 ][ c ];
-    
-      // clear velocity
-      aVariable->clearVelocity();
+      theTaylorSeries[ 1 ][ c ] -= theTaylorSeries[ 0 ][ c ];
     }
-	
+
   // ========= 3 ===========
   setCurrentTime( aCurrentTime + getStepInterval() * 0.5 );
   interIntegrate2();
   fireProcesses();
-	
+  setVariableVelocity( theTaylorSeries[ 2 ] );
+
   Real maxError( 0.0 );
 
   // restore theValueBuffer
   for( VariableVector::size_type c( 0 ); c < aSize; ++c )
     {
-      VariablePtr const aVariable( theVariableVector[ c ] );
-	
-      const Real aVelocity( aVariable->getVelocity() );
- 
       theTaylorSeries[ 1 ][ c ] *= 0.5;
-
       const Real anExpectedVelocity( theTaylorSeries[ 0 ][ c ]
       				     + theTaylorSeries[ 1 ][ c ] );
 
       // ( k1 + k2 + k3 * 4 ) / 6 for ~Yn+1
       // ( k1 + k2 - k3 * 2 ) / 3 for ( Yn+1 - ~Yn+1 ) as a local error
       const Real anEstimatedError
-	( fabs( ( anExpectedVelocity - aVelocity ) * ( 2.0 / 3.0 ) ) );
+	( fabs( ( anExpectedVelocity - theTaylorSeries[ 2 ][ c ] ) 
+		* ( 2.0 / 3.0 ) ) );
 
       const Real aTolerance( eps_rel *
 			     ( a_y * fabs( theValueBuffer[ c ] ) 
@@ -157,10 +133,8 @@ bool ODE23Stepper::calculate()
 	}
 
       // restore x (original value)
-      aVariable->loadValue( theValueBuffer[ c ] );
-
-      //// x(n+1) = x(n) + k2 * aStepInterval + O(h^3)
-      aVariable->setVelocity( anExpectedVelocity );
+      theVariableVector[ c ]->loadValue( theValueBuffer[ c ] );
+      theTaylorSeries[ 2 ][ c ] = 0.0;
     }
     
   setMaxErrorRatio( maxError );
@@ -178,5 +152,3 @@ bool ODE23Stepper::calculate()
   // set the error limit interval
   return true;
 }
-
-

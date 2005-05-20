@@ -118,7 +118,6 @@ bool ESSYNSStepper::calculate()
       const Real aVelocity( ( exp( (theESSYNSMatrix[c])[0] ) - ( aVariable->getValue() ) ) / aStepInterval );
 		     
       theTaylorSeries[ 0 ][ anIndex ] = aVelocity;
-      aVariable->setVelocity( aVelocity );
     }
 
   return true;

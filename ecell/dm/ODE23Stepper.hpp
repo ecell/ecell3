@@ -48,14 +48,13 @@ public:
       INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
     }
 
-  ODE23Stepper( void );
-  
+  ODE23Stepper( void );  
   virtual ~ODE23Stepper( void );
 
   virtual void initialize();
   virtual bool calculate();
 
-  virtual GET_METHOD( Integer, Stage ) { return 2; }
+  virtual GET_METHOD( Integer, Stage ) { return 3; }
 
   void interIntegrate2();
 

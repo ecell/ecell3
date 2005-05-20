@@ -1,6 +1,6 @@
 Stepper TauLeapStepper( TL )
 {
-	Epsilon	0.01;
+	# Epsilon	0.01;
 }
 
 System System( / )
@@ -27,27 +27,27 @@ System System( / )
 		Value	0;
 	}
 	
-	Process TauLeapProcess( C1 )
+	Process GillespieProcess( C1 )
 	{
 		k	1;
 		VariableReferenceList	[ S0 :.:S1 -1 ];
 	}
 
-	Process TauLeapProcess( C2 )
+	Process GillespieProcess( C2 )
 	{
 		k	@(0.002 * 1e-15 * 6.02214 * 1e+23);
 		VariableReferenceList	[ S0 :.:S1 -2 ]
 					[ P0 :.:S2  1 ];
 	}
 
-	Process TauLeapProcess( C3 )
+	Process GillespieProcess( C3 )
 	{
 		k	0.5;
 		VariableReferenceList	[ S0 :.:S2 -1 ]
 					[ P0 :.:S1  2 ];
 	}
 
-	Process TauLeapProcess( C4 )
+	Process GillespieProcess( C4 )
 	{
 		k	0.04;
 		VariableReferenceList	[ S0 :.:S2 -1 ]
