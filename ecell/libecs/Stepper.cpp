@@ -529,8 +529,6 @@ namespace libecs
 
 	// save original value values
 	theValueBuffer[ c ] = aVariable->getValue();
-
-	aVariable->clearVelocity();
       }
 
   }
@@ -579,7 +577,6 @@ namespace libecs
 
 	// restore x (original value) and clear velocity
 	aVariable->setValue( theValueBuffer[ c ] );
-	aVariable->clearVelocity();
       }
   }
 

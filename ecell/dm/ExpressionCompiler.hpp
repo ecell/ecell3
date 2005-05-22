@@ -710,11 +710,6 @@ appendVariableReferenceMethodInstruction( Code& aCode,
       APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
 				 getVelocity );
     }
-  else if( aMethodName == "TotalVelocity" )
-    {
-      APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
-				 getTotalVelocity );
-    }
   else if( aMethodName == "Coefficient" )
     {
       APPEND_OBJECT_METHOD_INTEGER( aVariableReference, VariableReference,
