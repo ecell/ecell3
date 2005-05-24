@@ -2,7 +2,7 @@
 ## this one is commonly used with AM_PATH_PYTHONDIR ...
 dnl AM_CHECK_PYMOD(MODNAME [,SYMBOL [,ACTION-IF-FOUND [,ACTION-IF-NOT-FOUND]]])
 dnl Check if a module containing a given symbol is visible to python.
-AC_DEFUN(AM_CHECK_PYMOD,
+AC_DEFUN([AM_CHECK_PYMOD],
 [AC_REQUIRE([AM_PATH_PYTHON])
 py_mod_var=`echo $1['_']$2 | sed 'y%./+-%__p_%'`
 AC_MSG_CHECKING(for ifelse([$2],[],,[$2 in ])python module $1)
@@ -71,7 +71,7 @@ CPPFLAGS="$save_CPPFLAGS"
 ## this one is to check the correct version of gnome-python
 dnl AM_CHECK_GNOME_CANVAS()
 dnl Check if gnome canvas >= 2.0.2 is installed
-AC_DEFUN(AM_CHECK_GNOME_CANVAS,
+AC_DEFUN([AM_CHECK_GNOME_CANVAS],
 [AC_REQUIRE([AM_PATH_PYTHON])
 
 AC_MSG_CHECKING(for correct version of gnome canvas)

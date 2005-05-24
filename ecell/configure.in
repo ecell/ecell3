@@ -260,13 +260,6 @@ AC_CHECK_SIZEOF(double)
 AC_CHECK_SIZEOF(long double)
 
 
-dnl ICE_CXX_EXPLICIT
-dnl ICE_CXX_MUTABLE
-dnl ICE_CXX_NAMESPACE
-dnl ICE_CXX_PRETTY_FUNCTION
-dnl ICE_CXX_STD_EXCEPTIONS
-dnl ICE_CXX_TYPEINFO
-
 dnl Checks for library functions.
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(mkdir select strdup strerror strtod uname modf modfl)

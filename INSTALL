@@ -32,8 +32,7 @@ $Id$
 2. make
 3. make install
 
-NOTE: If you get this package via cvs, use ./autogen.sh instead of 
-      ./configure.
+NOTE: If you get this package via cvs, run ./autogen.sh before configure.
 
 
 
