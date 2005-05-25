@@ -48,18 +48,18 @@ class Session:
     #
 
     def loadScript( self, ecs, parameters={} ):
-	(ecsDir, ecsFile ) = os.path.split( ecs )
-	if ecsDir != '':
-		os.chdir( ecsDir )
+        ( ecsDir, ecsFile ) = os.path.split( ecs )
+        if ecsDir != '':
+            os.chdir( ecsDir )
         aContext = self.__createScriptContext( parameters )
 
         execfile( ecsFile, aContext )
             
     def interact( self, parameters={} ):
         aContext = self.__createScriptContext( parameters )
-	if os.name != "nt":
-	    import readline # to provide convenient commandline editing :)
-        import code
+        if os.name != "nt":
+            import readline # to provide convenient commandline editing :)
+            import code
         anInterpreter = code.InteractiveConsole( aContext )
 
         self._prompt = self._session_prompt( self )
@@ -97,7 +97,7 @@ class Session:
         else:
             raise TypeError, " The type of aModel must be EML instance, string(file name) or file object "
 	
-	# change directory to file's home directory
+	    # change directory to file's home directory
         if type( aModel ) != type( eml.Eml ) and\
                type( aModel ) != type( eml.Eml() ):
             dirname = os.path.dirname( aModel )
@@ -143,7 +143,7 @@ class Session:
 <eml>
 ''' % ( time.asctime( time.localtime() ) , self.getCurrentTime() )
        	    aString = anEml.asString()
-            aBuffer = string.join( string.split(aString, '<eml>\n'), aCurrentInfo)
+            aBuffer = string.join( string.split( aString, '<eml>\n' ), aCurrentInfo )
             aFileObject = open( aModel, 'w' )
             aFileObject.write( aBuffer )
             aFileObject.close()
@@ -162,8 +162,8 @@ class Session:
     # end of saveModel
 
 
-    def restoreMessageMethod(self):
-	self.theMessageMethod=self.__plainMessageMethod
+    def restoreMessageMethod( self ):
+        self.theMessageMethod=self.__plainMessageMethod
         
     def setMessageMethod( self, aMethod ):
         self.theMessageMethod = aMethod
@@ -266,13 +266,13 @@ class Session:
         # Execute saving.
         # -------------------------------------------------
         if not os.path.isdir( aSaveDirectory ):
-            os.mkdir( aSaveDirectory )
+           os.mkdir( aSaveDirectory )
 
         # creates instance datafilemanager
         aDataFileManager = DataFileManager()
 
         # sets root directory to datafilemanager
-        aDataFileManager.setRootDirectory(aSaveDirectory)
+        aDataFileManager.setRootDirectory( aSaveDirectory )
         
         aFileIndex=0
 
@@ -280,18 +280,18 @@ class Session:
             # gets all list of selected property name
         for aFullPNString in aLoggerNameList: #(2)
 
-            # -------------------------------------------------
+             # -------------------------------------------------
             # from [Variable:/CELL/CYTOPLASM:E:Value]
             # to   [Variable_CELL_CYTOPLASM_E_Value]
-            # -------------------------------------------------
+             # -------------------------------------------------
 
-            aRootIndex=find(aFullPNString,':/')
+            aRootIndex=find( aFullPNString, ':/' )
             aFileName=aFullPNString[:aRootIndex]+aFullPNString[aRootIndex+1:]
-            aFileName=replace(aFileName,':','_')
-            aFileName=replace(aFileName,'/','_')
+            aFileName=replace( aFileName, ':', '_' )
+            aFileName=replace( aFileName, '/', '_' )
             
             aECDDataFile = ECDDataFile()
-            aECDDataFile.setFileName(aFileName)
+            aECDDataFile.setFileName( aFileName )
             
             # -------------------------------------------------
             # Gets logger
@@ -375,7 +375,7 @@ class Session:
 	# end of saveData
 
     def plainMessageMethod( self, aMessage ):
-	self.__plainMessageMethod( aMessage )
+        self.__plainMessageMethod( aMessage )
 
     #
     # private methods
@@ -392,18 +392,27 @@ class Session:
         for aStepper in aStepperList:
 
             aClassName = anEml.getStepperClass( aStepper )
-            self.theSimulator.createStepper( str( aClassName ),\
-                                             str( aStepper ) )
+
+            try:
+                self.theSimulator.createStepper( str( aClassName ),\
+                                                 str( aStepper ) )
+            except RuntimeError, e:
+                raise RuntimeError( 'Failed to create Stepper [%s]: ' % (aStepper,) +\
+                                    str( e ) )
 
             aPropertyList = anEml.getStepperPropertyList( aStepper )
 
             for aProperty in aPropertyList:
-                
-                aValue = anEml.getStepperProperty( aStepper, aProperty )
-                self.theSimulator.loadStepperProperty( aStepper,\
-                                                       aProperty,\
-                                                       aValue )
-                                             
+                try:
+                    aValue = anEml.getStepperProperty( aStepper, aProperty )
+                    self.theSimulator.loadStepperProperty( aStepper,\
+                                                           aProperty,\
+                                                           aValue )
+                except RuntimeError, e:
+                    raise RuntimeError( 'When creating Stepper [%s], ' % (aStepper,) +\
+                                        'failed to set property [%s]: ' % (aProperty,) +\
+                                        str( e ) )
+                                        
     def __loadEntity( self, anEml, aSystemPath='/' ):
 
         aVariableList = anEml.getEntityList( 'Variable', aSystemPath )
@@ -446,20 +455,31 @@ class Session:
 
             aPropertyList = anEml.getEntityPropertyList( aFullID )
 
-            aFullPNList = map( lambda x: aFullID + ':' + x, aPropertyList ) 
-            aValueList = map( anEml.getEntityProperty, aFullPNList )
-            map( self.theSimulator.loadEntityProperty,
-                 aFullPNList, aValueList )
-
+            for aProperty in aPropertyList:
+                aFullPN = aFullID + ':' + aProperty
+                aValue = anEml.getEntityProperty( aFullPN )
+    
+                try:
+                    self.theSimulator.loadEntityProperty( aFullPN, aValue )
+                except RuntimeError, e:
+                    raise RuntimeError( 'Failed to set Entity property [%s],' + \
+                                        'value =:\n%s\n' % ( aFullPN, aValue ) +\
+                                        str( e ) )
             
     def __loadEntityList( self, anEml, anEntityTypeString,\
                           aSystemPath, anIDList ):
         
         aPrefix = anEntityTypeString + ':' + aSystemPath + ':'
 
-        aFullIDList = map( lambda x: aPrefix + x, anIDList )
-        aClassNameList = map( anEml.getEntityClass, aFullIDList )
-        map( self.theSimulator.createEntity, aClassNameList, aFullIDList )
+        for anID in anIDList:
+            aClassName = anEml.getEntityClass( aPrefix + anID )
+            aFullID = aPrefix + anID
+            
+            try:
+                self.theSimulator.createEntity( aClassName, aFullID )
+            except RuntimeError, e:
+                raise RuntimeError( 'Failed to create Entity [%s]: ' % (aFullID,) +\
+                                    str( e ) )
 
 
 
@@ -491,49 +511,49 @@ class Session:
         for aStepper in aStepperList:
 
             aClassName = self.theSimulator.getStepperClassName( aStepper )
-            anEml.createStepper( str( aClassName ),\
+            anEml.createStepper( str( aClassName ), \
                                              str( aStepper ) )
 
             aPropertyList = self.theSimulator.getStepperPropertyList( aStepper )
 
             for aProperty in aPropertyList:
                 
-                anAttributeList = self.theSimulator.getStepperPropertyAttributes( aStepper, aProperty)
+                anAttributeList = self.theSimulator.getStepperPropertyAttributes( aStepper, aProperty )
 
                 # check get attribute 
                 if anAttributeList[3] != 0:
                                     
                     aValue = self.theSimulator.\
-                             getStepperProperty( aStepper, aProperty )
+                            getStepperProperty( aStepper, aProperty )
                         
                     #if aValue == '':
                     #    pass
                     
                     aValueList = list()
                     if type( aValue ) != tuple:
-                        aValueList.append( str(aValue) )
+                        aValueList.append( str( aValue ) )
                     else:
                         aValueList = aValue
 
-                    anEml.setStepperProperty( aStepper,\
-                                              aProperty,\
+                    anEml.setStepperProperty( aStepper, \
+                                              aProperty, \
                                               aValueList )
     
     def __saveAllEntity( self, anEml, aSystemPath='/' ):
 
-        aVariableList = self.getEntityList(  'Variable', aSystemPath )
+        aVariableList = self.getEntityList( 'Variable', aSystemPath )
         aProcessList   = self.getEntityList( 'Process', aSystemPath )
         aSubSystemList = self.getEntityList( 'System', aSystemPath )
         
-        self.__saveEntityList( anEml, 'System',   aSystemPath, aSubSystemList )
+        self.__saveEntityList( anEml, 'System', aSystemPath, aSubSystemList )
         self.__saveEntityList( anEml, 'Variable', aSystemPath, aVariableList )
-        self.__saveEntityList( anEml, 'Process',  aSystemPath, aProcessList )
+        self.__saveEntityList( anEml, 'Process', aSystemPath, aProcessList )
 
         for aSystem in aSubSystemList:
             aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
             self.__saveAllEntity( anEml, aSubSystemPath )
             
-    def __saveEntityList( self, anEml, anEntityTypeString,\
+    def __saveEntityList( self, anEml, anEntityTypeString, \
                           aSystemPath, anIDList ):
 
        for anID in anIDList:
@@ -550,11 +570,11 @@ class Session:
         # the default of aSystemPath is empty because
         # unlike __loadEntity() this starts with the root system
 
-        aVariableList  = self.theSimulator.getEntityList( 'Variable',\
+        aVariableList  = self.theSimulator.getEntityList( 'Variable', \
                                                           aSystemPath )
-        aProcessList   = self.theSimulator.getEntityList( 'Process',\
+        aProcessList   = self.theSimulator.getEntityList( 'Process', \
                                                           aSystemPath )
-        aSubSystemList = self.theSimulator.getEntityList( 'System',\
+        aSubSystemList = self.theSimulator.getEntityList( 'System', \
                                                           aSystemPath )
 
         self.__savePropertyList( anEml, 'Variable', \
@@ -569,7 +589,7 @@ class Session:
             self.__saveProperty( anEml, aSubSystemPath )
 
 
-    def __savePropertyList( self, anEml, anEntityTypeString,\
+    def __savePropertyList( self, anEml, anEntityTypeString, \
                             aSystemPath, anIDList ):
 
         for anID in anIDList:
@@ -580,19 +600,19 @@ class Session:
             for aProperty in aPropertyList:
                 aFullPN = aFullID + ':' + aProperty
                 
-                anAttributeList = self.theSimulator.getEntityPropertyAttributes(aFullPN)
+                anAttributeList = self.theSimulator.getEntityPropertyAttributes( aFullPN )
 
                 # check savable
                 if anAttributeList[3] != 0:
                     
-                    aValue = self.theSimulator.saveEntityProperty(aFullPN)
+                    aValue = self.theSimulator.saveEntityProperty( aFullPN )
                     #print aValue
 
                     if aValue != '':
 
                         aValueList = list()
                         if type( aValue ) != tuple:
-                            aValueList.append( str(aValue) )
+                            aValueList.append( str( aValue ) )
                             
                         elif aValue == ():
                             # exclude the empty tuple (ad-hoc, Jul. 21, 2004)
@@ -604,7 +624,7 @@ class Session:
 
                             #aValueList = aValue
                             
-                        anEml.setEntityProperty( aFullID, aProperty,
+                        anEml.setEntityProperty( aFullID, aProperty, 
                                                  aValueList )
                     
     def __convertPropertyValueList( self, aValueList ):
@@ -620,7 +640,7 @@ class Session:
                 if type( aValueListNode[0] ) == tuple:
                     aConvertedList = self.__convertPropertyValueList( aValueListNode )
                 else:
-                    aConvertedList = map(str, aValueListNode)
+                    aConvertedList = map( str, aValueListNode )
                     
                 aList.append( aConvertedList )
                 
@@ -648,7 +668,7 @@ class Session:
                 return 'ecell3-session>>> '
             else:
                 return '<%s, t=%g>>> ' %\
-                       ( self.theSession.theModelName,\
+                       ( self.theSession.theModelName, \
                          self.theSession.getCurrentTime() )
 
 if __name__ == "__main__":

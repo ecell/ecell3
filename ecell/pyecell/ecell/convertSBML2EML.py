@@ -99,8 +99,7 @@ def convertSBML2EML( aSBMLString ):
 
         # setConstant( default = 1 )
         if ( aCompartment[7] == 1 ):
-            aTmpList = [ str( aCompartment[7]) ]
-            anEml.setEntityProperty( aSizeFullID, 'Fixed', aTmpList[0:1] )
+            anEml.setEntityProperty( aSizeFullID, 'Fixed', ['1',] )
            
            
     # ------------------------------
