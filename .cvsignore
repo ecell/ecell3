@@ -19,3 +19,4 @@ stamp-h1
 config.guess
 config.sub
 autom4te.cache
+install
