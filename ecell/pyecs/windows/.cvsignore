@@ -1,0 +1,4 @@
+*.iss
+*.in
+Makefile
+pathVariables

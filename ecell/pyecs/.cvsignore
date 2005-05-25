@@ -8,3 +8,5 @@ IndirectPythonInterface.cxx
 cxx_extensions.cxx
 cxxextensions.c
 cxxsupport.cxx
+*.so
+ecell3-python

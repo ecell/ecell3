@@ -1,14 +1,9 @@
-.cvsignore
-*.pyc
 autom4te.cache
+.in
 aclocal.m4
-config.h
-config.h.in
 config.log
-config.py
 config.status
 configure
-gecell
 Makefile
 Makefile.in
-stamp-h1
+toollauncher

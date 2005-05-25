@@ -1,0 +1,6 @@
+.deps
+.libs
+_tableio.la
+_tableio.lo
+Makefile
+Makefile.in

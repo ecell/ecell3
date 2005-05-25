@@ -8,3 +8,7 @@ Makefile
 dmtool
 dmcompile
 libtool
+autom4te.cache
+config.h
+dmgen
+stamp-h1
