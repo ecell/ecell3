@@ -291,8 +291,6 @@ void FixedDAE1Stepper::calculateJacobian()
   const ProcessVector::size_type
     aDiscreteProcessOffset( getDiscreteProcessOffset() );
 
-  Real aJacobian( 0.0 );
-
   gsl_matrix_set_zero( theJacobianMatrix );
 
   setCurrentTime( aCurrentTime + aStepInterval );
@@ -355,8 +353,8 @@ void FixedDAE1Stepper::calculateJacobian()
 	c < theContinuousVariableVector.size(); c++ )
     {
       const int anIndex( theContinuousVariableVector[ c ] );
-      aJacobian = gsl_matrix_get( theJacobianMatrix, c, anIndex );
-      gsl_matrix_set( theJacobianMatrix, c, anIndex, 1.0 + aJacobian );
+      const Real aDerivative( gsl_matrix_get( theJacobianMatrix, c, anIndex ) );
+      gsl_matrix_set( theJacobianMatrix, c, anIndex, 1.0 + aDerivative );
     }
 
   setCurrentTime( aCurrentTime );
@@ -377,13 +375,15 @@ const Real FixedDAE1Stepper::solve()
   for( VariableVector::size_type c( 0 ); c < aReadOnlyVariableOffset; ++c )
     {
       VariablePtr const aVariable( theVariableVector[ c ] );
-      const Real aDifference( gsl_vector_get( theSolutionVector, c ) );
 
+      const Real aDifference( gsl_vector_get( theSolutionVector, c ) );
       aVariable->addValue( aDifference );
       anError += aDifference;
-
-      theTaylorSeries[ 0 ][ c ] 
-	= ( aVariable->getValue() - theValueBuffer[ c ] ) / getStepInterval();
+      
+      const Real aVelocity( aVariable->getValue() - theValueBuffer[ c ] );
+      aTotalVelocity += aVelocity;
+      
+      theTaylorSeries[ 0 ][ c ] = aVelocity / getStepInterval();
     }
 
   return fabs( anError / aTotalVelocity );
