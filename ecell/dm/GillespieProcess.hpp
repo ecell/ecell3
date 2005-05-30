@@ -30,6 +30,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
     {
       INHERIT_PROPERTIES( DiscreteEventProcess );
       
+      PROPERTYSLOT_SET_GET( Real, c );
       PROPERTYSLOT_SET_GET( Real, k );
 
       PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Propensity );
@@ -40,7 +41,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
   GillespieProcess() 
     :
     theOrder( 0 ),
-    k( 0.0 ),
+    c( 0.0 ),
     theGetPropensityMethodPtr( RealMethodProxy::
 			       create<&GillespieProcess::getZero>() ),
     theGetMinValueMethodPtr( RealMethodProxy::
@@ -56,8 +57,34 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
     }
   
 
-  SIMPLE_SET_GET_METHOD( Real, k );
+  // c means stochastic reaction constant
+  SIMPLE_SET_GET_METHOD( Real, c );
+  
+  GET_METHOD( Real, k )
+  {
+    if ( theOrder == 1 ) 
+      return c;
+    else if ( theOrder == 2 and getZeroVariableReferenceOffset() == 1 )
+      return c * 0.5 * getSuperSystem()->getSize() * N_A;
+    else if ( theOrder == 2 and getZeroVariableReferenceOffset() == 2 )
+      return c * getSuperSystem()->getSize() * N_A;
+    else
+      return 0.0; // should some exception be throwed?
+  }
 
+  // k means reaction rate constant, which depends on the volume
+  SET_METHOD( Real, k )
+  {
+    if ( theOrder == 1 ) 
+      c = value;
+    else if ( theOrder == 2 and getZeroVariableReferenceOffset() == 1 )
+      c = value * 2.0 / ( N_A * getSuperSystem()->getSize() );
+    else if ( theOrder == 2 and getZeroVariableReferenceOffset() == 2 )
+      c = value / ( N_A * getSuperSystem()->getSize() );
+    else
+      c = 0.0; // should some exception be throwed?
+  }
+  
   GET_METHOD( Real, Propensity )
   {
     const Real aPropensity( theGetPropensityMethodPtr( this ) );
@@ -136,7 +163,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 
   virtual void fire()
   {
-    Real velocity( k * N_A );
+    Real velocity( getk() * N_A );
     velocity *= getSuperSystem()->getSize();
 
     for( VariableReferenceVectorConstIterator
@@ -181,7 +208,7 @@ protected:
 
   const Real getPropensity_FirstOrder() const
   {
-    return k * theVariableReferenceVector[ 0 ].getValue();
+    return c * theVariableReferenceVector[ 0 ].getValue();
   }
 
   const Real getMinValue_FirstOrder() const
@@ -193,7 +220,7 @@ protected:
     {
       if ( theVariableReferenceVector[ 0 ].getVariable() == aVariable )
 	{
-	  return k;
+	  return c;
 	}
       else
 	{
@@ -207,7 +234,7 @@ protected:
 
   const Real getPropensity_SecondOrder_TwoSubstrates() const
   {
-    return k * theVariableReferenceVector[ 0 ].getValue() * theVariableReferenceVector[ 1 ].getValue() / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
+    return c * theVariableReferenceVector[ 0 ].getValue() * theVariableReferenceVector[ 1 ].getValue();
   }
 
   const Real getMinValue_SecondOrder_TwoSubstrates() const
@@ -222,11 +249,11 @@ protected:
     {
       if ( theVariableReferenceVector[ 0 ].getVariable() == aVariable )
 	{
-	  return ( k * theVariableReferenceVector[ 1 ].getValue() ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
+	  return c * theVariableReferenceVector[ 1 ].getValue();
 	}
       else if ( theVariableReferenceVector[ 1 ].getVariable() == aVariable )
 	{
-	  return ( k * theVariableReferenceVector[ 0 ].getValue() ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
+	  return c * theVariableReferenceVector[ 0 ].getValue();
 	}
       else
 	{
@@ -244,7 +271,7 @@ protected:
 
     if ( aValue > 1.0 ) // there must be two or more molecules
       {
-	return k * aValue * ( aValue - 1.0 ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
+	return c * 0.5 * aValue * ( aValue - 1.0 );
       }
     else
       {
@@ -265,7 +292,7 @@ protected:
 
 	  if ( aValue > 0.0 ) // there must be at least one molecule
 	    {
-	      return  k * ( 2.0 * aValue - 1.0 ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
+	      return  c * 0.5 * ( 2.0 * aValue - 1.0 );
 	    }
 	  else
 	    {
@@ -281,7 +308,7 @@ protected:
 
 protected:
 
-  Real k;    
+  Real c;
 
   Integer theOrder;
 
