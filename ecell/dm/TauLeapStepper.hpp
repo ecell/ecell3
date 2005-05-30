@@ -98,7 +98,7 @@ public:
       return totalPropensity;
     }
 
-  void TauLeapStepper::calculateTau()
+  void calculateTau()
     {
       tau = libecs::INF;
 
