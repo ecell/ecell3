@@ -76,6 +76,7 @@ bool ODE23Stepper::calculate()
   const Real a_dydt( getDerivativeToleranceFactor() );
 
   const Real aCurrentTime( getCurrentTime() );
+  const Real aStepInterval( getStepInterval() );
 
   theStateFlag = true;
 
@@ -87,7 +88,7 @@ bool ODE23Stepper::calculate()
   setVariableVelocity( theTaylorSeries[ 0 ] );
 
   // ========= 2 ===========
-  setCurrentTime( aCurrentTime + getStepInterval() );
+  setCurrentTime( aCurrentTime + aStepInterval );
   interIntegrate2();
   fireProcesses();
   setVariableVelocity( theTaylorSeries[ 1 ] );
@@ -98,7 +99,7 @@ bool ODE23Stepper::calculate()
     }
 
   // ========= 3 ===========
-  setCurrentTime( aCurrentTime + getStepInterval() * 0.5 );
+  setCurrentTime( aCurrentTime + aStepInterval * 0.5 );
   interIntegrate2();
   fireProcesses();
   setVariableVelocity( theTaylorSeries[ 2 ] );
@@ -116,7 +117,7 @@ bool ODE23Stepper::calculate()
       // ( k1 + k2 - k3 * 2 ) / 3 for ( Yn+1 - ~Yn+1 ) as a local error
       const Real anEstimatedError
 	( fabs( ( anExpectedVelocity - theTaylorSeries[ 2 ][ c ] ) 
-		* ( 2.0 / 3.0 ) ) );
+		* ( 2.0 / 3.0 ) ) * aStepInterval );
 
       const Real aTolerance( eps_rel *
 			     ( a_y * fabs( theValueBuffer[ c ] ) 

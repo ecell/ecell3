@@ -235,12 +235,13 @@ bool ODE45Stepper::calculate()
 
       // calculate error
       const Real anEstimatedError
-	( theTaylorSeries[ 0 ][ c ] * ( 71.0 / 57600.0 )
-	  + theRungeKuttaBuffer[ 1 ][ c ] * ( -71.0 / 16695.0 )
-	  + theRungeKuttaBuffer[ 2 ][ c ] * ( 71.0 / 1920.0 )
-	  + theRungeKuttaBuffer[ 3 ][ c ] * ( -17253.0 / 339200.0 )
-	  + theRungeKuttaBuffer[ 4 ][ c ] * ( 22.0 / 525.0 )
-	  + theRungeKuttaBuffer[ 5 ][ c ] * ( -1.0 / 40.0 ) );
+	( ( theTaylorSeries[ 0 ][ c ] * ( 71.0 / 57600.0 )
+	    + theRungeKuttaBuffer[ 1 ][ c ] * ( -71.0 / 16695.0 )
+	    + theRungeKuttaBuffer[ 2 ][ c ] * ( 71.0 / 1920.0 )
+	    + theRungeKuttaBuffer[ 3 ][ c ] * ( -17253.0 / 339200.0 )
+	    + theRungeKuttaBuffer[ 4 ][ c ] * ( 22.0 / 525.0 )
+	    + theRungeKuttaBuffer[ 5 ][ c ] * ( -1.0 / 40.0 ) )
+	  * aStepInterval );
 
       aSpectralRadius 
 	+= ( theRungeKuttaBuffer[ 5 ][ c ] - theRungeKuttaBuffer[ 4 ][ c ] ) * ( theRungeKuttaBuffer[ 5 ][ c ] - theRungeKuttaBuffer[ 4 ][ c ] );

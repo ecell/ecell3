@@ -919,12 +919,12 @@ bool ODEStepper::calculate()
 
       // calculate error
       const Real anEstimatedError
-	( theTaylorSeries[ 0 ][ c ] * ( 71.0 / 57600.0 )
+	( ( theTaylorSeries[ 0 ][ c ] * ( 71.0 / 57600.0 )
 	  + theW[ 1 ][ c ] * ( -71.0 / 16695.0 )
 	  + theW[ 2 ][ c ] * ( 71.0 / 1920.0 )
 	  + theW[ 3 ][ c ] * ( -17253.0 / 339200.0 )
 	  + theW[ 4 ][ c ] * ( 22.0 / 525.0 )
-	  + theW[ 5 ][ c ] * ( -1.0 / 40.0 ) );
+	  + theW[ 5 ][ c ] * ( -1.0 / 40.0 ) ) * aStepInterval );
 
       aSpectralRadius 
 	+= ( theW[ 5 ][ c ] - theW[ 4 ][ c ] ) * ( theW[ 5 ][ c ] - theW[ 4 ][ c ] );
