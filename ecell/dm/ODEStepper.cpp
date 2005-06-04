@@ -940,7 +940,7 @@ bool ODEStepper::calculate()
 
       const Real aTolerance( eps_rel * 
 			     ( a_y * fabs( theValueBuffer[ c ] ) 
-			       + a_dydt * fabs( theTaylorSeries[ 2 ][ c ] ) )
+			       + a_dydt * fabs( theTaylorSeries[ 2 ][ c ] ) * aStepInterval )
 			     + eps_abs );
 
       const Real anError( fabs( anEstimatedError / aTolerance ) );

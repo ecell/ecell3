@@ -121,7 +121,7 @@ bool ODE23Stepper::calculate()
 
       const Real aTolerance( eps_rel *
 			     ( a_y * fabs( theValueBuffer[ c ] ) 
-			       +  a_dydt * fabs( anExpectedVelocity ) )
+			       +  a_dydt * fabs( anExpectedVelocity ) * aStepInterval )
 			     + eps_abs );
 
       //      const Real aTolerance( std::max( eps_rel * ( a_y * fabs( theValueBuffer[ c ] ) + 0.0 * fabs( anExpectedVelocity ) ), eps_abs ) );
