@@ -462,8 +462,9 @@ class Session:
                 try:
                     self.theSimulator.loadEntityProperty( aFullPN, aValue )
                 except RuntimeError, e:
-                    raise RuntimeError( 'Failed to set Entity property [%s],' + \
-                                        'value =:\n%s\n' % ( aFullPN, aValue ) +\
+                    raise RuntimeError( 'Failed to set Entity property [%s],'
+                                          % aFullPN \
+                                        + 'value =:\n%s\n' % str( aValue ) +\
                                         str( e ) )
             
     def __loadEntityList( self, anEml, anEntityTypeString,\
