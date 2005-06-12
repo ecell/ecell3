@@ -30,7 +30,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
     {
       INHERIT_PROPERTIES( DiscreteEventProcess );
       
-      PROPERTYSLOT_SET_GET( Real, c );
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, c );
       PROPERTYSLOT_SET_GET( Real, k );
 
       PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Propensity );
@@ -58,32 +58,8 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
   
 
   // c means stochastic reaction constant
+  SIMPLE_SET_GET_METHOD( Real, k );
   SIMPLE_SET_GET_METHOD( Real, c );
-  
-  GET_METHOD( Real, k )
-  {
-    if ( theOrder == 1 ) 
-      return c;
-    else if ( theOrder == 2 and getZeroVariableReferenceOffset() == 1 )
-      return c * 0.5 * getSuperSystem()->getSize() * N_A;
-    else if ( theOrder == 2 and getZeroVariableReferenceOffset() == 2 )
-      return c * getSuperSystem()->getSize() * N_A;
-    else
-      return 0.0; // should some exception be throwed?
-  }
-
-  // k means reaction rate constant, which depends on the volume
-  SET_METHOD( Real, k )
-  {
-    if ( theOrder == 1 ) 
-      c = value;
-    else if ( theOrder == 2 and getZeroVariableReferenceOffset() == 1 )
-      c = value * 2.0 / ( N_A * getSuperSystem()->getSize() );
-    else if ( theOrder == 2 and getZeroVariableReferenceOffset() == 2 )
-      c = value / ( N_A * getSuperSystem()->getSize() );
-    else
-      c = 0.0; // should some exception be throwed?
-  }
   
   GET_METHOD( Real, Propensity )
   {
@@ -308,6 +284,7 @@ protected:
 
 protected:
 
+  Real k;
   Real c;
 
   Integer theOrder;

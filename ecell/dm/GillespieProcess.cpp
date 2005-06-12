@@ -80,4 +80,26 @@ void GillespieProcess::calculateOrder()
 	create<&GillespieProcess::getZero>();
       theGetPDMethodPtr         = &GillespieProcess::getZero;
     }
+
+
+
+  //
+  if ( theOrder == 1 ) 
+    {
+      c = k;
+    }
+  else if ( theOrder == 2 and getZeroVariableReferenceOffset() == 1 )
+    {
+      c = k * 2.0 / ( N_A * getSuperSystem()->getSize() );
+    }
+  else if ( theOrder == 2 and getZeroVariableReferenceOffset() == 2 )
+    {
+      c = k / ( N_A * getSuperSystem()->getSize() );
+    }
+  else
+    {
+      NEVER_GET_HERE;
+    } 
+
+
 }
