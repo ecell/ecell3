@@ -184,7 +184,16 @@ protected:
 
   const Real getPropensity_FirstOrder() const
   {
-    return c * theVariableReferenceVector[ 0 ].getValue();
+    const Real aValue(  theVariableReferenceVector[ 0 ].getValue() );
+
+    if ( aValue > 0.0 )
+      {
+	return c * aValue;
+      }
+    else
+      {
+	return 0.0;
+      }
   }
 
   const Real getMinValue_FirstOrder() const
@@ -210,7 +219,17 @@ protected:
 
   const Real getPropensity_SecondOrder_TwoSubstrates() const
   {
-    return c * theVariableReferenceVector[ 0 ].getValue() * theVariableReferenceVector[ 1 ].getValue();
+    const Real aValue1( theVariableReferenceVector[ 0 ].getValue() );
+    const Real aValue2( theVariableReferenceVector[ 1 ].getValue() );
+
+    if ( aValue1 > 0.0 && aValue2 > 0.0 )
+      {
+	return c * aValue1 * aValue2;
+      }
+    else
+      {
+	return 0.0;
+      }
   }
 
   const Real getMinValue_SecondOrder_TwoSubstrates() const
