@@ -205,9 +205,7 @@ gsl_matrix* FluxDistributionStepper::generateInverse(gsl_matrix *m_unknown,
   gsl_matrix_free(m_tmp3);
   gsl_matrix_free(V);
   gsl_vector_free(S);
-			}
-		    }	      
-		}
+
   gsl_vector_free(work);
   
   return inv;  
