@@ -38,11 +38,11 @@ LIBECS_DM_INIT( FluxDistributionStepper, Stepper );
 
 FluxDistributionStepper::FluxDistributionStepper()
   :
-  theMatrixSize( 0 ),
   theUnknownMatrix( NULLPTR ),
   theInverseMatrix( NULLPTR ),
   theVariableVelocityVector( NULLPTR ),
   theFluxVector( NULLPTR ),
+  theIrreversibleFlag( false ),
   Epsilon( 1e-6 )
 {
   // gcc3 doesn't currently support numeric_limits::infinity.
@@ -65,13 +65,12 @@ void FluxDistributionStepper::initialize()
 {
 
   DifferentialStepper::initialize();
-
-  std::map< VariablePtr, Integer > aVariableMap;
-
+  
+  theVariableMap.clear();
   VariableVector::size_type aVariableVectorSize( theVariableVector.size() );  
   for( VariableVector::size_type i( 0 ); i < aVariableVectorSize; i++ )
     { 
-      aVariableMap.insert( std::pair< VariablePtr, Integer >( theVariableVector[i], i ) );
+      theVariableMap.insert( std::pair< VariablePtr, Integer >( theVariableVector[i], i ) );
     }
   
   //
@@ -94,23 +93,61 @@ void FluxDistributionStepper::initialize()
       gsl_vector_free( theFluxVector );
     }
   
-  theUnknownMatrix         = gsl_matrix_calloc( theMatrixSize, theMatrixSize );
+  theUnknownMatrix          = gsl_matrix_calloc( theMatrixSize, theMatrixSize );
   theVariableVelocityVector = gsl_vector_calloc( theMatrixSize );
   theFluxVector             = gsl_vector_calloc( theMatrixSize );
 
   //
   // generate theUnknownMatrix
   //
-  
-  ProcessVector::size_type aProcessVectorSize( theProcessVector.size() );  
-  for( ProcessVector::size_type i( 0 ); i < aProcessVectorSize; i++ )
+
+  theQuasiDynamicFluxProcessVector.clear();
+
+  try
+    {
+      std::transform( theProcessVector.begin(), theProcessVector.end(),
+		      std::back_inserter( theQuasiDynamicFluxProcessVector ),
+		      DynamicCaster<QuasiDynamicFluxProcessPtr,ProcessPtr>() );
+    }
+  catch( const libecs::TypeError& )
+    {
+      THROW_EXCEPTION( InitializationFailed,
+		       getClassNameString() +
+		       ": Only QuasiDynamicFluxProcesses are allowed to exist "
+		       "in this Stepper." );
+    }
+
+  QuasiDynamicFluxProcessVector::size_type aProcessVectorSize( theQuasiDynamicFluxProcessVector.size() );  
+
+  for( QuasiDynamicFluxProcessVector::size_type i( 0 ); i < aProcessVectorSize; i++ )
     {    
-      VariableReferenceVector aVariableReferenceVector( theProcessVector[i]->getVariableReferenceVector() );  
-      
+      VariableReferenceVector aVariableReferenceVector( theQuasiDynamicFluxProcessVector[i]->getFluxDistributionVector() );    
+
       VariableReferenceVector::size_type aVariableReferenceVectorSize( aVariableReferenceVector.size() );  
       for( VariableReferenceVector::size_type j( 0 ); j < aVariableReferenceVectorSize; j++ )
 	{
-	  gsl_matrix_set( theUnknownMatrix, aVariableMap.find( aVariableReferenceVector[j].getVariable() )->second, i, aVariableReferenceVector[j].getCoefficient() );
+	  gsl_matrix_set( theUnknownMatrix, theVariableMap.find( aVariableReferenceVector[j].getVariable() )->second, i, aVariableReferenceVector[j].getCoefficient() );
+	}
+    }
+
+  //
+  // set Irreversible & Vmax
+  //
+
+  theIrreversibleProcessVector.clear();
+  theVmaxProcessVector.clear();
+
+  for( QuasiDynamicFluxProcessVector::size_type i( 0 ); i < aProcessVectorSize; i++ )
+    {    
+      if( theQuasiDynamicFluxProcessVector[i]->getIrreversible() )
+	{
+	  theIrreversibleFlag = true;
+	  theIrreversibleProcessVector.push_back( theQuasiDynamicFluxProcessVector[i] );
+	}
+
+      if( theQuasiDynamicFluxProcessVector[i]->getVmax() != 0 )
+	{
+	  theVmaxProcessVector.push_back( theQuasiDynamicFluxProcessVector[i] );
 	}
     }
 
@@ -168,6 +205,9 @@ gsl_matrix* FluxDistributionStepper::generateInverse(gsl_matrix *m_unknown,
   gsl_matrix_free(m_tmp3);
   gsl_matrix_free(V);
   gsl_vector_free(S);
+			}
+		    }	      
+		}
   gsl_vector_free(work);
   
   return inv;  
