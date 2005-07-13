@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.10  2005/07/13 15:20:06  shafi
+ :	support for BSD contributedby Hisham Zarka.
+ :
  :	Revision 1.9  2004/06/17 16:55:30  shafi
  :	copyright updates
- :
+ :	
  :	Revision 1.8  2003/08/17 00:15:34  satyanandavel
  :	update for gcc-3.3.1 in mingw
  :	
@@ -103,6 +106,15 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  */
 #include "libecs.hpp"
+
+// Support for BSD contributed by Hisham Zarka.
+
+/* systems that satisfy the below all have <sys/param.h> */
+#if (defined(__unix__) || defined(unix)) && !defined(USG)
+/* if this is a BSD system, param.h defines the BSD macro */
+#include <sys/param.h>
+#endif
+
 #if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
 /* MS-Windows */
 #include <dos.h>
@@ -115,8 +127,17 @@
 #include <unistd.h>
 #include <sys/statvfs.h>
 #define statfs statvfs
+#elif defined(BSD4_4)
+/* assume BSD */
+#include <errno.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <sys/statvfs.h>
+#define statfs statvfs
 # else
-/* assume BSD or Linux */
+/* assume Linux */
 // #include <process.h>
 #include <errno.h>
 #include <unistd.h>
