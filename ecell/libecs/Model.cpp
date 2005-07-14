@@ -29,6 +29,7 @@
 //
 
 #include "Util.hpp"
+#include "EntityType.hpp"
 #include "StepperMaker.hpp"
 #include "VariableMaker.hpp"
 #include "ProcessMaker.hpp"
@@ -38,12 +39,6 @@
 #include "SystemStepper.hpp"
 
 #include "Model.hpp"
-#define STEPPERTYPE_NAME "Stepper"
-#define SYSTEMTYPE_NAME "System"
-#define PROCESSTYPE_NAME "Process"
-#define VARIABLETYPE_NAME "Variable"
-
-#include <stdio.h>
 
 namespace libecs
 {
@@ -61,7 +56,7 @@ namespace libecs
     theProcessMaker(     *new ProcessMaker          )
   {
     // initialize theRootSystem
-    theRootSystemPtr = getSystemMaker().make( "CompartmentSystem" );
+    theRootSystemPtr = getSystemMaker().make( "System" );
     theRootSystemPtr->setModel( this );
     theRootSystemPtr->setID( "/" );
     theRootSystemPtr->setName( "The Root System" );
@@ -98,28 +93,32 @@ namespace libecs
   {
 	const void* (*InfoPtrFunc)();
      
-	if ( aClassType == VARIABLETYPE_NAME )
-	  {
-		InfoPtrFunc = getVariableMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
-	  }
-	else if (aClassType ==  PROCESSTYPE_NAME )
-	  {
-		InfoPtrFunc = getProcessMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
-	  }
-	else if ( aClassType == SYSTEMTYPE_NAME )
-	  {
-		InfoPtrFunc = getSystemMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
-	  }
-	else if ( aClassType == STEPPERTYPE_NAME )
-	  {
-		InfoPtrFunc = getStepperMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
-	  }
-
-    else 
-	  {
-		THROW_EXCEPTION( InvalidEntityType,
-						 "bad ClassType specified." );
-	  }
+    if ( aClassType == "Stepper" )
+      {
+        InfoPtrFunc = getStepperMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
+      }
+    else
+      {
+        EntityType anEntityType( aClassType );
+        if ( anEntityType.getType() == EntityType::VARIABLE )
+	      {    
+		    InfoPtrFunc = getVariableMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
+	      }
+        else if ( anEntityType.getType() == EntityType::PROCESS )
+	      {
+		    InfoPtrFunc = getProcessMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
+	      }
+        else if ( anEntityType.getType() == EntityType::SYSTEM )
+	      {
+		    InfoPtrFunc = getSystemMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
+	      }
+        else 
+	      {
+		    THROW_EXCEPTION( InvalidEntityType,
+			  			     "bad ClassType specified." );
+	      }
+      }
+      
 	return *(reinterpret_cast<const PolymorphMap*>( InfoPtrFunc() ) );
   }
 
