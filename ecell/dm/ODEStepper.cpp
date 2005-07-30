@@ -72,7 +72,7 @@ ODEStepper::ODEStepper()
   CheckIntervalCount( 100 ),
   SwitchingCount( 20 ),
   isInterrupted( true ),
-  isStiff( true ) // this must be non-stiff
+  isStiff( true )
 {
   const Real pow913( pow( 9.0, 1.0 / 3.0 ) );
   
@@ -113,6 +113,7 @@ void ODEStepper::initialize()
 void ODEStepper::initializeStepper()
 {
   isInterrupted = true;
+  isStiff = true;
   theStiffnessCounter = 0;
 
   if ( getReadOnlyVariableOffset() > 0 )
@@ -699,7 +700,6 @@ void ODEStepper::stepRadauIIA()
 	setJacobianMatrix();
     }
 
-  UnsignedInteger counter( 0 );
   while ( !calculateRadauIIA() )
     {
       theRejectedStepFlag = true;
