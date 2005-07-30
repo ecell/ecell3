@@ -423,6 +423,7 @@ Real ODEStepper::solve()
 bool ODEStepper::calculateRadauIIA()
 {
   const Real aStepInterval( getStepInterval() );
+
   Real aNewStepInterval;
   Real aNorm;
   Real theta( fabs( theJacobianRecalculateTheta ) );
@@ -591,7 +592,7 @@ bool ODEStepper::calculateRadauIIA()
 	{
 	  setStepInterval( aNewStepInterval );
 	}
-      
+
       return false;
     }
 }
@@ -701,8 +702,6 @@ void ODEStepper::stepRadauIIA()
   UnsignedInteger counter( 0 );
   while ( !calculateRadauIIA() )
     {
-      if ( counter++ > 10 ) break;
-
       theRejectedStepFlag = true;
 
       if ( !theJacobianCalculateFlag )
