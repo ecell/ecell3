@@ -1,30 +1,23 @@
+
 #include "libecs.hpp"
-#include "Process.hpp"
-#include "Util.hpp"
-#include "PropertyInterface.hpp"
 
-#include "System.hpp"
-#include "Stepper.hpp"
-#include "Variable.hpp"
-#include "Interpolant.hpp"
-
-#include "Process.hpp"
+#include "ContinuousProcess.hpp"
 
 USE_LIBECS;
 
-LIBECS_DM_CLASS( CatalyzedMassActionProcess, Process )
+LIBECS_DM_CLASS( CatalyzedMassActionFluxProcess, ContinuousProcess )
 {
 
  public:
 
-  LIBECS_DM_OBJECT( CatalyzedMassActionProcess, Process )
+  LIBECS_DM_OBJECT( CatalyzedMassActionFluxProcess, Process )
     {
       INHERIT_PROPERTIES( Process );
       PROPERTYSLOT_SET_GET( Real, k );
     }
 
 
-  CatalyzedMassActionProcess()
+  CatalyzedMassActionFluxProcess()
     {
       ; // do nothing
     }
@@ -67,4 +60,4 @@ LIBECS_DM_CLASS( CatalyzedMassActionProcess, Process )
 
 };
 
-LIBECS_DM_INIT( CatalyzedMassActionProcess, Process );
+LIBECS_DM_INIT( CatalyzedMassActionFluxProcess, Process );
