@@ -164,8 +164,9 @@ namespace libecs
   void Logger::log( RealParam aTime )
   {
     ++theStepCounter;
-
-    if( ( theStepCounter >= theMinimumStep ) 	 // step condition
+    if( 
+	( ( theStepCounter >= theMinimumStep ) 	 // step condition
+	&& ( theMinimumInterval == 0.0) )
 	|| ( theMinimumInterval > 0 &&           // OR time condition
 	     theMinimumInterval <= ( aTime - theLastTime ) ) )
       {
@@ -223,7 +224,6 @@ namespace libecs
       }
     
     ++aPhysicalRange;
-
     Real aTimeGap( ( thePhysicalLogger.back().getTime() 
 		     - thePhysicalLogger.front().getTime() ) /
 		   thePhysicalLogger.size() );
@@ -284,7 +284,7 @@ namespace libecs
       }
     
     
-    return DataPointVectorSharedPtr( aDataPointVector );    
+    return DataPointVectorSharedPtr( aDataPointVector ); 
   }
   
 
