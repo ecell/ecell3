@@ -116,12 +116,12 @@ class SBML_Model:
         self.SpeciesList = getSpecies( aSBMLmodel )
         self.UnitDefinitionList = getUnitDefinition( aSBMLmodel )
 
-        self.setFunctionDefinitionToDictionaly()
+        self.setFunctionDefinitionToDictionary()
         
 
     # =========================================================
 
-    def setFunctionDefinitionToDictionaly( self ):
+    def setFunctionDefinitionToDictionary( self ):
 
         if ( self.FunctionDefinitionList != [] ):
 
@@ -505,7 +505,7 @@ class SBML_Species( SBML_Model ):
 
             if ( aSpecies[9] == 1 ):
 
-                return aSpecies[9]
+                return 1
 
             else:
                 return 0
@@ -514,7 +514,7 @@ class SBML_Species( SBML_Model ):
 
             if ( aSpecies[11] == 1 ):
                 
-                return aSpecies[11]
+                return 1
 
             else:
                 return 0
