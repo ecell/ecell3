@@ -157,7 +157,7 @@ def getParameter( aSBMLmodel ):
             if aParameter.isSetValue():
                 aValue_Pa = aParameter.getValue()
             else:
-                'Unknown'
+                aValue_Pa = 'Unknown'
                 
             anUnit_Pa = aParameter.getUnits()
             aConstant_Pa = aParameter.getConstant()
