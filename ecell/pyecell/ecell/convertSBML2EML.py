@@ -30,7 +30,8 @@ def convertSBML2EML( aSBMLString ):
     #  Set Stepper
     # ------------------------------
 
-    anEml.createStepper( 'ODE45Stepper', 'DE' )
+    anEml.createStepper( 'ODEStepper', 'DE' )
+##    anEml.createStepper( 'ODE45Stepper', 'DE' )
 
 
     # ------------------------------
