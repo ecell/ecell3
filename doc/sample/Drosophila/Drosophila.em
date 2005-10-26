@@ -2,7 +2,11 @@
 # Drosophila.em
 #
 
-# Stepper FixedODE1Stepper( DE )
+@{
+VOLUME = 1e-18
+N_A = 6.02e+23
+}
+
 Stepper ODEStepper( DE )
 {
 	# no property
@@ -17,37 +21,40 @@ System System( / )
 System System( /CELL )
 {
 	StepperID	DE;
-}
-
+}	
+	
 System System( /CELL/CYTOPLASM )
 {
 	StepperID	DE;
-
-	Variable Variable( SIZE ) { Value 1e-18; }
+	
+	Variable Variable( SIZE ) 
+        {	
+                Value   @(VOLUME);
+        }
 
 	Variable Variable( M )
 	{
-		Value	3.61328202E-01;
+		Value	@(3.61328202E-01 * N_A * VOLUME);
 	}
 	
 	Variable Variable( Pn )
 	{
-		Value	6.21367E-01;
+		Value	@(6.21367E-01 * N_A * VOLUME);
 	}
 	
 	Variable Variable( P0 )
 	{
-		Value	3.01106835E-01;
+		Value	@(3.01106835E-01 * N_A * VOLUME);
 	}
 	
 	Variable Variable( P1 )
 	{
-		Value	3.01106835E-01;
+		Value	@(3.01106835E-01 * N_A * VOLUME);
 	}
 	
 	Variable Variable( P2 )
 	{
-		Value	3.61328202E-01;
+		Value	@(3.61328202E-01 * N_A * VOLUME);
 	}
 	
 	Process ExpressionFluxProcess( R_toy1 )
@@ -65,18 +72,18 @@ System System( /CELL/CYTOPLASM )
 		vm	0.65;
 		Km	0.5;
 
-		Expression "( (-1 * vm * P0.MolarConc) / ( Km + P0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		Expression "( (vm * S0.MolarConc) / ( Km + S0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:M 1 ];
+		VariableReferenceList	[ S0 Variable:.:M -1 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy3 )
 	{
-		Km	0.38;
+		Ks	0.38;
 
-		Expression "( (Km * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		Expression "( (Ks * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ C0 Variable:.:M ];
+		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ C0 Variable:.:M 0 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy4 )
@@ -84,9 +91,9 @@ System System( /CELL/CYTOPLASM )
 		V1	3.2;
 		K1	2;
 
-		Expression "( (-1 * V1 * C0.MolarConc) / (K1 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		Expression "( ( V1 * S0.MolarConc) / (K1 + S0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ C0 Variable:.:P0 ];
+		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ S0 Variable:.:P0 -1 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy5 )
@@ -94,117 +101,58 @@ System System( /CELL/CYTOPLASM )
 		V2	1.58;
 		K2	2;
 
-		Expression "( (V2 * C0.MolarConc) / (K2 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		Expression "( (V2 * S0.MolarConc) / (K2 + S0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ C0 Variable:.:P1 ];
+		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ S0 Variable:.:P1 -1 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy6 )
 	{
-		V1	3.2;
-		K1	2;
+		V3	5;
+		K3	2;
 
-		Expression "( (V1 * C0.MolarConc) / (K1 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		Expression "( ( V3 * S0.MolarConc) / (K3 + S0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P0 ];
+		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ S0 Variable:.:P1 -1];
 	}
 	
 	Process ExpressionFluxProcess( R_toy7 )
 	{
-		V2	1.58;
-		K2	2;
+		V4	2.5;
+		K4	2;
 
-		Expression "( (-1 * V2 * C0.MolarConc) / (K2 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		Expression "( (V4 * S0.MolarConc) / (K4 + S0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P1 ];
+		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ S0 Variable:.:P2 -1 ];
 	}
-	
+			
 	Process ExpressionFluxProcess( R_toy8 )
 	{
-		V3	5;
-		K3	2;
+		k1	1.9;
 
-		Expression "( (-1 * V3 * C0.MolarConc) / (K3 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		Expression "( ( k1 * S0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P1 ];
+		VariableReferenceList	[ P0 Variable:.:Pn 1 ] [ S0 Variable:.:P2 -1 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy9 )
 	{
-		V4	2.5;
-		K4	2;
+		k2	1.3;
 
-		Expression "( (V4 * C0.MolarConc) / (K4 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		Expression "( (k2 * S0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ C0 Variable:.:P2 ];
+		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ S0 Variable:.:Pn -1 ];
 	}
 	
 	Process ExpressionFluxProcess( R_toy10 )
 	{
-		V3	5;
-		K3	2;
-
-		Expression "( (V3 * C0.MolarConc) / (K3 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
-
-		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P1 ];
-	}
-	
-	Process ExpressionFluxProcess( R_toy11 )
-	{
-		V4	2.5;
-		K4	2;
-
-		Expression "( (-1 * V4 * C0.MolarConc) / (K4 + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
-
-		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P2 ];
-	}
-	
-	Process ExpressionFluxProcess( R_toy12 )
-	{
-		k1	1.9;
-
-		Expression "( (-1 * k1 * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
-
-		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P2 ];
-	}
-	
-	Process ExpressionFluxProcess( R_toy13 )
-	{
-		k2	1.3;
-
-		Expression "( (k2 * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
-
-		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:Pn ];
-	}
-	
-	Process ExpressionFluxProcess( R_toy14 )
-	{
 		vd	0.95;
 		Kd	0.2;
 
-		Expression "( (-1 * vd * C0.MolarConc) / (Kd + C0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		Expression "( ( vd * S0.MolarConc) / (Kd + S0.MolarConc) * self.getSuperSystem().SizeN_A )";
 
-		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ C0 Variable:.:P2 ];
-	}
-	
-	Process ExpressionFluxProcess( R_toy15 )
-	{
-		k1	1.9;
-
-		Expression "( (k1 * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
-
-		VariableReferenceList	[ P0 Variable:.:Pn 1 ] [ C0 Variable:.:P2 ];
-	}
-	
-	Process ExpressionFluxProcess( R_toy16 )
-	{
-		k2	1.3;
-
-		Expression "( (-1 * k2 * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
-
-		VariableReferenceList	[ P0 Variable:.:Pn 1 ] [ C0 Variable:.:Pn ];
-	}
-	
+		VariableReferenceList	[ S0 Variable:.:P2 -1 ];
+	}	
 	
 }
 
