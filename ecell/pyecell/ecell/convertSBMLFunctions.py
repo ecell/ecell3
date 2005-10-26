@@ -422,78 +422,92 @@ class SBML_Species( SBML_Model ):
     
     def getSpeciesValue( self, aSpecies ):
 
-        if ( self.Model.Level == 1 ):
+        if aSpecies[ 3 ] != 'Unknown': # initialAmount
+            return float( aSpecies[ 3 ] )
 
-            if ( aSpecies[3] != "Unknown" ):
+        elif self.Model.Level == 2 \
+                 and aSpecies[ 4 ] != 'Unknown': # initialConcentration
 
-                if ( aSpecies[7] == '' or aSpecies[7] == 'mole' ):
+            # spatialSizeUnits and hasOnlySubstanceUnits should be checked
+            
+            aSize = self.Model.CompartmentSize[ aSpecies[ 2 ] ]
+            return aSpecies[ 4 ] * aSize
 
-                    return float( aSpecies[3] ) * N_A
+        else:
+            raise ValueError, 'InitialAmount or InitialConcentration of Species [%s] must be defined.' % ( aSpecies[ 0 ] )
 
-                elif ( aSpecies[7] == 'item' ):
+##         if ( self.Model.Level == 1 ):
 
-                    return float( aSpecies[3] )
+##             if ( aSpecies[3] != "Unknown" ):
 
-                else:
+##                 if ( aSpecies[7] == '' or aSpecies[7] == 'mole' ):
+
+##                     return float( aSpecies[3] ) * N_A
+
+##                 elif ( aSpecies[7] == 'item' ):
+
+##                     return float( aSpecies[3] )
+
+##                 else:
                     
-                    return ( self.Model.convertUnit( aSpecies[7], aSpecies[3] ) ) * N_A
+##                     return ( self.Model.convertUnit( aSpecies[7], aSpecies[3] ) ) * N_A
 
-            else:
-                raise ValueError, "InitialAmount must be defined, but this model is undefined."
+##             else:
+##                 raise ValueError, "InitialAmount must be defined, but this model is undefined."
 
 
-        elif ( self.Model.Level == 2 ):
+##         elif ( self.Model.Level == 2 ):
 
-            if ( aSpecies[3] != "Unknown" ):
+##             if ( aSpecies[3] != "Unknown" ):
 
-                if ( aSpecies[5] != '' and aSpecies[5] != 'mole' ):
+##                 if ( aSpecies[5] != '' and aSpecies[5] != 'mole' ):
 
-                    return ( self.Model.convertUnit( aSpecies[5], aSpecies[3] ) ) * N_A
+##                     return ( self.Model.convertUnit( aSpecies[5], aSpecies[3] ) ) * N_A
 
-                elif( aSpecies[5] == 'item' ):
+##                 elif( aSpecies[5] == 'item' ):
 
-                    return float( aSpecies[3] )
+##                     return float( aSpecies[3] )
 
-                else:
-                    return float( aSpecies[3] ) * N_A
+##                 else:
+##                     return float( aSpecies[3] ) * N_A
                 
 
-            # aSpecies[4] : InitialConcentration
-            elif ( aSpecies[4] != "Unknown" ):
+##             # aSpecies[4] : InitialConcentration
+##             elif ( aSpecies[4] != "Unknown" ):
 
-                aValue = aSpecies[4]
-                aSize = self.Model.CompartmentSize[aSpecies[2]]
+##                 aValue = aSpecies[4]
+##                 aSize = self.Model.CompartmentSize[aSpecies[2]]
 
-                # convert InitialConcentration into molecules number for E-Cell unit
-                aValue = aValue * aSize * N_A
+##                 # convert InitialConcentration into molecules number for E-Cell unit
+##                 aValue = aValue * aSize * N_A
 
                 
-                # aSpecies[5] : SubstanceUnit
-                if ( aSpecies[5] != '' ):
+##                 # aSpecies[5] : SubstanceUnit
+##                 if ( aSpecies[5] != '' ):
 
-                    # convert Value for matching SubstanceUnit
-                    aValue = self.Model.convertUnit( aSpecies[5], aValue )
+##                     # convert Value for matching SubstanceUnit
+##                     aValue = self.Model.convertUnit( aSpecies[5], aValue )
 
 
-                # aSpecies[8] : hasOnlySubstanceUnit
-                if ( aSpecies[6] != '' ):
+##                 # aSpecies[8] : hasOnlySubstanceUnit
+##                 if ( aSpecies[6] != '' ):
 
-                    # convert Value for matching SpatialSizeUnit
-                    return self.Model.convertUnit( aSpecies[6], aValue )
+##                     # convert Value for matching SpatialSizeUnit
+##                     return self.Model.convertUnit( aSpecies[6], aValue )
 
-                else:
-                    aCompartmentUnit = self.Model.CompartmentUnit[aSpecies[2]]
+##                 else:
+##                     aCompartmentUnit = self.Model.CompartmentUnit[aSpecies[2]]
 
-                    if ( aCompartmentUnit != '' ):
+##                     if ( aCompartmentUnit != '' ):
 
-                        # convert Value for matching CompartmentUnit
-                        return self.Model.convertUnit( aCompartmentUnit,
-                                                       aValue )
-                    else:
-                        return aValue 
+##                         # convert Value for matching CompartmentUnit
+##                         return self.Model.convertUnit( aCompartmentUnit,
+##                                                        aValue )
+##                     else:
+##                         return aValue 
 
-            else:
-                raise ValueError, "Value must be defined as InitialAmount or InitialConcentration"
+##             else:
+##                 raise ValueError, "Value must be defined as InitialAmount or InitialConcentration"
 
 
     
@@ -579,37 +593,37 @@ class SBML_Rule( SBML_Model ):
         raise TypeError, "Variable type must be Species, Parameter, or Compartment"
     
 
-    # =========================================================
+##     # =========================================================
 
-    def setMolarConcName( self, aName ):
+##     def setMolarConcName( self, aName ):
 
-        for aVariableReference in self.VariableReferenceList:
-            if aVariableReference[1].split(':')[2] == aName:
+##         for aVariableReference in self.VariableReferenceList:
+##             if aVariableReference[1].split(':')[2] == aName:
                 
-                return aVariableReference[0] + '.MolarConc'
+##                 return aVariableReference[0] + '.MolarConc'
                 
 
-    # =========================================================
+##     # =========================================================
 
-    def setValueName( self, aName ):
+##     def setValueName( self, aName ):
 
-        for aVariableReference in self.VariableReferenceList:
-            if aVariableReference[1].split(':')[2] == aName:
+##         for aVariableReference in self.VariableReferenceList:
+##             if aVariableReference[1].split(':')[2] == aName:
 
-                return aVariableReference[0] + '.Value'
-
-
-    # =========================================================
-
-    def setSizeName( self, aName ):
-
-        for aVariableReference in self.VariableReferenceList:
-            if aVariableReference[1].split(':')[2] == 'SIZE':
-
-                return aVariableReference[0] + '.Value'
+##                 return aVariableReference[0] + '.Value'
 
 
-    # =========================================================
+##     # =========================================================
+
+##     def setSizeName( self, aName ):
+
+##         for aVariableReference in self.VariableReferenceList:
+##             if aVariableReference[1].split(':')[2] == 'SIZE':
+
+##                 return aVariableReference[0] + '.Value'
+
+
+##     # =========================================================
 
     def setSpeciesToVariableReference( self, aName, aStoichiometry='0' ):
 
@@ -618,21 +632,33 @@ class SBML_Rule( SBML_Model ):
             if ( ( self.Model.Level == 1 and aSpecies[1] == aName ) or
                  ( self.Model.Level == 2 and aSpecies[0] == aName ) ):
             
-                for aVariableReference in self.VariableReferenceList:
+                for c in range( len( self.VariableReferenceList ) ):
+                    aVariableReference = self.VariableReferenceList[ c ]
+                    
                     if aVariableReference[1].split(':')[2] == aName:
 
-                        return 
+                        if aStoichiometry != 0:
+                            aVariableReference[ 2 ] = aStoichiometry
+
+                        compartmentName = self.setCompartmentToVariableReference( aSpecies[ 2 ] )
+                        return ( aVariableReference[ 0 ], compartmentName )
 
                 aVariableList = []
-                aVariableList.append( 'V' + str( self.VariableNumber ) )
+
+                variableName = 'V%d' % ( self.VariableNumber )
+                aVariableList.append( variableName )
                 self.VariableNumber = self.VariableNumber + 1
-                
+
                 aVariableID = self.Model.getSpeciesReferenceID( aName )
                 aVariableList.append( 'Variable:' + aVariableID )
                 aVariableList.append( aStoichiometry )
                 
                 self.VariableReferenceList.append( aVariableList )
                 
+                compartmentID = aSpecies[ 2 ]
+                compartmentName = self.setCompartmentToVariableReference( compartmentID )
+
+                return ( variableName, compartmentName )
 
     # =========================================================
 
@@ -643,18 +669,25 @@ class SBML_Rule( SBML_Model ):
             if ( ( self.Model.Level == 1 and aParameter[1] == aName ) or
                  ( self.Model.Level == 2 and aParameter[0] == aName ) ):
                 
-                for aVariableReference in self.VariableReferenceList:
+                for c in range( len( self.VariableReferenceList ) ):
+                    aVariableReference = self.VariableReferenceList[ c ]
+                    
                     if aVariableReference[1].split(':')[2] == aName:
 
-                        return
+                        if aStoichiometry != 0:
+                            aVariableReference[ 2 ] = aStoichiometry
+
+                        return aVariableReference[ 0 ]
 
                 aParameterList = []
-                aParameterList.append( 'P' + str( self.ParameterNumber ) )
+                variableName = 'P%d' % ( self.ParameterNumber )
+                aParameterList.append( variableName )
                 self.ParameterNumber = self.ParameterNumber + 1
                 aParameterList.append( 'Variable:/SBMLParameter:' + aName )
                 aParameterList.append( aStoichiometry )
                 self.VariableReferenceList.append( aParameterList )
-            
+
+                return variableName
 
     # =========================================================
 
@@ -665,13 +698,17 @@ class SBML_Rule( SBML_Model ):
             if ( ( self.Model.Level == 1 and aCompartment[1] == aName ) or
                  ( self.Model.Level == 2 and aCompartment[0] == aName ) ):
                 
-                print self.VariableReferenceList
-                for aVariableReference in self.VariableReferenceList:
+                for c in range( len( self.VariableReferenceList ) ):
+                    aVariableReference = self.VariableReferenceList[ c ]
+                    
                     if ( aVariableReference[1].split(':')[1] ==\
                        self.Model.getPath( aName ) ) and\
                     ( aVariableReference[1].split(':')[2] == 'SIZE' ):
 
-                        return
+                        if aStoichiometry != 0:
+                            aVariableReference[ 2 ] = aStoichiometry
+
+                        return aVariableReference[ 0 ]
 
                 aCompartmentList = []
                 aCompartmentList.append( aName )
@@ -682,7 +719,7 @@ class SBML_Rule( SBML_Model ):
                 aCompartmentList.append( aStoichiometry )
                 self.VariableReferenceList.append( aCompartmentList )
                 
-
+                return aName
                             
     # =========================================================
 
@@ -703,35 +740,35 @@ class SBML_Rule( SBML_Model ):
 
             else:
                 aName = anASTNode.getName()
-                newName = []
                 aType = self.getVariableType( aName )
 
                 # Species
                 if ( aType == libsbml.SBML_SPECIES ):
 
-                    self.setSpeciesToVariableReference( aName )
-                    newName.append( self.setMolarConcName( aName ) )
-                    if( newName[0] != '' ):
-                        anASTNode.setName( newName[0] )      
+                    ( variableName, compartmentName ) = self.setSpeciesToVariableReference( aName )
+                    if( variableName != '' ):
+
+                        anASTNode.setType( libsbml.AST_DIVIDE )
+                        anASTNode.addChild( libsbml.ASTNode( libsbml.AST_NAME ) )
+                        anASTNode.addChild( libsbml.ASTNode( libsbml.AST_NAME ) )
+                        anASTNode.getLeftChild().setName( '%s.Value' % ( variableName ) )      
+                        anASTNode.getRightChild().setName( '%s.Value' % ( compartmentName ) )      
                         return anASTNode
 
                 # Parameter
-                if ( aType == libsbml.SBML_PARAMETER ):
+                elif ( aType == libsbml.SBML_PARAMETER ):
                     
-                    self.setParameterToVariableReference( aName )
-                    newName.append( self.setValueName( aName ) )
-                    if( newName[0] != '' ):
-                        anASTNode.setName( newName[0] )                    
+                    variableName = self.setParameterToVariableReference( aName )
+                    if( variableName != '' ):
+                        anASTNode.setName( variableName )
                         return anASTNode
 
                 # Compartment
-                if ( aType == libsbml.SBML_COMPARTMENT ):
+                elif ( aType == libsbml.SBML_COMPARTMENT ):
                     
-                    self.setCompartmentToVariableReference( aName )
-                    newName.append( self.setSizeName( aName ) )
-#                    print newName
-                    if( newName[0] != '' ):
-                        anASTNode.setName( newName[0] )                    
+                    variableName = self.setCompartmentToVariableReference( aName )
+                    if( variableName != '' ):
+                        anASTNode.setName( variableName )                    
                         return anASTNode
 
         return anASTNode
@@ -797,6 +834,35 @@ class SBML_Reaction( SBML_Model ):
 
     # =========================================================
 
+    def setCompartmentToVariableReference( self, aName ):
+
+        for aCompartment in self.Model.CompartmentList:
+            if ( aCompartment[0] == aName or
+                 aCompartment[1] == aName ):
+
+                for aVariableReference in self.VariableReferenceList:
+                    if( aVariableReference[1].split(':')[2] == 'SIZE' ):
+                        aCurrentPath = ( aVariableReference[1].split(':')[1] )
+                        aLastSlash = string.rindex( aCurrentPath, '/' )
+                        variableName = aCurrentPath[aLastSlash+1:]
+                        return aVariableReference[ 0 ]
+                        ## return variableName
+                                
+                aCompartmentList = []
+                aCompartmentList.append( aName )
+                            
+                aCompartmentList.append(
+                    'Variable:' + self.Model.getPath( aName ) + ':SIZE' )
+                            
+                aCompartmentList.append( '0' )
+                self.VariableReferenceList.append( aCompartmentList )
+
+                return aCompartmentList[0]
+
+        return ''
+    
+    # =========================================================
+
     def __convertVariableName( self, anASTNode ):
         
         aNumChildren = anASTNode.getNumChildren()
@@ -835,21 +901,19 @@ class SBML_Reaction( SBML_Model ):
                 pass
             else:
                 aName = anASTNode.getName()
-                newName = []
+                variableName = ''
 
                 for aSpecies in self.Model.SpeciesList:
                     if ( aSpecies[0] == aName or aSpecies[1] == aName):
 
                         for aVariableReference in self.VariableReferenceList:
                             if aVariableReference[1].split(':')[2] == aName:
-                                newName.append( aVariableReference[0] + '.MolarConc' )
-                            else:
-                                pass
+                                variableName =  aVariableReference[0]
 
-                        if( self.Model.Level == 2 and newName == [] ):
+                        if( self.Model.Level == 2 and variableName == '' ):
                             raise NameError,"in libSBML :"+aName+" isn't defined in VariableReferenceList"
 
-                        elif( self.Model.Level == 1 and newName == [] ):
+                        elif( self.Model.Level == 1 and variableName == '' ):
 
                             aModifierList = []
                             aModifierList.append(
@@ -861,81 +925,55 @@ class SBML_Reaction( SBML_Model ):
                             aModifierList.append( '0' )
                             self.VariableReferenceList.append( aModifierList )
                             
-                            newName.append( aModifierList[0] + '.MolarConc' )
+                            variableName = aModifierList[0]
 
-                        anASTNode.setName( newName[0] )      
+                        compartmentName = self.setCompartmentToVariableReference( aSpecies[ 2 ] )
 
+                        anASTNode.setType( libsbml.AST_DIVIDE )
+                        anASTNode.addChild( libsbml.ASTNode( libsbml.AST_NAME ) )
+                        anASTNode.addChild( libsbml.ASTNode( libsbml.AST_NAME ) )
+                        anASTNode.getLeftChild().setName( '%s.Value' % ( variableName ) )      
+                        anASTNode.getRightChild().setName( '%s.Value' % ( compartmentName ) )      
+                        
                         return anASTNode
 
+##                if variableName == '':
+                for aParameter in self.Model.ParameterList:
+                    if ( aParameter[0] == aName or
+                         aParameter[1] == aName ):
 
-                if ( newName == [] ):
+                        for aVariableReference in self.VariableReferenceList:
+                            if aVariableReference[1].split(':')[2] == aName:
+                                variableName = aVariableReference[0]
 
-                    for aParameter in self.Model.ParameterList:
-                        if ( aParameter[0] == aName or
-                             aParameter[1] == aName ):
+                        if( variableName == '' ):
 
-                            for aVariableReference in self.VariableReferenceList:
-                                if aVariableReference[1].split(':')[2] == aName:
-                                    newName.append( aVariableReference[0] + '.Value' )
-                            else:
-                                pass
-
-                            if( newName == [] ):
-
-                                aParameterList = []
-                                aParameterList.append(
-                                    'Param' + str( self.ParameterNumber ) )
+                            aParameterList = []
+                            aParameterList.append(
+                                'Param' + str( self.ParameterNumber ) )
                             
-                                self.ParameterNumber = self.ParameterNumber + 1
+                            self.ParameterNumber = self.ParameterNumber + 1
 
-                                aParameterList.append(
-                                    'Variable:/SBMLParameter:' + aName )
+                            aParameterList.append(
+                                'Variable:/SBMLParameter:' + aName )
                             
-                                aParameterList.append( '0' )
-                                self.VariableReferenceList.append( aParameterList )
+                            aParameterList.append( '0' )
+                            self.VariableReferenceList.append( aParameterList )
 
-                                newName.append( aParameterList[0] + '.Value' )
-
-
-                            anASTNode.setName( newName[0] )
-
-                            return anASTNode
-
-                    
-                if ( newName == [] ):
-                    for aCompartment in self.Model.CompartmentList:
-                        if ( aCompartment[0] == aName or
-                             aCompartment[1] == aName ):
-
-                            for aVariableReference in self.VariableReferenceList:
-                                if( aVariableReference[1].split(':')[2] == 'SIZE' ):
-                                    aCurrentPath = ( aVariableReference[1].split(':')[1] )
-                                    aLastSlash = string.rindex( aCurrentPath, '/' )
-                                    newName.append( aCurrentPath[aLastSlash+1:] + '.Value' )
-                                else:
-                                    pass
-
-                            if( newName == [] ):
-                                
-                                aCompartmentList = []
-                                aCompartmentList.append( aName )
-                            
-                                aCompartmentList.append(
-                                    'Variable:' + self.Model.getPath( aName ) + ':SIZE' )
-                            
-                                aCompartmentList.append( '0' )
-                                self.VariableReferenceList.append( aCompartmentList )
-
-                                newName.append( aCompartmentList[0] + '.Value' )
+                            variableName = aParameterList[0]
 
 
-                            anASTNode.setName( newName[0] )                    
-                            
-                            return anASTNode
+                        anASTNode.setName( '%s.Value' % ( variableName ) )
+                        
+                        return anASTNode
 
-            
-                return anASTNode
+##                if variableName == '':
+                variableName = self.setCompartmentToVariableReference( aName )
+                if variableName != '':
+                    anASTNode.setName( '%s.Value' % ( variableName ) )
+                    return anASTNode
                 
+                return anASTNode
 
     # =========================================================
     
@@ -944,23 +982,25 @@ class SBML_Reaction( SBML_Model ):
         aASTRootNode = libsbml.parseFormula( aFormula )
         convertedAST = self.__convertVariableName( aASTRootNode )
 
-        if( self.VariableReferenceList[0][0] == "S0" ):
+        return libsbml.formulaToString( convertedAST )
+    
+##         if( self.VariableReferenceList[0][0] == "S0" ):
 
-            aConvertedFormula = "( " + libsbml.formulaToString( convertedAST ) + " )" + " * S0.getSuperSystem().SizeN_A"
+##             aConvertedFormula = "( " + libsbml.formulaToString( convertedAST ) + " )" + " * S0.getSuperSystem().SizeN_A"
                 
-        elif( self.VariableReferenceList[0][0] == "P0" ):
+##         elif( self.VariableReferenceList[0][0] == "P0" ):
             
-            aConvertedFormula = "( " + libsbml.formulaToString( convertedAST ) + " )" + " * P0.getSuperSystem().SizeN_A"
+##             aConvertedFormula = "( " + libsbml.formulaToString( convertedAST ) + " )" + " * P0.getSuperSystem().SizeN_A"
             
-        elif( self.VariableReferenceList[0][0] == "C0" ):
+##         elif( self.VariableReferenceList[0][0] == "C0" ):
 
-            aConvertedFormula = "( " + libsbml.formulaToString( convertedAST ) + " )" +" * C0.getSuperSystem().SizeN_A" 
+##             aConvertedFormula = "( " + libsbml.formulaToString( convertedAST ) + " )" +" * C0.getSuperSystem().SizeN_A" 
 
-        else:
-            aConvertedFormula = libsbml.formulaToString( convertedAST )
+##         else:
+##             aConvertedFormula = libsbml.formulaToString( convertedAST )
 
 
-        return aConvertedFormula
+##         return aConvertedFormula
 
 
     # =========================================================
@@ -1027,14 +1067,16 @@ class SBML_Parameter( SBML_Model ):
    # =========================================================
 
    def getParameterValue( self, aParameter ):
-       
-       if ( aParameter[3] != '' and aParameter[2] != 0 ):
 
-           return self.Model.convertUnit( aParameter[3], aParameter[2] )
-       
-       else:
+       return aParameter[ 2 ]
+   
+##        if ( aParameter[3] != '' and aParameter[2] != 0 ):
 
-           return aParameter[2]
+##            return self.Model.convertUnit( aParameter[3], aParameter[2] )
+       
+##        else:
+
+##            return aParameter[2]
         
 
     # =========================================================
