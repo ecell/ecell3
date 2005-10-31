@@ -68,6 +68,17 @@ namespace libecs
     createInterpolants();
     theTaylorSeries.resize( boost::extents[ getStage() ][ getReadOnlyVariableOffset() ] );
 
+    // should registerProcess be overrided?
+    if ( getDiscreteProcessOffset() < theProcessVector.size() )
+      {
+	for ( ProcessVectorConstIterator
+		i( theProcessVector.begin() + getDiscreteProcessOffset() );
+	      i < theProcessVector.end(); ++i )
+	  {
+	    std::cerr << "WARNING: Process [" << (*i)->getID() << "] is not continuous." << std::endl;
+	  }
+      }
+
     initializeVariableReferenceList();
 
     // should create another method for property slot ?
