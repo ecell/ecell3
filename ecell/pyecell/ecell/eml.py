@@ -218,10 +218,8 @@ class Eml:
 
             aTargetSystemNode.appendChild( anEntityElement )
 
-        else:
-
-            raise "unexpected error."
-
+        else:            
+            raise "unexpected error. %s should be System, Variable, or Process."%anEntityType
 
         self.__addToCache( aFullID, anEntityElement )
 
@@ -314,10 +312,7 @@ class Eml:
                             
                             anEntityList.append( str( aChildNode.getAttribute( 'id' ) ) )
 
-
         return anEntityList
-
-
 
     def getEntityPropertyList( self, aFullID ):
 
@@ -395,12 +390,6 @@ class Eml:
                         anID = aChildNode.getAttribute( 'id' )
                         aFullID = aType + ':' + aSystemPath + ':' + anID
                         self.__addToCache( aFullID, aChildNode )
-
-
-
-
-
-
 
     ##-------------------------------------------
     ## Utils
@@ -481,8 +470,7 @@ class Eml:
                 self.__addToCache( aFullID, aChildNode )
                 return aChildNode
 
-
-        raise "Entity [" + aFullID + "] not found."
+        raise "Entity [%s] not found."%aFullID
 
                         
     def __getSystemNode( self, aSystemPath ):
@@ -503,9 +491,7 @@ class Eml:
                 self.__addToCache( aFullID, aSystemNode )
                 return aSystemNode
 
-
-        raise "System [" + aFullID + "] not found."
-
+        raise "System [%s] not found."%aFullID
 
     def __getEntityPropertyNode( self, aFullID, aPropertyName ):
 
