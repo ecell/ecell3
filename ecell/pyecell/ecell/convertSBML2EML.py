@@ -133,7 +133,8 @@ def convertSBML2EML( aSBMLString ):
 
         # setFixed ( default = 1 )
         if ( aParameter[4] == 1 ):
-            aTmpList = [ str( aParameter[4] ) ]
+            # aTmpList = [ str( aParameter[4] ) ]
+            aTmpList = [ '1' ]
             anEml.setEntityProperty( aSystemFullID, 'Fixed', aTmpList[0:1] )
 
 
