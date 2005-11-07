@@ -30,7 +30,6 @@ Send feedback to Kouichi Takahashi <shafi@e-cell.org>'''\
 class Session:
     'Session class'
 
-
     def __init__( self, aSimulator=None ):
         'constructor'
 
@@ -123,9 +122,6 @@ class Session:
         # creates ana seve an EML instance 
         anEml = eml.Eml()
 
-        # creates root entity
-
-        
         # calls save methods
         self.__saveAllStepper( anEml )
         self.__saveEntity( anEml, 'System::/' )
@@ -161,7 +157,61 @@ class Session:
 
     # end of saveModel
 
+    def importSBML( self, sbml ):
 
+        #import
+        try:
+            from ecell.convertSBML2EML import *
+        except ImportError:
+            self.messege( "can not import convertSBML2EML" )
+
+        #type check
+        if type( sbml ) == str:        
+            aSbmlFile = open( sbml )
+            aSbmlString = aSbmlFile.read()
+            aSbmlFile.close()
+
+        elif type( sbml ) == file:
+            aSbmlString = sbml.read()
+            aSbmlFile.close()
+                                    
+        else:
+            raise TypeError, "The type of SBML must be string(file name) or file object "
+        
+        anEml = convertSBML2EML( aSbmlString )
+        self.loadModel( anEml )
+        
+    def exportSBML( self, filename ):
+
+        #import
+        try:
+            from ecell.convertEML2SBML import *
+        except ImportError:
+            self.messege( "can not import convertEML2SBML." )
+            
+        #type check
+        if type( sbml ) == str:
+            aFileName = sbml
+        else:
+            raise TypeError, "The type of SBML must be string(file name)"
+
+        # creates ana seve an EML instance 
+        anEml = eml.Eml()
+
+        # calls save methods
+        self.__saveAllStepper( anEml )
+        self.__saveEntity( anEml, 'System::/' )
+        self.__saveAllEntity( anEml )
+        self.__saveProperty( anEml )
+
+        # convert eml to sbml
+        aSbmlString = convertToSBMLModel( anEml, filename, aSBMLLevel=2, aSBMLVersion=2 )
+
+        # save sbml file
+        aSbmlFIle = open( filename, "w" )
+        aSbmlFIle.write( aSbmlString )
+        aSbmlFile.close()
+    
     def restoreMessageMethod( self ):
         self.theMessageMethod=self.__plainMessageMethod
         
@@ -215,7 +265,6 @@ class Session:
     def createStepperStub( self, id ):
         return StepperStub( self.theSimulator, id )
 
-
     #
     # Entity methods
     #
@@ -225,7 +274,6 @@ class Session:
 
     def createEntityStub( self, fullid ):
         return EntityStub( self.theSimulator, fullid )
-
 
     #
     # Logger methods
@@ -259,7 +307,7 @@ class Session:
         elif type( fullpn ) == tuple: 
             aLoggerNameList = fullpn
         else:
-            self.message( fullpn +" is not suitable type.\nuse string or list or tuple" )
+            self.message( "%s is not suitable type.\nuse string or list or tuple"%fullpn )
             return
             
         # -------------------------------------------------
@@ -351,7 +399,6 @@ class Session:
             # displays error message and exit this method.
             # -------------------------------------------------
 
-            import sys
             import traceback 
             print __name__,
             aErrorMessageList = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
@@ -413,6 +460,8 @@ class Session:
                                         'failed to set property [%s]: ' % (aProperty,) +\
                                         str( e ) )
                                         
+
+
     def __loadEntity( self, anEml, aSystemPath='/' ):
 
         aVariableList = anEml.getEntityList( 'Variable', aSystemPath )
