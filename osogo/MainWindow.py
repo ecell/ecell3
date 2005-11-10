@@ -316,6 +316,10 @@ class MainWindow(OsogoWindow):
                     'board_window_menu_activate'  : self.__displayWindow,
                     #'preferences_menu_activate'   : self.openPreferences,
                     'about_menu_activate'         : self.__displayAbout,
+
+                    #sbml
+                    'on_import_sbml_activate'    : self.__openFileSelection,
+                    'on_export_sbml_activate'   : self.__openFileSelection,
                     
                     # toolbars
                     'simulation_button_clicked'        : self.__handleSimulation,
@@ -455,6 +459,8 @@ class MainWindow(OsogoWindow):
 		self['load_model_menu'].set_sensitive(not aDataLoadedStatus)
 		self['load_script_menu'].set_sensitive(not aDataLoadedStatus)
 		self['save_model_menu'].set_sensitive(aDataLoadedStatus)
+		self['import_sbml'].set_sensitive(not aDataLoadedStatus)
+                self['export_sbml'].set_sensitive(aDataLoadedStatus)
 
 		# window menu
 		self['logger_window_menu'].set_sensitive(aDataLoadedStatus)
@@ -500,11 +506,18 @@ class MainWindow(OsogoWindow):
                      arg[0] == self['save_model_button']:
 			self.openFileSelection('Save','Model')
 
+                # when 'Import SBML' is selected
+                elif arg[0] == self['import_sbml']:
+			self.openFileSelection('Load','SBML')
+
+                # when 'Export SBML' is selected
+                elif arg[0] == self['export_sbml']:
+			self.openFileSelection('Save','SBML')
 
         def openFileSelection( self, aType, aTarget ) :
 		"""displays FileSelection 
 		aType     ---  'Load'/'Save' (str)
-		aTarget   ---  'Model'/'Script' (str)
+		aTarget   ---  'Model'/'Script'/'SBML' (str)
 		Return None
 		[Note]:When FileSelection is already created, moves it to the top of desktop,
 		       like singleton pattern.
@@ -545,6 +558,19 @@ class MainWindow(OsogoWindow):
 				self.theFileSelection.ok_button.connect('clicked', self.__saveModel)
 				self.theFileSelection.complete( '*.'+ MODEL_FILE_EXTENSION )
 				self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,MODEL_FILE_EXTENSION) )
+
+			# when 'Import SBML' is selected
+			elif aType == 'Load' and aTarget == 'SBML':
+				self.theFileSelection.ok_button.connect('clicked', self.__loadData, aTarget)
+				self.theFileSelection.complete( '*.'+ MODEL_FILE_EXTENSION )
+				self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,MODEL_FILE_EXTENSION) )
+
+			# when 'Save Model' is selected
+			elif aType == 'Save' and aTarget == 'SBML':
+				self.theFileSelection.ok_button.connect('clicked', self.__exportSBML)
+				self.theFileSelection.complete( '*.'+ MODEL_FILE_EXTENSION )
+				self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,MODEL_FILE_EXTENSION) )
+
 			else:
 				raise "(%s,%s) does not match." %(aType,aTarget)
 
@@ -595,9 +621,10 @@ class MainWindow(OsogoWindow):
 				self.theSession.loadModel( aFileName )
 				# self.theSession.theSimulator.initialize()
 			elif aFileType == 'Script':
-
 				self.theSession.loadScript( aFileName )
-
+                        elif aFileType == 'SBML':
+                                self.theSession.importSBML( aFileName )
+                                
                         self.theEntityListWindow.updateButtons()
 
                         self.update()
@@ -652,7 +679,7 @@ class MainWindow(OsogoWindow):
 		try:
 
 			# displays save message
-			self.theSession.message('Save model file %s\n' % aFileName)
+			self.theSession.message('Save model file %s\n' % aFileName)                        
 			# saves Model
 			self.theSession.saveModel( aFileName )
 
@@ -669,6 +696,54 @@ class MainWindow(OsogoWindow):
 
 			# displays error message of MessageWindow
 			self.theSession.message('Can\'t save [%s]' %aFileName)
+			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+			self.theSession.message(anErrorMessage)
+
+		# updates
+		self.update()
+		self.updateButtons()
+		self.theSession.updateFundamentalWindows()
+
+	def __exportSBML( self, *arg ) :
+
+		# gets file name
+		aFileName = self.theFileSelection.get_filename()
+
+		# when the file already exists
+		if os.path.isfile( aFileName ):
+
+			# displays confirm window
+			aMessage = 'Would you like to replace the existing file? \n[%s]' %aFileName
+			aDialog = ConfirmWindow(OKCANCEL_MODE,aMessage,'Confirm File Overwrite')
+
+			# when canceled, does nothing 
+			if aDialog.return_result() != OK_PRESSED:
+				# does nothing
+				return None
+
+		# when ok is pressed, overwrites it.
+		# deletes FileSelection
+		self.__deleteFileSelection()
+
+		try:
+
+			# displays save message
+			self.theSession.message('Export SBML file %s\n' % aFileName)                        
+			# saves Model
+			self.theSession.exportSBML( aFileName )
+
+		except:
+
+			# expants message window, when it is folded.
+			if ( self['message_togglebutton'].get_child() ).get_active() == FALSE:
+				( self['message_togglebutton'].get_child() ).set_active(TRUE)
+
+			# displays confirm window
+			aMessage = 'Can\'t save [%s]\nSee MessageWindow for details.' %aFileName
+			aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+
+			# displays error message of MessageWindow
+			self.theSession.message('Can\'t export [%s]' %aFileName)
 			anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
 			self.theSession.message(anErrorMessage)
 
