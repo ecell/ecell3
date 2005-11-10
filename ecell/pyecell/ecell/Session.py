@@ -176,8 +176,7 @@ class Session:
         try:
             from ecell.convertSBML2EML import *
         except ImportError:
-            self.messege( "ImportError:can not import convertSBML2EML.\ncan not use importSBML in session." )
-            return
+            raise ImportError, "ImportError:can not import convertSBML2EML.\ncan not use importSBML in session."
         
         #type check
         if type( sbml ) == str:        
@@ -201,12 +200,11 @@ class Session:
         try:
             from ecell.convertEML2SBML import *
         except ImportError:
-            self.messege( "ImportError:can not import convertEML2SBML.\ncan not use exportSBML in session." )
-            return
+            raise ImportError, "ImportError:can not import convertEML2SBML.\ncan not use exportSBML in session."
         
         #type check
-        if type( sbml ) == str:
-            aFileName = sbml
+        if type( filename ) == str:
+            aFileName = filename
         else:
             raise TypeError, "The type of SBML must be string(file name)"
 
@@ -219,8 +217,19 @@ class Session:
         self.__saveAllEntity( anEml )
         self.__saveProperty( anEml )
 
+        # save annotation
+
+        for aFullID in self.theEntityAnnotationDict.keys():
+            for aProperty in self.theEntityAnnotationDict[aFullID].keys():
+                anEml.setEntityProperty( aFullID, aProperty, self.theEntityAnnotationDict[aFullID][aProperty] )
+
+        for anID in self.theStepperAnnotationDict.keys():
+            for aProperty in self.theStepperAnnotationDict[anID].keys():
+                anEml.setStepperProperty( anID, aProperty, self.theStepperAnnotationDict[anID][aProperty] )
+
+
         # convert eml to sbml
-        aSbmlString = convertToSBMLModel( anEml, filename, aSBMLLevel=2, aSBMLVersion=2 )
+        aSbmlString = convertToSBMLModel( anEml, filename, aLevel=2, aVersion=2 )
 
         # save sbml file
         aSbmlFIle = open( filename, "w" )
