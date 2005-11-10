@@ -35,6 +35,9 @@ class Session:
 
         self.theMessageMethod = self.__plainMessageMethod
 
+        self.theEntityAnnotationDict = {}
+        self.theStepperAnnotationDict = {}
+
         if aSimulator is None:
             self.theSimulator = ecell.emc.Simulator()
         else:
@@ -128,6 +131,16 @@ class Session:
         self.__saveAllEntity( anEml )
         self.__saveProperty( anEml )
 
+        # save annotation
+
+        for aFullID in self.theEntityAnnotationDict.keys():
+            for aProperty in self.theEntityAnnotationDict[aFullID].keys():
+                anEml.setEntityProperty( aFullID, aProperty, self.theEntityAnnotationDict[aFullID][aProperty] )
+
+        for anID in self.theStepperAnnotationDict.keys():
+            for aProperty in self.theStepperAnnotationDict[anID].keys():
+                anEml.setStepperProperty( anID, aProperty, self.theStepperAnnotationDict[anID][aProperty] )
+                
         # if the type is string
         if type( aModel ) == str:
 
@@ -163,8 +176,9 @@ class Session:
         try:
             from ecell.convertSBML2EML import *
         except ImportError:
-            self.messege( "can not import convertSBML2EML" )
-
+            self.messege( "ImportError:can not import convertSBML2EML.\ncan not use importSBML in session." )
+            return
+        
         #type check
         if type( sbml ) == str:        
             aSbmlFile = open( sbml )
@@ -187,8 +201,9 @@ class Session:
         try:
             from ecell.convertEML2SBML import *
         except ImportError:
-            self.messege( "can not import convertEML2SBML." )
-            
+            self.messege( "ImportError:can not import convertEML2SBML.\ncan not use exportSBML in session." )
+            return
+        
         #type check
         if type( sbml ) == str:
             aFileName = sbml
@@ -373,7 +388,6 @@ class Session:
                 # gets data without specifing interval 
                 aMatrixData = aLoggerStub.getData( aStartTime, anEndTime, anInterval )
 
-                
             # sets data name 
             aECDDataFile.setDataName(aFullPNString)
 
@@ -437,7 +451,7 @@ class Session:
         aStepperList = anEml.getStepperList()
 
         for aStepper in aStepperList:
-
+            anAnnotationDict = {}
             aClassName = anEml.getStepperClass( aStepper )
 
             try:
@@ -450,17 +464,21 @@ class Session:
             aPropertyList = anEml.getStepperPropertyList( aStepper )
 
             for aProperty in aPropertyList:
-                try:
-                    aValue = anEml.getStepperProperty( aStepper, aProperty )
-                    self.theSimulator.loadStepperProperty( aStepper,\
+                aValue = anEml.getStepperProperty( aStepper, aProperty )
+
+                if aProperty[0] == "!":
+                    anAnnotationDict[aProperty] = aValue
+                else:
+                    try:
+                        self.theSimulator.loadStepperProperty( aStepper,\
                                                            aProperty,\
                                                            aValue )
-                except RuntimeError, e:
-                    raise RuntimeError( 'When creating Stepper [%s], ' % (aStepper,) +\
-                                        'failed to set property [%s]: ' % (aProperty,) +\
-                                        str( e ) )
-                                        
-
+                    except RuntimeError, e:
+                        raise RuntimeError( 'When creating Stepper [%s], ' % (aStepper,) +\
+                                            'failed to set property [%s]: ' % (aProperty,) +\
+                                            str( e ) )
+            if len( anAnnotationDict.keys() ) != 0:
+                self.theStepperAnnotationDict[aStepper] = anAnnotationDict
 
     def __loadEntity( self, anEml, aSystemPath='/' ):
 
@@ -499,23 +517,27 @@ class Session:
                             aSystemPath, anIDList ):
 
         for anID in anIDList:
-
+            anAnnotationDict = {}
             aFullID = anEntityTypeString + ':' + aSystemPath + ':' + anID
-
             aPropertyList = anEml.getEntityPropertyList( aFullID )
 
-            for aProperty in aPropertyList:
+            for aProperty in aPropertyList:                
                 aFullPN = aFullID + ':' + aProperty
                 aValue = anEml.getEntityProperty( aFullPN )
-    
-                try:
-                    self.theSimulator.loadEntityProperty( aFullPN, aValue )
-                except RuntimeError, e:
-                    raise RuntimeError( 'Failed to set Entity property [%s],'
-                                          % aFullPN \
-                                        + 'value =:\n%s\n' % str( aValue ) +\
-                                        str( e ) )
-            
+                if aProperty[0] == "!":
+                    anAnnotationDict[aProperty] = aValue
+                else:
+                    try:
+                        self.theSimulator.loadEntityProperty( aFullPN, aValue )
+                    except RuntimeError, e:
+                        raise RuntimeError( 'Failed to set Entity property [%s],'
+                                            % aFullPN \
+                                            + 'value =:\n%s\n' % str( aValue ) +\
+                                            str( e ) )
+
+            if len( anAnnotationDict.keys() ) != 0: 
+                self.theEntityAnnotationDict[aFullID] = anAnnotationDict
+
     def __loadEntityList( self, anEml, anEntityTypeString,\
                           aSystemPath, anIDList ):
         
@@ -676,7 +698,7 @@ class Session:
                             
                         anEml.setEntityProperty( aFullID, aProperty, 
                                                  aValueList )
-                    
+ 
     def __convertPropertyValueList( self, aValueList ):
        
         aList = list()
