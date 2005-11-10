@@ -760,7 +760,7 @@ class SBML_Rule( SBML_Model ):
                     
                     variableName = self.setParameterToVariableReference( aName )
                     if( variableName != '' ):
-                        anASTNode.setName( variableName )
+                        anASTNode.setName( '%s.Value' % ( variableName ) )
                         return anASTNode
 
                 # Compartment
@@ -768,7 +768,7 @@ class SBML_Rule( SBML_Model ):
                     
                     variableName = self.setCompartmentToVariableReference( aName )
                     if( variableName != '' ):
-                        anASTNode.setName( variableName )                    
+                        anASTNode.setName( '%s.Value' % ( variableName ) )
                         return anASTNode
 
         return anASTNode
