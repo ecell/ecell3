@@ -32,11 +32,11 @@ class EntityListWindow(OsogoWindow):
     VARIABLE_COLUMN_INFO_MAP= {
         # Name:      Type
 
-        'Value':     gobject.TYPE_FLOAT
+        'Value':     gobject.TYPE_STRING
         }
 
     PROCESS_COLUMN_INFO_MAP= {
-        'Activity':  gobject.TYPE_FLOAT
+        'Activity':  gobject.TYPE_STRING
         }
 
     VARIABLE_COLUMN_LIST = [ 'ID', 'Value', 'Classname', 'Path' ]
@@ -892,7 +892,7 @@ class EntityListWindow(OsogoWindow):
             columnList = []
             for propertyColumn in propertyColumnList:
                 newValue = stub[ propertyColumn[1] ]
-                columnList += [ propertyColumn[0], newValue ] 
+                columnList += [ propertyColumn[0], "%g"%(newValue) ] 
 
             model.set( iter, *columnList )
 
