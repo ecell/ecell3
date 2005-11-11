@@ -232,8 +232,8 @@ class Session:
         aSbmlString = convertToSBMLModel( anEml, filename, aLevel=2, aVersion=2 )
 
         # save sbml file
-        aSbmlFIle = open( filename, "w" )
-        aSbmlFIle.write( aSbmlString )
+        aSbmlFile = open( filename, "w" )
+        aSbmlFile.write( aSbmlString )
         aSbmlFile.close()
     
     def restoreMessageMethod( self ):
