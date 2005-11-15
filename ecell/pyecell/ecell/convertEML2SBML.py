@@ -220,7 +220,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                 # set Constant 
                 elif ( aPropertyName == "Fixed" ):
                     aParameter.setConstant\
-                    ( int( anEml.getEntityProperty( aFullPN )[0] ) )
+                    ( int( float( anEml.getEntityProperty( aFullPN )[0] ) ) )
 
                 else:
                     raise AttributeError,"unexpected error in Parameter"
@@ -286,7 +286,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                     elif ( aPropertyName == "Fixed" ):
                         
                         aSpecies.setConstant(
-                            int( anEml.getEntityProperty( aFullPN )[0] ) )
+                            int( float( anEml.getEntityProperty( aFullPN )[0] ) ) )
 
                     else:
                         raise AttributeError,"unexpected error in Species"
@@ -446,7 +446,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
                         if( len( aVariableReference ) == 3 ):
 
-                            if( int( aVariableReference[2] ) != 0 ):
+                            if( int( float( aVariableReference[2]) ) != 0 ):
  
                                 aFirstColon =\
                                 string.index( aVariableReference[1], ':' )
@@ -699,7 +699,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                                       anID + ':' + aProperty
 
                             aCompartment.setConstant(
-                                int( anEml.getEntityProperty( aFullPN )[0] ) )
+                                int( float( anEml.getEntityProperty( aFullPN )[0] ) ) )
 
                 # set Dimensions of Compartment
                 elif( anID == "Dimensions" ):
@@ -707,7 +707,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                     aFullPN = "Variable:" + aSystemPath + ':' + anID + ":Value"
 
                     aCompartment.setSpatialDimensions(
-                        int( anEml.getEntityProperty( aFullPN )[0] ) )
+                        int( float( anEml.getEntityProperty( aFullPN )[0] ) ) )
 
             # set Outside element of Compartment
             if( aFullID[1] == '/' ):
