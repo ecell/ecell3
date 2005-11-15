@@ -35,9 +35,6 @@ class Session:
 
         self.theMessageMethod = self.__plainMessageMethod
 
-        self.theEntityAnnotationDict = {}
-        self.theStepperAnnotationDict = {}
-
         if aSimulator is None:
             self.theSimulator = ecell.emc.Simulator()
         else:
@@ -131,16 +128,6 @@ class Session:
         self.__saveAllEntity( anEml )
         self.__saveProperty( anEml )
 
-        # save annotation
-
-        for aFullID in self.theEntityAnnotationDict.keys():
-            for aProperty in self.theEntityAnnotationDict[aFullID].keys():
-                anEml.setEntityProperty( aFullID, aProperty, self.theEntityAnnotationDict[aFullID][aProperty] )
-
-        for anID in self.theStepperAnnotationDict.keys():
-            for aProperty in self.theStepperAnnotationDict[anID].keys():
-                anEml.setStepperProperty( anID, aProperty, self.theStepperAnnotationDict[anID][aProperty] )
-                
         # if the type is string
         if type( aModel ) == str:
 
@@ -169,72 +156,61 @@ class Session:
             raise TypeError, "The type of aModel must be string(file name) or file object "
 
     # end of saveModel
+ 
+##     def importSBML( self, sbml ):
 
-    def importSBML( self, sbml ):
-
-        #import
-        try:
-            from ecell.convertSBML2EML import *
-        except ImportError:
-            raise ImportError, "ImportError:can not import convertSBML2EML.\ncan not use importSBML in session."
+##         #import
+##         try:
+##             from ecell.convertSBML2EML import *
+##         except ImportError:
+##             raise ImportError, "ImportError:can not import convertSBML2EML.\ncan not use importSBML in session."
         
-        #type check
-        if type( sbml ) == str:        
-            aSbmlFile = open( sbml )
-            aSbmlString = aSbmlFile.read()
-            aSbmlFile.close()
+##         #type check
+##         if type( sbml ) == str:        
+##             aSbmlFile = open( sbml )
+##             aSbmlString = aSbmlFile.read()
+##             aSbmlFile.close()
 
-        elif type( sbml ) == file:
-            aSbmlString = sbml.read()
-            aSbmlFile.close()
+##         elif type( sbml ) == file:
+##             aSbmlString = sbml.read()
+##             aSbmlFile.close()
                                     
-        else:
-            raise TypeError, "The type of SBML must be string(file name) or file object "
+##         else:
+##             raise TypeError, "The type of SBML must be string(file name) or file object "
         
-        anEml = convertSBML2EML( aSbmlString )
-        self.loadModel( anEml )
+##         anEml = convertSBML2EML( aSbmlString )
+##         self.loadModel( anEml )
+
+##     def exportSBML( self, filename ):
+
+##         #import
+##         try:
+##             from ecell.convertEML2SBML import *
+##         except ImportError:
+##             raise ImportError, "ImportError:can not import convertEML2SBML.\ncan not use exportSBML in session."
         
-    def exportSBML( self, filename ):
+##         #type check
+##         if type( filename ) == str:
+##             aFileName = filename
+##         else:
+##             raise TypeError, "The type of SBML must be string(file name)"
 
-        #import
-        try:
-            from ecell.convertEML2SBML import *
-        except ImportError:
-            raise ImportError, "ImportError:can not import convertEML2SBML.\ncan not use exportSBML in session."
-        
-        #type check
-        if type( filename ) == str:
-            aFileName = filename
-        else:
-            raise TypeError, "The type of SBML must be string(file name)"
+##         # creates ana seve an EML instance 
+##         anEml = eml.Eml()
 
-        # creates ana seve an EML instance 
-        anEml = eml.Eml()
+##         # calls save methods
+##         self.__saveAllStepper( anEml )
+##         self.__saveEntity( anEml, 'System::/' )
+##         self.__saveAllEntity( anEml )
+##         self.__saveProperty( anEml )
 
-        # calls save methods
-        self.__saveAllStepper( anEml )
-        self.__saveEntity( anEml, 'System::/' )
-        self.__saveAllEntity( anEml )
-        self.__saveProperty( anEml )
+##         # convert eml to sbml
+##         aSbmlString = convertToSBMLModel( anEml, filename, aLevel=2, aVersion=2 )
 
-        # save annotation
-
-        for aFullID in self.theEntityAnnotationDict.keys():
-            for aProperty in self.theEntityAnnotationDict[aFullID].keys():
-                anEml.setEntityProperty( aFullID, aProperty, self.theEntityAnnotationDict[aFullID][aProperty] )
-
-        for anID in self.theStepperAnnotationDict.keys():
-            for aProperty in self.theStepperAnnotationDict[anID].keys():
-                anEml.setStepperProperty( anID, aProperty, self.theStepperAnnotationDict[anID][aProperty] )
-
-
-        # convert eml to sbml
-        aSbmlString = convertToSBMLModel( anEml, filename, aLevel=2, aVersion=2 )
-
-        # save sbml file
-        aSbmlFile = open( filename, "w" )
-        aSbmlFile.write( aSbmlString )
-        aSbmlFile.close()
+##         # save sbml file
+##         aSbmlFIle = open( filename, "w" )
+##         aSbmlFIle.write( aSbmlString )
+##         aSbmlFile.close()
     
     def restoreMessageMethod( self ):
         self.theMessageMethod=self.__plainMessageMethod
@@ -460,7 +436,6 @@ class Session:
         aStepperList = anEml.getStepperList()
 
         for aStepper in aStepperList:
-            anAnnotationDict = {}
             aClassName = anEml.getStepperClass( aStepper )
 
             try:
@@ -475,19 +450,14 @@ class Session:
             for aProperty in aPropertyList:
                 aValue = anEml.getStepperProperty( aStepper, aProperty )
 
-                if aProperty[0] == "!":
-                    anAnnotationDict[aProperty] = aValue
-                else:
-                    try:
-                        self.theSimulator.loadStepperProperty( aStepper,\
+                try:
+                    self.theSimulator.loadStepperProperty( aStepper,\
                                                            aProperty,\
                                                            aValue )
-                    except RuntimeError, e:
-                        raise RuntimeError( 'When creating Stepper [%s], ' % (aStepper,) +\
-                                            'failed to set property [%s]: ' % (aProperty,) +\
-                                            str( e ) )
-            if len( anAnnotationDict.keys() ) != 0:
-                self.theStepperAnnotationDict[aStepper] = anAnnotationDict
+                except RuntimeError, e:
+                    raise RuntimeError( 'When creating Stepper [%s], ' % (aStepper,) +\
+                                        'failed to set property [%s]: ' % (aProperty,) +\
+                                        str( e ) )
 
     def __loadEntity( self, anEml, aSystemPath='/' ):
 
@@ -526,26 +496,19 @@ class Session:
                             aSystemPath, anIDList ):
 
         for anID in anIDList:
-            anAnnotationDict = {}
             aFullID = anEntityTypeString + ':' + aSystemPath + ':' + anID
             aPropertyList = anEml.getEntityPropertyList( aFullID )
 
             for aProperty in aPropertyList:                
                 aFullPN = aFullID + ':' + aProperty
                 aValue = anEml.getEntityProperty( aFullPN )
-                if aProperty[0] == "!":
-                    anAnnotationDict[aProperty] = aValue
-                else:
-                    try:
-                        self.theSimulator.loadEntityProperty( aFullPN, aValue )
-                    except RuntimeError, e:
-                        raise RuntimeError( 'Failed to set Entity property [%s],'
-                                            % aFullPN \
-                                            + 'value =:\n%s\n' % str( aValue ) +\
-                                            str( e ) )
-
-            if len( anAnnotationDict.keys() ) != 0: 
-                self.theEntityAnnotationDict[aFullID] = anAnnotationDict
+                try:
+                    self.theSimulator.loadEntityProperty( aFullPN, aValue )
+                except RuntimeError, e:
+                    raise RuntimeError( 'Failed to set Entity property [%s],'
+                                        % aFullPN \
+                                        + 'value =:\n%s\n' % str( aValue ) +\
+                                        str( e ) )
 
     def __loadEntityList( self, anEml, anEntityTypeString,\
                           aSystemPath, anIDList ):
