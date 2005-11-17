@@ -253,7 +253,7 @@ class Eml:
     def isEntityExist( self, aFullID ):
 
         try:
-            __getEntityNode( aFullID )
+            self.__getEntityNode( aFullID )
         except:
             return 0
         else:
