@@ -28,7 +28,7 @@
 // Koichi Takahashi <shafi@e-cell.org>
 // Nayuta Iwata
 //
-// E-Cell Project, Institute for Advanced Biosciences, Keio University.
+// E-Cell Project.
 //
 
 #ifndef __PYTHONFLUXPROCESS_HPP

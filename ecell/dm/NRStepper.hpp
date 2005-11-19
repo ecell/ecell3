@@ -25,11 +25,11 @@
 //END_HEADER
 //
 // written by Hu Bin <hubin@sfc.keio.ac.jp>,
-// E-Cell Project, Institute for Advanced Biosciences, Keio University.
+// E-Cell Project.
 //
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
-// E-Cell Project, Institute for Advanced Biosciences, Keio University.
+// E-Cell Project.
 //
 
 

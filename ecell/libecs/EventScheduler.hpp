@@ -3,6 +3,7 @@
 //        This file is part of E-Cell Simulation Environment package
 //
 //                Copyright (C) 1996-2005 Keio University
+//                Copyright (C) 2005 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -25,7 +26,7 @@
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
-// E-Cell Project, Institute for Advanced Biosciences, Keio University.
+// E-Cell Project.
 //
 
 #ifndef __EVENTSCHEDULER_HPP

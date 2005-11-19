@@ -29,7 +29,7 @@
 //   Koichi Takahashi
 //   Tatsuya Ishida
 //
-// E-Cell Project, Institute for Advanced Biosciences, Keio University.
+// E-Cell Project.
 //
 
 #ifndef __EXPRESSIONPROCESSBASE_HPP

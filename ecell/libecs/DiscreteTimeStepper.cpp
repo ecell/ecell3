@@ -25,7 +25,7 @@
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
-// E-Cell Project, Institute for Advanced Biosciences, Keio University.
+// E-Cell Project.
 //
 
 #include "DiscreteTimeStepper.hpp"

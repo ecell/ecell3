@@ -3,6 +3,7 @@
 //        This file is part of E-Cell Simulation Environment package
 //
 //                Copyright (C) 1996-2002 Keio University
+//                Copyright (C) 2005 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -25,6 +26,7 @@
 //END_HEADER
 //
 // written by Eiichiro Adachi
+// modified by Koichi Takahashi
 //
 
 

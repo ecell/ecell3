@@ -24,7 +24,7 @@
 //END_HEADER
 //
 // written by Masayuki Okayama <smash@e-cell.org>,
-// E-Cell Project, Institute for Advanced Biosciences, Keio University.
+// E-Cell Project.
 //
 // modified by Gabor Bereczki <gabor.bereczki@talk21.com>
 // 14/04/2002
