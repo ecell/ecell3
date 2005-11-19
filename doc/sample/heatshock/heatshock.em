@@ -18,7 +18,7 @@ Stepper ODEStepper( DE1 )
 @#{FOLDING_STEPPER='NR1'}
 @#{FOLDING_PROCESS='GillespieProcess'}
 
-Stepper NRStepper( NR1 ){Tolerance      0;}
+Stepper DiscreteEventStepper( NR1 ){Tolerance      0;}
 
 @{
 DNAJ = 310.
