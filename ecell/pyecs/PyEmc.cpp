@@ -85,8 +85,9 @@ BOOST_PYTHON_MODULE( _emc )
   // this module uses Numeric module
   import_array();
 
-  signal( SIGSEGV, PyEcsSignalHandler );
-  signal( SIGFPE,  PyEcsSignalHandler );
+  // don't catch SEGV and FPE, as it makes debugging harder.
+  //  signal( SIGSEGV, PyEcsSignalHandler );
+  //  signal( SIGFPE,  PyEcsSignalHandler );
   signal( SIGINT,  PyEcsSignalHandler );
 
   register_EventCheckerSharedPtr_from_python();
