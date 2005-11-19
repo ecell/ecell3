@@ -79,12 +79,12 @@ namespace libecs
 				&Process::saveVariableReferenceList );
 
 	PROPERTYSLOT_SET_GET( Integer,       Priority );
-	PROPERTYSLOT_SET_GET( String,    StepperID );
+	PROPERTYSLOT_SET_GET( String,        StepperID );
 
-	PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real,     Activity );
-	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real,     MolarActivity );
+	PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real,    Activity );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE(     Real,    MolarActivity );
 
-	PROPERTYSLOT_GET_NO_LOAD_SAVE(     Integer,      IsContinuous );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE(     Integer, IsContinuous );
       }
 
     /** 
@@ -144,9 +144,15 @@ namespace libecs
     
     virtual void fire() = 0;
     
+    virtual GET_METHOD( Real, StepInterval )
+    {
+      return INF;
+    }
+
 
     /**
        This method returns true if this Process is compatible with 
+       continuous Steppers.
     */
 
     virtual const bool isContinuous() const
@@ -378,21 +384,6 @@ namespace libecs
     void setFlux( RealParam aVelocity )
     {
       setActivity( aVelocity );
-
-      /**
-      // Increase or decrease variables, skipping zero coefficients.
-      std::for_each( theVariableReferenceVector.begin(),
-		     theZeroVariableReferenceIterator,
-		     boost::bind2nd
-		     ( boost::mem_fun_ref
-		       ( &VariableReference::addFlux ), aVelocity ) );
-
-      std::for_each( thePositiveVariableReferenceIterator,
-		     theVariableReferenceVector.end(),
-		     boost::bind2nd
-		     ( boost::mem_fun_ref
-		       ( &VariableReference::addFlux ), aVelocity ) );
-      */
     }
 
     /**
@@ -411,6 +402,15 @@ namespace libecs
     */
 
     void declareUnidirectional();
+
+
+    /**
+       Check if this Process can affect on a given Process.
+       
+
+    */
+
+    const bool isDependentOn( const ProcessCptr aProcessPtr ) const;
 
 
   protected:

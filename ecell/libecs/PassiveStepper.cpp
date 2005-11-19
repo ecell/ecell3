@@ -50,9 +50,6 @@ namespace libecs
   void PassiveStepper::initialize()
   {
     Stepper::initialize();
-
-    // Make sure this never scheduled by the scheduler.
-    getModel()->reschedule( this );
   }
 
 

@@ -422,6 +422,7 @@ typedef const mytype & mytype ## Cref;
     
   //  DECLARE_TYPE( HighReal, Time );
   DECLARE_TYPE( Real, Time );
+  typedef Param<Time>::type TimeParam;
     
   //! Infinity.  Currently this is defined as INFINITY symbol of C99 standard.
   const Real INF( INFINITY );

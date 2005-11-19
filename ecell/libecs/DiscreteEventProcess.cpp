@@ -44,40 +44,6 @@ namespace libecs
     ; // do nothing
   }
 
-  const bool DiscreteEventProcess::
-  checkProcessDependency( DiscreteEventProcessPtr 
-			  anDiscreteEventProcessPtr ) const
-  {
-    VariableReferenceVectorCref 
-      aVariableReferenceVector( anDiscreteEventProcessPtr->
-				getVariableReferenceVector() );
-    
-    for( VariableReferenceVectorConstIterator 
-	   i( theVariableReferenceVector.begin() );
-	 i != theVariableReferenceVector.end() ; ++i )
-      {
-	VariableReferenceCref aVariableReference1(*i );
-	
-	VariableCptr const aVariable1( aVariableReference1.getVariable() );
-
-	for( VariableReferenceVectorConstIterator 
-	       j( aVariableReferenceVector.begin() );
-	     j != aVariableReferenceVector.end(); ++j )
-	  {
-	    VariableReferenceCref aVariableReference2( *j );
-	    VariableCptr const aVariable2( aVariableReference2.getVariable() );
-	    const Integer
-	      aCoefficient2( aVariableReference2.getCoefficient() );
-	    
-	    if( aVariable1 == aVariable2 && aCoefficient2 < 0 )
-	      {
-		return true;
-	      }
-	  }
-      }
-
-    return false;
-  }
 
 } // namespace libecs
 

@@ -66,6 +66,7 @@ namespace libecs
     Stepper::initialize();
 
     createInterpolants();
+
     theTaylorSeries.resize( boost::extents[ getStage() ][ getReadOnlyVariableOffset() ] );
 
     // should registerProcess be overrided?
@@ -207,9 +208,11 @@ namespace libecs
       }
   }
 
-  void DifferentialStepper::interrupt( StepperPtr const aCaller )
+  void DifferentialStepper::interrupt( TimeParam aTime )
   {
-    const Real aCallerTimeScale( aCaller->getTimeScale() );
+    const Real aCallerCurrentTime( aTime );
+
+    const Real aCallerTimeScale( getModel()->getLastStepper()->getTimeScale() );
     const Real aStepInterval( getStepInterval() );
 
     // If the step size of this is less than caller's timescale,
@@ -220,7 +223,6 @@ namespace libecs
       }
 
     const Real aCurrentTime( getCurrentTime() );
-    const Real aCallerCurrentTime( aCaller->getCurrentTime() );
 
     // aCallerTimeScale == 0 implies need for immediate reset
     if( aCallerTimeScale != 0.0 )
@@ -253,8 +255,6 @@ namespace libecs
     const Real aNewStepInterval( aCallerCurrentTime - aCurrentTime );
 
     loadStepInterval( aNewStepInterval );
-
-    getModel()->reschedule( this );
   }
 
 
@@ -287,8 +287,9 @@ namespace libecs
   {
     DifferentialStepper::initialize();
 
-    theEpsilonChecked = ( theEpsilonChecked 
-			  || ( theDependentStepperVector.size() > 1 ) );
+    //FIXME:!!
+    //    theEpsilonChecked = ( theEpsilonChecked 
+    //			  || ( theDependentStepperVector.size() > 1 ) );
   }
 
   void AdaptiveDifferentialStepper::step()

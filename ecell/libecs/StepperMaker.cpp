@@ -31,6 +31,7 @@
 #include "StepperMaker.hpp"
 
 #include "DiscreteTimeStepper.hpp"
+#include "DiscreteEventStepper.hpp"
 #include "PassiveStepper.hpp"
 
 namespace libecs
@@ -47,6 +48,7 @@ namespace libecs
 
   void StepperMaker::makeClassList()
   {
+    NewStepperModule( DiscreteEventStepper );
     NewStepperModule( DiscreteTimeStepper );
     NewStepperModule( PassiveStepper );
   }

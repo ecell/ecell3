@@ -35,7 +35,8 @@
 
 #include "libecs.hpp"
 
-#include "Scheduler.hpp"
+#include "EventScheduler.hpp"
+#include "StepperEvent.hpp"
 
 namespace libecs
 {
@@ -54,6 +55,8 @@ namespace libecs
   DECLARE_ASSOCVECTOR( String, StepperPtr, std::less< const String >,
 		       StepperMap ); 
 
+  
+
   /**
      Model class represents a simulation model.
 
@@ -63,6 +66,11 @@ namespace libecs
 
   class Model
   {
+
+  protected:
+
+    typedef EventScheduler<StepperEvent> StepperEventScheduler;
+    typedef StepperEventScheduler::EventIndex EventIndex;
 
   public:
 
@@ -98,6 +106,10 @@ namespace libecs
 
     void step()
     {
+      StepperEventCref aNextEvent( theScheduler.getTopEvent() );
+      theCurrentTime = aNextEvent.getTime();
+      theLastStepper = aNextEvent.getStepper();
+
       theScheduler.step();
     }
 
@@ -107,30 +119,9 @@ namespace libecs
 
      */
 
-    SchedulerEventCref const getNextEvent() const
+    const StepperEvent& getTopEvent() const
     {
-      return theScheduler.getNextEvent();
-    }
-
-
-    /**
-       Reschedule a Stepper.
-
-       This method changes the next scheduled time of the Stepper on the
-       Scheduler.   
-
-       The next time is calculated as Stepper::CurrentTime +
-       Stepper::StepInterval.   
-
-       If the next time is before Model::CurrentTime, this method
-       throws a SimulationError exception.
-
-       @param aStepperPtr a pointer to the Stepper to be rescheduled
-    */
-
-    void reschedule( StepperPtr const aStepperPtr )
-    {
-      theScheduler.reschedule( aStepperPtr );
+      return theScheduler.getTopEvent();
     }
 
 
@@ -142,7 +133,13 @@ namespace libecs
 
     const Real getCurrentTime() const
     {
-      return theScheduler.getCurrentTime();
+      return theCurrentTime;
+    }
+
+
+    const StepperPtr getLastStepper() const
+    {
+      return theLastStepper;
     }
 
     /**
@@ -267,6 +264,8 @@ namespace libecs
       return theLoggerBroker; 
     }
 
+    StepperEventScheduler&   getScheduler() { return theScheduler; }
+
     /// @internal
 
     StepperMakerRef     getStepperMaker()     { return theStepperMaker; }
@@ -303,7 +302,10 @@ namespace libecs
 
   private:
 
-    Scheduler           theScheduler;
+    Time                theCurrentTime;
+    StepperPtr          theLastStepper;
+
+    StepperEventScheduler theScheduler;
 
     LoggerBrokerRef     theLoggerBroker;
 

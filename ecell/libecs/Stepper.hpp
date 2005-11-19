@@ -92,7 +92,6 @@ namespace libecs
 	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Real,      CurrentTime );
 	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, ProcessList );
 	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, SystemList );
-	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, DependentStepperList );
 	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, ReadVariableList );
 	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, WriteVariableList );
 
@@ -240,7 +239,6 @@ namespace libecs
     GET_METHOD( Polymorph, ReadVariableList );
     GET_METHOD( Polymorph, ProcessList );
     GET_METHOD( Polymorph, SystemList );
-    GET_METHOD( Polymorph, DependentStepperList );
 
     SET_METHOD( String, RngSeed );
 
@@ -306,8 +304,7 @@ namespace libecs
     /**
        Remove a Process from this Stepper.
 
-       @note This method is not currently supported.  Calling this method
-       causes undefined behavior.
+       @note This method is not currently supported.
 
        @param aProcessPtr a pointer to a Process object
     */
@@ -440,7 +437,7 @@ namespace libecs
        @see getVariableVector()
     */
 
-    const VariableVector::size_type getReadWriteVariableOffset()
+    const VariableVector::size_type getReadWriteVariableOffset() const
     {
       return theReadWriteVariableOffset;
     }
@@ -449,15 +446,11 @@ namespace libecs
        @see getVariableVector()
     */
 
-    const VariableVector::size_type getReadOnlyVariableOffset()
+    const VariableVector::size_type getReadOnlyVariableOffset() const
     {
       return theReadOnlyVariableOffset;
     }
 
-    StepperVectorCref getDependentStepperVector() const
-    {
-      return theDependentStepperVector;
-    }
 
     RealVectorCref getValueBuffer() const
     {
@@ -469,9 +462,7 @@ namespace libecs
       getVariableIndex( VariableCptr const aVariable );
 
 
-    void dispatchInterruptions();
-
-    virtual void interrupt( StepperPtr const aCaller );
+    virtual void interrupt( TimeParam aTime );
 
     /**
 	Definition of the Stepper dependency:
@@ -487,7 +478,7 @@ namespace libecs
 	@see Process, VariableReference
     */
 
-    void updateDependentStepperVector();
+    virtual const bool isDependentOn( const StepperCptr aStepper );
 
     /** 
 	This method updates theIntegratedVariableVector.
@@ -583,8 +574,6 @@ namespace libecs
 
     ProcessVector             theProcessVector;
     ProcessVector::size_type  theDiscreteProcessOffset;
-
-    StepperVector             theDependentStepperVector;
 
     RealVector theValueBuffer;
 

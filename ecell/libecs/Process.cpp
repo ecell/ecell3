@@ -387,6 +387,40 @@ namespace libecs
 		     ( &VariableReference::setIsAccessor ), false ) );
   }
 
+  
+
+  const bool Process::isDependentOn( const ProcessCptr aProcessPtr ) const
+  {
+    VariableReferenceVectorCref 
+      aVariableReferenceVector( aProcessPtr->getVariableReferenceVector() );
+    
+    for( VariableReferenceVectorConstIterator 
+	   i( theVariableReferenceVector.begin() );
+	 i != theVariableReferenceVector.end() ; ++i )
+      {
+	VariableReferenceCref aVariableReference1( *i );
+
+	for( VariableReferenceVectorConstIterator 
+	       j( aVariableReferenceVector.begin() );
+	     j != aVariableReferenceVector.end(); ++j )
+	  {
+	    VariableReferenceCref aVariableReference2( *j );
+	    
+	    if( aVariableReference1.getVariable() == 
+		aVariableReference2.getVariable() && 
+		aVariableReference1.isAccessor() && 
+		aVariableReference2.isMutator() )
+
+	      {
+		return true;
+	      }
+	  }
+      }
+
+    return false;
+  }
+
+
   void Process::initialize()
   {
     ; // do nothing

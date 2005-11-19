@@ -304,8 +304,8 @@ bool ODE45Stepper::calculate()
   return true;
 }
 
-void ODE45Stepper::interrupt( StepperPtr aCaller )
+void ODE45Stepper::interrupt( TimeParam aTime )
 {
   isInterrupted = true;
-  AdaptiveDifferentialStepper::interrupt( aCaller );
+  AdaptiveDifferentialStepper::interrupt( aTime );
 }

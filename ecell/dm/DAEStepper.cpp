@@ -908,8 +908,8 @@ void DAEStepper::step()
     isInterrupted = false;
 }
 
-void DAEStepper::interrupt( StepperPtr aCaller )
+void DAEStepper::interrupt( TimeParam aTime )
 {
   isInterrupted = true;
-  DifferentialStepper::interrupt( aCaller );
+  DifferentialStepper::interrupt( aTime );
 }

@@ -58,7 +58,7 @@ public:
   virtual void step();
   virtual bool calculate();
 
-  virtual void interrupt( StepperPtr const aCaller );
+  virtual void interrupt( TimeParam aTime );
 
   virtual GET_METHOD( Integer, Order ) { return 4; }
   virtual GET_METHOD( Integer, Stage ) { return 5; }

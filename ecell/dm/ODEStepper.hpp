@@ -121,7 +121,7 @@ public:
   virtual void initialize();
   virtual void step();
   virtual bool calculate();
-  virtual void interrupt( StepperPtr const aCaller );
+  virtual void interrupt( TimeParam aTime );
 
   void initializeStepper();
 

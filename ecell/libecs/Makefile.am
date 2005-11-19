@@ -44,13 +44,11 @@ PassiveStepper.cpp\
 SystemStepper.cpp\
 Interpolant.cpp\
 Model.cpp\
-Scheduler.cpp\
 EntityType.cpp\
 System.cpp\
 Entity.cpp\
 Process.cpp\
 ContinuousProcess.cpp\
-DiscreteEventProcess.cpp\
 StepperMaker.cpp\
 SystemMaker.cpp\
 DataPoint.cpp\
@@ -81,6 +79,9 @@ ProcessMaker.hpp\
 Variable.hpp\
 VariableMaker.hpp\
 Stepper.hpp\
+ProcessEvent.hpp\
+StepperEvent.hpp\
+EventScheduler.hpp\
 DifferentialStepper.hpp\
 DiscreteTimeStepper.hpp\
 DiscreteEventStepper.hpp\
@@ -88,13 +89,11 @@ PassiveStepper.hpp\
 SystemStepper.hpp\
 Interpolant.hpp\
 Model.hpp\
-Scheduler.hpp\
 EntityType.hpp\
 System.hpp\
 Entity.hpp\
 Process.hpp\
 ContinuousProcess.hpp\
-DiscreteEventProcess.hpp\
 StepperMaker.hpp\
 SystemMaker.hpp\
 DataPoint.hpp\

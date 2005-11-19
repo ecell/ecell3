@@ -60,21 +60,22 @@ namespace libecs
       {
 	INHERIT_PROPERTIES( Process );
 
-	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, StepInterval );
+	//	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, StepInterval );
       }
 
     DiscreteEventProcess()
       :
-      theStepInterval( 0.0 ),
-      Index( -1 )
+      //      theStepInterval( 0.0 ),
+      //      Index( -1 )
       {
 	; // do nothing
       }
 
     virtual ~DiscreteEventProcess();
 
-    SIMPLE_SET_GET_METHOD( Integer, Index );
+    //    SIMPLE_SET_GET_METHOD( Integer, Index );
 
+    /*
     GET_METHOD( Real, StepInterval )
       {
 	return theStepInterval;
@@ -84,6 +85,7 @@ namespace libecs
       {
 	return getStepInterval();
       }
+    */
 
     virtual void initialize()
       {
@@ -92,23 +94,13 @@ namespace libecs
     
     // virtual void fire();
 
-    virtual void updateStepInterval() = 0;
+    virtual const Real calculateStepInterval() = 0;
 
-    /**
-       Check if this Process can affect on the given Process.
-
-       This dependency is 
-
-    */
-
-    virtual const bool 
-      checkProcessDependency( DiscreteEventProcessPtr 
-			      aDiscreteEventProcessPtr ) const;
 
   protected:
 
-    Real theStepInterval;
-    Integer Index;
+    //    Real theStepInterval;
+    // Integer Index;
 
   };
 

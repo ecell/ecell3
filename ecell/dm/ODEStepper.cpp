@@ -1024,8 +1024,8 @@ void ODEStepper::step()
     isInterrupted = false;
 }
 
-void ODEStepper::interrupt( StepperPtr aCaller )
+void ODEStepper::interrupt( TimeParam aTime )
 {
   isInterrupted = true;
-  AdaptiveDifferentialStepper::interrupt( aCaller );
+  AdaptiveDifferentialStepper::interrupt( aTime );
 }

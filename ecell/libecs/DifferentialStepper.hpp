@@ -308,7 +308,7 @@ namespace libecs
 
     virtual void reset();
 
-    virtual void interrupt( StepperPtr const aCaller );
+    virtual void interrupt( TimeParam aTime );
 
     virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
     {

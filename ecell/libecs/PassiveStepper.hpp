@@ -50,10 +50,14 @@ namespace libecs
      PassiveStepper steps only when triggered by incoming interruptions from
      other Steppers.
 
-     This Stepper never dispatch interruptions to other Steppers.
+     Note that this Stepper DOES dispatch interruptions to other Steppers
+     when it steps.
 
-     The step interval of this Stepper is fixed to infinity -- which 
-     means that this doesn't step spontaneously.
+     The step interval of this Stepper is usually infinity -- which
+     means that this doesn't step spontaneously.  However, when
+     interrupted by another Stepper, the step interval will be
+     set zero, and this Stepper will step immediately after the
+     currently stepping Stepper, at the same time point.
 
   */
 
@@ -76,15 +80,14 @@ namespace libecs
     virtual void step()
     {
       fireProcesses();
+
+      setStepInterval( INF );
     }
 
     virtual void interrupt( StepperPtr const aCaller )
     {
-      //      setCurrentTime( aCaller->getCurrentTime() );
-
-      integrate( aCaller->getCurrentTime() );
-      step();
-      log();
+      setCurrentTime( aCaller->getCurrentTime() );
+      setStepInterval( 0.0 );
     }
 
     virtual SET_METHOD( Real, StepInterval )
@@ -93,10 +96,6 @@ namespace libecs
       loadStepInterval( value );
     }
 
-    virtual void dispatchInterruptions()
-    {
-      ; // do nothing
-    }
 
   };
 

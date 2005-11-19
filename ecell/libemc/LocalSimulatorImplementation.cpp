@@ -464,7 +464,7 @@ namespace libemc
   const libecs::Polymorph LocalSimulatorImplementation::
   getNextEvent() const
   {
-    libecs::SchedulerEventCref aNextEvent( getModel().getNextEvent() );
+    libecs::StepperEventCref aNextEvent( getModel().getTopEvent() );
 
     PolymorphVector aVector;
     aVector.push_back( static_cast<Real>( aNextEvent.getTime() ) );
@@ -566,10 +566,13 @@ namespace libemc
     const libecs::Real aStopTime( getModel().getCurrentTime() + aDuration );
 
     // setup SystemStepper to step at aStopTime
+
+    //FIXME: dirty, ugly!
     StepperPtr aSystemStepper( getModel().getSystemStepper() );
     aSystemStepper->setCurrentTime( aStopTime );
     aSystemStepper->setStepInterval( 0.0 );
-    getModel().reschedule( aSystemStepper );
+
+    getModel().getScheduler().updateEvent( 0, aStopTime );
 
 
     if( typeid( *theEventChecker ) != 
@@ -594,7 +597,7 @@ namespace libemc
 	unsigned int aCounter( theEventCheckInterval );
 	do 
 	  {
-	    if( getModel().getNextEvent().getStepper() == aSystemStepper )
+	    if( getModel().getTopEvent().getStepper() == aSystemStepper )
 	      {
 		getModel().step();
 		stop();
@@ -619,7 +622,7 @@ namespace libemc
 
     do
       {
-	if( getModel().getNextEvent().getStepper() == aSystemStepper )
+	if( getModel().getTopEvent().getStepper() == aSystemStepper )
 	  {
 	    getModel().step();
 	    stop();

@@ -72,7 +72,6 @@ namespace libecs
   void SystemStepper::integrateVariablesRecursively( SystemPtr const aSystem,
 						     RealParam aTime )
   {
-    
     FOR_ALL( VariableMap, aSystem->getVariableMap() )
       {
 	VariablePtr const aVariable( i->second );
@@ -92,22 +91,7 @@ namespace libecs
 
   void SystemStepper::initialize()
   {
-    // all Steppers are dependent on this SystemStepper.
-    SystemStepper::updateDependentStepperVector();
-  }
-
-  void SystemStepper::updateDependentStepperVector()
-  {
-    theDependentStepperVector.clear();
-
-    StepperMapCref aStepperMap( getModel()->getStepperMap() );
-
-    FOR_ALL( StepperMap, aStepperMap )
-      {
-	StepperPtr aStepper( i->second );
-
-	theDependentStepperVector.push_back( aStepper );
-      }
+    ; // do nothing
   }
 
 

@@ -112,7 +112,7 @@ public:
   bool calculate();
   virtual void step();
 
-  virtual void interrupt( StepperPtr aCaller );
+  virtual void interrupt( TimeParam aTime );
 
   void checkDependency();
 

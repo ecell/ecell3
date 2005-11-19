@@ -39,6 +39,7 @@
 #include "Model.hpp"
 #include "FullID.hpp"
 #include "Logger.hpp"
+#include "SystemStepper.hpp"
 
 #include "Stepper.hpp"
 
@@ -300,64 +301,50 @@ namespace libecs
     std::sort( theLoggerVector.begin(), theLoggerVector.end() );
   }
 
-
-  void Stepper::updateDependentStepperVector()
+  const bool Stepper::isDependentOn( const StepperCptr aStepper )
   {
-    theDependentStepperVector.clear();
-
-    StepperMapCref aStepperMap( getModel()->getStepperMap() );
-
-    for( StepperMapConstIterator i( aStepperMap.begin() );
-	 i != aStepperMap.end(); ++i )
+    // Every Stepper depends on the SystemStepper.
+    // FIXME: UGLY -- reimplement SystemStepper in another way
+    if( typeid( *aStepper ) == typeid( SystemStepper ) )
       {
-	StepperPtr aStepperPtr( i->second );
-
-	// exclude this
-	if( aStepperPtr == this )
-	  {
-	    continue;
-	  }
-
-	VariableVectorCref aTargetVector( aStepperPtr->getVariableVector() );
-
-	VariableVectorConstIterator aReadWriteTargetVariableIterator
-	  ( aTargetVector.begin() + 
-	    aStepperPtr->getReadWriteVariableOffset() );
-
-	VariableVectorConstIterator aReadOnlyTargetVariableIterator
-	  ( aTargetVector.begin() +
-	    aStepperPtr->getReadOnlyVariableOffset() );
-
-	// For efficiency, binary_search should be done for supposedly longer
-	// vector, and linear iteration for supposedly shorter vector.
-	//
-
-	// if one Variable in this::readlist appears in the target::write list
-	for( VariableVector::size_type c( 0 ); 
-	     c != theReadOnlyVariableOffset; ++c )
-	  {
-	    VariablePtr const aVariablePtr( theVariableVector[ c ] );
-
-	    // search in target::readwrite and target::read list.
-	    if( std::binary_search( aReadWriteTargetVariableIterator,
-				    aReadOnlyTargetVariableIterator,
-				    aVariablePtr ) ||
-		std::binary_search( aReadOnlyTargetVariableIterator,
-				    aTargetVector.end(),
-				    aVariablePtr ) )
-	      {
-		theDependentStepperVector.push_back( aStepperPtr );
-		break;
-	      }
-	  }
-
+	return true;
       }
 
-    // optimization: sort by memory address.
-    std::sort( theDependentStepperVector.begin(), 
-	       theDependentStepperVector.end() );
-
+    VariableVectorCref aTargetVector( aStepper->getVariableVector() );
+    
+    VariableVectorConstIterator aReadWriteTargetVariableIterator
+      ( aTargetVector.begin() + 
+	aStepper->getReadWriteVariableOffset() );
+    
+    VariableVectorConstIterator aReadOnlyTargetVariableIterator
+      ( aTargetVector.begin() +
+	aStepper->getReadOnlyVariableOffset() );
+    
+    // For efficiency, binary_search should be done for supposedly longer
+    // vector, and linear iteration for supposedly shorter vector.
+    //
+    
+    // if one Variable in this::readlist appears in the target::write list
+    for( VariableVector::size_type c( 0 ); 
+	 c != theReadOnlyVariableOffset; ++c )
+      {
+	VariablePtr const aVariablePtr( theVariableVector[ c ] );
+	
+	// search in target::readwrite and target::read list.
+	if( std::binary_search( aReadWriteTargetVariableIterator,
+				aReadOnlyTargetVariableIterator,
+				aVariablePtr ) ||
+	    std::binary_search( aReadOnlyTargetVariableIterator,
+				aTargetVector.end(),
+				aVariablePtr ) )
+	  {
+	    return true;
+	  }
+      }
+    
+    return false;
   }
+
 
   GET_METHOD_DEF( Polymorph, SystemList, Stepper )
   {
@@ -378,6 +365,7 @@ namespace libecs
   }
 
 
+  /*
   GET_METHOD_DEF( Polymorph, DependentStepperList, Stepper )
   {
     PolymorphVector aVector;
@@ -393,7 +381,7 @@ namespace libecs
 
     return aVector;
   }
-
+  */
 
   void Stepper::registerSystem( SystemPtr aSystemPtr )
   { 
@@ -581,15 +569,7 @@ namespace libecs
   }
 
 
-  void Stepper::dispatchInterruptions()
-  {
-    FOR_ALL( StepperVector, theDependentStepperVector )
-      {
-	(*i)->interrupt( this );
-      }
-  }
-
-  void Stepper::interrupt( StepperPtr const )
+  void Stepper::interrupt( TimeParam aTime )
   {
     ; // do nothing
   }

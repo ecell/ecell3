@@ -46,7 +46,8 @@ namespace libecs
   ////////////////////////// Model
 
   Model::Model()
-    : 
+    :
+    theCurrentTime( 0.0 ),
     theLoggerBroker(     *new LoggerBroker( *this ) ),
     theRootSystemPtr(    NULL ),
     theSystemStepperPtr(  new SystemStepper ),
@@ -67,8 +68,11 @@ namespace libecs
     // initialize theSystemStepper
     theSystemStepperPtr->setModel( this );
     theSystemStepperPtr->setID( "___SYSTEM" );
-    // don't insert this to the stepper map.
-    theScheduler.registerStepper( theSystemStepperPtr );
+    theScheduler.
+      addEvent( StepperEvent( getCurrentTime() + theSystemStepperPtr
+			      ->getStepInterval(), theSystemStepperPtr ) );
+
+    theLastStepper = theSystemStepperPtr;
   }
 
   Model::~Model()
@@ -251,7 +255,9 @@ namespace libecs
 
     theStepperMap.insert( std::make_pair( anID, aStepper ) );
 
-    theScheduler.registerStepper( aStepper );
+    theScheduler.
+      addEvent( StepperEvent( getCurrentTime() + aStepper->getStepInterval(),
+			      aStepper ) );
   }
 
 
@@ -331,11 +337,24 @@ namespace libecs
     
     FOR_ALL_SECOND( StepperMap, theStepperMap, initializeProcesses );
     FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
-    FOR_ALL_SECOND( StepperMap, theStepperMap, updateDependentStepperVector );
+    theSystemStepperPtr->initialize();
+
+
     FOR_ALL_SECOND( StepperMap, theStepperMap, 
 		    updateIntegratedVariableVector );
 
-    theSystemStepperPtr->initialize();
+    theScheduler.updateEventDependency();
+    //    theScheduler.updateAllEvents( getCurrentTime() );
+
+    for( EventIndex c( 0 ); c != theScheduler.getSize(); ++c )
+      {
+	theScheduler.getEvent(c).reschedule();
+      }
+
+
+
+
+
 
   }
 

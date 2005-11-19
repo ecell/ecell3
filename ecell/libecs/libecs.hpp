@@ -113,7 +113,7 @@ namespace libecs
   DECLARE_CLASS( Interpolant );
   DECLARE_CLASS( Model );
   DECLARE_CLASS( Scheduler );
-  DECLARE_CLASS( SchedulerEvent );
+  DECLARE_CLASS( StepperEvent );
   DECLARE_CLASS( StepperMaker );
   DECLARE_CLASS( Variable );
   DECLARE_CLASS( VariableMaker );

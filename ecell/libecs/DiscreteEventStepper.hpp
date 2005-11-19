@@ -33,8 +33,11 @@
 
 #include "libecs.hpp"
 #include "Stepper.hpp"
-#include "DynamicPriorityQueue.hpp"
-#include "DiscreteEventProcess.hpp"
+#include "Process.hpp"
+
+#include "EventScheduler.hpp"
+#include "ProcessEvent.hpp"
+
 
 namespace libecs
 {
@@ -54,64 +57,20 @@ namespace libecs
 
   protected:
 
-    DECLARE_CLASS( StepperEvent );
-    DECLARE_TYPE( DynamicPriorityQueue<StepperEvent>, PriorityQueue );
+    typedef EventScheduler<ProcessEvent> ProcessEventScheduler;
+    typedef ProcessEventScheduler::EventIndex EventIndex;
 
-    // A pair of (reaction index, time) for inclusion in the priority queue.
-    class StepperEvent
-    {
-    public:
 
-      StepperEvent()
-      {
-	; // do nothing
-      }
-
-      StepperEvent( RealParam aTime, DiscreteEventProcessPtr aProcess )
-	:
-	theTime( aTime ),
-	theProcess( aProcess )
-      {
-	; // do nothing
-      }
-
-      const Real getTime() const
-      {
-	return theTime;
-      }
-
-      DiscreteEventProcessPtr const getProcess() const
-      {
-	return theProcess;
-      }
-
-      const bool operator< ( StepperEventCref rhs ) const
-      {
-	return theTime < rhs.theTime;
-      }
-
-      const bool operator!= ( StepperEventCref rhs ) const
-      {
-	return theTime != rhs.theTime || 
-	  theProcess != rhs.theProcess;
-      }
-
-    private:
-
-      Real       theTime;
-      DiscreteEventProcessPtr theProcess;
-
-    };
 
   public:
 
-    LIBECS_DM_OBJECT_ABSTRACT( DiscreteEventStepper )
+    LIBECS_DM_OBJECT( DiscreteEventStepper, Stepper )
       {
 	INHERIT_PROPERTIES( Stepper );
 
 	PROPERTYSLOT_SET_GET( Real, Tolerance );
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TimeScale );
-	PROPERTYSLOT_GET_NO_LOAD_SAVE( String, LastProcessName );
+	PROPERTYSLOT_GET_NO_LOAD_SAVE( String, LastProcess );
       }
 
     DiscreteEventStepper();
@@ -119,7 +78,7 @@ namespace libecs
 
     virtual void initialize();
     virtual void step();
-    virtual void interrupt( StepperPtr const aCaller );
+    virtual void interrupt( TimeParam aTime );
     virtual void log();
 
 
@@ -135,32 +94,28 @@ namespace libecs
     
     virtual GET_METHOD( Real, TimeScale )
       {
-	return theTimeScale;
+	//	return theTimeScale;  temporarily disabled
+	return 0.0;
       }
 
-    GET_METHOD( String, LastProcessName );
+    GET_METHOD( String, LastProcess );
 
-    DiscreteEventProcessPtr const getLastProcess() const
+    ProcessVectorCref getProcessVector() const
       {
-	return theLastProcess;
-      }
-
-    DiscreteEventProcessVectorCref getDiscreteEventProcessVector() const
-      {
-	return theDiscreteEventProcessVector;
+	return theProcessVector;
       }
 
   protected:
 
-    DiscreteEventProcessVector theDiscreteEventProcessVector;
-    PriorityQueue thePriorityQueue;
+    ProcessEventScheduler  theScheduler;
 
-    Real            theTimeScale;
+    // temporarily disabled
+    //    Real            theTimeScale;
     Real            theTolerance;
 
-    DiscreteEventProcessPtr    theLastProcess;
+    EventIndex      theLastEventIndex;
 
-    std::vector<DiscreteEventProcessVector> theDependentProcessVector;
+
 
   };
 

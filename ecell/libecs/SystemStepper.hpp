@@ -89,10 +89,6 @@ namespace libecs
 
   protected:
 
-    // overriding the method in Stepper.
-
-    void updateDependentStepperVector();
-
     void integrateVariablesRecursively( SystemPtr const aSystem,
 					RealParam aTime );
 

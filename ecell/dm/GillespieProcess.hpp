@@ -6,7 +6,7 @@
 #include <gsl/gsl_rng.h>
 
 #include <libecs/libecs.hpp>
-#include <libecs/DiscreteEventProcess.hpp>
+#include <libecs/Process.hpp>
 #include <libecs/Stepper.hpp>
 #include <libecs/FullID.hpp>
 #include <libecs/MethodProxy.hpp>
@@ -18,7 +18,7 @@ USE_LIBECS;
      GillespieProcess 
 ***************************************************************************/
 
-LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
+LIBECS_DM_CLASS( GillespieProcess, Process )
 {
   
   typedef MethodProxy<GillespieProcess,Real> RealMethodProxy;
@@ -28,7 +28,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
   
   LIBECS_DM_OBJECT( GillespieProcess, Process )
     {
-      INHERIT_PROPERTIES( DiscreteEventProcess );
+      INHERIT_PROPERTIES( Process );
       
       PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, c );
       PROPERTYSLOT_SET_GET( Real, k );
@@ -107,15 +107,17 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
     return theOrder;
   }
 
+  /*
   virtual GET_METHOD( Real, TimeScale )
   {
     return theGetMinValueMethodPtr( this ) * getStepInterval();
   }
+  */
 
-
-  virtual void updateStepInterval()
+  //  virtual void updateStepInterval()
+  virtual GET_METHOD( Real, StepInterval )
   {
-    theStepInterval = getPropensity_R() * 
+    return getPropensity_R() * 
       ( - log( gsl_rng_uniform_pos( getStepper()->getRng() ) ) );
   }
 
@@ -123,7 +125,7 @@ LIBECS_DM_CLASS( GillespieProcess, DiscreteEventProcess )
 
   virtual void initialize()
   {
-    DiscreteEventProcess::initialize();
+    Process::initialize();
     declareUnidirectional();
   
     calculateOrder();

@@ -42,48 +42,105 @@ struct PtrGreater
 };
 
 
-template < typename key_type >
+template < typename Item >
 class DynamicPriorityQueue
 {
   
 
 public:
 
-  typedef std::vector< key_type >    KeyVector;
-  typedef std::vector< key_type* >   KeyPtrVector;
+  typedef std::vector< Item >    ItemVector;
+  typedef std::vector< Item* >   ItemPtrVector;
 
-  typedef typename KeyVector::size_type       size_type;
-  typedef typename KeyVector::difference_type index_type;
+  typedef typename ItemVector::size_type       size_type;
+  typedef typename ItemVector::difference_type Index;
 
-  typedef std::vector< index_type >  IndexVector;
+  typedef std::vector< Index >  IndexVector;
 
 
   DynamicPriorityQueue();
   
-  inline void changeOneKey( index_type aPosition, key_type aKey );
+  inline void move( const Index anIndex );
 
-  inline void changeTopKey( key_type aKey );
+  inline void moveTop();
 
-  index_type topIndex() const 
+  const Index getTopIndex() const 
   {
-    return( c.front() - theFirstKeyPtr );
+    return( getItemIndex( theItemPtrVector.front() ) );
   }
 
-  const key_type& top() const
+  const Item& getTopItem() const
   {
-    return *( c.front() );
+    return *( theItemPtrVector.front() );
   }
 
-  inline void pop();
-  inline void push( key_type aKey );
-
-
-  bool empty() const
+  Item& getTopItem()
   {
-    return ( size() == 0 );
+    return *( theItemPtrVector.front() );
   }
 
-  size_type size() const
+  const Item& getItem( const Index anIndex ) const
+  {
+    return theItemVector[ anIndex ];
+  }
+
+  Item& getItem( const Index anIndex )
+  {
+    return theItemVector[ anIndex ];
+  }
+
+  void popItem();
+  const Index pushItem( const Item& anItem )
+  {
+    const Index anOldSize( theSize );
+    
+    ++theSize;
+    
+    if( getSize() > theItemPtrVector.size() )
+      {
+	theItemVector.resize( getSize() );
+	theItemPtrVector.resize( getSize() );
+	theIndexVector.resize( getSize() );
+	
+	theItemVector.push_back( anItem );
+
+	for( Index i( 0 ); i < getSize(); ++i )
+	  {
+	    theItemPtrVector[i] = &theItemVector[i];
+	  }
+
+	*theItemPtrVector[ anOldSize ] = anItem;
+ 
+	make_heap( theItemPtrVector.begin(), theItemPtrVector.end(), comp );
+
+	for( Index i( 0 ); i < getSize(); ++i )
+	  {
+	    theIndexVector[ getItemIndex( theItemPtrVector[i] ) ] = i;
+	  }
+      }
+    else
+      {
+	*theItemPtrVector[ anOldSize ] = anItem;  
+	if( comp( &anItem, theItemPtrVector[ anOldSize ] ) )
+	  {
+	    moveDown( anOldSize );
+	  }
+	else
+	  {
+	    moveUp( anOldSize ); 
+	  }
+      }
+
+    return anOldSize;
+  }
+
+
+  bool isEmpty() const
+  {
+    return ( getSize() == 0 );
+  }
+
+  size_type getSize() const
   {
     return theSize;
   }
@@ -91,22 +148,44 @@ public:
 
   void clear();
 
+  void moveUp( const Index anIndex )
+  {
+    const Index aPosition( theIndexVector[anIndex] );
+    moveUpPos( aPosition );
+  }
+
+
+  void moveDown( const Index anIndex )
+  {
+    const Index aPosition( theIndexVector[anIndex] );
+    moveDownPos( aPosition );
+  }
+
 private:
 
-  inline void goUp( index_type );
-  inline void goDown( index_type );
+  inline void moveUpPos( const Index aPosition );
+  inline void moveDownPos( const Index aPosition );
 
+  /*
+    This method returns the index of the given pointer to Item.
+
+    The pointer must point to a valid item on theItemVector.
+    Returned index is that of theItemVector.
+  */
+  const Index getItemIndex( const Item * const ItemPtr ) const
+  {
+    return ItemPtr - theItemVector.begin().base();
+  }
 
 private:
 
-  IndexVector  theIndices;
-  KeyVector    v;
-  KeyPtrVector c;
+  ItemVector    theItemVector;
+  ItemPtrVector theItemPtrVector;
+  IndexVector   theIndexVector;
 
-  key_type*  theFirstKeyPtr;
-  index_type theSize;
+  Index    theSize;
 
-  PtrGreater< key_type* > comp;
+  PtrGreater< const Item* const > comp;
 
 };
 
@@ -114,8 +193,8 @@ private:
 
 // begin implementation
 
-template < typename key_type >
-DynamicPriorityQueue< key_type >::DynamicPriorityQueue()
+template < typename Item >
+DynamicPriorityQueue< Item >::DynamicPriorityQueue()
   :
   theSize( 0 )
 {
@@ -123,223 +202,188 @@ DynamicPriorityQueue< key_type >::DynamicPriorityQueue()
 }
 
 
-template < typename key_type >
-void DynamicPriorityQueue< key_type >::clear()
+template < typename Item >
+void DynamicPriorityQueue< Item >::clear()
 {
-  theIndices.clear();
-  c.clear();
-  v.clear();
+  theItemVector.clear();
+  theItemPtrVector.clear();
+  theIndexVector.clear();
   
   theSize = 0;
   
-  theFirstKeyPtr = 0;
 }
 
 
-template < typename key_type >
-void DynamicPriorityQueue< key_type >::
-changeOneKey( index_type aPosition, key_type aNewKey )
+template < typename Item >
+void DynamicPriorityQueue< Item >::
+move( Index anIndex )
 {
-  const index_type anIndex( theIndices[aPosition] );
-  // assert( anIndex < size() );
+  //  assert( aPosition < getSize() );
+  const Index aPosition( theIndexVector[anIndex] );
 
-  // this if is unneeded:
-  //   if( *c[anIndex] != aNewKey )
-  // because the new key is always assumed to be different.
+  moveDownPos( aPosition );
 
-  key_type* aCurrentKey( c[anIndex] );
-
-  if( comp( &aNewKey, aCurrentKey ) )
+  // If above moveDown() didn't move this item,
+  // then we need to try moveUp() too.  If moveDown()
+  // did work, nothing should be done.
+  if( theIndexVector[anIndex] == aPosition )
     {
-      *aCurrentKey = aNewKey;
-      goDown( anIndex );
-    }
-  else
-    {
-      *aCurrentKey = aNewKey;
-      goUp( anIndex );
+      moveUpPos( aPosition );
     }
 }
 
 
-template < typename key_type >
-void DynamicPriorityQueue<key_type>::goUp( index_type anIndex )
+template < typename Item >
+void DynamicPriorityQueue<Item>::moveUpPos( Index aPosition )
 {
-  key_type* const aKey( c[anIndex] );
-  index_type aPredecessor( anIndex );
+  Item* const anItem( theItemPtrVector[aPosition] );
+  Index aPredecessor( ( aPosition - 1 ) / 2 );
 
+  // first pass: do nothing if move up doesn't occur.
+  Item* aPredItem( theItemPtrVector[aPredecessor] );
+  if( aPredecessor == aPosition || comp( anItem, aPredItem ) )
+    {
+      return;
+    }
+
+  // main loop
   while( 1 )
     {
+      theItemPtrVector[aPosition] = aPredItem;
+      theIndexVector[ getItemIndex( aPredItem ) ] = aPosition;
+      aPosition = aPredecessor;
+      
       aPredecessor = ( aPredecessor - 1 ) / 2;
-      // with gcc 3.2, this form yields better assembly than:
-      // --aPredecessor /= 2;
 
-      key_type* const aPredKey( c[aPredecessor] );
+      aPredItem = theItemPtrVector[aPredecessor];
 
-      if( aPredecessor != anIndex && comp( aPredKey, aKey ) )
-	{
-	  c[anIndex] = aPredKey;
-	  theIndices[ aPredKey - theFirstKeyPtr ] = anIndex;
-	  anIndex = aPredecessor;
-	}
-      else
+      if( aPredecessor == aPosition || comp( anItem, aPredItem ) )
 	{
 	  break;
 	}
     }
 
-  c[anIndex] = aKey;
-  theIndices[ aKey - theFirstKeyPtr ] = anIndex;
+  theItemPtrVector[aPosition] = anItem;
+  theIndexVector[ getItemIndex( anItem ) ] = aPosition;
 }
 
-
 // this is an optimized version.
-template < typename key_type >
-void DynamicPriorityQueue< key_type >::goDown( index_type anIndex )
+template < typename Item >
+void DynamicPriorityQueue< Item >::moveDownPos( Index aPosition )
 {
-  key_type* const aKey( c[anIndex] );
-  index_type aSuccessor( anIndex );
+  Item* const anItem( theItemPtrVector[aPosition] );
+  Index aSuccessor( aPosition * 2 + 1);
+ 
 
-  while( 1 )
+  // first pass: simply return doing nothing if move down doesn't occur.
+  if( aSuccessor < getSize() - 1 )
     {
-      // find the next successor
-      aSuccessor *= 2;
-      ++aSuccessor;
-      // with gcc 3.2, this code results in better code than:
-      // aSuccessor = aSuccessor * 2 + 1;
-
-      if( aSuccessor < size() - 1 && 
-	  comp( c[aSuccessor], c[ aSuccessor + 1 ] ) )
+      if( comp( theItemPtrVector[ aSuccessor ], 
+		theItemPtrVector[ aSuccessor + 1 ] ) )
 	{
 	  ++aSuccessor;
 	}
+    }
+  else if( aSuccessor >= getSize() )
+    {
+      return;
+    }
+  
+  Item* aSuccItem( theItemPtrVector[ aSuccessor ] );
+  if( comp( aSuccItem, anItem ) )
+    {
+      return;    // if the going down does not occur, return doing nothing.
+    }
 
-      key_type* const aSuccKey( c[aSuccessor] );
+  // main loop
+  while( 1 )
+    {
+      // bring up the successor
+      theItemPtrVector[aPosition] = aSuccItem;
+      theIndexVector[ getItemIndex( aSuccItem ) ] = aPosition;
+      aPosition = aSuccessor;
+
+      // the next successor
+      aSuccessor = aSuccessor * 2 + 1;
+
+      if( aSuccessor < getSize() - 1 )
+	{
+	  if( comp( theItemPtrVector[ aSuccessor ], 
+		    theItemPtrVector[ aSuccessor + 1 ] ) )
+	    {
+	      ++aSuccessor;
+	    }
+	}
+      else if( aSuccessor >= getSize() )
+	{
+	  break;
+	}
+
+      aSuccItem = theItemPtrVector[ aSuccessor ];
 
       // if the going down is finished, break.
-      //      if( ! ( aSuccessor < size() && comp( aKey, aSuccKey ) ) )
-      if( aSuccessor < size() && comp( aKey, aSuccKey ) )
-	{
-	  // go up the successor
-	  c[anIndex] = aSuccKey;
-	  theIndices[ aSuccKey - theFirstKeyPtr ] = anIndex;
-
-	  anIndex = aSuccessor;
-	}
-      else
+      if( comp( aSuccItem, anItem ) )
 	{
 	  break;
 	}
     }
 
-  c[anIndex] = aKey;
-  theIndices[ aKey - theFirstKeyPtr ] = anIndex;
+  theItemPtrVector[aPosition] = anItem;
+  theIndexVector[ getItemIndex( anItem ) ] = aPosition;
 }
 
-/*
-template < typename key_type >
-void DynamicPriorityQueue< key_type >::goDown( index_type anIndex )
-{
-  index_type aSuccessor( anIndex * 2 + 1 );
 
-  if( aSuccessor < size() - 1 && comp( c[aSuccessor], c[aSuccessor + 1] ) )
+/* original version
+template < typename Item >
+void DynamicPriorityQueue< Item >::moveDown( Index anIndex )
+{
+  Index aSuccessor( anIndex * 2 + 1 );
+
+  if( aSuccessor < getSize() - 1 && comp( theItemPtrVector[aSuccessor], theItemPtrVector[aSuccessor + 1] ) )
     {
       ++aSuccessor;
     }
 
-  key_type* aKey( c[anIndex] );
+  Item* anItem( theItemPtrVector[anIndex] );
   
-  while( aSuccessor < size() && comp( aKey, c[aSuccessor] ) )
+  while( aSuccessor < getSize() && comp( anItem, theItemPtrVector[aSuccessor] ) )
     {
-      c[anIndex] = c[aSuccessor];
-      theIndices[ c[anIndex] - theFirstKeyPtr ] = anIndex;
+      theItemPtrVector[anIndex] = theItemPtrVector[aSuccessor];
+      theIndexVector[ theItemPtrVector[anIndex] - theFirstItemPtr ] = anIndex;
       anIndex = aSuccessor;
       aSuccessor = anIndex * 2 + 1;
 
-      if( aSuccessor < size() - 1 && 
-	  comp( c[aSuccessor], c[ aSuccessor + 1 ] ) )
+      if( aSuccessor < getSize() - 1 && 
+	  comp( theItemPtrVector[aSuccessor], theItemPtrVector[ aSuccessor + 1 ] ) )
 	{
 	  ++aSuccessor;
 	}
     }
 
-  c[anIndex] = aKey;
-  theIndices[ c[anIndex] - theFirstKeyPtr ] = anIndex;
+  theItemPtrVector[anIndex] = anItem;
+  theIndexVector[ theItemPtrVector[anIndex] - theFirstItemPtr ] = anIndex;
 }
 */
 
-template < typename key_type >
-void DynamicPriorityQueue< key_type >::pop()
+template < typename Item >
+void DynamicPriorityQueue< Item >::popItem()
 {
-  key_type* aKey( c[0] );
+  Item* anItem( theItemPtrVector[0] );
   --theSize;
-  c[0] = c[size()];
-  c[size()] = aKey;
+  theItemPtrVector[0] = theItemPtrVector[getSize()];
+  theItemPtrVector[getSize()] = anItem;
   
-  theIndices[ c[0] - theFirstKeyPtr ] = 0;
+  theIndexVector[ getItemIndex( theItemPtrVector[0] ) ] = 0;
   
-  goDown( 0 );
+  moveDown( 0 );
 }
 
-template < typename key_type >
-void DynamicPriorityQueue< key_type >::push( key_type aKey )
+template < typename Item >
+void DynamicPriorityQueue< Item >::moveTop()
 {
-  const index_type anOldSize( theSize );
+  Index aPosition( theIndexVector[ getTopIndex() ] );
 
-  ++theSize;
-
-  if( size() > c.size() )
-    {
-      c.resize( size() );
-      v.resize( size() );
-      theIndices.resize( size() );
-
-      v.push_back( aKey );
-
-      theFirstKeyPtr = v.begin().base();
-    
-      for( index_type i( 0 ); i < size(); ++i )
-	{
-	  c[i] = &v[i];
-	}
-
-      *c[ anOldSize ] = aKey;
- 
-      make_heap( c.begin(), c.end(), comp );
-
-      for( index_type i( 0 ); i < size(); ++i )
-	{
-	  theIndices[ c[i] - theFirstKeyPtr ] = i;
-	}
-    }
-  else
-    {
-      *c[ anOldSize ] = aKey;  
-      if( comp( &aKey, c[ anOldSize ] ) )
-	{
-	  goDown( anOldSize );
-	}
-      else
-	{
-	  goUp( anOldSize ); 
-	}
-    }
-}
-
-
-template < typename key_type >
-void DynamicPriorityQueue< key_type >::changeTopKey( key_type aNewKey )
-{
-  index_type anIndex( theIndices[ topIndex() ] );
-
-  // skip this if:
-  // if( *c[anIndex] != aNewKey )
-  // because the new key would be always different.
-
-  *c[anIndex] = aNewKey;
-  goDown( anIndex );
-
-  //  changeOneKey(topIndex(),k);
+  moveDownPos( aPosition );
 }
 
 

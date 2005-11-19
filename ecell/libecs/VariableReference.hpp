@@ -269,7 +269,7 @@ namespace libecs
 
     void addValue( RealParam aValue ) const
     {
-      theVariablePtr->addValue( aValue );
+      theVariablePtr->addValue( aValue * theCoefficient );
     }
 
     const Real getMolarConc() const
