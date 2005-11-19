@@ -25,7 +25,7 @@
 //END_HEADER
 //
 // authors:
-// Kouichi Takahashi <shafi@e-cell.org>
+// Koichi Takahashi <shafi@e-cell.org>
 // Nayuta Iwata
 //
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.

@@ -22,7 +22,7 @@ License along with E-Cell -- see the file COPYING.
 If not, write to the Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-Design: Kouichi Takahashi <shafi@e-cell.org>
+Design: Koichi Takahashi <shafi@e-cell.org>
 Programming: Masahiro Sugimoto <msugi@sfc.keio.ac.jp>
 
  E-Cell Project, Lab. for Bioinformatics, Keio University.

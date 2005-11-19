@@ -26,7 +26,7 @@
 #END_HEADER
 #
 #'Design: Kenta Hashimoto <kem@e-cell.org>',
-#'Design and application Framework: Kouichi Takahashi <shafi@e-cell.org>',
+#'Design and application Framework: Koichi Takahashi <shafi@e-cell.org>',
 #'Programming: Yuki Fujita',
 #             'Yoshiya Matsubara',
 #             'Yuusuke Saito'

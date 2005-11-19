@@ -27,7 +27,7 @@
 //END_HEADER
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //	This file is a part of E-CELL2.
-//	Original codes of E-CELL1 core were written by Kouichi TAKAHASHI
+//	Original codes of E-CELL1 core were written by Koichi TAKAHASHI
 //	<shafi@e-cell.org>.
 //	Some codes of E-CELL2 core are minor changed from E-CELL1
 //	by Naota ISHIKAWA <naota@mag.keio.ac.jp>.
@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.2  2005/11/19 09:23:59  shafi
+ :	Kouichi -> Koichi
+ :
  :	Revision 1.1  2002/04/30 11:21:53  shafi
  :	gabor's vvector logger patch + modifications by shafi
- :
+ :	
  :	Revision 1.5  2002/01/15 14:53:43  ishikawa
  :	osif_add_path()
  :	

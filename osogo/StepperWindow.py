@@ -27,7 +27,7 @@
 #END_HEADER
 #
 #'Design: Kenta Hashimoto <kem@e-cell.org>',
-#'Design and application Framework: Kouichi Takahashi <shafi@e-cell.org>',
+#'Design and application Framework: Koichi Takahashi <shafi@e-cell.org>',
 #'Programming: Masahiro Sugimoto <sugi@bioinformatics.org>' at
 # E-Cell Project, Lab. for Bioinformatics, Keio University.
 #

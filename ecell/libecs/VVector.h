@@ -27,7 +27,7 @@
 //END_HEADER
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //	This file is a part of E-CELL2.
-//	Original codes of E-CELL1 core were written by Kouichi TAKAHASHI
+//	Original codes of E-CELL1 core were written by Koichi TAKAHASHI
 //	<shafi@e-cell.org>.
 //	Some codes of E-CELL2 core are minor changed from E-CELL1
 //	by Naota ISHIKAWA <naota@mag.keio.ac.jp>.
@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.21  2005/11/19 09:23:59  shafi
+ :	Kouichi -> Koichi
+ :
  :	Revision 1.20  2005/04/29 01:38:50  shafi
  :	for gcc4.  more necessary.
- :
+ :	
  :	Revision 1.19  2004/07/29 03:52:02  bgabor
  :	Fixing bug [ 994313 ] vvector should close files after read and write.
  :	

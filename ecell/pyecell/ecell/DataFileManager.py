@@ -26,7 +26,7 @@
 # 
 #END_HEADER
 #
-# Design: Kouichi Takahashi <shafi@e-cell.org>
+# Design: Koichi Takahashi <shafi@e-cell.org>
 # Design and Programming: Masahiro Sugimoto <sugi@bioinformatics.org> at
 # E-Cell Project, Lab. for Bioinformatics, Keio University.
 #

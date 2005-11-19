@@ -24,8 +24,8 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
      
-  28/4/05 Modified based on antiauto for ecell3 project.  (Kouichi Takahashi)
-  24/5/05 Simplified.  Now runs just autogen and configure. (Kouichi Takahashi)
+  28/4/05 Modified based on antiauto for ecell3 project.  (Koichi Takahashi)
+  24/5/05 Simplified.  Now runs just autogen and configure. (Koichi Takahashi)
 
   =======================================================================
 -->

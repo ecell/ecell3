@@ -6,12 +6,12 @@ E-CELL Simulation Environment Version 3 authors
 
 == Architect ==
 
-* Kouichi Takahashi <shafi@e-cell.org>
+* Koichi Takahashi <shafi@e-cell.org>
 
 
 == libecs, libemc & pyecs ==
 
-* Kouichi Takahashi
+* Koichi Takahashi
 * Masayuki Okayama
 * Eiichiro Adachi 
 * Masaaki Kawata
@@ -19,7 +19,7 @@ E-CELL Simulation Environment Version 3 authors
 
 == dmtool ==
 
-* Kouichi Takahashi
+* Koichi Takahashi
 * Tomoya Kitayama
 
 
@@ -29,12 +29,12 @@ E-CELL Simulation Environment Version 3 authors
 * Yuki Fujita
 * Kenta Hashimoto
 * Yoshiya Matsubara
-* Kouichi Takahashi
+* Koichi Takahashi
 
 
 == Documentation ==
 
 * Chris Pickett
-* Kouichi Takahashi
+* Koichi Takahashi
 
 

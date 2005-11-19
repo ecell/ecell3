@@ -22,7 +22,7 @@ License along with E-Cell -- see the file COPYING.
 If not, write to the Free Software Foundation, Inc.,
 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-Design: Kouichi Takahashi <shafi@e-cell.org>
+Design: Koichi Takahashi <shafi@e-cell.org>
 Programming: Masahiro Sugimoto <msugi@sfc.keio.ac.jp>
 
 E-Cell Project, Lab. for Bioinformatics, Keio University.
@@ -51,7 +51,7 @@ DEFAULT_STDERR = 'stderr'
 BANNERSTRING =\
 '''ecell3-session-manager [ E-Cell SE Version %s, on Python Version %d.%d.%d ]
 Copyright (C) 2001-2004 Keio University.
-Send feedback to Kouichi Takahashi <shafi@e-cell.org>'''\
+Send feedback to Koichi Takahashi <shafi@e-cell.org>'''\
 % ( ecell.ecs.getLibECSVersion(), sys.version_info[0], sys.version_info[1], sys.version_info[2] )
 
 

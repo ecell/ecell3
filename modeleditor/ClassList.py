@@ -27,7 +27,7 @@
 #END_HEADER
 #
 #'Design: Gabor Bereczki <gabor@e-cell.org>',
-#'Design and application Framework: Kouichi Takahashi <shafi@e-cell.org>',
+#'Design and application Framework: Koichi Takahashi <shafi@e-cell.org>',
 #'Programming: Gabor Bereczki' at
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #

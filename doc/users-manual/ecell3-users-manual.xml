@@ -168,7 +168,7 @@
 
     <authorgroup> 
       <author> 
-	<firstname>Kouichi</firstname> 
+	<firstname>Koichi</firstname> 
 	<surname>Takahashi</surname> 
 	<affiliation> 
 	  <orgname>E-Cell Project</orgname> 
@@ -199,7 +199,7 @@
 	<revnumber>E-Cell 3 Manual V&manrevision;</revnumber> 
 	<date>&date;</date> 
 	<revdescription> 
-	  <para role="author">Kouichi Takahashi
+	  <para role="author">Koichi Takahashi
 	    	<email>shafi@e-cell.org</email>
 	  		</para>
 	  <para role="publisher">E-Cell Project</para>
@@ -252,7 +252,7 @@
   manual, this is the place to put it. Alternatively, you can put this information in the title page.-->
   <chapter id="myapp-about"> 
     <title>About &app;</title> 
-    <para> &app; was written by Kouichi Takahashi 
+    <para> &app; was written by Koichi Takahashi 
       (<email>shafi@e-cell.org</email>). To find more information about
       &app;, please visit the 
       <ulink url="http://www.e-cell.org" type="http">E-Cell Project Web

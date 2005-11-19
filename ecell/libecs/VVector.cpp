@@ -27,7 +27,7 @@
 //END_HEADER
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //	This file is a part of E-Cell2.
-//	Original codes of E-Cell1 core were written by Kouichi TAKAHASHI
+//	Original codes of E-Cell1 core were written by Koichi TAKAHASHI
 //	<shafi@e-cell.org>.
 //	Some codes of E-Cell2 core are minor changed from E-Cell1
 //	by Naota ISHIKAWA <naota@mag.keio.ac.jp>.
@@ -45,9 +45,12 @@
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  *	$Id$
  :	$Log$
+ :	Revision 1.16  2005/11/19 09:23:59  shafi
+ :	Kouichi -> Koichi
+ :
  :	Revision 1.15  2004/07/29 03:52:02  bgabor
  :	Fixing bug [ 994313 ] vvector should close files after read and write.
- :
+ :	
  :	Revision 1.14  2004/07/13 18:29:34  shafi
  :	extensive logger code cleanup. remaining things are: replace DataPointVector with boost::multi_array, and understand, reconsider and rename getData( s,e,i )
  :	

@@ -138,7 +138,7 @@ executing the &ESS;.
         <screen><prompt>$</prompt> <userinput>&ecell3-session; <optional>-f model.eml</optional></userinput>
 ecell3-session [ for E-Cell SE Version 3, on Python Version 2.2.1 ]
 Copyright (C) 1996-2002 Keio University.
-Send feedback to Kouichi Takahashi <email>shafi@e-cell.org</email>
+Send feedback to Koichi Takahashi <email>shafi@e-cell.org</email>
 <prompt>ecell3-session>>> </prompt>
         </screen>
         
@@ -1137,7 +1137,7 @@ This GDB was configured as "i386-redhat-linux-gnu"...
 [New Thread 1074178112 (LWP 7327)]
 ecell3-session [ E-Cell SE Version 3.2.0, on Python Version 2.2.2 ]
 Copyright (C) 1996-2003 Keio University.
-Send feedback to Kouichi Takahashi &lt;shafi@e-cell.org></computeroutput>
+Send feedback to Koichi Takahashi &lt;shafi@e-cell.org></computeroutput>
 <prompt>&lt;foo.eml, t=0>>> </prompt><userinput><keycombo action='simul'>
 		<keycap>Ctrl</keycap>
 		<keycap>C</keycap>

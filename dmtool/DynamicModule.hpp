@@ -2,7 +2,7 @@
 //
 // 		This file is part of dmtool package
 //
-//	       written by Kouichi Takahashi  <shafi@sfc.keio.ac.jp>
+//	       written by Koichi Takahashi  <shafi@sfc.keio.ac.jp>
 //
 //                              E-CELL Project,
 //                          Lab. for Bioinformatics,  

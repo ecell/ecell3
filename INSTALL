@@ -2,7 +2,7 @@ $Id$
 
   Installation notes for E-Cell Simulation Environment Version 3 (E-Cell SE 3)
 
-                                       Kouichi Takahashi <shafi@e-cell.org>
+                                       Koichi Takahashi <shafi@e-cell.org>
 
 
 
@@ -98,7 +98,7 @@ NOTE: If you get this package via cvs, run ./autogen.sh before configure.
       [foo@bar simple]$ ecell3-session
       ecell3-session [ E-Cell SE Version 3.1.102, on Python Version 2.2.3 ]
       Copyright (C) 1996-2004 Keio University.
-      Send feedback to Kouichi Takahashi <shafi@e-cell.org>
+      Send feedback to Koichi Takahashi <shafi@e-cell.org>
       ecell3-session>>> loadModel( 'simple.eml' )
       <simple.eml, t=0>>> run( 10 )
       <simple.eml, t=10.001>>> (press Ctrl+d to exit)

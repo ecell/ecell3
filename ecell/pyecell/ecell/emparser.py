@@ -7,7 +7,7 @@ This program is part of E-Cell Simulation Environment Version 3.
 
 __program__ = 'emparser'
 __version__ = '0.1'
-__author__ = 'Kentarou Takahashi and Kouichi Takahashi <shafi@e-cell.org>'
+__author__ = 'Kentarou Takahashi and Koichi Takahashi <shafi@e-cell.org>'
 __copyright__ = 'Copyright (C) 2002-2003 Keio University'
 __license__ = 'GPL'
 

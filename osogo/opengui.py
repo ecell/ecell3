@@ -4,7 +4,7 @@
 #
 
 __program__ = 'opengui.py'
-__author__ = 'Kouichi Takahashi <shafi@e-cell.org>, zhaiteng and sugi'
+__author__ = 'Koichi Takahashi <shafi@e-cell.org>, zhaiteng and sugi'
 __copyright__ = 'Copyright (C) 2002-2003 Keio University'
 __license__ = 'GPL'
 

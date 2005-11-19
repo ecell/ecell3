@@ -28,7 +28,7 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 //
-// written by Kouichi Takahashi <shafi@e-cell.org>,
+// written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 

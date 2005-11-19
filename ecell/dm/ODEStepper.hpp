@@ -24,7 +24,7 @@
 // 
 //END_HEADER
 //
-// written by Kouichi Takahashi <shafi@e-cell.org> at
+// written by Koichi Takahashi <shafi@e-cell.org> at
 // E-Cell Project, Lab. for Bioinformatics, Keio University.
 //
 

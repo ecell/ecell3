@@ -7,7 +7,7 @@
 #
 # this program is part of E-CELL Simulation Environment.
 #
-# author:    Kouichi Takahashi <shafi@e-cell.org>
+# author:    Koichi Takahashi <shafi@e-cell.org>
 #
 
 # variables substituted by ./configure script
@@ -76,7 +76,7 @@ Options:
 	-h or --help)		Print this message.
 
 This program is part of E-CELL Simulation Environment.
-Written by Kouichi Takahashi <shafi@e-cell.org>
+Written by Koichi Takahashi <shafi@e-cell.org>
 EOT_HELP
 }
 

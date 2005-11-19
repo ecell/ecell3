@@ -29,7 +29,7 @@
 // modified by Gabor Bereczki <gabor.bereczki@talk21.com>
 // 14/04/2002
 //
-// modified by Kouichi Takahashi <shafi@e-cell.org>
+// modified by Koichi Takahashi <shafi@e-cell.org>
 
 #include "libecs.hpp"
 #include "Polymorph.hpp"

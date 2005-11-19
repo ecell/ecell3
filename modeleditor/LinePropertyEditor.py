@@ -25,7 +25,7 @@
 #END_HEADER
 #
 #'Design: Dini Karnaga, Sylvia Tarigan, Thaw Tint <polytech@e-cell.org>',
-#'Design and application Framework: Kouichi Takahashi <shafi@e-cell.org>',
+#'Design and application Framework: Koichi Takahashi <shafi@e-cell.org>',
 #'Programming: Dini Karnaga, Sylvia Tarigan, Thaw Tint' at
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #

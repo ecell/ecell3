@@ -26,7 +26,7 @@
 //END_HEADER
 //
 // authors:
-//   Kouichi Takahashi
+//   Koichi Takahashi
 //   Tatsuya Ishida
 //
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
