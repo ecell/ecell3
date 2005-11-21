@@ -32,6 +32,7 @@
 // E-Cell Project.
 //
 
+#include <iostream>
 
 #include "NRStepper.hpp"
 
@@ -41,7 +42,8 @@ LIBECS_DM_INIT( NRStepper, Stepper );
 
 NRStepper::NRStepper()
 {
-  ; // do nothing
+  std::cerr << "NRStepper will be deprecated." <<  
+    " Use DiscreteEventStepper instead." << std::endl;
 }
 	    
 NRStepper::~NRStepper()
