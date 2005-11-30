@@ -36,6 +36,7 @@ tokens = reserved + (
     'System',
     'Variable',
     'Process',
+    'Attachment',
     'number',
     'identifier',
     'fullid',
@@ -84,6 +85,10 @@ def t_Variable(t):
     t.value = t.value[:-1]
     return t
 
+def t_Attachment(t):
+    r' Attachment[\s|\t] '
+    t.value = t.value[:-1]
+    return t
 
 def t_number(t):
     r' [+-]?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)? '
@@ -156,7 +161,7 @@ def t_error(t):
 
 # may be wrong..
 precedence = (
-    ( 'right', 'Variable', 'Process', 'System', 'Stepper' ),
+    ( 'right', 'Variable', 'Process', 'System', 'Stepper', 'Attachment' ),
     ( 'left', 'identifier' )
     )
 
@@ -172,6 +177,7 @@ def p_stmt(t):
     '''
         stmt : stepper_stmt
              | system_stmt
+             | attachment_stmt
          | ecs
         '''
 
@@ -182,7 +188,13 @@ def p_stepper_stmt(t):
     stepper_stmt : stepper_decl LBRACE propertylist RBRACE
     '''
     t[0] = t[1], t[3]
-    
+
+def p_attachment_stmt(t):
+    '''
+    attachment_stmt : attachment_decl LBRACE propertylist RBRACE
+    '''
+    t[0] = t[1], t[3]
+
 def p_system_stmt(t):
     '''
     system_stmt : system_decl LBRACE property_entity_list RBRACE
@@ -253,6 +265,20 @@ def p_stepper_decl(t):
         anEml.setStepperInfo( t.id, t[2][2])
     
     t[0] = t[1], t[2]
+
+def p_attachment_decl(t):
+    '''
+    attachment_decl : Attachment object_decl
+    '''
+    t.type = t[1]
+    t.classname = t[2][0]
+    t.id = t[2][1]
+    anEml.createAttachment(t.classname, t.id)
+#   if len(t[2]) == 3:
+#       anEml.setStepperInfo( t.id, t[2][2])
+    
+    t[0] = t[1], t[2]
+
     
 def p_system_decl(t):
     '''
@@ -302,6 +328,8 @@ def p_property(t):
 
     if t.type == 'Stepper':
         anEml.setStepperProperty(t.id, t[1], t[2])
+    if t.type == 'Attachment':
+        anEml.setAttachmentProperty(t.id, t[1], t[2])
     else:
         anEml.setEntityProperty(t.id, t[1], t[2])
         
@@ -363,6 +391,7 @@ def p_name(t):
              | Process
           | System
            | Stepper
+           | Attachment
     '''
     t[0] = t[1]
 
