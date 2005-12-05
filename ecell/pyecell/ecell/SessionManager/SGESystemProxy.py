@@ -52,15 +52,39 @@ class SGESystemProxy(SystemProxy):
 
 	def __init__(self,sessionmanager):
 		'''constructor
-		sessionmanager -- the reference to SessionManager
+		sessionmanager -- an instance of SessionManager
 		'''
 
-		# calls superclass's constructor
+		# Check the argument type.
+		if sessionmanager.__class__.__name__ != "SessionManager":
+			raise TypeError("A type of sessionmanager is \"%s\". The type of sessionmanager must be SessionManager" %type(sessionmanager))
+
+		# Call superclass's constructor.
 		SystemProxy.__init__(self,sessionmanager)
 
-		# get user parameter for qstat
+		# Get user parameter for qstat.
 		self.__theUser = os.getenv('USER')
 
+		# Check the existance of SGE command.
+		# qsub
+		if checkCommandExistence(SGESessionProxy.QSUB) == False:
+			raise Exception("\"%s\" is not included in the $PATH environment"\
+			                %SGESessionProxy.QSUB)
+
+		# qstat
+		if checkCommandExistence(SGESessionProxy.QSTAT) == False:
+			raise Exception("\"%s\" is not included in the $PATH environment"\
+			                %SGESessionProxy.QSTAT)
+
+		# qhost
+		if checkCommandExistence(SGESessionProxy.QHOST) == False:
+			raise Exception("\"%s\" is not included in the $PATH environment"\
+			                %SGESessionProxy.QHOST)
+
+		# Initialize attributes.
+		self.__theQueueList = None
+
+	# end of def __init__(self,sessionmanager):
 
 
 	def getDefaultConcurrency(self):
@@ -91,6 +115,7 @@ class SGESystemProxy(SystemProxy):
 
 		return aCpuNumber
 
+	# end of def getDefaultConcurrency(self):
 
 
 	def createSessionProxy(self):
@@ -101,6 +126,7 @@ class SGESystemProxy(SystemProxy):
 		# creates and returns new SGESession Proxy instance
 		return SGESessionProxy()
 
+	# end of def createSessionProxy(self):
 
 
 	def update(self):
@@ -123,7 +149,7 @@ class SGESystemProxy(SystemProxy):
 		aStatusDict = {}
 
 		# reads the result of qstat
-		aLines = os.popen("qstat -u %s" %self.__theUser).readlines()
+		aLines = os.popen("%s -u %s" %(SGESessionProxy.QSTAT,self.__theUser)).readlines()
 
 		# When there are running jobs, gets SGE job id and status
 		if len(aLines) >= 3:
@@ -221,6 +247,76 @@ class SGESystemProxy(SystemProxy):
 
 	# end of def update
 
+
+	def setOptionList(self,optionlist):
+		'''set option list to SGESessionProxy.
+		optionlist(list of str) -- a list of options
+
+		Return None
+		'''
+
+		# Check the argument type.
+		if type(optionlist) != list:
+			raise TypeError("A type of optionlist is \"%s\". The type of optionlist must be a list." %type(sessionmanager))
+
+
+		# Check all elements in option list.
+		for anOption in optionlist:
+
+			# Check the type of element.
+			if type(anOption) != str:
+				raise TypeError("A type of element of optionlist is \"%s\". The type of element of optionlist must be \"str\"." %type(anOption))
+
+		
+			# Check "-q option".
+			if len(anOption) == 4 and anOption[0:3] == "-q ":
+				raise Exception("The [-q] option is set but no queue is specified.")
+
+
+			# Check the value of "-q option".
+			if len(anOption) > 4 and anOption[0:3] == "-q ":
+				aQueueList = string.split(anOption[3:],",")
+				for aQueue in aQueueList:
+					if self.checkQueueExistence(aQueue) == False:
+						raise Exception("The queue [%s] is not available." %aQueue)
+
+		# Set the option list to SessionProxy.
+		SessionProxy.setOptionList( optionlist )
+
+	# end of def setOptionList(self,optionlist):
+
+
+	def checkQueueExistence(self,queue):
+		'''creates and returns new SGESessionProxy instance
+		queue(str) -- a queue name
+
+		Return True(exists)/False(does not exists)
+		'''
+
+		# Check the type of element.
+		if type(queue) != str:
+			raise TypeError("A type of queue is \"%s\". The type of queue must be \"str\"." %type(queue))
+
+		# Get queue list.
+		if self.__theQueueList == None:
+			aCheckProcess = popen2.Popen3("%s -q | grep \".q \" | awk \'NR>3 {print $1}\'" %SGESessionProxy.QHOST)
+			aCheckProcess.wait()
+			self.__theQueueList = []
+			for aQueue in aCheckProcess.fromchild.readlines():
+				self.__theQueueList.append(aQueue[:-1])
+
+		# Check the existence of the queue.
+		if queue in self.__theQueueList:
+			return True
+		else:
+			return False
+
+
+	# end of def checkQueueExistence(self,queuelist):
+
+
+
+# end of class SGESystemProxy(SystemProxy):
 
 
 

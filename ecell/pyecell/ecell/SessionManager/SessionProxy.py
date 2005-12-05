@@ -56,7 +56,7 @@ class SessionProxy:
 	__theStderror = DEFAULT_STDERR
 	__theRetryMaxCount = 0
 	__theSystemProxy = None
-
+	__theOptionList = []
 
 	# -----------------
 	# class methods
@@ -145,16 +145,36 @@ class SessionProxy:
 
 
 	def setSystemProxy(cls, systemproxy):
-		'''Set SystemProxy
+		'''Set SystemProxy.
 		Return None
 		'''
 		SessionProxy.__theSystemProxy = systemproxy 
 
 	def getSystemProxy(cls):
-		'''Get SystemProxy
+		'''Get SystemProxy.
 		Return SystemProxy
 		'''
 		return SessionProxy.__theSystemProxy 
+
+
+	def setOptionList(cls, optionlist):
+		'''Set an option list.
+		optionlist(list of str) -- a list of options
+		Return None
+		'''
+		
+		# Check the type of argument.
+		if type(optionlist) != list:
+			raise TypeError("optionlist must be list of str")
+
+		SessionProxy.__theOptionList = optionlist 
+
+
+	def getOptionList(cls):
+		'''Get the option list.
+		Return list of str
+		'''
+		return SessionProxy.__theOptionList 
 
 
 	# register class methods
@@ -168,6 +188,8 @@ class SessionProxy:
 	setRetryMaxCount = classmethod(setRetryMaxCount)
 	setSystemProxy = classmethod(setSystemProxy)
 	getSystemProxy = classmethod(getSystemProxy)
+	setOptionList = classmethod(setOptionList)
+	getOptionList = classmethod(getOptionList)
 
 
 	# -----------------

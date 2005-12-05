@@ -36,14 +36,14 @@ from Util import *
 from SessionProxy import *
 
 
-QSUB = 'qsub'
-
-
 class SGESessionProxy(SessionProxy):
 	'''SGESessionProxy class
 	Target environment is local PC that has only one cpu.
 	'''
 
+	QSUB = 'qsub'
+	QSTAT = 'qstat'
+	QHOST = 'qhost'
 
 	def __init__(self):
 		'''constructor
@@ -101,7 +101,6 @@ class SGESessionProxy(SessionProxy):
 		if self.getStatus() == FINISHED or self.getStatus() == ERROR:
 			return None
 
-
 		# save current directory
 		aCwd = os.getcwd()
 
@@ -112,6 +111,17 @@ class SGESessionProxy(SessionProxy):
 		# execute script
 		# --------------------------------
 		# create context
+
+		if SessionProxy.getOptionList() == None or \
+		   len(SessionProxy.getOptionList()) == 0:
+			anOptionStr = ""
+		else:
+			anOptionMap = {}
+			for anOption in SessionProxy.getOptionList():
+				anOptionMap[anOption] = None
+			if anOptionMap.has_key("-cwd"):
+				del anOptionMap["-cwd"] 
+			anOptionStr = string.join(anOptionMap.keys(),' ')
 
 
 		# --------------------------------------------------------------------------
@@ -145,12 +155,13 @@ class SGESessionProxy(SessionProxy):
 
 
 			# create a context
-			aContext = "%s -v %s -cwd -S %s -o %s -e %s %s" \
-			            %(QSUB,
+			aContext = "%s -v %s -cwd -S %s -o %s -e %s %s %s" \
+			            %(SGESessionProxy.QSUB,
 			             aHyphenVOption,
 			             getCurrentShell(),
 			             self.getStdoutFileName(),
 			             self.getStderrFileName(),
+			             anOptionStr,
 			             self.__theTmpScriptFileName)
 
 
@@ -163,11 +174,13 @@ class SGESessionProxy(SessionProxy):
 			anArgument = str(self.getArgument())
 
 			# create a context
-			aContext = "%s -v %s -cwd -S %s -o %s -e %s %s %s" %(QSUB,
+			aContext = "%s -v %s -cwd -S %s -o %s -e %s %s %s %s" \
+			           %(SGESessionProxy.QSUB,
 			            getEnvString(),
 			            self.getInterpreter(),
 			            self.getStdoutFileName(),
 			            self.getStderrFileName(),
+			            anOptionStr,
 			            self.getScriptFileName(),
 			            anArgument)
 

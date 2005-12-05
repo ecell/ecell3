@@ -32,6 +32,7 @@ import sys
 import string
 import os
 import time
+import popen2
 
 import ecell.eml
 import ecell.emc
@@ -118,5 +119,29 @@ def getEnvString():
 	aString += ",PATH=%s" %os.getenv('PATH')
 
 	return aString
+
+
+def checkCommandExistence(command):
+	'''constructor
+	command(str) -- a command name to be checked.
+	Return True(exists)/False(does not exist)
+	'''
+
+	# Check the argument.
+	if type(command) != str:
+		raise TypeError("type of command is %s. But command must be str." %type(command))
+
+	if len(command) == 0:
+		raise Exception("The length of command must be > 0.")
+
+	# Check the existence of command
+	aCheckProcess = popen2.Popen3("which %s" %command)
+	aCheckProcess.wait()
+	if aCheckProcess.poll() == 0:
+		return True
+	else:
+		return False
+
+# end of def checkCommandExistence(command):
 
 

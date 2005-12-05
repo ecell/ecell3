@@ -100,6 +100,19 @@ class SystemProxy:
 		raise NotImplementedError(caller + ' must be implemented in subclass')
 
 
+	def setOptionList(self,optionlist):
+		'''ABSTRACT : This method must be overwrote in subclass
+		creates and returns new SessionProxy instance
+		Return SessionProxy
+		raise NotImplementedError
+		'''
+
+		# When this method is not implemented in sub class,
+		# raise NotImplementedError
+		import inspect
+		caller = inspect.getouterframes(inspect.currentframe())[0][3]
+
+
 # end of class SystemProxy
 
 

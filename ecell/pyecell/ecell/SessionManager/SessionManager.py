@@ -898,6 +898,27 @@ class SessionManager:
 
 		return self.__theSystemProxy
 
+
+	def setOptionList( self, optionlist ):
+		'''Set a list of options for the execution command.
+
+		optionlist(list of str) -- a list of options
+		
+		Return None
+		'''
+
+		self.__theSystemProxy.setOptionList( optionlist )
+
+
+	def getOptionList( self ):
+		'''Get the option list of the execution command.
+
+		Return a list of options
+		'''
+
+		return SessionProxy.getOptionList()
+
+
 	# -------------------------------------------------
 	# methods for intaractive mode
 	# -------------------------------------------------

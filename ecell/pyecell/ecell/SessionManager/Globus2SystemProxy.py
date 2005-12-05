@@ -252,5 +252,17 @@ class Globus2SystemProxy(SystemProxy):
 	# end of def update
 
 
+	def setOptionList(self,optionlist):
+		'''set option list to LocalSessionProxy.
+		optionlist(list of str) -- a list of options
+
+		Return None
+		'''
+
+		# Set the option list to SessionProxy.
+		SessionProxy.setOptionList( optionlist )
+
+	# end of def setOptionList(self,optionlist):
 
 
+# end of class Globus2SystemProxy(SystemProxy):
