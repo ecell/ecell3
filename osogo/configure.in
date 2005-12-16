@@ -16,7 +16,6 @@ AM_CHECK_PYMOD(Numeric,,,[AC_MSG_ERROR(could not find Numeric module)])
 dnl
 AC_OUTPUT(
 Makefile
-gecell
 plugins/Makefile
 config.py,
 chmod +x gecell
