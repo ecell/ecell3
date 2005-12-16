@@ -4,20 +4,25 @@
 
 import os
 import sys
-import _winreg
+import imp 
 
 os.environ['PACKAGE'] = '@PACKAGE@'
 os.environ['VERSION'] = '@VERSION@'
 
-# Get installed E-Cell prefix from Windows registry
-try:
-	key = _winreg.OpenKey( _winreg.HKEY_LOCAL_MACHINE, r'Software\E-Cell3\Settings' )
-except:
-	print "Could not find E-Cell3 in registry"
-	sys.exit(1)
+# Get installed E-Cell prefix
+def main_is_frozen():
+   return ( hasattr(sys, "frozen") or # new py2exe
+            hasattr(sys, "importers") # old py2exe
+            or imp.is_frozen("__main__") )
 
-prefix = os.path.abspath( _winreg.QueryValueEx( key, 'ECELL3_PREFIX' )[0] )
-_winreg.CloseKey( key )
+def getPrefix():
+   if main_is_frozen(): # exe file
+       return os.path.dirname( os.path.abspath( 
+                os.path.dirname( sys.executable ) ) )
+   return os.path.dirname( os.path.abspath( 
+                os.path.dirname( sys.argv[0]) ) )
+
+prefix = getPrefix()
 
 os.environ['ECELL3_PREFIX']=\
 	prefix
@@ -56,9 +61,7 @@ os.environ['PYTHONPATH']=\
 os.environ['BOOST_LIBRARIES']=\
 	'\"-L' + os.path.join( prefix, 'lib' ) + '\" -lboost_python'
 
-
 import _winreg
-
 # Get installed Python prefix from Windows registry
 try:
 	key = _winreg.OpenKey( _winreg.HKEY_LOCAL_MACHINE, \

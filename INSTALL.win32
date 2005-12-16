@@ -271,8 +271,9 @@ Satya Nanda Vel Arjunan  <satya@sfc.keio.ac.jp>
     i. make install
     i. mkdir /d/development/ecell3windows/ecell3-i386/lib/python2.4
     i. mv /d/development/Python24/Lib/site-packages /d/development/ecell3windows/ecell3-i386/lib/python2.4
-    i. mv /d/development/Python24/Lib/site /d/development/Python24/Lib/site-packages/
-    i. cp -r /d/development/ecell3windows/ecell3-i386/lib/python2.4/site-packages/* /d/development/Python24/Lib/site-packages
+    i. cp -r /d/development/Python24/Lib/site/* /d/development/Python24/Lib/site-packages/
+    i. rm -r /d/development/Python24/Lib/site
+
 ----
 '''E-Cell Windows Installer Packaging Steps:'''
 {{{

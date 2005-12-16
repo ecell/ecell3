@@ -170,8 +170,8 @@ Name: themes\lighthouse; Description: Lighthouse Blue Theme; Flags: exclusive
 
 [Registry]
 ;Registry entry for ECELL3_PREFIX
-Root: HKLM; Subkey: "Software\E-Cell3"; Flags: deletekey uninsdeletekey
-Root: HKLM; Subkey: "Software\E-Cell3\Settings"; ValueType: string; ValueName: "ECELL3_PREFIX"; ValueData: "{app}"
+;Root: HKLM; Subkey: "Software\E-Cell3"; Flags: deletekey uninsdeletekey
+;Root: HKLM; Subkey: "Software\E-Cell3\Settings"; ValueType: string; ValueName: "ECELL3_PREFIX"; ValueData: "{app}"
 
 ;File association for *.eml
 Root: HKCR; Subkey: .eml; ValueType: string; ValueName: ; ValueData: EcellModelDescriptor; Flags: createvalueifdoesntexist uninsdeletevalue; Components: file\eml
