@@ -20,13 +20,13 @@
 
 
 #define FullInstall
-;#define Arch          'i386'
-#define Arch          'sse2'
+#define Arch          'i386'
+;#define Arch          'sse2'
 #define Version       '@VERSION@'
 #define PythonVersion '@PYTHON_VERSION@'
-#define GtkVersion    '2.4'
-#define PythonSetup   'python-2.4.msi'
-#define GtkSetup      'gtk-win32-2.4.10-rc1.exe'
+#define GtkVersion    '2.8'
+#define PythonSetup   'python-2.4.2.msi'
+#define GtkSetup      'gtk-win32-2.8.8-rc2.exe'
 #define Pythondll     'python@PYTHON_WIN_VERSION@.dll'
 #define Libpython     'libpython@PYTHON_WIN_VERSION@.a'
 #define LicenseFile   'COPYING'
@@ -79,32 +79,19 @@ Source: share\*.*; DestDir: {app}\share; Flags: recursesubdirs ignoreversion
 
 ;Runtime libraries used by E-Cell
 Source: ..\runtime\1.mingw\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\2.mingw-runtime\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\3.gcc-core\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\4.gcc-g++\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\5.binutils\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\6.msys-cp.find.grep.ls.mkdir.mv.rm\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\7.ecell3-docs\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\{#Arch}\8.boost\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\{#Arch}\9.gsl\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\{#Arch}\10.libart_lgpl\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\{#Arch}\11.libgnomecanvas\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\{#Arch}\12.ecell3-samples\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\{#Arch}\13.xerces-c\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\2.msys-cp.find.grep.ls.mkdir.mv.rm\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\3.ecell3-docs\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\{#Arch}\4.boost\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\{#Arch}\5.gsl\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\{#Arch}\6.libgnomecanvas\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\{#Arch}\7.ecell3-samples\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\{#Arch}\8.xerces-c\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 
 ;Python modules used by E-Cell
 Source: ..\pythonModules\1.Numeric\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 Source: ..\pythonModules\{#Arch}\2.pygtk\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 Source: ..\pythonModules\{#Arch}\3.gnome-python\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 Source: ..\pythonModules\{#Arch}\4.libsbml\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-
-;Gtk libraries
-Source: ..\gtk\lighthouse\gtkrc; DestDir: {code:GetGtkDir}\share\themes\Default\gtk-2.0; Flags: ignoreversion; Components: themes\lighthouse
-Source: ..\gtk\lighthouse\liblighthouseblue.dll; DestDir: {code:GetGtkDir}\lib\gtk-2.0\{#GtkVersion}.0\engines; Flags: ignoreversion; Components: themes\lighthouse
-Source: ..\gtk\{#Arch}\wimp\gtkrc; DestDir: {code:GetGtkDir}\share\themes\Default\gtk-2.0; Flags: ignoreversion; Components: themes\wimp
-Source: ..\gtk\{#Arch}\wimp\libwimp.dll; DestDir: {code:GetGtkDir}\lib\gtk-2.0\{#GtkVersion}.0\engines; Flags: ignoreversion; Components: themes\wimp
-Source: ..\gtk\{#Arch}\prettyOk\gtkrc; DestDir: {code:GetGtkDir}\share\themes\Default\gtk-2.0; Flags: ignoreversion; Components: themes\prettyOK
-Source: ..\gtk\{#Arch}\prettyOK\libcleanice.dll; DestDir: {code:GetGtkDir}\lib\gtk-2.0\{#GtkVersion}.0\engines; Flags: ignoreversion; Components: themes\prettyOK
 
 ;Files not installed on host
 #ifdef FullInstall
@@ -183,8 +170,8 @@ Name: themes\lighthouse; Description: Lighthouse Blue Theme; Flags: exclusive
 
 [Registry]
 ;Registry entry for ECELL3_PREFIX
-;Root: HKLM; Subkey: "Software\E-Cell3"; Flags: deletekey uninsdeletekey
-;Root: HKLM; Subkey: "Software\E-Cell3\Settings"; ValueType: string; ValueName: "ECELL3_PREFIX"; ValueData: "{app}"
+Root: HKLM; Subkey: "Software\E-Cell3"; Flags: deletekey uninsdeletekey
+Root: HKLM; Subkey: "Software\E-Cell3\Settings"; ValueType: string; ValueName: "ECELL3_PREFIX"; ValueData: "{app}"
 
 ;File association for *.eml
 Root: HKCR; Subkey: .eml; ValueType: string; ValueName: ; ValueData: EcellModelDescriptor; Flags: createvalueifdoesntexist uninsdeletevalue; Components: file\eml
