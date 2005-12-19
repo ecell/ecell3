@@ -81,7 +81,7 @@ namespace libecs
 
     virtual void step();
 
-    virtual void interrupt( StepperPtr const aCaller )
+    virtual void interrupt( TimeParam aTime )
     {
       ; // do nothing
     }

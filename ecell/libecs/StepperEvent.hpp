@@ -35,7 +35,6 @@
 #include "libecs.hpp"
 #include "Stepper.hpp"
 
-#include "EventScheduler.hpp"
 
 namespace libecs
 {

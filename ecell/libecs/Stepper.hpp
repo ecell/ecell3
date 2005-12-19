@@ -462,7 +462,7 @@ namespace libecs
       getVariableIndex( VariableCptr const aVariable );
 
 
-    virtual void interrupt( TimeParam aTime );
+    virtual void interrupt( TimeParam aTime ) = 0;
 
     /**
 	Definition of the Stepper dependency:
@@ -478,7 +478,7 @@ namespace libecs
 	@see Process, VariableReference
     */
 
-    virtual const bool isDependentOn( const StepperCptr aStepper );
+    const bool isDependentOn( const StepperCptr aStepper );
 
     /** 
 	This method updates theIntegratedVariableVector.

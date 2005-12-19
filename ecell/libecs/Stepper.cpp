@@ -304,7 +304,7 @@ namespace libecs
   const bool Stepper::isDependentOn( const StepperCptr aStepper )
   {
     // Every Stepper depends on the SystemStepper.
-    // FIXME: UGLY -- reimplement SystemStepper in another way
+    // FIXME: UGLY -- reimplement SystemStepper in a different way
     if( typeid( *aStepper ) == typeid( SystemStepper ) )
       {
 	return true;
@@ -312,31 +312,31 @@ namespace libecs
 
     VariableVectorCref aTargetVector( aStepper->getVariableVector() );
     
-    VariableVectorConstIterator aReadWriteTargetVariableIterator
-      ( aTargetVector.begin() + 
-	aStepper->getReadWriteVariableOffset() );
-    
     VariableVectorConstIterator aReadOnlyTargetVariableIterator
       ( aTargetVector.begin() +
 	aStepper->getReadOnlyVariableOffset() );
+
+    VariableVectorConstIterator aReadWriteTargetVariableIterator
+      ( aTargetVector.begin() +
+	aStepper->getReadWriteVariableOffset() );
     
-    // For efficiency, binary_search should be done for supposedly longer
-    // vector, and linear iteration for supposedly shorter vector.
-    //
-    
-    // if one Variable in this::readlist appears in the target::write list
-    for( VariableVector::size_type c( 0 ); 
-	 c != theReadOnlyVariableOffset; ++c )
+    // if at least one Variable in this::readlist appears in
+    // the target::write list.
+    for( VariableVectorConstIterator i( getVariableVector().begin() +
+					theReadWriteVariableOffset ); 
+	 i != getVariableVector().end(); ++i )
       {
-	VariablePtr const aVariablePtr( theVariableVector[ c ] );
+	VariablePtr const aVariablePtr( *i );
 	
-	// search in target::readwrite and target::read list.
-	if( std::binary_search( aReadWriteTargetVariableIterator,
+	// search in target::write or readwrite lists.
+	if( std::binary_search( aTargetVector.begin(),  // write-only
+				aReadWriteTargetVariableIterator,
+				aVariablePtr ) ||       
+	    std::binary_search( aReadWriteTargetVariableIterator, // read-write
 				aReadOnlyTargetVariableIterator,
-				aVariablePtr ) ||
-	    std::binary_search( aReadOnlyTargetVariableIterator,
-				aTargetVector.end(),
 				aVariablePtr ) )
+	  
+
 	  {
 	    return true;
 	  }
@@ -566,12 +566,6 @@ namespace libecs
 	// restore x (original value) and clear velocity
 	aVariable->setValue( theValueBuffer[ c ] );
       }
-  }
-
-
-  void Stepper::interrupt( TimeParam aTime )
-  {
-    ; // do nothing
   }
 
 

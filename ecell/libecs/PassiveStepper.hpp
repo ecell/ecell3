@@ -84,9 +84,9 @@ namespace libecs
       setStepInterval( INF );
     }
 
-    virtual void interrupt( StepperPtr const aCaller )
+    virtual void interrupt( TimeParam aTime )
     {
-      setCurrentTime( aCaller->getCurrentTime() );
+      setCurrentTime( aTime );
       setStepInterval( 0.0 );
     }
 
