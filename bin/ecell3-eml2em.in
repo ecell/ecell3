@@ -118,26 +118,6 @@ def createStepperList( anEml ):
 
     return aBuffer
 
-def createAttachmentList( anEml ):
-    aBuffer = ''
-
-    for anAttachmentID in anEml.getAttachmentList():
-        aType = 'Attachment'
-        aClass = anEml.getAttachmentClass( anAttachmentID )
-        anArgList = ( anAttachmentID, )
-        aPropertyNameList = anEml.getAttachmentPropertyList( anAttachmentID )
-        aPropertyList = []
-        for aPropertyName in aPropertyNameList:
-            aPropertyValue = anEml.getAttachmentProperty( anAttachmentID,\
-                                                       aPropertyName )
-            aPropertyList.append( ( aPropertyName, aPropertyValue ) )
-
-        aBuffer += createObjectDef( 'Attachment', aClass, anArgList,
-                                    aPropertyList )
-        aBuffer += '\n'
-
-    return aBuffer
-
 def createEntity( anEml, aFullID, anOptional='' ):
 
     aFullIDString = createFullIDString( aFullID )
@@ -285,7 +265,7 @@ Options:
 #    try:
     aBuffer += createStepperList( anEml )
     aBuffer += createSystemList( anEml )
-    aBuffer += createAttachmentList( anEml )
+
 #    except:
 #        sys.stderr.write( 'Error: ' + str( sys.exc_type ) + '\n' )
 #        sys.exit( 1 )
