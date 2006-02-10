@@ -18,6 +18,7 @@ try:
 	import getopt
 	import traceback
 	import gtk
+	import gobject 
 	import MainWindow
 	import ecell.GtkSessionMonitor
 

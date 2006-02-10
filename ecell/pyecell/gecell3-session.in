@@ -8,6 +8,7 @@ import os
 import ecell.emc
 import ecell.GtkSessionMonitor
 import gtk
+import gobject
 
 #FIXME: commandline processing needed
 

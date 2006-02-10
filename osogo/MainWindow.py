@@ -205,7 +205,7 @@ class LogoAnimation:
                 self.theTimer = gobject.timeout_add( 60, LogoAnimation.animate, self )
             else:
                 if self.theTimer != None:
-                    gobject.timeout_remove( self.theTimer )
+                    gobject.source_remove( self.theTimer )
                     self.theTimer = None
                     
 

@@ -43,6 +43,7 @@ import MainWindow
 from ecell.Session import *
 from ecell.ModelWalker import *
 import gtk
+import gobject 
 sys.path.insert(0, GUI_OSOGO_PATH)
 import EntityListWindow
 import LoggerWindow
@@ -391,7 +392,7 @@ class GtkSessionMonitor(Session):
 		Returns None
 		"""
 
-		gobject.timeout_remove( self.theTimer )
+		gobject.source_remove( self.theTimer )
 
 	# ==========================================================================
 	def updateWindows( self ):
