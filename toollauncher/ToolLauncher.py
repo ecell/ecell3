@@ -484,7 +484,7 @@ class ToolLauncher(ParentWindow):
         del self.theFileSelectorDlg
         self.close()
         gtk.mainquit()
-        return gtk.TRUE
+        return True
 
 
     # ==========================================================================

@@ -791,8 +791,8 @@ class Plot:
         for aColor in ColorList:
             newgc = self.getGC ( aColor )
             self.theGCColorMap[ aColor ] = newgc
-            newpm.draw_rectangle(newgc,gtk.TRUE,0,0,10,10)
-            pb=gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,gtk.TRUE,8,10,10)
+            newpm.draw_rectangle(newgc,True,0,0,10,10)
+            pb=gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,True,8,10,10)
             newpb=pb.get_from_drawable(newpm,self.theColorMap,0,0,0,0,10,10)
             self.thePixmapDict[ aColor ]=newpb
 
@@ -810,7 +810,7 @@ class Plot:
         self.doesConnectPoints = True
         self.doesDisplayMinMax = True
         # stripinterval/pixel
-        self.doesRequireScaling=gtk.TRUE
+        self.doesRequireScaling=True
         
         #initialize data buffers
         self.theStripMode = MODE_STRIP
@@ -1113,13 +1113,13 @@ class Plot:
 
     def drawBox(self, aColor, x0,y0,width,height):
         #uses raw plot coordinates!
-        self.thePixmapBuffer.draw_rectangle(self.theGCColorMap[aColor],gtk.TRUE,x0,y0,width,height)
+        self.thePixmapBuffer.draw_rectangle(self.theGCColorMap[aColor],True,x0,y0,width,height)
         self.theWidget.queue_draw_area(x0,y0,width,height)
 
     def drawxorbox(self,x0,y0,x1,y1):
         newgc=self.thePixmapBuffer.new_gc()
         newgc.set_function(gtk.gdk.INVERT)
-        self.thePixmapBuffer.draw_rectangle(newgc,gtk.TRUE,int(x0),int(y0),int(x1-x0),int(y1-y0))
+        self.thePixmapBuffer.draw_rectangle(newgc,True,int(x0),int(y0),int(x1-x0),int(y1-y0))
         self.theWidget.queue_draw_area(int(x0),int(y0),int(x1),int(y1))
 
     def drawText(self,aColor,x0,y0,text):

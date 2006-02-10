@@ -51,5 +51,5 @@ class ToolLauncherErrorMessage( ParentWindow ):
 		"""when OK button is clicked
 		"""
 		self.close()
-		return gtk.TRUE
+		return True
 

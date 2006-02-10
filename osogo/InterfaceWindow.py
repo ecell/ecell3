@@ -52,13 +52,13 @@ class InterfaceWindow( OsogoWindow ):
 					    gobject.TYPE_STRING )
 		self.theInterfaceListWidget.set_model( aListStore )
 		column=gtk.TreeViewColumn('Title',gtk.CellRendererText(),text=TITLE)
-		column.set_resizable(gtk.TRUE)
+		column.set_resizable(True)
 		self.theInterfaceListWidget.append_column(column)
 		column=gtk.TreeViewColumn('Class',gtk.CellRendererText(),text=CLASS)
-		column.set_resizable(gtk.TRUE)
+		column.set_resizable(True)
 		self.theInterfaceListWidget.append_column(column)
 		column=gtk.TreeViewColumn('FullPN',gtk.CellRendererText(),text=FULLPN)
-		column.set_resizable(gtk.TRUE)
+		column.set_resizable(True)
 		self.theInterfaceListWidget.append_column(column)
 
 		# initialize row selection

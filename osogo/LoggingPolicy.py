@@ -87,7 +87,7 @@ class LoggingPolicy(Window):
 
 		# appends ok button
 		ok_button = gtk.Button("  OK  ")
-		self.win.action_area.pack_start(ok_button,gtk.FALSE,gtk.FALSE,)
+		self.win.action_area.pack_start(ok_button,False,False,)
 		ok_button.set_flags(gtk.CAN_DEFAULT)
 		ok_button.grab_default()
 		ok_button.show()
@@ -96,7 +96,7 @@ class LoggingPolicy(Window):
 
 		# appends cancel button
 		cancel_button = gtk.Button(" Cancel ")
-		self.win.action_area.pack_start(cancel_button,gtk.FALSE,gtk.FALSE)
+		self.win.action_area.pack_start(cancel_button,False,False)
 		cancel_button.show()
 		cancel_button.connect("clicked",self.cancelButtonClicked)
 
@@ -115,33 +115,33 @@ class LoggingPolicy(Window):
 	# ==========================================================================
 	def __populateDialog( self, aLoggingPolicy ):
 		if aLoggingPolicy[0]>0:
-			self['log_by_step'].set_active( gtk.TRUE )
+			self['log_by_step'].set_active( True )
 			self['step_entry'].set_text( str(aLoggingPolicy[0] ))
-			self['second_entry'].set_sensitive( gtk.FALSE )
-			self['step_entry'].set_sensitive( gtk.TRUE )
+			self['second_entry'].set_sensitive( False )
+			self['step_entry'].set_sensitive( True )
 		else:
-			self['log_by_secs'].set_active( gtk.TRUE )
+			self['log_by_secs'].set_active( True )
 			self['second_entry'].set_text( str(aLoggingPolicy[1] ))
-			self['second_entry'].set_sensitive( gtk.TRUE )
-			self['step_entry'].set_sensitive( gtk.FALSE )
+			self['second_entry'].set_sensitive( True )
+			self['step_entry'].set_sensitive( False )
 		if aLoggingPolicy[2]== 0:
-			self['end_throw_ex'].set_active( gtk.TRUE )
+			self['end_throw_ex'].set_active( True )
 		else:
-			self['end_overwrite'].set_active( gtk.TRUE )
+			self['end_overwrite'].set_active( True )
 
 		if aLoggingPolicy[3] == 0:
-			self['space_no_limit'].set_active ( gtk.TRUE )
-			self['space_entry'].set_sensitive( gtk.FALSE )
+			self['space_no_limit'].set_active ( True )
+			self['space_entry'].set_sensitive( False )
 		else:
-			self['spac_max'].set_active( gtk.TRUE )
+			self['spac_max'].set_active( True )
 			self['space_entry'].set_text( str( aLoggingPolicy[3] ) )
-			self['space_entry'].set_sensitive( gtk.TRUE )
+			self['space_entry'].set_sensitive( True )
 			
 
 	# ==========================================================================
 	def __depopulateDialog( self ):
 		aLoggingPolicy = [1,0,0,0]
-		if self['log_by_step'].get_active() == gtk.TRUE:
+		if self['log_by_step'].get_active() == True:
 			try:
 				num = self['step_entry'].get_text()
 				aLoggingPolicy[0] = int(num)
@@ -160,11 +160,11 @@ class LoggingPolicy(Window):
 			except:
 				self.theSession.openConfirmWindow( "Please enter valid non-negative number for minimum timeinterval", "Invalid number format", 0)
 				return None
-		if self['end_overwrite'].get_active() == gtk.TRUE :
+		if self['end_overwrite'].get_active() == True :
 			aLoggingPolicy[2] = 1
 		else:
 			aLoggingPolicy[2] = 0
-		if self['spac_max'].get_active() == gtk.TRUE:
+		if self['spac_max'].get_active() == True:
 			try:
 				aLoggingPolicy[3] = int(self['space_entry'].get_text())
 				if aLoggingPolicy[3]<0:
@@ -181,15 +181,15 @@ class LoggingPolicy(Window):
 	def __buttonChosen( self, *args ):
 		aName = args[0].get_name()
 		if aName == "log_by_secs":
-			self['second_entry'].set_sensitive( gtk.TRUE )
-			self['step_entry'].set_sensitive( gtk.FALSE )
+			self['second_entry'].set_sensitive( True )
+			self['step_entry'].set_sensitive( False )
 		elif aName == "log_by_step":
-			self['second_entry'].set_sensitive( gtk.FALSE )
-			self['step_entry'].set_sensitive( gtk.TRUE )
+			self['second_entry'].set_sensitive( False )
+			self['step_entry'].set_sensitive( True )
 		elif aName == "space_no_limit":
-			self['space_entry'].set_sensitive( gtk.FALSE )
+			self['space_entry'].set_sensitive( False )
 		elif aName == "spac_max":
-			self['space_entry'].set_sensitive( gtk.TRUE )
+			self['space_entry'].set_sensitive( True )
 
 
 	# ==========================================================================

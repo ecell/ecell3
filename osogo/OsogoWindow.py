@@ -198,7 +198,7 @@ class OsogoWindow(Window):
 		""" destroys Widgets and sets __theExist FALSE """
 		if self.exists():
 			self[self.theTopWidget].destroy()
-			self.__theExist = gtk.FALSE
+			self.__theExist = False
 			self.widgets = None
 			self.theSession.theMainWindow.update()
 #			self.theSession.updateFundamentalWindows()

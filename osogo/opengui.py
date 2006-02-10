@@ -152,7 +152,7 @@ def main():
 
 		# print message on MainWindow
 		aSession.message("%s is being loaded and executed.\n" %anEssFile )
-		gtk.timeout_add( 1, loadScript, [aSession, anEssFile] )
+		gobject.timeout_add( 1, loadScript, [aSession, anEssFile] )
 
 	else:
 		aMainWindow = aSession.openWindow('MainWindow')

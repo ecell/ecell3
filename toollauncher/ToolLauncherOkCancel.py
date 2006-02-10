@@ -54,7 +54,7 @@ class ToolLauncherOkCancel( ParentWindow ):
 		"""
 		self.theObj.onOk()
 		self.close()
-		return gtk.TRUE
+		return True
 	# end of onOk
 
 
@@ -63,7 +63,7 @@ class ToolLauncherOkCancel( ParentWindow ):
 		"""
 #		self.theObj.onCancel()
 		self.close()
-#		return gtk.FALSE
+#		return False
 	# end of onCancel
 # end of ToolLauncherOkCancel
 

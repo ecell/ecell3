@@ -100,19 +100,19 @@ class StepperWindow(OsogoWindow):
 		self['property_list'].set_model(aPropertyModel)
 		column=gtk.TreeViewColumn( 'Property',gtk.CellRendererText(),\
 					   text=PROPERTY_INDEX )
-		column.set_resizable(gtk.TRUE)
+		column.set_resizable(True)
 		self['property_list'].append_column(column)
 		column=gtk.TreeViewColumn( 'Value',gtk.CellRendererText(),\
 					   text=VALUE_INDEX )
-		column.set_resizable(gtk.TRUE)
+		column.set_resizable(True)
 		self['property_list'].append_column(column)
 		column=gtk.TreeViewColumn( 'Get',gtk.CellRendererText(),\
 					   text=GET_INDEX )
-		column.set_resizable(gtk.TRUE)
+		column.set_resizable(True)
 		self['property_list'].append_column(column)
 		column=gtk.TreeViewColumn( 'Set',gtk.CellRendererText(),\
 					   text=SET_INDEX )
-		column.set_resizable(gtk.TRUE)
+		column.set_resizable(True)
 		self['property_list'].append_column(column)
 		
 
@@ -158,7 +158,7 @@ class StepperWindow(OsogoWindow):
 			aTitle = self['stepper_id_list'].get_model().get_value(anIter, 0 )
 			if aTitle == aStepperID:
 				aPath = self['stepper_id_list'].get_model().get_path ( anIter )
-				self['stepper_id_list'].set_cursor( aPath, None, gtk.FALSE )
+				self['stepper_id_list'].set_cursor( aPath, None, False )
 				break
 			anIter=self['stepper_id_list'].get_model().iter_next(anIter)
 		self.__selectStepperID(  None )
@@ -272,7 +272,7 @@ class StepperWindow(OsogoWindow):
 			aTitle = self['property_list'].get_model().get_value(anIter, PROPERTY_INDEX )
 			if aTitle == aPropertyName:
 				aPath = self['property_list'].get_model().get_path ( anIter )
-				self['property_list'].set_cursor( aPath, None, gtk.FALSE )
+				self['property_list'].set_cursor( aPath, None, False )
 				break
 			anIter=self['property_list'].get_model().iter_next(anIter)
 

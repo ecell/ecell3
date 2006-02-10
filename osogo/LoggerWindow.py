@@ -88,13 +88,13 @@ class LoggerWindow(OsogoWindow):
 
 		self.theEntryList.set_model( aListStore )
 		column=gtk.TreeViewColumn('FullPN',gtk.CellRendererText(),text=0)
-		column.set_resizable(gtk.TRUE)
+		column.set_resizable(True)
 		self.theEntryList.append_column(column)
 		column=gtk.TreeViewColumn('Start',gtk.CellRendererText(),text=1)
-		column.set_resizable(gtk.TRUE)
+		column.set_resizable(True)
 		self.theEntryList.append_column(column)
 		column=gtk.TreeViewColumn('End',gtk.CellRendererText(),text=2)
-		column.set_resizable(gtk.TRUE)
+		column.set_resizable(True)
 		self.theEntryList.append_column(column)
 		self.theEntryList.get_selection().set_mode(gtk.SELECTION_MULTIPLE)
 		self.initialize()
@@ -411,7 +411,7 @@ class LoggerWindow(OsogoWindow):
 			if anEvent.button == 3:
 				self.thePopupMenu.popup( None, None, None, 1, 0 )
 
-		return gtk.FALSE
+		return False
 
 	# end of poppuMenu
 
@@ -447,7 +447,7 @@ class LoggerWindow(OsogoWindow):
 			aTitle = self.theEntryList.get_model().get_value(anIter, 0 )
 			if aTitle == aFullPNString:
 				aPath = self.theEntryList.get_model().get_path ( anIter )
-				self.theEntryList.set_cursor( aPath, None, gtk.FALSE )
+				self.theEntryList.set_cursor( aPath, None, False )
 				break
 			anIter = self.theEntryList.get_model().iter_next( anIter )
 		if aDirectory != None:
@@ -487,7 +487,7 @@ class LoggerWindow(OsogoWindow):
 			also sets interval checkbox True
 		"""
 		self['datainterval_spinbutton'].set_value( anInterval )
-		self['datainterval_checkbox'].set_active( gtk.TRUE )
+		self['datainterval_checkbox'].set_active( True )
 		self.updateDataInterval()
 		
 
@@ -508,7 +508,7 @@ class LoggerWindow(OsogoWindow):
 			also sets time checkbox True
 		"""
 		self['start_spinbutton'].set_value( aTime )
-		self['time_checkbox'].set_active( gtk.TRUE )
+		self['time_checkbox'].set_active( True )
 		self.updateStartEnd()
 		
 
@@ -529,7 +529,7 @@ class LoggerWindow(OsogoWindow):
 			also sets time checkbox True
 		"""
 		self['end_spinbutton'].set_value( aTime )
-		self['time_checkbox'].set_active( gtk.TRUE )
+		self['time_checkbox'].set_active( True )
 		self.updateStartEnd()
 
 	# ==============================================================================
@@ -560,14 +560,14 @@ class LoggerWindow(OsogoWindow):
 	# ==============================================================================
 	def setUseDefaultInterval ( self, aBoolean ):
 		""" sets interval checkbox to aBoolean """
-		if aBoolean == gtk.TRUE or aBoolean == gtk.FALSE:
+		if aBoolean == True or aBoolean == False:
 			self['datainterval_checkbox'].set_active( aBoolean )
 			self.updateDataInterval()
 
 	# ==============================================================================
 	def setUseDefaultTime ( self, aBoolean ):
 		""" sets time checkbox to aBoolean """
-		if aBoolean == gtk.TRUE or aBoolean == gtk.FALSE:
+		if aBoolean == True or aBoolean == False:
 			self['time_checkbox'].set_active( aBoolean )
 			self.updateStartEnd()
 

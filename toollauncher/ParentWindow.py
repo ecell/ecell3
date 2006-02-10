@@ -129,7 +129,7 @@ class ParentWindow(Window):
 		"""
 
 		# when glade file is not loaded yet or already deleted.
-		if self.__theExist == gtk.FALSE:
+		if self.__theExist == False:
 
 			# sets __theExist flag is TRUE
 			self.__theExist = True
@@ -155,6 +155,6 @@ class ParentWindow(Window):
 		""" destroys Widgets and sets __theExist FALSE """
 		if self.exists:
 			self[self.__class__.__name__].destroy()
-			self.__theExist = gtk.FALSE
+			self.__theExist = False
 
 # end of ParentWindow

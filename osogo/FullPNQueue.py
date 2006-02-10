@@ -78,13 +78,13 @@ class FullPNQueue:
 
     def __updateNavigatorButtons( self ):
         if len( self.backwardQueue ) == 0:
-            backFlag = gtk.FALSE
+            backFlag = False
         else:
-            backFlag = gtk.TRUE
+            backFlag = True
         if len( self.forwardQueue ) == 0:
-            forFlag = gtk.FALSE
+            forFlag = False
         else:
-            forFlag = gtk.TRUE
+            forFlag = True
         self.forwardButton.set_sensitive( forFlag )
         self.backButton.set_sensitive( backFlag )
         

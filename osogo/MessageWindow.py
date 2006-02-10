@@ -104,7 +104,7 @@ class MessageWindow( Window ):
 	def __updateEndMark( self ):
 
 		endIter=self.messageBuffer.get_end_iter()
-		self.endMark=self.messageBuffer.create_mark( 'EM', endIter, gtk.FALSE )
+		self.endMark=self.messageBuffer.create_mark( 'EM', endIter, False )
 
 
 if __name__ == "__main__":

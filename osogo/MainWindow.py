@@ -176,7 +176,7 @@ class LogoAnimation:
             self.image.set_from_file( self.iconList[self.__currentImage] )
             self.__currentImage += 1
 
-            self.theTimer = gtk.timeout_add( self.delay, LogoAnimation.animate, self )
+            self.theTimer = gobject.timeout_add( self.delay, LogoAnimation.animate, self )
 
             
             #if ( self.__currentImage == self.END_ROTATION ):
@@ -202,10 +202,10 @@ class LogoAnimation:
 
                 self.image.set_from_file( self.iconList[self.__currentImage] )
                 self.__currentImage += 1
-                self.theTimer = gtk.timeout_add( 60, LogoAnimation.animate, self )
+                self.theTimer = gobject.timeout_add( 60, LogoAnimation.animate, self )
             else:
                 if self.theTimer != None:
-                    gtk.timeout_remove( self.theTimer )
+                    gobject.timeout_remove( self.theTimer )
                     self.theTimer = None
                     
 
@@ -776,7 +776,7 @@ class MainWindow(OsogoWindow):
 			if aDialog.return_result() != OK_PRESSED:
 				if running_flag:
 					self.theSession.run()
-				return gtk.TRUE		
+				return True		
 
 		self.setStopState()
 
@@ -784,7 +784,7 @@ class MainWindow(OsogoWindow):
 
 		self.theSession.QuitGUI()
 
-		return gtk.TRUE
+		return True
 
 
 	def close( self ):
@@ -883,8 +883,8 @@ class MainWindow(OsogoWindow):
 
 	def getStepType( self ):
 		""" returns state of sec radiobutton
-			gtk.TRUE: seconds
-			gtk.FALSE: steps
+			True: seconds
+			False: steps
 		"""
 		return self['sec_radiobutton'].get_active()
 
@@ -895,9 +895,9 @@ class MainWindow(OsogoWindow):
 			False : step			
 			"""
 		if aState == True :
-			self['sec_radiobutton'].set_active( gtk.TRUE )
+			self['sec_radiobutton'].set_active( True )
 		if aState == False:
-			self['sec_radiobutton'].set_active( gtk.FALSE )
+			self['sec_radiobutton'].set_active( False )
 
 
 	def getStepSize( self ):
@@ -1028,33 +1028,33 @@ class MainWindow(OsogoWindow):
 
 		# boardwindow:
 		if self.theSession.doesExist('BoardWindow' ):
-			flag = gtk.TRUE
+			flag = True
 		else:
-			flag = gtk.FALSE
+			flag = False
 		self['board_window_menu'].set_active( flag )
 		( self['board_button'].get_child() ).set_active(flag)
 
 		# Loggerwindow:
 		if self.theSession.doesExist('LoggerWindow' ):
-			flag = gtk.TRUE
+			flag = True
 		else:
-			flag = gtk.FALSE
+			flag = False
 		self['logger_window_menu'].set_active( flag )
 		( self['logger_button'].get_child() ).set_active(flag)
 			
 		# interface window:
 		if self.theSession.doesExist('InterfaceWindow' ):
-			flag = gtk.TRUE
+			flag = True
 		else:
-			flag = gtk.FALSE
+			flag = False
 		self['interface_window_menu'].set_active( flag )
 		( self['interface_button'].get_child() ).set_active(flag)
 
 		# stepperwindow:
 		if self.theSession.doesExist('StepperWindow' ):
-			flag = gtk.TRUE
+			flag = True
 		else:
-			flag = gtk.FALSE
+			flag = False
 		self['stepper_window_menu'].set_active( flag )
 		( self['stepper_button'].get_child() ).set_active(flag)
 
@@ -1062,9 +1062,9 @@ class MainWindow(OsogoWindow):
 	
 		#MessageWindow
 		if self.theMessageWindowVisible:
-			flag = gtk.TRUE
+			flag = True
 		else:
-			flag = gtk.FALSE
+			flag = False
 		self['message_window_menu'].set_active(flag)
 		( self['message_togglebutton'].get_child() ).set_active( flag )
 
@@ -1213,12 +1213,12 @@ class MainWindow(OsogoWindow):
 	def hideMessageWindow( self ):            
             
                 self[ 'messagehandlebox' ].hide()
-		( self['message_togglebutton'].get_child() ).set_active(gtk.FALSE)
+		( self['message_togglebutton'].get_child() ).set_active(False)
 
 
 	def showMessageWindow( self ):
 		self[ 'messagehandlebox' ].show()
-		( self['message_togglebutton'].get_child() ).set_active(gtk.TRUE)
+		( self['message_togglebutton'].get_child() ).set_active(True)
 
 
         def __toggleMessageWindow( self, *arg ) :

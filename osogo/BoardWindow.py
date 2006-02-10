@@ -377,9 +377,9 @@ class BoardWindow(OsogoWindow):
             False : Down
         """
         if aDirection:
-            self['forward_radiobutton'].set_active( gtk.TRUE )
+            self['forward_radiobutton'].set_active( True )
         if not aDirection:
-            self['forward_radiobutton'].set_active( gtk.FALSE )
+            self['forward_radiobutton'].set_active( False )
 
         self.changeAlignment( None )                
     

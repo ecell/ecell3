@@ -169,10 +169,10 @@ def main():
 
     if anEssFile:
 
-	gtk.timeout_add( 1, loadScript, [aSession, aParameters, anEssFile] )
+	gobject.timeout_add( 1, loadScript, [aSession, aParameters, anEssFile] )
 
     else:
-	gtk.timeout_add( 1, startInteract, [aSession, aParameters] )
+	gobject.timeout_add( 1, startInteract, [aSession, aParameters] )
     aSession.GUI_interact()
 
          

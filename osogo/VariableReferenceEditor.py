@@ -86,8 +86,8 @@ class VariableReferenceEditor:
             aFullID = aVariableReference[VARREF_FULLID]
             aCoef = aVariableReference[VARREF_COEF]
             anIter = self.theListStore.append(  )
-            # to make columns editable change gtk.FALSE to gtk.TRUE 
-            self.theListStore.set( anIter, 0, aName, 1, aFullID, 2, aCoef, 3, gtk.FALSE )
+            # to make columns editable change False to True 
+            self.theListStore.set( anIter, 0, aName, 1, aFullID, 2, aCoef, 3, False )
         
         
     def __setValue( self ):
@@ -146,7 +146,7 @@ class VariableReferenceEditor:
                 self.__openAction( None, realFullID )
         if event.button == 3:
             self.__popUpMenu()
-            return gtk.TRUE
+            return True
 
     def __getRealFullID( self ):
         selectedFullID = self.__getSelectedFullID()
@@ -169,14 +169,14 @@ class VariableReferenceEditor:
         if realFullID != None:
             openItem.connect( "activate", self.__openAction, realFullID )
         else:
-            openItem.set_sensitive( gtk.FALSE )
+            openItem.set_sensitive( False )
         aMenu.append( openItem )
 
         openNewItem = gtk.MenuItem( "Open in new" )
         if realFullID != None:
             openNewItem.connect( "activate", self.__openNewAction, realFullID )
         else:
-            openNewItem.set_sensitive( gtk.FALSE )
+            openNewItem.set_sensitive( False )
         aMenu.append( openNewItem )
         aMenu.append( gtk.SeparatorMenuItem() )
         
@@ -190,7 +190,7 @@ class VariableReferenceEditor:
         if selectedIter != None:
             deleteItem.connect( "activate", self.__deleteAction, selectedIter )
         else:
-            deleteItem.set_sensitive( gtk.FALSE )
+            deleteItem.set_sensitive( False )
         # to add delete functionality uncomment it
         #aMenu.append( deleteItem )
         aMenu.show_all()

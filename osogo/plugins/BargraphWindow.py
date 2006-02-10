@@ -78,7 +78,7 @@ class BargraphWindow( OsogoPluginWindow ):
 		#self.pm=gtk.gdk.Pixmap(root.window,BAR_WIDTH,BAR_HEIGTH,-1)
 		self.pm=gtk.gdk.Pixmap(root.window,self.BAR_WIDTH,self.BAR_HEIGTH,-1)
 		
-		self.pm.draw_rectangle(self.colored_ranges[1][2],gtk.TRUE,0,0,
+		self.pm.draw_rectangle(self.colored_ranges[1][2],True,0,0,
 			    #BAR_WIDTH,BAR_HEIGTH)
 			    self.BAR_WIDTH,self.BAR_HEIGTH)
 
@@ -111,7 +111,7 @@ class BargraphWindow( OsogoPluginWindow ):
 	    self.current_scale=self.get_scale(self.current_value)
 	    if self.current_scale==0:
 	    #paint the whole area black, lastvalue, lastposition, lastscale=0
-		self.pm.draw_rectangle(self.colored_ranges[0][2],gtk.TRUE,0,0,
+		self.pm.draw_rectangle(self.colored_ranges[0][2],True,0,0,
 			    self.BAR_WIDTH,self.BAR_HEIGTH)
 		self.drawingarea.queue_draw_area(0,0,self.BAR_WIDTH,self.BAR_HEIGTH)
 		self.lastvalue=0
@@ -132,8 +132,8 @@ class BargraphWindow( OsogoPluginWindow ):
 		if self.lastscale!=self.current_scale:
 		    #draw painted area and draw grey area
 		    self.pm.draw_rectangle(self.colored_ranges[self.current_scale][2],
-			gtk.TRUE,0,0,self.current_position,self.BAR_HEIGTH)
-		    self.pm.draw_rectangle(self.colored_ranges[1][2],gtk.TRUE,
+			True,0,0,self.current_position,self.BAR_HEIGTH)
+		    self.pm.draw_rectangle(self.colored_ranges[1][2],True,
 			self.current_position,0,self.BAR_WIDTH-self.current_position,
 			self.BAR_HEIGTH)
 		    self.drawingarea.queue_draw_area(0,0,self.BAR_WIDTH,self.BAR_HEIGTH)
@@ -151,7 +151,7 @@ class BargraphWindow( OsogoPluginWindow ):
 		    #if difference ispositiv , paint with proper color
 		    else:
 			return True #do not draw if no changes
-		    self.pm.draw_rectangle(brush,gtk.TRUE,x0,0,width,self.BAR_HEIGTH)
+		    self.pm.draw_rectangle(brush,True,x0,0,width,self.BAR_HEIGTH)
 		    self.drawingarea.queue_draw_area(x0,0,width,self.BAR_HEIGTH) 
 		self.lastvalue=self.current_value
 		self.lastscale=self.current_scale

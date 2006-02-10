@@ -74,11 +74,11 @@ class TracerWindow( OsogoPluginWindow ):
         onoffColumn = gtk.TreeViewColumn( 'on', onoffRenderer, active = COL_ON )
         xaxisColumn = gtk.TreeViewColumn ( 'x', xaxisRenderer, active = COL_X )
 
-        pixBufColumn.set_resizable( gtk.TRUE )
-        fullpnColumn.set_resizable( gtk.TRUE )
-        loggerColumn.set_resizable( gtk.TRUE )
-        onoffColumn.set_resizable( gtk.TRUE )
-        xaxisColumn.set_resizable( gtk.TRUE )
+        pixBufColumn.set_resizable( True )
+        fullpnColumn.set_resizable( True )
+        loggerColumn.set_resizable( True )
+        onoffColumn.set_resizable( True )
+        xaxisColumn.set_resizable( True )
 
         self.theListWindow.append_column( onoffColumn )
         self.theListWindow.append_column( pixBufColumn )
@@ -181,13 +181,13 @@ class TracerWindow( OsogoPluginWindow ):
 #    def checkHistoryButton(self):
 #        history_button = self['togglebutton3']
 #        if len( self.displayedFullPNStringList ) == 0:
-#            history_button.set_sensitive( gtk.FALSE )
+#            history_button.set_sensitive( False )
 #            return None 
 #        for fpn in self.displayedFullPNStringList:
 #            if not self.hasLogger(fpn):
-#                history_button.set_sensitive(gtk.FALSE)
+#                history_button.set_sensitive(False)
 #                return None 
-#        history_button.set_sensitive(gtk.TRUE)
+#        history_button.set_sensitive(True)
 
 
     # ========================================================================
@@ -213,9 +213,9 @@ class TracerWindow( OsogoPluginWindow ):
         while iter != None:
             text = self.theListStore.get_value( iter, COL_TXT )
             if self.hasLogger( text ):
-                fixed=gtk.TRUE
+                fixed=True
             else:
-                fixed=gtk.FALSE
+                fixed=False
             self.theListStore.set(iter, COL_LOG, fixed)
             iter = self.theListStore.iter_next(iter)
 
@@ -272,9 +272,9 @@ class TracerWindow( OsogoPluginWindow ):
 #    def checkRemoveButton( self ):
 #        remove_button = self['button9']
 #        if len( self.displayedFullPNStringList ) > 1:
-#            remove_button.set_sensitive( gtk.TRUE )
+#            remove_button.set_sensitive( True )
 #        else:
-#            remove_button.set_sensitive( gtk.FALSE )
+#            remove_button.set_sensitive( False )
 
 
     # ========================================================================
@@ -335,13 +335,13 @@ class TracerWindow( OsogoPluginWindow ):
             self.thePaned.add( self.theDrawingArea )
             self.theTopFrame.add( self.theVbox2 )
         
-        self.thePlotInstance.showControl( gtk.TRUE )
+        self.thePlotInstance.showControl( True )
 
 
     # ========================================================================
     def minimize(self):
 
-        self.thePlotInstance.showControl( gtk.FALSE )
+        self.thePlotInstance.showControl( False )
         if self.theTopFrame== self.theVbox2.get_parent():
             if self.isStandAlone():
                 dividerPos = self.thePaned.get_position()
@@ -444,8 +444,8 @@ class TracerWindow( OsogoPluginWindow ):
     def setTraceVisible (self, aFullPNString, aBoolean):
         """ sets visible trace of identified by FullPNString 
             aBoolean:
-            gtk.TRUE - Display
-            gtk,FALSE - Don't display trace
+            True - Display
+            False - Don't display trace
         """
         if aFullPNString not in self.thePlotInstance.getDataSeriesNames():
             return
@@ -681,7 +681,7 @@ class TracerWindow( OsogoPluginWindow ):
         fixed = model.get_value( iter, COL_LOG )
         text = self.theListStore.get_value( iter, COL_TXT )
 
-        if fixed == gtk.FALSE:
+        if fixed == False:
             if self.checkRun():
                 return
             self.createLogger( [text] )
@@ -698,7 +698,7 @@ class TracerWindow( OsogoPluginWindow ):
         fixed = model.get_value( iter, COL_X )
         text = self.theListStore.get_value( iter, COL_TXT )
         
-        if fixed == gtk.FALSE:
+        if fixed == False:
             self.setXAxis( text )
         else:
             self.setXAxis( "Time" )

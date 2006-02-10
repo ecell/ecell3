@@ -248,14 +248,14 @@ class ToolLauncherPreferences( ParentWindow ):
 	    	"""update the checkboxes and entry boxes with the preferences from ToolLauncher
 		"""
 		if self.theToolLauncher.thePref['save_em'] == '1' :
-		    self['save_em_checkbox'].set_active( gtk.TRUE )
+		    self['save_em_checkbox'].set_active( True )
 		else:
-		    self['save_em_checkbox'].set_active( gtk.FALSE )
+		    self['save_em_checkbox'].set_active( False )
 
 		if self.theToolLauncher.thePref['save_eml'] == '1' :
-		    self['save_eml_checkbox'].set_active( gtk.TRUE )
+		    self['save_eml_checkbox'].set_active( True )
 		else:
-		    self['save_eml_checkbox'].set_active( gtk.FALSE )
+		    self['save_eml_checkbox'].set_active( False )
 
 
 		self['editor_path'].set_text( self.theToolLauncher.thePref['editor_path'] )
@@ -272,7 +272,7 @@ class ToolLauncherPreferences( ParentWindow ):
 		del self.thePathSelectorDlg 
 		self.theToolLauncher.thePref['window_open'] = 0
 		self.close()
-		return gtk.TRUE
+		return True
 
 
 	def __deleteFileSelection( self, *arg ):

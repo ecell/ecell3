@@ -90,7 +90,7 @@ class ConfirmWindow(gtk.Dialog):
 	
 		# appends ok button
 		ok_button = gtk.Button("  OK  ")
-		self.win.action_area.pack_start(ok_button,gtk.FALSE,gtk.FALSE,)
+		self.win.action_area.pack_start(ok_button,False,False,)
 		ok_button.set_flags(gtk.CAN_DEFAULT)
 		ok_button.grab_default()
 		ok_button.show()
@@ -105,7 +105,7 @@ class ConfirmWindow(gtk.Dialog):
 
 			# appends cancel button
 			cancel_button = gtk.Button(" Cancel ")
-			self.win.action_area.pack_start(cancel_button,gtk.FALSE,gtk.FALSE)
+			self.win.action_area.pack_start(cancel_button,False,False)
 			cancel_button.show()
 			cancel_button.connect("clicked",self.cancelButtonClicked)	
 

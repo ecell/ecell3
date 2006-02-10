@@ -144,10 +144,10 @@ class EntityListWindow(OsogoWindow):
 
     def updateButtons( self ):
         if ( self.theSession.theModelWalker != None ):
-            self['search_button'].set_sensitive(gtk.TRUE)
-            self['view_button'].set_sensitive(gtk.TRUE)
-            self['search_entry'].set_sensitive(gtk.TRUE)
-            self['plugin_optionmenu'].set_sensitive(gtk.TRUE)
+            self['search_button'].set_sensitive(True)
+            self['view_button'].set_sensitive(True)
+            self['search_entry'].set_sensitive(True)
+            self['plugin_optionmenu'].set_sensitive(True)
 
         else:
             self['search_button'].set_sensitive(0)
@@ -198,7 +198,7 @@ class EntityListWindow(OsogoWindow):
         column = gtk.TreeViewColumn( 'System Tree',
                                      gtk.CellRendererText(),
                                      text=0 )
-        column.set_visible( gtk.TRUE )
+        column.set_visible( True )
         self.systemTree.append_column(column)
 
         selection = self.systemTree.get_selection()
@@ -577,7 +577,7 @@ class EntityListWindow(OsogoWindow):
 
             path = systemStore.get_path( iter )
             if systemListLength < 6 and len( path ) < 6:
-                self.systemTree.expand_row( path, gtk.TRUE )
+                self.systemTree.expand_row( path, True )
 
 
     def reconstructSystemTree( self ):
@@ -772,7 +772,7 @@ class EntityListWindow(OsogoWindow):
                 self.__expandRow( parentPath )
                 
             # expand this path
-            self.systemTree.expand_row( aPath, gtk.FALSE )
+            self.systemTree.expand_row( aPath, False )
 
 
     def selectListIter( self, aListStore, aSelection, anIDList ):
@@ -1274,20 +1274,20 @@ class EntityListWindow(OsogoWindow):
             return
         self.searchString = searchString
         self.theQueue.pushFullPNList( aFullPNList )
-        self['search_button'].set_sensitive( gtk.FALSE)
+        self['search_button'].set_sensitive( False)
         if self.searchString != '':
-            self['clear_button'].set_sensitive(gtk.TRUE )
+            self['clear_button'].set_sensitive(True )
 
 
     def filterSelectedSystems( self ):
         
         self.searchString = self['search_entry'].get_text()
         self.reconstructLists()
-        self['search_button'].set_sensitive( gtk.FALSE)
+        self['search_button'].set_sensitive( False)
         if self.searchString != '':
-            self['clear_button'].set_sensitive(gtk.TRUE )
+            self['clear_button'].set_sensitive(True )
         else:
-            self['clear_button'].set_sensitive(gtk.FALSE )
+            self['clear_button'].set_sensitive(False )
 
 
     def pushSearchButton( self, *arg ):
@@ -1304,7 +1304,7 @@ class EntityListWindow(OsogoWindow):
 
             self.pushSearchButton( None )
         else :
-            self['search_button'].set_sensitive(gtk.TRUE )
+            self['search_button'].set_sensitive(True )
 
         
     def pushClearButton( self, *args ):
@@ -1314,7 +1314,7 @@ class EntityListWindow(OsogoWindow):
     def searchScopeChanged( self, *args ):
         searchString = self['search_entry'].get_text()
         if self.searchString != '':
-            self['search_button'].set_sensitive( gtk.TRUE)
+            self['search_button'].set_sensitive( True)
         else:
-            self['search_button'].set_sensitive( gtk.FALSE)
+            self['search_button'].set_sensitive( False)
             

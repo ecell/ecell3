@@ -160,8 +160,8 @@ class GtkSessionMonitor(Session):
 	# ==========================================================================
 	def doesExist( self, aWindowName):
 		""" aWindowName: (str) name of Window
-			 returns gtk.TRUE if window is opened
-				 gtk.FALSE if window is not opened
+			 returns True if window is opened
+				 False if window is not opened
 			 checks both plugin and fundamental windows 
 		"""
 
@@ -171,15 +171,15 @@ class GtkSessionMonitor(Session):
 
 		# check entity list windows
 		if aWindowName == 'EntityListWindow' and len( self.theEntityListInstanceMap>0):
-			return gtk.TRUE
+			return True
 		# check pluginwindow instances
 		
 		aPluginInstanceList = self.thePluginManager.thePluginTitleDict.keys()
 
 		for aPluginInstance in aPluginInstanceList:
 			if aWindowName == self.thePluginManager.thePluginTitleDict[aPluginInstance]:
-				return gtk.TRUE
-		return gtk.FALSE
+				return True
+		return False
 
 
 	# ==========================================================================
@@ -382,7 +382,7 @@ class GtkSessionMonitor(Session):
 			if self.stuckRequests >6:
 				self.theUpdateInterval *= 1.5
 				self.stuckRequests = 3
-		self.theTimer = gtk.timeout_add( int(self.theUpdateInterval), self.__updateByTimeOut, 0 )
+		self.theTimer = gobject.timeout_add( int(self.theUpdateInterval), self.__updateByTimeOut, 0 )
 
 
 	# ==========================================================================
@@ -391,7 +391,7 @@ class GtkSessionMonitor(Session):
 		Returns None
 		"""
 
-		gtk.timeout_remove( self.theTimer )
+		gobject.timeout_remove( self.theTimer )
 
 	# ==========================================================================
 	def updateWindows( self ):
@@ -602,7 +602,7 @@ class GtkSessionMonitor(Session):
 
 		try:
 			self.theRunningFlag = True
-			self.theTimer = gtk.timeout_add(self.theUpdateInterval, self.__updateByTimeOut, FALSE)
+			self.theTimer = gobject.timeout_add(self.theUpdateInterval, self.__updateByTimeOut, FALSE)
 
 			aCurrentTime = self.getCurrentTime()
 			self.message("%15s"%aCurrentTime + ":Start\n" )
@@ -657,7 +657,7 @@ class GtkSessionMonitor(Session):
 			self.theRunningFlag = True
 
 			self.message( "Step\n" )
-			self.theTimer = gtk.timeout_add( self.theUpdateInterval, self.__updateByTimeOut, 0 )
+			self.theTimer = gobject.timeout_add( self.theUpdateInterval, self.__updateByTimeOut, 0 )
 
 			Session.step( self, int( num ) )
 
