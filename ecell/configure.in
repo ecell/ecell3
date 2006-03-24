@@ -178,40 +178,6 @@ fi
 AC_SUBST(DMTOOL_DIR)
 AC_SUBST(DMTOOL_INCLUDE_DIR)
 
-dnl
-dnl
-dnl boost package
-dnl
-dnl
-AC_ARG_WITH( boost-root-dir,,
-  [BOOST_ROOT_DIR="$withval"],
-  [BOOST_ROOT_DIR=])
-EXT_GUESS="$BOOST_ROOT_DIR $EXT_GUESS "
-
-AC_MSG_CHECKING( for boost include dir );
-BOOST_INCLUDE=""	
-for ac_dir in $EXT_GUESS ; do
-    if test "$BOOST_INCLUDE" = "" ; then
-        if test -f $ac_dir/include/boost/python.hpp ; then
-            BOOST_INCLUDE=`(cd $ac_dir/include ; pwd)`
-            BOOST_LIB=`(cd $ac_dir/lib ; pwd)`
-        elif test -f $ac_dir/include/boost*/boost/python.hpp ; then
-            BOOST_INCLUDE=`(cd $ac_dir/include/boost* ; pwd)`
-            BOOST_LIB=`(cd $ac_dir/lib ; pwd)`
-        fi
-    fi
-done
-if test "$BOOST_INCLUDE" = "" ; then
-    AC_MSG_ERROR(boost includes not found);
-else
-    BOOST_INCLUDE="-I$BOOST_INCLUDE"
-    BOOST_LIB="-L$BOOST_LIB"
-    BOOST_PYTHON_LIB="-lboost_python"
-fi
-AC_MSG_RESULT($BOOST_INCLUDE)
-AC_SUBST(BOOST_INCLUDE)
-AC_SUBST(BOOST_PYTHON_LIB)
-AC_SUBST(BOOST_LIB)
 
 AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR([])])
 

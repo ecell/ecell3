@@ -14,13 +14,12 @@ GSL_LIBADD = -lgsl -lgslcblas
 DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
 INCLTDL=@INCLTDL@
 LIBLTDL=@LIBLTDL@
-BOOST_INCLUDE=@BOOST_INCLUDE@
 
 AM_CXXFLAGS=@CXXFLAGS@
 
-INCLUDES = -I${top_srcdir}  -I${top_srcdir}/.. ${BOOST_INCLUDE} ${DMTOOL_INCLUDE} ${INCLTDL}
+INCLUDES = -I${top_srcdir}  -I${top_srcdir}/.. ${DMTOOL_INCLUDE} ${INCLTDL}
 
-lib_LTLIBRARIES = libecs.la
+pkglib_LTLIBRARIES = libecs.la
 
 libecs_la_LDFLAGS= -version-info 2:0:0 $(no_undefined) #-rpath ${libdir}
 libecs_la_LIBADD=  -lstdc++ ${LIBLTDL} ${GSL_LIBADD}

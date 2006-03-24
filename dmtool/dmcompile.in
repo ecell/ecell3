@@ -8,7 +8,8 @@ import getopt
 
 prefix=os.environ['ECELL3_PREFIX']
 exec_prefix=prefix
-libdir=exec_prefix + os.sep + 'lib'
+#libdir=exec_prefix + os.sep + 'lib'
+libdir='@libdir@'
 CXX='@CXX@'
 ORIG_CXXFLAGS="@CXXFLAGS@"
 LDADD='-lstdc++'
