@@ -113,9 +113,7 @@ class EntityListWindow(OsogoWindow):
  
         self.__initializeProcessTree()
         self.__initializeVariableTree()
-
-        
-        
+        self.__initializeSelection()
         self.__initializePluginWindowOptionMenu()
 
         aFullPN = convertFullIDToFullPN( createFullID ( 'System::/' ) )
@@ -201,15 +199,21 @@ class EntityListWindow(OsogoWindow):
         column.set_visible( True )
         self.systemTree.append_column(column)
 
-        selection = self.systemTree.get_selection()
-        selection.set_mode( gtk.SELECTION_MULTIPLE )
-        selection.connect( 'changed', self.selectSystem )
-
         self.systemTree.set_model( treeStore )
 
         self.processTree.set_search_column( 0 )
         self.theSysSelection =  self.systemTree.get_selection()
 
+    def __initializeSelection( self ):
+        selection = self.systemTree.get_selection()
+        selection.set_mode( gtk.SELECTION_MULTIPLE )
+        selection.connect( 'changed', self.selectSystem )
+        selection = self.processTree.get_selection()
+        selection.set_mode( gtk.SELECTION_MULTIPLE )
+        selection.connect( 'changed', self.selectProcess )
+        selection = self.variableTree.get_selection()
+        selection.set_mode( gtk.SELECTION_MULTIPLE )
+        selection.connect( 'changed', self.selectVariable )
 
     def __initializeProcessTree( self ):
         """initialize ProcessTree
@@ -236,9 +240,6 @@ class EntityListWindow(OsogoWindow):
                 column.set_alignment( 1.0 )
                 column.get_cell_renderers()[0].set_property( 'xalign', 1.0 )
 
-        selection = self.processTree.get_selection()
-        selection.set_mode( gtk.SELECTION_MULTIPLE )
-        selection.connect( 'changed', self.selectProcess )
         self.processTree.set_search_column( 0 )
 
         model = gtk.ListStore( *columnTypeList )
@@ -270,9 +271,6 @@ class EntityListWindow(OsogoWindow):
                 column.set_alignment( 1.0 )
                 column.get_cell_renderers()[0].set_property( 'xalign', 1.0 )
 
-        selection = self.variableTree.get_selection()
-        selection.set_mode( gtk.SELECTION_MULTIPLE )
-        selection.connect( 'changed', self.selectVariable )
         self.variableTree.set_search_column( 0 )
 
         model = gtk.ListStore( *columnTypeList )
