@@ -3,7 +3,7 @@ $Id$
 Installation notes for E-Cell Simulation Environment Version 3 (E-Cell SE 3)
 on MS Windows32
 
-Satya Nanda Vel Arjunan  <satya@sfc.keio.ac.jp>
+Satya Nanda Vel Arjunan  <satya.arjunan@gmail.com>
 
 == Getting the latest version of E-Cell 3 ==
 
@@ -33,7 +33,7 @@ Satya Nanda Vel Arjunan  <satya@sfc.keio.ac.jp>
  1. GTK+ Runtime (gtk-win32-2.8.8-rc2.exe) and development (gtk-win32-devel-2.8.8-rc2.exe) from http://gladewin32.sourceforge.net/
  1. Python-2.4.2.msi from http://www.python.org/
  1. Numeric-24.2.win32-py2.4.exe from http://sourceforge.net/project/showfiles.php?group_id=1369&release_id=144555
- 1. py2exe-0.6.3.win32-py2.4.exe from http://starship.python.net/crew/theller/py2exe/
+ 1. py2exe-0.6.5.win32-py2.4.exe from http://starship.python.net/crew/theller/py2exe/
  1. gsl-1.7.tar.gz from http://mirrors.rcn.net/pub/sourceware/gsl/
  1. boost_1_33_1.tar.bz2 from http://sourceforge.net/project/showfiles.php?group_id=7586
  1. boost-jam-3.1.11-1-ntx86.zip from http://sourceforge.net/project/showfiles.php?group_id=7586
@@ -44,6 +44,8 @@ Satya Nanda Vel Arjunan  <satya@sfc.keio.ac.jp>
  1. libsbml-2.3.4.zip http://www.sbml.org/software/sbmltoolbox/
  1. swig-1.3.22.tar.gz from http://www.swig.org/index.html
  1. libtool from http://www.gnu.org/software/libtool/libtool.html
+ 1. svn-win32-1.3.1.zip from http://subversion.tigris.org/servlets/ProjectDocumentList?folderID=91
+   
 
 ----
 '''E-Cell Windows Development Environment Creation Steps:'''
@@ -56,12 +58,13 @@ Satya Nanda Vel Arjunan  <satya@sfc.keio.ac.jp>
  1. Extract pexports.exe into D:\development\MinGW\bin directory
  1. Install MSYS-1.0.11-2004.03.30-1.exe in D:\development\MSYS: during post install, give the location of MinGW as D:\development\MinGW
  1. Install msysDTK (msysDTK-1.0.1.exe) in  D:\development\MSYS (this is for automake, libtool etc)
+ 1. Extract svn-win32-*.zip into D:\development\MSYS
  1. Install GTK- Devel (gtk-win32-devel-2.8.8-rc2.exe) in D:\development\GTK register for MSYS
  1. Install Python (python-2.4.2.msi) in  D:\development\Python24
  1. Install Numerical Python (Numeric-24.2.win32-py2.4.exe) in D:\development\Python24
     i. mkdir /d/development/ecell3windows/pythonModules/1.numeric/lib/python2.4
     i. cp -r /d/development/Python24/Lib/site-packages /d/development/ecell3windows/pythonModules/1.numeric/lib/python2.4
- 1. Install Py2exe (py2exe-0.6.3.win32-py2.4.exe) in D:\development\Python24
+ 1. Install Py2exe (py2exe-0.6.5.win32-py2.4.exe) in D:\development\Python24
  1. As administrator edit the Path environment variable from:
     * Settings->Control Panel->System->Advanced->Environment Variables->Path->Edit
     * The following is the partial content of Path:
@@ -253,8 +256,7 @@ Satya Nanda Vel Arjunan  <satya@sfc.keio.ac.jp>
     i. mv /d/development/ecell3windows/pythonModules/i386/4.libsbml/lib/site-packages /d/development/ecell3windows/pythonModules/i386/4.libsbml/lib/python2.4
 
  1. Install E-Cell
-    i. export CVS_RSH=ssh
-    i. cvs -z3 -d:ext:anonymous@cvs.sf.net:/cvsroot/ecell co ecell3
+    i. svn co https://svn.sourceforge.net/svnroot/ecell/ecell3/trunk ecell3 
     i. cd ecell3
     i. ./autogen.sh
     i. for i386: CXXFLAGS="-O3" CFLAGS="-O3" LDFLAGS="-Wl,-s" ./configure --prefix=/d/development/ecell3windows/ecell3-i386
@@ -271,15 +273,14 @@ Satya Nanda Vel Arjunan  <satya@sfc.keio.ac.jp>
     i. make install
     i. mkdir /d/development/ecell3windows/ecell3-i386/lib/python2.4
     i. mv /d/development/Python24/Lib/site-packages /d/development/ecell3windows/ecell3-i386/lib/python2.4
-    i. cp -r /d/development/Python24/Lib/site/* /d/development/Python24/Lib/site-packages/
-    i. rm -r /d/development/Python24/Lib/site
-
+    i. mv /d/development/Python24/Lib/site /d/development/Python24/Lib/site-packages/
+    i. cp -r /d/development/ecell3windows/ecell3-i386/lib/python2.4/site-packages/* /d/development/Python24/Lib/site-packages
 ----
 '''E-Cell Windows Installer Packaging Steps:'''
 {{{
 Directory structure used for packaging under e:\ecell3windows:
 
-e:\ecell3windows
+d:\development\ecell3windows
 |-- dontCopy
 |-- ecell3-i386
 |   |-- bin
@@ -316,7 +317,8 @@ e:\ecell3windows
     |-- 1.MinGW
     |   |-- bin
     |   |-- include
-    |   `-- lib
+    |   |-- lib 
+    |   `-- libexec
     |-- 2.msys-cp.find.grep.ls.mkdir.mv.rm
     |   |-- bin
     |   `-- etc
@@ -396,5 +398,3 @@ Install/extract the following libraries/packages according to the above director
  1. The compiled installer will appear in the root directory of the script file, d:\development\ecell3windows\ecell3-i386
 
 You are done!! ;)
-
-

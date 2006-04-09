@@ -84,8 +84,8 @@ Source: ..\runtime\3.ecell3-docs\*.*; DestDir: {app}; Flags: recursesubdirs igno
 Source: ..\runtime\{#Arch}\4.boost\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 Source: ..\runtime\{#Arch}\5.gsl\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 Source: ..\runtime\{#Arch}\6.libgnomecanvas\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\{#Arch}\7.ecell3-samples\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
-Source: ..\runtime\{#Arch}\8.xerces-c\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\{#Arch}\7.xerces-c\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
+Source: ..\runtime\{#Arch}\8.ecell3-samples\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
 
 ;Python modules used by E-Cell
 Source: ..\pythonModules\1.Numeric\*.*; DestDir: {app}; Flags: recursesubdirs ignoreversion
@@ -264,6 +264,7 @@ begin
         pythondef := libdir + '\python.def';
         cmd := ExpandConstant('{cmd}')
         InstExec(cmd, '/C ' + pexports + ' ' + pythondll + ' > python.def', libdir, True, False, SW_HIDE, Dummy);
+        InstExec(cmd, '/C copy ' + pythondll + ' ' + PYTHONDLL_FILE, ExpandConstant('{app}') + '\bin\', True, False, SW_HIDE, Dummy);
         InstExec(dlltool, '--dllname  ' + pythondll + ' --def python.def ' + '--output-lib ' + LIBPYTHON_FILE, libdir, True, False, SW_SHOWMINNOACTIVE, Dummy);
         if FileExists(pythondef) then
           DeleteFile(pythondef);
@@ -492,7 +493,7 @@ begin
                          'Please wait for a few moments while the setup file is extracted.', mbInformation, MB_OK);
                   ExtractTemporaryFile(PYTHON_SETUP)
                   FileName := ExpandConstant('{tmp}') + '\' + PYTHON_SETUP;
-                  InstExec(FileName, '', '', True, False, SW_SHOWNORMAL, Dummy);
+                  InstShellExec(FileName, '', '', SW_SHOWNORMAL, Dummy);
                 end;
                 if CheckListBox.Checked[GtkCheck] then begin
                   MsgBox('GTK installation setup will start now since GTK-' + GTK_VERSION + ' was not found on your computer.' #13#10

@@ -1,12 +1,12 @@
 libdir=@libdir@
-USE_COMPILER_CONVERSIONS=@USE_COMPILER_CONVERSIONS@
 
 if OS_WIN32
-  no_undefined = -no-undefined
+  no_undefined = -no-undefined -Wl,--enable-runtime-pseudo-reloc
   SHLEXT = .dll.a
 else
   SHLEXT = @LTDL_SHLIB_EXT@
 endif
+
 
 SUBDIRS =
 
@@ -15,13 +15,12 @@ DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
 INCLTDL=@INCLTDL@
 LIBLTDL=@LIBLTDL@
 
+INCLUDES = -I${top_srcdir}  -I${top_srcdir}/.. ${DMTOOL_INCLUDE} ${INCLTDL}
+lib_LTLIBRARIES = libecs.la
+
 AM_CXXFLAGS=@CXXFLAGS@
 
-INCLUDES = -I${top_srcdir}  -I${top_srcdir}/.. ${DMTOOL_INCLUDE} ${INCLTDL}
-
-pkglib_LTLIBRARIES = libecs.la
-
-libecs_la_LDFLAGS= -version-info 2:0:0 $(no_undefined) #-rpath ${libdir}
+libecs_la_LDFLAGS= -version-info 2:0:0 $(no_undefined)
 libecs_la_LIBADD=  -lstdc++ ${LIBLTDL} ${GSL_LIBADD}
 libecs_la_SOURCES=\
 libecs.cpp\
@@ -109,7 +108,6 @@ VariableReference.hpp\
 DynamicPriorityQueue.hpp\
 FluxProcess.hpp\
 MethodProxy.hpp
-
 
 all-local: libecs$(SHLEXT)
 

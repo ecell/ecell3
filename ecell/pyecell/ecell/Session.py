@@ -59,7 +59,7 @@ class Session:
         aContext = self.__createScriptContext( parameters )
         if os.name != "nt":
             import readline # to provide convenient commandline editing :)
-            import code
+        import code
         anInterpreter = code.InteractiveConsole( aContext )
 
         self._prompt = self._session_prompt( self )

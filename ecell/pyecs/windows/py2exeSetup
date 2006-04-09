@@ -140,9 +140,8 @@ if CONSOLE:
 		zipfile = 'shared.zip',
 		options = {
 			'py2exe': {
-				'excludes' : ['ecell', 'gtk'],
+				'excludes' : ['ecell', 'gtk', 'ecell.emc' ],
                                 'unbuffered' : 1,
-                                'bundle_files' : 1,
 				'dist_dir' : '.'
 			}
 		}
@@ -155,9 +154,8 @@ else:
 		zipfile = 'shared.zip',
 		options = {
 			'py2exe': {
-				'excludes' : ['ecell', 'gtk'],
+				'excludes' : ['ecell', 'gtk', 'ecell.emc'],
                                 'unbuffered' : 1,
-                                'bundle_files' : 1,
 				'dist_dir' : '.'
 			}
 		}
