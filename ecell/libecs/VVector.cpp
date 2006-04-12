@@ -191,11 +191,11 @@ vvectorbase::vvectorbase()
       _directoryPriority = 3;
     } else
       {
-#ifdef	_Windows
-	_defaultDirectory = strdup("c:\\temp");
+#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
+	_defaultDirectory = getenv("TMP");
 #else
 	_defaultDirectory = strdup("/tmp");
-#endif	/* _Windows */
+#endif	
 	_directoryPriority = 4;
       }
   }
