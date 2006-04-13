@@ -1,4 +1,4 @@
-#!/usr/bin/env @prefix@/bin/ecell3-python
+#!/usr/bin/env python
 
 import sys
 import os
@@ -6,10 +6,12 @@ import glob
 import string
 import getopt
 
-prefix=os.environ['ECELL3_PREFIX']
-exec_prefix=prefix
-#libdir=exec_prefix + os.sep + 'lib'
+#prefix=@prefix@
+#exec_prefix=@exec_prefix@
+
+#FIXME: libdir should not be used in this program?
 libdir='@libdir@'
+
 CXX='@CXX@'
 ORIG_CXXFLAGS="@CXXFLAGS@"
 LDADD='-lstdc++'

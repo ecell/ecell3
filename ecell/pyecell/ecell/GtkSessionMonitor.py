@@ -38,13 +38,13 @@
 from gui_config import *
 import sys
 
-sys.path.insert(0, GUI_OSOGO_PATH)
+sys.path.insert(0, os.environ['OSOGOPATH'])
 import MainWindow  
 from ecell.Session import *
 from ecell.ModelWalker import *
 import gtk
 import gobject 
-sys.path.insert(0, GUI_OSOGO_PATH)
+sys.path.insert(0, os.environ['OSOGOPATH'])
 import EntityListWindow
 import LoggerWindow
 import InterfaceWindow 

@@ -6,8 +6,6 @@ WIN_ICON = ../ecell/pyecs/windows/ecell3-console.ico
 PATH_VARIABLES = ../ecell/pyecs/windows/pathVariables
 
 BINS =\
-rd2dm\
-eri2eml\
 ecell3-dmc\
 ecell3-em2eml\
 ecell3-eml2em

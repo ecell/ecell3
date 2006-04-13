@@ -4,8 +4,11 @@ import os
 import sys
 import string
 
-OSOGOPATH = os.environ['OSOGOPATH']
-PYTHONPATH = os.environ['PYTHONPATH']
+ECELL3_LIBDIR = os.environ['ECELL3_LIBDIR']
+OSOGOPATH = ECELL3_LIBDIR + os.sep + 'osogo'
+PYTHONPATH = OSOGOPATH + os.pathsep + os.environ['PYTHONPATH']
+
+os.environ['OSOGOPATH'] = OSOGOPATH
 os.environ['PYTHONPATH'] = OSOGOPATH + os.pathsep + PYTHONPATH
 os.environ['LANG'] = 'C'
 

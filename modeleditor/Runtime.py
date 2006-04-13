@@ -12,7 +12,7 @@ from Constants import *
 import os
 import sys
 import traceback
-sys.path.insert(0, GUI_OSOGO_PATH )
+sys.path.insert(0, os.environ['OSOGOPATH'] )
 import ecell.GtkSessionMonitor
 import ecell.ecssupport
 import time

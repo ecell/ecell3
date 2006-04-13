@@ -6,11 +6,7 @@ dnl AC_CONFIG_AUX_DIR()
 dnl
 dnl 
 dnl 
-ECELL_MAJOR_VERSION=3
-ECELL_MINOR_VERSION=1
-ECELL_MICRO_VERSION=105
-VERSION=$ECELL_MAJOR_VERSION.$ECELL_MINOR_VERSION.$ECELL_MICRO_VERSION
-PACKAGE=ecell
+source ecell_version.sh
 dnl
 AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION, do-not-define)
@@ -31,40 +27,15 @@ dnl
 AC_ARG_WITH(gtk,
   AC_HELP_STRING([--without-gtk],
                [build ecell without gtk library.]),
-  [ECELL_SUBDIR="libltdl bin dmtool ecell"]
-  NOGTK=1,
-  [ECELL_SUBDIR="libltdl bin dmtool ecell osogo toollauncher"
-  NOGTK=0
+  [ECELL_SUBDIR="libltdl bin dmtool ecell"],
+  [ECELL_SUBDIR="libltdl bin dmtool ecell osogo modeleditor toollauncher"
   AC_CONFIG_SUBDIRS(osogo)
+  AC_CONFIG_SUBDIRS(modeleditor)
   AC_CONFIG_SUBDIRS(toollauncher)]
-)
-dnl
-AC_ARG_ENABLE(modeleditor,
-  AC_HELP_STRING([--disable-modeleditor],
-               [disable the modeleditor.]),
-  if test $NOGTK = 1
-  then
-        test
-  else
-        [ECELL_SUBDIR="libltdl bin dmtool ecell osogo toollauncher"]
-  fi,
-  if test $NOGTK = 1
-  then
-        test
-  else
-        [ECELL_SUBDIR="libltdl bin dmtool ecell osogo modeleditor toollauncher"
-        AC_CONFIG_SUBDIRS(modeleditor)]
-  fi
 )
 dnl
 AC_SUBST(ECELL_SUBDIR)
 dnl
-dnl
-dnl
-dnl
-AC_ARG_WITH( boost-root-dir,
-  AC_HELP_STRING([--with-boost-root-dir=],
-               [specify a non-standard root installation directory for boost library.]) )
 dnl
 dnl
 AC_ARG_ENABLE( compiler-extensions,
@@ -78,6 +49,6 @@ dnl
 dnl Create the top-level Makefile.
 dnl
 AC_CONFIG_FILES([Makefile])
-
+dnl
 AC_OUTPUT(ecell3.doxy)
 

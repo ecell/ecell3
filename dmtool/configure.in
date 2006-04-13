@@ -1,6 +1,6 @@
 AC_REVISION([$Id$])
 dnl
-AC_INIT(dmgen.in)
+AC_INIT(dmcompile.in)
 dnl AC_CONFIG_AUX_DIR()
 dnl
 dnl 
@@ -67,7 +67,6 @@ else
     AC_SUBST(LTDL_SHLIB_EXT)
   fi
 fi
-
 dnl
 dnl
 dnl
@@ -75,6 +74,6 @@ AM_CONFIG_HEADER(config.h)
 dnl
 dnl Create the top-level Makefile.
 dnl
-AC_OUTPUT(Makefile dmcompile dmgen,chmod +x dmcompile dmgen)
+AC_OUTPUT(Makefile dmcompile,chmod +x dmcompile)
 
 

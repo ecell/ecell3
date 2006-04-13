@@ -6,7 +6,7 @@ INCLTDL=@INCLTDL@
 LIBLTDL=@LIBLTDL@
 PYTHON_INCLUDES=@PYTHON_INCLUDES@
 
-pkgpythondir=@pkgpythondir@
+pkgpyexecdir=@pkgpyexecdir@
 
 if OS_WIN32
   SUBDIRS = windows
@@ -32,7 +32,7 @@ LIBBOOSTPYTHON=-lboost_python
 CFLAGS=${CXXFLAGS}
 
 
-pkgpython_LTLIBRARIES = _ecs.la _emc.la
+pkgpyexec_LTLIBRARIES = _ecs.la _emc.la
 
 _ecs_la_SOURCES=\
 PyEcs.cpp

@@ -13,8 +13,8 @@ else
   ECELL3_DMC = ../pyecs/ecell3-python ../../bin/ecell3-dmc
 endif
 
-DM_SO_DIR = ${prefix}/lib/${PACKAGE}/${VERSION}
-DM_SRC_DIR =  ${prefix}/share/${PACKAGE}/${VERSION}/DM
+DM_SO_DIR = ${pkglibdir}/${VERSION}
+DM_SRC_DIR =  ${pkgdatadir}/${VERSION}/DM
 
 PYTHON_INCLUDES=@PYTHON_INCLUDES@
 

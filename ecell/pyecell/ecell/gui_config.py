@@ -1,6 +1,6 @@
 import os
 
-GUI_OSOGO_PATH = os.environ['OSOGOPATH']
+#GUI_OSOGO_PATH = os.environ['OSOGOPATH']
 aHomeDir = os.path.expanduser( '~' )
 if aHomeDir not in ( '~', '%USERPROFILE%' ):
 	GUI_HOMEDIR = aHomeDir

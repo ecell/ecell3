@@ -63,7 +63,7 @@ class ToolLauncher(ParentWindow):
 
     def initPref( self ):
         self.thePref = {}
-        self.thePrefFile = os.environ['ECELL3_PREFIX'] + os.sep + 'lib' + os.sep + "toollauncher" + os.sep + 'launcher.ini'
+        self.thePrefFile = os.environ['TLPATH'] + os.sep + 'launcher.ini'
         if not os.path.isfile( self.thePrefFile ):
             aFile = open( self.thePrefFile, 'w' )
             aFile.write( '[DEFAULT]' )

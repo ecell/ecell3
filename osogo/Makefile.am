@@ -3,6 +3,7 @@ AUTOMAKE_OPTIONS = foreign
 SUBDIRS = plugins
 
 osogodir=${pkglibdir}
+
 osogo_PYTHON=\
 osogo.ini\
 BoardWindow.py\

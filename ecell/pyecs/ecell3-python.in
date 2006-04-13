@@ -4,29 +4,32 @@
 PACKAGE=@PACKAGE@
 VERSION=@VERSION@
 
+PYTHON=@PYTHON@
+DEBUGGER=gdb
+
+BASENAME=`basename $0`
+
 prefix=@prefix@
-exec_prefix=${prefix}
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+pythondir=@pythondir@
+pyexecdir=@pyexecdir@
+PYTHON_INCLUDES="@PYTHON_INCLUDES@"
 
 export ECELL3_PREFIX=${prefix}
-export OSOGOPATH=${exec_prefix}/lib/osogo
-export MEPATH=${exec_prefix}/lib/modeleditor
-export TLPATH=${exec_prefix}/lib/toollauncher
-export PYTHONDIR=@pythondir@
-export LD_LIBRARY_PATH="${exec_prefix}/lib:${LD_LIBRARY_PATH}"
-export PYTHONPATH="$PYTHONDIR/ecell/SessionManager:$PYTHONDIR:${PYTHONPATH}"
-export PYTHON_INCLUDES="@PYTHON_INCLUDES@"
+export PYTHONDIR=${pyexecdir}
+export LD_LIBRARY_PATH="${libdir}:${LD_LIBRARY_PATH}"
+#export PYTHONPATH="$PYTHONDIR/ecell/SessionManager:$PYTHONDIR:${PYTHONPATH}"
+export PYTHONPATH="$PYTHONDIR:${PYTHONPATH}"
+export PYTHON_INCLUDES=${PYTHON_INCLUDES}
 export BOOST_LIBRARIES="-lboost_python"
 export LTDL_LIBRARY_PATH=".:${ECELL3_DM_PATH}:${prefix}/lib/ecell/${VERSION}:${LTDL_LIBRARY_PATH}"
 export VERSION=${VERSION}
 export CXXFLAGS="@CXXFLAGS@"
 export CXX="@CXX@"
 export LDFLAGS="@LDFLAGS@"
+export ECELL3_LIBDIR=${libdir}
 
-
-PYTHON=@PYTHON@
-DEBUGGER=gdb
-
-BASENAME=`basename $0`
 
 ecell3_usage() 
 {

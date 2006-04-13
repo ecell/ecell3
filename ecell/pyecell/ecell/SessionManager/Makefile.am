@@ -7,11 +7,11 @@ endif
 
 CXX_FLAGS=@CXX_FLAGS@
 PYTHON_INCLUDES=@PYTHON_INCLUDES@
-pkgpythondir=@pkgpythondir@/SessionManager
+pkgpyexecdir=@pkgpyexecdir@/SessionManager
 
 LIBS=  # do not need gsl and gslcblas linked
 
-pkgpython_PYTHON=\
+pkgpyexec_PYTHON=\
 Globus2SessionProxy.py\
 Globus2SystemProxy.py\
 SessionManager.py\
