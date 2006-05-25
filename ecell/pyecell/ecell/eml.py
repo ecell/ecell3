@@ -204,7 +204,11 @@ class Eml:
         anEntityElement = self.__createElement( anEntityType.lower() )
         anEntityElement.setAttribute( 'class', aClass )
 
+
         if( anEntityType == 'System' ):
+
+            if aTargetPath != '':  # check if the supersystem exists
+                dummy = self.__getSystemNode( aTargetPath )
 
             anID = convertSystemFullID2SystemID( aFullID )
             anEntityElement.setAttribute( 'id', anID )
@@ -213,9 +217,7 @@ class Eml:
         elif( anEntityType == 'Variable' or anEntityType == 'Process' ):
 
             anEntityElement.setAttribute( 'id', anID )
-
             aTargetSystemNode = self.__getSystemNode( aTargetPath )
-
             aTargetSystemNode.appendChild( anEntityElement )
 
         else:            
