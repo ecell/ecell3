@@ -99,37 +99,59 @@ namespace libecs
       {
 	ProcessPtr const aProcess( theProcessVector[ i ] );
 
-	const VariableReferenceVectorCref aVariableReferenceVector( aProcess->getVariableReferenceVector() );
+	const VariableReferenceVectorCref 
+	  aVariableReferenceVector( aProcess->getVariableReferenceVector() );
 
-	VariableReferenceVector::size_type const aZeroVariableReferenceOffset( aProcess->getZeroVariableReferenceOffset() );
-	VariableReferenceVector::size_type const aPositiveVariableReferenceOffset( aProcess->getPositiveVariableReferenceOffset() );
+	VariableReferenceVector::size_type const 
+	  aZeroVariableReferenceOffset( aProcess->
+					getZeroVariableReferenceOffset() );
+	VariableReferenceVector::size_type const 
+	  aPositiveVariableReferenceOffset( aProcess->
+					    getPositiveVariableReferenceOffset() );
 
-	theVariableReferenceListVector[ i ].resize( 2 * ( aVariableReferenceVector.size() - aPositiveVariableReferenceOffset + aZeroVariableReferenceOffset ) );
+	theVariableReferenceListVector[ i ].
+	  resize( 2 * ( aVariableReferenceVector.size() - 
+			aPositiveVariableReferenceOffset + 
+			aZeroVariableReferenceOffset ) );
 
 	std::vector<Integer>::size_type j( 0 );
-	for ( VariableReferenceVectorConstIterator anIterator( aVariableReferenceVector.begin() ); anIterator < aVariableReferenceVector.begin() + aZeroVariableReferenceOffset; ++anIterator )
+	for ( VariableReferenceVectorConstIterator 
+		anIterator( aVariableReferenceVector.begin() );
+	      anIterator < aVariableReferenceVector.begin() + 
+		aZeroVariableReferenceOffset; 
+	      ++anIterator )
 	  {
 	    VariableReference const aVariableReference( *anIterator );
 
-	    theVariableReferenceListVector[ i ][ j ] = getVariableIndex( aVariableReference.getVariable() );
+	    theVariableReferenceListVector[ i ][ j ] = 
+	      getVariableIndex( aVariableReference.getVariable() );
 	    ++j;
-	    theVariableReferenceListVector[ i ][ j ] = aVariableReference.getCoefficient();
+	    theVariableReferenceListVector[ i ][ j ] = 
+	      aVariableReference.getCoefficient();
 	    ++j;
 	  }
 
-	for ( VariableReferenceVectorConstIterator anIterator( aVariableReferenceVector.begin() + aPositiveVariableReferenceOffset ); anIterator < aVariableReferenceVector.end(); ++anIterator )
+	for ( VariableReferenceVectorConstIterator 
+		anIterator( aVariableReferenceVector.begin() + 
+			    aPositiveVariableReferenceOffset ); 
+	      anIterator < aVariableReferenceVector.end(); 
+	      ++anIterator )
 	  {
 	    VariableReference const aVariableReference( *anIterator );
 
-	    theVariableReferenceListVector[ i ][ j ] = getVariableIndex( aVariableReference.getVariable() );
+	    theVariableReferenceListVector[ i ][ j ] = 
+	      getVariableIndex( aVariableReference.getVariable() );
 	    ++j;
-	    theVariableReferenceListVector[ i ][ j ] = aVariableReference.getCoefficient();
+	    theVariableReferenceListVector[ i ][ j ] = 
+	      aVariableReference.getCoefficient();
 	    ++j;
 	  }
       }
   }
 
-  void DifferentialStepper::setVariableVelocity( boost::detail::multi_array::sub_array<Real, 1> aVelocityBuffer )
+  void DifferentialStepper::
+  setVariableVelocity( boost::detail::multi_array::sub_array<Real, 1>
+		       aVelocityBuffer )
   {
     const ProcessVector::size_type 
       aDiscreteProcessOffset( getDiscreteProcessOffset() );

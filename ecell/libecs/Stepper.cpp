@@ -55,6 +55,7 @@ namespace libecs
     :
     theReadWriteVariableOffset( 0 ),
     theReadOnlyVariableOffset( 0 ),
+    theDiscreteProcessOffset( 0 ),
     theModel( NULLPTR ),
     theSchedulerIndex( -1 ),
     thePriority( 0 ),

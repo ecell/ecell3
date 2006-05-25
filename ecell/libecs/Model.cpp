@@ -155,10 +155,10 @@ namespace libecs
 
 	break;
       case EntityType::SYSTEM:
-		aSystemPtr = getSystemMaker().make( aClassname );
-		aSystemPtr->setID( aFullID.getID() );
-		aSystemPtr->setModel( this );
-		aContainerSystemPtr->registerSystem( aSystemPtr );
+	aSystemPtr = getSystemMaker().make( aClassname );
+	aSystemPtr->setID( aFullID.getID() );
+	aSystemPtr->setModel( this );
+	aContainerSystemPtr->registerSystem( aSystemPtr );
 	break;
 
       default:
