@@ -19,24 +19,13 @@ DM_SRC_DIR =  ${pkgdatadir}/${VERSION}/DM
 PYTHON_INCLUDES=@PYTHON_INCLUDES@
 
 DMS = MassActionFluxProcess.cpp\
-CatalyzedMassActionFluxProcess.cpp\
 MichaelisUniUniFluxProcess.cpp\
-RandomBiUniFluxProcess.cpp\
 ConstantFluxProcess.cpp\
-RandomUniBiFluxProcess.cpp\
-RandomBiBiFluxProcess.cpp\
-RapidEquilibriumProcess.cpp\
-BisectionRapidEquilibriumProcess.cpp\
 DecayFluxProcess.cpp\
-IsoUniUniFluxProcess.cpp\
-OrderedBiBiFluxProcess.cpp\
-OrderedBiUniFluxProcess.cpp\
-OrderedUniBiFluxProcess.cpp\
 SSystemProcess.cpp\
 GillespieProcess.cpp\
 TauLeapProcess.cpp\
 TauLeapStepper.cpp\
-NRStepper.cpp\
 FixedODE1Stepper.cpp\
 FixedDAE1Stepper.cpp\
 ODE23Stepper.cpp\
@@ -64,7 +53,6 @@ ExpressionCompiler.hpp\
 FixedODE1Stepper.hpp\
 FixedDAE1Stepper.hpp\
 GillespieProcess.hpp\
-NRStepper.hpp\
 ESSYNSStepper.hpp\
 ODE23Stepper.hpp\
 ODEStepper.hpp\
@@ -76,8 +64,6 @@ TauLeapStepper.hpp\
 ODE45Stepper.hpp
 
 DESCS = \
-BisectionRapidEquilibriumProcess.desc\
-CatalyzedMassActionFluxProcess.desc\
 ConstantFluxProcess.desc\
 DAEStepper.desc\
 DecayFluxProcess.desc\
@@ -90,25 +76,15 @@ FluxDistributionStepper.desc\
 QuasiDynamicFluxProcess.desc\
 GillespieProcess.desc\
 GMAProcess.desc\
-IsoUniUniFluxProcess.desc\
 MassActionFluxProcess.desc\
 MichaelisUniUniFluxProcess.desc\
-NRStepper.desc\
 ODEStepper.desc\
 ODE23Stepper.desc\
 ODE45Stepper.desc\
-OrderedBiBiFluxProcess.desc\
-OrderedBiUniFluxProcess.desc\
-OrderedUniBiFluxProcess.desc\
 PythonFluxProcess.desc\
 PythonProcess.desc\
-RandomBiBiFluxProcess.desc\
-RandomBiUniFluxProcess.desc\
-RandomUniBiFluxProcess.desc\
-RapidEquilibriumProcess.desc\
 SSystemProcess.desc\
 System.desc\
-CompartmentSystem.desc\
 Variable.desc
 
 EXTRA_DIST = ${DMS} ${DMH} ${DESCS}
