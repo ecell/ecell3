@@ -1,11 +1,13 @@
 
 
-ECELLDIR=${top_srcdir}
+TOPSRCDIR=${top_srcdir}
 DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
 INCLTDL=@INCLTDL@
 LIBLTDL=@LIBLTDL@
 PYTHON_INCLUDES=@PYTHON_INCLUDES@
 
+ECELL_DIRNAME=@ECELL_DIRNAME@
+ECELL_INCLUDE_DIR=${includedir}/${ECELL_DIRNAME}
 pkgpyexecdir=@pkgpyexecdir@
 
 if OS_WIN32
@@ -19,11 +21,11 @@ endif
 
 BPLCXXFLAGS=-ftemplate-depth-70
 
-ECELLINCLUDES=-I${ECELLDIR} ${DMTOOL_INCLUDE} ${INCLTDL} ${PYTHON_INCLUDES}
+ECELLINCLUDES=-I${TOPSRCDIR} ${DMTOOL_INCLUDE} ${INCLTDL} ${PYTHON_INCLUDES}
 AM_CXXFLAGS=@CXXFLAGS@ ${ECELLINCLUDES} ${BPLCXXFLAGS}
 
-LIBECSDIR=$(ECELLDIR)/libecs
-LIBEMCDIR=$(ECELLDIR)/libemc
+LIBECSDIR=$(TOPSRCDIR)/libecs
+LIBEMCDIR=$(TOPSRCDIR)/libemc
 
 LIBECS=$(LIBECSDIR)/libecs.la
 LIBEMC=$(LIBEMCDIR)/libemc.la
@@ -34,13 +36,12 @@ CFLAGS=${CXXFLAGS}
 
 pkgpyexec_LTLIBRARIES = _ecs.la _emc.la
 
-_ecs_la_SOURCES=\
-PyEcs.cpp
-
-
-pyecsdir=${pkgincludedir}/pyecs
+pyecsdir=${ECELL_INCLUDE_DIR}/pyecs
 pyecs_HEADERS=\
 PyEcs.hpp PyEmc.hpp
+
+_ecs_la_SOURCES=\
+PyEcs.cpp
 
 _ecs_la_LDFLAGS=-module -export-dynamic -avoid-version $(no_undefined)
 

@@ -6,6 +6,9 @@ endif
 
 ECELLDIR=..
 
+ECELL_DIRNAME=@ECELL_DIRNAME@
+ECELL_INCLUDE_DIR=${includedir}/${ECELL_DIRNAME}
+
 DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
 INCLTDL=@INCLTDL@
 LIBLTDL=@LIBLTDL@
@@ -27,7 +30,7 @@ Simulator.cpp\
 SimulatorImplementation.cpp\
 LocalSimulatorImplementation.cpp
 
-libemcdir=${pkgincludedir}/libemc
+libemcdir=${ECELL_INCLUDE_DIR}/libemc
 libemc_HEADERS=\
 libemc.hpp\
 LocalSimulatorImplementation.hpp\

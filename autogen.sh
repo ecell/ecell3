@@ -35,7 +35,7 @@ case $CC in
 *xlc | *xlc\ * | *lcc | *lcc\ *) am_opt=--include-deps;;
 esac
 
-for dir in . libltdl dmtool ecell osogo bin 
+for dir in . libltdl dmtool ecell
   do 
   echo -n Running autotools for $dir ...
   (cd $dir; \
@@ -45,22 +45,6 @@ for dir in . libltdl dmtool ecell osogo bin
   { echo -n 'autoconf '; autoconf; } && \
   echo )
   
-  if  test $? != 0 ; then
-      echo "Error processing $dir"
-      exit $? 
-  fi
-
-done
-
-for dir in modeleditor toollauncher
-do 
-  echo -n Running autotools for $dir ...
-  (cd $dir; \
-  { echo -n ' aclocal '; aclocal; } && \
-  { echo -n 'automake ';  automake --add-missing --gnu $am_opt; } && \
-  { echo -n 'autoconf '; autoconf; } && \
-  echo )
-
   if  test $? != 0 ; then
       echo "Error processing $dir"
       exit $? 

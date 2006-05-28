@@ -7,8 +7,10 @@ else
   SHLEXT = @LTDL_SHLIB_EXT@
 endif
 
-
 SUBDIRS =
+
+ECELL_DIRNAME=@ECELL_DIRNAME@
+ECELL_INCLUDE_DIR=${includedir}/${ECELL_DIRNAME}
 
 GSL_LIBADD = -lgsl -lgslcblas
 DMTOOL_INCLUDE=-I@DMTOOL_INCLUDE_DIR@
@@ -61,7 +63,7 @@ LoggerBroker.cpp\
 Exceptions.cpp
 
 
-libecsdir=${pkgincludedir}/libecs
+libecsdir=${ECELL_INCLUDE_DIR}/libecs
 libecs_HEADERS=\
 AssocVector.h\
 libecs.hpp\

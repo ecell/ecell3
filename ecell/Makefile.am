@@ -1,7 +1,9 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = libecs libemc pyecs pyecell dm
+SUBDIRS = @ECELL_SUBDIRS@
 
-ecellheaderdir=${pkgincludedir}
+ECELL_DIRNAME=@ECELL_DIRNAME@
+
+ecellheaderdir=${includedir}/${ECELL_DIRNAME}
 ecellheader_HEADERS= config.h

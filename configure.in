@@ -1,15 +1,17 @@
 AC_REVISION([$Id$])
 dnl
+dnl
 AC_INIT
 AC_CONFIG_SRCDIR([autogen.sh])
+dnl
+source ecell_version.sh
 dnl AC_CONFIG_AUX_DIR()
 dnl
 dnl 
 dnl 
-source ecell_version.sh
 dnl
 AC_CANONICAL_TARGET([])
-AM_INIT_AUTOMAKE($PACKAGE, $VERSION, do-not-define)
+AM_INIT_AUTOMAKE([ecell],${ECELL_VERSION_NUMBER})
 AC_PROG_MAKE_SET
 dnl
 dnl
@@ -26,15 +28,7 @@ dnl
 dnl
 AC_ARG_WITH(gtk,
   AC_HELP_STRING([--without-gtk],
-               [build ecell without gtk library.]),
-  [ECELL_SUBDIR="libltdl bin dmtool ecell"],
-  [ECELL_SUBDIR="libltdl bin dmtool ecell osogo modeleditor toollauncher"
-  AC_CONFIG_SUBDIRS(osogo)
-  AC_CONFIG_SUBDIRS(modeleditor)
-  AC_CONFIG_SUBDIRS(toollauncher)]
-)
-dnl
-AC_SUBST(ECELL_SUBDIR)
+	         [build ecell without gtk library.]),,)
 dnl
 dnl
 dnl

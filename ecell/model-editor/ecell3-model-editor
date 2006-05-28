@@ -1,0 +1,21 @@
+#!/usr/bin/env ecell3-python
+
+import os
+import sys
+import string
+
+ECELL3_LIBDIR = os.environ['ECELL3_LIBDIR']
+MEPATH = ECELL3_LIBDIR + os.sep + 'model-editor'
+# remove this!!
+SESSIONMONITORPATH = ECELL3_LIBDIR + os.sep + 'session-monitor'
+
+
+os.environ['SESSIONMONITORPATH'] = SESSIONMONITORPATH
+os.environ['PYTHONPATH'] =  os.environ['PYTHONPATH'] + os.pathsep + MEPATH + os.pathsep + SESSIONMONITORPATH
+os.environ['MEPATH'] = MEPATH
+
+if os.name == 'nt':
+    os.popen('python' + ' ' + '\"' + MEPATH + '\"' + os.sep + 'opengui.py' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')
+else:
+    os.system('python' + ' ' + '\"' + MEPATH + '\"' + os.sep + 'opengui.py' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')
+

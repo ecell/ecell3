@@ -31,7 +31,7 @@
 
 #ifndef __DEFS_HPP
 #define __DEFS_HPP
-#include "../config.h"
+#include "ecell_config.h"
 
 #include <stdint.h>
 #include <float.h>

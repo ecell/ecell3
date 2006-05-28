@@ -8,13 +8,15 @@ LTDL_SHLIB_EXT = @LTDL_SHLIB_EXT@
 CXXFLAGS = @CXXFLAGS@
 
 if OS_WIN32
-  ECELL3_DMC = ../../bin/ecell3-dmc.exe
+  ECELL3_DMC = ../bin/ecell3-dmc.exe
 else
-  ECELL3_DMC = ../pyecs/ecell3-python ../../bin/ecell3-dmc
+  ECELL3_DMC = ../pyecs/ecell3-python ../bin/ecell3-dmc
 endif
 
-DM_SO_DIR = ${pkglibdir}/${VERSION}
-DM_SRC_DIR =  ${pkgdatadir}/${VERSION}/DM
+ECELL_DIRNAME=@ECELL_DIRNAME@
+
+DM_SO_DIR = ${libdir}/${ECELL_DIRNAME}/dms
+DM_SRC_DIR =  ${datadir}/${ECELL_DIRNAME}/dms
 
 PYTHON_INCLUDES=@PYTHON_INCLUDES@
 

@@ -3,20 +3,28 @@ AC_REVISION([$Id$])dnl
 dnl Process this file with autoconf to produce a configure script.
 
 
+
 AC_INIT
 AC_CONFIG_SRCDIR([libecs/Entity.hpp])
 
-AM_CONFIG_HEADER(config.h)
-AC_SYS_LARGEFILE
-
 source ../ecell_version.sh
+
+
+AM_CONFIG_HEADER(ecell_config.h)
+
+AM_INIT_AUTOMAKE([ecell],${ECELL_VERSION_NUMBER})
+
+ECELL_DIRNAME=${PACKAGE}-${ECELL_MAJOR_VERSION}.${ECELL_MINOR_VERSION}
 
 AC_DEFINE_UNQUOTED( ECELL_MAJOR_VERSION, ${ECELL_MAJOR_VERSION},[] )
 AC_DEFINE_UNQUOTED( ECELL_MINOR_VERSION, ${ECELL_MINOR_VERSION},[] )
 AC_DEFINE_UNQUOTED( ECELL_MICRO_VERSION, ${ECELL_MICRO_VERSION},[] )
-AC_DEFINE_UNQUOTED( ECELL_VERSION_STRING, "${ECELL_VERSION_STRING}",[] )
+AC_DEFINE_UNQUOTED( ECELL_VERSION_STRING, "${ECELL_VERSION_NUMBER}",[] )
+AC_SUBST( ECELL_DIRNAME )
+AC_SUBST( ECELL_MAJOR_VERSION )
+AC_SUBST( ECELL_MINOR_VERSION )
+AC_SUBST( ECELL_MICRO_VERSION )
 
-AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 
 AM_SANITY_CHECK
 
@@ -29,6 +37,17 @@ else
 fi
 
 AC_SUBST(PREFIX)
+
+dnl
+AC_ARG_WITH(gtk,
+  AC_HELP_STRING([--without-gtk],
+	         [build ecell without gtk library.]),
+  [ECELL_SUBDIRS="libecs libemc pyecs pyecell bin dm"],
+  [ECELL_SUBDIRS="libecs libemc pyecs pyecell bin dm session-monitor model-editor toollauncher"]
+)
+AC_SUBST( ECELL_SUBDIRS )
+dnl
+
 
 dnl Checks for programs.
 
@@ -130,6 +149,19 @@ AC_CHECK_LIB(gsl,gsl_block_alloc,,[AC_MSG_ERROR([The libgsl (GNU Scientific Libr
 AM_CHECK_PYMOD(Numeric,,,[AC_MSG_ERROR([could not find Python Numeric module])])
 AM_CHECK_PYMOD(xml,,,[AC_MSG_ERROR([could not find Python xml module])])
 
+if test -n "$with_gtk"; then
+   AM_CHECK_PYMOD(pygtk,,,[AC_MSG_ERROR([could not find Python pygtk module])])
+   AM_CHECK_PYMOD(gtk,,,[AC_MSG_ERROR([could not find Python gtk module])])
+   AM_CHECK_PYMOD(gtk.gdk,,,
+		[AC_MSG_ERROR([could not find Python gtk.gdk module])])
+   AM_CHECK_PYMOD(gtk.glade,,,
+		[AC_MSG_ERROR([could not find Python gtk.glade module])])
+   AM_CHECK_PYMOD(gnome.ui,,[AC_SUBST([GNOME_INSTALLED],yes)],[AC_SUBST([GNOME_INSTALLED],no)])
+   AM_CHECK_PYMOD(gnomecanvas,,,[AC_MSG_WARN(could not find gnomecanvas module. model-editor will not work. )])
+   AM_CHECK_PYMOD(xml.dom.minidom,,,[AC_MSG_WARN(could not find xml.dom.minidom module. model-editor will not work.)])
+fi
+
+
 dnl Checks for header files.
 
 AC_HEADER_DIRENT
@@ -174,10 +206,10 @@ AC_SUBST(DMTOOL_DIR)
 AC_SUBST(DMTOOL_INCLUDE_DIR)
 
 
-AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR([])])
+AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR([AM_CHECK_PYTHON_HEADERS failed.])])
 
 
-AC_MSG_CHECKING( if use of compiler specific language features are allowed )
+AC_MSG_CHECKING( if use of compiler specific features are allowed )
 
 AC_ARG_ENABLE( compiler-extensions,,
 	       USE_COMPILER_EXTENSIONS=$enable_compiler_features,
@@ -197,6 +229,8 @@ fi
 
 
 AC_LANG_PUSH([C])
+
+AC_SYS_LARGEFILE
 
 AC_C_CONST
 AC_C_INLINE
@@ -241,4 +275,16 @@ AC_CONFIG_FILES([Makefile
                  pyecell/ecell/Makefile
                  pyecell/ecell/SessionManager/Makefile
                  dm/Makefile])
+AC_CONFIG_FILES([session-monitor/Makefile
+		 session-monitor/plugins/Makefile
+                 session-monitor/config.py],
+                 [chmod +x session-monitor/gecell])
+AC_CONFIG_FILES([model-editor/Makefile
+		 model-editor/glade/Makefile
+		 model-editor/plugin/Makefile
+		 model-editor/doc/Makefile],
+		[chmod +x model-editor/ecell3-model-editor])
+AC_CONFIG_FILES([toollauncher/Makefile
+		 toollauncher/misc/Makefile],
+		[chmod +x toollauncher/toollauncher])
 AC_OUTPUT

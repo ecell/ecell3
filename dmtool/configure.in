@@ -15,8 +15,8 @@ dnl
 AC_PROG_CXX
 
 dnl
-AM_PATH_PYTHON(2.2)
-AC_SUBST(PYTHON)
+dnl AM_PATH_PYTHON(2.2)
+dnl AC_SUBST(PYTHON)
 #AM_CHECK_PYTHON_HEADERS()
 dnl
  
@@ -70,7 +70,7 @@ fi
 dnl
 dnl
 dnl
-AM_CONFIG_HEADER(config.h)
+dnl AM_CONFIG_HEADER(config.h)
 dnl
 dnl Create the top-level Makefile.
 dnl

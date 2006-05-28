@@ -145,7 +145,7 @@
 
 #ifndef __VVECOTOR_H__
 #define	__VVECOTOR_H__
-#include "ecell/config.h"
+#include "ecell_config.h"
 #include <sys/types.h>
 #if	defined(__GNUC__)
 #include <vector>

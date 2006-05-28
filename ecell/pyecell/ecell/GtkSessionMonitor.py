@@ -37,14 +37,14 @@
 
 from gui_config import *
 import sys
-
-sys.path.insert(0, os.environ['OSOGOPATH'])
+#sys.path.append(os.environ['SESSIONMONITORPATH'])
+print sys.path
 import MainWindow  
 from ecell.Session import *
 from ecell.ModelWalker import *
 import gtk
 import gobject 
-sys.path.insert(0, os.environ['OSOGOPATH'])
+
 import EntityListWindow
 import LoggerWindow
 import InterfaceWindow 
@@ -52,12 +52,13 @@ import StepperWindow
 import BoardWindow 
 import ConfigParser
 import LoggingPolicy
-import os.path
+import OsogoPluginManager
+
 import os
+import os.path
 
-from ConfirmWindow import *
+SESSIONMONITORPATH = os.environ['SESSIONMONITORPATH']
 
-from OsogoPluginManager import *
 
 class GtkSessionMonitor(Session):
 #
@@ -83,7 +84,7 @@ class GtkSessionMonitor(Session):
 		self.theConfigDB=ConfigParser.ConfigParser()
 
 		self.theIniFileName = GUI_HOMEDIR + os.sep + 'osogo.ini'
-		theDefaultIniFileName = OSOGO_PATH + os.sep + 'osogo.ini'
+		theDefaultIniFileName = SESSIONMONITORPATH + os.sep + 'osogo.ini'
 		if not os.path.isfile( self.theIniFileName ):
 			# get from default
 	   		self.theConfigDB.read(theDefaultIniFileName)
@@ -102,7 +103,7 @@ class GtkSessionMonitor(Session):
 		# -------------------------------------
 		# creates PluginManager
 		# -------------------------------------
-		self.thePluginManager = OsogoPluginManager( self )
+		self.thePluginManager = OsogoPluginManager.OsogoPluginManager( self )
 		self.thePluginManager.loadAll()
 
 		# -------------------------------------
@@ -283,19 +284,6 @@ class GtkSessionMonitor(Session):
 			return None
 		return aBoardWindow.addPluginWindows( aType, aFullPNList)
 
-
-	# ==========================================================================
-	def openConfirmWindow(self,  aMessage, aTitle, isCancel = 1 ):
-		""" pops up a modal dialog window
-			with aTitle (str) as its title
-			and displaying aMessage as its message
-			and with an OK and a Cancel button
-			returns:
-			True if Ok button is pressed
-			False if cancel button is pressed
-		"""
-		aConfirmWindow = ConfirmWindow(isCancel, aMessage, aTitle )
-		return aConfirmWindow.return_result() == OK_PRESSED
 
 	# ==========================================================================
 	def openLogPolicyWindow(self,  aLogPolicy, aTitle ="Set log policy" ):

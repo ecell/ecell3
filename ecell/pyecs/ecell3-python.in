@@ -16,19 +16,25 @@ pythondir=@pythondir@
 pyexecdir=@pyexecdir@
 PYTHON_INCLUDES="@PYTHON_INCLUDES@"
 
+ECELL_DIRNAME=@ECELL_DIRNAME@
+
 export ECELL3_PREFIX=${prefix}
 export PYTHONDIR=${pyexecdir}
 export LD_LIBRARY_PATH="${libdir}:${LD_LIBRARY_PATH}"
-#export PYTHONPATH="$PYTHONDIR/ecell/SessionManager:$PYTHONDIR:${PYTHONPATH}"
-export PYTHONPATH="$PYTHONDIR:${PYTHONPATH}"
+
+# make a __init__.py file in ecell/SessionManager!
+export PYTHONPATH="$PYTHONDIR/ecell/SessionManager:$PYTHONDIR:${PYTHONPATH}"
+#export PYTHONPATH="$PYTHONDIR:${PYTHONPATH}"
 export PYTHON_INCLUDES=${PYTHON_INCLUDES}
 export BOOST_LIBRARIES="-lboost_python"
 export LTDL_LIBRARY_PATH=".:${ECELL3_DM_PATH}:${prefix}/lib/ecell/${VERSION}:${LTDL_LIBRARY_PATH}"
+
+# what version? not good.
 export VERSION=${VERSION}
 export CXXFLAGS="@CXXFLAGS@"
 export CXX="@CXX@"
 export LDFLAGS="@LDFLAGS@"
-export ECELL3_LIBDIR=${libdir}
+export ECELL3_LIBDIR="${libdir}/${ECELL_DIRNAME}"
 
 
 ecell3_usage() 
