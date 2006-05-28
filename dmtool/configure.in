@@ -3,6 +3,9 @@ dnl
 AC_INIT(dmcompile.in)
 dnl AC_CONFIG_AUX_DIR()
 dnl
+dnl dummy
+AC_CONFIG_HEADER( config.h )
+dnl
 dnl 
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE(dmtool,0.1)
