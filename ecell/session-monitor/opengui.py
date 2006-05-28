@@ -171,7 +171,7 @@ def main():
 # return -> None
 # -----------------------------------------------------------------
 def usage():
-	aProgramName = 'gecell'
+	aProgramName = 'ecell3-session-monitor'
 	print '''
 %s -- start up E-Cell3 GUI
 
@@ -191,7 +191,7 @@ Configurations:
 	
 	example: 
         
-	ECELL3_DM_PATH=/home/user/dm:/home/user/dm_other gecell
+	ECELL3_DM_PATH=/home/user/dm:/home/user/dm_other
 ''' % ( aProgramName, aProgramName )
 
 

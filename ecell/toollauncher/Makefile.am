@@ -32,11 +32,11 @@ EXTRA_DIST=${toollauncher_PYTHON} ${BINS}
 
 # Windows py2exe setup options, ignore for Unix based systems
 PY2EXE_SETUP = ../ecell/pyecs/windows/py2exeSetup
-WIN_ICON = toollauncher.ico
+WIN_ICON = ecell3-toollauncher.ico
 PATH_VARIABLES = ../ecell/pyecs/windows/pathVariables
 
 BINS =\
-toollauncher
+ecell3-toollauncher
 
 EXE = ${BINS:=$(EXEEXT)}
 bin_SCRIPTS = ${EXE}

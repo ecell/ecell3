@@ -4,15 +4,13 @@ import os
 import sys
 import string
 
-ECELL3_LIBDIR = os.environ['ECELL3_LIBDIR']
-SESSIONMONITORPATH = ECELL3_LIBDIR + os.sep + 'session-monitor'
-PYTHONPATH = SESSIONMONITORPATH + os.pathsep + os.environ['PYTHONPATH']
+oldcommand = sys.argv[0]
+newcommand = 'ecell3-session-monitor'
+commandline = newcommand + ' ' + string.join( sys.argv[1:], '\" \"' )
 
-os.environ['SESSIONMONITORPATH'] = SESSIONMONITORPATH
-os.environ['PYTHONPATH'] = SESSIONMONITORPATH + os.pathsep + PYTHONPATH
-os.environ['LANG'] = 'C'
+print 'WARNING: %s was renamed to %s. Invoking %s.' % ( oldcommand, newcommand, newcommand )
 
 if os.name == 'nt':
-    os.popen('python' + ' ' + '\"' + SESSIONMONITORPATH + '\"' + os.sep + 'opengui.py' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')
+    os.popen( commandline )
 else:
-    os.system('python' + ' ' + '\"' + SESSIONMONITORPATH + '\"' + os.sep + 'opengui.py' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')
+    os.system( commandline )

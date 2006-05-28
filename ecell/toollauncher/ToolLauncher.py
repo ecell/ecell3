@@ -239,7 +239,7 @@ class ToolLauncher(ParentWindow):
     def viewErrorMessage( self, msg ):
 
         gladePath = os.getcwd()
-        os.chdir( self.thePref['ecell3_path']+'/lib'+os.sep+"toollauncher" )
+        os.chdir( os.environ['TLPATH'] )
         self.theErrorMessage = ToolLauncherErrorMessage( self )
         self.theErrorMessage.openWindow( msg )
         os.chdir( gladePath )

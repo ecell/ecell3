@@ -76,6 +76,7 @@ WIN_ICON = plugins/ecell.ico
 PATH_VARIABLES = ../ecell/pyecs/windows/pathVariables
 
 BINS =\
+ecell3-session-monitor\
 gecell
 
 EXE = ${BINS:=$(EXEEXT)}
