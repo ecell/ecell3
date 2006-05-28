@@ -38,7 +38,6 @@
 from gui_config import *
 import sys
 #sys.path.append(os.environ['SESSIONMONITORPATH'])
-print sys.path
 import MainWindow  
 from ecell.Session import *
 from ecell.ModelWalker import *

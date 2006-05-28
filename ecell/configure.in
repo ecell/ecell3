@@ -275,6 +275,11 @@ AC_CONFIG_FILES([Makefile
                  pyecell/ecell/Makefile
                  pyecell/ecell/SessionManager/Makefile
                  dm/Makefile])
+AC_CONFIG_FILES([bin/Makefile
+		 bin/ecell3-dmc
+		 bin/ecell3-eml2em
+		 bin/ecell3-em2eml],
+		 [chmod +x bin/ecell3-dmc bin/ecell3-em2eml bin/ecell3-eml2em])
 AC_CONFIG_FILES([session-monitor/Makefile
 		 session-monitor/plugins/Makefile
                  session-monitor/config.py],
