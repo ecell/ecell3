@@ -10,7 +10,7 @@ PATH_VARIABLES = ../pyecs/windows/pathVariables
 BINS =\
 ecell3-session\
 ecell3-session-manager\
-gecell3-session\
+ecell3-session-gui\
 ecell3-sbml2eml\
 ecell3-eml2sbml
 

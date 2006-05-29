@@ -51,8 +51,8 @@ DEFAULT_STDERR = 'stderr'
 
 BANNERSTRING =\
 '''ecell3-session-manager [ E-Cell SE Version %s, on Python Version %d.%d.%d ]
-Copyright (C) 2001-2004 Keio University.
-Send feedback to Koichi Takahashi <shafi@e-cell.org>'''\
+Copyright (C) 2001-2006 Keio University.
+Copyright (C) 2005-2006 The Molecular Sciences Institute.'''\
 % ( ecell.ecs.getLibECSVersion(), sys.version_info[0], sys.version_info[1], sys.version_info[2] )
 
 

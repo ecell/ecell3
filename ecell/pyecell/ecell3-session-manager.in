@@ -7,7 +7,7 @@ import os
 
 import ecell.emc
 import ecell.Session
-import SessionManager
+import ecell.SessionManager
 
 DEFAULT_ENVIRONMENT = 'Local'
 
@@ -196,7 +196,7 @@ def main():
 
 	aModulePath= [ecell.__path__[0] + os.sep + "SessionManager"]
 
-	aSessionManager = SessionManager.SessionManager( aModulePath, aConcurrency, anEnvironment )
+	aSessionManager = ecell.SessionManager.SessionManager( aModulePath, aConcurrency, anEnvironment )
 
 	if anEmsFile:
 		aSessionManager.loadScript( anEmsFile, aParameters  )

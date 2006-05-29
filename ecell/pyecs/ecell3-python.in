@@ -23,8 +23,8 @@ export PYTHONDIR=${pyexecdir}
 export LD_LIBRARY_PATH="${libdir}:${LD_LIBRARY_PATH}"
 
 # make a __init__.py file in ecell/SessionManager!
-export PYTHONPATH="$PYTHONDIR/ecell/SessionManager:$PYTHONDIR:${PYTHONPATH}"
-#export PYTHONPATH="$PYTHONDIR:${PYTHONPATH}"
+#export PYTHONPATH="$PYTHONDIR/ecell/SessionManager:$PYTHONDIR:${PYTHONPATH}"
+export PYTHONPATH="$PYTHONDIR:${PYTHONPATH}"
 export PYTHON_INCLUDES=${PYTHON_INCLUDES}
 export BOOST_LIBRARIES="-lboost_python"
 export LTDL_LIBRARY_PATH=".:${ECELL3_DM_PATH}:${prefix}/lib/ecell/${VERSION}:${LTDL_LIBRARY_PATH}"

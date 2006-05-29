@@ -38,10 +38,9 @@ import time
 import signal
 
 
-# imports ecell modules
-from Util import *
-from LocalSessionProxy import *
-from SystemProxy import *
+from ecell.SessionManager.Util import *
+from ecell.SessionManager.LocalSessionProxy import *
+from ecell.SessionManager.SystemProxy import *
 
 
 class LocalSystemProxy(SystemProxy):
