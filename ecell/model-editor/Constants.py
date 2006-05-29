@@ -8,8 +8,9 @@ SHAPE_PLUGIN_PATH=os.environ['MEPATH']+os.sep+"plugin"+os.sep
 ME_DESIGN_MODE = "Design"
 ME_RUN_MODE = "Run"
 
-# Layout constants
 
+
+# Layout constants
 #Shape Plugin Constants
 SHAPE_PLUGIN_NAME='Default Shape'
 SHAPE_PLUGIN_TYPE='Default Type'

@@ -11,7 +11,7 @@ SESSIONMONITORPATH = ECELL3_LIBDIR + os.sep + 'session-monitor'
 
 
 os.environ['SESSIONMONITORPATH'] = SESSIONMONITORPATH
-os.environ['PYTHONPATH'] =  os.environ['PYTHONPATH'] + os.pathsep + MEPATH + os.pathsep + SESSIONMONITORPATH
+os.environ['PYTHONPATH'] =  MEPATH + os.pathsep + SESSIONMONITORPATH + os.pathsep + os.environ['PYTHONPATH'] 
 os.environ['MEPATH'] = MEPATH
 
 if os.name == 'nt':
