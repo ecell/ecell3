@@ -283,8 +283,7 @@ AC_CONFIG_FILES([bin/Makefile
 AC_CONFIG_FILES([session-monitor/Makefile
 		 session-monitor/plugins/Makefile
                  session-monitor/config.py],
-                 [chmod +x session-monitor/ecell3-session-monitor
-                           session-monitor/gecell])
+                 [chmod +x session-monitor/ecell3-session-monitor session-monitor/gecell])
 AC_CONFIG_FILES([model-editor/Makefile
 		 model-editor/glade/Makefile
 		 model-editor/plugin/Makefile
