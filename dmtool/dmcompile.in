@@ -6,16 +6,15 @@ import glob
 import string
 import getopt
 
-#prefix=@prefix@
-#exec_prefix=@exec_prefix@
 
-#FIXME: libdir should not be used in this program?
-libdir='@libdir@'
+#prefix='@prefix@'
+#exec_prefix='@exec_prefix@'
+#libdir='@libdir@'
+ORIG_CXXFLAGS="@CXXFLAGS@"
+SHLEXT='@LTDL_SHLIB_EXT@'
 
 CXX='@CXX@'
-ORIG_CXXFLAGS="@CXXFLAGS@"
 LDADD='-lstdc++'
-SHLEXT='@LTDL_SHLIB_EXT@'
 CXXSUFFIX='.cpp'
 CXXFLAGS = os.environ.get('CXXFLAGS','')
 VERBOSE = False
@@ -62,7 +61,7 @@ def main():
       
   	# be verbose
         if anOption in ( "-v", '--verbose'):
-	    VERBOSE = True 
+	    VERBOSE = True
 
     # check if source file is given
     if len( args ) < 1:
@@ -81,7 +80,7 @@ def main():
     OBJ = CLASSNAME + '.o'
     SOBJ = CLASSNAME + SHLEXT
     LDFLAGS =  os.environ.get('LDFLAGS','')
-    LDFLAGS = '-Wl,-rpath=\"' + libdir + '\",-soname=\"' + SOBJ + '\" ' + \
+    LDFLAGS = '-Wl,-soname=\"' + SOBJ + '\" ' + \
               LDFLAGS 
     ARGS = ' \"' + string.join( args[1:], '\" \"' ) + '\"'
 
