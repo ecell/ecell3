@@ -6,8 +6,8 @@ import string
 
 oldcommand = sys.argv[0]
 newcommand = 'ecell3-session-monitor'
-commandline = newcommand + ' ' + string.join( sys.argv[1:], '\" \"' )
-
+commandline = newcommand + ' ' + string.join( sys.argv[1:], ' ' )
+print commandline
 print 'WARNING: %s was renamed to %s, and will be removed. Invoking %s.' % ( oldcommand, newcommand, newcommand )
 
 if os.name == 'nt':
