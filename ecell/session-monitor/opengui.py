@@ -5,7 +5,7 @@
 
 __program__ = 'opengui.py'
 __author__ = 'Koichi Takahashi <shafi@e-cell.org>, zhaiteng and sugi'
-__copyright__ = 'Copyright (C) 2002-2003 Keio University'
+__copyright__ = 'Copyright (C) 2002-2006 Keio University'
 __license__ = 'GPL'
 
 import sys
@@ -173,7 +173,7 @@ def main():
 def usage():
 	aProgramName = 'ecell3-session-monitor'
 	print '''
-%s -- start up E-Cell3 GUI
+%s -- E-Cell3 Session Monitor
 
 Usage: %s [-h] ([-e EmlFile]|[-f ModelFile])
 
@@ -182,7 +182,7 @@ Options:
         -f or --file=[.eml file]  :  load model (.eml) file
         -h or --help              :  print this message.
 
-	Do not use -e and -f at same time.
+	Do not use -e and -f at the same time.
 
 Configurations:
 
