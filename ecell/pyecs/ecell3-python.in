@@ -19,6 +19,7 @@ PYTHON_INCLUDES="@PYTHON_INCLUDES@"
 ECELL_DIRNAME=@ECELL_DIRNAME@
 
 export ECELL3_PREFIX=${prefix}
+export ECELL_DIRNAME
 export PYTHONDIR=${pyexecdir}
 export LD_LIBRARY_PATH="${libdir}:${LD_LIBRARY_PATH}"
 
@@ -27,7 +28,7 @@ export LD_LIBRARY_PATH="${libdir}:${LD_LIBRARY_PATH}"
 export PYTHONPATH="$PYTHONDIR:${PYTHONPATH}"
 export PYTHON_INCLUDES=${PYTHON_INCLUDES}
 export BOOST_LIBRARIES="-lboost_python"
-export LTDL_LIBRARY_PATH=".:${ECELL3_DM_PATH}:${prefix}/lib/ecell/${VERSION}:${LTDL_LIBRARY_PATH}"
+export LTDL_LIBRARY_PATH=".:${ECELL3_DM_PATH}:${prefix}/lib/${ECELL_DIRNAME}/dms:${LTDL_LIBRARY_PATH}"
 
 # what version? not good.
 export VERSION=${VERSION}
@@ -94,7 +95,7 @@ Configurations:
         separated directory path, it loads dynamic modules from there.
 
         ex.
-	  ECELL3_DM_PATH=/home/user/dm:/home/user/dm_other ecell3
+	  ECELL3_DM_PATH=/home/user/dm:/home/user/dm_other
 
 EOT_USAGE
 }
