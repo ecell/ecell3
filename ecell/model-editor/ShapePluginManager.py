@@ -20,7 +20,7 @@ class ShapePluginManager:
 
         for value in theFileNameList:
             aFp, aPath, self.theDescription = imp.find_module(value ,[SHAPE_PLUGIN_PATH,'.'] )
-            module = imp.load_module( SHAPE_PLUGIN_PATH + value,aFp,aPath, self.theDescription )
+            module = imp.load_module( value,aFp,aPath, self.theDescription )
             aShapeType = module.SHAPE_PLUGIN_TYPE
             if aShapeType not in self.theShapeDescriptors.keys():
                 self.theShapeDescriptors[aShapeType] = {}

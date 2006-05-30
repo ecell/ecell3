@@ -152,6 +152,6 @@ class StepperTab(ListWindow):
         self.theStepperPropertyList.close()
         self.theModelEditor.theMainWindow.update()
         self.theModelEditor.theStepperWindowList.remove( self )
-        return gtk.TRUE
+        return True
 
 

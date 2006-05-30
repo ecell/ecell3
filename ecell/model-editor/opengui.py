@@ -6,8 +6,6 @@ import sys
 
 import ModelEditor
 
-print sys.path
-
 usageString = " ModelEditor for ecell3 modeling environment.\n (C): Keio University 2003-2004 \n Authors: Gabor Bereczki <gabor.bereczki@talk21.com>, Sylvia Kinta, Dini Karnaga\n\n Usage:\n\t-f\t:\t file to load.\n\t-h\t:\t prints this help.\n"
 
 aFileName = None

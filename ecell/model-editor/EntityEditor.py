@@ -103,9 +103,9 @@ class EntityEditor(ViewComponent):
             horizontal.remove( proplist)
             desc_horizontal.remove( infoDesc )
             vertical.pack_end( proplist)
-            vertical.child_set_property( proplist, "expand", gtk.TRUE )
-            vertical.child_set_property( proplist, "fill", gtk.TRUE )
-            vertical.child_set_property( horizontal, "expand", gtk.FALSE )
+            vertical.child_set_property( proplist, "expand", True )
+            vertical.child_set_property( proplist, "fill", True )
+            vertical.child_set_property( horizontal, "expand", False )
             desc_vertical.pack_end( infoDesc )
             vertical.show_all()
             desc_vertical.show_all()
@@ -113,7 +113,7 @@ class EntityEditor(ViewComponent):
         
         # make sensitive change class button for process
         if self.theType == ME_PROCESS_TYPE:
-            self['class_combo'].set_sensitive( gtk.TRUE )
+            self['class_combo'].set_sensitive( True )
                 
         self.setDisplayedEntity( None )
                 
@@ -159,19 +159,19 @@ class EntityEditor(ViewComponent):
             nameText = ''
         self['ID_entry'].set_text( nameText )
 
-        sensitiveFlag = gtk.FALSE
+        sensitiveFlag = False
         if self.theDisplayedEntity != None:
-            sensitiveFlag = gtk.TRUE
+            sensitiveFlag = True
         self['user_info'].set_sensitive( sensitiveFlag )
         if sensitiveFlag and self.theDisplayedEntity == ME_ROOTID:
-            sensitiveFlag = gtk.FALSE
+            sensitiveFlag = False
         self['ID_entry'].set_sensitive( sensitiveFlag )
         
 
         # delete class list from combo
         self['class_combo'].entry.set_text('')
         self['class_combo'].set_popdown_strings([''])
-        self['class_combo'].set_sensitive( gtk.FALSE )
+        self['class_combo'].set_sensitive( False )
         self['class_combo'].set_data( 'selection', '' )
         descText = ''
 
@@ -181,7 +181,7 @@ class EntityEditor(ViewComponent):
 
             if self.theDisplayedEntity.split(':')[0] == ME_PROCESS_TYPE:
 
-                self['class_combo'].set_sensitive( gtk.TRUE )
+                self['class_combo'].set_sensitive( True )
                 
             # get class list
             classStore = copyValue ( self.theModelEditor.getDMInfo().getClassList( ME_PROCESS_TYPE) )
@@ -314,7 +314,7 @@ class EntityEditor(ViewComponent):
     def __getInfoText( self ):
         endIter = self.theInfoBuffer.get_end_iter()
         startIter = self.theInfoBuffer.get_start_iter()
-        return self.theInfoBuffer.get_text( startIter, endIter, gtk.TRUE )
+        return self.theInfoBuffer.get_text( startIter, endIter, True )
 
 
     def __setInfoText( self, textString ):

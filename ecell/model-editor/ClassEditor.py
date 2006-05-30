@@ -77,7 +77,7 @@ class ClassEditor(ViewComponent):
         #self['hbox3'] = None
 
         # make sensitive change class button for process
-        self['class_combo'].set_sensitive( gtk.TRUE )
+        self['class_combo'].set_sensitive( True )
 
         self.theModelEditor = self.theParentWindow.theModelEditor
         self.setDisplayedStepper( None )
@@ -114,9 +114,9 @@ class ClassEditor(ViewComponent):
 
     def updateEditor( self ):
         self.updateInProgress = True
-        editableFlag = gtk.FALSE
+        editableFlag = False
         if self.theDisplayedStepper != None:
-            editableFlag = gtk.TRUE
+            editableFlag = True
         self['ID_entry'].set_sensitive ( editableFlag )
         self['user_info'].set_sensitive( editableFlag )     
 
@@ -128,12 +128,12 @@ class ClassEditor(ViewComponent):
         # delete class list from combo
         self['class_combo'].entry.set_text('')
         self['class_combo'].set_popdown_strings([''])
-        self['class_combo'].set_sensitive( gtk.FALSE )
+        self['class_combo'].set_sensitive( False )
         self['class_combo'].set_data( 'selection', '' )
         descText = ''
 
         if self.theDisplayedStepper != None:
-            self['class_combo'].set_sensitive( gtk.TRUE )
+            self['class_combo'].set_sensitive( True )
 
             # get class list
             classStore = copyValue ( self.theModelEditor.getDMInfo().getClassList( ME_STEPPER_TYPE) )
@@ -257,7 +257,7 @@ class ClassEditor(ViewComponent):
     def __getInfoText( self ):
         endIter = self.theInfoBuffer.get_end_iter()
         startIter = self.theInfoBuffer.get_start_iter()
-        return self.theInfoBuffer.get_text( startIter, endIter, gtk.TRUE )
+        return self.theInfoBuffer.get_text( startIter, endIter, True )
 
 
     def __setInfoText( self, textString ):

@@ -136,12 +136,12 @@ class MEMainWindow( ListWindow ):
         self.theMessageWindow = self['scrolledwindow1']
         self.smallWindowAttachment = self.theMessageWindow
         endIter=self.theMessageBuffer.get_end_iter()
-        self.endMark=self.theMessageBuffer.create_mark('EM',endIter,gtk.FALSE)
+        self.endMark=self.theMessageBuffer.create_mark('EM',endIter,False)
         self.setIconList( os.environ['MEPATH'] + os.sep + "glade" +
                      os.sep + "modeleditor.png", os.environ['MEPATH'] + os.sep
                      + "glade" + os.sep + "modeleditor32.png" )
                              
-        self['stop_button'].set_sensitive(gtk.FALSE)                           
+        self['stop_button'].set_sensitive(False)                           
         self['entry5'].set_text(str(0.0))
         self['entry4'].set_text(str(1))
         
@@ -189,8 +189,8 @@ class MEMainWindow( ListWindow ):
         self.lockTabs = True
         #error occurred here
         self['ObjectWindow'].append_page( topFrame, aContainer)
-        aContainer.expand = gtk.FALSE
-        aContainer.fill = gtk.FALSE
+        aContainer.expand = False
+        aContainer.fill = False
         aContainer.show_all()
         topFrame.show_all()
         topFrame.set_data("ParentWindow",aWindow)
@@ -364,17 +364,17 @@ class MEMainWindow( ListWindow ):
 
         # update undo, redo buttons, menus
         if self.theModelEditor.canUndo():
-            undoFlag = gtk.TRUE
+            undoFlag = True
         else:
-            undoFlag = gtk.FALSE
+            undoFlag = False
 
         self['button1'].set_sensitive( undoFlag )       
         self['undo1'].set_sensitive( undoFlag )
 
         if self.theModelEditor.canRedo():
-            redoFlag = gtk.TRUE
+            redoFlag = True
         else:
-            redoFlag = gtk.FALSE
+            redoFlag = False
 
         self['button2'].set_sensitive( redoFlag )       
         self['redo1'].set_sensitive( redoFlag )
@@ -403,24 +403,24 @@ class MEMainWindow( ListWindow ):
 #       adcpFlags = self.theModelEditor.getADCPFlags()
 
 #       if adcpFlags[ME_COPY_FLAG]:
-#           copyFlag = gtk.TRUE
+#           copyFlag = True
 #       else:
-#           copyFlag = gtk.FALSE
+#           copyFlag = False
 
 #       self['copy1'].set_sensitive( copyFlag )
 #       self['button4'].set_sensitive( copyFlag )
 #       if adcpFlags[ME_COPY_FLAG] and adcpFlags[ME_DELETE_FLAG]:
-#           cutFlag = gtk.TRUE
+#           cutFlag = True
 #       else:
-#           cutFlag = gtk.FALSE
+#           cutFlag = False
 
 #       self['cut1'].set_sensitive( cutFlag )
 #       self['button3'].set_sensitive( cutFlag )
 
 #       if adcpFlags[ME_PASTE_FLAG]:
-#           pasteFlag = gtk.TRUE
+#           pasteFlag = True
 #       else:
-#           pasteFlag = gtk.FALSE
+#           pasteFlag = False
 
 #       self['paste1'].set_sensitive( pasteFlag )
 #       self['button5'].set_sensitive( pasteFlag )
@@ -471,7 +471,7 @@ class MEMainWindow( ListWindow ):
         aDialog.show_fileop_buttons( )
 
         # make dialog modal
-        aDialog.set_modal( gtk.TRUE )
+        aDialog.set_modal( True )
 
         # present dialog       
         retVal = aDialog.run()
@@ -494,11 +494,11 @@ class MEMainWindow( ListWindow ):
     def updateRunMode( self ):
         self.noModeToggle = True
         if self.theModelEditor.getMode() == ME_RUN_MODE:
-            self['run_mode'].set_active( gtk.TRUE )
-            self['design_mode'].set_active( gtk.FALSE )
+            self['run_mode'].set_active( True )
+            self['design_mode'].set_active( False )
         else:
-            self['run_mode'].set_active( gtk.FALSE )
-            self['design_mode'].set_active( gtk.TRUE )
+            self['run_mode'].set_active( False )
+            self['design_mode'].set_active( True )
         self.noModeToggle = False
 
 
@@ -542,7 +542,7 @@ class MEMainWindow( ListWindow ):
 
     def __changeNotebookTab( self, *args ):
         if self.lockTabs == True:
-            return gtk.TRUE
+            return True
         else:
 
             topFrame = self['ObjectWindow'].get_nth_page(args[2])
@@ -552,14 +552,14 @@ class MEMainWindow( ListWindow ):
 
                 self.presentTab(aWindow)
             self.restoreMessageWindow()
-            return gtk.TRUE
+            return True
    
         #self.update()
   
     def deleted( self, *arg ):
         self['layout_name_entry'].disconnect(self.comboEntryHandlerID )
         self.theModelEditor.quitApplication()
-        return gtk.TRUE
+        return True
 
 
     def __new_menu_clicked( self, *args ):
@@ -616,14 +616,14 @@ class MEMainWindow( ListWindow ):
             
     def updateRunPanel( self ):
         if self.theModelEditor.isRunning():
-            self['stop_button'].set_sensitive(gtk.TRUE)
-            self['start_button'].set_sensitive(gtk.FALSE)
-            self['step_button'].set_sensitive(gtk.FALSE)
+            self['stop_button'].set_sensitive(True)
+            self['start_button'].set_sensitive(False)
+            self['step_button'].set_sensitive(False)
 
         else:
-            self['stop_button'].set_sensitive(gtk.FALSE)
-            self['start_button'].set_sensitive(gtk.TRUE)
-            self['step_button'].set_sensitive(gtk.TRUE)
+            self['stop_button'].set_sensitive(False)
+            self['start_button'].set_sensitive(True)
+            self['step_button'].set_sensitive(True)
         if self.theModelEditor.getMode() == ME_RUN_MODE:
             self['entry5'].set_text(str(self.theRuntimeObject.getSimulationTime())[:10])
         else:
@@ -647,11 +647,11 @@ class MEMainWindow( ListWindow ):
             dialog = ConfirmWindow(0,"Please enter a positive value as step size")
             return
          
-        if self['radiobuttonSec'].get_active() == gtk.TRUE:
+        if self['radiobuttonSec'].get_active() == True:
             if self.theRuntimeObject.checkState(ME_RUN_MODE) == True:
                 self.theRuntimeObject.run(aNum)
                             
-        elif self['radiobuttonStep'].get_active() == gtk.TRUE:                                               
+        elif self['radiobuttonStep'].get_active() == True:                                               
             if self.theRuntimeObject.checkState(ME_RUN_MODE) == True:                                    
                 self.theRuntimeObject.step(aNum)
                 
@@ -695,7 +695,7 @@ class MEMainWindow( ListWindow ):
             
 
         #self['combo1'].entry.set_text(layoutName)
-        #self['combo1'].set_sensitive(gtk.TRUE)
+        #self['combo1'].set_sensitive(True)
 
     
     def __on_combo_entry_changed(self, *args):

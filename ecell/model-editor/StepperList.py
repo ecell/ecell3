@@ -64,12 +64,12 @@ class StepperList(ViewComponent):
         column=gtk.TreeViewColumn( 'System Tree',
                        renderer,
                        text=0, editable = 1 )
-        column.set_visible( gtk.TRUE )
+        column.set_visible( True )
         self['theTreeView'].append_column(column)
         self.theColumn = column
         self.theListSelection =  self['theTreeView'].get_selection()
         self.theListSelection.set_mode( gtk.SELECTION_MULTIPLE )
-        self['theTreeView'].set_headers_visible( gtk.FALSE )
+        self['theTreeView'].set_headers_visible( False )
         self.theModelEditor = self.theParentWindow.theModelEditor
        
         # set up variables
@@ -225,7 +225,7 @@ class StepperList(ViewComponent):
     
         # open for edit
         self.noActivate = True
-        self.__selectRows( [ newName ], gtk.TRUE )
+        self.__selectRows( [ newName ], True )
         self.noActivate = False
 
     def delete ( self ):
@@ -271,7 +271,7 @@ class StepperList(ViewComponent):
         self.theModelEditor.setLastUsedComponent( self )
         if args[1].button == 3:
             self.theModelEditor.createPopupMenu( self, args[1] )
-            return gtk.TRUE
+            return True
 
 
     def __cursor_changed( self, *args ):
@@ -319,7 +319,7 @@ class StepperList(ViewComponent):
         for aName in aNameList:
             anIter = self.theListStore.append(  )
             self.theListStore.set_value ( anIter, 0 , aName )
-            self.theListStore.set_value ( anIter, 1 , gtk.TRUE )
+            self.theListStore.set_value ( anIter, 1 , True )
         
 
 
@@ -350,7 +350,7 @@ class StepperList(ViewComponent):
 
         
 
-    def __selectRows( self, aNameList, forEdit = gtk.FALSE, doSelect = False ):
+    def __selectRows( self, aNameList, forEdit = False, doSelect = False ):
         """
         in: list of string aNameList
             bool forEdit can only go edit mode if only one name is in namelist
@@ -365,7 +365,7 @@ class StepperList(ViewComponent):
                 if aNameList.__contains__( aName ):
                     self.theListSelection.select_iter( anIter )
 
-                    if forEdit == gtk.FALSE and not doSelect:
+                    if forEdit == False and not doSelect:
                         self.noActivate = True
                     aPath = self.theListStore.get_path ( anIter )
                     self['theTreeView'].set_cursor( aPath, self.theColumn, forEdit )

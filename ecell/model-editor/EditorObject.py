@@ -442,26 +442,26 @@ class EditorObject:
                     
                     if not self.getModelEditor().canUndo() :
                         
-                        menuItem.set_sensitive(gtk.FALSE)
+                        menuItem.set_sensitive(False)
                 if aMenuName =='redo':
                     
                     if not self.getModelEditor().canRedo():
-                        menuItem.set_sensitive(gtk.FALSE)
+                        menuItem.set_sensitive(False)
 
                 if aMenuName =='paste':
                     if self.getModelEditor().getCopyBuffer() == None or not self.canPaste():
-                        menuItem.set_sensitive(gtk.FALSE)
+                        menuItem.set_sensitive(False)
 
                 if aMenuName =='show system' or aMenuName =='show process' or aMenuName =='show variable':
                     (aSubMenu,NoOfSubMenuItem)=self.getSubMenu(aMenuName)
                     if NoOfSubMenuItem ==0:
-                        menuItem.set_sensitive(gtk.FALSE)
+                        menuItem.set_sensitive(False)
                     else:
                         menuItem.set_submenu(aSubMenu )
                 if aMenuName == 'show connection':
                     (aSubMenu,NoOfSubMenuItem)=self.getConnectionMenu()
                     if NoOfSubMenuItem ==0:
-                        menuItem.set_sensitive(gtk.FALSE)
+                        menuItem.set_sensitive(False)
                     else:
                         menuItem.set_submenu(aSubMenu )
 
@@ -469,9 +469,9 @@ class EditorObject:
                     maxShift=self.getMaxShiftPos(DIRECTION_RIGHT)
                     aLabel=self.getProperty(OB_LABEL)
                     if aLabel.endswith('...') and  maxShift>15: 
-                        menuItem.set_sensitive(gtk.TRUE)
+                        menuItem.set_sensitive(True)
                     else:
-                        menuItem.set_sensitive(gtk.FALSE)
+                        menuItem.set_sensitive(False)
                         
 
                 aMenu.add(menuItem)
@@ -996,7 +996,7 @@ class GhostLine:
         self.y2 = endy
         (self.x1, self.y1) = self.parentObject.getRingPosition( ringCode )
         self.root = self.parentObject.theCanvas.getCanvas().root()
-        self.theLine = self.root.add( gnomecanvas.CanvasLine, points=(self.x1, self.y1, self.x2, self.y2), last_arrowhead = gtk.TRUE,arrow_shape_a=5, arrow_shape_b=5, arrow_shape_c=3 )
+        self.theLine = self.root.add( gnomecanvas.CanvasLine, points=(self.x1, self.y1, self.x2, self.y2), last_arrowhead = True,arrow_shape_a=5, arrow_shape_b=5, arrow_shape_c=3 )
 
 
     def moveEndPoint( self, deltax, deltay ):

@@ -68,12 +68,12 @@ class SystemTree(ViewComponent):
         column=gtk.TreeViewColumn( 'System Tree',
                        renderer,
                        text=0, editable = 1 )
-        column.set_visible( gtk.TRUE )
+        column.set_visible( True )
         self['theTreeView'].append_column(column)
         self.theColumn = column
         self.theSysSelection =  self['theTreeView'].get_selection()
         self.theSysSelection.set_mode( gtk.SELECTION_MULTIPLE )
-        self['theTreeView'].set_headers_visible( gtk.FALSE )
+        self['theTreeView'].set_headers_visible( False )
         self.theModelEditor = self.theParentWindow.theModelEditor
         # set up variables
         self.theSelection = []
@@ -302,7 +302,7 @@ class SystemTree(ViewComponent):
 
         anIter = self.__getIter ( self.theSelection[0] )
         self.noActivate = True
-        self.__selectRow( anIter, gtk.TRUE )
+        self.__selectRow( anIter, True )
         self.noActivate = False
 
     
@@ -370,7 +370,7 @@ class SystemTree(ViewComponent):
         self.theParentWindow.setLastActiveComponent( self )
         if args[1].button == 3:
             self.theModelEditor.createPopupMenu( self, args[1] )
-            return gtk.TRUE
+            return True
 
 
 
@@ -407,9 +407,9 @@ class SystemTree(ViewComponent):
         fromTuple = fromSysID.split(':')
         anIter = self.theSysTreeStore.append( fromIter )
         self.theSysTreeStore.set_value( anIter, 0, fromTuple[2] )
-        editable = gtk.TRUE
+        editable = True
         if fromTuple[2] == '/':
-            editable = gtk.FALSE
+            editable = False
         self.theSysTreeStore.set_value( anIter, 1, editable )       
 
         # gets system entities of SysID
@@ -541,7 +541,7 @@ class SystemTree(ViewComponent):
 
 
 
-    def __selectRow ( self, anIter, forEdit = gtk.FALSE ):
+    def __selectRow ( self, anIter, forEdit = False ):
         """
         in:     gtkIter anIter
             bool forEdit
@@ -549,7 +549,7 @@ class SystemTree(ViewComponent):
         aPath = self.theSysTreeStore.get_path( anIter )
         self.__expandRow( aPath )
         self.theSysSelection.select_iter( anIter )
-        if forEdit == gtk.TRUE:
+        if forEdit == True:
             self.noActivate = True
             self['theTreeView'].set_cursor( aPath, self.theColumn, forEdit )
         self.noActivate = False
@@ -577,7 +577,7 @@ class SystemTree(ViewComponent):
                 self.__expandRow( parentPath )
                 
             # expand this path
-            self['theTreeView'].expand_row( aPath, gtk.FALSE )
+            self['theTreeView'].expand_row( aPath, False )
 
 
     

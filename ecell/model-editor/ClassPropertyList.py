@@ -37,53 +37,53 @@ class ClassPropertyList( ViewComponent ):
         renderer = gtk.CellRendererText()
         renderer.connect('edited', self.__nameEdited)
         column = gtk.TreeViewColumn( 'Name', renderer, text = 0, editable = 4)
-        column.set_visible( gtk.TRUE )
-        column.set_resizable( gtk.TRUE )
+        column.set_visible( True )
+        column.set_resizable( True )
         self['theTreeView'].append_column(column)
         self.theNameColumn = column
 
         renderer = gtk.CellRendererText()
         renderer.connect('edited', self.__valueEdited)
         column = gtk.TreeViewColumn( 'Value', renderer, text = 1, editable = 5)
-        column.set_visible( gtk.TRUE )
-        column.set_resizable( gtk.TRUE )
+        column.set_visible( True )
+        column.set_resizable( True )
         self['theTreeView'].append_column(column)
         self.theValueColumn = column
 
         renderer = gtk.CellRendererToggle()
         column=gtk.TreeViewColumn( 'Settable', renderer, active = 2)
-        column.set_visible( gtk.TRUE )
-        column.set_resizable( gtk.TRUE )
+        column.set_visible( True )
+        column.set_resizable( True )
         self['theTreeView'].append_column(column)
 
 
         renderer = gtk.CellRendererToggle()
         column=gtk.TreeViewColumn( 'Deleteable', renderer, active = 3)
-        column.set_visible( gtk.TRUE )
-        column.set_resizable( gtk.TRUE )
+        column.set_visible( True )
+        column.set_resizable( True )
         self['theTreeView'].append_column(column)
 
         renderer = gtk.CellRendererToggle()
         column=gtk.TreeViewColumn( 'Loadable', renderer, active = 6)
-        column.set_visible( gtk.TRUE )
-        column.set_resizable( gtk.TRUE )
+        column.set_visible( True )
+        column.set_resizable( True )
         self['theTreeView'].append_column(column)
 
         renderer = gtk.CellRendererToggle()
         column=gtk.TreeViewColumn( 'Saveable', renderer, active = 7)
-        column.set_visible( gtk.TRUE )
-        column.set_resizable( gtk.TRUE )
+        column.set_visible( True )
+        column.set_resizable( True )
         self['theTreeView'].append_column(column)
 
         # add variable type column
         renderer = gtk.CellRendererText()
         column = gtk.TreeViewColumn( 'Type', renderer, text = 8, editable = 5)
-        column.set_visible( gtk.TRUE )
-        column.set_resizable( gtk.TRUE )
+        column.set_visible( True )
+        column.set_resizable( True )
         self['theTreeView'].append_column(column)
         self.theTypeColumn = column
 
-        self['theTreeView'].set_headers_visible(gtk.TRUE)
+        self['theTreeView'].set_headers_visible(True)
 
         self.theListSelection =  self['theTreeView'].get_selection()
         self.theListSelection.set_mode( gtk.SELECTION_MULTIPLE )
@@ -246,10 +246,10 @@ class ClassPropertyList( ViewComponent ):
         """
         # set button's sensitivity
         if self.canAddNewProperty():
-            self.addButton.set_sensitive(gtk.TRUE)
+            self.addButton.set_sensitive(True)
         else:
-            self.addButton.set_sensitive(gtk.FALSE)
-        self.delButton.set_sensitive(gtk.FALSE)
+            self.addButton.set_sensitive(False)
+        self.delButton.set_sensitive(False)
 
         self.__buildList()
 
@@ -485,7 +485,7 @@ self.theDisplayedEntity, self.theSelection )
         """
         aName = self.theSelection[0]
         if self.isEditable( aName ):
-            self.__selectRows( [ aName ], gtk.FALSE, gtk.TRUE )
+            self.__selectRows( [ aName ], False, True )
         else:
             aPropertyEditor = PropertyEditor( aName, self.getPropertyType( aName), self.getPropertyValue( aName ), self )
 
@@ -521,9 +521,9 @@ self.theDisplayedEntity, self.theSelection )
         if len(canDelete)>0:
             for d in canDelete:
                 if d==0:
-                    self.delButton.set_sensitive(gtk.FALSE)
+                    self.delButton.set_sensitive(False)
                     return
-        self.delButton.set_sensitive(gtk.TRUE)
+        self.delButton.set_sensitive(True)
                 
 
     def __button_pressed( self, *args ):
@@ -533,7 +533,7 @@ self.theDisplayedEntity, self.theSelection )
         if args[1].button == 3:
             self.selectByUser()
             self.theModelEditor.createPopupMenu( self, args[1] )
-            return gtk.TRUE
+            return True
         
 
 
@@ -641,7 +641,7 @@ self.theDisplayedEntity, self.theSelection )
 
 
 
-    def __selectRows( self, aNameList, forNameEdit = gtk.FALSE , forValueEdit = gtk.FALSE ):
+    def __selectRows( self, aNameList, forNameEdit = False , forValueEdit = False ):
         """
         in: list of string aNameList
             bool forEdit can only go edit mode if only one name is in namelist

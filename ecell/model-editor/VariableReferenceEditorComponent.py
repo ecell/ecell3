@@ -146,17 +146,17 @@ class  VariableReferenceEditorComponent(ViewComponent):
     #    Private methods                    #
     #########################################
     def updateVarRef(self):
-        ViewComponent.getWidget(self,'ent_conname').set_sensitive(gtk.TRUE)
-        ViewComponent.getWidget(self,'ent_coef').set_sensitive(gtk.TRUE)
-        ViewComponent.getWidget(self,'varAbs').set_sensitive(gtk.TRUE)
+        ViewComponent.getWidget(self,'ent_conname').set_sensitive(True)
+        ViewComponent.getWidget(self,'ent_coef').set_sensitive(True)
+        ViewComponent.getWidget(self,'varAbs').set_sensitive(True)
         ViewComponent.getWidget(self,'ent_ProName').set_text(self.proFullID )
         ViewComponent.getWidget(self,'ent_conname').set_text(self.varreffName)
         ViewComponent.getWidget(self,'ent_varid').set_text( self.varFullID)
         ViewComponent.getWidget(self,'ent_coef').set_text( str(self.acoef) )
         if self.showAbs:
-            ViewComponent.getWidget(self,'varAbs').set_active(gtk.TRUE)
+            ViewComponent.getWidget(self,'varAbs').set_active(True)
         elif not self.showAbs:
-            ViewComponent.getWidget(self,'varAbs').set_active(gtk.FALSE)
+            ViewComponent.getWidget(self,'varAbs').set_active(False)
         
     def setDisplayedVarRef(self, aLayout,connObj):
         self.theLayout = aLayout
@@ -226,9 +226,9 @@ class  VariableReferenceEditorComponent(ViewComponent):
         self.varFullID=''
         self.acoef=''
         self.updateVarRef()
-        ViewComponent.getWidget(self,'ent_conname').set_sensitive(gtk.FALSE)
-        ViewComponent.getWidget(self,'ent_coef').set_sensitive(gtk.FALSE)
-        ViewComponent.getWidget(self,'varAbs').set_sensitive(gtk.FALSE)
+        ViewComponent.getWidget(self,'ent_conname').set_sensitive(False)
+        ViewComponent.getWidget(self,'ent_coef').set_sensitive(False)
+        ViewComponent.getWidget(self,'varAbs').set_sensitive(False)
     
     def checkVarAbs(self):
         if self.varFullID == None:

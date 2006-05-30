@@ -80,14 +80,14 @@ class ConnectionObject( EditorObject ):
         self.processRing = self.thePropertyMap[ CO_PROCESS_RING ]       
 
     def __defineArrowDirection( self ):
-        self.thePropertyMap[ CO_HASARROW1 ] = gtk.FALSE
-        self.thePropertyMap[ CO_HASARROW2 ] = gtk.FALSE
+        self.thePropertyMap[ CO_HASARROW1 ] = False
+        self.thePropertyMap[ CO_HASARROW2 ] = False
         if self.thePropertyMap[ CO_COEF ] == 0:
             return
         elif self.thePropertyMap[ CO_COEF ] <0:
-            self.thePropertyMap[ CO_HASARROW1 ] = gtk.TRUE
+            self.thePropertyMap[ CO_HASARROW1 ] = True
         else:
-            self.thePropertyMap[ CO_HASARROW2 ] = gtk.TRUE
+            self.thePropertyMap[ CO_HASARROW2 ] = True
 
     def arrowheadDragged(self,shapeName, deltax, deltay, absx, absy):
         (offsetx, offsety ) = self.getAbsolutePosition()

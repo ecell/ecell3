@@ -70,7 +70,7 @@ class AutosaveWindow:
 
             # appends ok button
             ok_button = gtk.Button("  OK  ")
-            self.win.action_area.pack_start(ok_button,gtk.FALSE,gtk.FALSE,)
+            self.win.action_area.pack_start(ok_button,False,False,)
             ok_button.set_flags(gtk.CAN_DEFAULT)
             ok_button.grab_default()
             ok_button.show()
@@ -78,7 +78,7 @@ class AutosaveWindow:
 
             # appends cancel button
             cancel_button = gtk.Button(" Cancel ")
-            self.win.action_area.pack_start(cancel_button,gtk.FALSE,gtk.FALSE)
+            self.win.action_area.pack_start(cancel_button,False,False)
             cancel_button.show()
             cancel_button.connect("clicked",self.cancelButtonClicked)
 
@@ -104,19 +104,19 @@ class AutosaveWindow:
             
         def __setAutosaveDuration ( self, aDuration ):
             if aDuration[0]>0:
-                self.ViewComponentObject['set_duration'].set_active(gtk.TRUE)
+                self.ViewComponentObject['set_duration'].set_active(True)
                 self.ViewComponentObject['duration'].set_text(str(aDuration[0]))
-                self.ViewComponentObject['operations'].set_sensitive(gtk.FALSE)
-                self.ViewComponentObject['duration'].set_sensitive(gtk.TRUE)
+                self.ViewComponentObject['operations'].set_sensitive(False)
+                self.ViewComponentObject['duration'].set_sensitive(True)
             elif aDuration[1]>0:
-                self.ViewComponentObject['set_operations'].set_active(gtk.TRUE)
+                self.ViewComponentObject['set_operations'].set_active(True)
                 self.ViewComponentObject['operations'].set_text(str(aDuration[1]))
-                self.ViewComponentObject['operations'].set_sensitive(gtk.TRUE)
-                self.ViewComponentObject['duration'].set_sensitive(gtk.FALSE) 
+                self.ViewComponentObject['operations'].set_sensitive(True)
+                self.ViewComponentObject['duration'].set_sensitive(False) 
             else:
-                self.ViewComponentObject['turn_off'].set_active( gtk.TRUE)
-                self.ViewComponentObject['duration'].set_sensitive(gtk.FALSE)
-                self.ViewComponentObject['operations'].set_sensitive(gtk.FALSE)
+                self.ViewComponentObject['turn_off'].set_active( True)
+                self.ViewComponentObject['duration'].set_sensitive(False)
+                self.ViewComponentObject['operations'].set_sensitive(False)
 
         def cancelButtonClicked( self, *arg ):
             """
@@ -142,7 +142,7 @@ class AutosaveWindow:
                           
             else:
                 #radiobutton(set_duration) is selected              
-                if self.ViewComponentObject['set_duration'].get_active() == gtk.TRUE:      
+                if self.ViewComponentObject['set_duration'].get_active() == True:      
                     try:
                 
                         num = self.ViewComponentObject['duration'].get_text()
@@ -190,18 +190,18 @@ class AutosaveWindow:
             aName = args[0].get_name()
             if aName == "turn_off":
                 self.__off = True
-                self.ViewComponentObject['duration'].set_sensitive(gtk.FALSE)
-                self.ViewComponentObject['operations'].set_sensitive(gtk.FALSE)
+                self.ViewComponentObject['duration'].set_sensitive(False)
+                self.ViewComponentObject['operations'].set_sensitive(False)
                 
             else:    
                 
                 self.__off = False
                 if aName == "set_duration":
-                    self.ViewComponentObject['duration'].set_sensitive(gtk.TRUE)
-                    self.ViewComponentObject['operations'].set_sensitive(gtk.FALSE)
+                    self.ViewComponentObject['duration'].set_sensitive(True)
+                    self.ViewComponentObject['operations'].set_sensitive(False)
                 else:
-                    self.ViewComponentObject['duration'].set_sensitive(gtk.FALSE)
-                    self.ViewComponentObject['operations'].set_sensitive(gtk.TRUE)
+                    self.ViewComponentObject['duration'].set_sensitive(False)
+                    self.ViewComponentObject['operations'].set_sensitive(True)
             
                 
 

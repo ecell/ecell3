@@ -68,22 +68,22 @@ class MEVariableReferenceEditor(ViewComponent):
         renderer = gtk.CellRendererText()
         renderer.connect('edited', self.__nameEdited )
         column=gtk.TreeViewColumn( 'Name', renderer, text = 0, editable = 3 )
-        column.set_visible( gtk.TRUE )
+        column.set_visible( True )
         self['theTreeView'].append_column(column)
         self.theNameColumn = column
 
         renderer = gtk.CellRendererText()
         renderer.connect('edited', self.__valueEdited )
         column=gtk.TreeViewColumn( 'Variable', renderer, text = 1, editable = 3,foreground = 4 )
-        column.set_visible( gtk.TRUE )
+        column.set_visible( True )
         self['theTreeView'].append_column(column)
 
         renderer = gtk.CellRendererText()
         renderer.connect('edited', self.__coefEdited )
         column=gtk.TreeViewColumn( 'Coefficient', renderer, text = 2, editable = 3 )
-        column.set_visible( gtk.TRUE )
+        column.set_visible( True )
         self['theTreeView'].append_column(column)
-        self['theTreeView'].set_headers_visible(gtk.TRUE)
+        self['theTreeView'].set_headers_visible(True)
 
         self.theListSelection =  self['theTreeView'].get_selection()
         self.theListSelection.set_mode( gtk.SELECTION_MULTIPLE )
@@ -290,7 +290,7 @@ class MEVariableReferenceEditor(ViewComponent):
         # when any button is pressed on list
         if args[1].button == 3:
             self.theModelEditor.createPopupMenu( self,  args[1] )
-            return gtk.TRUE
+            return True
 
 
 
@@ -323,7 +323,7 @@ class MEVariableReferenceEditor(ViewComponent):
             self.theListStore.set_value ( anIter, 0, aVarref[ME_VARREF_NAME] )
             self.theListStore.set_value ( anIter, 1, aVarref[ME_VARREF_FULLID] )
             self.theListStore.set_value ( anIter, 2, aVarref[ME_VARREF_COEF] )
-            self.theListStore.set_value ( anIter, 3, gtk.TRUE )
+            self.theListStore.set_value ( anIter, 3, True )
             aFullID = aVarref[ ME_VARREF_FULLID ]
 
             refValid = True
@@ -364,7 +364,7 @@ class MEVariableReferenceEditor(ViewComponent):
 
 
 
-    def __selectRows( self, aNameList, forEdit = gtk.FALSE ):
+    def __selectRows( self, aNameList, forEdit = False ):
         """
         in: list of string aNameList
             bool forEdit can only go edit mode if only one name is in namelist

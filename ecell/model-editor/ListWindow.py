@@ -127,7 +127,7 @@ class ListWindow(Window):
         self.close()
 
         # does not widgets
-        return gtk.TRUE
+        return True
 
 
 

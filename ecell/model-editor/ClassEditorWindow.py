@@ -147,6 +147,6 @@ class ClassEditorWindow(ListWindow):
         self.theClassPropertyList.close()
         self.theModelEditor.theClassEditor = None
         self.theModelEditor.theMainWindow.update()
-        return gtk.TRUE
+        return True
 
 

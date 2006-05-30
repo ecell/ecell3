@@ -17,8 +17,8 @@ class LineDescriptor:
         self.Qarray = [1,2,4,3] 
         self.theDescriptorList = {\
          "textbox": [ "textbox",CV_TEXT, SD_FILL, SD_FILL, 0, [ label, 0,0,0,0 ], {}  ],\
-        ARROWHEAD1: [ARROWHEAD1,CV_LINE, SD_ARROWHEAD, SD_FILL, 1, [ 0,0,0,0, firstArrow, gtk.FALSE, linewidth ], {} ],\
-        ARROWHEAD2: [ ARROWHEAD2,CV_LINE, SD_ARROWHEAD, SD_FILL, 1, [ 0,0,0,0 ,secondArrow, gtk.FALSE, linewidth], {} ] }
+        ARROWHEAD1: [ARROWHEAD1,CV_LINE, SD_ARROWHEAD, SD_FILL, 1, [ 0,0,0,0, firstArrow, False, linewidth ], {} ],\
+        ARROWHEAD2: [ ARROWHEAD2,CV_LINE, SD_ARROWHEAD, SD_FILL, 1, [ 0,0,0,0 ,secondArrow, False, linewidth], {} ] }
 
     def renameLabel( self, newLabel ):
         aDescriptor = self.theDescriptorList[ "textbox"]
@@ -82,7 +82,7 @@ class LineDescriptor:
         #cheCk: ARROWHEAD1 is the default arrow Line
         aDescriptor = self.theDescriptorList[ ARROWHEAD1]
         aSpecific = aDescriptor[ SD_SPECIFIC ]
-        #cheCk: ARROWHEAD1: [ARROWHEAD1,CV_LINE, SD_ARROWHEAD, SD_FILL, 1, [ 0,0,0,0, firstArrow, gtk.FALSE, linewidth ], {} ]
+        #cheCk: ARROWHEAD1: [ARROWHEAD1,CV_LINE, SD_ARROWHEAD, SD_FILL, 1, [ 0,0,0,0, firstArrow, False, linewidth ], {} ]
         aSpecific [0] = self.x1 # coords in charge of arrowhead connection with entities
         aSpecific [1] = self.y1
         aSpecific [2] = self.insidex1 # coords in charge of arrowhead connection with 'ms'
@@ -293,9 +293,9 @@ class corneredLineSD(LineDescriptor ):
         #NAME, TYPE, FUNCTION, COLOR, Z, POINTS, PROPERTIES 
         linewidth = self.parentObject.getProperty( CO_LINEWIDTH )
         # self.theDescriptorList["curvedLine"] = ["curvedLine",CV_BPATH, SD_MOVINGLINE, SD_FILL, 1,[[0,0,0],linewidth-2],{}]
-        self.theDescriptorList["lineL"] = [ "lineL", CV_LINE, SD_MOVINGLINE, SD_FILL, 1, [ 0,0,0,0, gtk.FALSE, gtk.FALSE, linewidth], {} ]
-        self.theDescriptorList["lineC"] = [ "lineC", CV_LINE,  SD_MOVINGLINE, SD_FILL, 1, [ 0,0,0,0, gtk.FALSE, gtk.FALSE, linewidth], {} ]
-        self.theDescriptorList["lineR"] = [ "lineR", CV_LINE,  SD_MOVINGLINE, SD_FILL, 1, [ 0,0,0,0, gtk.FALSE, gtk.FALSE, linewidth],{} ] 
+        self.theDescriptorList["lineL"] = [ "lineL", CV_LINE, SD_MOVINGLINE, SD_FILL, 1, [ 0,0,0,0, False, False, linewidth], {} ]
+        self.theDescriptorList["lineC"] = [ "lineC", CV_LINE,  SD_MOVINGLINE, SD_FILL, 1, [ 0,0,0,0, False, False, linewidth], {} ]
+        self.theDescriptorList["lineR"] = [ "lineR", CV_LINE,  SD_MOVINGLINE, SD_FILL, 1, [ 0,0,0,0, False, False, linewidth],{} ] 
         '''
         self.Matrix = {'Bpath1':[ nu.array([[1,0,-self.coef,0],[0,1,0,0]]), 
                                 nu.array([[1,0,self.coef,0],[0,1,0,0]]), 
@@ -377,7 +377,7 @@ class StraightLineSD( LineDescriptor ):
         LineDescriptor.__init__( self, graphUtils, parentObject )
         #NAME, TYPE, FUNCTION, COLOR, Z, POINTS, PROPERTIES 
         linewidth = self.parentObject.getProperty( CO_LINEWIDTH )
-        self.theDescriptorList["straightline"]= [ "straightline", CV_LINE, SD_MOVINGLINE, SD_FILL, 1, [ 0,0,0,0, gtk.FALSE, gtk.FALSE, linewidth], {} ]
+        self.theDescriptorList["straightline"]= [ "straightline", CV_LINE, SD_MOVINGLINE, SD_FILL, 1, [ 0,0,0,0, False, False, linewidth], {} ]
         
         self.reCalculate()
 

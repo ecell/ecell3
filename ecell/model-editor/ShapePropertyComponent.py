@@ -181,12 +181,12 @@ class ShapePropertyComponent(ViewComponent):
 
     def updateShapeProperty(self):
         if len( self.theObjectDict.values() ) > 0:
-            colorSettable = gtk.TRUE
+            colorSettable = True
         else:
-            colorSettable = gtk.FALSE
-        heightSensitive = gtk.FALSE
-        widthSensitive = gtk.FALSE
-        labelSensitive = gtk.FALSE
+            colorSettable = False
+        heightSensitive = False
+        widthSensitive = False
+        labelSensitive = False
         label = ""
         x = ""
         y = ""
@@ -196,12 +196,12 @@ class ShapePropertyComponent(ViewComponent):
                 self.theFullId = theObject.getProperty(OB_FULLID)
                 label = self.theFullId.split(':')[2]
                 if theObject.getProperty(OB_TYPE) == OB_TYPE_SYSTEM:
-                    heightSensitive = gtk.TRUE
-                    widthSensitive = gtk.TRUE
+                    heightSensitive = True
+                    widthSensitive = True
             else:
-                heightSensitive = gtk.TRUE
-                widthSensitive = gtk.TRUE
-                labelSensitive = gtk.TRUE
+                heightSensitive = True
+                widthSensitive = True
+                labelSensitive = True
 
             
             x = str(theObject.getProperty( OB_DIMENSION_X ))
@@ -224,7 +224,7 @@ class ShapePropertyComponent(ViewComponent):
     def populateComboBox(self):
         # populate list item of combobox
         if self.theType not in [ "None", "Mixed" ]:
-            comboSensitive = gtk.TRUE
+            comboSensitive = True
             theObject = self.theObjectDict.values()[0]
             aShapeList = theObject.getAvailableShapes()
             currentShape = theObject.getProperty(OB_SHAPE_TYPE)
@@ -232,7 +232,7 @@ class ShapePropertyComponent(ViewComponent):
             aShapeList.insert(0, currentShape )
         else:
             aShapeList = []
-            comboSensitive = gtk.FALSE
+            comboSensitive = False
         self.noUpdate = True
         self.theCombo.set_popdown_strings( aShapeList )
         self.noUpdate = False
@@ -245,7 +245,7 @@ class ShapePropertyComponent(ViewComponent):
         aColorSel=aDialog.colorsel
         aColorSel.set_previous_color(aColor)
         aColorSel.set_current_color(aColor)
-        aColorSel.set_has_palette(gtk.TRUE)
+        aColorSel.set_has_palette(True)
         return[aDialog,aColorSel]
         
     def setHexadecimal(self,theColor,theColorMode ):

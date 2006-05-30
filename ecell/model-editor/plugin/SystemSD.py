@@ -1,6 +1,3 @@
-
-print locals(), globals()
-
 from Constants import *
 import Numeric as nu
 from gnomecanvas import *

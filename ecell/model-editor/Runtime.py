@@ -349,13 +349,13 @@ gtk.main()\n\
         newMenuItem = gtk.MenuItem( "New Tracer" )
         newMenuItem.connect( 'activate', self.__subMenuHandler, ["newtracer",aFullPNStringList] )
         if len( aFullPNStringList) == 0:
-            newMenuItem.set_sensitive( gtk.FALSE )
+            newMenuItem.set_sensitive( False )
         subMenu.append( newMenuItem )
         for aTracer in self.getTracerList():
             tracerMenu = gtk.MenuItem( aTracer )
             tracerMenu.connect( 'activate', self.__subMenuHandler, [ aTracer, aFullPNStringList] )
             if len( aFullPNStringList) == 0:
-                tracerMenu.set_sensitive( gtk.FALSE )
+                tracerMenu.set_sensitive( False )
             subMenu.append( tracerMenu )
         subMenuItem = gtk.MenuItem( "Add to" )
         subMenuItem.set_submenu( subMenu )

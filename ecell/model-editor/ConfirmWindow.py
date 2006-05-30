@@ -114,7 +114,7 @@ class ConfirmWindow(gtk.Dialog):
     # ==========================================================================
     def addButton( self, aName, aNumber, default= False ):
         button = gtk.Button( aName )
-        self.win.action_area.pack_start( button,gtk.FALSE,gtk.FALSE,)
+        self.win.action_area.pack_start( button,False,False,)
         if default:
             button.set_flags(gtk.CAN_DEFAULT)
             button.grab_default()

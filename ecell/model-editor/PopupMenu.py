@@ -110,7 +110,7 @@ class PopupMenu:
         else:
             
             # set insensitive
-            aMenuItem.set_sensitive( gtk.FALSE )
+            aMenuItem.set_sensitive( False )
 
         return aMenuItem
 

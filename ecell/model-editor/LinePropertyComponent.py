@@ -142,27 +142,27 @@ class  LinePropertyComponent(ViewComponent):
     def clearLineProperty(self):
         self.theFillColor = self.getColorObject([0,0,0])
         self.thecoef = 0
-        self.theArwTypeCombo.set_sensitive(gtk.TRUE)
-        self.theLineTypeCombo.set_sensitive(gtk.TRUE)
-        ViewComponent.getWidget(self,'arw_color_button').set_sensitive(gtk.TRUE)
-        ViewComponent.getWidget(self,'chk_last_arw').set_active(gtk.FALSE)
-        ViewComponent.getWidget(self,'chk_first_arw').set_active(gtk.FALSE)
+        self.theArwTypeCombo.set_sensitive(True)
+        self.theLineTypeCombo.set_sensitive(True)
+        ViewComponent.getWidget(self,'arw_color_button').set_sensitive(True)
+        ViewComponent.getWidget(self,'chk_last_arw').set_active(False)
+        ViewComponent.getWidget(self,'chk_first_arw').set_active(False)
 
     def updateLineProperty(self):
-        self.theArwTypeCombo.set_sensitive(gtk.TRUE)
-        self.theLineTypeCombo.set_sensitive(gtk.TRUE)
-        ViewComponent.getWidget(self,'arw_color_button').set_sensitive(gtk.TRUE)
+        self.theArwTypeCombo.set_sensitive(True)
+        self.theLineTypeCombo.set_sensitive(True)
+        ViewComponent.getWidget(self,'arw_color_button').set_sensitive(True)
         ViewComponent.getWidget(self,'da_fill').modify_bg(gtk.STATE_NORMAL,self.theFillColor)
         
         if int(self.thecoef) < 0:
-            ViewComponent.getWidget(self,'chk_first_arw').set_active(gtk.TRUE)
-            ViewComponent.getWidget(self,'chk_last_arw').set_active(gtk.FALSE)
+            ViewComponent.getWidget(self,'chk_first_arw').set_active(True)
+            ViewComponent.getWidget(self,'chk_last_arw').set_active(False)
         elif int(self.thecoef) > 0:
-            ViewComponent.getWidget(self,'chk_last_arw').set_active(gtk.TRUE)
-            ViewComponent.getWidget(self,'chk_first_arw').set_active(gtk.FALSE)
+            ViewComponent.getWidget(self,'chk_last_arw').set_active(True)
+            ViewComponent.getWidget(self,'chk_first_arw').set_active(False)
         elif int(self.thecoef) == 0:
-            ViewComponent.getWidget(self,'chk_last_arw').set_active(gtk.FALSE)
-            ViewComponent.getWidget(self,'chk_first_arw').set_active(gtk.FALSE)
+            ViewComponent.getWidget(self,'chk_last_arw').set_active(False)
+            ViewComponent.getWidget(self,'chk_first_arw').set_active(False)
         
     def changeArwType(self, newArwType):
         if newArwType!="" and  self.theObject.getProperty(OB_SHAPE_TYPE) != newArwType:
@@ -175,7 +175,7 @@ class  LinePropertyComponent(ViewComponent):
         aColorSel=aDialog.colorsel
         aColorSel.set_previous_color(aColor)
         aColorSel.set_current_color(aColor)
-        aColorSel.set_has_palette(gtk.TRUE)
+        aColorSel.set_has_palette(True)
         return[aDialog,aColorSel]
     
     def setHexadecimal(self,theColor,theColorMode ):

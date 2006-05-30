@@ -217,7 +217,7 @@ class EntityListTab(ListWindow):
         self.theEntityEditorList.close()
         self.theModelEditor.theEntityListWindowList.remove( self )
         self.theModelEditor.updateWindows()
-        return gtk.TRUE
+        return True
 
 
     def __entitychooser_changed( self, *args ):

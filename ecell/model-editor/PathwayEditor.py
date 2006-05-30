@@ -109,7 +109,7 @@ class PathwayEditor( ListWindow ):
         #get Palette Button Widgets
         
         selector = ListWindow.getWidget(self,'selector_button')
-        selector.set_active(gtk.TRUE)
+        selector.set_active(True)
         variable = ListWindow.getWidget(self,'variable_button')
         process = ListWindow.getWidget(self,'process_button')
         system = ListWindow.getWidget(self,'system_button')
@@ -162,9 +162,9 @@ class PathwayEditor( ListWindow ):
 
     def toggle(self,aName,aStat):
         if aStat:
-            self.thePaletteButtonDict[aName].set_active(gtk.TRUE)
+            self.thePaletteButtonDict[aName].set_active(True)
         else:
-            self.thePaletteButtonDict[aName].set_active(gtk.FALSE)
+            self.thePaletteButtonDict[aName].set_active(False)
         
         
     def getLayout( self ):
@@ -180,7 +180,7 @@ class PathwayEditor( ListWindow ):
         self.theHBox.pack_start( self.theEntry )
         self.theEntry.show()
         self.theEntry.grab_focus()
-        self['rename_button'].set_sensitive( gtk.FALSE )
+        self['rename_button'].set_sensitive( False )
     
     
     def __zoom_in( self, *args ):
@@ -188,9 +188,9 @@ class PathwayEditor( ListWindow ):
         aNewratio=aZoomratio+self.zoom
         self.thePathwayCanvas.setZoomRatio(aNewratio)
         if not self.zoomout.get_property('sensitive'):
-            self.zoomout.set_sensitive(gtk.TRUE)
+            self.zoomout.set_sensitive(True)
         if not self.zoomtofit.get_property('sensitive'):
-            self.zoomtofit.set_sensitive(gtk.TRUE)
+            self.zoomtofit.set_sensitive(True)
 
         
     def __rename_layout( self, *args ):
@@ -208,7 +208,7 @@ class PathwayEditor( ListWindow ):
             self.theHBox.remove( self.theEntry )
             self.theHBox.pack_start( self.theLabel)
             self.theLabel.show()
-            self['rename_button'].set_sensitive( gtk.TRUE )
+            self['rename_button'].set_sensitive( True )
 #            if self.theModelEditor.theLayoutManager.renameLayout(self.theLayout.getName(),self['layout_name_entry'].get_text()):
 #                self.theModelEditor.updateWindows()
 
@@ -222,8 +222,8 @@ class PathwayEditor( ListWindow ):
     def __zoom_out( self, *args ):
         width,height=self.thePathwayCanvas.getSize()
         if width<860:
-            self.zoomout.set_sensitive(gtk.FALSE)
-            self.zoomtofit.set_sensitive(gtk.FALSE)
+            self.zoomout.set_sensitive(False)
+            self.zoomtofit.set_sensitive(False)
             return
 
         if width>860:
@@ -234,8 +234,8 @@ class PathwayEditor( ListWindow ):
     def __zoom_to_fit( self, *args ):
         aNewratio=self.zoom
         self.thePathwayCanvas.setZoomRatio(aNewratio)
-        self.zoomtofit.set_sensitive(gtk.FALSE)
-        self.zoomout.set_sensitive(gtk.FALSE)
+        self.zoomtofit.set_sensitive(False)
+        self.zoomout.set_sensitive(False)
 
 
     def __print( self, *args ):
