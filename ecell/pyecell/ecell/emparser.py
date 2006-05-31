@@ -456,6 +456,36 @@ import StringIO
 import ecell.em
 em = ecell.em ; del ecell.em
 
+class ecellHookClass(em.Hook):
+    def __init__(self, aPreprocessor, anInterpreter):
+        self.theInterpreter = anInterpreter
+        self.thePreprocessor = aPreprocessor
+    def afterInclude( self ):          # def afterInclude( self, interpreter, keywords ):
+        ( file, line ) = self.interpreter.context().identify()
+        self.thePreprocessor.lineControl( self.theInterpreter, file, line )
+
+    def beforeIncludeHook( self, name, file, locals ):  
+        self.thePreprocessor.lineControl( self.theInterpreter, name, 1 )  
+
+    def afterExpand( self, result ):
+        self.thePreprocessor.need_linecontrol = 1
+
+    def afterEvaluate(self, result):
+        self.thePreprocessor.need_linecontrol = 1
+        return
+
+    def afterSignificate(self):
+        self.thePreprocessor.need_linecontrol = 1
+        return
+                         
+    def atParse(self, scanner, locals):
+        if not self.thePreprocessor.need_linecontrol:
+            return
+
+        ( file, line ) = self.theInterpreter.context().identify()
+        self.thePreprocessor.lineControl( self.theInterpreter, file, line )
+        self.thePreprocessor.need_linecontrol = 0        
+
 
 
 class Preprocessor:
@@ -475,21 +505,6 @@ class Preprocessor:
     def needLineControl( self, *args ):
         self.need_linecontrol = 1
 
-    def atParseHook( self, interpreter, keywords ):
-        if not self.need_linecontrol:
-            return
-
-        ( file, line ) = interpreter.context().identify()
-        self.lineControl( interpreter, file, line )
-        self.need_linecontrol = 0
-
-    def beforeIncludeHook( self, interpreter, keywords ):
-        self.lineControl( interpreter, keywords['name'], 1 )
-
-    def afterIncludeHook( self, interpreter, keywords ):
-        ( file, line ) = interpreter.context().identify()
-        self.lineControl( interpreter, file, line )
-
     def preprocess( self ):
 
         #
@@ -497,21 +512,7 @@ class Preprocessor:
         #
         Output = StringIO.StringIO()
         self.interpreter = em.Interpreter( output = Output )
-        pseudo = self.interpreter.pseudo
-        pseudo.flatten()
-
-        #
-        # set hooks
-        #
-        pseudo.addHook( 'after_include',     self.afterIncludeHook )
-        pseudo.addHook( 'before_include',    self.beforeIncludeHook )
-        pseudo.addHook( 'after_expand',      self.needLineControl )
-        pseudo.addHook( 'after_evaluate',    self.needLineControl )
-        pseudo.addHook( 'after_execute',     self.needLineControl )
-        pseudo.addHook( 'after_substitute',  self.needLineControl )
-        pseudo.addHook( 'after_significate', self.needLineControl )
-        pseudo.addHook( 'at_parse',          self.atParseHook )
-
+        self.interpreter.addHook(ecellHookClass(self, self.interpreter))   # pseudo.addHook(ecellHookClass(self, self.interpreter))
 
         #
         # processing
