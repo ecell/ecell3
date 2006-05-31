@@ -48,6 +48,18 @@ LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
     {
       return GMASystemMatrix;
     }
+
+
+  // Although this class is not exactly a continuous process
+  // (this doesn't set the activity),  the method below is defined
+  // just to suppless the warning in ESSYNSStepper's
+  // superclass, AdaptiveDifferentialStepper.   some more thoughts on
+  // Process ontology will be necessary.
+  virtual const bool isContinuous() const
+    {
+      return true;
+    }
+
   
   void fire()
     {
