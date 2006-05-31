@@ -11,7 +11,7 @@ import Plugin
 from PluginWindow import *
 from ecssupport import *
 
-import Numeric
+import numpy
 import GTK
 
 

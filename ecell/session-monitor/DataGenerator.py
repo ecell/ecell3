@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from Numeric import *
+from numpy import *
 from random import *
 import gtk
 import gtk.gdk
@@ -115,6 +115,7 @@ class DataGenerator:
         '''
         update aDataSeries with new data points gotten from whole Logger
         '''
+
         xAxis = aDataSeries.getXAxis()
         dataList = zeros( (0,5), LOGGER_TYPECODE )
         fullPNString = aDataSeries.getFullPNString()
@@ -122,12 +123,12 @@ class DataGenerator:
             if  self.hasLogger( fullPNString ) :
                 aStartTime = self.theLoggerAdapter.getStartTime( fullPNString )
                 anEndTime = self.theLoggerAdapter.getEndTime ( fullPNString )
+                
                 requiredResolution = ( anEndTime - aStartTime ) / numberOfElements
-
                 dataList = self.theLoggerAdapter.getData( fullPNString, 
-                    aStartTime, anEndTime, requiredResolution )
-
-
+                                                          aStartTime,
+                                                          anEndTime,
+                                                          requiredResolution )
 
         else:
             aWindow = aDataSeries.thePlot.theWidget.get_ancestor( gtk.Window)
@@ -239,7 +240,8 @@ class CachedLoggerAdapter:
     def getData( self, fullPNString, start, end, interval ):
         if fullPNString not in self.theCachedLoggerDict.keys():
             self.theCachedLoggerDict[ fullPNString ] = CachedLogger( self.theSession, fullPNString )
-        return self.theCachedLoggerDict[ fullPNString ].getData( start, end, interval )
+        ret = self.theCachedLoggerDict[ fullPNString ].getData( start, end, interval )
+        return ret 
 
 
 

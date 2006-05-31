@@ -32,7 +32,7 @@
 
 import string
 from DataFile import *
-import Numeric
+import numpy
 import TableIO
 
 # extension
@@ -60,7 +60,7 @@ class ECDDataFile( DataFile ):
 		self.theNote=''
 
 		if data is None:
-			self.setData( Numeric.array([[]]) )
+			self.setData( numpy.array([[]]) )
 		else:
 			self.setData( data )
 

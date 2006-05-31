@@ -3,7 +3,7 @@
 from Constants import *
 import gtk
 import gnomecanvas
-import Numeric as n
+import numpy as n
 
 class GraphicalUtils:
 

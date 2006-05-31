@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import gtk
-import Numeric as nu
+import numpy as nu
 import gtk.gdk
 import gobject
 import re
@@ -957,7 +957,6 @@ class Plot:
                 aSeries = DataSeries( aFullPNString, self.theOwner, self, aColor )
                 self.theSeriesMap[ aFullPNString ] = aSeries
                 return_list.append( aFullPNString )
-
         #if mode is strip
         if self.theStripMode == MODE_STRIP:
             self.requestData( ) 

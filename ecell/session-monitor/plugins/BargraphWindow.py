@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import  gtk 
-from Numeric import *
+from numpy import *
 import gtk.gdk
 import re
 import string

@@ -1,6 +1,6 @@
 from Constants import *
 from __future__ import division
-import Numeric as nu
+import numpy as nu
 import gnomecanvas
 
 class LineDescriptor:

@@ -36,7 +36,7 @@ import re
 
 
 import ecell.eml
-from Numeric import *
+from numpy import *
 import ecell.emc
 import ecell.ecs
 

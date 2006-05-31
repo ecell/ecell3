@@ -1,5 +1,5 @@
 from Constants import *
-import Numeric as nu
+import numpy as nu
 from gnomecanvas import *
 
 def estLabelDims(graphUtils, aLabel):

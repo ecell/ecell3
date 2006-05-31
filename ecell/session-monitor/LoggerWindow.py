@@ -36,7 +36,7 @@
 from OsogoWindow import *
 import gobject
 import gtk
-from Numeric import *
+from numpy import *
 
 from os import *
 

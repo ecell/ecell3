@@ -7,7 +7,7 @@ import os
 import time
 
 
-from Numeric import *
+from numpy import *
 import ecell.ecs
 import ecell.emc
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import gtk
-import Numeric as nu
+import numpy as nu
 import gtk.gdk
 import re
 import string
@@ -43,8 +43,8 @@ class TracerWindow( OsogoPluginWindow ):
         self.theSaveDirectorySelection.ok_button.connect('clicked', self.changeSaveDirectory)
         self.theSaveDirectorySelection.cancel_button.connect('clicked', self.closeParentWindow)
 
-
     def openWindow(self):
+
         OsogoPluginWindow.openWindow(self)
 
         #self.openWindow()
@@ -67,7 +67,6 @@ class TracerWindow( OsogoPluginWindow ):
         pixbufRenderer = gtk.CellRendererPixbuf()
         xaxisRenderer = gtk.CellRendererToggle()
         xaxisRenderer.connect( 'toggled', self.xaxisToggled, self.theListStore )
-
         pixBufColumn = gtk.TreeViewColumn( 'color', pixbufRenderer, pixbuf = COL_PIX )
         fullpnColumn = gtk.TreeViewColumn( 'trace', gtk.CellRendererText(), text = COL_TXT )
         loggerColumn = gtk.TreeViewColumn( 'lg', loggerRenderer, active=COL_LOG )
@@ -92,30 +91,25 @@ class TracerWindow( OsogoPluginWindow ):
         self.theListSelection = self.theListWindow.get_selection()
         self.theListSelection.set_mode( gtk.SELECTION_MULTIPLE )
         self.theWindow = self.getWidget( self.__class__.__name__ )
-
         #determine plotsize
         self.thePlotWidget = self.theDrawingArea
 
         #init plotter instance
         self.thePlotInstance = Plot( self, self.getParent(), self.thePlotWidget )
         #attach plotterwidget to window
-
         aWindowWidget = self.getWidget( 'frame8' )
         self.noHandle = False
 
         aWindowWidget.show_all()
 
         #add handlers to buttons
-
         self.theListWindow.connect( "button-press-event", self.buttonPressedOnList)
 
         self.setIconList(
         os.environ['SESSIONMONITORPATH'] + os.sep + "ecell.png",
         os.environ['SESSIONMONITORPATH'] + os.sep + "ecell32.png")
-
         #addtrace to plot
         self.addTraceToPlot( self.theFullPNList() )
-
         #sets stripinterval, disable history buttons
         self.theEntry.set_text( str(self.thePlotInstance.getStripInterval()) )
         self.theEntry.connect( 'activate', self.stripIntervalChangedEnter )
@@ -124,11 +118,9 @@ class TracerWindow( OsogoPluginWindow ):
         if not self.isStandAlone():
             self.minimize()
 
-
         self.thePluginManager.appendInstance( self )
 
         self.showHistory()               
-
 
     def update(self):
         self.thePlotInstance.update()
@@ -225,12 +217,10 @@ class TracerWindow( OsogoPluginWindow ):
         #checks that newpn has logger if mode is history
         #calls superclass
         pass_flag = 0
-
         if self.theSession.getParameter('log_all_traces'):
             for aFullPN in aFullPNList:
                 aFullPNString = createFullPNString( aFullPN )
                 self.createLogger( [aFullPNString] )
-
         if self.thePlotInstance.getStripMode() == 'history':
             for aFullPN in aFullPNList:
                 aFullPNString= createFullPNString( aFullPN)

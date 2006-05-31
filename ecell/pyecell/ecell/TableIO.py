@@ -26,12 +26,12 @@ USA.
 __version__ = "$Revision$"
 # $Source$
    
-import Numeric
+import numpy
 import _tableio
 import types
 
 def TableToArray(t):
-    a = Numeric.array(t['data'])
+    a = numpy.array(t['data'])
     a.shape = (t['rows'],t['columns'])
     return a
 
@@ -49,33 +49,33 @@ def readColumns(file, commentChars, columns='all'):
     return extractColumns(t, columns)
 
 def extractColumns(t, columns='all'):
-    a = Numeric.array(t['data'])
+    a = numpy.array(t['data'])
     a.shape = (t['rows'],t['columns'])
     if columns == 'all':
         data = []
         for c in range(t['columns']):
-            data.append(Numeric.ravel(Numeric.take(a, [c], 1)))
+            data.append(numpy.ravel(numpy.take(a, [c], 1)))
     else:
         if type(columns) == types.ListType \
            or type(columns) == types.TupleType:
             data = []
             for c in columns:
-                data.append(Numeric.ravel(Numeric.take(a, [c], 1)))
+                data.append(numpy.ravel(numpy.take(a, [c], 1)))
                 
     return data
 
 def selectColumns(t, columns):
-    a = Numeric.array(t['data'])
+    a = numpy.array(t['data'])
     a.shape = (t['rows'],t['columns'])
     data = []
     for c in columns:
-        data.append(Numeric.ravel(Numeric.take(a, [c], 1)))        
+        data.append(numpy.ravel(numpy.take(a, [c], 1)))        
     return data
 
 def writeArray(file, data, append=0 ):
     t = {}
     t['filename'] = file
-    t['data'] = Numeric.ravel(data).tolist()
+    t['data'] = numpy.ravel(data).tolist()
     t['rows'] = data.shape[0]
     t['columns'] = data.shape[1]
     t['append'] = append
@@ -98,7 +98,7 @@ def TableFromColumns(list):
         t['filename'] = ''
         t['rows'] = len(list[0])
         t['columns'] = len(list)
-        t['data'] = Numeric.ravel(Numeric.transpose(Numeric.array(list))).tolist()
+        t['data'] = numpy.ravel(numpy.transpose(numpy.array(list))).tolist()
     return t
 
 def test():

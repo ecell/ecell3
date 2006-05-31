@@ -6,7 +6,7 @@ from ConfirmWindow import *
 import string
 import os
 import re
-import Numeric as nu
+import numpy as nu
 import math
 POINTS_PER_INCH = 36
 FACTOR = 1.5

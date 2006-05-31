@@ -42,7 +42,7 @@ from os import *
 from ecell.ecssupport import *
 import ConfirmWindow
 
-from Numeric import *
+from numpy import *
 
 FORWARD=0
 DOWN=1

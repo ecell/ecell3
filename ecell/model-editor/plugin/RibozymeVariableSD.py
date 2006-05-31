@@ -1,7 +1,7 @@
 from Constants import *
 from gnomecanvas import *
 from ShapeDescriptor import *
-import Numeric as nu
+import numpy as nu
 
 SHAPE_PLUGIN_TYPE='Variable' #Shape Plugin Constants
 SHAPE_PLUGIN_NAME='Ribozyme'

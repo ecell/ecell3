@@ -5,7 +5,7 @@ import gtk
 from EntityCommand import *
 from Utils import *
 from PackingStrategy import *
-import Numeric as n
+import numpy as n
 from LayoutBufferFactory import *
 
 

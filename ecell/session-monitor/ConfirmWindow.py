@@ -145,7 +145,7 @@ class ConfirmWindow(gtk.Dialog):
 		"""destroy dialog
 		"""
 		self.win.hide()
-		gtk.mainquit()
+		gtk.main_quit()
 
 
 # ----------------------------------------------------
