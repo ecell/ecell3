@@ -279,8 +279,6 @@ class MainWindow(OsogoWindow):
 
                 self['sec_step_entry'].set_property( 'xalign', 1 )
                 self['time_entry'].set_property( 'xalign', 1 )
-                self['time_entry'].modify_base( gtk.STATE_NORMAL,
-                                                gtk.gdk.Color(61000,61000,61000,0) )
 
 
 		# -------------------------------------
@@ -390,8 +388,6 @@ class MainWindow(OsogoWindow):
                 # set Timer entry
                 # --------------------
                 self['timer_entry'].set_text( str( 0 ) )
-                self['timer_entry'].modify_base( gtk.STATE_NORMAL,
-                                                gtk.gdk.Color(61000,61000,61000,0) )
                 self['timer_entry'].set_property( 'xalign', 1 )
                 self['timer_box'].hide()
 
