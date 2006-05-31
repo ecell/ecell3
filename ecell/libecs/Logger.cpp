@@ -208,6 +208,23 @@ namespace libecs
 	return createEmptyVector();
       }
 
+    // this case doesn't work well with below routine on x86-64.
+    // anyway a serious effort of code cleanup is necessary. 
+    if( aStartTime == anEndTime )  
+      {
+	PhysicalLogger::size_type 
+	  anIterator( thePhysicalLogger.upper_bound
+		       ( thePhysicalLogger.begin(),
+			 thePhysicalLogger.end(), 
+			 anEndTime ) );
+	LongDataPoint 
+	  aLongDataPoint( thePhysicalLogger.at( anIterator ) );
+	DataPointVectorPtr 
+	  aDataPointVector( new DataPointVector( 1, 5 ) );
+	aDataPointVector->asLong( 0 ) = aLongDataPoint;
+	return DataPointVectorSharedPtr( aDataPointVector ); 
+      }
+
     // set up output vector
     DataPointVectorIterator 
       aPhysicalRange( static_cast<size_type>
@@ -222,18 +239,15 @@ namespace libecs
       {
 	++aPhysicalRange;
       }
-    
-    ++aPhysicalRange;
+
     Real aTimeGap( ( thePhysicalLogger.back().getTime() 
 		     - thePhysicalLogger.front().getTime() ) /
 		   thePhysicalLogger.size() );
-
 
     DataPointVectorPtr 
       aDataPointVector( new DataPointVector( aPhysicalRange, 5 ) );
 
     // set up iterators
-    
     PhysicalLogger::size_type 
       anIterationEnd( thePhysicalLogger.
 		       upper_bound_linear_estimate
@@ -259,7 +273,6 @@ namespace libecs
     
     DataPointAggregator anAggregator;
     anAggregator.aggregate( aLongDataPoint );
-
     for( DataPointVectorIterator anElementCount( 0 ); 
 	 anElementCount < aPhysicalRange; ++anElementCount )
       {
@@ -282,7 +295,6 @@ namespace libecs
 	
 	aTargetTime += anInterval;
       }
-    
     
     return DataPointVectorSharedPtr( aDataPointVector ); 
   }
