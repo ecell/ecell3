@@ -37,7 +37,7 @@
 #include <boost/cast.hpp>
 #include <boost/python.hpp>
 
-#include <Numeric/arrayobject.h>
+#include <numpy/arrayobject.h>
 
 #include "libecs/libecs.hpp"
 #include "libecs/Polymorph.hpp"
