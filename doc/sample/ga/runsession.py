@@ -16,7 +16,7 @@ import os
 # --------------------------------------------------------
 
 # simulation
-DULATION = 1000
+DULATION = 1001
 START_TIME = 0
 INTERVAL = 10
 
@@ -61,7 +61,7 @@ for i in range( len(VARIABLE_LIST_FOR_LOGGER) ):
 # --------------------------------------------------------
 # (4) run
 # --------------------------------------------------------
-run( DULATION )
+run( DULATION + INTERVAL )
 
 # --------------------------------------------------------
 # (5) read training time-course
@@ -74,7 +74,6 @@ for i in range( len(TRAINING_DATA_FILE_LIST) ):
 	aTimeCouse.load( _DATA_ + os.sep + TRAINING_DATA_FILE_LIST[i] )
 	aTrainingTimeCourseList.append( aTimeCouse )
 
-
 # --------------------------------------------------------
 # (6) save predicted time-course
 # --------------------------------------------------------
@@ -83,7 +82,7 @@ aPredictedTimeCouseList = []
 for i in range( len(aLoggerList) ):
 	
 	aTimeCouse = ECDDataFile( aLoggerList[i].getData(START_TIME, \
-							 DULATION, \
+							 DULATION + INTERVAL, \
 							 INTERVAL) )
 	aTimeCouse.setDataName( aLoggerList[i].getName() )
 	aTimeCouse.setNote( 'Predicted %s' %VARIABLE_LIST_FOR_LOGGER[i] )
@@ -108,7 +107,8 @@ for i in range(aTrainingTimeCourseList[0].getSize()[1]):
 		aDenominator = aTrainingTimeCourseList[j].getData()[i][1] 
 		if aDenominator < MINIMUM_DENOMINATOR:
 			aDenominator = MINIMUM_DENOMINATOR
-			
+		print aTrainingTimeCourseList[j].getData()[i][1]
+		print aPredictedTimeCouseList[j].getData()[i][1]
 		# add the difference of predicted S and predicted S
 		aDifference += (abs(aTrainingTimeCourseList[j].getData()[i][1]-
 				    aPredictedTimeCouseList[j].getData()[i][1])/
