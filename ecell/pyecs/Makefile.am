@@ -6,6 +6,7 @@ INCLTDL=@INCLTDL@
 LIBLTDL=@LIBLTDL@
 NUMPY_INCLUDE_DIR=@NUMPY_INCLUDE_DIR@
 PYTHON_INCLUDES=@PYTHON_INCLUDES@ -I${NUMPY_INCLUDE_DIR}
+PYTHON_VERSION=@PYTHON_VERSION@
 
 ECELL_DIRNAME=@ECELL_DIRNAME@
 ECELL_INCLUDE_DIR=${includedir}/${ECELL_DIRNAME}
@@ -14,10 +15,11 @@ pkgpyexecdir=@pkgpyexecdir@
 if OS_WIN32
   SUBDIRS = windows
   no_undefined = -no-undefined
-  LIBPYTHON = -lpython@PYTHON_WIN_VERSION@
+  LIBPYTHON = -lpython${PYTHON_VERSION/'.'}
 else
   bin_SCRIPTS =\
   ecell3-python
+  LIBPYTHON = -lpython${PYTHON_VERSION}
 endif
 
 BPLCXXFLAGS=-ftemplate-depth-70
