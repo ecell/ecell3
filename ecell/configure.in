@@ -293,6 +293,7 @@ AC_CONFIG_FILES([Makefile
                  pyecell/Makefile
                  pyecell/ecell/Makefile
                  pyecell/ecell/SessionManager/Makefile
+                 pyecell/ecell/analysis/Makefile
                  dm/Makefile])
 AC_CONFIG_FILES([bin/Makefile
 		 bin/ecell3-dmc
