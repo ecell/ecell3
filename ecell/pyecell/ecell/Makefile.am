@@ -5,7 +5,8 @@ if OS_WIN32
   LIBPYTHON = -lpython@PYTHON_WIN_VERSION@
 endif
 
-SUBDIRS = SessionManager
+SUBDIRS = SessionManager\
+analysis
 
 CXX_FLAGS=@CXX_FLAGS@
 PYTHON_INCLUDES=@PYTHON_INCLUDES@
