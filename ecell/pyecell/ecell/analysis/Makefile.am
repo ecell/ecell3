@@ -1,0 +1,18 @@
+AUTOMAKE_OPTIONS = foreign
+
+pkgpyexecdir=@pkgpyexecdir@/analysis
+
+pkgpyexec_PYTHON=\
+__init__.py\
+ControlCoefficient.py\
+Elasticity.py\
+Jacobian.py\
+MatrixIO.py\
+PathwayProxy.py\
+Structure.py\
+ecdsupport.py\
+emlsupport.py\
+emlsupport2.py\
+util.py
+
+
