@@ -69,8 +69,8 @@ def getJacobianMatrix2( aPathwayProxy ):
 
     aJacobianMatrix = numpy.zeros( ( size, size ), numpy.Float )
 
-    relationMatrix = numpy.matrixmultiply( aPathwayProxy.getRelationMatrix(), numpy.transpose( aPathwayProxy.getRelationMatrix( 1 ) ) )
-    independentGroupList = createIndependentGroupList( relationMatrix )
+    incidentMatrix = numpy.matrixmultiply( aPathwayProxy.getIncidentMatrix(), numpy.transpose( aPathwayProxy.getIncidentMatrix( 1 ) ) )
+    independentGroupList = createIndependentGroupList( incidentMatrix )
 
     velocityBuffer = numpy.zeros( size, numpy.Float )
 
@@ -98,7 +98,7 @@ def getJacobianMatrix2( aPathwayProxy ):
             i = groupList[ c ]
             aPerturbation = perturbationList[ c ]
             for j in range( len( variableList ) ):
-                if relationMatrix[ i ][ j ] != 0:
+                if incidentMatrix[ i ][ j ] != 0:
                     aJacobianMatrix[ j ][ i ] = ( aSession.theSimulator.getEntityProperty( variableList[ j ] + ':Velocity' ) - velocityBuffer[ j ] ) / aPerturbation
 
     return aJacobianMatrix

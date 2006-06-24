@@ -283,8 +283,8 @@ def getEpsilonElasticityMatrix2( aPathwayProxy ):
 
     elasticityMatrix = numpy.zeros( ( len( variableList ), len( processList ) ), numpy.Float )
 
-    relationMatrix = aPathwayProxy.getRelationMatrix()
-    independentGroupList = createIndependentGroupList( relationMatrix )
+    incidentMatrix = aPathwayProxy.getIncidentMatrix()
+    independentGroupList = createIndependentGroupList( incidentMatrix )
     
     activityBuffer = numpy.zeros( len( processList ), numpy.Float )
 
@@ -312,7 +312,7 @@ def getEpsilonElasticityMatrix2( aPathwayProxy ):
             i = groupList[ c ]
             aPerturbation = perturbationList[ c ]
             for j in range( len( processList ) ):
-                if relationMatrix[ i ][ j ]:
+                if incidentMatrix[ i ][ j ]:
                     elasticityMatrix[ i ][ j ] = ( aSession.theSimulator.getEntityProperty( processList[ j ] + ':Activity' ) - activityBuffer[ j ] ) / aPerturbation
 
     return elasticityMatrix

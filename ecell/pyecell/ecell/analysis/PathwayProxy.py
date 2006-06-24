@@ -256,14 +256,14 @@ class PathwayProxy:
     # end of addProcess
 
     
-    def getRelationMatrix( self, mode=0 ):
+    def getIncidentMatrix( self, mode=0 ):
         '''
-        create the relation matrix (array)
+        create the incident matrix (array)
         mode: (0 or 1) 0 means that only the \'write\' variables are checked. 0 is set as default.
-        return relationMatrix
+        return incidentMatrix
         '''
 
-        relationMatrix = numpy.zeros( ( len( self.__variableList ), len( self.__processList ) ) )
+        incidentMatrix = numpy.zeros( ( len( self.__variableList ), len( self.__processList ) ) )
 
         for j in range( len( self.__processList ) ):
 
@@ -289,13 +289,13 @@ class PathwayProxy:
                     if len( aVariableReference ) > 2:
                         coeff = string.atoi( aVariableReference[ 2 ] )
                         if coeff != 0:
-                            relationMatrix[ i ][ j ] = 1
+                            incidentMatrix[ i ][ j ] = 1
                 else:
-                    relationMatrix[ i ][ j ] = 1
+                    incidentMatrix[ i ][ j ] = 1
 
-        return relationMatrix
+        return incidentMatrix
     
-    # end of getRelationMatrix
+    # end of getIncidentMatrix
 
 
     def getStoichiometryMatrix( self ):
@@ -381,8 +381,8 @@ if __name__ == '__main__':
         print aPathwayProxy.getProcessList()
         print 'related variable list ='
         print aPathwayProxy.getVariableList()
-        print 'relation matrix ='
-        print aPathwayProxy.getRelationMatrix()
+        print 'incident matrix ='
+        print aPathwayProxy.getIncidentMatrix()
         print 'stoichiometry matrix ='
         print aPathwayProxy.getStoichiometryMatrix()
         print 'reversibility list ='
