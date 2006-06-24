@@ -67,15 +67,15 @@ def createIdFromFullID( fullIDString ):
 # end of createIdFromFullID
 
 
-def getSBaseAnnotation( sbaseObj, pn ):
+def getSBaseAnnotation( sbaseObj, pn, aXMLNamespaceList ):
 
-    # namespace is simlified on this implementation
     propertyName = '%s__%s' % ( ECELL_XML_NAMESPACE_PREFIX, pn )
 
     if sbaseObj.isSetAnnotation():
-        annotationString = sbaseObj.getAnnotation()
-
-        annotationString = string.replace( annotationString, ':', '__' )
+        annotationString = '<xml'
+        for i in range( aXMLNamespaceList.getLength() ):
+            annotationString += ' xmlns:%s="%s"' % ( aXMLNamespaceList.getPrefix( i ), aXMLNamespaceList.getURI( i ) )
+        annotationString = '%s>%s</xml>' % ( annotationString, sbaseObj.getAnnotation() )
         
         annotationDoc = xml.dom.minidom.parseString( annotationString )
         annotationNode = annotationDoc.childNodes[ 0 ]
@@ -98,7 +98,7 @@ def getSBaseAnnotation( sbaseObj, pn ):
 # end of getSBaseAnnotation
 
 
-def setSBaseAnnotation( sbaseObj, pn, value ):
+def setSBaseAnnotation( sbaseObj, pn, value, aXMLNamespaceList ):
 
     if type( value ) != str:
         raise TypeError, 'Value must be a string'
@@ -109,9 +109,13 @@ def setSBaseAnnotation( sbaseObj, pn, value ):
         sbaseObj.setAnnotation( annotationString )
 
     else:
-        annotationString = sbaseObj.getAnnotation()
+        annotationString = '<xml'
+        for i in range( aXMLNamespaceList.getLength() ):
+            annotationString += ' xmlns:%s="%s"' % ( aXMLNamespaceList.getPrefix( i ), aXMLNamespaceList.getURI( i ) )
+        annotationString = '%s>%s</xml>' % ( annotationString, sbaseObj.getAnnotation() )
+
         annotationDoc = xml.dom.minidom.parseString( annotationString )
-        annotationNode = annotationDoc.childNodes[ 0 ]
+        annotationNode = annotationDoc.childNodes[ 0 ].childNodes[ 0 ]
 
         targetNode = None
         for aNode in annotationNode.childNodes:
@@ -138,12 +142,15 @@ def setSBaseAnnotation( sbaseObj, pn, value ):
 class SBMLIdManager:
 
 
-    def __init__( self, aModel ):
+    def __init__( self, aSBMLDocument ):
 
         self.idRegex = re.compile( '[a-zA-Z_][a-zA-Z0-9_]*' )
 
         self.namespace = 'System::/'
-        self.initialize( aModel )
+
+        self.theXMLNamespaceList = aSBMLDocument.getNamespaces()
+
+        self.initialize( aSBMLDocument.getModel() )
 
     # end of __init__
 
@@ -422,7 +429,7 @@ class SBMLIdManager:
 
         aCompartment = aModel.getCompartment( sbmlId )
         
-        annotation = getSBaseAnnotation( aCompartment, 'ID' )
+        annotation = getSBaseAnnotation( aCompartment, 'ID', self.theXMLNamespaceList )
         if annotation == '/':
             return self.getNamespace()
 
@@ -435,8 +442,7 @@ class SBMLIdManager:
         fullID = ecell.ecssupport.createFullID( fullIDString )
         systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
 
-        return 'System:%s:%s' % ( systemPath, \
-                                  self.__createSObjectID( aCompartment ) )
+        return 'System:%s:%s' % ( systemPath, self.__createSObjectID( aCompartment, self.theXMLNamespaceList ) )
 
     # end of __createCompartmentFullID
 
@@ -455,8 +461,7 @@ class SBMLIdManager:
         fullID = ecell.ecssupport.createFullID( fullIDString )
         systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
 
-        return 'Variable:%s:%s' % ( systemPath, \
-                                    self.__createSObjectID( aSpecies ) )
+        return 'Variable:%s:%s' % ( systemPath, self.__createSObjectID( aSpecies, self.theXMLNamespaceList ) )
 
     # end of __createSpeciesFullID
     
@@ -465,7 +470,7 @@ class SBMLIdManager:
 
         aParameter = aModel.getParameter( sbmlId )
 
-        annotation = getSBaseAnnotation( aParameter, 'compartment' )
+        annotation = getSBaseAnnotation( aParameter, 'compartment', self.theXMLNamespaceList )
         if annotation != None and self.idRegex.match( annotation ):
             fullIDString = self.getCompartmentFullID( annotation )
             if not fullIDString:
@@ -477,8 +482,7 @@ class SBMLIdManager:
         fullID = ecell.ecssupport.createFullID( fullIDString )
         systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
             
-        return 'Variable:%s:%s' % ( systemPath, \
-                                    self.__createSObjectID( aParameter ) )
+        return 'Variable:%s:%s' % ( systemPath, self.__createSObjectID( aParameter, self.theXMLNamespaceList ) )
 
     # end of __createParameterFullID
     
@@ -487,7 +491,7 @@ class SBMLIdManager:
 
         aReaction = aModel.getReaction( sbmlId )
 
-        annotation = getSBaseAnnotation( aReaction, 'compartment' )
+        annotation = getSBaseAnnotation( aReaction, 'compartment', self.theXMLNamespaceList )
         if annotation != None and self.idRegex.match( annotation ):
             fullIDString = self.getCompartmentFullID( annotation )
             if not fullIDString:
@@ -498,8 +502,7 @@ class SBMLIdManager:
         fullID = ecell.ecssupport.createFullID( fullIDString )
         systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
             
-        return 'Process:%s:%s' % ( systemPath, \
-                                    self.__createSObjectID( aReaction ) )
+        return 'Process:%s:%s' % ( systemPath, self.__createSObjectID( aReaction, self.theXMLNamespaceList ) )
 
     # end of __createReactionFullID
 
@@ -508,7 +511,7 @@ class SBMLIdManager:
 
         aRule = aModel.getRule( i )
             
-        annotation = getSBaseAnnotation( aRule, 'compartment' )
+        annotation = getSBaseAnnotation( aRule, 'compartment', self.theXMLNamespaceList )
         if annotation != None and self.idRegex.match( annotation ):
             fullIDString = self.getCompartmentFullID( annotation )
             if not fullIDString:
@@ -519,19 +522,17 @@ class SBMLIdManager:
         fullID = ecell.ecssupport.createFullID( fullIDString )
         systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
         
-        return 'Process:%s:%s' \
-               % ( systemPath, \
-                   self.__createSObjectID( aRule, 'Rule%s' % ( i ) ) )
+        return 'Process:%s:%s' % ( systemPath, self.__createSObjectID( aRule, self.theXMLNamespaceList, 'Rule%s' % ( i ) ) )
     
     # end of __createRuleFulllID
 
 
-    def __createSObjectID( self, sbmlObj, default=None ):
+    def __createSObjectID( self, sbmlObj, aXMLNamespaceList, default=None ):
 
         if not default:
             default = sbmlObj.getId()
         
-        annotation = getSBaseAnnotation( sbmlObj, 'ID' )
+        annotation = getSBaseAnnotation( sbmlObj, 'ID', self.theXMLNamespaceList )
         if annotation != None and self.idRegex.match( annotation ):
             return annotation
         else:
@@ -553,8 +554,7 @@ if __name__ == '__main__':
     def main( filename ):
 
         sbmlDocument = libsbml.readSBML( filename )
-        aModel = sbmlDocument.getModel()
-        aSBMLIdManager = sbmlsupport.SBMLIdManager( aModel )
+        aSBMLIdManager = sbmlsupport.SBMLIdManager( sbmlDocument )
 
         print aSBMLIdManager.compartmentDict
         print aSBMLIdManager.speciesDict

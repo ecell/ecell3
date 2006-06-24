@@ -142,7 +142,6 @@ class SBMLExporter:
         self.theEml = ecell.analysis.emlsupport.EmlSupport( filename )
 
         self.theSBMLDocument = None
-        self.theModel = None
 
     # end of initialize
     
@@ -159,6 +158,15 @@ class SBMLExporter:
         if self.theSBMLDocument.getLevel() != 2:
             self.theSBMLDocument.setLevel( 2 )
             
+        aXMLNamespaceList = self.theSBMLDocument.getNamespaces()
+        anURI = aXMLNamespaceList.getURI( ECELL_XML_NAMESPACE_PREFIX )
+        if anURI != ECELL_XML_NAMESPACE_URI:
+            if anURI == '':
+                aXMLNamespaceList.add( ECELL_XML_NAMESPACE_PREFIX, \
+                                       ECELL_XML_NAMESPACE_URI )
+            else:
+                raise SBMLConvertError, 'Wrong URI [%s] is already assinged to xmlns:%s. Remove or correct it by yourself' % ( anURI, ECELL_XML_NAMESPACE_PREFIX )
+
         if self.theSBMLDocument.getNumFatals() > 0:
             fatalerrorList = []
             for i in range( self.theSBMLDocument.getNumFatals() ):
@@ -169,9 +177,8 @@ class SBMLExporter:
                   'This SBML document is invalid: %s' \
                   % ( ', '.join( fatalerrorList ) )
 
-        self.theModel = self.theSBMLDocument.getModel()
-        if not self.theModel:
-            self.theModel = self.theSBMLDocument.createModel()
+        if not self.theSBMLDocument.getModel():
+            self.theSBMLDocument.createModel()
 
         self.__createIdDict()
         
@@ -183,41 +190,32 @@ class SBMLExporter:
         if not self.theSBMLDocument:
             self.loadSBML( libsbml.SBMLDocument() )
 
-        aXMLNamespaceList = self.theSBMLDocument.getNamespaces()
-        anURI = aXMLNamespaceList.getURI( ECELL_XML_NAMESPACE_PREFIX )
-        if anURI != ECELL_XML_NAMESPACE_URI:
-            if anURI == '':
-                aXMLNamespaceList.add( ECELL_XML_NAMESPACE_PREFIX, \
-                                       ECELL_XML_NAMESPACE_URI )
-            else:
-                raise SBMLConvertError, 'Wrong URI [%s] is already assinged to xmlns:%s. Remove or correct it by yourself' % ( anURI, ECELL_XML_NAMESPACE_PREFIX )
-
         for fullIDString in self.theEml.getSystemList():
             ( id, sbaseType ) = self.searchIdFromFullID( fullIDString )
             aCompartmentExporter = CompartmentExporter( self, fullIDString, id )
-            aCompartmentExporter.writeSBML( self.theModel )
+            aCompartmentExporter.writeSBML( self.theSBMLDocument )
 
         for fullIDString in self.theEml.getVariableList():
             ( id, sbaseType ) = self.searchIdFromFullID( fullIDString )
 
             if sbaseType == libsbml.SBML_SPECIES:
                 aSpeciesExporter = SpeciesExporter( self, fullIDString, id )
-                aSpeciesExporter.writeSBML( self.theModel )
+                aSpeciesExporter.writeSBML( self.theSBMLDocument )
 
             elif sbaseType == libsbml.SBML_PARAMETER:
                 aParameterExporter = ParameterExporter( self, fullIDString, id )
-                aParameterExporter.writeSBML( self.theModel )
+                aParameterExporter.writeSBML( self.theSBMLDocument )
 
         for fullIDString in self.theEml.getProcessList():
             ( id, sbaseType ) = self.searchIdFromFullID( fullIDString )
 
             if sbaseType == libsbml.SBML_REACTION:
                 aReactionExporter = ReactionExporter( self, fullIDString, id )
-                aReactionExporter.writeSBML( self.theModel )
+                aReactionExporter.writeSBML( self.theSBMLDocument )
 
             elif sbaseType == libsbml.SBML_ASSIGNMENT_RULE:
                 aRuleExporter = RuleExporter( self, fullIDString, id )
-                aRuleExporter.writeSBML( self.theModel )
+                aRuleExporter.writeSBML( self.theSBMLDocument )
 
         return self.theSBMLDocument
         
@@ -234,10 +232,10 @@ class SBMLExporter:
 
     def __createIdDict( self ):
 
-        if not self.theModel:
+        if not self.theSBMLDocument:
             return
 
-        aSBMLIdManager = SBMLIdManager( self.theModel )
+        aSBMLIdManager = SBMLIdManager( self.theSBMLDocument )
         self.idDict = aSBMLIdManager.createIdDict()
         del aSBMLIdManager
 
@@ -379,7 +377,7 @@ class SBaseExporter:
     # end of isSetId
     
 
-    def writeSBML( self, aModel ):
+    def writeSBML( self, aSBMLDocument ):
 
         import inspect
         caller = inspect.getouterframes( inspect.currentframe() )[ 0 ][ 3 ]
@@ -413,8 +411,9 @@ class CompartmentExporter( SBaseExporter ):
     # end of setFullID
     
 
-    def writeSBML( self, aModel ):
+    def writeSBML( self, aSBMLDocument ):
 
+        aModel = aSBMLDocument.getModel()
         aCompartment = aModel.getCompartment( self.id )
         if not aCompartment:
             aCompartment = aModel.createCompartment()
@@ -423,7 +422,7 @@ class CompartmentExporter( SBaseExporter ):
         fullID = ecell.ecssupport.createFullID( self.fullID )
 
         if self.isSetId():
-            setSBaseAnnotation( aCompartment, 'ID', fullID[ 2 ] )
+            setSBaseAnnotation( aCompartment, 'ID', fullID[ 2 ], aSBMLDocument.getNamespaces() )
 
         outsideFullID = None
         if fullID[ 1 ] == '':
@@ -529,8 +528,9 @@ class SpeciesExporter( SBaseExporter ):
     # end of setFullID
     
 
-    def writeSBML( self, aModel ):
+    def writeSBML( self, aSBMLDocument ):
 
+        aModel = aSBMLDocument.getModel()
         aSpecies = aModel.getSpecies( self.id )
         if not aSpecies:
             aSpecies = aModel.createSpecies()
@@ -539,7 +539,7 @@ class SpeciesExporter( SBaseExporter ):
         fullID = ecell.ecssupport.createFullID( self.fullID )
 
         if self.isSetId():
-            setSBaseAnnotation( aSpecies, 'ID', fullID[ 2 ] )
+            setSBaseAnnotation( aSpecies, 'ID', fullID[ 2 ], aSBMLDocument.getNamespaces() )
 
         compartment = ecell.ecssupport.createFullIDFromSystemPath( fullID[ 1 ] )
         compartment = ecell.ecssupport.createFullIDString( compartment )
@@ -613,8 +613,9 @@ class ParameterExporter( SBaseExporter ):
     # end of setFullID
     
 
-    def writeSBML( self, aModel ):
+    def writeSBML( self, aSBMLDocument ):
 
+        aModel = aSBMLDocument.getModel()
         aParameter = aModel.getParameter( self.id )
         if not aParameter:
             aParameter = aModel.createParameter()
@@ -623,13 +624,13 @@ class ParameterExporter( SBaseExporter ):
         fullID = ecell.ecssupport.createFullID( self.fullID )
 
         if self.isSetId():
-            setSBaseAnnotation( aParameter, 'ID', fullID[ 2 ] )
+            setSBaseAnnotation( aParameter, 'ID', fullID[ 2 ], aSBMLDocument.getNamespaces() )
 
         compartment = ecell.ecssupport.createFullIDFromSystemPath( fullID[ 1 ] )
         compartment = ecell.ecssupport.createFullIDString( compartment )
         ( compartment, sbmlType ) \
           = self.theSBMLExporter.searchIdFromFullID( compartment )
-        setSBaseAnnotation( aParameter, 'compartment', compartment )
+        setSBaseAnnotation( aParameter, 'compartment', compartment, aSBMLDocument.getNamespaces() )
 
         propertyList = self.theSBMLExporter.theEml.getEntityPropertyList( self.fullID )
         for pn in propertyList:
@@ -710,8 +711,9 @@ class ReactionExporter( SBaseExporter ):
     # end of setFullID
     
 
-    def writeSBML( self, aModel ):
+    def writeSBML( self, aSBMLDocument ):
 
+        aModel = aSBMLDocument.getModel()
         aReaction = aModel.getReaction( self.id )
         if not aReaction:
             aReaction = aModel.createReaction()
@@ -725,13 +727,13 @@ class ReactionExporter( SBaseExporter ):
         fullID = ecell.ecssupport.createFullID( self.fullID )
 
         if self.isSetId():
-            setSBaseAnnotation( aReaction, 'ID', fullID[ 2 ] )
+            setSBaseAnnotation( aReaction, 'ID', fullID[ 2 ], aSBMLDocument.getNamespaces() )
 
         compartment = ecell.ecssupport.createFullIDFromSystemPath( fullID[ 1 ] )
         compartment = ecell.ecssupport.createFullIDString( compartment )
         ( compartment, sbmlType ) \
           = self.theSBMLExporter.searchIdFromFullID( compartment )
-        setSBaseAnnotation( aReaction, 'compartment', compartment )
+        setSBaseAnnotation( aReaction, 'compartment', compartment, aSBMLDocument.getNamespaces() )
 
         anExpression = self.theSBMLExporter.theEml.getEntityProperty( '%s:Expression' % ( self.fullID ) )[ 0 ]
         namespaceDict = self.createNamespaceFromVariableReferenceList()
@@ -919,8 +921,9 @@ class RuleExporter( SBaseExporter ):
     # end of setFullID
     
 
-    def writeSBML( self, aModel ):
+    def writeSBML( self, aSBMLDocument ):
 
+        aModel = aSBMLDocument.getModel()
         if self.id == None:
             aRule = aModel.createAssignmentRule()
         else:
@@ -957,9 +960,10 @@ class RuleExporter( SBaseExporter ):
         compartment = ecell.ecssupport.createFullIDString( compartment )
         ( compartment, sbmlType ) \
           = self.theSBMLExporter.searchIdFromFullID( compartment )
-       
-        setSBaseAnnotation( aRule, 'ID', fullID[ 2 ] )
-        setSBaseAnnotation( aRule, 'compartment', compartment )
+
+        aXMLNamespaceList = aSBMLDocument.getNamespaces()
+        setSBaseAnnotation( aRule, 'ID', fullID[ 2 ], aXMLNamespaceList )
+        setSBaseAnnotation( aRule, 'compartment', compartment, aXMLNamespaceList )
 
         anExpression = self.theSBMLExporter.theEml.getEntityProperty( '%s:Expression' % ( self.fullID ) )[ 0 ]
         anExpressionParser = ExpressionParser( namespaceDict )
@@ -978,7 +982,7 @@ class RuleExporter( SBaseExporter ):
                           % ( self.fullID )
 
                 name = name[ 0 ]
-                setSBaseAnnotation( aRule, 'Name', name )
+                setSBaseAnnotation( aRule, 'Name', name, aXMLNamespaceList )
 
             elif pn == 'Priority':
                 value = self.theSBMLExporter.theEml.getEntityProperty( '%s:Priority' % ( self.fullID ) )

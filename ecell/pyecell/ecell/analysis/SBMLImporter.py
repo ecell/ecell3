@@ -16,6 +16,7 @@ import libsbml
 
 import ecell.eml
 import ecell.ecssupport
+import ecell.ecs_constants
 import ecell.emc
 import ecell.Session
 
@@ -163,7 +164,7 @@ class ModelImporter( SBaseImporter ):
     def initialize( self, aSBMLDocument, sbmlId=None ):
 
         SBaseImporter.initialize( self, aSBMLDocument )
-        self.theSBMLIdManager = SBMLIdManager( self.theSBase )
+        self.theSBMLIdManager = SBMLIdManager( self.rootobj )
 
     # end of initialize
 
@@ -269,11 +270,32 @@ class CompartmentImporter( SBaseImporter ):
     # end of getFullID
     
 
+    def createEntity( self, anEml, fullIDString ):
+
+        if anEml.isEntityExist( fullIDString ):
+            return
+        
+        fullID = ecell.ecssupport.createFullID( fullIDString )
+        if fullID[ 0 ] != ecell.ecs_constants.SYSTEM:
+            return
+
+        if fullID[ 1 ] != '':        
+            newSysID = ecell.ecssupport.createFullIDFromSystemPath( fullID[ 1 ] )
+            newSysIDString = ecell.ecssupport.createFullIDString( newSysID )
+            if not anEml.isEntityExist( newSysIDString ):
+                self.createEntity( anEml, newSysIDString )
+
+        anEml.createEntity( 'System', fullIDString )
+
+    # end of createEntity
+    
+
     def writeEML( self, anEml ):
 
         fullIDString = self.getFullID()
         if not anEml.isEntityExist( fullIDString ):
-            anEml.createEntity( 'System', fullIDString )
+            # Use not anEml.createEntity but self.createEntity
+            self.createEntity( anEml, fullIDString )
 ##         else:
 ##             raise SBMLConvertError, \
 ##                   'System [%s] already exists' % ( fullIDString )
@@ -281,7 +303,7 @@ class CompartmentImporter( SBaseImporter ):
         ## ODEStepper is set as default
         if anEml.getStepperList().count( ODE_STEPPER_ID ) == 0:
             anEml.createStepper( 'ODEStepper', ODE_STEPPER_ID )
-            
+
         anEml.setEntityProperty( fullIDString, \
                                  'StepperID', [ ODE_STEPPER_ID ] )
 
