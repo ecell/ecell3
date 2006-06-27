@@ -90,9 +90,9 @@ class ExpressionParser:
                           % ( referenceName )
                 elif type( sbmlId ) == tuple:
                     expressionList[ c ] = '%s / %e' % ( sbmlId[ 0 ], AVOGADRO_CONSTANT )
-##                     if coeff == 0 \
-##                            and self.modifierList.count( sbmlId[ 0 ] ) == 0:
-##                         self.modifierList.append( sbmlId[ 0 ] )         
+                    if coeff == 0 \
+                           and self.modifierList.count( sbmlId[ 0 ] ) == 0:
+                        self.modifierList.append( sbmlId[ 0 ] )         
 
         formulaString = ''.join( expressionList )
         formulaString = string.replace( formulaString, 'self.getSuperSystem().SizeN_A', '( %s * %e )' % ( self.compartment, AVOGADRO_CONSTANT ) )
@@ -170,11 +170,11 @@ class SBMLExporter:
         if self.theSBMLDocument.getNumFatals() > 0:
             fatalerrorList = []
             for i in range( self.theSBMLDocument.getNumFatals() ):
-                fatalerrorList.append( self.theSBMLDocument.getFatal( i ) )
+                fatalerrorList.append( self.theSBMLDocument.getFatal( i ).getMessage() )
                 
             self.theSBMLDocument = None
             raise SBMLConvertError, \
-                  'This SBML document is invalid: %s' \
+                  'This SBML document is invalid:\n %s' \
                   % ( ', '.join( fatalerrorList ) )
 
         if not self.theSBMLDocument.getModel():
@@ -460,7 +460,7 @@ class CompartmentExporter( SBaseExporter ):
                 outsidePath = ecell.ecssupport.createSystemPathFromFullID( outsideFullID )
                 outsideSizeFullIDString = 'Variable:%s:SIZE' % ( outsidePath )
 
-                if self.theSBMLExporter.theEml.isEntityExist( outsideSizeFullIDString ) and self.theSBMLExporter.theEml.getEntityPropertyList( outsideSize.FullIDString ).count( 'Value' ) == 1:
+                if self.theSBMLExporter.theEml.isEntityExist( outsideSizeFullIDString ) and self.theSBMLExporter.theEml.getEntityPropertyList( outsideSizeFullIDString ).count( 'Value' ) == 1:
                     outsideSize = self.theSBMLExporter.theEml.getEntityProperty( '%s:Value' % ( outsideSizeFullIDString ) )
                     if len( outsideSize ) != 1:
                         raise SBMLConvertError, \
