@@ -14,27 +14,9 @@ __license__ = ''
 import ecell.ECDDataFile
 
 import string
-import re
 
 import numpy.dft
 import numpy
-
-
-def convertToDataString( aValue ):
-    '''
-    convert "Variable:/CELL/CYTOPLASM:S:Value"
-    to "Variable__CELL_CYTOPLASM_S_Value"
-    aValue: (str) ex. FullPN
-    return (str)
-    '''
-    
-    p = re.compile( '(/|:)' )
-    if not type( aValue ) == str:
-        raise TypeError( 'can not create DataString from %s type object' % type( aValue ) )
-    else:
-        return p.sub( '_', aValue )
-
-# end of convertToDataString
 
 
 def checkTrend( aValue1, aValue2 ):

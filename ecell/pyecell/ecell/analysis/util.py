@@ -12,6 +12,7 @@ __license__ = ''
 
 
 import string
+import re
 
 from ecell.ecssupport import *
 
@@ -20,6 +21,23 @@ import numpy
 
 RELATIVE_PERTURBATION = 0.001
 ABSOLUTE_PERTURBATION = 1e-6
+
+
+def convertToDataString( aValue ):
+    '''
+    convert "Variable:/CELL/CYTOPLASM:S:Value"
+    to "Variable__CELL_CYTOPLASM_S_Value"
+    aValue: (str) ex. FullPN
+    return (str)
+    '''
+    
+    p = re.compile( '(/|:)' )
+    if not type( aValue ) == str:
+        raise TypeError( 'can not create DataString from %s type object' % type( aValue ) )
+    else:
+        return p.sub( '_', aValue )
+
+# end of convertToDataString
 
 
 def allzero( a, err=0 ):
