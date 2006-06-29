@@ -506,7 +506,9 @@ class RuleImporter( SBaseImporter ):
             raise SBMLConvertError, 'Rule [%s] has no math' % ( sbmlId )
 
         # SBML_ASSIGNMENT_RULE or SBML_RATE_RULE
-        if aRule.getType() == 1 or aRule.getType() == 2:
+##         if aRule.getType() == 1 or aRule.getType() == 2:
+        if type( aRule ) == libsbml.AssignmentRulePtr \
+               or type( aRule ) == libsbml.RateRulePtr:
             if not aRule.isSetVariable():
                 raise SBMLConvertError, \
                       'Rule [%d] has no variable' % ( sbmlId )
@@ -528,8 +530,9 @@ class RuleImporter( SBaseImporter ):
         fullIDString = self.getFullID()
         if not anEml.isEntityExist( fullIDString ):
 
-            ruleType = self.theSBase.getType()
-            if ruleType == 1: # SBML_ASSIGNMENT_RULE
+##             ruleType = self.theSBase.getType()
+##             if ruleType == 1: # SBML_ASSIGNMENT_RULE
+            if type( self.theSBase ) == libsbml.AssignmentRulePtr:
                 if anEml.getStepperList().count( PASSIVE_STEPPER_ID ) == 0:
                     anEml.createStepper( 'PassiveStepper', PASSIVE_STEPPER_ID )
 
@@ -566,8 +569,10 @@ class RuleImporter( SBaseImporter ):
         self.theExpression = libsbml.formulaToString( anASTNode )
 
         # SBML_ASSIGNMENT_RULE or SBML_RATE_RULE
-        if self.theSBase.getType() == 1 \
-               or self.theSBase.getType() == 2:
+##         if self.theSBase.getType() == 1 \
+##                or self.theSBase.getType() == 2:
+        if type( self.theSBase ) == libsbml.AssignmentRulePtr \
+               or type( self.theSBase ) == libsbml.RateRulePtr:
 
             variable = self.theSBase.getVariable()
             ( fullIDString, sbaseType ) \
