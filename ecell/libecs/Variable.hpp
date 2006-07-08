@@ -73,6 +73,8 @@ namespace libecs
 				&Variable::saveValue );
 
 
+	PROPERTYSLOT_SET_GET( Real,  DiffusionCoeff );
+
 	PROPERTYSLOT_SET_GET( Integer,  Fixed );
 
 	PROPERTYSLOT_NO_LOAD_SAVE( Real, Velocity,
@@ -242,6 +244,15 @@ namespace libecs
       return theFixed;
     }
 
+    SET_METHOD( Real, DiffusionCoeff )
+    { 
+      theDiffusionCoeff = value;
+    }
+
+    GET_METHOD( Real, DiffusionCoeff )
+    { 
+      return theDiffusionCoeff;
+    }
 
     /**
        Returns the molar concentration of this Variable.
@@ -384,6 +395,8 @@ namespace libecs
     Real theValue;
 
     Real theLastTime;
+
+    Real theDiffusionCoeff;
 
     InterpolantVector theInterpolantVector;
 
