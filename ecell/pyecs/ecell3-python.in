@@ -27,7 +27,7 @@ export LD_LIBRARY_PATH="${libdir}:${LD_LIBRARY_PATH}"
 #export PYTHONPATH="$PYTHONDIR/ecell/SessionManager:$PYTHONDIR:${PYTHONPATH}"
 export PYTHONPATH="$PYTHONDIR:${PYTHONPATH}"
 export PYTHON_INCLUDES=${PYTHON_INCLUDES}
-export BOOST_LIBRARIES="-lboost_python -lboost_thread-mt"
+export BOOST_LIBRARIES="-lboost_python"
 export LTDL_LIBRARY_PATH=".:${ECELL3_DM_PATH}:${prefix}/lib/${ECELL_DIRNAME}/dms:${LTDL_LIBRARY_PATH}"
 
 # what version? not good.
