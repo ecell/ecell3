@@ -512,6 +512,7 @@ class Preprocessor:
         #
         Output = StringIO.StringIO()
         self.interpreter = em.Interpreter( output = Output )
+        self.interpreter.flatten()
         self.interpreter.addHook(ecellHookClass(self, self.interpreter))   # pseudo.addHook(ecellHookClass(self, self.interpreter))
 
         #
