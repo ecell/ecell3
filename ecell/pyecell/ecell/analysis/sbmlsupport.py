@@ -69,19 +69,20 @@ def createIdFromFullID( fullIDString ):
 
 def getSBaseAnnotation( sbaseObj, pn, aXMLNamespaceList ):
 
-    propertyName = '%s__%s' % ( ECELL_XML_NAMESPACE_PREFIX, pn )
+    propertyName = '%s:%s' % ( ECELL_XML_NAMESPACE_PREFIX, pn )
 
     if sbaseObj.isSetAnnotation():
         annotationString = '<xml'
         for i in range( aXMLNamespaceList.getLength() ):
             annotationString += ' xmlns:%s="%s"' % ( aXMLNamespaceList.getPrefix( i ), aXMLNamespaceList.getURI( i ) )
         annotationString = '%s>%s</xml>' % ( annotationString, sbaseObj.getAnnotation() )
-        
+
         annotationDoc = xml.dom.minidom.parseString( annotationString )
-        annotationNode = annotationDoc.childNodes[ 0 ]
+        annotationNode = annotationDoc.childNodes[ 0 ].childNodes[ 0 ]
 
         targetNode = None
         for aNode in annotationNode.childNodes:
+            print aNode.nodeName
             if str( aNode.nodeName ) == propertyName:
                 targetNode = aNode
                 break
