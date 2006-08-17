@@ -82,7 +82,6 @@ def getSBaseAnnotation( sbaseObj, pn, aXMLNamespaceList ):
 
         targetNode = None
         for aNode in annotationNode.childNodes:
-            print aNode.nodeName
             if str( aNode.nodeName ) == propertyName:
                 targetNode = aNode
                 break
