@@ -65,6 +65,8 @@ class LocalSessionProxy(SessionProxy):
 			aPid = self.__theSubProcess.pid
 			os.kill(aPid,1)
 
+		self.setStatus( QUEUED )
+
 		# run again.
 		self.run()
 
