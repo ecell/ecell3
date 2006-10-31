@@ -71,9 +71,9 @@ icon_stop.png
 EXTRA_DIST=${osogo_PYTHON} ${BINS}
 
 # Windows py2exe setup options, ignore for Unix based systems
-PY2EXE_SETUP = ../ecell/pyecs/windows/py2exeSetup
+PY2EXE_SETUP = ../../ecell/pyecs/windows/py2exeSetup
 WIN_ICON = plugins/ecell.ico
-PATH_VARIABLES = ../ecell/pyecs/windows/pathVariables
+PATH_VARIABLES = ../../ecell/pyecs/windows/pathVariables
 
 BINS =\
 ecell3-session-monitor\
