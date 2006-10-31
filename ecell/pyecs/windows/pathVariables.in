@@ -6,6 +6,7 @@ import os
 import sys
 import imp 
 
+os.environ['ECELL_DIRNAME'] = '@ECELL_DIRNAME@'
 os.environ['PACKAGE'] = '@PACKAGE@'
 os.environ['VERSION'] = '@VERSION@'
 
@@ -26,17 +27,20 @@ prefix = getPrefix()
 os.environ['ECELL3_PREFIX']=\
 	prefix
 
-os.environ['OSOGOPATH']=\
-	os.path.join( prefix, 'lib', 'osogo' )
+os.environ['ECELL3_LIBDIR']=\
+	os.path.join( prefix, 'lib', os.environ['ECELL_DIRNAME'])
+
+os.environ['SESSIONMONITORPATH']=\
+	os.path.join( prefix, 'lib', os.environ['ECELL_DIRNAME'], 'session-monitor' )
 
 os.environ['MEPATH']=\
-	os.path.join( prefix, 'lib', 'modeleditor' )
+	os.path.join( prefix, 'lib', os.environ['ECELL_DIRNAME'], 'modeleditor' )
 
 os.environ['TLPATH']=\
-	os.path.join( prefix, 'lib', 'toollauncher' )
+	os.path.join( prefix, 'lib', os.environ['ECELL_DIRNAME'], 'toollauncher' )
 
 os.environ['LTDL_LIBRARY_PATH']=\
-	os.path.join( prefix, 'lib', 'ecell', os.environ['VERSION'] )
+	os.path.join( prefix, 'lib', os.environ['ECELL_DIRNAME'], 'dms' )
 
 os.environ['VVECTORTMPDIR']=\
 	os.environ['TMP']
@@ -110,7 +114,7 @@ sys.path = [
 	os.path.join( os.environ['PYTHONDIR'], 'Numeric'),
 	os.path.join( os.environ['PYTHONDIR'], 'gtk-2.0'),
 	os.path.join( os.environ['PYTHONDIR'], 'libsbml'),
-	os.environ['OSOGOPATH'],
+	os.environ['SESSIONMONITORPATH'],
 	os.path.join( python_prefix, 'lib', 'site-packages' ),
 	os.path.join( python_prefix, 'DLLs' ),
 	os.path.join( python_prefix, 'lib' ),

@@ -105,7 +105,7 @@ Source: share\doc\ecell-{#Version}\{#LicenseFile}; Flags: dontcopy
 [Icons]
 ;Main E-Cell icons in Start Menu
 Name: {group}\E-Cell Session Monitor; Filename: {app}\bin\gecell.exe; WorkingDir: {app}
-Name: {group}\E-Cell Toollauncher; Filename: {app}\bin\toollauncher.exe; WorkingDir: {app}\share
+Name: {group}\E-Cell Toollauncher; Filename: {app}\bin\ecell3-toollauncher.exe; WorkingDir: {app}\share
 Name: {group}\E-Cell Model Editor; Filename: {app}\bin\ecell3-model-editor.exe; WorkingDir: {app}
 Name: {group}\E-Cell Console; Filename: {app}\bin\ecell3-console.exe; WorkingDir: {app}; IconFilename: {app}\bin\ecell3-console.exe
 
@@ -129,13 +129,13 @@ Name: {group}\E-Cell3 Documentation\User's Manual (html); Filename: {app}\share\
 
 ;Main E-Cell shortcuts in Desktop
 Name: {userdesktop}\E-Cell Session Monitor; Filename: {app}\bin\gecell.exe; WorkingDir: {app}; Tasks: desktopicon
-Name: {userdesktop}\E-Cell Toollauncher; Filename: {app}\bin\toollauncher.exe; WorkingDir: {app}; Tasks: desktopicon
+Name: {userdesktop}\E-Cell Toollauncher; Filename: {app}\bin\ecell3-toollauncher.exe; WorkingDir: {app}; Tasks: desktopicon
 Name: {userdesktop}\E-Cell Model Editor; Filename: {app}\bin\ecell3-model-editor.exe; WorkingDir: {app}; Tasks: desktopicon
 Name: {userdesktop}\E-Cell Console; Filename: {app}\bin\ecell3-console.exe; WorkingDir: {app}; IconFilename: {app}\bin\ecell3-console.exe; Tasks: desktopicon
 
 ;Main E-Cell shortcuts in Quick Launch
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\E-Cell Session Monitor; Filename: {app}\bin\gecell.exe; WorkingDir: {app}; Tasks: quicklaunchicon; MinVersion: 4,4
-Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\E-Cell Toollauncher; Filename: {app}\bin\toollauncher.exe; WorkingDir: {app}; Tasks: quicklaunchicon; MinVersion: 4,4
+Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\E-Cell Toollauncher; Filename: {app}\bin\ecell3-toollauncher.exe; WorkingDir: {app}; Tasks: quicklaunchicon; MinVersion: 4,4
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\E-Cell Model Editor; Filename: {app}\bin\ecell3-model-editor.exe; WorkingDir: {app}; Tasks: quicklaunchicon; MinVersion: 4,4
 Name: {userappdata}\Microsoft\Internet Explorer\Quick Launch\E-Cell Console; Filename: {app}\bin\ecell3-console.exe; WorkingDir: {app}; IconFilename: {app}\bin\ecell3-console.exe; Tasks: quicklaunchicon; MinVersion: 4,4
 
