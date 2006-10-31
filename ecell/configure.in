@@ -210,7 +210,7 @@ dnl
 py_prefix=`$PYTHON -c "import sys; print sys.prefix"`
 pydir=python${PYTHON_VERSION}
 numpy_include="site-packages/numpy/core/include"
-EXT_GUESS="${py_prefix}/lib/${pydir}/${numpy_include} ${py_prefix}/lib64/${pydir}/${numpy_include} /usr/lib/${pydir}/${numpy_include} /usr/lib64/${pydir}/${numpy_include} /usr/local/lib/${pydir}/${numpy_include} /usr/local/lib64/${pydir}/${numpy_include} ${prefix}/include /usr/include/${pydir} /usr/local/include /opt/numpy/include"
+EXT_GUESS="${py_prefix}/Lib/${numpy_include} ${py_prefix}/lib/${pydir}/${numpy_include} ${py_prefix}/lib64/${pydir}/${numpy_include} /usr/lib/${pydir}/${numpy_include} /usr/lib64/${pydir}/${numpy_include} /usr/local/lib/${pydir}/${numpy_include} /usr/local/lib64/${pydir}/${numpy_include} ${prefix}/include /usr/include/${pydir} /usr/local/include /opt/numpy/include"
 dnl
 dnl
 AC_MSG_CHECKING( for numpy include dir )
