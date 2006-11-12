@@ -1,22 +1,24 @@
 #!/usr/bin/env python
 
+# usage: dcompile cfile [[cflags]... ]
+
 import sys
 import os
 import glob
 import string
 import getopt
 
-
-#prefix='@prefix@'
-#exec_prefix='@exec_prefix@'
-#libdir='@libdir@'
-ORIG_CXXFLAGS="@CXXFLAGS@"
-SHLEXT='@LTDL_SHLIB_EXT@'
-
-CXX='@CXX@'
-LDADD='-lstdc++'
-CXXSUFFIX='.cpp'
+# prefix='@prefix@'
+# exec_prefix='@exec_prefix@'
+# libdir='@libdir@'
+ORIG_CXXFLAGS = '@CXXFLAGS@'
+ORIG_CPPFLAGS = '@CPPFLAGS@'
+ORIG_LDFLAGS = '@LDFLAGS@'
+SHLEXT = '@LTDL_SHLIB_EXT@'
+CXX = '@CXX@'
+CXXSUFFIX = '.cpp'
 CXXFLAGS = os.environ.get('CXXFLAGS','')
+LDFLAGS =  os.environ.get('LDFLAGS','')
 VERBOSE = False
 
 def help():
@@ -41,8 +43,14 @@ def execute( cmdstr ):
 def compile( CXX, CXXCOMPILEFLAGS, SRC ):
     return execute( CXX + ' ' + CXXCOMPILEFLAGS + ' -fPIC -c ' + SRC )
 
-def link( CXX, OBJ, SOBJ, LDFLAGS ):
-    return execute( CXX + ' -shared ' + OBJ + ' -o ' + SOBJ + ' ' + LDFLAGS )
+def link( CXX, CPPFLAGS, OBJ, SOBJ, LDFLAGS ):
+	cflags = CPPFLAGS
+	if sys.platform == 'darwin':
+			cflags = cflags + ' -dynamiclib -install_name ' + SOBJ
+	else:
+			cflags = cflags + ' -shared -Wl,-soname=\"' + SOBJ + '\" ' 
+
+	return execute( CXX + ' ' + cflags + ' ' + OBJ + ' -o ' + SOBJ + ' ' + LDFLAGS)
 
 def cleanup( OBJ ):
     if os.path.isfile( OBJ ):
@@ -79,21 +87,19 @@ def main():
     CLASSNAME, ext = os.path.splitext( ext.replace( '\"', '' ) )
     OBJ = CLASSNAME + '.o'
     SOBJ = CLASSNAME + SHLEXT
-    LDFLAGS =  os.environ.get('LDFLAGS','')
-    LDFLAGS = '-Wl,-soname=\"' + SOBJ + '\" ' + \
-              LDFLAGS 
     ARGS = ' \"' + string.join( args[1:], '\" \"' ) + '\"'
 
-    if CXXFLAGS != '':
-	CXXCOMPILEFLAGS = CXXFLAGS + ARGS
-    else:
-	CXXCOMPILEFLAGS = ORIG_CXXFLAGS + ARGS
+	# compiler: use env + autoconf + plus anything that was given on the cmd line (?) -- FIXME
+    CXXCOMPILEFLAGS = CXXFLAGS + ' ' + ORIG_CXXFLAGS + ' ' + ORIG_CPPFLAGS + ' ' + ARGS
 
+    # linker: use env + autoconf (?) -- FIXME
+    LINKFLAGS = LDFLAGS + ' ' + ORIG_LDFLAGS
+    
     if compile( CXX, CXXCOMPILEFLAGS, "\"" + SRC + "\"" ) or not os.path.isfile( OBJ ):
 	msg( "Error: The compiler failed to create " + OBJ )
 	sys.exit(1)
 	
-    if link( CXX, '\"' + OBJ + '\"' , '\"' + SOBJ + '\"', LDFLAGS ) or not os.path.isfile( SOBJ ):
+    if link( CXX, CXXCOMPILEFLAGS, '\"' + OBJ + '\"' , '\"' + SOBJ + '\"', LINKFLAGS ) or not os.path.isfile( SOBJ ):
 	msg( "Error: The compiler failed to create " + SOBJ )
 	sys.exit(1)
     
