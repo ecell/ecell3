@@ -147,7 +147,11 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#ifndef __APPLE__
 #include <sys/vfs.h>
+#else
+#include <sys/mount.h>
+#endif /* __APPLE__ */
 #endif /* OS dependent part */
 #include <ctype.h>
 #include "osif.h"
