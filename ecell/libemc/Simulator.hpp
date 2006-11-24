@@ -73,7 +73,7 @@ namespace libemc
      @see SimulatorImplementation
   */
 
-  class Simulator
+  class ECELL_API Simulator
   {
 
   public:
@@ -325,7 +325,7 @@ namespace libemc
 
     const bool isEntityExist( libecs::StringCref         aFullIDString ) const
     {
-      theSimulatorImplementation->isEntityExist( aFullIDString );
+      return theSimulatorImplementation->isEntityExist( aFullIDString );
     }
 
     /**
