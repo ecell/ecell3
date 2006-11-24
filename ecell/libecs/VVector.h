@@ -147,14 +147,14 @@
 #define	__VVECOTOR_H__
 #include "ecell_config.h"
 #include <sys/types.h>
-#if	defined(__GNUC__)
+#if	defined(__GNUC__) || defined(_MSC_VER)
 #include <vector>
 #else
 #include <vector.h>
 #endif	/* compiler dependent part */
 
 
-#if defined(__BORLANDC__)
+#if defined(__BORLANDC__) || defined(_MSC_VER)
 typedef int ssize_t;
 #endif /* __BORLANDC__ */
 
@@ -164,7 +164,7 @@ typedef int ssize_t;
 #include <stdio.h>
 #include <assert.h>
 #include <errno.h>
-#if 	defined(__BORLANDC__)
+#if 	defined(__BORLANDC__) || defined(_MSC_VER)
 #include <io.h>
 #elif	defined(__linux__) && !defined(__powerpc__)
 #include <unistd.h>
@@ -391,7 +391,11 @@ template<class T> void vvector<T>::push_back(const T & x)
 	#ifdef OPEN_WHEN_ACCESS
 	   my_open_to_append();
 	#endif /*OPEN_WHEN_ACCESS*/
+#ifndef _MSC_VER
 	  red_bytes = write( _fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
+#else
+	  red_bytes = _write( _fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
+#endif
 	#ifdef OPEN_WHEN_ACCESS
 	  my_close_write();
     #endif /*OPEN_WHEN_ACCESS*/
@@ -427,13 +431,21 @@ template<class T> void vvector<T>::push_back(const T & x)
 	  my_open_to_append();
     #endif /*OPEN_WHEN_ACCESS*/
 
+#ifndef _MSC_VER
 	if (lseek(_fdw, static_cast<off_t>((start_offset) * sizeof(T)), SEEK_SET) == static_cast<off_t>(-1)) 
-	  {
+#else
+	if (_lseeki64(_fdw, static_cast<off_t>((start_offset) * sizeof(T)), SEEK_SET) == static_cast<off_t>(-1))
+#endif
+    {
 	  my_close_write();
 	    throw vvector_write_error();
 	  }
 
+#ifndef _MSC_VER
     red_bytes = write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE);
+#else
+    red_bytes = _write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE);
+#endif
 	#ifdef OPEN_WHEN_ACCESS
 	  my_close_write();
     #endif /*OPEN_WHEN_ACCESS*/
@@ -518,7 +530,11 @@ template<class T>  T const & vvector<T>::at(size_type i)
    #ifdef OPEN_WHEN_ACCESS
      my_open_to_read( off_t( phys_read_start * sizeof(T) ));
     #endif /*OPEN_WHEN_ACCESS*/
+#ifndef _MSC_VER
   num_red = read(_fdr, _cacheRV, num_to_read * sizeof(T));
+#else
+  num_red = _read(_fdr, _cacheRV, static_cast<unsigned int>(num_to_read * sizeof(T)));
+#endif
    #ifdef OPEN_WHEN_ACCESS
   my_close_read();
     #endif /*OPEN_WHEN_ACCESS*/
