@@ -169,8 +169,56 @@ dnl
 dnl AC_CHECK_HEADER(stl.h,,
 dnl 	AC_MSG_ERROR([stl.h not found.])
 dnl )
-AC_CHECK_HEADERS(math,,)
-AC_CHECK_HEADERS(cmath,,)
+AC_CHECK_HEADERS(math,ac_ch_math=yes,)
+AC_CHECK_HEADERS(cmath,ac_ch_cmath=yes,)
+if test "$ac_ch_cmath" == "yes"; then
+    AC_MSG_CHECKING(for INFINITY)
+    AC_CACHE_VAL(ac_cv_func_or_macro_infinity,
+        [AC_TRY_LINK(
+            [#include <cmath>],
+            [double inf = INFINITY;],
+            [ac_cv_func_or_macro_infinity=yes],
+            [ac_cv_func_or_macro_infinity=no])])
+    if [[ $ac_cv_func_or_macro_infinity == yes ]]; then
+        AC_DEFINE(HAVE_INFINITY, 1, Define to 1 if INFINITY is supported.)
+        AC_MSG_RESULT(yes)
+    else
+        AC_MSG_RESULT(no)
+    fi
+elif test "$ac_ch_math" == "yes"; then
+    AC_MSG_CHECKING(for INFINITY)
+    AC_CACHE_VAL(ac_cv_func_or_macro_infinity,
+        [AC_TRY_LINK(
+            [#include <cmath>],
+            [double inf = INFINITY;],
+            [ac_cv_func_or_macro_infinity=yes],
+            [ac_cv_func_or_macro_infinity=no])])
+    if [[ $ac_cv_func_or_macro_infinity == yes ]]; then
+        AC_DEFINE(HAVE_INFINITY, 1, Define to 1 if INFINITY is supported.)
+        AC_MSG_RESULT(yes)
+    else
+        AC_MSG_RESULT(no)
+    fi
+fi
+AC_CHECK_HEADERS(windows.h,,)
+AC_MSG_CHECKING(for __PRETTY_FUNCTION__)
+AC_CACHE_VAL(ac_cv_macro_pf,
+    [AC_TRY_LINK(
+        [#include <stdio.h>],
+        [const char* pf = __PRETTY_FUNCTION__;],
+        [ac_cv_macro_pf=yes],
+        [ac_cv_macro_pf=no])])
+if [[ $ac_cv_macro_pf == yes ]]; then
+    AC_DEFINE(HAVE_PRETTY_FUNCTION, 1, Define to 1 if __PRETTY_FUNCTION__ is supported.)
+    AC_MSG_RESULT(yes)
+else
+    AC_MSG_RESULT(no)
+fi
+AC_ARG_WITH(msvc, [  --with-msvc             create dmtool_config.h 4 MSVC])
+if test "${with_msvc}" == "yes"; then
+    msvcFlag=1
+    AC_DEFINE_UNQUOTED(USE_MSVC, ${msvcFlag}, The Flag of the Compiler)
+fi
 
 
 dnl
