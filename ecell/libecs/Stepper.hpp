@@ -235,12 +235,12 @@ namespace libecs
     }
 
 
-    GET_METHOD( Polymorph, WriteVariableList );
-    GET_METHOD( Polymorph, ReadVariableList );
-    GET_METHOD( Polymorph, ProcessList );
-    GET_METHOD( Polymorph, SystemList );
+    ECELL_API GET_METHOD( Polymorph, WriteVariableList );
+    ECELL_API GET_METHOD( Polymorph, ReadVariableList );
+    ECELL_API GET_METHOD( Polymorph, ProcessList );
+    ECELL_API GET_METHOD( Polymorph, SystemList );
 
-    SET_METHOD( String, RngSeed );
+    ECELL_API SET_METHOD( String, RngSeed );
 
     GET_METHOD( String, RngType );
 
@@ -263,7 +263,7 @@ namespace libecs
 
     virtual void step() = 0;
 
-    virtual void integrate( RealParam aTime );
+    ECELL_API virtual void integrate( RealParam aTime );
 
     /**
        Let the Loggers log data.
@@ -272,7 +272,7 @@ namespace libecs
        any Entities related to this Stepper.
     */
 
-    virtual void log();
+    ECELL_API virtual void log();
     
     /**
        Register a System to this Stepper.
@@ -458,7 +458,7 @@ namespace libecs
     }
 
 
-    const VariableVector::size_type 
+    ECELL_API const VariableVector::size_type 
       getVariableIndex( VariableCptr const aVariable );
 
 
@@ -514,9 +514,9 @@ namespace libecs
 
   protected:
 
-    void clearVariables();
+    ECELL_API void clearVariables();
 
-    void fireProcesses();
+    ECELL_API void fireProcesses();
 
     virtual void reset();
 
