@@ -96,7 +96,7 @@ namespace libecs
   {
     size_type i_start( start );
     size_type i_end( end );
-    Real aTime;
+//     Real aTime;
     
     if ( start > end )
       {

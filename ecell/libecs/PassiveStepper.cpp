@@ -42,8 +42,7 @@ namespace libecs
   {
     // gcc3 doesn't currently support numeric_limits::infinity.
     // using max() instead.
-    const Real anInfinity( std::numeric_limits<Real>::max() *
-			   std::numeric_limits<Real>::max() );
+      const Real anInfinity( std::numeric_limits<Real>::infinity() );
     setStepInterval( anInfinity );
   }
 

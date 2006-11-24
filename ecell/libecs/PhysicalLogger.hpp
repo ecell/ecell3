@@ -135,7 +135,7 @@ namespace libecs
     DataPointVectorSharedPtr getVector( const size_type start,
 					const size_type end ) const;
 
-    size_type size() const;
+    ECELL_API size_type size() const;
 
     bool empty() const;
 
