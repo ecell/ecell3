@@ -41,6 +41,7 @@ namespace libecs
   {
     setTime( aLongDataPoint.getTime() );
     setValue ( aLongDataPoint.getValue() );
+    return *this;
   }
 
   

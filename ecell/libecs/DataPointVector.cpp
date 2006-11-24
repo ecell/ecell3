@@ -118,6 +118,10 @@ namespace libecs
 
   }
 
+  Integer DataPointVector::getPointSize()
+  {
+      return DataPointVector::thePointSize;
+  }
 } // namespace libecs
 
 

@@ -59,11 +59,11 @@ namespace libecs
 
     ~DataPointVector();
 
-    DataPointRef asShort( DataPointVectorIterator aPosition );
+    ECELL_API DataPointRef asShort( DataPointVectorIterator aPosition );
 
     DataPointCref asShort( DataPointVectorIterator aPosition ) const;
 
-    LongDataPointRef asLong( DataPointVectorIterator aPosition );
+    ECELL_API LongDataPointRef asLong( DataPointVectorIterator aPosition );
 
     LongDataPointCref asLong( DataPointVectorIterator aPosition ) const;
 
@@ -85,6 +85,8 @@ namespace libecs
     }
 	
     const void* getRawArray() const;
+
+    ECELL_API Integer getPointSize();
 
   private:
 
