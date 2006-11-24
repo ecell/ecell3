@@ -56,7 +56,7 @@ namespace libecs
 
   public:
 
-    virtual ~PolymorphValue();
+    ECELL_API virtual ~PolymorphValue();
 
     virtual const String  asString()        const = 0;
     virtual const Real    asReal()          const = 0;
@@ -178,12 +178,12 @@ namespace libecs
 
     PolymorphNoneValue() {}
 
-    virtual ~PolymorphNoneValue();
+    ECELL_API virtual ~PolymorphNoneValue();
 
-    virtual const String  asString() const;
+    ECELL_API virtual const String  asString() const;
     virtual const Real    asReal() const       { return 0.0; }
     virtual const Integer asInteger() const    { return 0; }
-    virtual const PolymorphVector asPolymorphVector() const;
+    ECELL_API virtual const PolymorphVector asPolymorphVector() const;
   
     virtual PolymorphValuePtr createClone() const
     {
@@ -293,7 +293,7 @@ namespace libecs
       //      DefaultSpecializationInhibited();
       //    }
 
-    const Type getType() const;
+    ECELL_API const Type getType() const;
 
     void changeType( const Type aType );
 
