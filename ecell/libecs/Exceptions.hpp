@@ -79,9 +79,9 @@ if( ! ( EXPRESSION ) )\
       ; // do nothing
     }
 
-    virtual ~Exception() throw();
+    ECELL_API virtual ~Exception() throw();
 
-    virtual const String message() const;
+    ECELL_API virtual const String message() const;
 
     virtual const char* what() const throw() { return message().c_str(); }
     virtual const char* const getClassName() const  { return "Exception"; }

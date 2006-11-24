@@ -176,7 +176,7 @@ private:
   */
   const Index getItemIndex( const Item * const ItemPtr ) const
   {
-    return ItemPtr - theItemVector.begin().base();
+    return ItemPtr - &theItemVector.front();
   }
 
 private:
