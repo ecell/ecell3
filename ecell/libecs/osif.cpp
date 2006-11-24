@@ -139,6 +139,10 @@
 #include <fcntl.h>
 #include <sys/statvfs.h>
 #define statfs statvfs
+# elif defined(_MSC_VER)
+#include <direct.h>
+#include <windows.h>
+#include <process.h>
 # else
 /* assume Linux */
 // #include <process.h>
@@ -164,13 +168,17 @@ int		num_process_path;
 
 long		osif_get_pid(void)
 {
+#ifndef _MSC_VER
 	return (long)getpid();
+#else
+	return (long)_getpid();
+#endif
 }
 
 
 long		osif_disk_free(const char *__path)
 {
-#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
+#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__) || defined(_MSC_VER)
 	ULARGE_INTEGER	free_bytes_available;
 	ULARGE_INTEGER	total_number_of_bytes;
 	ULARGE_INTEGER	total_number_of_free_bytes;
@@ -186,11 +194,21 @@ long		osif_disk_free(const char *__path)
 		drive[0] = '.';
 		drive[1] = '\0';
 	}
+#if !defined(_MSC_VER)
 	GetDiskFreeSpaceEx(
 	  drive,
 	  &free_bytes_available,
 	  &total_number_of_bytes,
 	  &total_number_of_free_bytes);
+#else
+      wchar_t driveNameWide[sizeof(drive)];
+      MultiByteToWideChar(CP_ACP, 0, drive, -1, driveNameWide, sizeof(drive));
+      GetDiskFreeSpaceEx(
+        driveNameWide,
+        &free_bytes_available,
+        &total_number_of_bytes,
+        &total_number_of_free_bytes);
+#endif
 	kbfree = (long)(free_bytes_available.QuadPart >> 10);
 #ifdef	DEBUG_DONE
 	printf("%ld k bytes free on %s\n", kbfree, __path);
@@ -225,9 +243,17 @@ int	osif_mkdir(const char *__name)
 
 int	osif_is_dir(const char *__name)
 {
-#if defined(__BORLANDC__) || defined(__MINGW32__)
+#if defined(__BORLANDC__) || defined(__MINGW32__) || defined(_MSC_VER)
 	DWORD result;
-	result = GetFileAttributes(__name);
+#if !defined(_MSC_VER)
+    result = GetFileAttributes(__name);
+#else
+        char dirName[10000];
+        strcpy_s(dirName, __name);
+        wchar_t dirNameWide[sizeof(dirName)];
+        MultiByteToWideChar(CP_ACP, 0, dirName, -1, dirNameWide, sizeof(dirName));
+        result = GetFileAttributes(dirNameWide);
+#endif
 	if (result != (DWORD)-1 && (result & FILE_ATTRIBUTE_DIRECTORY)) {
 		return 1;
 	} else {
@@ -264,11 +290,19 @@ int	osif_add_path(const char *dir, int to_first)
 		for (iii = num_process_path; iii == 1; iii--) {
 			process_path[iii] = process_path[iii - 1];
 		}
+#if !defined(_MSC_VER)
 		process_path[0] = strdup(dir);
+#else
+		process_path[0] = _strdup(dir);
+#endif
 		++num_process_path;
 		return 0;
 	} else {
+#if !defined(_MSC_VER)
 		process_path[num_process_path] = strdup(dir);
+#else
+		process_path[num_process_path] = _strdup(dir);
+#endif
 		++num_process_path;
 		return 0;
 	}
