@@ -1,4 +1,4 @@
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+﻿//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 // 		This file is part of dmtool package
 //
@@ -33,14 +33,8 @@
 #define __DYNAMICMODULE_HPP
 
 #include <exception>
-
+#include "ecell/libecs/Defs.hpp"
 #include <string>
-//#include <ltdl.h>
-#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
- #include <windows.h>
-#else
- #include <dlfcn.h>
-#endif
 
 
 /// doc needed
@@ -170,6 +164,7 @@ public:
 private:
 
   lt_dlhandle theHandle;
+  std::string theFileName;
 
 };
 
@@ -220,6 +215,7 @@ SharedDynamicModule( const std::string& classname )
   theHandle( NULL )
 {
   std::string filename( classname );
+  this->theFileName = filename;
   this->theHandle = lt_dlopenext( filename.c_str() );
   if( this->theHandle == NULL ) 
     {
@@ -261,6 +257,8 @@ SharedDynamicModule<Base,DMAllocator>::~SharedDynamicModule()
 template < class Base, class DMAllocator >
 const std::string SharedDynamicModule<Base,DMAllocator>::getFileName() const
 {
+  return this->theFileName;
+  /*
   const lt_dlinfo* aDlInfo = lt_dlgetinfo( this->theHandle );
 
   if( aDlInfo == NULL )
@@ -269,6 +267,7 @@ const std::string SharedDynamicModule<Base,DMAllocator>::getFileName() const
     }
 
   return std::string( aDlInfo->filename );
+  */
 }
 
 #endif /* __DYNAMICMODULE_HPP */
