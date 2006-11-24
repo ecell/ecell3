@@ -33,12 +33,12 @@
 #define __DEFS_HPP
 #include "ecell_config.h"
 
-#include <stdint.h>
 #include <float.h>
 #include <string>
 #include <list>
 #include <vector>
 #include <map>
+#include <time.h>
 
 #include <boost/call_traits.hpp>
 #include <boost/smart_ptr.hpp>
@@ -61,7 +61,28 @@
 #else
 #error "either math or cmath header is needed."
 #endif /* HAVE_CMATH */
+#if defined( USE_MSVC )
+#define _USE_MATH_DEFINES
+#include <math.h>
+#undef _USE_MATH_DEFINES
+#endif /* M_PI, M_E */
 
+
+#if defined( HAVE_STDINT_H )
+#include <stdint.h>
+#endif /* HAVE_STDINT_H */
+
+#if defined( HAVE_DLFCN_H )
+#include <dlfcn.h>
+#include <ltdl.h>
+#endif /* HAVE_DLFCN_H */
+
+#if defined( HAVE_WINDOWS_H )
+#include <windows.h>
+#if defined GetClassInfo
+#undef GetClassInfo
+#endif
+#endif /* HAVE_WINDOWS_H */
 
 // 
 // If USE_COMPILER_EXTENSIONS is defined, the compiler's special
@@ -425,7 +446,11 @@ typedef const mytype & mytype ## Cref;
   typedef Param<Time>::type TimeParam;
     
   //! Infinity.  Currently this is defined as INFINITY symbol of C99 standard.
+#if defined( HAVE_INFINITY )
   const Real INF( INFINITY );
+#else
+  const Real INF( HUGE_VAL );
+#endif
 
 
   //! Avogadro number. 
@@ -451,13 +476,9 @@ typedef const mytype & mytype ## Cref;
 
   // MACROS
 
-#if 0
-
 #if !defined( HAVE_PRETTY_FUNCTION )
 #define __PRETTY_FUNCTION__ ""
 #endif
-
-#endif // 0
 
   /**
      Converts each type into a unique, insipid type.
@@ -479,8 +500,163 @@ typedef const mytype & mytype ## Cref;
 } // namespace libecs
 
 
-#endif /* __DEFS_HPP */
+/**
+   4 MSVC
+ */
+/**
+   DLL
+ */
+#if defined( USE_MSVC )
+#if defined( ECELL_EXPORTS )
+#define ECELL_API __declspec( dllexport )
+#else
+#define ECELL_API __declspec( dllimport )
+#endif /* ECELL_EXPORTS */
+#else
+#define ECELL_API
+#endif /* USE_MSVC */
+/**
+   Virtual Libtool
+ */
+#if defined( USE_MSVC )
 
+#define DM_PATH "dm"
+#define FILE_EXTENSION ".dll"
+#define REGISTORY_DM_KEY L"ECELLIDE_DM"
+#define REGISTORY_ENV_KEY L"Environment"
+#define REGISTORY_SW_KEY L"Software\\KeioUniv\\E-Cell_IDE"
+#define SIZE 10000
+class Util
+{
+private:
+    static std::string getDMPath(HKEY aHKEY, LPCWSTR aSubKey)
+    {
+        HKEY hKey;
+        DWORD dwType;
+        DWORD dwSize;
+        LONG errorCode = RegOpenKeyEx(aHKEY, aSubKey, 0, KEY_READ, &hKey);
+        if(errorCode != 0)
+        {
+            return "";
+        }
+        wchar_t aValueWide[SIZE];
+        errorCode = RegQueryValueEx(hKey, REGISTORY_DM_KEY, NULL, &dwType, NULL, &dwSize);
+        if(errorCode != 0)
+        {
+            return "";
+        }
+        errorCode = RegQueryValueEx(hKey, REGISTORY_DM_KEY, NULL, &dwType, (LPBYTE)&aValueWide, &dwSize);
+        if(errorCode != 0)
+        {
+            return "";
+        }
+        int buffSize = WideCharToMultiByte(CP_ACP, 0, aValueWide, -1, NULL, 0, NULL, NULL);
+        if(buffSize <= 0)
+        {
+            return "";
+        }
+        LPSTR aValue = new char [buffSize];
+        buffSize = WideCharToMultiByte(CP_ACP, 0, aValueWide, -1, aValue, buffSize, NULL, NULL);
+        if(buffSize <= 0)
+        {
+            return "";
+        }
+        RegCloseKey(hKey);
+        return aValue;
+    }
+public:
+    static std::string getDMPath()
+    {
+        std::string aPath;
+        if((aPath = Util::getDMPath(HKEY_CURRENT_USER, REGISTORY_ENV_KEY)).length() > 0)
+        {
+            return aPath;
+        }
+        else if((aPath = Util::getDMPath(HKEY_CURRENT_USER, REGISTORY_SW_KEY)).length() > 0)
+        {
+            return aPath;
+        }
+        else
+        {
+            return Util::getDMPath(HKEY_LOCAL_MACHINE, REGISTORY_SW_KEY);
+        }
+    }
+};
+#define lt_dlclose(x) FreeLibrary(x)
+#define lt_dlhandle HMODULE
+#define lt_dlsym(x, y) GetProcAddress(x, y)
+static char errbuf[64];
+static char * lt_dlerror()
+{
+  sprintf_s(errbuf, "LoadLibrary/GetProcAddress error %d", static_cast<int>(GetLastError()));
+  return errbuf;
+}
+static int lt_dlexit()
+{
+    return 0;
+}
+static const char * lt_dlgetsearchpath()
+{
+    return 0;
+}
+static int lt_dlinit()
+{
+    return 0;
+}
+static lt_dlhandle lt_dlopenext(const char* aFileName)
+{
+    if (aFileName == NULL)
+    {
+        return NULL;
+    }
+    std::string anAllDMPath = Util::getDMPath();
+    if (anAllDMPath.size() < 1)
+    {
+      anAllDMPath = DM_PATH;
+    }
+    while (anAllDMPath.size() > 0)
+    {
+        int anIndex = static_cast<int>(anAllDMPath.find(";"));
+        char aDMPath[SIZE];
+        if(anIndex == -1)
+        {
+            strcpy_s(aDMPath, anAllDMPath.c_str());
+            anAllDMPath.clear();
+        }
+        else if(anIndex == anAllDMPath.size() - 1)
+        {
+            strcpy_s(aDMPath, anAllDMPath.substr(0, anIndex).c_str());
+            anAllDMPath.clear();
+        }
+        else
+        {
+            strcpy_s(aDMPath, anAllDMPath.substr(0, anIndex).c_str());
+            anAllDMPath = anAllDMPath.substr(anIndex + 1);
+        }
+        std::string dllNameStr = std::string(aDMPath) + "/" + aFileName + FILE_EXTENSION;
+        char dllName[SIZE];
+        strcpy_s(dllName, dllNameStr.c_str());
+        wchar_t dllNameWide[SIZE];
+        MultiByteToWideChar(CP_ACP, 0, dllName, -1, dllNameWide, SIZE);
+        lt_dlhandle aHandle = LoadLibrary(dllNameWide);
+        if (aHandle != NULL)
+        {
+            return aHandle;
+        }
+    }
+    return NULL;
+}
+static int lt_dlsetsearchpath(const char *search_path)
+{
+    return 0;
+}
+/**
+   Some Functions
+ */
+#define fmin(x, y) __min(x, y)
+#endif /* USE_MSVC */
+
+#endif /* __DEFS_HPP */
 
 /*
   Do not modify
