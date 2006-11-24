@@ -74,8 +74,8 @@ namespace libecs
 
   public:
 
-    Model();
-    ~Model();
+    ECELL_API Model();
+    ECELL_API ~Model();
 
     /**
        Initialize the whole model.
@@ -96,7 +96,7 @@ namespace libecs
        @throw InitializationFailed
     */
 
-    void initialize();
+    ECELL_API void initialize();
 
     /**
        Conduct a step of the simulation.
@@ -150,7 +150,7 @@ namespace libecs
        @param aClassType
     */
 
-    PolymorphMap getClassInfo( StringCref aClassType, StringCref aClassname, Integer forceReload );
+    ECELL_API PolymorphMap getClassInfo( StringCref aClassType, StringCref aClassname, Integer forceReload );
 
     /**
        Creates a new Entity object and register it in an appropriate System
@@ -161,7 +161,7 @@ namespace libecs
        @param aName
     */
 
-    void createEntity( StringCref aClassname, FullIDCref aFullID );
+    ECELL_API void createEntity( StringCref aClassname, FullIDCref aFullID );
 
 
     /**
@@ -171,7 +171,7 @@ namespace libecs
        @return A borrowed pointer to an Entity specified by the FullID.
     */
 
-    EntityPtr getEntity( FullIDCref aFullID ) const;
+    ECELL_API EntityPtr getEntity( FullIDCref aFullID ) const;
 
     /**
        This method finds a System object pointed by the SystemPath.  
@@ -182,7 +182,7 @@ namespace libecs
     */
 
 
-    SystemPtr getSystem( SystemPathCref aSystemPath ) const;
+    ECELL_API SystemPtr getSystem( SystemPathCref aSystemPath ) const;
 
 
     /**
@@ -194,7 +194,7 @@ namespace libecs
 
     */
 
-    void createStepper( StringCref aClassname, StringCref anID );
+    ECELL_API void createStepper( StringCref aClassname, StringCref anID );
 
 
     /**
@@ -204,7 +204,7 @@ namespace libecs
        @return a borrowed pointer to the Stepper.
     */
 
-    StepperPtr getStepper( StringCref anID ) const;
+    ECELL_API StepperPtr getStepper( StringCref anID ) const;
 
 
     /**
@@ -230,7 +230,7 @@ namespace libecs
 
     */
 
-    void flushLoggers();
+    ECELL_API void flushLoggers();
 
 
     /**

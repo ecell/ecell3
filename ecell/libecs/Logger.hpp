@@ -121,7 +121,7 @@ namespace libecs
     
     */
 
-    void setLoggerPolicy( PolymorphCref aParamList );
+    ECELL_API void setLoggerPolicy( PolymorphCref aParamList );
 
 
     /**
@@ -130,7 +130,7 @@ namespace libecs
 
     */
 
-    const Polymorph getLoggerPolicy( void );
+    ECELL_API const Polymorph getLoggerPolicy( void );
 
     /**
 
@@ -146,14 +146,14 @@ namespace libecs
 
     */
 
-    DataPointVectorSharedPtr getData( void ) const;
+    ECELL_API DataPointVectorSharedPtr getData( void ) const;
 
     /**
        Returns a slice of the data from aStartTime to anEndTime.
 
     */
 
-    DataPointVectorSharedPtr getData( RealParam aStartTime,
+    ECELL_API DataPointVectorSharedPtr getData( RealParam aStartTime,
 				      RealParam anEndTime ) const;
 
     /**
@@ -161,7 +161,7 @@ namespace libecs
        intervals anInterval between data elements.
     */
 
-    DataPointVectorSharedPtr getData( RealParam aStartTime,
+    ECELL_API DataPointVectorSharedPtr getData( RealParam aStartTime,
 				      RealParam anEndTime, 
 				      RealParam anInterval ) const;
     
@@ -171,13 +171,13 @@ namespace libecs
        Returns time of the first element  in Logger.
     */
 
-    const Real getStartTime( void ) const;
+    ECELL_API const Real getStartTime( void ) const;
 
     /**
        Returns time of the last element in Logger
     */
 
-    const Real getEndTime( void ) const;
+    ECELL_API const Real getEndTime( void ) const;
 
     /**
       Returns size of logger
@@ -192,7 +192,7 @@ namespace libecs
        DEPRECATED - Use setLoggerPolicy 
     */
 
-    void setMinimumInterval( RealParam anInterval );
+    ECELL_API void setMinimumInterval( RealParam anInterval );
 
     /**
        DEPRECATED - Use getLoggerPolicy

@@ -62,7 +62,7 @@ public:
 #if defined( LIBECS_USE_PMF_CONVERSIONS )
     return MethodProxy( Invoker( METHOD ));
 #else  /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
-    return MethodProxy( invoke<CLASS,METHOD> );
+    return MethodProxy( invoke<METHOD> );
 #endif /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
   }
 
