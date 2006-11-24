@@ -100,7 +100,7 @@ namespace libecs
     //    SystemPath();
 
 
-    void parse( StringCref systempathstring );
+    ECELL_API void parse( StringCref systempathstring );
 
   public:
 
@@ -164,12 +164,12 @@ namespace libecs
       return theEntityType; 
     }
 
-    const SystemPathCref getSystemPath()    const 
+    SystemPathCref getSystemPath() const
     { 
       return theSystemPath; 
     }
 
-    const StringCref     getID()            const 
+    StringCref getID() const
     { 
       return theID;
     }
@@ -192,7 +192,7 @@ namespace libecs
 
     bool isValid() const;
 
-    const String getString() const;
+    ECELL_API const String getString() const;
 
     bool operator<( FullIDCref rhs ) const
     {
@@ -238,7 +238,7 @@ namespace libecs
 
   protected:
 
-    void parse( StringCref fullidstring );
+    ECELL_API void parse( StringCref fullidstring );
 
   private:
 
@@ -288,15 +288,14 @@ namespace libecs
       ; // do nothing
     }
 
-    FullPN( StringCref fullpropertynamestring );
+    ECELL_API FullPN( StringCref fullpropertynamestring );
 
     ~FullPN() 
     {
       ; // do nothing
     }
 
-
-    const FullIDCref     getFullID()        const
+    FullIDCref getFullID() const
     {
       return theFullID;
     }
@@ -306,17 +305,17 @@ namespace libecs
       return getFullID().getEntityType(); 
     }
 
-    const SystemPathCref getSystemPath()    const
+    SystemPathCref getSystemPath() const
     { 
       return getFullID().getSystemPath();
     }
 
-    const StringCref     getID()            const
+    StringCref getID() const
     { 
       return getFullID().getID();
     }
 
-    const StringCref     getPropertyName()  const
+    StringCref     getPropertyName()  const//const StringCref     getPropertyName()  const
     {
       return thePropertyName;
     }
@@ -341,7 +340,7 @@ namespace libecs
       thePropertyName = propertyname;
     }
 
-    const String getString() const;
+    ECELL_API const String getString() const;
 
     bool isValid() const;
 

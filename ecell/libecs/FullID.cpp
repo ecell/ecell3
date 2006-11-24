@@ -113,6 +113,10 @@ namespace libecs
 	  }
       }
 
+    if( i == end() ) {
+        return aString;
+    }
+
     ++i;
 
     while( i != end() )
