@@ -14,11 +14,11 @@ Base* ObjectAllocator()
 #define DM_INIT( CLASSNAME, TYPE )\
   extern "C"\
   {\
-    TYPE::AllocatorFuncPtr CreateObject =\
+    ECELL_API TYPE::AllocatorFuncPtr CreateObject =\
     &ObjectAllocator<TYPE,CLASSNAME>;\
     const char* __DM_CLASSNAME = #CLASSNAME;\
     const char* __DM_TYPE = #TYPE;\
-    const void *(*GetClassInfo)() = &CLASSNAME::getClassInfoPtr;\
+    ECELL_API const void *(*GetClassInfo)() = &CLASSNAME::getClassInfoPtr;\
   } // 
 
 
