@@ -157,7 +157,7 @@ namespace libecs
         const Real aTimeInterval1( aTime - theStepper.getCurrentTime() );
         const Real aTimeInterval2( aTimeInterval1 - anInterval );
 
-        const RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
+        RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
 	RealCptr aTaylorCoefficientPtr( aTaylorSeries.origin() + theIndex );
 
 	// calculate first order.
@@ -217,7 +217,7 @@ namespace libecs
 
         const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
 
-        const RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
+        RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
 	RealCptr aTaylorCoefficientPtr( aTaylorSeries.origin() + theIndex );
 
 	// calculate first order.
@@ -269,8 +269,9 @@ namespace libecs
 
   public:
 
-    DifferentialStepper();
-    virtual ~DifferentialStepper();
+    ECELL_API DifferentialStepper();
+
+    ECELL_API virtual ~DifferentialStepper();
 
     SET_METHOD( Real, NextStepInterval )
     {
@@ -299,16 +300,19 @@ namespace libecs
       setNextStepInterval( aStepInterval );
     }
 
-    void resetAll();
-    void interIntegrate();
+    ECELL_API void resetAll();
+
+    ECELL_API void interIntegrate();
+
     void initializeVariableReferenceList();
-    void setVariableVelocity( boost::detail::multi_array::sub_array<Real, 1> aVelocityBuffer );
+
+    ECELL_API void setVariableVelocity( boost::detail::multi_array::sub_array<Real, 1> aVelocityBuffer );
  
-    virtual void initialize();
+    ECELL_API virtual void initialize();
 
-    virtual void reset();
+    ECELL_API virtual void reset();
 
-    virtual void interrupt( TimeParam aTime );
+    ECELL_API virtual void interrupt( TimeParam aTime );
 
     virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
     {
@@ -380,8 +384,9 @@ namespace libecs
 
   public:
 
-    AdaptiveDifferentialStepper();
-    virtual ~AdaptiveDifferentialStepper();
+    ECELL_API AdaptiveDifferentialStepper();
+
+    ECELL_API virtual ~AdaptiveDifferentialStepper();
 
     /**
        Adaptive stepsize control.
@@ -478,8 +483,10 @@ namespace libecs
       return theRelativeEpsilon;
     }
 
-    virtual void initialize();
-    virtual void step();
+    ECELL_API virtual void initialize();
+
+    ECELL_API virtual void step();
+
     virtual bool calculate() = 0;
 
     virtual GET_METHOD( Integer, Stage )

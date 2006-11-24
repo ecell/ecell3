@@ -99,7 +99,7 @@ namespace libecs
       {
 	ProcessPtr const aProcess( theProcessVector[ i ] );
 
-	const VariableReferenceVectorCref 
+	VariableReferenceVectorCref 
 	  aVariableReferenceVector( aProcess->getVariableReferenceVector() );
 
 	VariableReferenceVector::size_type const 
