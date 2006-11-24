@@ -51,7 +51,7 @@ namespace libecs
 
   /** @file */
 
-  class PropertyInterfaceBase
+  class ECELL_API PropertyInterfaceBase
   {
   public:
 
@@ -114,6 +114,9 @@ namespace libecs
     DECLARE_ASSOCVECTOR_TEMPLATE( String, PropertySlotPtr,
 				  std::less<const String>, PropertySlotMap );
 
+    DECLARE_ASSOCVECTOR_TEMPLATE( String, Polymorph,
+				  std::less<const String>, PolymorphAssocVector);
+
     PropertyInterface()
     {
 	  theInfoMap[ String( PROPERTYLIST_FIELD )] = Polymorph( PolymorphVector() ) ;
@@ -139,7 +142,12 @@ namespace libecs
 	*/
 	static PolymorphMapCref getInfoMap( void ) 
 	{
-	  return  theInfoMap;
+      static PolymorphMap aPolymorphMap;
+      for (PolymorphAssocVectorIterator i(theInfoMap.begin()); i != theInfoMap.end() ; ++i)
+      {
+        aPolymorphMap[i->first] = i->second;
+      }
+      return aPolymorphMap;
 	}
 
 	/** 
@@ -490,18 +498,17 @@ namespace libecs
 
     static PropertySlotMap  thePropertySlotMap;
 
-    static PolymorphMap     theInfoMap;
-
+    static PolymorphAssocVector theInfoMap;
   };
 
 
   // This is necessary for the static data member of 
   // the PropertyInterface template class to be instantiated
   // when the class is specialized (in LIBECS_DM_INIT_STATIC()).
-  template< class T > class libecs::PropertyInterface< T>::PropertySlotMap
+  template< class T > typename libecs::PropertyInterface< T>::PropertySlotMap
     libecs::PropertyInterface< T>::thePropertySlotMap;
-  template< class T > class std::map<const String, Polymorph, std::less<const String> > libecs::PropertyInterface< T>::theInfoMap;
- 
+  template< class T > typename libecs::PropertyInterface< T>::PolymorphAssocVector
+    libecs::PropertyInterface< T>::theInfoMap;
 
 
   /*@}*/

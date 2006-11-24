@@ -65,7 +65,7 @@ namespace libecs
       ; // do nothing
     }
     
-    virtual ~PropertySlotProxy();
+    ECELL_API virtual ~PropertySlotProxy();
 
     virtual SET_METHOD( Polymorph, Polymorph ) = 0;
     virtual GET_METHOD( Polymorph, Polymorph ) = 0;

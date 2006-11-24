@@ -131,7 +131,7 @@ public:\
  {\
   return thePropertyInterface.getPropertyAttributes( *this, aPropertyName );\
  } \
-static const PolymorphMapCref getClassInfo( void )\
+static PolymorphMapCref getClassInfo( void )\
 {\
   return thePropertyInterface.getInfoMap();\
 }\
@@ -363,15 +363,15 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
     virtual const Polymorph 
     getPropertyAttributes( StringCref aPropertyName ) const = 0;
 
-    virtual void defaultSetProperty( StringCref aPropertyName, 
+    ECELL_API virtual void defaultSetProperty( StringCref aPropertyName, 
 				     PolymorphCref aValue );
     
-    virtual const Polymorph 
+    ECELL_API virtual const Polymorph 
     defaultGetProperty( StringCref aPorpertyName ) const;
     
-    virtual const Polymorph defaultGetPropertyList() const;
+    ECELL_API virtual const Polymorph defaultGetPropertyList() const;
     
-    virtual const Polymorph 
+    ECELL_API virtual const Polymorph 
     defaultGetPropertyAttributes( StringCref aPropertyName ) const;
 
     void registerLogger( LoggerPtr aLogger );
@@ -387,8 +387,7 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
 
     virtual StringLiteral getClassName() const = 0;
 
-
-  protected:
+  public:
 
     /// @internal
 
@@ -423,7 +422,7 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
   // inline copies of them around.  This reduces sizes of DM .so files a bit.
 
 #define NULLSET_SPECIALIZATION( TYPE )\
-  template <> void PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )
+  template <> ECELL_API void PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )
 
   NULLSET_SPECIALIZATION( Real );
   NULLSET_SPECIALIZATION( Integer );
@@ -431,7 +430,7 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
   NULLSET_SPECIALIZATION( Polymorph );
 
 #define NULLGET_SPECIALIZATION( TYPE )\
-  template <> const TYPE PropertiedClass::nullGet<TYPE>() const
+  template <> ECELL_API const TYPE PropertiedClass::nullGet<TYPE>() const
 
   NULLGET_SPECIALIZATION( Real );
   NULLGET_SPECIALIZATION( Integer );

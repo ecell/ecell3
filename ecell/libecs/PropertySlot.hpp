@@ -73,13 +73,13 @@ namespace libecs
       ; // do nothing
     }
     
-    virtual ~PropertySlotBase();
+    ECELL_API virtual ~PropertySlotBase();
 
     virtual const bool isSetable() const = 0;
     virtual const bool isGetable() const = 0;
 
-    virtual const bool isLoadable() const;
-    virtual const bool isSavable()  const;
+    ECELL_API virtual const bool isLoadable() const;
+    ECELL_API virtual const bool isSavable()  const;
 
   };
 
