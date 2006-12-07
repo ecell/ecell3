@@ -250,7 +250,7 @@ AC_SUBST(DMTOOL_DIR)
 AC_SUBST(DMTOOL_INCLUDE_DIR)
 
 
-AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR([AM_CHECK_PYTHON_HEADERS failed.])])
+AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR([Failed to find Python headers.])])
 
 dnl numpy package.
 dnl find arrayobject.h.
