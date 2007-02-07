@@ -33,8 +33,8 @@ import string
 import os
 import popen2
 
-from Util import *
-from SessionProxy import *
+from ecell.SessionManager.Util import *
+from ecell.SessionManager.SessionProxy import *
 
 class LocalSessionProxy(SessionProxy):
 	'''LocalSessionProxy class

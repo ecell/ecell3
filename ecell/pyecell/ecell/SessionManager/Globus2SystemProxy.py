@@ -41,9 +41,9 @@ import popen2
 
 
 # imports ecell modules
-from Util import *
-from Globus2SessionProxy import *
-from SystemProxy import *
+from ecell.SessionManager.Util import *
+from ecell.SessionManager.Globus2SessionProxy import *
+from ecell.SessionManager.SystemProxy import *
 
 GRID_PROXY_INIT = 'grid-proxy-init'
 GRID_INFO_SEARCH = 'grid-info-search'

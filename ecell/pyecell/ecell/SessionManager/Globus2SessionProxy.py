@@ -32,8 +32,8 @@ import sys
 import string
 import os
 
-from Util import *
-from SessionProxy import *
+from ecell.SessionManager.Util import *
+from ecell.SessionManager.SessionProxy import *
 
 GLOBUS_JOB_RUN='globus-job-run'
 GLOBUS_JOB_SUBMIT='globus-job-submit'

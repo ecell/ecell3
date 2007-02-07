@@ -32,8 +32,8 @@ import sys
 import string
 import os
 
-from Util import *
-from SessionProxy import *
+from ecell.SessionManager.Util import *
+from ecell.SessionManager.SessionProxy import *
 
 
 class SGESessionProxy(SessionProxy):
