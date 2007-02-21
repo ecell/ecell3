@@ -14,7 +14,7 @@ __license__ = ''
 from Structure import generateFullRankMatrix
 
 import numpy
-import numpy.lib.mlab
+import numpy.lib.twodim_base
 import numpy.linalg
 
 
@@ -84,7 +84,7 @@ def calculateUnscaledControlCoefficient( stoichiometryMatrix, elasticityMatrix )
 
 def invdiag( traceArray ):
     '''
-    return numpy.lib.mlab.diag( 1.0 / array )
+    return numpy.lib.twodim_base.diag( 1.0 / array )
     if there\'re zeros in the array, set zero for that
     traceArray: (array) one dimensional array
     return (matrix)
@@ -96,7 +96,7 @@ def invdiag( traceArray ):
         if abs( traceArray[ i ] ) > 0.0:
             invArray[ i ] = 1.0 / traceArray[ i ]
 
-    return numpy.lib.mlab.diag( invArray )
+    return numpy.lib.twodim_base.diag( invArray )
 
 # end of invdiag
 
@@ -130,13 +130,13 @@ def scaleControlCoefficient( aPathwayProxy, unscaledCCCMatrix, unscaledFCCMatrix
     # ( scaled CS_ij ) = E_j / S_i * ( unscaled CS_ij )
 
     scaledCCCMatrix = numpy.matrixmultiply( invdiag( valueBuffer ), unscaledCCCMatrix )
-    scaledCCCMatrix = numpy.matrixmultiply( scaledCCCMatrix, numpy.lib.mlab.diag( activityBuffer ) )
+    scaledCCCMatrix = numpy.matrixmultiply( scaledCCCMatrix, numpy.lib.twodim_base.diag( activityBuffer ) )
 
     # calculate scaled flux control coefficient
     # ( scaled CJ_ij ) = E_j / E_i * ( unscaled CJ_ij )
 
     scaledFCCMatrix = numpy.matrixmultiply( invdiag( activityBuffer ), unscaledFCCMatrix )
-    scaledFCCMatrix = numpy.matrixmultiply( scaledFCCMatrix, numpy.lib.mlab.diag( activityBuffer ) )
+    scaledFCCMatrix = numpy.matrixmultiply( scaledFCCMatrix, numpy.lib.twodim_base.diag( activityBuffer ) )
 
     return ( scaledCCCMatrix, scaledFCCMatrix )
 

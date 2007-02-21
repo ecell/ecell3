@@ -15,7 +15,7 @@ import ecell.ECDDataFile
 
 import string
 
-import numpy.dft
+import numpy.fft
 import numpy
 
 
@@ -66,7 +66,7 @@ class EcdSupport( ecell.ECDDataFile ):
 
         aSamplingTime = aDiscretizedData[ -1 ][ 0 ] - aDiscretizedData[ 0 ][ 0 ]
         
-        aFourierClassList = numpy.dft.real_fft( aValueList )
+        aFourierClassList = numpy.fft.rfft( aValueList )
         anOrder = len( aFourierClassList )
         aSpectrumList = []
         aSpectrumList.append( [ 0.0, abs( aFourierClassList[ 0 ] ) / anOrder * 0.5 ] )
