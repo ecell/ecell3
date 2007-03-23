@@ -125,11 +125,11 @@ public:
 	*theItemPtrVector[ anOldSize ] = anItem;  
 	if( comp( &anItem, theItemPtrVector[ anOldSize ] ) )
 	  {
-	    moveDown( anOldSize );
+	    moveDownPos( anOldSize );
 	  }
 	else
 	  {
-	    moveUp( anOldSize ); 
+	    moveUpPos( anOldSize ); 
 	  }
       }
 
@@ -370,22 +370,25 @@ void DynamicPriorityQueue< Item >::moveDown( Index anIndex )
 template < typename Item >
 void DynamicPriorityQueue< Item >::popItem()
 {
-  Item* anItem( theItemPtrVector[0] );
   --theSize;
+  if( this->size == 0 )
+    {
+      return;
+    }
+
+  Item* anItem( theItemPtrVector[0] );
   theItemPtrVector[0] = theItemPtrVector[getSize()];
   theItemPtrVector[getSize()] = anItem;
   
   theIndexVector[ getItemIndex( theItemPtrVector[0] ) ] = 0;
   
-  moveDown( 0 );
+  moveDownPos( 0 );
 }
 
 template < typename Item >
 void DynamicPriorityQueue< Item >::moveTop()
 {
-  Index aPosition( theIndexVector[ getTopIndex() ] );
-
-  moveDownPos( aPosition );
+  moveDownPos( 0 );
 }
 
 
