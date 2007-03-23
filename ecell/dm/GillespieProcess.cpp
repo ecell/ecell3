@@ -88,11 +88,11 @@ void GillespieProcess::calculateOrder()
     {
       c = k;
     }
-  else if ( theOrder == 2 and getZeroVariableReferenceOffset() == 1 )
+  else if ( theOrder == 2 && getZeroVariableReferenceOffset() == 1 )
     {
       c = k * 2.0 / ( N_A * getSuperSystem()->getSize() );
     }
-  else if ( theOrder == 2 and getZeroVariableReferenceOffset() == 2 )
+  else if ( theOrder == 2 && getZeroVariableReferenceOffset() == 2 )
     {
       c = k / ( N_A * getSuperSystem()->getSize() );
     }
