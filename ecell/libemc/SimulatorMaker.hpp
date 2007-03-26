@@ -52,7 +52,8 @@ namespace libemc
   public:
 
     SimulatorMaker();
-    Simulator* make( libecs::StringCref classname );
+    // Defined in superclass; no need to redefine here
+    // Simulator* make( libecs::StringCref classname );
     void install( libecs::StringCref systementry );
 
     virtual const char* const className() const {return "SimulatorMaker";}
