@@ -54,9 +54,27 @@ namespace libecs
 
   */
 
-  class DataPoint 
+  class DataPoint
   {
 
+  public:
+    class EarlinessOrdering
+    {
+    public:
+      bool operator()(const DataPoint& x, const DataPoint& y)
+      {
+        return x.getTime() < y.getTime();
+      }
+    };
+
+    class LatenessOrdering
+    {
+    public:
+      bool operator()(const DataPoint& x, const DataPoint& y)
+      {
+        return x.getTime() > y.getTime();
+      }
+    };
 
   public:
 
@@ -143,7 +161,7 @@ namespace libecs
     {
       return 2;
     }
-   
+
     DataPointRef operator= ( LongDataPointCref aLongDataPoint );
 
   protected:
@@ -272,7 +290,7 @@ namespace libecs
     {
       return 5;
     }
-   
+
   protected:
 
     Real theAvg;

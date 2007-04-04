@@ -169,14 +169,14 @@ namespace libecs
 				       const_iterator last,
 				       RealParam aTime ) 
     {
-      return std::lower_bound( first, last, aTime );
+      return std::lower_bound( first, last, DataPoint(aTime, 0), DataPoint::EarlinessOrdering() );
     }
 
     static const_iterator upper_bound( const_iterator first,
 				       const_iterator last,
 				       RealParam aTime ) 
     {
-      return std::upper_bound( first, last, aTime );
+      return std::upper_bound( first, last, DataPoint(aTime, 0), DataPoint::LatenessOrdering() );
     }
 
 
