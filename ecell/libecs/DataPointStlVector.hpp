@@ -1,4 +1,4 @@
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 //
 //        This file is part of E-Cell Simulation Environment package
 //
@@ -79,13 +79,6 @@ namespace libecs
 
 
     DataPointStlVector( DataPointStlVectorCref vector )
-      :
-      theContainer( vector.getContainer() )
-    {
-      ; // do nothing
-    }
-
-    DataPointStlVector( DataPointStlVectorRef vector )
       :
       theContainer( vector.getContainer() )
     {
