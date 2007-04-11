@@ -12,14 +12,14 @@ docdir = $(prefix)/share/doc/$(PACKAGE)-$(VERSION)
 
 
 install-data-hook:
-	$(mkinstalldirs) $(docdir)
-	cp README NEWS COPYING INSTALL AUTHORS ChangeLog $(docdir)
-	rm -rf $(docdir)/CVS
-	rm -rf $(docdir)/*/CVS
-	rm -rf $(docdir)/*/*/CVS
+	$(mkinstalldirs) $(DESTDIR)$(docdir)
+	cp README NEWS COPYING INSTALL AUTHORS ChangeLog $(DESTDIR)$(docdir)
+	rm -rf $(DESTDIR)$(docdir)/CVS
+	rm -rf $(DESTDIR)$(docdir)/*/CVS
+	rm -rf $(DESTDIR)$(docdir)/*/*/CVS
 
 uninstall-hook:
-	rm -rf $(docdir)
+	rm -rf $(DESTDIR)$(docdir)
 
 
 dist-hook:
@@ -38,10 +38,10 @@ doc: ${DOXYGEN_OUTFILE} ${DOCBOOK_OUTFILE}
 
 doc-install:
 	$(MAKE) $(AM_MAKEFLAGS) doc doc-all
-	(cd doc ; cp -r * $(docdir) )
-	rm -rf $(docdir)/CVS
-	rm -rf $(docdir)/*/CVS
-	rm -rf $(docdir)/*/*/CVS
+	(cd doc ; cp -r * $(DESTDIR)$(docdir) )
+	rm -rf $(DESTDIR)$(docdir)/CVS
+	rm -rf $(DESTDIR)$(docdir)/*/CVS
+	rm -rf $(DESTDIR)$(docdir)/*/*/CVS
 
 doc-all: doc-pdf doc-html-archive
 
