@@ -1,6 +1,5 @@
 from Constants import *
 import numpy as nu
-from gnomecanvas import *
 from ShapeDescriptor import *
 
 SHAPE_PLUGIN_TYPE='Process' #Shape Plugin Constants

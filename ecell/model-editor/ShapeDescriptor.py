@@ -1,6 +1,9 @@
 from Constants import *
 import numpy as nu
-from gnomecanvas import *
+try:
+    import gnomecanvas
+except:
+    import gnome.canvas as gnomecanvas
 
 def estLabelDims(graphUtils, aLabel):
     (tx_height, tx_width) = graphUtils.getTextDimensions(aLabel )

@@ -1,5 +1,4 @@
 from Constants import *
-from gnomecanvas import *
 from ShapeDescriptor import *
 import numpy as nu
 

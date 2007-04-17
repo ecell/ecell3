@@ -38,8 +38,11 @@ import os.path
 import string
 from Constants import *
 from PathwayCanvas import *
-import gnomecanvas
 from LayoutCommand import *
+try:
+    import gnomecanvas
+except:
+    import gnome.canvas as gnomecanvas
 
 class PathwayEditor( ListWindow ):
 

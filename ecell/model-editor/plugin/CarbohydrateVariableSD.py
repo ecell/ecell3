@@ -1,7 +1,6 @@
 
 from Constants import *
 import numpy as nu
-from gnomecanvas import *
 from ShapeDescriptor import *
 
 SHAPE_PLUGIN_TYPE='Variable' #Shape Plugin Constants

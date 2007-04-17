@@ -1,5 +1,8 @@
-import gnomecanvas
 import gtk.gdk
+try:
+    import gnomecanvas
+except:
+    import gnome.canvas as gnomecanvas
 
 class ResizeableText:
     def __init__( self, aRoot, aCanvas, x ,y , fillColor, text, anchor):

@@ -988,7 +988,10 @@ class EditorObject:
             pos=self.maxShiftMap[dir][0]
             return max(0, mshift[pos] )
 
-import gnomecanvas
+try:
+    import gnomecanvas
+except:
+    import gnome.canvas as gnomecanvas
 class GhostLine:
     def __init__( self, parentObject, ringCode, endx, endy ):
         self.parentObject = parentObject

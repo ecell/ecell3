@@ -1,8 +1,10 @@
-from gnomecanvas import *
 import gtk.gdk
+try:
+    import gnomecanvas
+except:
+    import gnome.canvas as gnomecanvas
 
-
-class PathwayCanvas( Canvas ):
+class PathwayCanvas( gnomecanvas.Canvas ):
     
     def __init__( self, parentWindow, aCanvas):
         self.theParentWindow = parentWindow

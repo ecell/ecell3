@@ -1,7 +1,10 @@
 from Constants import *
 import numpy as nu
-from gnomecanvas import *
 from ShapeDescriptor import *
+try:
+    import gnomecanvas
+except:
+    import gnome.canvas as gnomecanvas
 
 SHAPE_PLUGIN_TYPE='Variable' #Shape Plugin Constants
 SHAPE_PLUGIN_NAME='Default'
@@ -30,7 +33,7 @@ class VariableSD( ShapeDescriptor):
                                 [[1,1,0,-2,0 ], [1,0.5,0,-1,0 ]], [[1,1,0,0,0 ], [1,0.5,0,1,0 ]]\
                                 ])
         self.theCodeMap = {\
-                    'frame' : [ [MOVETO_OPEN, 0], [LINETO, 1], [CURVETO, 2,3,4], [LINETO, 5], [CURVETO, 6, 7, 8] ],
+                    'frame' : [ [ gnomecanvas.MOVETO_OPEN, 0], [ gnomecanvas.LINETO, 1], [gnomecanvas.CURVETO, 2,3,4], [gnomecanvas.LINETO, 5], [ gnomecanvas.CURVETO, 6, 7, 8] ],
                     'text' : [9],
                     RING_TOP : [10,11],
                     RING_BOTTOM : [12,13],

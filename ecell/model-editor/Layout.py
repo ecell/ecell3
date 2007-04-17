@@ -8,7 +8,10 @@ from VariableObject import *
 from TextObject import *
 from ConnectionObject import *
 import math
-import gnomecanvas 
+try:
+    import gnomecanvas 
+except:
+    import gnome.canvas as gnomecanvas
 
 
 class Layout:

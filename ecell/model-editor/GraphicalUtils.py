@@ -1,9 +1,10 @@
-
-
 from Constants import *
 import gtk
-import gnomecanvas
 import numpy as n
+try:
+    import gnomecanvas
+except:
+    import gnome.canvas as gnomecanvas
 
 class GraphicalUtils:
 

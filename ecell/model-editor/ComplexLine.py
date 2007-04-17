@@ -1,7 +1,10 @@
-import gnomecanvas
 from Constants import *
 from Utils import *
 from ResizeableText import *
+try:
+    import gnomecanvas
+except:
+    import gnome.canvas as gnomecanvas
 
 class ComplexLine:
 

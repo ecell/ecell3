@@ -1,10 +1,13 @@
-import gnomecanvas
 from Constants import *
 from Utils import *
 from ResizeableText import *
 import os
 import gtk
 import gtk.gdk
+try:
+    import gnomecanvas
+except:
+    import gnome.canvas as gnomecanvas
 
 class ComplexShape:
 

@@ -1,7 +1,10 @@
 from Constants import *
 from __future__ import division
 import numpy as nu
-import gnomecanvas
+try:
+    import gnomecanvas
+except:
+    import gnome.canvas as gnomecanvas
 
 class LineDescriptor:
 
