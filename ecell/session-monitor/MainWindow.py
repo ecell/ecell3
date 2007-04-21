@@ -53,9 +53,6 @@ import math
 import time
 import datetime
 
-if GNOME_INSTALLED =='yes':
-    import gnome.ui
-
 #
 #import pyecell module
 #

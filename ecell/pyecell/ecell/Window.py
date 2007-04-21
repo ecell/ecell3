@@ -40,7 +40,6 @@ from config import *
 
 import os
 import gtk
-#import gnome.ui
 import gtk.gdk
 import gtk.glade
 
