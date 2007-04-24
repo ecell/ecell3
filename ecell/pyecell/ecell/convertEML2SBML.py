@@ -16,7 +16,7 @@ from ecell.expressionparser import *
 from ecell.SbmlFunctions import *
 
 import libsbml
-
+import numpy
 
 def getCurrentCompartment( aSystemPath ):
 
@@ -168,6 +168,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
         aPropertyNameList = anEml.getEntityPropertyList( aFullIDString )
         aCurrentCompartment = getCurrentCompartment( aFullID[1] )
+        aCurrentCompartmentObj = aSBMLModel.getCompartment( aCurrentCompartment )
 
         if( aCurrentCompartment == "SBMLParameter" ):
 
@@ -223,12 +224,10 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                     ( int( float( anEml.getEntityProperty( aFullPN )[0] ) ) )
 
                 else:
-                    raise AttributeError,"unexpected error in Parameter"
+                    raise AttributeError, "Unrepresentable property `%s' in Parameter" % aPropertyName
 
         else:
-            
             if( aFullID[2] != "SIZE" and aFullID[2] != "Dimensions" ):
-
                 # create Species object
                 aSpecies = aSBMLModel.createSpecies()
 
@@ -288,8 +287,26 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                         aSpecies.setConstant(
                             int( float( anEml.getEntityProperty( aFullPN )[0] ) ) )
 
+                    # set Concentration by rule
+                    elif ( aPropertyName == "MolarConc" ):
+                        # XXX: units are just eventually correct here, because
+                        # SBML falls back to mole and liter for substance and
+                        # volume of the species if these are unspecified.
+                        if aSBMLLevel == '1':
+                            if aCurrentCompartmentObj != None:
+                                compVol = float( \
+                                        aCurrentCompartmentObj.getVolume() )
+                            else:
+                                compVol = 1.0
+                            propValue = float( \
+                                    anEml.getEntityProperty( aFullPN )[0] )
+                            aSpecies.setInitialAmount( compVol * propValue )
+                        else: # SBML lv.2
+                            aSpecies.setInitialConcentration( \
+                                float( anEml.getEntityProperty( aFullPN )[0] )\
+                                )
                     else:
-                        raise AttributeError,"unexpected error in Species"
+                        raise AttributeError, "Unrepresentable property `%s' in Species" % aPropertyName
 
 
     # -------------------------------------
@@ -651,7 +668,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
             # set ID ROOT System and Other System
             if( aFullID[2] == '' ):
- 	        aCompartmentID = 'default' # Root system
+     	        aCompartmentID = 'default' # Root system
             else:
                 if( ( aFullID[2] in ID_Namespace ) == False ):
                     aCompartmentID = aFullID[2]
@@ -725,18 +742,6 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
 def createModel( anEml, aSBMLModel, aSystemPath='/' ):
 
-    # set Species
-    for anID in anEml.getEntityList( 'Variable', aSystemPath ):
-
-        aFullID = ( VARIABLE, aSystemPath, anID )
-        createEntity( anEml, aSBMLModel, aFullID )
-
-    # set Reaction
-    for anID in anEml.getEntityList( 'Process', aSystemPath ):
-
-        aFullID = ( PROCESS, aSystemPath, anID )
-        createEntity( anEml, aSBMLModel, aFullID )
-
     # set System
     if aSystemPath == '':
         aFullID = ( SYSTEM, '', '/' )
@@ -748,6 +753,18 @@ def createModel( anEml, aSBMLModel, aSystemPath='/' ):
         aFullID = ( SYSTEM, aPath, anID )
 
     createEntity( anEml, aSBMLModel, aFullID )
+
+    # set Species
+    for anID in anEml.getEntityList( 'Variable', aSystemPath ):
+
+        aFullID = ( VARIABLE, aSystemPath, anID )
+        createEntity( anEml, aSBMLModel, aFullID )
+
+    # set Reaction
+    for anID in anEml.getEntityList( 'Process', aSystemPath ):
+
+        aFullID = ( PROCESS, aSystemPath, anID )
+        createEntity( anEml, aSBMLModel, aFullID )
 
     # create SubSystem by iterating calling createModel
     for aSystem in anEml.getEntityList( 'System', aSystemPath ):
