@@ -7,7 +7,7 @@ else
   SHLEXT = @LTDL_SHLIB_EXT@
 endif
 
-SUBDIRS =
+SUBDIRS = . tests
 
 ECELL_DIRNAME=@ECELL_DIRNAME@
 ECELL_INCLUDE_DIR=${includedir}/${ECELL_DIRNAME}
@@ -110,6 +110,8 @@ VariableReference.hpp\
 DynamicPriorityQueue.hpp\
 FluxProcess.hpp\
 MethodProxy.hpp
+
+TESTS=tests/DynamicPriorityQueue_test
 
 all-local: libecs$(SHLEXT)
 

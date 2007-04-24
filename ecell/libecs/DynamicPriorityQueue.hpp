@@ -2,7 +2,7 @@
 //
 //        This file is part of E-Cell Simulation Environment package
 //
-//                Copyright (C) 1996-2002 Keio University
+//                Copyright (C) 1996-2007 Keio University
 //                Copyright (C) 2005 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -41,9 +41,12 @@ namespace libecs
 {
 
 template < typename Item >
+class DynamicPriorityQueueTest;
+
+template < typename Item >
 class DynamicPriorityQueue
 {
-  
+  friend class DynamicPriorityQueueTest< Item >;
 
 public:
 
@@ -110,7 +113,7 @@ public:
 
 	*theItemPtrVector[ anOldSize ] = anItem;
  
-	make_heap( theItemPtrVector.begin(), theItemPtrVector.end(), comp );
+	std::make_heap( theItemPtrVector.begin(), theItemPtrVector.end(), comp );
 
 	for( Index i( 0 ); i < getSize(); ++i )
 	  {
@@ -168,6 +171,64 @@ private:
   {
     // this cast is safe.
     return static_cast< Index >( ItemPtr - &theItemVector.front() );
+  }
+
+  template< typename RandomAccessIterator, typename PosteriorityPredicate >
+  static bool is_heap( RandomAccessIterator first,
+                       RandomAccessIterator last,
+                       PosteriorityPredicate former_is_less )
+  {
+    return is_heap( first, last, 0, former_is_less );
+  }
+
+  template< typename RandomAccessIterator, typename PosteriorityPredicate >
+  static bool is_heap( RandomAccessIterator first,
+                       RandomAccessIterator last,
+                       typename RandomAccessIterator::difference_type pos,
+                       PosteriorityPredicate former_is_less )
+  {
+    typename RandomAccessIterator::difference_type
+      left_node_pos( pos * 2 + 1 ),
+      right_node_pos( pos * 2 + 2 );
+
+    if ( first >= last )
+      {
+        return true;
+      }
+
+    typename RandomAccessIterator::value_type node_value( *( first + pos ) );
+
+    if ( first + left_node_pos >= last )
+      {
+        return true;
+      }
+
+    if ( former_is_less( node_value, *( first + left_node_pos ) ) )
+      {
+        return false;
+      }
+
+    if ( first + right_node_pos >= last )
+      {
+        return true;
+      }
+
+    if ( former_is_less( node_value, *( first + right_node_pos ) ) )
+      {
+        return false;
+      }
+
+    return is_heap< RandomAccessIterator, PosteriorityPredicate >(
+                first, last, left_node_pos, former_is_less ) &&
+           is_heap< RandomAccessIterator, PosteriorityPredicate >(
+                first, last, right_node_pos, former_is_less );
+  }
+
+  const bool checkConsistency() const
+  {
+    return is_heap( theItemPtrVector.begin(),
+                    theItemPtrVector.begin() + getSize(),
+                    comp );
   }
 
 private:

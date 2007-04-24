@@ -333,6 +333,7 @@ AC_CONFIG_FILES([pyecell/ecell3-session-manager],
                 [chmod +x pyecell/ecell3-session-manager])
 AC_CONFIG_FILES([Makefile
                  libecs/Makefile
+                 libecs/tests/Makefile
                  libemc/Makefile
                  pyecs/Makefile
                  pyecs/windows/Makefile
