@@ -371,7 +371,7 @@ template < typename Item >
 void DynamicPriorityQueue< Item >::popItem()
 {
   --theSize;
-  if( this->size == 0 )
+  if( this->theSize == 0 )
     {
       return;
     }
