@@ -37,12 +37,8 @@
 
 //#include "Util.hpp"
 
-template < class T >
-struct PtrGreater
+namespace libecs
 {
-  bool operator()( T x, T y ) const { return *y < *x; }
-};
-
 
 template < typename Item >
 class DynamicPriorityQueue
@@ -123,14 +119,7 @@ public:
     else
       {
 	*theItemPtrVector[ anOldSize ] = anItem;  
-	if( comp( &anItem, theItemPtrVector[ anOldSize ] ) )
-	  {
-	    moveDownPos( anOldSize );
-	  }
-	else
-	  {
-	    moveUpPos( anOldSize ); 
-	  }
+	 moveUpPos( anOldSize ); 
       }
 
     return anOldSize;
@@ -187,7 +176,12 @@ private:
 
   Index    theSize;
 
-  PtrGreater< const Item* const > comp;
+  struct PtrGreater
+  {
+    bool operator()( Item* const x, Item* const y ) const { return *y < *x; }
+  };
+
+  PtrGreater comp;
 
 };
 
@@ -391,6 +385,7 @@ void DynamicPriorityQueue< Item >::moveTop()
   moveDownPos( 0 );
 }
 
+} // namespace libecs
 
 #endif // __DYNAMICPRIORITYQUEUE_HPP
 
