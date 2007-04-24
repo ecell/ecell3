@@ -87,7 +87,10 @@ def main():
     CLASSNAME, ext = os.path.splitext( ext.replace( '\"', '' ) )
     OBJ = CLASSNAME + '.o'
     SOBJ = CLASSNAME + SHLEXT
-    ARGS = ' \"' + string.join( args[1:], '\" \"' ) + '\"'
+    if len(args) > 0:
+        ARGS = ' \"' + string.join( args[1:], '\" \"' ) + '\"'
+    else:
+        ARGS = ' '
 
 	# compiler: use env + autoconf + plus anything that was given on the cmd line (?) -- FIXME
     CXXCOMPILEFLAGS = CXXFLAGS + ' ' + ORIG_CXXFLAGS + ' ' + ORIG_CPPFLAGS + ' ' + ARGS
