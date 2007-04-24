@@ -51,7 +51,8 @@ public:
   typedef std::vector< Item* >   ItemPtrVector;
 
   typedef typename ItemVector::size_type       size_type;
-  typedef typename ItemVector::difference_type Index;
+  typedef typename ItemVector::difference_type difference_type;
+  typedef size_type                            Index;
 
   typedef std::vector< Index >  IndexVector;
 
@@ -165,7 +166,8 @@ private:
   */
   const Index getItemIndex( const Item * const ItemPtr ) const
   {
-    return ItemPtr - &theItemVector.front();
+    // this cast is safe.
+    return static_cast< Index >( ItemPtr - &theItemVector.front() );
   }
 
 private:
@@ -211,7 +213,7 @@ void DynamicPriorityQueue< Item >::clear()
 
 
 template < typename Item >
-void DynamicPriorityQueue< Item >::
+inline void DynamicPriorityQueue< Item >::
 move( Index anIndex )
 {
   //  assert( aPosition < getSize() );
@@ -232,31 +234,22 @@ move( Index anIndex )
 template < typename Item >
 void DynamicPriorityQueue<Item>::moveUpPos( Index aPosition )
 {
-  Item* const anItem( theItemPtrVector[aPosition] );
-  Index aPredecessor( ( aPosition - 1 ) / 2 );
-
-  // first pass: do nothing if move up doesn't occur.
-  Item* aPredItem( theItemPtrVector[aPredecessor] );
-  if( aPredecessor == aPosition || comp( anItem, aPredItem ) )
-    {
-      return;
-    }
+  Item* const anItem( theItemPtrVector[ aPosition ] );
 
   // main loop
-  while( 1 )
+  while( aPosition > 0 )
     {
+      Index aPredecessor( ( aPosition - 1 ) / 2 );
+      Item* aPredItem( theItemPtrVector[ aPredecessor ] );
+
+      if( comp( anItem, aPredItem ) )
+        {
+          break;
+        }
+
       theItemPtrVector[aPosition] = aPredItem;
       theIndexVector[ getItemIndex( aPredItem ) ] = aPosition;
       aPosition = aPredecessor;
-      
-      aPredecessor = ( aPredecessor - 1 ) / 2;
-
-      aPredItem = theItemPtrVector[aPredecessor];
-
-      if( aPredecessor == aPosition || comp( anItem, aPredItem ) )
-	{
-	  break;
-	}
     }
 
   theItemPtrVector[aPosition] = anItem;
@@ -268,107 +261,49 @@ template < typename Item >
 void DynamicPriorityQueue< Item >::moveDownPos( Index aPosition )
 {
   Item* const anItem( theItemPtrVector[aPosition] );
-  Index aSuccessor( aPosition * 2 + 1);
- 
-
-  // first pass: simply return doing nothing if move down doesn't occur.
-  if( aSuccessor < getSize() - 1 )
-    {
-      if( comp( theItemPtrVector[ aSuccessor ], 
-		theItemPtrVector[ aSuccessor + 1 ] ) )
-	{
-	  ++aSuccessor;
-	}
-    }
-  else if( aSuccessor >= getSize() )
-    {
-      return;
-    }
-  
-  Item* aSuccItem( theItemPtrVector[ aSuccessor ] );
-  if( comp( aSuccItem, anItem ) )
-    {
-      return;    // if the going down does not occur, return doing nothing.
-    }
 
   // main loop
   while( 1 )
     {
+      Index aSuccessor( aPosition * 2 + 1 );
+
+      if( aSuccessor >= getSize() )
+        {
+          break;
+        }
+
+      if( aSuccessor + 1 < getSize() &&
+          comp( theItemPtrVector[ aSuccessor ],
+                theItemPtrVector[ aSuccessor + 1 ] ) )
+        {
+          ++aSuccessor;
+        }
+
+      Item* const aSuccItem( theItemPtrVector[ aSuccessor ] );
+
+      // if the going down is finished, break.
+      if( !comp( anItem, aSuccItem ) )
+	{
+	  break;
+	}
       // bring up the successor
       theItemPtrVector[aPosition] = aSuccItem;
       theIndexVector[ getItemIndex( aSuccItem ) ] = aPosition;
       aPosition = aSuccessor;
-
-      // the next successor
-      aSuccessor = aSuccessor * 2 + 1;
-
-      if( aSuccessor < getSize() - 1 )
-	{
-	  if( comp( theItemPtrVector[ aSuccessor ], 
-		    theItemPtrVector[ aSuccessor + 1 ] ) )
-	    {
-	      ++aSuccessor;
-	    }
-	}
-      else if( aSuccessor >= getSize() )
-	{
-	  break;
-	}
-
-      aSuccItem = theItemPtrVector[ aSuccessor ];
-
-      // if the going down is finished, break.
-      if( comp( aSuccItem, anItem ) )
-	{
-	  break;
-	}
     }
 
   theItemPtrVector[aPosition] = anItem;
   theIndexVector[ getItemIndex( anItem ) ] = aPosition;
 }
 
-
-/* original version
-template < typename Item >
-void DynamicPriorityQueue< Item >::moveDown( Index anIndex )
-{
-  Index aSuccessor( anIndex * 2 + 1 );
-
-  if( aSuccessor < getSize() - 1 && comp( theItemPtrVector[aSuccessor], theItemPtrVector[aSuccessor + 1] ) )
-    {
-      ++aSuccessor;
-    }
-
-  Item* anItem( theItemPtrVector[anIndex] );
-  
-  while( aSuccessor < getSize() && comp( anItem, theItemPtrVector[aSuccessor] ) )
-    {
-      theItemPtrVector[anIndex] = theItemPtrVector[aSuccessor];
-      theIndexVector[ theItemPtrVector[anIndex] - theFirstItemPtr ] = anIndex;
-      anIndex = aSuccessor;
-      aSuccessor = anIndex * 2 + 1;
-
-      if( aSuccessor < getSize() - 1 && 
-	  comp( theItemPtrVector[aSuccessor], theItemPtrVector[ aSuccessor + 1 ] ) )
-	{
-	  ++aSuccessor;
-	}
-    }
-
-  theItemPtrVector[anIndex] = anItem;
-  theIndexVector[ theItemPtrVector[anIndex] - theFirstItemPtr ] = anIndex;
-}
-*/
-
 template < typename Item >
 void DynamicPriorityQueue< Item >::popItem()
 {
-  --theSize;
   if( this->theSize == 0 )
     {
       return;
     }
+  --theSize;
 
   Item* anItem( theItemPtrVector[0] );
   theItemPtrVector[0] = theItemPtrVector[getSize()];
