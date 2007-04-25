@@ -186,12 +186,12 @@ namespace libecs
 
     EventCref getTopEvent() const
     {
-      return theEventPriorityQueue.getTopItem();
+      return theEventPriorityQueue.getTop();
     }
 
     EventRef getTopEvent()
     {
-      return theEventPriorityQueue.getTopItem();
+      return theEventPriorityQueue.getTop();
     }
 
     EventIndex getTopIndex()
@@ -201,17 +201,17 @@ namespace libecs
 
     EventCref getEvent( const EventIndex anIndex ) const
     {
-      return theEventPriorityQueue.getItem( anIndex );
+      return theEventPriorityQueue.get( anIndex );
     }
 
     EventRef getEvent( const EventIndex anIndex )
     {
-      return theEventPriorityQueue.getItem( anIndex );
+      return theEventPriorityQueue.get( anIndex );
     }
 
     void step()
     {
-      EventRef aTopEvent( theEventPriorityQueue.getTopItem() );
+      EventRef aTopEvent( theEventPriorityQueue.getTop() );
       const Time aCurrentTime( aTopEvent.getTime() );
       const EventIndex aTopEventIndex( getTopIndex() );
 
@@ -244,7 +244,7 @@ namespace libecs
 
     void updateEvent( const EventIndex anIndex, TimeParam aCurrentTime )
     {
-      EventRef anEvent( theEventPriorityQueue.getItem( anIndex ) );
+      EventRef anEvent( theEventPriorityQueue.get( anIndex ) );
       const Time anOldTime( anEvent.getTime() );
       anEvent.update( aCurrentTime );
       const Time aNewTime( anEvent.getTime() );
@@ -273,7 +273,7 @@ namespace libecs
 
     const EventIndex addEvent( EventCref anEvent )
     {
-      return theEventPriorityQueue.pushItem( anEvent );
+      return theEventPriorityQueue.push( anEvent );
     }
 
 
@@ -310,7 +310,7 @@ namespace libecs
   void EventScheduler<Event>::
   updateEventDependency( const EventIndex i1 )
   {
-    EventCref anEvent1( theEventPriorityQueue.getItem( i1 ) );
+    EventCref anEvent1( theEventPriorityQueue.get( i1 ) );
 
     EventIndexVector& anEventIndexVector( theEventDependencyArray[ i1 ] );
     anEventIndexVector.clear();
@@ -323,7 +323,7 @@ namespace libecs
 	    continue;
 	  }
 	
-	EventCref anEvent2( theEventPriorityQueue.getItem( i2 ) );
+	EventCref anEvent2( theEventPriorityQueue.get( i2 ) );
 	
 	if( anEvent2.isDependentOn( anEvent1 ) )
 	  {

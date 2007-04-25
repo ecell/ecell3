@@ -120,6 +120,7 @@ public:\
   DEFINE_EXCEPTION( AlreadyExist,           Exception );
   DEFINE_EXCEPTION( ValueError,             Exception );
   DEFINE_EXCEPTION( TypeError,              Exception );
+  DEFINE_EXCEPTION( IllegalOperation,       Exception );
 
   // simulation errors
   DEFINE_EXCEPTION( SimulationError,        Exception );

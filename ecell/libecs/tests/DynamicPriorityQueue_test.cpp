@@ -63,11 +63,10 @@ public:
     void testClear()
     {
         DPQ dpq;
-        typedef typename DPQ::Index Index;
 
-        dpq.pushItem( 1 );
-        dpq.pushItem( 20 );
-        dpq.pushItem( 50 );
+        dpq.push( 1 );
+        dpq.push( 20 );
+        dpq.push( 50 );
 
         BOOST_CHECK_EQUAL( Index( 3 ), dpq.getSize() );
 
@@ -76,9 +75,9 @@ public:
         BOOST_CHECK( dpq.isEmpty() );
         BOOST_CHECK( dpq.checkConsistency() );
 
-        dpq.pushItem( 2 );
-        dpq.pushItem( 20 );
-        dpq.pushItem( 30 );
+        dpq.push( 2 );
+        dpq.push( 20 );
+        dpq.push( 30 );
 
         BOOST_CHECK_EQUAL( Index( 3 ), dpq.getSize() );
 
@@ -92,31 +91,31 @@ public:
     {
         DPQ dpq;
 
-        dpq.pushItem( 1 );
+        dpq.push( 1 );
 
         BOOST_CHECK( dpq.checkConsistency() );
-        BOOST_CHECK( dpq.getTopItem() == 1.0 );
+        BOOST_CHECK( dpq.getTop() == 1.0 );
     }
 
     void testDuplicatedItems()
     {
         DPQ dpq;
 
-        dpq.pushItem( 1 );
-        dpq.pushItem( 2 );
-        dpq.pushItem( 1 );
-        dpq.pushItem( 2 );
+        dpq.push( 1 );
+        dpq.push( 2 );
+        dpq.push( 1 );
+        dpq.push( 2 );
 
         BOOST_CHECK( dpq.checkConsistency() );
 
-        BOOST_CHECK( dpq.getTopItem() == 1 );
-        dpq.popItem();
-        BOOST_CHECK( dpq.getTopItem() == 1 );
-        dpq.popItem();
-        BOOST_CHECK( dpq.getTopItem() == 2 );
-        dpq.popItem();
-        BOOST_CHECK( dpq.getTopItem() == 2 );
-        dpq.popItem();
+        BOOST_CHECK( dpq.getTop() == 1 );
+        dpq.popTop();
+        BOOST_CHECK( dpq.getTop() == 1 );
+        dpq.popTop();
+        BOOST_CHECK( dpq.getTop() == 2 );
+        dpq.popTop();
+        BOOST_CHECK( dpq.getTop() == 2 );
+        dpq.popTop();
 
         BOOST_CHECK( dpq.isEmpty() );
 
@@ -130,7 +129,7 @@ public:
         const int MAXI( 100 );
         for( int i( MAXI ); i != 0  ; --i )
         {
-            dpq.pushItem( i );
+            dpq.push( i );
         }
 
         BOOST_CHECK( dpq.checkConsistency() );
@@ -139,8 +138,8 @@ public:
         while( ! dpq.isEmpty() )
         {
             ++n;
-            BOOST_CHECK_EQUAL( n, dpq.getTopItem() );
-            dpq.popItem();
+            BOOST_CHECK_EQUAL( n, dpq.getTop() );
+            dpq.popTop();
         }
 
         BOOST_CHECK_EQUAL( MAXI, n );
@@ -152,17 +151,16 @@ public:
     void testInterleavedSorting()
     {
         DPQ dpq;
-        typedef typename DPQ::Index Index;
 
         const Index MAXI( 101 );
         for( int i( MAXI-1 ); i != 0  ; i-=2 )
         {
-            dpq.pushItem( i );
+            dpq.push( i );
         }
 
         for( int i( MAXI ); i != -1  ; i-=2 )
         {
-            dpq.pushItem( i );
+            dpq.push( i );
         }
 
         BOOST_CHECK_EQUAL( MAXI, dpq.getSize() );
@@ -173,8 +171,169 @@ public:
         while( ! dpq.isEmpty() )
         {
             ++n;
-            BOOST_CHECK_EQUAL( n, dpq.getTopItem() );
-            dpq.popItem();
+            BOOST_CHECK_EQUAL( n, dpq.getTop() );
+            dpq.popTop();
+        }
+
+        BOOST_CHECK_EQUAL( MAXI, Index( n ) );
+
+        BOOST_CHECK( dpq.isEmpty() );
+        BOOST_CHECK( dpq.checkConsistency() );
+    }
+
+    void testReplaceTop()
+    {
+        DPQ dpq;
+
+        dpq.push( 4 );
+        dpq.push( 2 );
+        dpq.push( 1 );
+
+        BOOST_CHECK_EQUAL( 1, dpq.getTop() );
+
+        dpq.replaceTop( 3 );
+
+        BOOST_CHECK( dpq.checkConsistency() );
+        BOOST_CHECK_EQUAL( 2, dpq.getTop() );
+
+        dpq.popTop();
+        BOOST_CHECK_EQUAL( 3, dpq.getTop() );
+        dpq.popTop();
+        BOOST_CHECK_EQUAL( 4, dpq.getTop() );
+        dpq.popTop();
+
+
+        BOOST_CHECK( dpq.isEmpty() );
+        BOOST_CHECK( dpq.checkConsistency() );
+    }
+
+    void testReplace()
+    {
+        DPQ dpq;
+
+        dpq.push( 5 );
+        const Index id( dpq.push( 4 ) );
+        dpq.push( 3 );
+        dpq.push( 1 );
+
+        BOOST_CHECK_EQUAL( 1, dpq.getTop() );
+
+        dpq.replace( id, 2 );  // 4->2
+
+        BOOST_CHECK( dpq.checkConsistency() );
+        BOOST_CHECK_EQUAL( 1, dpq.getTop() );
+
+        dpq.popTop();
+        BOOST_CHECK_EQUAL( 2, dpq.getTop() );
+        dpq.popTop();
+        BOOST_CHECK_EQUAL( 3, dpq.getTop() );
+        dpq.popTop();
+        BOOST_CHECK_EQUAL( 5, dpq.getTop() );
+        dpq.popTop();
+
+        BOOST_CHECK( dpq.isEmpty() );
+        BOOST_CHECK( dpq.checkConsistency() );
+    }
+
+    void testSimpleSortingWithPops()
+    {
+        DPQ dpq;
+
+        IndexVector idVector;
+
+        const Index MAXI( 100 );
+        for( int n( MAXI ); n != 0  ; --n )
+        {
+            Index id( dpq.push( n ) );
+            if( n == 11 || n == 45 )
+            {
+                idVector.push_back( id );
+            }
+        }
+
+        BOOST_CHECK( dpq.checkConsistency() );
+
+        BOOST_CHECK_EQUAL( MAXI, dpq.getSize() );
+
+        for( typename IndexVector::const_iterator i( idVector.begin() );
+             i != idVector.end(); ++i )
+        {
+            dpq.pop( *i );
+        }
+
+        BOOST_CHECK_EQUAL( MAXI - 2, dpq.getSize() );
+
+        int n( 0 );
+        while( ! dpq.isEmpty() )
+        {
+            ++n;
+            if( n == 11 || n == 45 )
+            {
+                continue; // skip
+            }
+            BOOST_CHECK_EQUAL( int( n ), dpq.getTop() );
+            dpq.popTop();
+        }
+
+        BOOST_CHECK_EQUAL( MAXI, Index( n ) );
+
+        BOOST_CHECK( dpq.isEmpty() );
+        BOOST_CHECK( dpq.checkConsistency() );
+    }
+
+    void testInterleavedSortingWithPops()
+    {
+        DPQ dpq;
+
+        IndexVector idVector;
+
+        const Index MAXI( 101 );
+        for( int n( MAXI-1 ); n != 0  ; n-=2 )
+        {
+            const Index id( dpq.push( n ) );
+
+            if( n == 12 || n == 46 )
+            {
+                idVector.push_back( id );
+            }
+        }
+
+        dpq.pop( idVector.back() );
+        idVector.pop_back();
+
+        BOOST_CHECK_EQUAL( MAXI/2 -1, dpq.getSize() );
+
+        BOOST_CHECK( dpq.checkConsistency() );
+
+        for( int n( MAXI ); n != -1  ; n-=2 )
+        {
+            const Index id( dpq.push( n ) );
+
+            if( n == 17 || n == 81 )
+            {
+                idVector.push_back( id );
+            }
+        }
+
+        for( typename IndexVector::const_iterator i( idVector.begin() );
+             i != idVector.end(); ++i )
+        {
+            dpq.pop( *i );
+        }
+
+        BOOST_CHECK( dpq.checkConsistency() );
+        BOOST_CHECK_EQUAL( MAXI-4, dpq.getSize() );
+
+        int n( 0 );
+        while( ! dpq.isEmpty() )
+        {
+            ++n;
+            if( n == 12 || n == 46 || n == 17 || n == 81 )
+            {
+                continue;
+            }
+            BOOST_CHECK_EQUAL( n, dpq.getTop() );
+            dpq.popTop();
         }
 
         BOOST_CHECK_EQUAL( MAXI, Index( n ) );
@@ -208,6 +367,10 @@ boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
         add_test( IntegerDPQTest, testDuplicatedItems );
         add_test( IntegerDPQTest, testSimpleSorting );
         add_test( IntegerDPQTest, testInterleavedSorting );
+        add_test( IntegerDPQTest, testReplace );
+        add_test( IntegerDPQTest, testReplaceTop );
+        add_test( IntegerDPQTest, testSimpleSortingWithPops );
+        add_test( IntegerDPQTest, testInterleavedSortingWithPops );
 
         suites->add(suite);
     }
@@ -224,6 +387,10 @@ boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
         add_test( DoubleDPQTest, testDuplicatedItems );
         add_test( DoubleDPQTest, testSimpleSorting );
         add_test( DoubleDPQTest, testInterleavedSorting );
+        add_test( DoubleDPQTest, testReplace );
+        add_test( DoubleDPQTest, testReplaceTop );
+        add_test( DoubleDPQTest, testSimpleSortingWithPops );
+        add_test( DoubleDPQTest, testInterleavedSortingWithPops );
 
         suites->add(suite);
     }

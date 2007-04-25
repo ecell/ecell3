@@ -35,7 +35,7 @@
 #include <vector>
 #include <algorithm>
 
-//#include "Util.hpp"
+#include "Exceptions.hpp"
 
 namespace libecs
 {
@@ -61,38 +61,68 @@ public:
 
 
   DynamicPriorityQueue();
-  
-  inline void move( const Index anIndex );
 
-  inline void moveTop();
+  void move( const Index anIndex )
+  {
+    const Index aPosition( theIndexVector[anIndex] );
+
+    if ( aPosition == 0 )
+      {
+        moveDownPos( aPosition );
+        return;
+      }
+
+    const Index aPredecessor( ( aPosition - 1 ) / 2 );
+
+    if ( comp( theItemPtrVector[ aPredecessor ],
+               theItemPtrVector[ aPosition ] ) )
+      {
+        moveUpPos( aPosition );
+      }
+    else 
+      {
+        moveUpPos( aPosition );
+      }
+  }
 
   const Index getTopIndex() const 
   {
-    return( getItemIndex( theItemPtrVector.front() ) );
+    return( getIndex( theItemPtrVector.front() ) );
   }
 
-  const Item& getTopItem() const
+  const Item& getTop() const
   {
     return *( theItemPtrVector.front() );
   }
 
-  Item& getTopItem()
+  Item& getTop()
   {
     return *( theItemPtrVector.front() );
   }
 
-  const Item& getItem( const Index anIndex ) const
+  const Item& get( const Index anIndex ) const
   {
     return theItemVector[ anIndex ];
   }
 
-  Item& getItem( const Index anIndex )
+  Item& get( const Index anIndex )
   {
     return theItemVector[ anIndex ];
   }
 
-  void popItem();
-  const Index pushItem( const Item& anItem )
+  Item popByPosition( const Index aPosition );
+
+  Item pop( const Index anIndex )
+  {
+    return popByPosition( theIndexVector[ anIndex ] );
+  }
+
+  Item popTop()
+  {
+    return popByPosition( 0 );
+  }
+
+  const Index push( const Item& anItem )
   {
     const Index anOldSize( theSize );
     
@@ -117,7 +147,7 @@ public:
 
 	for( Index i( 0 ); i < getSize(); ++i )
 	  {
-	    theIndexVector[ getItemIndex( theItemPtrVector[i] ) ] = i;
+	    theIndexVector[ getIndex( theItemPtrVector[i] ) ] = i;
 	  }
       }
     else
@@ -156,10 +186,22 @@ public:
     moveDownPos( aPosition );
   }
 
+  void replace( const Index anIndex, const Item& anItem )
+  {
+    pop( anIndex );
+    push( anItem );
+  }
+
+  void replaceTop( const Item& anItem )
+  {
+    popTop();
+    push( anItem );
+  }
+
 private:
 
-  inline void moveUpPos( const Index aPosition );
-  inline void moveDownPos( const Index aPosition );
+  void moveUpPos( const Index aPosition );
+  void moveDownPos( const Index aPosition );
 
   /*
     This method returns the index of the given pointer to Item.
@@ -167,7 +209,7 @@ private:
     The pointer must point to a valid item on theItemVector.
     Returned index is that of theItemVector.
   */
-  const Index getItemIndex( const Item * const ItemPtr ) const
+  const Index getIndex( const Item * const ItemPtr ) const
   {
     // this cast is safe.
     return static_cast< Index >( ItemPtr - &theItemVector.front() );
@@ -205,6 +247,9 @@ private:
 
     if ( former_is_less( node_value, *( first + left_node_pos ) ) )
       {
+        fprintf( stderr, "%lf %lf\n",
+                 (double) *node_value,
+                 (double) **( first + left_node_pos ) );
         return false;
       }
 
@@ -215,6 +260,9 @@ private:
 
     if ( former_is_less( node_value, *( first + right_node_pos ) ) )
       {
+        fprintf( stderr, "%lf %lf\n",
+                 (double) *node_value,
+                 (double) **( first + right_node_pos ) );
         return false;
       }
 
@@ -274,26 +322,7 @@ void DynamicPriorityQueue< Item >::clear()
 
 
 template < typename Item >
-inline void DynamicPriorityQueue< Item >::
-move( Index anIndex )
-{
-  //  assert( aPosition < getSize() );
-  const Index aPosition( theIndexVector[anIndex] );
-
-  moveDownPos( aPosition );
-
-  // If above moveDown() didn't move this item,
-  // then we need to try moveUp() too.  If moveDown()
-  // did work, nothing should be done.
-  if( theIndexVector[anIndex] == aPosition )
-    {
-      moveUpPos( aPosition );
-    }
-}
-
-
-template < typename Item >
-void DynamicPriorityQueue<Item>::moveUpPos( Index aPosition )
+inline void DynamicPriorityQueue<Item>::moveUpPos( Index aPosition )
 {
   Item* const anItem( theItemPtrVector[ aPosition ] );
 
@@ -309,17 +338,17 @@ void DynamicPriorityQueue<Item>::moveUpPos( Index aPosition )
         }
 
       theItemPtrVector[aPosition] = aPredItem;
-      theIndexVector[ getItemIndex( aPredItem ) ] = aPosition;
+      theIndexVector[ getIndex( aPredItem ) ] = aPosition;
       aPosition = aPredecessor;
     }
 
   theItemPtrVector[aPosition] = anItem;
-  theIndexVector[ getItemIndex( anItem ) ] = aPosition;
+  theIndexVector[ getIndex( anItem ) ] = aPosition;
 }
 
 // this is an optimized version.
 template < typename Item >
-void DynamicPriorityQueue< Item >::moveDownPos( Index aPosition )
+inline void DynamicPriorityQueue< Item >::moveDownPos( Index aPosition )
 {
   Item* const anItem( theItemPtrVector[aPosition] );
 
@@ -349,36 +378,33 @@ void DynamicPriorityQueue< Item >::moveDownPos( Index aPosition )
 	}
       // bring up the successor
       theItemPtrVector[aPosition] = aSuccItem;
-      theIndexVector[ getItemIndex( aSuccItem ) ] = aPosition;
+      theIndexVector[ getIndex( aSuccItem ) ] = aPosition;
       aPosition = aSuccessor;
     }
 
   theItemPtrVector[aPosition] = anItem;
-  theIndexVector[ getItemIndex( anItem ) ] = aPosition;
+  theIndexVector[ getIndex( anItem ) ] = aPosition;
 }
 
 template < typename Item >
-void DynamicPriorityQueue< Item >::popItem()
+inline Item DynamicPriorityQueue< Item >::popByPosition( const Index aPosition )
 {
   if( this->theSize == 0 )
     {
-      return;
+      throw IllegalOperation( "DynamicPriorityQueue<>::popByPosition()",
+                              "Queue is empty" );
     }
   --theSize;
 
-  Item* anItem( theItemPtrVector[0] );
-  theItemPtrVector[0] = theItemPtrVector[getSize()];
-  theItemPtrVector[getSize()] = anItem;
+  Item* anItem( theItemPtrVector[ aPosition ] );
+  theItemPtrVector[ aPosition ] = theItemPtrVector[ theSize ];
+  theItemPtrVector[ theSize ] = anItem;
   
-  theIndexVector[ getItemIndex( theItemPtrVector[0] ) ] = 0;
+  theIndexVector[ getIndex( anItem ) ] = 0;
   
-  moveDownPos( 0 );
-}
+  moveDownPos( aPosition );
 
-template < typename Item >
-void DynamicPriorityQueue< Item >::moveTop()
-{
-  moveDownPos( 0 );
+  return *anItem;
 }
 
 } // namespace libecs
