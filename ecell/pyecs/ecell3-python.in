@@ -18,25 +18,36 @@ PYTHON_INCLUDES="@PYTHON_INCLUDES@"
 
 ECELL_DIRNAME=@ECELL_DIRNAME@
 
-export ECELL3_PREFIX=${prefix}
-export ECELL_DIRNAME
-export PYTHONDIR=${pyexecdir}
-export LD_LIBRARY_PATH="${libdir}:${LD_LIBRARY_PATH}"
+ECELL3_PREFIX=${prefix}
+PYTHONDIR=${pyexecdir}
+LD_LIBRARY_PATH="${libdir}:${LD_LIBRARY_PATH}"
 
 # make a __init__.py file in ecell/SessionManager!
-#export PYTHONPATH="$PYTHONDIR/ecell/SessionManager:$PYTHONDIR:${PYTHONPATH}"
-export PYTHONPATH="$PYTHONDIR:${PYTHONPATH}"
-export PYTHON_INCLUDES=${PYTHON_INCLUDES}
-export BOOST_LIBRARIES="-lboost_python"
-export LTDL_LIBRARY_PATH=".:${ECELL3_DM_PATH}:${prefix}/lib/${ECELL_DIRNAME}/dms:${LTDL_LIBRARY_PATH}"
+PYTHONPATH="$PYTHONDIR:${PYTHONPATH}"
+PYTHON_INCLUDES=${PYTHON_INCLUDES}
+BOOST_LIBRARIES="-lboost_python"
+LTDL_LIBRARY_PATH=".:${ECELL3_DM_PATH}:${prefix}/lib/${ECELL_DIRNAME}/dms:${LTDL_LIBRARY_PATH}"
 
 # what version? not good.
-export VERSION=${VERSION}
-export CXXFLAGS="@CXXFLAGS@"
-export CXX="@CXX@"
-export LDFLAGS="@LDFLAGS@"
-export ECELL3_LIBDIR="${libdir}/${ECELL_DIRNAME}"
+VERSION=${VERSION}
+CXXFLAGS="@CXXFLAGS@"
+CXX="@CXX@"
+LDFLAGS="@LDFLAGS@"
+ECELL3_LIBDIR="${libdir}/${ECELL_DIRNAME}"
 
+export ECELL3_PREFIX
+export ECELL_DIRNAME
+export PYTHONDIR
+export LD_LIBRARY_PATH
+export PYTHONPATH
+export PYTHON_INCLUDES
+export BOOST_LIBRARIES
+export LTDL_LIBRARY_PATH
+export VERSION
+export CXXFLAGS
+export CXX
+export LDFLAGS
+export ECELL3_LIBDIR
 
 ecell3_usage() 
 {
@@ -117,8 +128,10 @@ if [ "$1" = '-h' ] ; then
 fi
 
 if [ $ECELL_PROFILE ] ; then
-    export LD_PROFILE_OUTPUT=.
-    export LD_PROFILE=$ECELL_PROFILE
+    LD_PROFILE_OUTPUT=.
+    LD_PROFILE=$ECELL_PROFILE
+    export LD_PROFILE_OUTPUT
+    export LD_PROFILE
     rm -f $LD_PROFILE_OUTPUT/$ECELL_PROFILE.profile
 fi
 
