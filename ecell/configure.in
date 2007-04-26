@@ -2,8 +2,6 @@ AC_REVISION([$Id$])dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-
-
 AC_INIT
 AC_CONFIG_SRCDIR([libecs/Entity.hpp])
 
@@ -31,9 +29,9 @@ AM_SANITY_CHECK
 AC_CANONICAL_HOST
 
 if test $prefix = "NONE" ; then
-	PREFIX=$ac_default_prefix
+        PREFIX=$ac_default_prefix
 else
-	PREFIX=$prefix
+        PREFIX=$prefix
 fi
 
 AC_SUBST(PREFIX)
@@ -41,7 +39,7 @@ AC_SUBST(PREFIX)
 dnl
 AC_ARG_WITH(gtk,
   AC_HELP_STRING([--without-gtk],
-	         [build ecell without gtk library.]),
+                 [build ecell without gtk library.]),
   [ECELL_SUBDIRS="libecs libemc pyecs pyecell bin dm"],
   [ECELL_SUBDIRS="libecs libemc pyecs pyecell bin dm session-monitor model-editor toollauncher"]
 )
@@ -73,8 +71,9 @@ rm -f conftest
 ./libtool --config > conftest
 . ./conftest
 rm -f conftest
-dnl
+
 dnl compatibility for libtool 1.5.6
+
 LTDL_SHLIB_EXT=""
 if test -n "$shrext_cmds"; then
     eval LTDL_SHLIB_EXT=\"$shrext_cmds\"
@@ -149,9 +148,9 @@ if test -n "$with_gtk"; then
    AM_CHECK_PYMOD(pygtk,,,[AC_MSG_ERROR([could not find Python pygtk module])])
    AM_CHECK_PYMOD(gtk,,,[AC_MSG_ERROR([could not find Python gtk module])])
    AM_CHECK_PYMOD(gtk.gdk,,,
-		[AC_MSG_ERROR([could not find Python gtk.gdk module])])
+                [AC_MSG_ERROR([could not find Python gtk.gdk module])])
    AM_CHECK_PYMOD(gtk.glade,,,
-		[AC_MSG_ERROR([could not find Python gtk.glade module])])
+                [AC_MSG_ERROR([could not find Python gtk.glade module])])
    AM_CHECK_PYMOD(gnome.ui,,[AC_SUBST([GNOME_INSTALLED],yes)],[AC_SUBST([GNOME_INSTALLED],no)])
    AM_CHECK_PYMOD(gnomecanvas,,,[AC_MSG_WARN(could not find gnomecanvas module. model-editor will not work. )])
    AM_CHECK_PYMOD(xml.dom.minidom,,,[AC_MSG_WARN(could not find xml.dom.minidom module. model-editor will not work.)])
@@ -167,7 +166,7 @@ dnl
 dnl stl
 dnl
 dnl AC_CHECK_HEADER(stl.h,,
-dnl 	AC_MSG_ERROR([stl.h not found.])
+dnl         AC_MSG_ERROR([stl.h not found.])
 dnl )
 AC_CHECK_HEADERS(math,ac_ch_math=yes,)
 AC_CHECK_HEADERS(cmath,ac_ch_cmath=yes,)
@@ -220,81 +219,52 @@ if test "${with_msvc}" == "yes"; then
     AC_DEFINE_UNQUOTED(USE_MSVC, ${msvcFlag}, The Flag of the Compiler)
 fi
 
-
-dnl
-dnl
 EXT_GUESS="../../../.. ../../.. ../.. ../ ./ $prefix /usr /usr/local /opt"
-dnl
-dnl
+
 dnl dmtool package
-dnl
+
 if test "$DMTOOL_DIR" = "" ; then
-        AC_MSG_CHECKING( for dmtool dir)
-        ac_cv_dmtool_dir="no"
-        for ac_dir in $EXT_GUESS ; do
-                if test -d $ac_dir/dmtool ; then
-                        ac_cv_dmtool_dir=`(cd $ac_dir ; pwd)`
-			DMTOOL_DIR=$ac_cv_dmtool_dir
-                fi
-        done
+  AC_MSG_CHECKING( for dmtool dir)
+  ac_cv_dmtool_dir="no"
+  for ac_dir in $EXT_GUESS ; do
+    if test -d $ac_dir/dmtool ; then
+      ac_cv_dmtool_dir=`(cd $ac_dir ; pwd)`
+      DMTOOL_DIR=$ac_cv_dmtool_dir
+    fi
+  done
 
-	if test "$DMTOOL_DIR" = "" ; then	
-		AC_MSG_ERROR("dmtool not found.")
-	fi
+  if test "$DMTOOL_DIR" = "" ; then        
+    AC_MSG_ERROR("dmtool not found.")
+  fi
 
-        AC_MSG_RESULT($ac_cv_dmtool_dir)
-        DMTOOL_DIR=$ac_cv_dmtool_dir
-        DMTOOL_INCLUDE_DIR=$ac_cv_dmtool_dir
+  AC_MSG_RESULT($ac_cv_dmtool_dir)
+  DMTOOL_DIR=$ac_cv_dmtool_dir
+  DMTOOL_INCLUDE_DIR=$ac_cv_dmtool_dir
 fi
 AC_SUBST(DMTOOL_DIR)
 AC_SUBST(DMTOOL_INCLUDE_DIR)
 
-
 AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR([Failed to find Python headers.])])
 
-dnl numpy package.
-dnl find arrayobject.h.
-dnl
-py_prefix=`$PYTHON -c "import sys; print sys.prefix"`
-pydir=python${PYTHON_VERSION}
-numpy_include="site-packages/numpy/core/include"
-EXT_GUESS="${py_prefix}/Lib/${numpy_include} ${py_prefix}/lib/${pydir}/${numpy_include} ${py_prefix}/lib64/${pydir}/${numpy_include} /usr/lib/${pydir}/${numpy_include} /usr/lib64/${pydir}/${numpy_include} /usr/local/lib/${pydir}/${numpy_include} /usr/local/lib64/${pydir}/${numpy_include} ${prefix}/include /usr/include/${pydir} /usr/local/include /opt/numpy/include"
-dnl
-dnl
-AC_MSG_CHECKING( for numpy include dir )
-NUMPY_INCLUDE_DIR=""
-for ac_dir in $EXT_GUESS ; do
-    if test -f ${ac_dir}/numpy/arrayobject.h ; then
-       NUMPY_INCLUDE_DIR=`(cd $ac_dir ; pwd)`
-    fi
-done
-
-if test "${NUMPY_INCLUDE_DIR}" = "" ; then	
-	AC_MSG_ERROR("numpy/arrayobject.h not found in ${EXT_GUESS}.")
-fi
-
-AC_MSG_RESULT($NUMPY_INCLUDE_DIR)
-AC_SUBST(NUMPY_INCLUDE_DIR)
+ECELL_CHECK_NUMPY
 
 AC_MSG_CHECKING( if use of compiler specific features are allowed )
 
 AC_ARG_ENABLE( compiler-extensions,,
-	       USE_COMPILER_EXTENSIONS=$enable_compiler_features,
-	       USE_COMPILER_EXTENSIONS=yes
-	       )
+               USE_COMPILER_EXTENSIONS=$enable_compiler_features,
+               USE_COMPILER_EXTENSIONS=yes
+               )
 AC_MSG_RESULT( $USE_COMPILER_EXTENSIONS )
 
 if test "$USE_COMPILER_EXTENSIONS" != no ; then
-   AC_MSG_CHECKING( for special compiler options )
-   AC_SUBST(USE_COMPILER_EXTENSIONS)
-   AC_DEFINE([USE_COMPILER_EXTENSIONS],1,[make use of compiler specific language features])
-   CXXFLAGS="$CXXFLAGS -Wno-pmf-conversions"
-   AC_SUBST(CXXFLAGS)
-   AC_MSG_RESULT( $CXXFLAGS )
+  AC_MSG_CHECKING( for special compiler options )
+  AC_SUBST(USE_COMPILER_EXTENSIONS)
+  AC_DEFINE([USE_COMPILER_EXTENSIONS],1,[make use of compiler specific language features])
+  CXXFLAGS="$CXXFLAGS -Wno-pmf-conversions"
+  AC_SUBST(CXXFLAGS)
+  AC_MSG_RESULT( $CXXFLAGS )
 fi
    
-
-
 AC_LANG_PUSH([C])
 
 AC_SYS_LARGEFILE
@@ -345,20 +315,20 @@ AC_CONFIG_FILES([Makefile
                  pyecell/ecell/analysis/Makefile
                  dm/Makefile])
 AC_CONFIG_FILES([bin/Makefile
-		 bin/ecell3-dmc
-		 bin/ecell3-eml2em
-		 bin/ecell3-em2eml],
-		 [chmod +x bin/ecell3-dmc bin/ecell3-em2eml bin/ecell3-eml2em])
+                 bin/ecell3-dmc
+                 bin/ecell3-eml2em
+                 bin/ecell3-em2eml],
+                 [chmod +x bin/ecell3-dmc bin/ecell3-em2eml bin/ecell3-eml2em])
 AC_CONFIG_FILES([session-monitor/Makefile
-		 session-monitor/plugins/Makefile
+                 session-monitor/plugins/Makefile
                  session-monitor/config.py],
                  [chmod +x session-monitor/ecell3-session-monitor session-monitor/gecell])
 AC_CONFIG_FILES([model-editor/Makefile
-		 model-editor/glade/Makefile
-		 model-editor/plugin/Makefile
-		 model-editor/doc/Makefile],
-		[chmod +x model-editor/ecell3-model-editor])
+                 model-editor/glade/Makefile
+                 model-editor/plugin/Makefile
+                 model-editor/doc/Makefile],
+                [chmod +x model-editor/ecell3-model-editor])
 AC_CONFIG_FILES([toollauncher/Makefile
-		 toollauncher/misc/Makefile],
-		[chmod +x toollauncher/ecell3-toollauncher])
+                 toollauncher/misc/Makefile],
+                [chmod +x toollauncher/ecell3-toollauncher])
 AC_OUTPUT
