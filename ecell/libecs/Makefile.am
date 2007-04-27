@@ -111,7 +111,10 @@ DynamicPriorityQueue.hpp\
 FluxProcess.hpp\
 MethodProxy.hpp
 
-TESTS=tests/DynamicPriorityQueue_test
+TESTS= \
+	tests/DynamicPriorityQueue_test \
+	tests/DataPointAggregator_test \
+	tests/FullID_test
 
 all-local: libecs$(SHLEXT)
 

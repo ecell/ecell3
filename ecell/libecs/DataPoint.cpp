@@ -130,8 +130,9 @@ namespace libecs
   }
   
   
-  void DataPointAggregator::calculateMinMax( LongDataPointRef aTarget,  
-					     LongDataPointCref aNewPoint)
+  inline void
+  DataPointAggregator::calculateMinMax( LongDataPointRef aTarget,
+                                        LongDataPointCref aNewPoint )
   {
     // accu min
     
@@ -187,32 +188,3 @@ namespace libecs
 } // namespace libecs
 
 
-#if defined(STANDALONE_TEST)
-
-using namespace libecs;
-void agr( Real aTime, Real aValue, DataPointAggregator* dpa)
-{
-  LongDataPoint pa;
-  DataPoint dp;
-  dp.setTime(aTime);
-  dp.setValue(aValue);
-  dpa->aggregate(dp);
-  pa=dpa->getData();
-  printf("aggregating time %f, value %f, results:  avg %f\n",  aTime,aValue, pa.getAvg() );
-
-}
-
-int main()
-{
-  DataPointAggregator dpa;
-
-  agr(3,4,&dpa);
-  agr(5,6,&dpa);
-  agr(7,8,&dpa);
-  agr(9,6,&dpa);
-  agr(11,4,&dpa);
-  agr(13,6,&dpa);
-  
-}
-
-#endif /* End of test script*/
