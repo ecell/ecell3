@@ -67,7 +67,9 @@ namespace libecs
 
     createInterpolants();
 
-    theTaylorSeries.resize( boost::extents[ getStage() ][ getReadOnlyVariableOffset() ] );
+    theTaylorSeries.resize( boost::extents[ getStage() ][
+            static_cast< RealMatrix::index >(
+                getReadOnlyVariableOffset() ) ] );
 
     // should registerProcess be overrided?
     if ( getDiscreteProcessOffset() < theProcessVector.size() )
@@ -158,7 +160,7 @@ namespace libecs
 
     //    aVelocityBuffer.clear();
     //    aVelocityBuffer.resize( theVariableVector.size() );
-    for ( RealMatrix::size_type i( 0 ); i < aVelocityBuffer.size(); ++i )
+    for ( RealMatrix::index i( 0 ); i < aVelocityBuffer.size(); ++i )
       {
 	aVelocityBuffer[ i ] = 0.0;
       }
@@ -171,7 +173,8 @@ namespace libecs
 		anIterator( theVariableReferenceListVector[ i ].begin() );
 	      anIterator < theVariableReferenceListVector[ i ].end(); )
 	  {
-	    const VariableVector::size_type anIndex( *anIterator );
+	    const RealMatrix::index anIndex(
+            static_cast< RealMatrix::index >( *anIterator ) );
 	    ++anIterator;
 	    const Integer aCoefficient( *anIterator );
 	    ++anIterator;	
@@ -184,8 +187,8 @@ namespace libecs
   void DifferentialStepper::reset()
   {
     // is this needed?
-    for ( RealMatrix::size_type i( 0 ); i != getStage(); ++i )
-      for ( RealMatrix::size_type j( 0 );
+    for ( RealMatrix::index i( 0 ); i != getStage(); ++i )
+      for ( RealMatrix::index j( 0 );
 	    j != getReadOnlyVariableOffset(); ++j )
       {
 	theTaylorSeries[ i ][ j ] = 0.0;
