@@ -32,8 +32,6 @@
 #define __DATAPOINT_HPP
 
 #include "libecs.hpp"
-
-
 #include "Polymorph.hpp"
 
 namespace libecs
@@ -163,6 +161,12 @@ namespace libecs
     }
 
     DataPointRef operator= ( LongDataPointCref aLongDataPoint );
+
+    bool operator==( const DataPoint& that ) const
+    {
+        return theTime == that.theTime &&
+               theValue == that.theValue;
+    }
 
   protected:
 
