@@ -101,52 +101,47 @@ namespace libecs
       {
 	ProcessPtr const aProcess( theProcessVector[ i ] );
 
-	VariableReferenceVectorCref 
-	  aVariableReferenceVector( aProcess->getVariableReferenceVector() );
+	VariableReferenceVectorCref aVariableReferenceVector(
+	    aProcess->getVariableReferenceVector() );
 
 	VariableReferenceVector::size_type const 
-	  aZeroVariableReferenceOffset( aProcess->
-					getZeroVariableReferenceOffset() );
+	    aZeroVariableReferenceOffset(
+		aProcess->getZeroVariableReferenceOffset() );
 	VariableReferenceVector::size_type const 
-	  aPositiveVariableReferenceOffset( aProcess->
-					    getPositiveVariableReferenceOffset() );
+	    aPositiveVariableReferenceOffset(
+		aProcess->getPositiveVariableReferenceOffset() );
 
-	theVariableReferenceListVector[ i ].
-	  resize( 2 * ( aVariableReferenceVector.size() - 
-			aPositiveVariableReferenceOffset + 
-			aZeroVariableReferenceOffset ) );
+	theVariableReferenceListVector[ i ].reserve(
+	    ( aVariableReferenceVector.size() - 
+		aPositiveVariableReferenceOffset + 
+		aZeroVariableReferenceOffset ) );
 
-	std::vector<Integer>::size_type j( 0 );
 	for ( VariableReferenceVectorConstIterator 
-		anIterator( aVariableReferenceVector.begin() );
-	      anIterator < aVariableReferenceVector.begin() + 
-		aZeroVariableReferenceOffset; 
-	      ++anIterator )
+		anIterator( aVariableReferenceVector.begin() ),
+		anEnd ( aVariableReferenceVector.begin() +
+		       aZeroVariableReferenceOffset );
+	      anIterator < anEnd; ++anIterator )
 	  {
-	    VariableReference const aVariableReference( *anIterator );
+	    VariableReference const& aVariableReference( *anIterator );
 
-	    theVariableReferenceListVector[ i ][ j ] = 
-	      getVariableIndex( aVariableReference.getVariable() );
-	    ++j;
-	    theVariableReferenceListVector[ i ][ j ] = 
-	      aVariableReference.getCoefficient();
-	    ++j;
+	    theVariableReferenceListVector[ i ].push_back(
+		ExprComponent( getVariableIndex(
+			           aVariableReference.getVariable() ),
+                               aVariableReference.getCoefficient() ) );
 	  }
 
-	for ( VariableReferenceVectorConstIterator 
-		anIterator( aVariableReferenceVector.begin() + 
-			    aPositiveVariableReferenceOffset ); 
+	for ( VariableReferenceVectorConstIterator anIterator(
+		aVariableReferenceVector.begin() +
+	        aPositiveVariableReferenceOffset ); 
 	      anIterator < aVariableReferenceVector.end(); 
 	      ++anIterator )
 	  {
-	    VariableReference const aVariableReference( *anIterator );
+	    VariableReference const& aVariableReference( *anIterator );
 
-	    theVariableReferenceListVector[ i ][ j ] = 
-	      getVariableIndex( aVariableReference.getVariable() );
-	    ++j;
-	    theVariableReferenceListVector[ i ][ j ] = 
-	      aVariableReference.getCoefficient();
-	    ++j;
+	    theVariableReferenceListVector[ i ].push_back(
+		ExprComponent( getVariableIndex(
+			           aVariableReference.getVariable() ),
+                               aVariableReference.getCoefficient() ) );
 	  }
       }
   }
@@ -169,17 +164,16 @@ namespace libecs
       {
 	const Real anActivity( theProcessVector[ i ]->getActivity() );
 
-	for ( std::vector<Integer>::const_iterator 
+	for ( VariableReferenceList::const_iterator 
 		anIterator( theVariableReferenceListVector[ i ].begin() );
-	      anIterator < theVariableReferenceListVector[ i ].end(); )
+	      anIterator < theVariableReferenceListVector[ i ].end();
+	      anIterator++ )
 	  {
+	    ExprComponent const& aComponent = *anIterator;
 	    const RealMatrix::index anIndex(
-            static_cast< RealMatrix::index >( *anIterator ) );
-	    ++anIterator;
-	    const Integer aCoefficient( *anIterator );
-	    ++anIterator;	
-	    
-	    aVelocityBuffer[ anIndex ] += aCoefficient * anActivity;
+		static_cast< RealMatrix::index >(
+		    aComponent.first ) );
+	    aVelocityBuffer[ anIndex ] += aComponent.second * anActivity;
 	  }
       }
   }

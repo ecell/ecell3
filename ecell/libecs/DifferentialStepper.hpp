@@ -56,6 +56,9 @@ namespace libecs
   typedef boost::multi_array<Real, 2> RealMatrix_;
   DECLARE_TYPE( RealMatrix_, RealMatrix );
 
+  typedef std::pair< VariableIndex, Integer > ExprComponent;
+  typedef std::vector< ExprComponent > VariableReferenceList;
+  typedef std::vector< VariableReferenceList > VariableReferenceListVector;
 
   DECLARE_CLASS( DifferentialStepper );
 
@@ -340,7 +343,7 @@ namespace libecs
 
     RealMatrix theTaylorSeries;
 
-    std::vector< std::vector<Integer> > theVariableReferenceListVector;
+    VariableReferenceListVector theVariableReferenceListVector;
 
     bool theStateFlag;
 

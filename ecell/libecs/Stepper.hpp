@@ -60,7 +60,7 @@ namespace libecs
   //  DECLARE_TYPE( std::valarray<Real>, RealValarray );
 
   DECLARE_VECTOR( Real, RealVector );
-
+  typedef VariableVector::size_type VariableIndex;
 
   /**
      Stepper class defines and governs a computation unit in a model.
@@ -458,7 +458,7 @@ namespace libecs
     }
 
 
-    ECELL_API const VariableVector::size_type 
+    ECELL_API const VariableIndex
       getVariableIndex( VariableCptr const aVariable );
 
 
