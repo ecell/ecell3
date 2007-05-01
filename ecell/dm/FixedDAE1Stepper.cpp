@@ -311,16 +311,15 @@ void FixedDAE1Stepper::calculateJacobian()
 
 	  if ( aDiscreteProcessOffset > anIndex )
 	    {
-	      for ( std::vector< Integer >::const_iterator anIterator
+	      for ( VariableReferenceList::const_iterator anIterator
 		      ( theVariableReferenceListVector[ anIndex ].begin() );
 		    anIterator < theVariableReferenceListVector[ anIndex ].end(); )
 		{
-		  const VariableVector::size_type j( *anIterator );
-		  ++anIterator;
-		  const Real aCoefficient( *anIterator );
-		  ++anIterator;
-		  
-		  theTaylorSeries[ 0 ][ j ] += aCoefficient * aDifference;
+		  ExprComponent const& aComponent( *anIterator );
+		  const RealMatrix::index anIndex(
+		      static_cast< RealMatrix::index >( aComponent.first ) );
+		  theTaylorSeries[ 0 ][ anIndex ] +=
+		      aComponent.second * aDifference;
 		}
 	    }
 	  else
