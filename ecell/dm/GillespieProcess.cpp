@@ -38,7 +38,7 @@ void GillespieProcess::calculateOrder()
 	create<&GillespieProcess::getZero>();
       theGetMinValueMethodPtr   = RealMethodProxy::
 	create<&GillespieProcess::getZero>();
-      theGetPDMethodPtr         = &GillespieProcess::getZero;
+      theGetPDMethodPtr         = &GillespieProcess::getPD_Zero;
     }
   else if( getOrder() == 1 )   // one substrate, first order.
     {
@@ -78,7 +78,7 @@ void GillespieProcess::calculateOrder()
 	create<&GillespieProcess::getZero>();
       theGetPropensityMethodPtr = RealMethodProxy::
 	create<&GillespieProcess::getZero>();
-      theGetPDMethodPtr         = &GillespieProcess::getZero;
+      theGetPDMethodPtr         = &GillespieProcess::getPD_Zero;
     }
 
 

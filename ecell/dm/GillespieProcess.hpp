@@ -46,7 +46,7 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
 			       create<&GillespieProcess::getZero>() ),
     theGetMinValueMethodPtr( RealMethodProxy::
 			     create<&GillespieProcess::getZero>() ),
-    theGetPDMethodPtr( &GillespieProcess::getZero )
+    theGetPDMethodPtr( &GillespieProcess::getPD_Zero )
     {
       ; // do nothing
     }
@@ -168,7 +168,7 @@ protected:
     return 0.0;
   }
 
-  const Real getZero( VariablePtr aVariable ) const
+  const Real getPD_Zero( VariablePtr aVariable ) const
   {
     return 0.0;
   }
