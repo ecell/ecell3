@@ -127,3 +127,87 @@ AC_DEFUN([ECELL_CHECK_NUMPY], [
   CPPFLAGS="${ac_save_CPPFLAGS}"
   AC_SUBST(NUMPY_INCLUDE_DIR)
 ])
+
+AC_DEFUN([ECELL_CHECK_MATH_HEADER], [
+  STD_MATH_HEADER=
+
+  CANDIDATES="math cmath math.h"
+  for hdr in $CANDIDATES; do
+    if test -z "$STD_MATH_HEADER"; then
+      AC_CHECK_HEADER([$hdr], [STD_MATH_HEADER="<$hdr>"])
+    fi
+  done
+
+  if test -z "$STD_MATH_HEADER"; then
+    AC_MSG_ERROR([No usable math headers ($CANDIDATES) found])
+  fi
+
+  AC_SUBST([STD_MATH_HEADER])
+])
+
+AC_DEFUN([ECELL_CHECK_INFINITY], [
+  AC_MSG_CHECKING(for INFINITY)
+  AC_CACHE_VAL([ac_cv_func_or_macro_infinity], [
+    AC_TRY_COMPILE(
+    [#include $STD_MATH_HEADER], [
+      double inf = INFINITY;
+    ], [
+      ac_cv_func_or_macro_infinity=yes
+    ], [
+      ac_cv_func_or_macro_infinity=no
+    ])
+  ])
+  if test "$ac_cv_func_or_macro_infinity" = "yes"; then
+    AC_DEFINE(HAVE_INFINITY, 1, [Define to 1 if INFINITY is supported.])
+    AC_MSG_RESULT(yes)
+    HAVE_INFINITY=1
+  else
+    AC_MSG_RESULT(no)
+    HAVE_INFINITY=
+  fi
+])
+
+AC_DEFUN([ECELL_CHECK_HUGE_VAL], [
+  AC_MSG_CHECKING(for HUGE_VAL)
+  AC_CACHE_VAL([ac_cv_func_or_macro_huge_val], [
+    AC_TRY_COMPILE(
+    [#include $STD_MATH_HEADER], [
+      double inf = HUGE_VAL;
+    ], [
+      ac_cv_func_or_macro_huge_val=yes
+    ], [
+      ac_cv_func_or_macro_huge_val=no
+    ])
+  ])
+  if test "$ac_cv_func_or_macro_huge_val" = "yes"; then
+    AC_DEFINE(HAVE_HUGE_VAL, 1, [Define to 1 if HUGE_VAL is supported.])
+    AC_MSG_RESULT(yes)
+    HAVE_HUGE_VAL=1
+  else
+    AC_MSG_RESULT(no)
+    HAVE_HUGE_VAL=
+  fi
+])
+
+AC_DEFUN([ECELL_CHECK_PRETTY_FUNCTION], [
+  AC_MSG_CHECKING(for __PRETTY_FUNCTION__)
+  AC_CACHE_VAL(ac_cv_macro_pretty_function, [
+    AC_TRY_CPP([
+  test()
+  {
+    const char* pretty_function = __PRETTY_FUNCTION__;
+  }
+    ], [
+      ac_cv_macro_pretty_function=yes
+    ], [
+      ac_cv_macro_pretty_function=no
+    ])
+  ])
+  if [[ $ac_cv_macro_pretty_function == yes ]]; then
+    AC_DEFINE(HAVE_PRETTY_FUNCTION, 1, dnl
+      [Define to 1 if __PRETTY_FUNCTION__ is supported.])
+    AC_MSG_RESULT(yes)
+  else
+    AC_MSG_RESULT(no)
+  fi
+])

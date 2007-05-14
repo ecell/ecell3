@@ -75,7 +75,7 @@ namespace libecs
   }
 
   const Polymorph 
-  PropertyInterfaceBase::convertInfoMapToPolymorph( StringMapCref anInfoMap )
+  PropertyInterfaceBase::convertInfoMapToPolymorph( StringMap const& anInfoMap )
   {
     return convertStringMapToPolymorph( anInfoMap );
   }

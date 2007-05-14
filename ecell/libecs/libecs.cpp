@@ -34,6 +34,11 @@
 
 namespace libecs
 {
+  int const MAJOR_VERSION( ECELL_MAJOR_VERSION );
+  int const MINOR_VERSION( ECELL_MINOR_VERSION );
+  int const MICRO_VERSION( ECELL_MICRO_VERSION );
+
+  char const* const VERSION_STRING( ECELL_VERSION_STRING );
 
   void setDMSearchPath( const std::string& path )
   {

@@ -14,14 +14,17 @@ AM_INIT_AUTOMAKE([ecell],${ECELL_VERSION_NUMBER})
 
 ECELL_DIRNAME=${PACKAGE}-${ECELL_MAJOR_VERSION}.${ECELL_MINOR_VERSION}
 
+ECELL_VERSION_STRING=\"${ECELL_VERSION_NUMBER}\"
+
 AC_DEFINE_UNQUOTED( ECELL_MAJOR_VERSION, ${ECELL_MAJOR_VERSION},[] )
 AC_DEFINE_UNQUOTED( ECELL_MINOR_VERSION, ${ECELL_MINOR_VERSION},[] )
 AC_DEFINE_UNQUOTED( ECELL_MICRO_VERSION, ${ECELL_MICRO_VERSION},[] )
-AC_DEFINE_UNQUOTED( ECELL_VERSION_STRING, "${ECELL_VERSION_NUMBER}",[] )
+AC_DEFINE_UNQUOTED( ECELL_VERSION_STRING, ${ECELL_VERSION_STRING},[] )
 AC_SUBST( ECELL_DIRNAME )
 AC_SUBST( ECELL_MAJOR_VERSION )
 AC_SUBST( ECELL_MINOR_VERSION )
 AC_SUBST( ECELL_MICRO_VERSION )
+AC_SUBST( ECELL_VERSION_STRING )
 
 
 AM_SANITY_CHECK
@@ -162,57 +165,21 @@ dnl Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_CHECK_HEADERS(fcntl.h unistd.h)
-dnl
-dnl stl
-dnl
-dnl AC_CHECK_HEADER(stl.h,,
-dnl         AC_MSG_ERROR([stl.h not found.])
-dnl )
-AC_CHECK_HEADERS(math,ac_ch_math=yes,)
-AC_CHECK_HEADERS(cmath,ac_ch_cmath=yes,)
-if test "$ac_ch_cmath" == "yes"; then
-    AC_MSG_CHECKING(for INFINITY)
-    AC_CACHE_VAL(ac_cv_func_or_macro_infinity,
-        [AC_TRY_LINK(
-            [#include <cmath>],
-            [double inf = INFINITY;],
-            [ac_cv_func_or_macro_infinity=yes],
-            [ac_cv_func_or_macro_infinity=no])])
-    if [[ $ac_cv_func_or_macro_infinity == yes ]]; then
-        AC_DEFINE(HAVE_INFINITY, 1, Define to 1 if INFINITY is supported.)
-        AC_MSG_RESULT(yes)
-    else
-        AC_MSG_RESULT(no)
-    fi
-elif test "$ac_ch_math" == "yes"; then
-    AC_MSG_CHECKING(for INFINITY)
-    AC_CACHE_VAL(ac_cv_func_or_macro_infinity,
-        [AC_TRY_LINK(
-            [#include <cmath>],
-            [double inf = INFINITY;],
-            [ac_cv_func_or_macro_infinity=yes],
-            [ac_cv_func_or_macro_infinity=no])])
-    if [[ $ac_cv_func_or_macro_infinity == yes ]]; then
-        AC_DEFINE(HAVE_INFINITY, 1, Define to 1 if INFINITY is supported.)
-        AC_MSG_RESULT(yes)
-    else
-        AC_MSG_RESULT(no)
-    fi
+
+ECELL_CHECK_MATH_HEADER
+ECELL_CHECK_INFINITY
+ECELL_CHECK_HUGE_VAL
+
+if test "$HAVE_INFINITY" = 1; then
+  INFINITY_VAL="INFINITY"
+elif test "$HAVE_HUGE_VAL" = 1; then
+  INFINITY_VAL="HUGE_VAL"
 fi
-AC_CHECK_HEADERS(windows.h,,)
-AC_MSG_CHECKING(for __PRETTY_FUNCTION__)
-AC_CACHE_VAL(ac_cv_macro_pf,
-    [AC_TRY_LINK(
-        [#include <stdio.h>],
-        [const char* pf = __PRETTY_FUNCTION__;],
-        [ac_cv_macro_pf=yes],
-        [ac_cv_macro_pf=no])])
-if [[ $ac_cv_macro_pf == yes ]]; then
-    AC_DEFINE(HAVE_PRETTY_FUNCTION, 1, Define to 1 if __PRETTY_FUNCTION__ is supported.)
-    AC_MSG_RESULT(yes)
-else
-    AC_MSG_RESULT(no)
-fi
+AC_SUBST([INFINITY_VAL])
+
+AC_CHECK_HEADERS([windows.h])
+ECELL_CHECK_PRETTY_FUNCTION
+
 AC_ARG_WITH(msvc, [  --with-msvc             create dmtool_config.h 4 MSVC])
 if test "${with_msvc}" == "yes"; then
     msvcFlag=1
@@ -280,6 +247,16 @@ AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
 AC_TYPE_SIGNAL
 AC_C_LONG_DOUBLE
+if test "$HAVE_LONG_DOUBLE" = 1; then
+  HIGHREAL_TYPE="long double"
+  HIGHREAL_IS_REAL=0
+else
+  HIGHREAL_TYPE="double"
+  HIGHREAL_IS_REAL=1
+fi
+AC_SUBST([HIGHREAL_TYPE])
+AC_SUBST([HIGHREAL_IS_REAL])
+
 AC_LANG_POP([])
 
 AC_CHECK_SIZEOF(int)
@@ -302,6 +279,7 @@ AC_CONFIG_FILES([pyecell/ecell3-session-gui], [chmod +x pyecell/ecell3-session-g
 AC_CONFIG_FILES([pyecell/ecell3-session-manager],
                 [chmod +x pyecell/ecell3-session-manager])
 AC_CONFIG_FILES([Makefile
+                 libecs/Defs.hpp  
                  libecs/Makefile
                  libecs/tests/Makefile
                  libemc/Makefile

@@ -98,8 +98,6 @@ StepperMaker.hpp\
 SystemMaker.hpp\
 DataPoint.hpp\
 DataPointVector.hpp\
-VVector.h\
-osif.h\
 PhysicalLogger.hpp\
 Logger.hpp\
 LoggerAdapter.hpp\
@@ -111,10 +109,9 @@ DynamicPriorityQueue.hpp\
 FluxProcess.hpp\
 MethodProxy.hpp
 
-TESTS= \
-	tests/DynamicPriorityQueue_test \
-	tests/DataPointAggregator_test \
-	tests/FullID_test
+noinst_HEADERS=\
+osif.h\
+VVector.h
 
 all-local: libecs$(SHLEXT)
 

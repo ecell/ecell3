@@ -45,7 +45,7 @@ namespace libecs
   } //
 
   __STRINGCAST_SPECIALIZATION_DEF( String, Real );
-#if !defined( HIGHREAL_IS_REAL )
+#if !HIGHREAL_IS_REAL
   __STRINGCAST_SPECIALIZATION_DEF( String, HighReal );
 #endif
   __STRINGCAST_SPECIALIZATION_DEF( String, Integer );
@@ -61,7 +61,7 @@ namespace libecs
 
   /* original:
   __STRINGCAST_SPECIALIZATION_DEF( Real, String );
-#if !defined( HIGHREAL_IS_REAL )
+#i !HIGHREAL_IS_REAL
   __STRINGCAST_SPECIALIZATION_DEF( HighReal, String );
 #endif
   */
@@ -99,7 +99,7 @@ namespace libecs
     return stringToFloat<Real>( aValue );
   }
 
-#if !defined( HIGHREAL_IS_REAL )
+#if !HIGHREAL_IS_REAL
   template<>
   const HighReal stringCast<HighReal,String>( StringCref aValue )
   {
@@ -143,7 +143,7 @@ namespace libecs
 
 
 
-  const Polymorph convertStringMapToPolymorph( StringMapCref aMap )
+  const Polymorph convertStringMapToPolymorph( StringMap const& aMap )
   {
     PolymorphVector aVector;
     aVector.reserve( aMap.size() );

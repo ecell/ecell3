@@ -35,17 +35,17 @@
 #include <float.h>
 #include <string>
 #include <time.h>
-#include <cmath>
+#include @STD_MATH_HEADER@
 
 #include <boost/call_traits.hpp>
 #include <boost/smart_ptr.hpp>
 
 #define DEBUG 1
 
-#define ECELL_MAJOR_VERSION 3
-#define ECELL_MINOR_VERSION 1
-#define ECELL_MICRO_VERSION 105
-#define ECELL_VERSION_STRING "3.1.105"
+#define ECELL_MAJOR_VERSION @ECELL_MAJOR_VERSION@
+#define ECELL_MINOR_VERSION @ECELL_MINOR_VERSION@
+#define ECELL_MICRO_VERSION @ECELL_MICRO_VERSION@
+#define ECELL_VERSION_STRING @ECELL_VERSION_STRING@
 
 // stringifiers.  see preprocessor manual
 #define XSTR( S ) STR( S )
@@ -403,8 +403,8 @@ typedef const mytype & mytype ## Cref;
   DECLARE_TYPE( double, Real );
   typedef Param<Real>::type RealParam;
 
-  DECLARE_TYPE( double, HighReal );
-# define HIGHREAL_IS_REAL 1
+  DECLARE_TYPE( @HIGHREAL_TYPE@, HighReal );
+# define HIGHREAL_IS_REAL @HIGHREAL_IS_REAL@
   typedef Param<HighReal>::type HighRealParam;
     
   //  DECLARE_TYPE( HighReal, Time );
@@ -412,7 +412,7 @@ typedef const mytype & mytype ## Cref;
   typedef Param<Time>::type TimeParam;
     
   //! Infinity.  Currently this is defined as INFINITY symbol of C99 standard.
-  const Real INF( INFINITY );
+  const Real INF( @INFINITY_VAL@ );
 
   //! Avogadro number. 
   const Real N_A( 6.0221367e+23 );
@@ -621,8 +621,8 @@ static int lt_dlsetsearchpath(const char *search_path)
 
 /*
   Do not modify
-  $Author$
-  $Revision$
+  $Author: sachiboo $
+  $Revision: 2616 $
   $Date$
   $Locker$
 */

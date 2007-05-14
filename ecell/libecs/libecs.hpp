@@ -32,7 +32,9 @@
 #define __LIBECS_HPP
 
 #include "Defs.hpp"
-
+#include <list>
+#include <vector>
+#include <map>
 
 namespace libecs
 {
@@ -45,11 +47,11 @@ namespace libecs
   /** @file */
 
 
-  const int MAJOR_VERSION( ECELL_MAJOR_VERSION );
-  const int MINOR_VERSION( ECELL_MINOR_VERSION );
-  const int MICRO_VERSION( ECELL_MICRO_VERSION );
+  extern int const MAJOR_VERSION;
+  extern int const MINOR_VERSION;
+  extern int const MICRO_VERSION;
 
-  const char* const VERSION_STRING( ECELL_VERSION_STRING );
+  extern char const* const VERSION_STRING;
 
 
   inline const int getMajorVersion()
@@ -89,9 +91,9 @@ namespace libecs
 
 
   // string STL containers.
-  DECLARE_LIST  ( String, StringList );
-  DECLARE_VECTOR( String, StringVector );
-  DECLARE_MAP( const String, String, std::less<const String>, StringMap );
+  typedef std::list<String> StringList;
+  typedef std::vector<String> StringVector;
+  typedef std::map<const String, String, std::less<const String> > StringMap;
   DECLARE_SHAREDPTR( StringList );
   DECLARE_SHAREDPTR( StringVector );
 

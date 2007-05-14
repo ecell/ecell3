@@ -418,6 +418,3 @@ namespace libecs
   $Date$
   $Locker$
 */
-
-
-

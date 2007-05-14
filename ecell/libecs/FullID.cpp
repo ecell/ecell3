@@ -86,7 +86,7 @@ namespace libecs
 
   const String SystemPath::getString() const
   {
-    StringListConstIterator i = begin();
+    StringList::const_iterator i = begin();
     String aString;
 
     if( isAbsolute() )

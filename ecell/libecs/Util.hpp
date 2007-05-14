@@ -534,7 +534,7 @@ namespace libecs
       return n * fact( n-1 );
   }
   
-  const Polymorph convertStringMapToPolymorph( StringMapCref aMap );
+  const Polymorph convertStringMapToPolymorph( StringMap const& aMap );
 
 
   //@}

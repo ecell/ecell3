@@ -27,13 +27,53 @@
 // written by Gabor Bereczki <gabor.bereczki@talk21.com>
 //
 
-#include "libecs.hpp"
+#include "VVector.h"
 
 #include "PhysicalLogger.hpp"
+#include "libecs.hpp"
+
 //#include <stdio.h>
 
 namespace libecs
 {
+  PhysicalLogger::PhysicalLogger()
+    : theVector( new Vector() )
+  {
+    setMaxSize( 0 ); // no limit
+  }
+
+  PhysicalLogger::~PhysicalLogger()
+  {
+    delete theVector;
+  }
+	
+  void PhysicalLogger::push( DataPointCref aDataPoint )
+  {
+    theVector->push_back( aDataPoint );
+  }
+
+  void PhysicalLogger::setEndPolicy( Integer anEndPolicy )
+  {
+    theVector->setEndPolicy ( anEndPolicy );
+  }
+
+  int PhysicalLogger::getEndPolicy() const
+  {
+    return theVector->getEndPolicy();
+  }
+
+    /// set max storage size in Kbytes.
+
+  void PhysicalLogger::setMaxSize( size_type aMaxSize )
+  {
+    theMaxSize = aMaxSize;
+    theVector->setMaxSize( ( theMaxSize * 1024 ) / sizeof( DataPoint ) );
+  }
+
+  LongDataPoint PhysicalLogger::at( size_type index) const
+  {
+    return (*theVector)[ index ];
+  }
 
   PhysicalLogger::size_type 
   PhysicalLogger::lower_bound( const size_type start,
@@ -249,7 +289,7 @@ namespace libecs
   
   PhysicalLogger::size_type PhysicalLogger::size() const
   {
-    return theVector.size();
+    return theVector->size();
   }
   
   

@@ -32,8 +32,8 @@
 #ifndef __DYNAMICMODULE_HPP
 #define __DYNAMICMODULE_HPP
 
+#include <ltdl.h>
 #include <exception>
-#include "ecell/libecs/Defs.hpp"
 #include <string>
 
 

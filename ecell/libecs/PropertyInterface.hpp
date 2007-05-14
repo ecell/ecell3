@@ -88,9 +88,9 @@ namespace libecs
     }
 
     static const Polymorph 
-    convertInfoMapToPolymorph( StringMapCref anInfoMap );
+    convertInfoMapToPolymorph( StringMap const& anInfoMap );
 
-    virtual StringMapCref getClassInfoMap() = 0;
+    virtual StringMap const& getClassInfoMap() = 0;
 
     */
 
@@ -453,7 +453,7 @@ namespace libecs
 				       aFieldName, anInfoString );
     }
 
-    virtual StringMapCref getClassInfoMap()
+    virtual StringMap const& getClassInfoMap()
     {
       return theClassInfoMap;
     }
@@ -469,7 +469,7 @@ namespace libecs
       aPropertySlotPtr->setClassInfo( aFieldName, anInfoString );
     }
 
-    static StringMapCref
+    static StringMap const&
     getPropertySlotInfoMap( StringCref aPropertySlotName )
     {
       PropertySlotCptr 

@@ -32,16 +32,14 @@
 #define __PHYSICALLOGGER_HPP
 
 #include "libecs.hpp"
-
-#include "VVector.h"
-
 #include "Exceptions.hpp"
 #include "DataPoint.hpp"
 #include "DataPointVector.hpp"
 
+template <typename T> class vvector;
+
 namespace libecs
 {
-
 
   /** @addtogroup logging
    *@{
@@ -60,42 +58,20 @@ namespace libecs
     
   public:
 
-    DECLARE_TYPE( Vector::size_type, VectorIterator );
-    DECLARE_TYPE( Vector::size_type, size_type );
+    DECLARE_TYPE( size_t, VectorIterator );
+    DECLARE_TYPE( size_t, size_type );
 
-    PhysicalLogger()
-    {
-      setMaxSize( 0 ); // no limit
-    }
-
-    virtual ~PhysicalLogger()
-    {
-      ; // do nothing
-    }
+    PhysicalLogger();
+    virtual ~PhysicalLogger();
 	
-    void push( DataPointCref aDataPoint )
-    {
-      theVector.push_back( aDataPoint );
-    }
+    void push( DataPointCref aDataPoint );
 
-    void setEndPolicy( Integer anEndPolicy )
-    {
-      theVector.setEndPolicy ( anEndPolicy );
-    }
+    void setEndPolicy( Integer anEndPolicy );
 
-    int getEndPolicy() const
-    {
-      return theVector.getEndPolicy();
-    }
+    int getEndPolicy() const;
 
     /// set max storage size in Kbytes.
-
-    void setMaxSize( size_type aMaxSize )
-    {
-      theMaxSize = aMaxSize;
-      theVector.setMaxSize( ( theMaxSize * 1024 ) / 
-			    sizeof( DataPoint ) );
-    }
+    void setMaxSize( size_type aMaxSize );
 
     size_type getMaxSize() const
     {
@@ -140,11 +116,8 @@ namespace libecs
     bool empty() const;
 
 
-    LongDataPoint at( size_type index) const
-    {
-      return theVector[ index ];
-    }
-    
+    LongDataPoint at( size_type index) const;
+
     size_type begin() const
     {
       return 0;
@@ -189,7 +162,7 @@ namespace libecs
   private:
 
     // this mutable can be removed if vvector supports const operations
-    mutable Vector      theVector;
+    Vector         *theVector;
 
     size_type      theMaxSize;
 
