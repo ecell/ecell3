@@ -31,9 +31,6 @@
 #ifndef __ODE23_HPP
 #define __ODE23_HPP
 
-
-// #include <iostream>
-
 #include "libecs/DifferentialStepper.hpp"
 
 USE_LIBECS;

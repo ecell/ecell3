@@ -31,11 +31,6 @@
 #ifndef __STEPPER_HPP
 #define __STEPPER_HPP
 
-//#include <vector>
-//#include <algorithm>
-//#include <utility>
-//#include <iostream>
-
 #include <gsl/gsl_rng.h>
 
 #include "libecs.hpp"

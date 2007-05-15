@@ -31,7 +31,6 @@
 #ifndef __PROPERTYSLOTPROXY_HPP
 #define __PROPERTYSLOTPROXY_HPP
 
-#include <iostream>
 #include <functional>
 
 #include "libecs.hpp"

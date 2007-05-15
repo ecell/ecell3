@@ -31,9 +31,6 @@
 #ifndef __ESSYNSSTEPPER_HPP
 #define __ESSYNSSTEPPER_HPP
 
-
-// #include <iostream>
-
 #include "libecs/DifferentialStepper.hpp"
 #include "ESSYNSProcess.hpp"
 

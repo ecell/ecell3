@@ -31,9 +31,6 @@
 #ifndef __ODE45_HPP
 #define __ODE45_HPP
 
-
-// #include <iostream>
-
 #include "libecs/Interpolant.hpp"
 #include "libecs/DifferentialStepper.hpp"
 
