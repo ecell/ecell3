@@ -40,8 +40,6 @@
 #include "libemc.hpp"
 #include "SimulatorImplementation.hpp"
 
-
-#include <stdio.h>
 namespace libemc
 {
   
