@@ -30,8 +30,6 @@
 
 #include <limits>
 
-#include "boost/array.hpp"
-
 #include "Util.hpp"
 #include "Variable.hpp"
 #include "Interpolant.hpp"
@@ -39,6 +37,8 @@
 #include "Model.hpp"
 
 #include "DifferentialStepper.hpp"
+
+#include <boost/array.hpp>
 
 
 namespace libecs
