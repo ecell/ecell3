@@ -640,7 +640,7 @@ Real ODEStepper::estimateLocalError()
 
   if ( anError < 1.0 ) return anError;
   
-  if ( theFirstStepFlag or theRejectedStepFlag )
+  if ( theFirstStepFlag || theRejectedStepFlag )
     {
       fireProcesses();
       setVariableVelocity( theW[ 4 ] );
