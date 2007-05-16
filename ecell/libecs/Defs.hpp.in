@@ -35,6 +35,7 @@
 #include <float.h>
 #include <string>
 #include <time.h>
+#include <limits>
 #include @STD_MATH_HEADER@
 
 #include <boost/call_traits.hpp>
@@ -411,7 +412,7 @@ typedef const mytype & mytype ## Cref;
   DECLARE_TYPE( Real, Time );
   typedef Param<Time>::type TimeParam;
     
-  //! Infinity.  Currently this is defined as INFINITY symbol of C99 standard.
+  //! Infinity.
   const Real INF( @INFINITY_VAL@ );
 
   //! Avogadro number. 

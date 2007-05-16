@@ -158,7 +158,7 @@ AC_DEFUN([ECELL_CHECK_INFINITY], [
     ])
   ])
   if test "$ac_cv_func_or_macro_infinity" = "yes"; then
-    AC_DEFINE(HAVE_INFINITY, 1, [Define to 1 if INFINITY is supported.])
+    AC_DEFINE(HAVE_INFINITY, 1, [Define to 1 if INFINITY is available.])
     AC_MSG_RESULT(yes)
     HAVE_INFINITY=1
   else
@@ -180,7 +180,7 @@ AC_DEFUN([ECELL_CHECK_HUGE_VAL], [
     ])
   ])
   if test "$ac_cv_func_or_macro_huge_val" = "yes"; then
-    AC_DEFINE(HAVE_HUGE_VAL, 1, [Define to 1 if HUGE_VAL is supported.])
+    AC_DEFINE(HAVE_HUGE_VAL, 1, [Define to 1 if HUGE_VAL is available.])
     AC_MSG_RESULT(yes)
     HAVE_HUGE_VAL=1
   else
@@ -188,6 +188,29 @@ AC_DEFUN([ECELL_CHECK_HUGE_VAL], [
     HAVE_HUGE_VAL=
   fi
 ])
+
+AC_DEFUN([ECELL_CHECK_NUMERIC_LIMITS_DOUBLE_INFINITY], [
+  AC_MSG_CHECKING(for numeric_limits<double>::infinity())
+  AC_CACHE_VAL([ac_cv_func_or_macro_numeric_limits_double_infinity], [
+    AC_TRY_COMPILE(
+    [#include <limits>], [
+      double inf(std::numeric_limits<double>::infinity());
+    ], [
+      ac_cv_func_or_macro_numeric_limits_double_infinity=yes
+    ], [
+      ac_cv_func_or_macro_numeric_limits_double_infinity=no
+    ])
+  ])
+  if test "$ac_cv_func_or_macro_numeric_limits_double_infinity" = "yes"; then
+    AC_DEFINE(HAVE_NUMERIC_LIMITS_DOUBLE_INFINTIY, 1, [Define to 1 if std::numeric_limits<double>::infinity() is available.])
+    AC_MSG_RESULT(yes)
+    HAVE_NUMERIC_LIMITS_DOUBLE_INFINITY=1
+  else
+    AC_MSG_RESULT(no)
+    HAVE_NUMERIC_LIMITS_DOUBLE_INFINITY=
+  fi
+])
+
 
 AC_DEFUN([ECELL_CHECK_PRETTY_FUNCTION], [
   AC_MSG_CHECKING(for __PRETTY_FUNCTION__)
