@@ -2,6 +2,16 @@ AUTOMAKE_OPTIONS = foreign # 1.5
 
 SUBDIRS = ecell
 
+all-local:
+	$(PYTHON) setup.py config
+	$(PYTHON) setup.py build
+
+mostlyclean-local:
+	$(PYTHON) setup.py clean
+
+install-exec-local:
+	$(PYTHON) setup.py install --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )
+
 # Windows py2exe setup options, ignore for Unix based systems
 PY2EXE_SETUP = ../pyecs/windows/py2exeSetup
 WIN_ICON = ../pyecs/windows/ecell3-console.ico

@@ -1,8 +1,4 @@
-AUTOMAKE_OPTIONS = foreign
-
-pkgpyexecdir=@pkgpyexecdir@/analysis
-
-pkgpyexec_PYTHON=\
+EXTRA_DISTS=\
 __init__.py\
 ControlCoefficient.py\
 Elasticity.py\

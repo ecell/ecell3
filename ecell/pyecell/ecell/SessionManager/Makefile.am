@@ -1,8 +1,4 @@
-AUTOMAKE_OPTIONS = foreign
-
-pkgpyexecdir=@pkgpyexecdir@/SessionManager
-
-pkgpyexec_PYTHON=\
+EXTRA_DISTS=\
 __init__.py\
 Globus2SessionProxy.py\
 Globus2SystemProxy.py\

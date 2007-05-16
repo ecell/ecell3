@@ -9,12 +9,8 @@ SUBDIRS = SessionManager\
 analysis
 
 CXX_FLAGS=@CXX_FLAGS@
-PYTHON_INCLUDES=@PYTHON_INCLUDES@
-pkgpyexecdir=@pkgpyexecdir@
 
-LIBS=  # do not need gsl and gslcblas linked
-
-pkgpyexec_PYTHON=\
+EXTRA_DISTS=\
 __init__.py\
 EntityStub.py\
 LoggerStub.py\
@@ -53,13 +49,3 @@ expressionlextab.py\
 expressionparser.py\
 expressionparsetab.py\
 ModelWalker.py
-
-INCLUDES=-I. -I.. ${PYTHON_INCLUDES}
-
-pkgpyexec_LTLIBRARIES = _tableio.la
-
-_tableio_la_LDFLAGS=-module -export-dynamic -avoid-version $(no_undefined)
-_tableio_la_LIBADD= $(LIBPYTHON)
-_tableio_la_SOURCES = \
-_tableio.c
-
