@@ -28,6 +28,7 @@
 // E-Cell Project.
 //
 
+#include <iostream>
 #include <signal.h>
 
 #include "libemc/libemc.hpp"
