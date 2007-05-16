@@ -78,7 +78,8 @@ namespace libecs
 		i( theProcessVector.begin() + getDiscreteProcessOffset() );
 	      i < theProcessVector.end(); ++i )
 	  {
-	    std::cerr << "WARNING: Process [" << (*i)->getID() << "] is not continuous." << std::endl;
+	    // XXX: To be addressed later.
+	    // std::cerr << "WARNING: Process [" << (*i)->getID() << "] is not continuous." << std::endl;
 	  }
       }
 
