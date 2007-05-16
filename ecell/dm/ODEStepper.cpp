@@ -472,7 +472,8 @@ bool ODEStepper::calculateRadauIIA()
     {
       if ( anIterator == getMaxIterationNumber() )
 	{
-	  std::cerr << "matrix is repeatedly singular" << std::endl;
+	  // XXX: this will be addressed somehow.
+	  // std::cerr << "matrix is repeatedly singular" << std::endl;
 	  break;
 	}
 
