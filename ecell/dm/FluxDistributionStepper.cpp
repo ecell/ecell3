@@ -45,12 +45,7 @@ FluxDistributionStepper::FluxDistributionStepper()
   theIrreversibleFlag( false ),
   Epsilon( 1e-6 )
 {
-  // gcc3 doesn't currently support numeric_limits::infinity.
-  // using max() instead.
-  const Real anInfinity( std::numeric_limits<Real>::max() *
-			 std::numeric_limits<Real>::max() );
-
-  initializeStepInterval( anInfinity );
+  initializeStepInterval( INF );
 }
 
 FluxDistributionStepper::~FluxDistributionStepper()
