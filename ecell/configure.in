@@ -290,6 +290,7 @@ AC_CONFIG_FILES([Makefile
                  pyecs/windows/Makefile
                  pyecs/windows/ecell3-installer.iss
                  pyecs/windows/pathVariables
+                 pyecell/setup.py
                  pyecell/Makefile
                  pyecell/ecell/Makefile
                  pyecell/ecell/SessionManager/Makefile
