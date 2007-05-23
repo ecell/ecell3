@@ -1,7 +1,10 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = @ECELL_SUBDIRS@
+SUBDIRS = libecs libemc pyecs pyecell bin dm
+if WITH_GTK
+SUBDIRS += session-monitor model-editor toollauncher
+endif
 
 ECELL_DIRNAME=@ECELL_DIRNAME@
 

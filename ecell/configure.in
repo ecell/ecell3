@@ -42,11 +42,9 @@ AC_SUBST(PREFIX)
 dnl
 AC_ARG_WITH(gtk,
   AC_HELP_STRING([--without-gtk],
-                 [build ecell without gtk library.]),
-  [ECELL_SUBDIRS="libecs libemc pyecs pyecell bin dm"],
-  [ECELL_SUBDIRS="libecs libemc pyecs pyecell bin dm session-monitor model-editor toollauncher"]
+                 [build ecell without gtk library.])
 )
-AC_SUBST( ECELL_SUBDIRS )
+AM_CONDITIONAL(WITH_GTK, test "$with_GTK" != "no")
 dnl
 
 
