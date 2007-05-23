@@ -126,6 +126,7 @@ namespace libecs
   DECLARE_CLASS( PropertiedClass );
   DECLARE_CLASS( PropertySlotProxy );
   DECLARE_CLASS( Polymorph );
+  DECLARE_CLASS( PolymorphValue );
   DECLARE_CLASS( LoggerBroker );
   DECLARE_CLASS( Logger );
   DECLARE_CLASS( LoggerAdapter );
@@ -133,7 +134,10 @@ namespace libecs
   DECLARE_CLASS( LongDataPoint );
   DECLARE_CLASS( DataPointAggregator );
   DECLARE_CLASS( DataPointVector );
-
+  DECLARE_CLASS( EventBase );
+  DECLARE_CLASS( DifferentialStepper );
+  DECLARE_CLASS( AdaptiveDifferentialStepper );
+  DECLARE_CLASS( ProcessEvent );
 
   // containers
   DECLARE_VECTOR( Polymorph,    PolymorphVector );

@@ -49,8 +49,6 @@ namespace libecs
 
   /** @file */
   
-  DECLARE_CLASS( PolymorphValue );
-
   class PolymorphValue
   {
 

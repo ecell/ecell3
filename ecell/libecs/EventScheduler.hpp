@@ -48,9 +48,6 @@ namespace libecs
 
   /** @file */
 
-  DECLARE_CLASS( EventBase );
-
-
   /**
      EventBase
 

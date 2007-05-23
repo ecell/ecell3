@@ -40,9 +40,6 @@ namespace libecs
 {
 
   /** @file */
-
-  DECLARE_CLASS( StepperEvent );
-
   class StepperEvent
     :
     public EventBase

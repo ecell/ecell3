@@ -60,8 +60,6 @@ namespace libecs
   typedef std::vector< ExprComponent > VariableReferenceList;
   typedef std::vector< VariableReferenceList > VariableReferenceListVector;
 
-  DECLARE_CLASS( DifferentialStepper );
-
   LIBECS_DM_CLASS( DifferentialStepper, Stepper )
   {
 
@@ -359,8 +357,6 @@ namespace libecs
 
 
   */
-
-  DECLARE_CLASS( AdaptiveDifferentialStepper );
 
   LIBECS_DM_CLASS( AdaptiveDifferentialStepper, DifferentialStepper )
   {
