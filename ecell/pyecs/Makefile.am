@@ -39,6 +39,8 @@ CFLAGS=${CXXFLAGS}
 
 pkgpyexec_LTLIBRARIES = _ecs.la _emc.la
 
+pkgpyexec_PYTHON = ecs.py emc.py ecsinit.py
+
 pyecsdir=${ECELL_INCLUDE_DIR}/pyecs
 pyecs_HEADERS=\
 PyEcs.hpp PyEmc.hpp

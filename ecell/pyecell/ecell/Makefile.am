@@ -20,9 +20,6 @@ DataFileManager.py\
 DataFile.py\
 ECDDataFile.py\
 ecs_constants.py\
-ecs.py\
-ecsinit.py\
-emc.py\
 Session.py\
 ecssupport.py\
 FullID.py\
