@@ -284,15 +284,13 @@ AC_CONFIG_FILES([Makefile
                  libecs/Makefile
                  libecs/tests/Makefile
                  libemc/Makefile
+                 pyecs/setup.py
                  pyecs/Makefile
                  pyecs/windows/Makefile
                  pyecs/windows/ecell3-installer.iss
                  pyecs/windows/pathVariables
                  pyecell/setup.py
                  pyecell/Makefile
-                 pyecell/ecell/Makefile
-                 pyecell/ecell/SessionManager/Makefile
-                 pyecell/ecell/analysis/Makefile
                  dm/Makefile])
 AC_CONFIG_FILES([bin/Makefile
                  bin/ecell3-dmc

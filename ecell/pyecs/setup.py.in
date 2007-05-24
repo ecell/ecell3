@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+
+import os
+import sys
+from distutils.core import setup, Extension
+
+include_dirs = [
+    '@DMTOOL_INCLUDE_DIR@',
+    '@NUMPY_INCLUDE_DIR@',
+    '@INCLTDL@'[2:],
+    '@top_srcdir@',
+    '@top_srcdir@/libecs',
+    '@top_srcdir@/libemc',
+    ]
+
+common_libraries = [
+    'boost_python',
+    ]
+
+ecell_staging_home = '@top_srcdir@/tmp'
+
+setup(
+    name = 'E-Cell',
+    version = @ECELL_VERSION_STRING@,
+    description = 'E-Cell python library',
+    author = 'E-Cell project',
+    author_email = 'info@e-cell.org',
+    url = 'http://www.e-cell.org/',
+    packages = [ 'ecell' ],
+    ext_modules = [
+        Extension(
+            'ecell._ecs',
+            include_dirs = include_dirs,
+            library_dirs = [ ecell_staging_home + os.environ['libdir'] ],
+            libraries = common_libraries + [ 'ecs' ],
+            define_macros = sys.platform == 'win32' and
+				[ ('WIN32','1'), ('_WIN32','1') ],
+            sources = [ 'PyEcs.cpp' ] ),
+        Extension(
+            'ecell._emc',
+            include_dirs = include_dirs,
+            library_dirs = [ ecell_staging_home + os.environ['libdir'] ],
+            libraries = common_libraries + [ 'ecs', 'emc' ],
+            define_macros = sys.platform == 'win32' and
+				[ ('WIN32','1'), ('_WIN32','1') ],
+            sources = [ 'PyEmc.cpp' ] )
+        ]
+    )

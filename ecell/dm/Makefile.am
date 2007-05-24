@@ -99,7 +99,7 @@ dmsodir = ${DM_SO_DIR}
 dmso_DATA = ${SOS} ${DESCS}
 
 %$(LTDL_SHLIB_EXT) : %.cpp
-	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L${top_srcdir}/libecs " --cxxflags='${CXXFLAGS} -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} -I${top_srcdir}/../libltdl  ${PYTHON_INCLUDES} ' $< 
+	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L$(abspath $(top_srcdir))/tmp$(libdir) " --cxxflags='${CXXFLAGS} -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} -I${top_srcdir}/../libltdl  ${PYTHON_INCLUDES} ' $< 
 
 clean-local:
 	${RM} -rf ${SOS}

@@ -37,3 +37,11 @@ LocalSimulatorImplementation.hpp\
 Simulator.hpp\
 SimulatorImplementation.hpp\
 SimulatorMaker.hpp
+
+ECELL_STAGING_HOME=$(abspath $(top_srcdir)/tmp)
+OUTPUT=$(ECELL_STAGING_HOME)$(libdir)/libemc$(SHLEXT)
+all-local: $(OUTPUT)
+
+$(OUTPUT): libemc.la
+	test -d $(ECELL_STAGING_HOME)$(libdir) || mkdir -p -- $(ECELL_STAGING_HOME)$(libdir)
+	$(LIBTOOL) --mode=install cp $< $(ECELL_STAGING_HOME)$(libdir)

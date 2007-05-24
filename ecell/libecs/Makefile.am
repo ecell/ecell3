@@ -113,7 +113,10 @@ noinst_HEADERS=\
 osif.h\
 VVector.h
 
-all-local: libecs$(SHLEXT)
+ECELL_STAGING_HOME=$(abspath $(top_srcdir)/tmp)
+OUTPUT=$(ECELL_STAGING_HOME)$(libdir)/libecs$(SHLEXT)
+all-local: $(OUTPUT)
 
-libecs$(SHLEXT): libecs.la
-	ln -sf .libs/libecs$(SHLEXT) ./libecs$(SHLEXT)
+$(OUTPUT): libecs.la
+	test -d $(ECELL_STAGING_HOME)$(libdir) || mkdir -p -- $(ECELL_STAGING_HOME)$(libdir)
+	$(LIBTOOL) --mode=install cp $< $(ECELL_STAGING_HOME)$(libdir)
