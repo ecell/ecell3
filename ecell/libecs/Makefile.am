@@ -113,7 +113,7 @@ noinst_HEADERS=\
 osif.h\
 VVector.h
 
-ECELL_STAGING_HOME=$(abspath $(top_srcdir)/tmp)
+ECELL_STAGING_HOME=$(abspath $(top_builddir)/tmp)
 OUTPUT=$(ECELL_STAGING_HOME)$(libdir)/libecs$(SHLEXT)
 all-local: $(OUTPUT)
 

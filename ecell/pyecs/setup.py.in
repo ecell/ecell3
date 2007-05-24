@@ -17,7 +17,7 @@ common_libraries = [
     'boost_python',
     ]
 
-ecell_staging_home = '@top_srcdir@/tmp'
+ecell_staging_home = '@top_builddir@/tmp'
 
 setup(
     name = 'E-Cell',

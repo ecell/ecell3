@@ -38,7 +38,7 @@ Simulator.hpp\
 SimulatorImplementation.hpp\
 SimulatorMaker.hpp
 
-ECELL_STAGING_HOME=$(abspath $(top_srcdir)/tmp)
+ECELL_STAGING_HOME=$(abspath $(top_builddir)/tmp)
 OUTPUT=$(ECELL_STAGING_HOME)$(libdir)/libemc$(SHLEXT)
 all-local: $(OUTPUT)
 
