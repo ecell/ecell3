@@ -29,17 +29,16 @@ if test "$DIE" -eq 1; then
         exit 1
 fi
 
-libtoolize -c --force
-
 case $CC in
 *xlc | *xlc\ * | *lcc | *lcc\ *) am_opt=--include-deps;;
 esac
 
 for dir in . libltdl dmtool ecell
   do 
-  echo -n Running autotools for $dir ...
+  echo -n "Running autotools for $dir ... "
   (cd $dir; \
-  { echo -n ' aclocal '; aclocal; } && \
+  { echo -n 'libtoolize '; libtoolize -c --force --automake; } && \
+  { echo -n 'aclocal '; aclocal; } && \
   { echo -n 'autoheader '; autoheader -f ; } && \
   { echo -n 'automake ';  automake --add-missing --gnu $am_opt; } && \
   { echo -n 'autoconf '; autoconf; } && \
