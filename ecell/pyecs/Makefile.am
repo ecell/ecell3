@@ -32,7 +32,7 @@ all-local:
 	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" libdir=$(libdir) $(PYTHON) setup.py build
 
 mostlyclean-local:
-	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" libdir=$(libdir) $(PYTHON) $(PYTHON) setup.py clean
+	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" libdir=$(libdir) $(PYTHON) setup.py clean
 	rm -rf build
 
 install-exec-local:
