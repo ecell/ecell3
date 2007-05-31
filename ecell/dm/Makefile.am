@@ -1,11 +1,11 @@
 
-SUFFIXES = .cpp @LTDL_SHLIB_EXT@
+LTDL_SHLIB_EXT := $(shell echo @LTDL_SHLIB_EXT@)
+
+SUFFIXES = .cpp $(LTDL_SHLIB_EXT)
 
 SHELL = @SHELL@
 
-LTDL_SHLIB_EXT = @LTDL_SHLIB_EXT@
-
-CXXFLAGS = @CXXFLAGS@
+AM_CXXFLAGS = @CXXFLAGS@
 
 if OS_WIN32
   ECELL3_DMC = ../bin/ecell3-dmc.exe
@@ -13,12 +13,12 @@ else
   ECELL3_DMC = ../pyecs/ecell3-python ../bin/ecell3-dmc
 endif
 
-ECELL_DIRNAME=@ECELL_DIRNAME@
+ECELL_DIRNAME = @ECELL_DIRNAME@
 
 DM_SO_DIR = ${libdir}/${ECELL_DIRNAME}/dms
 DM_SRC_DIR =  ${datadir}/${ECELL_DIRNAME}/dms
 
-PYTHON_INCLUDES=@PYTHON_INCLUDES@
+PYTHON_INCLUDES = @PYTHON_INCLUDES@
 
 DMS = MassActionFluxProcess.cpp\
 MichaelisUniUniFluxProcess.cpp\
@@ -93,13 +93,13 @@ EXTRA_DIST = ${DMS} ${DMH} ${DESCS}
 dmdir = ${DM_SRC_DIR}
 dm_DATA = ${DMS} ${DMH}
 
-SOS = ${DMS:.cpp=@LTDL_SHLIB_EXT@}
+SOS = ${DMS:.cpp=$(LTDL_SHLIB_EXT)}
 
 dmsodir = ${DM_SO_DIR}
 dmso_DATA = ${SOS} ${DESCS}
 
 %$(LTDL_SHLIB_EXT) : %.cpp
-	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L$(abspath $(top_srcdir))/tmp$(libdir) " --cxxflags='${CXXFLAGS} -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} -I${top_srcdir}/../libltdl  ${PYTHON_INCLUDES} ' $< 
+	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L$(abs_top_builddir)/tmp$(libdir) " --cxxflags='${CXXFLAGS} -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} -I${top_srcdir}/../libltdl  ${PYTHON_INCLUDES} ' $< 
 
 clean-local:
 	${RM} -rf ${SOS}

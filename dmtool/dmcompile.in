@@ -14,7 +14,7 @@ import getopt
 ORIG_CXXFLAGS = '@CXXFLAGS@'
 ORIG_CPPFLAGS = '@CPPFLAGS@'
 ORIG_LDFLAGS = '@LDFLAGS@'
-SHLEXT = '@LTDL_SHLIB_EXT@'
+SHLEXT = os.popen('echo @LTDL_SHLIB_EXT@').readline().rstrip()
 CXX = '@CXX@'
 CXXSUFFIX = '.cpp'
 CXXFLAGS = os.environ.get('CXXFLAGS','')
