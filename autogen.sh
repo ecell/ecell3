@@ -7,26 +7,31 @@ DIE=0
 
 PROJECT="E-Cell"
 
-(autoconf --version) < /dev/null > /dev/null 2>&1 || {
-        echo
-        echo "You must have autoconf installed to compile $PROJECT."
-        DIE=1
+if test -z "$AUTOCONF"; then
+    if autoconf --version < /dev/null > /dev/null 2>&1; then
+  echo
+  echo "You must have autoconf installed to compile $PROJECT."
+  DIE=1
 }
 
-(libtoolize --version) < /dev/null > /dev/null 2>&1 || {
-        echo
-        echo "You must have libtool installed to compile $PROJECT."
-        DIE=1
-}
+if libtoolize --version < /dev/null > /dev/null 2>&1; then
+  LIBTOOLIZE=libtoolize
+elif  glibtoolize --version < /dev/null > /dev/null 2>&1; then
+  LIBTOOLIZE=glibtoolize
+else
+  echo
+  echo "You must have libtool installed to compile $PROJECT."
+  DIE=1
+fi
 
 (automake --version) < /dev/null > /dev/null 2>&1 || {
-        echo
-        echo "You must have automake installed to compile $PROJECT."
-        DIE=1
+  echo
+  echo "You must have automake installed to compile $PROJECT."
+  DIE=1
 }
 
 if test "$DIE" -eq 1; then
-        exit 1
+  exit 1
 fi
 
 case $CC in
@@ -37,7 +42,7 @@ for dir in . libltdl dmtool ecell
   do 
   echo -n "Running autotools for $dir ... "
   (cd $dir; \
-  { echo -n 'libtoolize '; libtoolize -c --force --automake; } && \
+  { echo -n 'libtoolize '; $LIBTOOLIZE -c --force --automake; } && \
   { echo -n 'aclocal '; aclocal; } && \
   { echo -n 'autoheader '; autoheader -f ; } && \
   { echo -n 'automake ';  automake --add-missing --gnu $am_opt; } && \
