@@ -7,8 +7,7 @@ DIE=0
 
 PROJECT="E-Cell"
 
-if test -z "$AUTOCONF"; then
-    if autoconf --version < /dev/null > /dev/null 2>&1; then
+(autoconf --version) < /dev/null > /dev/null 2>&1 || {
   echo
   echo "You must have autoconf installed to compile $PROJECT."
   DIE=1
