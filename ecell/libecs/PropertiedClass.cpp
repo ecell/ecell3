@@ -30,6 +30,9 @@
 // modified by Masayuki Okayama <smash@e-cell.org>,
 // E-Cell Project.
 //
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include "PropertyInterface.hpp"
 #include "Exceptions.hpp"
@@ -126,6 +129,7 @@ namespace libecs
   template <> const TYPE PropertiedClass::nullGet<TYPE>() const\
   {\
     throwNotGetable();\
+    return TYPE(); \
   } //
 
   NULLGET_SPECIALIZATION_DEF( Real );
