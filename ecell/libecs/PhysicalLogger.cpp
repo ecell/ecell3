@@ -26,6 +26,9 @@
 //
 // written by Gabor Bereczki <gabor.bereczki@talk21.com>
 //
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include "VVector.h"
 
