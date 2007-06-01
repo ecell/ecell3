@@ -111,6 +111,8 @@
 #if defined( WIN32 )
 #include <windows.h>
 #include "unistd.h"
+#else
+#include <unistd.h>
 #endif
 
 #ifdef _MSC_VER
@@ -216,7 +218,7 @@ int osif_mkdir( const char *__name )
 #if defined( WIN32 )
     return CreateDirectory( __name, NULL ) ? 0: -1;
 #else
-    return mkdir( path, 0755 );
+    return mkdir( __name, 0755 );
 #endif
 }
 
