@@ -60,8 +60,12 @@ namespace libecs
   typedef std::vector< ExprComponent > VariableReferenceList;
   typedef std::vector< VariableReferenceList > VariableReferenceListVector;
 
+  DECLARE_CLASS( DifferentialStepper );
+
   LIBECS_DM_CLASS( DifferentialStepper, Stepper )
   {
+  public:
+    typedef VariableVector::size_type VariableIndex;
 
   public:
 
@@ -270,9 +274,9 @@ namespace libecs
 
   public:
 
-    ECELL_API DifferentialStepper();
+    LIBECS_API DifferentialStepper();
 
-    ECELL_API virtual ~DifferentialStepper();
+    LIBECS_API virtual ~DifferentialStepper();
 
     SET_METHOD( Real, NextStepInterval )
     {
@@ -301,19 +305,19 @@ namespace libecs
       setNextStepInterval( aStepInterval );
     }
 
-    ECELL_API void resetAll();
+    LIBECS_API void resetAll();
 
-    ECELL_API void interIntegrate();
+    LIBECS_API void interIntegrate();
 
     void initializeVariableReferenceList();
 
-    ECELL_API void setVariableVelocity( boost::detail::multi_array::sub_array<Real, 1> aVelocityBuffer );
+    LIBECS_API void setVariableVelocity( boost::detail::multi_array::sub_array<Real, 1> aVelocityBuffer );
  
-    ECELL_API virtual void initialize();
+    LIBECS_API virtual void initialize();
 
-    ECELL_API virtual void reset();
+    LIBECS_API virtual void reset();
 
-    ECELL_API virtual void interrupt( TimeParam aTime );
+    LIBECS_API virtual void interrupt( TimeParam aTime );
 
     virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
     {
@@ -358,6 +362,8 @@ namespace libecs
 
   */
 
+  DECLARE_CLASS( AdaptiveDifferentialStepper );
+
   LIBECS_DM_CLASS( AdaptiveDifferentialStepper, DifferentialStepper )
   {
 
@@ -383,9 +389,9 @@ namespace libecs
 
   public:
 
-    ECELL_API AdaptiveDifferentialStepper();
+    LIBECS_API AdaptiveDifferentialStepper();
 
-    ECELL_API virtual ~AdaptiveDifferentialStepper();
+    LIBECS_API virtual ~AdaptiveDifferentialStepper();
 
     /**
        Adaptive stepsize control.
@@ -482,9 +488,9 @@ namespace libecs
       return theRelativeEpsilon;
     }
 
-    ECELL_API virtual void initialize();
+    LIBECS_API virtual void initialize();
 
-    ECELL_API virtual void step();
+    LIBECS_API virtual void step();
 
     virtual bool calculate() = 0;
 

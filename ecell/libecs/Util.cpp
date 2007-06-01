@@ -27,6 +27,9 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include <limits>
 #include <time.h>
@@ -124,8 +127,8 @@ namespace libecs
       }
   }
 
-  void throwSequenceSizeError( const int aSize, 
-			       const int aMin, const int aMax )
+  void throwSequenceSizeError( const size_t aSize, 
+			       const size_t aMin, const size_t aMax )
   {
     THROW_EXCEPTION( RangeError,
 		     "Size of the sequence must be within [ " 
@@ -133,7 +136,7 @@ namespace libecs
 		     + " ] ( " + stringCast( aSize ) + " given)." );
   }
 
-  void throwSequenceSizeError( const int aSize, const int aMin )
+  void throwSequenceSizeError( const size_t aSize, const size_t aMin )
   {
     THROW_EXCEPTION( RangeError,
 		     "Size of the sequence must be at least " 
@@ -166,6 +169,25 @@ namespace libecs
 
 
 } // namespace libecs
+
+
+#ifdef UTIL_TEST
+
+#include <iostream>
+
+using namespace std;
+using namespace libecs;
+
+main()
+{
+  String str( "  \t  a bcde f\tghi\n\t jkl\n \tmnopq     \n   \t " );
+  eraseWhiteSpaces( str );
+  cerr << '[' << str << ']' << endl;
+
+}
+
+#endif /* UTIL_TEST */
+
 
 /*
   Do not modify

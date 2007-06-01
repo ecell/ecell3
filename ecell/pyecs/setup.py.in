@@ -9,6 +9,7 @@ include_dirs = [
     '@NUMPY_INCLUDE_DIR@',
     '@INCLTDL@'[2:],
     '@top_srcdir@',
+    '@top_srcdir@/../osdep/win32',
     '@top_srcdir@/libecs',
     '@top_srcdir@/libemc',
     ]
@@ -34,7 +35,7 @@ setup(
             library_dirs = [ ecell_staging_home + os.environ['libdir'] ],
             libraries = common_libraries + [ 'ecs' ],
             define_macros = sys.platform == 'win32' and
-				[ ('WIN32','1'), ('_WIN32','1') ],
+				[ ('WIN32','1'), ('_WIN32','1'), ('__STDC__', 1) ],
             sources = [ 'PyEcs.cpp' ] ),
         Extension(
             'ecell._emc',
@@ -42,7 +43,7 @@ setup(
             library_dirs = [ ecell_staging_home + os.environ['libdir'] ],
             libraries = common_libraries + [ 'ecs', 'emc' ],
             define_macros = sys.platform == 'win32' and
-				[ ('WIN32','1'), ('_WIN32','1') ],
+				[ ('WIN32','1'), ('_WIN32','1'), ('__STDC__', 1) ],
             sources = [ 'PyEmc.cpp' ] )
         ]
     )

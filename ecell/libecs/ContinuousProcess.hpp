@@ -1,7 +1,6 @@
 #include "libecs.hpp"
 #include "Process.hpp"
 
-
 namespace libecs
 {
 

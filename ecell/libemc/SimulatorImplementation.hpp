@@ -33,7 +33,7 @@
 #define __SIMULATORIMPLEMENTATION_HPP
 
 #include "libecs/libecs.hpp"
-
+#include "libecs/Logger.hpp"
 #include "libemc.hpp"
 
 
@@ -173,7 +173,7 @@ namespace libemc
     virtual const libecs::Polymorph
     getLoggerPolicy( libecs::StringCref aFullPNString ) const = 0;
 
-    virtual const libecs::Integer 
+    virtual const libecs::Logger::size_type
     getLoggerSize( libecs::StringCref aFullPNString ) const = 0;
 
     virtual const libecs::Polymorph getNextEvent() const = 0;

@@ -132,15 +132,15 @@ namespace libecs
 
   public:
 
-    ECELL_API Process();
-    ECELL_API virtual ~Process();
+    LIBECS_API Process();
+    LIBECS_API virtual ~Process();
 
     virtual const EntityType getEntityType() const
     {
       return EntityType( EntityType::PROCESS );
     }
 
-    ECELL_API virtual void initialize();
+    LIBECS_API virtual void initialize();
     
     virtual void fire() = 0;
     
@@ -196,9 +196,9 @@ namespace libecs
       return theActivity;
     }
 
-    ECELL_API SET_METHOD( Polymorph, VariableReferenceList );
-    ECELL_API GET_METHOD( Polymorph, VariableReferenceList );
-    ECELL_API SAVE_METHOD( Polymorph, VariableReferenceList );
+    SET_METHOD( Polymorph, VariableReferenceList );
+    GET_METHOD( Polymorph, VariableReferenceList );
+    SAVE_METHOD( Polymorph, VariableReferenceList );
 
 
     GET_METHOD( Real, MolarActivity )
@@ -237,7 +237,7 @@ namespace libecs
        @param anID Stepper ID.
     */
 
-    ECELL_API SET_METHOD( String, StepperID );
+    SET_METHOD( String, StepperID );
 
     /**
        Get an ID of the Stepper of this Process.
@@ -245,7 +245,7 @@ namespace libecs
        @return StepperID as a String.
     */
 
-    ECELL_API GET_METHOD( String, StepperID );
+    GET_METHOD( String, StepperID );
 
 
 
@@ -292,7 +292,7 @@ namespace libecs
        @see VariableReference
     */
 
-    ECELL_API VariableReferenceCref getVariableReference( StringCref aVariableReferenceName );
+    LIBECS_API VariableReferenceCref getVariableReference( StringCref aVariableReferenceName );
 
     /**
        @return a const reference to the VariableReferenceVector
@@ -401,7 +401,7 @@ namespace libecs
 
     */
 
-    ECELL_API void declareUnidirectional();
+    LIBECS_API void declareUnidirectional();
 
 
     /**
@@ -415,7 +415,7 @@ namespace libecs
 
   protected:
 
-    ECELL_API VariableReferenceVectorIterator findVariableReference( StringCref aName );
+    LIBECS_API VariableReferenceVectorIterator findVariableReference( StringCref aName );
 
     void updateVariableReferenceVector();
 

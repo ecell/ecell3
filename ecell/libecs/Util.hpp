@@ -95,7 +95,7 @@ namespace libecs
   }
 
 #define __STRINGCAST_SPECIALIZATION_DECL( NEW, GIVEN )\
-  template<> ECELL_API const NEW stringCast<NEW,GIVEN>( const GIVEN& )
+  template<> LIBECS_API const NEW stringCast<NEW,GIVEN>( const GIVEN& )
 
   __STRINGCAST_SPECIALIZATION_DECL( String, Real );
   __STRINGCAST_SPECIALIZATION_DECL( String, HighReal );
@@ -171,11 +171,11 @@ namespace libecs
 
 
   ///@internal
-  void throwSequenceSizeError( const int aSize, 
-			       const int aMin, const int aMax );
+  LIBECS_API void throwSequenceSizeError( const size_t aSize, 
+			       const size_t aMin, const size_t aMax );
 
   ///@internal
-  ECELL_API void throwSequenceSizeError( const int aSize, const int aMin );
+  LIBECS_API void throwSequenceSizeError( const size_t aSize, const size_t aMin );
 
 
   /**

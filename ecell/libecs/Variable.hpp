@@ -236,7 +236,7 @@ namespace libecs
     // wrappers to expose is/setFixed as PropertySlots 
     SET_METHOD( Integer, Fixed )
     { 
-      theFixed = static_cast<bool>( value );
+      theFixed = value != 0;
     }
 
     GET_METHOD( Integer, Fixed )

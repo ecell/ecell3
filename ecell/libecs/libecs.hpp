@@ -47,11 +47,11 @@ namespace libecs
   /** @file */
 
 
-  extern int const MAJOR_VERSION;
-  extern int const MINOR_VERSION;
-  extern int const MICRO_VERSION;
+  LIBECS_API extern int const MAJOR_VERSION;
+  LIBECS_API extern int const MINOR_VERSION;
+  LIBECS_API extern int const MICRO_VERSION;
 
-  extern char const* const VERSION_STRING;
+  LIBECS_API extern char const* const VERSION_STRING;
 
 
   inline const int getMajorVersion()
@@ -75,9 +75,9 @@ namespace libecs
   }
 
 
-  void setDMSearchPath( const String& path );
-  const String getDMSearchPath();
-  const String getLoadedDMList();
+  LIBECS_API void setDMSearchPath( const String& path );
+  LIBECS_API const String getDMSearchPath();
+  LIBECS_API const String getLoadedDMList();
 
   //  DECLARE_CLASS( Polymorph );
   //  const Polymorph getDMInfoList( const String& aDMName );
@@ -126,7 +126,6 @@ namespace libecs
   DECLARE_CLASS( PropertiedClass );
   DECLARE_CLASS( PropertySlotProxy );
   DECLARE_CLASS( Polymorph );
-  DECLARE_CLASS( PolymorphValue );
   DECLARE_CLASS( LoggerBroker );
   DECLARE_CLASS( Logger );
   DECLARE_CLASS( LoggerAdapter );
@@ -134,10 +133,7 @@ namespace libecs
   DECLARE_CLASS( LongDataPoint );
   DECLARE_CLASS( DataPointAggregator );
   DECLARE_CLASS( DataPointVector );
-  DECLARE_CLASS( EventBase );
-  DECLARE_CLASS( DifferentialStepper );
-  DECLARE_CLASS( AdaptiveDifferentialStepper );
-  DECLARE_CLASS( ProcessEvent );
+
 
   // containers
   DECLARE_VECTOR( Polymorph,    PolymorphVector );
@@ -153,7 +149,6 @@ namespace libecs
   DECLARE_CLASS( Exception );
   DECLARE_CLASS( UnexpectedError );
   DECLARE_CLASS( NotFound );
-  DECLARE_CLASS( CantOpen );
   DECLARE_CLASS( BadID );
   DECLARE_CLASS( CallbackFailed );
   DECLARE_CLASS( NoMethod );

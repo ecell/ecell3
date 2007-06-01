@@ -28,6 +28,9 @@
 // written by Koichi Takahashi
 // modified by Moriyoshi Koizumi
 //
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include <boost/mpl/list.hpp>
 #include <boost/test/unit_test.hpp>

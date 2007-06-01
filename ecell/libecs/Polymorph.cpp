@@ -27,6 +27,9 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include <typeinfo>
 
@@ -55,8 +58,7 @@ namespace libecs
 
   const String PolymorphNoneValue::asString() const
   { 
-    static String aNoneString;
-    return aNoneString;
+    return String();
   }
 
   const Polymorph::Type Polymorph::getType() const

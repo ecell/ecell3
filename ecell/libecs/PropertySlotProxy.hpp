@@ -64,7 +64,7 @@ namespace libecs
       ; // do nothing
     }
     
-    ECELL_API virtual ~PropertySlotProxy();
+    LIBECS_API virtual ~PropertySlotProxy();
 
     virtual SET_METHOD( Polymorph, Polymorph ) = 0;
     virtual GET_METHOD( Polymorph, Polymorph ) = 0;
@@ -166,7 +166,7 @@ namespace libecs
     typedef PropertySlot<T> PropertySlot_;
     DECLARE_TYPE( PropertySlot_, PropertySlot );
 
-    ConcretePropertySlotProxy( T& anObject, 
+    DM_IF ConcretePropertySlotProxy( T& anObject, 
 			       PropertySlotRef aPropertySlot )
       :
       theObject( anObject ),
@@ -175,7 +175,7 @@ namespace libecs
       ; // do nothing
     }
 
-    virtual ~ConcretePropertySlotProxy()
+    DM_IF virtual ~ConcretePropertySlotProxy()
     {
       ; // do nothing
     }
@@ -209,19 +209,19 @@ namespace libecs
 #undef _PROPERTYSLOT_GETMETHOD
 
 
-    virtual const bool isSetable() const
+    DM_IF virtual const bool isSetable() const
     {
       return thePropertySlot.isSetable();
     }
 
-    virtual const bool isGetable() const
+    DM_IF virtual const bool isGetable() const
     {
       return thePropertySlot.isGetable();
     }
 
   private:
 
-    ConcretePropertySlotProxy();
+    DM_IF ConcretePropertySlotProxy();
 
     T&               theObject;
     PropertySlotRef  thePropertySlot;
@@ -237,19 +237,19 @@ namespace libecs
 
   public:
 
-    PropertySlotProxyLoggerAdapter( PropertySlotProxyPtr aPropertySlotProxy )
+    DM_IF PropertySlotProxyLoggerAdapter( PropertySlotProxyPtr aPropertySlotProxy )
       :
       thePropertySlotProxy( aPropertySlotProxy )
     {
       ; // do nothing
     }
 
-    virtual ~PropertySlotProxyLoggerAdapter()
+    DM_IF virtual ~PropertySlotProxyLoggerAdapter()
     {
       delete thePropertySlotProxy;
     }
 
-    virtual const Real getValue() const
+    DM_IF virtual const Real getValue() const
     {
       return thePropertySlotProxy->getReal();
     }

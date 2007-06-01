@@ -79,14 +79,19 @@ extern "C" {
 #ifndef __OSIF_H__
 #define __OSIF_H__ 1
 
+#ifdef WIN32
+#include "unistd.h"
+#else
+#include <sys/types.h>
+#endif
 
-long	osif_get_pid();
-long	osif_disk_free(const char *__path);	/* by K Bytes */
-int	osif_mkdir(const char *__name);
-int	osif_is_dir(const char *__name);
-int	osif_load_dll(const char *__name);
-int	osif_add_path(const char *__path, int to_first);
 
+long osif_get_pid();
+off_t osif_disk_free(const char *__path);	/* by K Bytes */
+int osif_mkdir(const char *__name);
+int osif_is_dir(const char *__name);
+int osif_load_dll(const char *__name);
+int osif_add_path(const char *__path, int to_first);
 
 #ifdef __cplusplus
 } /* end of extern "C" */

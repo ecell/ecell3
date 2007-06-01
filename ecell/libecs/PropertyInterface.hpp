@@ -51,7 +51,7 @@ namespace libecs
 
   /** @file */
 
-  class ECELL_API PropertyInterfaceBase
+  class LIBECS_API PropertyInterfaceBase
   {
   public:
 

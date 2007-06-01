@@ -3,8 +3,7 @@
 //
 //        This file is a part of E-Cell Simulation Environment package
 //
-//                Copyright (C) 1996-2001 Keio university
-//   Copyright (C) 1998-2001 Japan Science and Technology Corporation (JST)
+//                Copyright (C) 1996-2007 Keio university
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -26,309 +25,260 @@
 // 
 //END_HEADER
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//	This file is a part of E-Cell2.
-//	Original codes of E-Cell1 core were written by Koichi TAKAHASHI
-//	<shafi@e-cell.org>.
-//	Some codes of E-Cell2 core are minor changed from E-Cell1
-//	by Naota ISHIKAWA <naota@mag.keio.ac.jp>.
-//	Other codes of E-Cell2 core and all of E-Cell2 UIMAN are newly
-//	written by Naota ISHIKAWA.
-//	All codes of E-Cell2 GUI are written by
-//	Mitsui Knowledge Industry Co., Ltd. <http://bio.mki.co.jp/>
+//    This file is part of E-Cell System.
 //
-//	Latest version is availabe on <http://bioinformatics.org/>
-//	and/or <http://www.e-cell.org/>.
-//END_V2_HEADER
+//    Authors: Koichi TAKAHASHI <shafi@e-cell.org>
+//             Naota ISHIKAWA <naota@mag.keio.ac.jp>
+//             Satya Nanda Vel Arjunan <satya@sfc.keio.ac.jp>
+//             Gabor Bereczki <gabor@e-cell.org>
+//             Moriyoshi Koizumi <mozo@sfc.keio.ac.jp>
+//             Mitsubishi Space Software Co., LTD.
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  */
 /*
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
- *	$Id$
- :	$Log$
- :	Revision 1.11  2005/11/19 09:23:59  shafi
- :	Kouichi -> Koichi
+ *    $Id$
+ :    $Log$
+ :    Revision 1.11  2005/11/19 09:23:59  shafi
+ :    Kouichi -> Koichi
  :
- :	Revision 1.10  2005/07/13 15:20:06  shafi
- :	support for BSD contributedby Hisham Zarka.
- :	
- :	Revision 1.9  2004/06/17 16:55:30  shafi
- :	copyright updates
- :	
- :	Revision 1.8  2003/08/17 00:15:34  satyanandavel
- :	update for gcc-3.3.1 in mingw
- :	
- :	Revision 1.7  2003/08/09 07:02:59  satyanandavel
- :	correction of a typo
- :	
- :	Revision 1.6  2003/08/08 13:40:07  satyanandavel
- :	Added support for native windows compilation using MinGW
- :	
- :	Revision 1.5  2002/10/11 15:51:32  shafi
- :	rename: Connection -> VariableReference
- :	
- :	Revision 1.4  2002/10/03 08:40:40  shafi
- :	react -> process, REACTANT -> CONNECTION
- :	
- :	Revision 1.3  2002/10/03 08:19:06  shafi
- :	removed korandom, renamings Process -> Process, Variable -> Variable, VariableReference -> VariableReference, Value -> Value, Coefficient -> Coefficient
- :	
- :	Revision 1.2  2002/06/23 14:45:10  shafi
- :	added ProxyPropertySlot. deprecated UpdatePolicy for ConcretePropertySlot. added NEVER_GET_HERE macro.
- :	
- :	Revision 1.1  2002/04/30 11:21:53  shafi
- :	gabor's vvector logger patch + modifications by shafi
- :	
- :	Revision 1.9  2002/01/08 10:23:02  ishikawa
- :	Functions for process path are defined but do not work in this version
- :	
- :	Revision 1.8  2001/10/21 15:27:12  ishikawa
- :	osif_is_dir()
- :	
- :	Revision 1.7  2001/10/15 17:17:18  ishikawa
- :	WIN32API for free disk space
- :	
- :	Revision 1.6  2001/10/08 10:14:58  ishikawa
- :	WIN32 API for free disk space
- :	
- :	Revision 1.5  2001/08/10 19:10:34  naota
- :	can be compiled using g++ on Linux and Solaris
- :	
- :	Revision 1.4  2001/03/23 18:51:17  naota
- :	comment for credit
+ :    Revision 1.10  2005/07/13 15:20:06  shafi
+ :    support for BSD contributedby Hisham Zarka.
+ :    
+ :    Revision 1.9  2004/06/17 16:55:30  shafi
+ :    copyright updates
+ :    
+ :    Revision 1.8  2003/08/17 00:15:34  satyanandavel
+ :    update for gcc-3.3.1 in mingw
+ :    
+ :    Revision 1.7  2003/08/09 07:02:59  satyanandavel
+ :    correction of a typo
+ :    
+ :    Revision 1.6  2003/08/08 13:40:07  satyanandavel
+ :    Added support for native windows compilation using MinGW
+ :    
+ :    Revision 1.5  2002/10/11 15:51:32  shafi
+ :    rename: Connection -> VariableReference
+ :    
+ :    Revision 1.4  2002/10/03 08:40:40  shafi
+ :    react -> process, REACTANT -> CONNECTION
+ :    
+ :    Revision 1.3  2002/10/03 08:19:06  shafi
+ :    removed korandom, renamings Process -> Process, Variable -> Variable, VariableReference -> VariableReference, Value -> Value, Coefficient -> Coefficient
+ :    
+ :    Revision 1.2  2002/06/23 14:45:10  shafi
+ :    added ProxyPropertySlot. deprecated UpdatePolicy for ConcretePropertySlot. added NEVER_GET_HERE macro.
+ :    
+ :    Revision 1.1  2002/04/30 11:21:53  shafi
+ :    gabor's vvector logger patch + modifications by shafi
+ :    
+ :    Revision 1.9  2002/01/08 10:23:02  ishikawa
+ :    Functions for process path are defined but do not work in this version
+ :    
+ :    Revision 1.8  2001/10/21 15:27:12  ishikawa
+ :    osif_is_dir()
+ :    
+ :    Revision 1.7  2001/10/15 17:17:18  ishikawa
+ :    WIN32API for free disk space
+ :    
+ :    Revision 1.6  2001/10/08 10:14:58  ishikawa
+ :    WIN32 API for free disk space
+ :    
+ :    Revision 1.5  2001/08/10 19:10:34  naota
+ :    can be compiled using g++ on Linux and Solaris
+ :    
+ :    Revision 1.4  2001/03/23 18:51:17  naota
+ :    comment for credit
  :
- :	Revision 1.3  2001/01/19 21:18:42  naota
- :	Can be comiled g++ on Linux.
+ :    Revision 1.3  2001/01/19 21:18:42  naota
+ :    Can be comiled g++ on Linux.
  :
- :	Revision 1.2  2001/01/13 01:31:47  naota
- :	Can be compiled by VC, but does not run.
+ :    Revision 1.2  2001/01/13 01:31:47  naota
+ :    Can be compiled by VC, but does not run.
  :
- :	Revision 1.1  2000/12/30 14:57:31  naota
- :	Initial revision
+ :    Revision 1.1  2000/12/30 14:57:31  naota
+ :    Initial revision
  :
 //END_RCS_HEADER
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  */
-#include "libecs.hpp"
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
+
+#include "osif.h"
+
+#if defined( WIN32 )
+#include <windows.h>
+#include "unistd.h"
+#endif
+
+#ifdef _MSC_VER
+#define strdup( x ) _strdup( x )
+#endif
+
+#include <string.h>
 
 // Support for BSD contributed by Hisham Zarka.
 
-/* systems that satisfy the below all have <sys/param.h> */
-#if (defined(__unix__) || defined(unix)) && !defined(USG)
-/* if this is a BSD system, param.h defines the BSD macro */
+
+#ifdef HAVE_SYS_PARAM_H
 #include <sys/param.h>
-#endif
+#endif /* HAVE_SYS_PARAM_H */
 
-#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
-/* MS-Windows */
-#include <dos.h>
-#include <process.h>
-#include <wtypes.h>
-#include <objidl.h>
-#include <winbase.h>
-#elif defined(__SVR4)
-/* assume SUN Solaris */
-#include <unistd.h>
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif /* HAVE_SYS_STAT_H */
+
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif /* HAVE_FCNTL_H */
+
+#ifdef HAVE_SYS_STATFS_H
+#include <sys/statfs.h>
+#endif /* HAVE_SYS_STATFS_H */
+
+#ifdef HAVE_SYS_STATVFS_H
 #include <sys/statvfs.h>
 #define statfs statvfs
-#elif defined(BSD4_4)
-/* assume BSD */
-#include <errno.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>
-#include <sys/statvfs.h>
-#define statfs statvfs
-# elif defined(_MSC_VER)
-#include <direct.h>
-#include <windows.h>
-#include <process.h>
-# else
-/* assume Linux */
-// #include <process.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>
-#ifndef __APPLE__
+#endif /* HAVE_SYS_STATVFS_H */
+
+#ifdef HAVE_SYS_VFS_H
 #include <sys/vfs.h>
-#else
+#endif
+
+#ifdef HAVE_SYS_MOUNT_H
 #include <sys/mount.h>
-#endif /* __APPLE__ */
-#endif /* OS dependent part */
+#endif
+
 #include <ctype.h>
-#include "osif.h"
 
 
-#define	MAX_RECTOR_PATH 256
-static char	*process_path[MAX_RECTOR_PATH];
-int		num_process_path;
+#define    MAX_RECTOR_PATH 256
+static char    *process_path[MAX_RECTOR_PATH];
+int        num_process_path;
 
-
-long		osif_get_pid(void)
+long osif_get_pid(void)
 {
-#ifndef _MSC_VER
-	return (long)getpid();
+#ifdef WIN32
+    return GetCurrentProcessId();
 #else
-	return (long)_getpid();
+    return (long)getpid();
 #endif
 }
 
-
-long		osif_disk_free(const char *__path)
+off_t osif_disk_free(const char *__path)
 {
-#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__) || defined(_MSC_VER)
-	ULARGE_INTEGER	free_bytes_available;
-	ULARGE_INTEGER	total_number_of_bytes;
-	ULARGE_INTEGER	total_number_of_free_bytes;
-	long		kbfree;
-	char		drive[4];
+#if defined(WIN32)
+    ULARGE_INTEGER free_bytes_available;
+    ULARGE_INTEGER total_number_of_bytes;
+    ULARGE_INTEGER total_number_of_free_bytes;
+    char drive[4];
 
-	if (__path[1] == ':') {
-		drive[0] = __path[0];
-		drive[1] = ':';
-		drive[2] = '/';
-		drive[3] = '\0';
-	} else {
-		drive[0] = '.';
-		drive[1] = '\0';
-	}
-#if !defined(_MSC_VER)
-	GetDiskFreeSpaceEx(
-	  drive,
-	  &free_bytes_available,
-	  &total_number_of_bytes,
-	  &total_number_of_free_bytes);
+    if (__path[0] != '\0' && __path[1] == ':')
+    {
+        drive[0] = __path[0];
+        drive[1] = ':';
+        drive[2] = '/';
+        drive[3] = '\0';
+    }
+    else
+    {
+        drive[0] = '.';
+        drive[1] = '\0';
+    }
+    if (!GetDiskFreeSpaceEx(
+            drive,
+            &free_bytes_available,
+            &total_number_of_bytes,
+            &total_number_of_free_bytes))
+    {
+        return -1;
+    }
+
+    return (off_t)free_bytes_available.QuadPart >> 10;
 #else
-      wchar_t driveNameWide[sizeof(drive)];
-      MultiByteToWideChar(CP_ACP, 0, drive, -1, driveNameWide, sizeof(drive));
-      GetDiskFreeSpaceEx(
-        driveNameWide,
-        &free_bytes_available,
-        &total_number_of_bytes,
-        &total_number_of_free_bytes);
-#endif
-	kbfree = (long)(free_bytes_available.QuadPart >> 10);
-#ifdef	DEBUG_DONE
-	printf("%ld k bytes free on %s\n", kbfree, __path);
-#endif	/* DEBUG_DONE */
-	return kbfree;
-#else
-	struct statfs statfsbuf;
-	errno = 0;
-	if (statfs(__path, &statfsbuf)) {
-		/* error */
-		return 0L;
-	}
-	return (long)(statfsbuf.f_bsize / 512)
-	 * (long)(statfsbuf.f_bavail / 2);
+    struct statfs statfsbuf;
+
+    if ( statfs( __path, &statfsbuf ) )
+    {
+        return -1;
+    }
+
+    return (off_t)(statfsbuf.f_bsize / 512) *
+            (statfsbuf.f_bavail / 2);
 #endif /* OS dependent part */
 }
 
 
-int	osif_mkdir(const char *__name)
+int osif_mkdir( const char *__name )
 {
-#if	defined(_MSC_VER)
-#include <direct.h>
-	return _mkdir(__name);
-#elif defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
-#include <dir.h>
-	return mkdir(__name);
+#if defined( WIN32 )
+    return CreateDirectory( __name, NULL ) ? 0: -1;
 #else
-	return mkdir(__name, 0755);
+    return mkdir( path, 0755 );
 #endif
 }
 
-
-int	osif_is_dir(const char *__name)
+// return a negative number on error
+int osif_is_dir(const char *__name)
 {
-#if defined(__BORLANDC__) || defined(__MINGW32__) || defined(_MSC_VER)
-	DWORD result;
-#if !defined(_MSC_VER)
-    result = GetFileAttributes(__name);
+#if defined( WIN32 )
+    DWORD result = GetFileAttributes( __name );
+    if ( INVALID_FILE_ATTRIBUTES == result )
+    {
+        return -1;
+    }
+
+    if ( result != (DWORD)-1 &&
+         (result & FILE_ATTRIBUTE_DIRECTORY) )
+    {
+        return 1;
+    } else {
+        return 0;
+    }
 #else
-        char dirName[10000];
-        strcpy_s(dirName, __name);
-        wchar_t dirNameWide[sizeof(dirName)];
-        MultiByteToWideChar(CP_ACP, 0, dirName, -1, dirNameWide, sizeof(dirName));
-        result = GetFileAttributes(dirNameWide);
-#endif
-	if (result != (DWORD)-1 && (result & FILE_ATTRIBUTE_DIRECTORY)) {
-		return 1;
-	} else {
-		return 0;
-	}
-#else
-	struct stat statbuf;
-	if (stat(__name, &statbuf) ==0
-	    && (S_ISDIR ( statbuf.st_mode))) { // gabor
-	  //	  && !(S_IFDIR & statbuf.st_rdev)) {
-		return 1;
-	} else {
-		return 0;
-	}
+    struct stat statbuf;
+    if ( stat( __name, &statbuf ) )
+    {
+        return -1;
+    }
+
+     return (S_ISDIR ( statbuf.st_mode)) && !(S_IFDIR & statbuf.st_rdev);
 #endif
 }
 
-
-int	osif_load_dll(const char *__name)
+int osif_add_path( const char *dir, int to_first )
 {
-	/* not implemented */
-	return -1;
+    if ( osif_is_dir(dir) <= 0 )
+    {
+        return -1; /* not directory */
+    }
+
+    if ( MAX_RECTOR_PATH <= num_process_path )
+    {
+        return -1; /* to many path */
+    }
+
+    if ( to_first )
+    {
+        if ( num_process_path > 0)
+        {
+            // Blit is enough
+            memmove( &process_path[1], &process_path[0],
+                    sizeof( process_path[0] ) *
+                    (num_process_path - 1) );
+        }
+
+        process_path[0] = strdup(dir);
+
+        return 0;
+    }
+    else
+    {
+        process_path[num_process_path] = strdup(dir);
+    }
+
+    ++num_process_path;
+    return 0;
 }
-
-
-int	osif_add_path(const char *dir, int to_first)
-{
-	if (!osif_is_dir(dir)) {
-		return -1; /* not directory */
-	} else if (MAX_RECTOR_PATH <= num_process_path) {
-		return -1; /* to many path */
-	} else if (to_first) {
-		int		iii;
-		for (iii = num_process_path; iii == 1; iii--) {
-			process_path[iii] = process_path[iii - 1];
-		}
-#if !defined(_MSC_VER)
-		process_path[0] = strdup(dir);
-#else
-		process_path[0] = _strdup(dir);
-#endif
-		++num_process_path;
-		return 0;
-	} else {
-#if !defined(_MSC_VER)
-		process_path[num_process_path] = strdup(dir);
-#else
-		process_path[num_process_path] = _strdup(dir);
-#endif
-		++num_process_path;
-		return 0;
-	}
-}
-
-
-/*
- *********************************************************************
- *	for stand alone test
- *********************************************************************
- */
-#ifdef TEST
-#include <stdio.h>
-
-
-int	main(int argc, char **argv)
-{
-	printf("pid = %ld\n", osif_get_pid());
-	printf("Disk free by KBytes = %ld on .\n", osif_disk_free("."));
-#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
-	printf("Disk free by KBytes = %ld on c:/tmp\n", osif_disk_free("c:/tmp"));
-	printf("Disk free by KBytes = %ld on c:/tmp/\n", osif_disk_free("c:/tmp/"));
-#endif	/* _Windows */
-	printf("osif_is_dir(\"/tmp\") returns %d\n", osif_is_dir("/tmp"));
-	printf("osif_is_dir(\"/tmp/\") returns %d\n", osif_is_dir("/tmp/"));
-	printf("osif_is_dir(\"/tmp/junk\") returns %d\n", osif_is_dir("/tmp/junk"));
-	return 0;
-}
-#endif /* TEST */

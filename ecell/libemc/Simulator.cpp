@@ -27,8 +27,6 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
-
-
 #include "LocalSimulatorImplementation.hpp"
 #include "Simulator.hpp"
 

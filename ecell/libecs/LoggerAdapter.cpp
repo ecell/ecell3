@@ -22,7 +22,9 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //END_HEADER
-
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include "LoggerAdapter.hpp"
 
@@ -31,12 +33,12 @@ namespace libecs
 
   ///////////////////////////// LoggerAdapter
 
-  LoggerAdapter::LoggerAdapter()
+  LIBECS_API LoggerAdapter::LoggerAdapter()
   {
     ; // do nothing
   }
 
-  LoggerAdapter::~LoggerAdapter()
+  LIBECS_API LoggerAdapter::~LoggerAdapter()
   {
     ; // do nothing
   }

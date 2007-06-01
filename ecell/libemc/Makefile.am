@@ -18,7 +18,7 @@ LIBECS=$(ECELLDIR)/libecs/libecs.la
 INCLUDES = -I${top_srcdir} ${DMTOOL_INCLUDE} ${INCLTDL}
 lib_LTLIBRARIES = libemc.la
 
-AM_CXXFLAGS= @CXXFLAGS@
+AM_CXXFLAGS = @CXXFLAGS@
 
 libemc_la_LDFLAGS= -version-info 2:0:0 $(no_undefined)
 

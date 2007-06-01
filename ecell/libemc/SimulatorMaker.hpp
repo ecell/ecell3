@@ -33,7 +33,7 @@
 #define __SIMULATORMAKER_HPP
 #include "Simulator.hpp"
 //FIXME: should be dmtool/ModuleMaker.hpp
-#include "ModuleMaker.hpp"
+#include "dmtool/ModuleMaker.hpp"
 
 namespace libemc
 {
@@ -54,9 +54,12 @@ namespace libemc
     SimulatorMaker();
     // Defined in superclass; no need to redefine here
     // Simulator* make( libecs::StringCref classname );
-    void install( libecs::StringCref systementry );
+    LIBEMC_API void install( libecs::StringCref systementry );
 
-    virtual const char* const className() const {return "SimulatorMaker";}
+    LIBEMC_API virtual const char* const className() const
+    {
+      return "SimulatorMaker";
+    }
   };
 
 #define NewSimulatorModule(CLASS) NewDynamicModule(Simulator,CLASS)

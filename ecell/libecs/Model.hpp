@@ -37,6 +37,13 @@
 
 #include "EventScheduler.hpp"
 #include "StepperEvent.hpp"
+#include "StepperMaker.hpp"
+#include "VariableMaker.hpp"
+#include "ProcessMaker.hpp"
+#include "SystemMaker.hpp"
+#include "LoggerBroker.hpp"
+#include "Stepper.hpp"
+#include "SystemStepper.hpp"
 
 namespace libecs
 {
@@ -55,7 +62,6 @@ namespace libecs
   DECLARE_ASSOCVECTOR( String, StepperPtr, std::less< const String >,
 		       StepperMap ); 
 
-  
 
   /**
      Model class represents a simulation model.
@@ -74,8 +80,8 @@ namespace libecs
 
   public:
 
-    ECELL_API Model();
-    ECELL_API ~Model();
+    LIBECS_API Model();
+    LIBECS_API ~Model();
 
     /**
        Initialize the whole model.
@@ -96,7 +102,7 @@ namespace libecs
        @throw InitializationFailed
     */
 
-    ECELL_API void initialize();
+    LIBECS_API void initialize();
 
     /**
        Conduct a step of the simulation.
@@ -150,7 +156,7 @@ namespace libecs
        @param aClassType
     */
 
-    ECELL_API PolymorphMap getClassInfo( StringCref aClassType, StringCref aClassname, Integer forceReload );
+    LIBECS_API PolymorphMap getClassInfo( StringCref aClassType, StringCref aClassname, Integer forceReload );
 
     /**
        Creates a new Entity object and register it in an appropriate System
@@ -161,7 +167,7 @@ namespace libecs
        @param aName
     */
 
-    ECELL_API void createEntity( StringCref aClassname, FullIDCref aFullID );
+    LIBECS_API void createEntity( StringCref aClassname, FullIDCref aFullID );
 
 
     /**
@@ -171,7 +177,7 @@ namespace libecs
        @return A borrowed pointer to an Entity specified by the FullID.
     */
 
-    ECELL_API EntityPtr getEntity( FullIDCref aFullID ) const;
+    LIBECS_API EntityPtr getEntity( FullIDCref aFullID ) const;
 
     /**
        This method finds a System object pointed by the SystemPath.  
@@ -182,7 +188,7 @@ namespace libecs
     */
 
 
-    ECELL_API SystemPtr getSystem( SystemPathCref aSystemPath ) const;
+    LIBECS_API SystemPtr getSystem( SystemPathCref aSystemPath ) const;;
 
 
     /**
@@ -194,7 +200,7 @@ namespace libecs
 
     */
 
-    ECELL_API void createStepper( StringCref aClassname, StringCref anID );
+    LIBECS_API void createStepper( StringCref aClassname, StringCref anID );
 
 
     /**
@@ -204,7 +210,7 @@ namespace libecs
        @return a borrowed pointer to the Stepper.
     */
 
-    ECELL_API StepperPtr getStepper( StringCref anID ) const;
+    LIBECS_API StepperPtr getStepper( StringCref anID ) const;
 
 
     /**
@@ -230,7 +236,7 @@ namespace libecs
 
     */
 
-    ECELL_API void flushLoggers();
+    LIBECS_API void flushLoggers();
 
 
     /**
@@ -244,13 +250,10 @@ namespace libecs
       return theRootSystemPtr;
     }
 
-
-    SystemStepperPtr getSystemStepper() const
+    SystemStepperPtr getSystemStepper()
     {
-      return theSystemStepperPtr;
+      return &theSystemStepper;
     }
-
-
 
 
     /**
@@ -259,15 +262,20 @@ namespace libecs
        @return a borrowed pointer to the LoggerBroker.
     */
 
-    LoggerBrokerRef getLoggerBroker() const
+    LoggerBrokerRef getLoggerBroker()
     { 
       return theLoggerBroker; 
     }
 
+    LoggerBrokerCref getLoggerBroker() const
+    { 
+      return theLoggerBroker; 
+    }
+
+
     StepperEventScheduler&   getScheduler() { return theScheduler; }
 
     /// @internal
-
     StepperMakerRef     getStepperMaker()     { return theStepperMaker; }
 
     /// @internal
@@ -307,18 +315,18 @@ namespace libecs
 
     StepperEventScheduler theScheduler;
 
-    LoggerBrokerRef     theLoggerBroker;
+    LoggerBroker        theLoggerBroker;
 
-    SystemPtr           theRootSystemPtr;
+    System              *theRootSystemPtr;
  
-    SystemStepperPtr    theSystemStepperPtr;
+    SystemStepper       theSystemStepper;
 
     StepperMap          theStepperMap;
 
-    StepperMakerRef     theStepperMaker;
-    SystemMakerRef      theSystemMaker;
-    VariableMakerRef    theVariableMaker;
-    ProcessMakerRef     theProcessMaker;
+    StepperMaker        theStepperMaker;
+    SystemMaker         theSystemMaker;
+    VariableMaker       theVariableMaker;
+    ProcessMaker        theProcessMaker;
 
   };
 

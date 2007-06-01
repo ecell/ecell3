@@ -1,5 +1,6 @@
 #!/usr/bin/env pytho
 
+import sys
 from distutils.core import setup, Extension
 
 setup(
@@ -11,5 +12,10 @@ setup(
     url = 'http://www.e-cell.org/',
     packages = [ 'ecell' ],
     ext_modules = [
-        Extension( 'ecell._tableio', [ 'ecell/_tableio.c' ] ) ]
+        Extension( 'ecell._tableio',
+			sources = [ 'ecell/_tableio.c' ],
+            define_macros = sys.platform == 'win32' and
+				[ ('WIN32','1'), ('_WIN32','1') ]
+			)
+		]
     )

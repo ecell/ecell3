@@ -247,10 +247,10 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
   //
 
 #define SET_SLOT( TYPE, METHODNAME )\
-  void METHODNAME( libecs::Param<TYPE>::type value )
+  DM_IF void METHODNAME( libecs::Param<TYPE>::type value )
 
 #define GET_SLOT( TYPE, METHODNAME )\
-  const TYPE METHODNAME() const
+  DM_IF const TYPE METHODNAME() const
 
 #define SET_SLOT_DEF( TYPE, METHODNAME, CLASS )\
   SET_SLOT( TYPE, CLASS::METHODNAME )
@@ -363,15 +363,15 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
     virtual const Polymorph 
     getPropertyAttributes( StringCref aPropertyName ) const = 0;
 
-    ECELL_API virtual void defaultSetProperty( StringCref aPropertyName, 
+    LIBECS_API virtual void defaultSetProperty( StringCref aPropertyName, 
 				     PolymorphCref aValue );
     
-    ECELL_API virtual const Polymorph 
+    LIBECS_API virtual const Polymorph 
     defaultGetProperty( StringCref aPorpertyName ) const;
     
-    ECELL_API virtual const Polymorph defaultGetPropertyList() const;
+    LIBECS_API virtual const Polymorph defaultGetPropertyList() const;
     
-    ECELL_API virtual const Polymorph 
+    LIBECS_API virtual const Polymorph 
     defaultGetPropertyAttributes( StringCref aPropertyName ) const;
 
     void registerLogger( LoggerPtr aLogger );
@@ -422,7 +422,7 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
   // inline copies of them around.  This reduces sizes of DM .so files a bit.
 
 #define NULLSET_SPECIALIZATION( TYPE )\
-  template <> ECELL_API void PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )
+  template <> LIBECS_API void PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )
 
   NULLSET_SPECIALIZATION( Real );
   NULLSET_SPECIALIZATION( Integer );
@@ -430,7 +430,7 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
   NULLSET_SPECIALIZATION( Polymorph );
 
 #define NULLGET_SPECIALIZATION( TYPE )\
-  template <> ECELL_API const TYPE PropertiedClass::nullGet<TYPE>() const
+  template <> LIBECS_API const TYPE PropertiedClass::nullGet<TYPE>() const
 
   NULLGET_SPECIALIZATION( Real );
   NULLGET_SPECIALIZATION( Integer );

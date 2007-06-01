@@ -128,16 +128,25 @@
  //END_RCS_HEADER
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  */
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
+
 #include "VVector.h"
-#include <string.h>
-#include <stdlib.h>
-#include <memory.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include "osif.h"
 
+#include <stdlib.h>
+#include <string.h>
+
+#ifdef _MSC_VER
+#define strdup( x ) _strdup( x )
+#endif /* _MSC_VER */
+
+#ifdef WIN32
+#define PATH_SEPARATOR '\\'
+#else
+#define PATH_SEPARATOR '/'
+#endif
 
 #ifndef O_BINARY
 // Must be for UNIX.
@@ -172,7 +181,7 @@ static void checkDiskFull(char const * const path, int mustCheck)
   if (mustCheck != 0 || (checkInterval <= skipCounter)) {
     skipCounter = 0;
     errno = 0;
-    long kbytes_free = osif_disk_free(path);
+    off_t kbytes_free = osif_disk_free(path);
     if (kbytes_free < diskFreeMargin) {
       vvectorbase::cbFull();
     }
@@ -181,37 +190,62 @@ static void checkDiskFull(char const * const path, int mustCheck)
   }
 }
 
+static const char* get_temp_dir()
+{
+#ifdef WIN32
+    return libecs_win32_get_temporary_directory();
+#else
+    static volatile const char *val = NULL;
+    if (val) // should be atomic
+        return (const char *)val;
+
+    const char* _val;
+    struct stat sb;
+
+    _val = getenv("TMPDIR");
+    if ( _val && stat( _val, &sb ) == 0 &&
+            ( sb.st_mode & S_IFDIR ) )
+    {
+        val = _val;
+        return _val;
+    }
+
+    _val = getenv("TEMPDIR");
+    if ( _val && stat( _val, &sb ) == 0 &&
+            ( sb.st_mode & S_IFDIR ) )
+    {
+        val = _val;
+        return _val;
+    }
+
+    _val = "/var/tmp";
+    if ( _val && stat( _val, &sb) == 0 &&
+            ( sb.st_mode & S_IFDIR ) )
+    {
+        val = _val;
+        return _val;
+    }
+
+    _val = "/tmp";
+    if ( _val && stat( _val, &sb) == 0 &&
+            ( sb.st_mode & S_IFDIR ) ) {
+        val = _val;
+        return _val;
+    }
+#endif
+}
 
 vvectorbase::vvectorbase()
 {
   if (_defaultDirectory == NULL) {
-#ifndef _MSC_VER
     char const *envVal = getenv("VVECTORTMPDIR");
-#else
-    char *envVal;
-    size_t len;
-    _dupenv_s(&envVal, &len, "VVECTORTMPDIR");
-#endif
     if (envVal != NULL) {
-#ifndef _MSC_VER
       _defaultDirectory = strdup(envVal);
-#else
-      _defaultDirectory = _strdup(envVal);
-#endif
       _directoryPriority = 3;
     }
     else
     {
-#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
-	  _defaultDirectory = getenv("TMP");
-#elif defined(_MSC_VER)
-      char *envVal;
-      size_t len;
-      _dupenv_s(&envVal, &len, "TMP");
-      _defaultDirectory = _strdup(envVal);
-#else
-	  _defaultDirectory = strdup("/tmp");
-#endif	
+	  _defaultDirectory = strdup( get_temp_dir() );
 	  _directoryPriority = 4;
     }
   }
@@ -244,11 +278,7 @@ void vvectorbase::unlinkfile()
   }
 #endif /* OPEN_WHEN_ACCESS */
   if (_file_name != NULL) {
-#ifndef _MSC_VER
     if (unlink(_file_name) != 0)
-#else
-    if (_unlink(_file_name) != 0)
-#endif
       {
 	fprintf(stderr, "unlink(%s) failed in VVector.\n", _file_name);
       }
@@ -272,11 +302,7 @@ void vvectorbase::setTmpDir(char const * const dirname, int priority)
     if (_defaultDirectory != NULL) {
       free(const_cast<char*>(_defaultDirectory));
     }
-#ifndef _MSC_VER
     _defaultDirectory = strdup(dirname);
-#else
-    _defaultDirectory = _strdup(dirname);
-#endif
   }
 }
 
@@ -305,11 +331,7 @@ void vvectorbase::removeTmpFile()
 
   for (iii = _tmp_name.begin(); iii != _tmp_name.end(); iii++) {
 
-#ifndef _MSC_VER
     unlink (*iii);
-#else
-    _unlink (*iii);
-#endif
   }
 }
 
@@ -319,54 +341,26 @@ void vvectorbase::initBase(char const * const dirname)
   char pathname[256];
   char filename[256];
   if (dirname != NULL) {
-#ifndef _MSC_VER
     strcpy(pathname, dirname);
-#else
-    strcpy_s(pathname, dirname);
-#endif
   } else {
-#ifndef _MSC_VER
     strcpy(pathname, _defaultDirectory);
-#else
-    strcpy_s(pathname, _defaultDirectory);
-#endif
   }
-#if defined(__BORLANDC__) || defined(__WINDOWS__) || defined(__MINGW32__)
-  if (pathname[strlen(pathname) - 1] != '\\') {
-    strcat(pathname, "\\");
+  if (pathname[strlen(pathname) - 1] != PATH_SEPARATOR) {
+    static const char sep[2] = { PATH_SEPARATOR, 0 };
+    strcat(pathname, sep);
   }
-#elif defined(_MSC_VER)
-  if (pathname[strlen(pathname) - 1] != '\\') {
-    strcat_s(pathname, "\\");
-  }
-#else
-  if (pathname[strlen(pathname) - 1] != '/') {
-    strcat(pathname, "/");
-  }
-#endif
   if (osif_is_dir(pathname) == 0) {
     throw vvector_init_error();
   }
   checkDiskFull(pathname, 1);
-#ifndef _MSC_VER
   sprintf(filename, "vvector-%ld-%04d",
 	  osif_get_pid(), _myNumber);
   strcat(pathname, filename);
   _file_name = strdup(pathname);
-#else
-  sprintf_s(filename, "vvector-%ld-%04d", osif_get_pid(), _myNumber);
-  strcat_s(pathname, filename);
-  _file_name = _strdup(pathname);
-#endif
   _tmp_name.push_back(_file_name);
 
-#ifndef _MSC_VER
   _fdw = open(_file_name, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY |O_LARGEFILE, 0600);
   _fdr = open(_file_name, O_RDONLY | O_BINARY | O_LARGEFILE );
-#else
-  _sopen_s(&_fdw, _file_name, _O_WRONLY | _O_CREAT | _O_TRUNC | _O_BINARY, _SH_DENYNO, 0600);
-  _sopen_s(&_fdr, _file_name, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD | _S_IWRITE);
-#endif
 
   if (_fdw < 0) 
     {
@@ -396,20 +390,12 @@ void vvectorbase::initBase(char const * const dirname)
 void vvectorbase::my_open_to_append()
 {
   checkDiskFull(_file_name, 0);
-#ifndef _MSC_VER
   _fdw = open(_file_name, O_WRONLY | O_BINARY |O_LARGEFILE);
-#else
-  _sopen_s(&_fdw, _file_name, _O_WRONLY | _O_BINARY, _SH_DENYNO, _S_IREAD | _S_IWRITE);
-#endif
   if (_fdw < 0) 
    {
       throw vvector_write_error();
   }
-#ifndef _MSC_VER
   if ( lseek( _fdw, 0, SEEK_END ) == -1 )
-#else
-  if (_lseeki64(_fdw, 0, SEEK_END) == -1)
-#endif
     {
     my_close_write();
        throw vvector_write_error();
@@ -420,21 +406,13 @@ void vvectorbase::my_open_to_append()
 void vvectorbase::my_open_to_read(off_t offset)
 {
   if (_fdr<0) {
-#ifndef _MSC_VER
     _fdr = open(_file_name, O_RDONLY | O_BINARY|O_LARGEFILE );
-#else
-    _sopen_s(&_fdr, _file_name, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD | _S_IWRITE);
-#endif
   }
   if (_fdr < 0) {
         throw vvector_read_error();
 
   }
-#ifndef _MSC_VER
   if (lseek(_fdr, offset, SEEK_SET) == static_cast<off_t>(-1)) {
-#else
-  if (_lseeki64(_fdr, offset, SEEK_SET) == static_cast<off_t>(-1)) {
-#endif
         throw vvector_read_error();
 
   }
@@ -443,11 +421,7 @@ void vvectorbase::my_open_to_read(off_t offset)
 void vvectorbase::my_close_read()
 {
   assert (0 <= _fdr);
-#ifndef _MSC_VER
   if (close(_fdr) < 0) {
-#else
-  if (_close(_fdr) < 0) {
-#endif
         throw vvector_read_error();
   }
   _fdr = -1;
@@ -456,11 +430,7 @@ void vvectorbase::my_close_read()
 void vvectorbase::my_close_write()
 {
   assert (0<=_fdw);
-#ifndef _MSC_VER
   if (close(_fdw) < 0) 
-#else
-  if (_close(_fdw) < 0) 
-#endif
     {
         throw vvector_read_error();
   }

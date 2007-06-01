@@ -26,11 +26,12 @@
 //
 // written by Gabor Bereczki <gabor.bereczki@talk21.com>
 // 14/04/2002
-
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include "DataPointVector.hpp"
 #include <assert.h>
-
 
 namespace libecs
 {

@@ -23,7 +23,4 @@ FullID_test_SOURCES = FullID_test.cpp
 check_PROGRAMS+=VVector_test
 VVector_test_SOURCES = VVector_test.cpp
 
-check_PROGRAMS+=Util_test
-Util_test_SOURCES = Util_test.cpp
-
 TESTS=$(check_PROGRAMS)

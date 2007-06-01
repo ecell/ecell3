@@ -602,7 +602,7 @@ bool DAEStepper::calculate()
 	  if ( theta < 0.99 )
 	    {
 	      eta = theta / ( 1.0 - theta );
-	      const Real anIterationError( eta * aNorm * pow( theta, getMaxIterationNumber() - 2 - anIterator ) / theStoppingCriterion );
+	      const Real anIterationError( eta * aNorm * pow( theta, static_cast<int>( getMaxIterationNumber() - 2 - anIterator ) ) / theStoppingCriterion );
 	      
 	      if ( anIterationError >= 1.0 )
 		{
@@ -763,7 +763,7 @@ Real DAEStepper::estimateLocalError()
 
   if ( anError < 1.0 ) return anError;
 
-  if ( theFirstStepFlag or theRejectedStepFlag )
+  if ( theFirstStepFlag || theRejectedStepFlag )
     {
       fireProcesses();
       setVariableVelocity( theTaylorSeries[ 4 ] );

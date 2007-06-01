@@ -84,9 +84,9 @@ namespace libecs
     };
 
 
-    ECELL_API Interpolant( VariablePtr const aVariable );
+    LIBECS_API Interpolant( VariablePtr const aVariable );
 
-    ECELL_API virtual ~Interpolant();
+    LIBECS_API virtual ~Interpolant();
     
     virtual 
     const Real getVelocity( RealParam aTime ) const

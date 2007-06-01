@@ -33,6 +33,7 @@
 
 #include <boost/static_assert.hpp>
 
+#include "dmtool/DMObject.hpp"
 #include "libecs.hpp"
 #include "convertTo.hpp"
 #include "Util.hpp"
@@ -49,22 +50,24 @@ namespace libecs
 
   /** @file */
   
+  DECLARE_CLASS( PolymorphValue );
+
   class PolymorphValue
   {
 
   public:
 
-    ECELL_API virtual ~PolymorphValue();
+    LIBECS_API virtual ~PolymorphValue();
 
-    virtual const String  asString()        const = 0;
-    virtual const Real    asReal()          const = 0;
-    virtual const Integer asInteger()       const = 0;
-    virtual const PolymorphVector asPolymorphVector() const = 0;
+    LIBECS_API virtual const String  asString()        const = 0;
+    LIBECS_API virtual const Real    asReal()          const = 0;
+    LIBECS_API virtual const Integer asInteger()       const = 0;
+    LIBECS_API virtual const PolymorphVector asPolymorphVector() const = 0;
 
     template< typename T >
     const T as() const;
 
-    virtual PolymorphValuePtr createClone() const = 0;
+    LIBECS_API virtual PolymorphValuePtr createClone() const = 0;
 
   protected:
   
@@ -128,32 +131,32 @@ namespace libecs
       ; // do nothing
     }
 
-    virtual ~ConcretePolymorphValue()
+    LIBECS_API virtual ~ConcretePolymorphValue()
     {
       ; // do nothing
     }
   
-    virtual const String asString() const 
+    LIBECS_API virtual const String asString() const 
     { 
       return convertTo<String>( theValue ); 
     }
 
-    virtual const Real   asReal()  const 
+    LIBECS_API virtual const Real   asReal()  const 
     { 
       return convertTo<Real>( theValue );
     }
 
-    virtual const Integer asInteger()   const 
+    LIBECS_API virtual const Integer asInteger()   const 
     { 
       return convertTo<Integer>( theValue ); 
     }
 
-    virtual const PolymorphVector asPolymorphVector() const
+    LIBECS_API virtual const PolymorphVector asPolymorphVector() const
     { 
       return convertTo<PolymorphVector>( theValue ); 
     }
 
-    virtual PolymorphValuePtr createClone() const
+    LIBECS_API virtual PolymorphValuePtr createClone() const
     {
       return new ConcretePolymorphValue<T>( *this );
     }
@@ -176,14 +179,14 @@ namespace libecs
 
     PolymorphNoneValue() {}
 
-    ECELL_API virtual ~PolymorphNoneValue();
+    LIBECS_API virtual ~PolymorphNoneValue();
 
-    ECELL_API virtual const String  asString() const;
-    virtual const Real    asReal() const       { return 0.0; }
-    virtual const Integer asInteger() const    { return 0; }
-    ECELL_API virtual const PolymorphVector asPolymorphVector() const;
+    LIBECS_API virtual const String  asString() const;
+    LIBECS_API virtual const Real    asReal() const       { return 0.0; }
+    LIBECS_API virtual const Integer asInteger() const    { return 0; }
+    LIBECS_API virtual const PolymorphVector asPolymorphVector() const;
   
-    virtual PolymorphValuePtr createClone() const
+    LIBECS_API virtual PolymorphValuePtr createClone() const
     {
       return new PolymorphNoneValue;
     }
@@ -291,9 +294,9 @@ namespace libecs
       //      DefaultSpecializationInhibited();
       //    }
 
-    ECELL_API const Type getType() const;
+    LIBECS_API const Type getType() const;
 
-    void changeType( const Type aType );
+    LIBECS_API void changeType( const Type aType );
 
 
     operator String() const

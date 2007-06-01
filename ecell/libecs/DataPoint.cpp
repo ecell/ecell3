@@ -26,11 +26,10 @@
 //
 // written by Gabor Bereczki <gabor.bereczki@talk21.com>
 // 24/03/2002
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
 
-
-
-
-#include <stdio.h>
 #include "DataPoint.hpp"
 
 namespace libecs

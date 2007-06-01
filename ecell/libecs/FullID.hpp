@@ -100,7 +100,7 @@ namespace libecs
     //    SystemPath();
 
 
-    ECELL_API void parse( StringCref systempathstring );
+    LIBECS_API void parse( StringCref systempathstring );
 
   public:
 
@@ -192,7 +192,7 @@ namespace libecs
 
     bool isValid() const;
 
-    ECELL_API const String getString() const;
+    LIBECS_API const String getString() const;
 
     bool operator<( FullIDCref rhs ) const
     {
@@ -238,7 +238,7 @@ namespace libecs
 
   protected:
 
-    ECELL_API void parse( StringCref fullidstring );
+    LIBECS_API void parse( StringCref fullidstring );
 
   private:
 
@@ -288,7 +288,7 @@ namespace libecs
       ; // do nothing
     }
 
-    ECELL_API FullPN( StringCref fullpropertynamestring );
+    LIBECS_API FullPN( StringCref fullpropertynamestring );
 
     ~FullPN() 
     {
@@ -340,7 +340,7 @@ namespace libecs
       thePropertyName = propertyname;
     }
 
-    ECELL_API const String getString() const;
+    LIBECS_API const String getString() const;
 
     bool isValid() const;
 

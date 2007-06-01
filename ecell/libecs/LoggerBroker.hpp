@@ -40,6 +40,8 @@
 
 namespace libecs
 {
+  // forward declaration
+  class Model;
 
   /** @addtogroup logging
    *@{
@@ -65,11 +67,19 @@ namespace libecs
 
     DECLARE_MAP( const FullPN, LoggerPtr, std::less<const FullPN>, LoggerMap );
 
-    LoggerBroker( ModelRef aModel );
+    LoggerBroker();
 
-    
     ~LoggerBroker();
 
+    void setModel( Model* model )
+    {
+      theModel = model;
+    }
+
+    Model* getModel()
+    {
+      return theModel;
+    }
 
     /**
        Get or create a Logger for a PropertySlot.
@@ -87,9 +97,9 @@ namespace libecs
        
     */
 
-    ECELL_API LoggerPtr getLogger( FullPNCref aFullPN ) const;
+    LIBECS_API LoggerPtr getLogger( FullPNCref aFullPN ) const;
 
-    ECELL_API LoggerPtr createLogger( FullPNCref aFullPN, PolymorphVectorCref aParamList );
+    LIBECS_API LoggerPtr createLogger( FullPNCref aFullPN, PolymorphVectorCref aParamList );
 
     /**
        Flush the data in all the Loggers immediately.
@@ -119,7 +129,7 @@ namespace libecs
 
   private:
     
-    ModelRef getModel() const
+    Model* getModel() const
     {
       return theModel;
     }
@@ -132,7 +142,7 @@ namespace libecs
   private:
 
     LoggerMap     theLoggerMap;
-    ModelRef      theModel;
+    Model*        theModel;
 
   };
 

@@ -27,6 +27,9 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include <algorithm>
 
@@ -281,7 +284,7 @@ namespace libecs
   {
     if( anID[0] == '.' )
       {
-	const int anIDSize( anID.size() );
+    const String::size_type anIDSize( anID.size() );
 
 	if( anIDSize == 1 ) // == "."
 	  {

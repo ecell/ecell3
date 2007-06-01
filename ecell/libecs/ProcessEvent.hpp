@@ -43,6 +43,8 @@ namespace libecs
 
   /** @file */
 
+  DECLARE_CLASS( ProcessEvent );
+
   class ProcessEvent
     :
     public EventBase

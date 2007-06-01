@@ -34,7 +34,6 @@
 
 #include "Defs.hpp"
 
-
 namespace libecs
 {
 
@@ -79,12 +78,19 @@ if( ! ( EXPRESSION ) )\
       ; // do nothing
     }
 
-    ECELL_API virtual ~Exception() throw();
+    LIBECS_API virtual ~Exception() throw();
 
-    ECELL_API virtual const String message() const;
+    LIBECS_API virtual const String message() const;
 
-    virtual const char* what() const throw() { return message().c_str(); }
-    virtual const char* const getClassName() const  { return "Exception"; }
+    LIBECS_API virtual const char* what() const throw()
+    {
+      return message().c_str();
+    }
+
+    LIBECS_API virtual const char* const getClassName() const
+    {
+      return "Exception";
+    }
 
   protected:
 
@@ -112,7 +118,7 @@ public:\
   // system errors
   DEFINE_EXCEPTION( UnexpectedError,        Exception );
   DEFINE_EXCEPTION( NotFound,               Exception );
-  DEFINE_EXCEPTION( CantOpen,               Exception ); 
+  DEFINE_EXCEPTION( IOException,            Exception );
   DEFINE_EXCEPTION( NotImplemented,         Exception ); 
 
 //    DEFINE_EXCEPTION( CallbackFailed,         Exception );
@@ -120,6 +126,7 @@ public:\
   DEFINE_EXCEPTION( AlreadyExist,           Exception );
   DEFINE_EXCEPTION( ValueError,             Exception );
   DEFINE_EXCEPTION( TypeError,              Exception );
+  DEFINE_EXCEPTION( OutOfRange,             Exception );
   DEFINE_EXCEPTION( IllegalOperation,       Exception );
 
   // simulation errors

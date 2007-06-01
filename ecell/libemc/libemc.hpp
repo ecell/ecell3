@@ -34,7 +34,20 @@
 
 #include <functional>
 
-#include "ecell/libecs/libecs.hpp"
+#include "libecs/libecs.hpp"
+
+// WIN32 stuff
+#if defined(WIN32)
+
+#ifdef LIBEMC_EXPORTS
+#define LIBEMC_API __declspec(dllexport)
+#else
+#define LIBEMC_API __declspec(dllimport)
+#endif /* LIBEMC_EXPORTS */
+
+#else
+#define LIBEMC_API
+#endif /* WIN32 */
 
 namespace libemc
 {
@@ -63,9 +76,9 @@ namespace libemc
   {
   public:
     EventHandler() {}
-    virtual ~EventHandler() {}
+    LIBEMC_API virtual ~EventHandler() {}
 
-    virtual void operator()( void ) const = 0;
+    LIBEMC_API virtual void operator()( void ) const = 0;
   };
 
   class EventChecker
@@ -74,9 +87,9 @@ namespace libemc
   {
   public:
     EventChecker() {}
-    virtual ~EventChecker() {}
+    LIBEMC_API virtual ~EventChecker() {}
 
-    virtual bool operator()( void ) const = 0;
+    LIBEMC_API virtual bool operator()( void ) const = 0;
   };
 
   class DefaultEventChecker
@@ -87,7 +100,7 @@ namespace libemc
     DefaultEventChecker() {}
     //    virtual ~DefaultEventChecker() {}
 
-    virtual bool operator()( void ) const
+    LIBEMC_API virtual bool operator()( void ) const
     {
       return false;
     }

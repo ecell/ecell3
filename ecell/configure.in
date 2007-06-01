@@ -42,9 +42,11 @@ AC_SUBST(PREFIX)
 dnl
 AC_ARG_WITH(gtk,
   AC_HELP_STRING([--without-gtk],
-                 [build ecell without gtk library.])
+                 [build ecell without gtk library.]),
+  [ECELL_SUBDIRS="libecs libemc pyecs pyecell bin dm"],
+  [ECELL_SUBDIRS="libecs libemc pyecs pyecell bin dm session-monitor model-editor toollauncher"]
 )
-AM_CONDITIONAL(WITH_GTK, test "$with_GTK" != "no")
+AC_SUBST( ECELL_SUBDIRS )
 dnl
 
 
@@ -162,7 +164,8 @@ dnl Checks for header files.
 
 AC_HEADER_DIRENT
 AC_HEADER_STDC
-AC_CHECK_HEADERS(fcntl.h unistd.h)
+
+AC_CHECK_HEADERS(fcntl.h unistd.h memory.h sys/stat.h sys/types.h sys/mman.h sys/param.h sys/statvfs.h sys/statfs.h sys/mount.h sys/vfs.h)
 
 ECELL_CHECK_MATH_HEADER
 ECELL_CHECK_INFINITY

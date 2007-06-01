@@ -96,7 +96,7 @@ namespace libecs
        @return a FullID of this Entity.
     */
 
-    ECELL_API const FullID getFullID() const;
+    LIBECS_API const FullID getFullID() const;
 
 
     /**
@@ -125,7 +125,7 @@ namespace libecs
        @return a SystemPath of this Entity.
     */
 
-    ECELL_API virtual const SystemPath getSystemPath() const;
+    LIBECS_API virtual const SystemPath getSystemPath() const;
 
 
     /// \name Properties
@@ -184,7 +184,7 @@ namespace libecs
        @return a FullID string of this Entity.
     */
 
-    ECELL_API const String getFullIDString() const;
+    LIBECS_API const String getFullIDString() const;
 
     //@}
 

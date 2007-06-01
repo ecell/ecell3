@@ -27,7 +27,9 @@
 // written by Masayuki Okayama <smash@e-cell.org>,
 // E-Cell Project.
 //
-
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include "libecs.hpp"
 
@@ -45,9 +47,8 @@
 namespace libecs
 {
 
-  LoggerBroker::LoggerBroker( ModelRef aModel )
-    :
-    theModel( aModel )
+  LoggerBroker::LoggerBroker()
+    : theModel(0)
   {
     ; // do nothing
   }
@@ -62,7 +63,6 @@ namespace libecs
   {
     FOR_ALL_SECOND( LoggerMap, theLoggerMap, flush );
   }
-
 
   LoggerPtr 
   LoggerBroker::getLogger( FullPNCref aFullPN ) const
@@ -87,7 +87,7 @@ namespace libecs
 			 + "] already exist." );
       }
 
-    EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+    EntityPtr anEntityPtr( theModel->getEntity( aFullPN.getFullID() ) );
 
     const String aPropertyName( aFullPN.getPropertyName() );
 
@@ -104,7 +104,7 @@ namespace libecs
     anEntityPtr->registerLogger( aNewLogger );
     theLoggerMap[aFullPN] = aNewLogger;
     // it should have at least one datapoint to work correctly.
-    aNewLogger->log( getModel().getCurrentTime() );
+    aNewLogger->log( theModel->getCurrentTime() );
     aNewLogger->flush();
 
     // set logger policy

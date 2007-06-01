@@ -31,6 +31,11 @@
 #ifndef __TAULEAP_HPP
 #define __TAULEAP_HPP
 
+#ifdef WIN32
+// Avoid conflicts with min() / max() macros in windows.h
+#define NOMINMAX
+#endif /* WIN32 */
+
 #include "GillespieProcess.hpp"
 
 #include "libecs/DifferentialStepper.hpp"

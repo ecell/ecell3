@@ -73,13 +73,13 @@ namespace libecs
       ; // do nothing
     }
     
-    ECELL_API virtual ~PropertySlotBase();
+    DM_IF virtual ~PropertySlotBase();
 
-    virtual const bool isSetable() const = 0;
-    virtual const bool isGetable() const = 0;
+    DM_IF virtual const bool isSetable() const = 0;
+    DM_IF virtual const bool isGetable() const = 0;
 
-    ECELL_API virtual const bool isLoadable() const;
-    ECELL_API virtual const bool isSavable()  const;
+    DM_IF virtual const bool isLoadable() const;
+    DM_IF virtual const bool isSavable()  const;
 
   };
 
@@ -131,12 +131,12 @@ namespace libecs
 #undef _PROPERTYSLOT_GETMETHOD
 
 
-    virtual void loadPolymorph( T& anObject, Param<Polymorph>::type aValue )
+    DM_IF virtual void loadPolymorph( T& anObject, Param<Polymorph>::type aValue )
     {
       setPolymorph( anObject, aValue );
     }
 
-    virtual const Polymorph savePolymorph( const T& anObject ) const
+    DM_IF virtual const Polymorph savePolymorph( const T& anObject ) const
     {
       return getPolymorph( anObject );
     }
@@ -173,18 +173,18 @@ namespace libecs
       ; // do nothing
     }
 
-    virtual ~ConcretePropertySlot()
+    DM_IF virtual ~ConcretePropertySlot()
     {
       ; // do nothing
     }
 
 
-    virtual const bool isSetable() const
+    DM_IF virtual const bool isSetable() const
     {
       return isSetableMethod( theSetMethodPtr );
     }
 
-    virtual const bool isGetable() const
+    DM_IF virtual const bool isGetable() const
     {
       return isGetableMethod( theGetMethodPtr );
     }
@@ -310,7 +310,7 @@ namespace libecs
     typedef typename ConcretePropertySlot::SetMethodPtr SetMethodPtr;
     typedef typename ConcretePropertySlot::GetMethodPtr GetMethodPtr;
 
-    LoadSaveConcretePropertySlot( const SetMethodPtr aSetMethodPtr,
+    DM_IF LoadSaveConcretePropertySlot( const SetMethodPtr aSetMethodPtr,
 				  const GetMethodPtr aGetMethodPtr,
 				  const SetMethodPtr aLoadMethodPtr,
 				  const GetMethodPtr aSaveMethodPtr )
@@ -322,28 +322,28 @@ namespace libecs
       ; // do nothing
     }
 
-    ~LoadSaveConcretePropertySlot()
+    DM_IF ~LoadSaveConcretePropertySlot()
     {
       ; // do nothing
     }
 
 
-    virtual const bool isLoadable() const
+    DM_IF virtual const bool isLoadable() const
     {
       return isSetableMethod( theLoadMethodPtr );
     }
 
-    virtual const bool isSavable()  const
+    DM_IF virtual const bool isSavable()  const
     {
       return isGetableMethod( theSaveMethodPtr );
     }
 
-    virtual void loadPolymorph( T& anObject, Param<Polymorph>::type aValue )
+    DM_IF virtual void loadPolymorph( T& anObject, Param<Polymorph>::type aValue )
     {
       loadImpl( anObject, aValue );
     }
 
-    virtual const Polymorph savePolymorph( const T& anObject ) const
+    DM_IF virtual const Polymorph savePolymorph( const T& anObject ) const
     {
       return saveImpl( anObject );
     }

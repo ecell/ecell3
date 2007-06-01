@@ -157,7 +157,7 @@ public:
       aVector.push_back( aPropertyFlag ); //isLoadable
       aVector.push_back( aPropertyFlag ); //isSavable
 
-      Integer aValue();
+      return Polymorph( aVector );
     }
 
   virtual void initialize();

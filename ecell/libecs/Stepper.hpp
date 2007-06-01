@@ -45,6 +45,8 @@
 namespace libecs
 {
 
+  class Model;
+
   /** @addtogroup stepper
    *@{
    */
@@ -230,12 +232,12 @@ namespace libecs
     }
 
 
-    ECELL_API GET_METHOD( Polymorph, WriteVariableList );
-    ECELL_API GET_METHOD( Polymorph, ReadVariableList );
-    ECELL_API GET_METHOD( Polymorph, ProcessList );
-    ECELL_API GET_METHOD( Polymorph, SystemList );
+    GET_METHOD( Polymorph, WriteVariableList );
+    GET_METHOD( Polymorph, ReadVariableList );
+    GET_METHOD( Polymorph, ProcessList );
+    GET_METHOD( Polymorph, SystemList );
 
-    ECELL_API SET_METHOD( String, RngSeed );
+    SET_METHOD( String, RngSeed );
 
     GET_METHOD( String, RngType );
 
@@ -258,7 +260,7 @@ namespace libecs
 
     virtual void step() = 0;
 
-    ECELL_API virtual void integrate( RealParam aTime );
+    LIBECS_API virtual void integrate( RealParam aTime );
 
     /**
        Let the Loggers log data.
@@ -267,7 +269,7 @@ namespace libecs
        any Entities related to this Stepper.
     */
 
-    ECELL_API virtual void log();
+    LIBECS_API virtual void log();
     
     /**
        Register a System to this Stepper.
@@ -453,7 +455,7 @@ namespace libecs
     }
 
 
-    ECELL_API const VariableIndex
+    LIBECS_API const VariableIndex
       getVariableIndex( VariableCptr const aVariable );
 
 
@@ -509,9 +511,9 @@ namespace libecs
 
   protected:
 
-    ECELL_API void clearVariables();
+    LIBECS_API void clearVariables();
 
-    ECELL_API void fireProcesses();
+    LIBECS_API void fireProcesses();
 
     virtual void reset();
 
@@ -576,7 +578,7 @@ namespace libecs
 
   private:
 
-    ModelPtr            theModel;
+    Model*              theModel;
     
     // the index on the scheduler
     int                 theSchedulerIndex;

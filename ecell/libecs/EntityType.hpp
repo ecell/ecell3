@@ -63,7 +63,7 @@ namespace libecs
 	SYSTEM    = 4
       };
 
-    ECELL_API EntityType( StringCref typestring );
+    LIBECS_API EntityType( StringCref typestring );
 
     EntityType( const int number );
 

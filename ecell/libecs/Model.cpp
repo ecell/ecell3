@@ -27,6 +27,9 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include "Util.hpp"
 #include "EntityType.hpp"
@@ -48,14 +51,15 @@ namespace libecs
   Model::Model()
     :
     theCurrentTime( 0.0 ),
-    theLoggerBroker(     *new LoggerBroker( *this ) ),
-    theRootSystemPtr(    NULL ),
-    theSystemStepperPtr(  new SystemStepper ),
-    theStepperMaker(     *new StepperMaker          ),
-    theSystemMaker(      *new SystemMaker           ),
-    theVariableMaker(    *new VariableMaker        ),
-    theProcessMaker(     *new ProcessMaker          )
+    theLoggerBroker(),
+    theRootSystemPtr(0),
+    theSystemStepper(),
+    theStepperMaker(),
+    theSystemMaker(),
+    theVariableMaker(),
+    theProcessMaker()
   {
+    theLoggerBroker.setModel( this );
     // initialize theRootSystem
     theRootSystemPtr = getSystemMaker().make( "System" );
     theRootSystemPtr->setModel( this );
@@ -66,24 +70,19 @@ namespace libecs
 
    
     // initialize theSystemStepper
-    theSystemStepperPtr->setModel( this );
-    theSystemStepperPtr->setID( "___SYSTEM" );
-    theScheduler.
-      addEvent( StepperEvent( getCurrentTime() + theSystemStepperPtr
-			      ->getStepInterval(), theSystemStepperPtr ) );
+    theSystemStepper.setModel( this );
+    theSystemStepper.setID( "___SYSTEM" );
+    theScheduler.addEvent(
+      StepperEvent( getCurrentTime()
+                    + theSystemStepper.getStepInterval(),
+                    &theSystemStepper ) );
 
-    theLastStepper = theSystemStepperPtr;
+    theLastStepper = &theSystemStepper;
   }
 
   Model::~Model()
   {
     delete theRootSystemPtr;
-    delete &theProcessMaker;
-    delete &theVariableMaker;
-    delete &theSystemMaker;
-    delete &theStepperMaker;
-    delete theSystemStepperPtr;
-    delete &theLoggerBroker;
   }
 
 
@@ -169,7 +168,6 @@ namespace libecs
 	
 
   }
-
 
 
   SystemPtr Model::getSystem( SystemPathCref aSystemPath ) const
@@ -337,7 +335,7 @@ namespace libecs
     
     FOR_ALL_SECOND( StepperMap, theStepperMap, initializeProcesses );
     FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
-    theSystemStepperPtr->initialize();
+    theSystemStepper.initialize();
 
 
     FOR_ALL_SECOND( StepperMap, theStepperMap, 

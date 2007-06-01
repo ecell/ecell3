@@ -32,6 +32,18 @@
 #ifndef __DEFS_HPP
 #define __DEFS_HPP
 
+#if defined(WIN32)
+#if defined(_MSC_VER)
+#define _USE_MATH_DEFINES
+#if _MANAGED
+/* suppress __fastcall warnings */
+#pragma warning(disable:4561)
+#endif /* _MANAGED */
+/* suppress deprecation warnings */
+#pragma warning(disable:4996)
+#endif /* _MSC_VER */
+#endif /* WIN32 */
+
 #include <float.h>
 #include <string>
 #include <time.h>
@@ -458,165 +470,49 @@ typedef const mytype & mytype ## Cref;
     typedef T OriginalType;
   };
 
+  template<typename T>
+  inline T safe_add(const T& o1, const T& o2)
+  {
+    T r = o1 + o2;
+    BOOST_ASSERT(r >= o1 || r >= o2);
+    return r;
+  }
+
+  template<typename T1, typename T2>
+  inline T1 safe_mul(const T1& o1, const T2& o2)
+  {
+    T1 r = o1 * o2;
+    BOOST_ASSERT(sizeof(o1) >= sizeof(double) || static_cast<T1>(static_cast<double>(o1) * o2) == r);
+    return r;
+  }
+ 
+  template<typename Td, typename Ts>
+  inline Td safe_int_cast(const Ts& v)
+  {
+    const Td retval = static_cast<Td>( v );
+    BOOST_ASSERT(v == static_cast<Ts>( retval ));
+    return retval;
+  }
+ 
 
 } // namespace libecs
 
+// WIN32 stuff
+#if defined(WIN32)
 
-/**
-   4 MSVC
- */
-/**
-   DLL
- */
-#if defined( USE_MSVC )
-#if defined( ECELL_EXPORTS )
-#define ECELL_API __declspec( dllexport )
+#ifdef LIBECS_EXPORTS
+#define LIBECS_API __declspec(dllexport)
 #else
-#define ECELL_API __declspec( dllimport )
-#endif /* ECELL_EXPORTS */
-#else
-#define ECELL_API
-#endif /* USE_MSVC */
-/**
-   Virtual Libtool
- */
-#if defined( USE_MSVC )
+#define LIBECS_API __declspec(dllimport)
+#endif /* LIBECS_EXPORTS */
 
-#define DM_PATH "dm"
-#define FILE_EXTENSION ".dll"
-#define REGISTORY_DM_KEY L"ECELLIDE_DM"
-#define REGISTORY_ENV_KEY L"Environment"
-#define REGISTORY_SW_KEY L"Software\\KeioUniv\\E-Cell_IDE"
-#define SIZE 10000
-class Util
-{
-private:
-    static std::string getDMPath(HKEY aHKEY, LPCWSTR aSubKey)
-    {
-        HKEY hKey;
-        DWORD dwType;
-        DWORD dwSize;
-        LONG errorCode = RegOpenKeyEx(aHKEY, aSubKey, 0, KEY_READ, &hKey);
-        if(errorCode != 0)
-        {
-            return "";
-        }
-        wchar_t aValueWide[SIZE];
-        errorCode = RegQueryValueEx(hKey, REGISTORY_DM_KEY, NULL, &dwType, NULL, &dwSize);
-        if(errorCode != 0)
-        {
-            return "";
-        }
-        errorCode = RegQueryValueEx(hKey, REGISTORY_DM_KEY, NULL, &dwType, (LPBYTE)&aValueWide, &dwSize);
-        if(errorCode != 0)
-        {
-            return "";
-        }
-        int buffSize = WideCharToMultiByte(CP_ACP, 0, aValueWide, -1, NULL, 0, NULL, NULL);
-        if(buffSize <= 0)
-        {
-            return "";
-        }
-        LPSTR aValue = new char [buffSize];
-        buffSize = WideCharToMultiByte(CP_ACP, 0, aValueWide, -1, aValue, buffSize, NULL, NULL);
-        if(buffSize <= 0)
-        {
-            return "";
-        }
-        RegCloseKey(hKey);
-        return aValue;
-    }
-public:
-    static std::string getDMPath()
-    {
-        std::string aPath;
-        if((aPath = Util::getDMPath(HKEY_CURRENT_USER, REGISTORY_ENV_KEY)).length() > 0)
-        {
-            return aPath;
-        }
-        else if((aPath = Util::getDMPath(HKEY_CURRENT_USER, REGISTORY_SW_KEY)).length() > 0)
-        {
-            return aPath;
-        }
-        else
-        {
-            return Util::getDMPath(HKEY_LOCAL_MACHINE, REGISTORY_SW_KEY);
-        }
-    }
-};
-#define lt_dlclose(x) FreeLibrary(x)
-#define lt_dlhandle HMODULE
-#define lt_dlsym(x, y) GetProcAddress(x, y)
-static char errbuf[64];
-static char * lt_dlerror()
-{
-  sprintf_s(errbuf, "LoadLibrary/GetProcAddress error %d", static_cast<int>(GetLastError()));
-  return errbuf;
-}
-static int lt_dlexit()
-{
-    return 0;
-}
-static const char * lt_dlgetsearchpath()
-{
-    return 0;
-}
-static int lt_dlinit()
-{
-    return 0;
-}
-static lt_dlhandle lt_dlopenext(const char* aFileName)
-{
-    if (aFileName == NULL)
-    {
-        return NULL;
-    }
-    std::string anAllDMPath = Util::getDMPath();
-    if (anAllDMPath.size() < 1)
-    {
-      anAllDMPath = DM_PATH;
-    }
-    while (anAllDMPath.size() > 0)
-    {
-        int anIndex = static_cast<int>(anAllDMPath.find(";"));
-        char aDMPath[SIZE];
-        if(anIndex == -1)
-        {
-            strcpy_s(aDMPath, anAllDMPath.c_str());
-            anAllDMPath.clear();
-        }
-        else if(anIndex == anAllDMPath.size() - 1)
-        {
-            strcpy_s(aDMPath, anAllDMPath.substr(0, anIndex).c_str());
-            anAllDMPath.clear();
-        }
-        else
-        {
-            strcpy_s(aDMPath, anAllDMPath.substr(0, anIndex).c_str());
-            anAllDMPath = anAllDMPath.substr(anIndex + 1);
-        }
-        std::string dllNameStr = std::string(aDMPath) + "/" + aFileName + FILE_EXTENSION;
-        char dllName[SIZE];
-        strcpy_s(dllName, dllNameStr.c_str());
-        wchar_t dllNameWide[SIZE];
-        MultiByteToWideChar(CP_ACP, 0, dllName, -1, dllNameWide, SIZE);
-        lt_dlhandle aHandle = LoadLibrary(dllNameWide);
-        if (aHandle != NULL)
-        {
-            return aHandle;
-        }
-    }
-    return NULL;
-}
-static int lt_dlsetsearchpath(const char *search_path)
-{
-    return 0;
-}
-/**
-   Some Functions
- */
 #define fmin(x, y) __min(x, y)
-#endif /* USE_MSVC */
+
+#else
+
+#define LIBECS_API
+
+#endif /* WIN32 */
 
 #endif /* __DEFS_HPP */
 

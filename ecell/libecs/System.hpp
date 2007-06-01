@@ -119,7 +119,7 @@ namespace libecs
        @return Size of this System.
     */
 
-    ECELL_API GET_METHOD( Real, Size );
+    GET_METHOD( Real, Size );
 
     GET_METHOD( Real, SizeN_A )
     {
@@ -282,9 +282,9 @@ namespace libecs
 
   public: // property slots
 
-    ECELL_API GET_METHOD( Polymorph, SystemList );
-    ECELL_API GET_METHOD( Polymorph, VariableList );
-    ECELL_API GET_METHOD( Polymorph, ProcessList );
+    GET_METHOD( Polymorph, SystemList );
+    GET_METHOD( Polymorph, VariableList );
+    GET_METHOD( Polymorph, ProcessList );
 
   protected:
 

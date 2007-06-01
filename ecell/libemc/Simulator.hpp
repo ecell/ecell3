@@ -36,6 +36,7 @@
 #include "libecs/EntityType.hpp"
 #include "libecs/Polymorph.hpp"
 #include "libecs/DataPointVector.hpp"
+#include "libecs/Logger.hpp"
 
 #include "libemc.hpp"
 #include "SimulatorImplementation.hpp"
@@ -71,13 +72,13 @@ namespace libemc
      @see SimulatorImplementation
   */
 
-  class ECELL_API Simulator
+  class Simulator
   {
 
   public:
 
-    Simulator();
-    virtual ~Simulator() {}
+    LIBEMC_API Simulator();
+    LIBEMC_API virtual ~Simulator() {}
 
 
     /**
@@ -534,7 +535,7 @@ namespace libemc
       return theSimulatorImplementation->getLoggerPolicy( aFullPNString );
     }
 
-    const libecs::Integer getLoggerSize( libecs::StringCref aFullPNString ) const
+    const libecs::Logger::size_type getLoggerSize( libecs::StringCref aFullPNString ) const
     {
       return theSimulatorImplementation->getLoggerSize( aFullPNString );
     }

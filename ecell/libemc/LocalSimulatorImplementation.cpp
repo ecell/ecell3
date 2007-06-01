@@ -27,7 +27,6 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
-
 #include "libecs/libecs.hpp"
 #include "libecs/Stepper.hpp"
 #include "libecs/System.hpp"
@@ -224,7 +223,7 @@ namespace libemc
 	return aVector;
       }
 
-    const libecs::SystemPtr aSystemPtr( getModel().getSystem( aSystemPath ) );
+    const libecs::SystemCptr aSystemPtr( getModel().getSystem( aSystemPath ) );
 
     switch( anEntityType )
       {
@@ -455,7 +454,7 @@ namespace libemc
     return getLogger( aFullPNString )->getLoggerPolicy();
   }
 
-  const libecs::Integer LocalSimulatorImplementation::
+  const libecs::Logger::size_type LocalSimulatorImplementation::
   getLoggerSize( libecs::StringCref aFullPNString ) const
   {
     return getLogger( aFullPNString )->getSize();

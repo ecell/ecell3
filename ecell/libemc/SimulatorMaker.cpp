@@ -27,8 +27,7 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
-
-#include "SimulatorMaker.h"
+#include "SimulatorMaker.hpp"
 
 namespace libemc
 {

@@ -32,10 +32,13 @@
 #ifndef __DYNAMICMODULE_HPP
 #define __DYNAMICMODULE_HPP
 
-#include <ltdl.h>
 #include <exception>
 #include <string>
+#include "ltdl.h"
 
+#ifdef _WIN32
+#undef GetClassInfo
+#endif /* _WIN32 */
 
 /// doc needed
 

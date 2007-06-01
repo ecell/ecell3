@@ -49,13 +49,13 @@ namespace libecs
 
   public:
 
-    virtual ~LoggerAdapter();
+    LIBECS_API virtual ~LoggerAdapter();
 
     virtual const Real getValue() const = 0;
 
   protected:
 
-    LoggerAdapter();
+    LIBECS_API LoggerAdapter();
 
   };
 

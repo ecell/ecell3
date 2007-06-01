@@ -27,8 +27,9 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
-
-#include <boost/format.hpp>
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
 
 #include "Util.hpp"
 #include "VariableReference.hpp"
@@ -40,6 +41,7 @@
 
 #include "Process.hpp"
 
+#include <boost/format.hpp>
 
 namespace libecs
 {
@@ -234,7 +236,7 @@ namespace libecs
   void Process::setVariableReference( PolymorphVectorCref aValue )
   {
 
-    UnsignedInteger aVectorSize( aValue.size() );
+    size_t aVectorSize( aValue.size() );
     
     // Require at least a VariableReference name.
     if( aVectorSize == 0 )
@@ -270,8 +272,7 @@ namespace libecs
     
     if( aVectorSize >= 4 )
       {
-	const bool anIsAccessorFlag( static_cast<bool>
-				     ( aValue[3].asInteger() ) );
+	const bool anIsAccessorFlag( aValue[3].asInteger() != 0 );
 	registerVariableReference( aVariableReferenceName, aVariable,
 				   aCoefficient, anIsAccessorFlag );
       }

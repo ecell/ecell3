@@ -141,37 +141,27 @@
  //END_RCS_HEADER
  *::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
  */
+#ifndef __VVECTOR_H__
+#define	__VVECTOR_H__
 
-
-#ifndef __VVECOTOR_H__
-#define	__VVECOTOR_H__
-#include "ecell_config.h"
-#include <sys/types.h>
-#if	defined(__GNUC__) || defined(_MSC_VER)
 #include <vector>
-#else
-#include <vector.h>
-#endif	/* compiler dependent part */
 
-
-#if defined(__BORLANDC__) || defined(_MSC_VER)
+#if !defined(HAVE_SSIZE_T)
 typedef int ssize_t;
-#endif /* __BORLANDC__ */
-
+#endif
 
 #include <string.h>
-#include <memory.h>
-#include <stdio.h>
 #include <assert.h>
-#include <errno.h>
-#if 	defined(__BORLANDC__) || defined(_MSC_VER)
-#include <io.h>
-#elif	defined(__linux__) && !defined(__powerpc__)
-#include <unistd.h>
-#include <sys/io.h>
+
+#ifdef WIN32
+#include "fcntl.h"
+#include "errno.h"
+#include "unistd.h"
 #else
+#include <fcntl.h>
+#include <errno.h>
 #include <unistd.h>
-#endif 
+#endif
 
 #include "Exceptions.hpp"
 
@@ -304,7 +294,7 @@ template<class T> class vvector : public vvectorbase {
   static void setDiskFullCB(void(*)());
   void setEndPolicy( int );
   int  getEndPolicy();
-  void setMaxSize( int aMaxSize );
+  void setMaxSize( size_type aMaxSize );
 };
 
 
@@ -348,7 +338,7 @@ template<class T> int vvector<T>::getEndPolicy()
   return end_policy;
 }
 
-template<class T> void vvector<T>::setMaxSize( int aMaxSize )
+template<class T> void vvector<T>::setMaxSize( size_type aMaxSize )
 {
   if (aMaxSize == 0) {
     max_size = 0;
@@ -391,11 +381,7 @@ template<class T> void vvector<T>::push_back(const T & x)
 	#ifdef OPEN_WHEN_ACCESS
 	   my_open_to_append();
 	#endif /*OPEN_WHEN_ACCESS*/
-#ifndef _MSC_VER
 	  red_bytes = write( _fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
-#else
-	  red_bytes = _write( _fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
-#endif
 	#ifdef OPEN_WHEN_ACCESS
 	  my_close_write();
     #endif /*OPEN_WHEN_ACCESS*/
@@ -431,21 +417,13 @@ template<class T> void vvector<T>::push_back(const T & x)
 	  my_open_to_append();
     #endif /*OPEN_WHEN_ACCESS*/
 
-#ifndef _MSC_VER
 	if (lseek(_fdw, static_cast<off_t>((start_offset) * sizeof(T)), SEEK_SET) == static_cast<off_t>(-1)) 
-#else
-	if (_lseeki64(_fdw, static_cast<off_t>((start_offset) * sizeof(T)), SEEK_SET) == static_cast<off_t>(-1))
-#endif
     {
 	  my_close_write();
 	    throw vvector_write_error();
 	  }
 
-#ifndef _MSC_VER
     red_bytes = write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE);
-#else
-    red_bytes = _write(_fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE);
-#endif
 	#ifdef OPEN_WHEN_ACCESS
 	  my_close_write();
     #endif /*OPEN_WHEN_ACCESS*/
@@ -530,11 +508,7 @@ template<class T>  T const & vvector<T>::at(size_type i)
    #ifdef OPEN_WHEN_ACCESS
      my_open_to_read( off_t( phys_read_start * sizeof(T) ));
     #endif /*OPEN_WHEN_ACCESS*/
-#ifndef _MSC_VER
   num_red = read(_fdr, _cacheRV, num_to_read * sizeof(T));
-#else
-  num_red = _read(_fdr, _cacheRV, static_cast<unsigned int>(num_to_read * sizeof(T)));
-#endif
    #ifdef OPEN_WHEN_ACCESS
   my_close_read();
     #endif /*OPEN_WHEN_ACCESS*/
@@ -557,4 +531,4 @@ template<class T> void vvector<T>::clear()
 }
 
 
-#endif	/* __VVECOTOR_H__ */
+#endif	/* __VVECTOR_H__ */
