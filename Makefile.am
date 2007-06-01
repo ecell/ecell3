@@ -5,8 +5,7 @@ SUBDIRS = libltdl dmtool ecell
 
 EXTRA_DIST = autogen.sh\
 depcomp\
-test
-
+ecell_version.sh
 
 docdir = $(prefix)/share/doc/$(PACKAGE)-$(VERSION)
 
