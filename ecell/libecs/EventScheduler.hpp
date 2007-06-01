@@ -114,6 +114,28 @@ namespace libecs
 	}
     }
 
+    const bool operator> ( EventBaseCref rhs ) const
+    {
+      if( getTime() > rhs.getTime() )
+	{
+	  return true;
+	}
+      else
+	{
+	  return false;
+	}
+    }
+
+    const bool operator>= ( EventBaseCref rhs ) const
+    {
+        return !(*this < rhs);
+    }
+
+    const bool operator<= ( EventBaseCref rhs ) const
+    {
+        return !(*this > rhs);
+    }
+
     const bool operator!= ( EventBaseCref rhs ) const
     {
       if( getTime() == rhs.getTime() )

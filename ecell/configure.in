@@ -165,7 +165,8 @@ dnl Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_STDC
 
-AC_CHECK_HEADERS(fcntl.h unistd.h memory.h sys/stat.h sys/types.h sys/mman.h sys/param.h sys/statvfs.h sys/statfs.h sys/mount.h sys/vfs.h)
+AC_CHECK_HEADERS([fcntl.h unistd.h memory.h sys/stat.h sys/types.h sys/mman.h sys/param.h sys/statvfs.h sys/statfs.h sys/mount.h sys/vfs.h])
+AC_CHECK_HEADERS([unordered_map tr1/unordered_map])
 
 ECELL_CHECK_MATH_HEADER
 ECELL_CHECK_INFINITY
