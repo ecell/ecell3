@@ -36,11 +36,10 @@
 #include <boost/test/unit_test_suite.hpp>
 #include <boost/test/test_case_template.hpp>
 #include <boost/preprocessor/stringize.hpp>
+
 #include "VVector.h"
 
 #include <iostream>
-#include <cstdlib>
-#include <vector>
 
 namespace libecs
 {
@@ -48,48 +47,11 @@ namespace libecs
 template<typename T>
 class VVectorTest
 {
-    typedef VVector<T> Vector;
-
-    char* getTempFileName()
-    {
-        static const char placeholder[] = "/XXXXXXXX";
-        static const size_t placeholder_len = sizeof( placeholder ) - 1;
-
-        const char* tmpdir = libecs_get_temp_dir();
-        size_t tmpdir_len = strlen( tmpdir );
-        char *tmpfile = new char[ tmpdir_len + placeholder_len + 1 ];
-        memcpy( tmpfile, tmpdir, tmpdir_len );
-        memcpy( tmpfile + tmpdir_len, placeholder, placeholder_len );
-        tmpfile[ tmpdir_len + placeholder_len ] = '\0';
-
-        return tmpfile;
-    }
+    typedef vvector<T> Vector;
 
     Vector* create()
     {
-        fildes_t fd;
-        char* tmpfile = getTempFileName();
-
-        fd = mkstemp( tmpfile );
-        if (fd < 0)
-        {
-            throw IOException( "VVectorTest<>::create()",
-                               "Cannot create temporary file");
-        }
-
-        try
-        {
-            return VVectorMaker::getInstance().create<T>( fd, tmpfile );
-        }
-        catch ( IOException e )
-        {
-            close( fd );
-            unlink( tmpfile );
-            delete[] tmpfile;
-            throw e;
-        }
-
-        // NEVER GET HERE
+        return new Vector();
     }
 
 public:
@@ -100,32 +62,6 @@ public:
         for (int i = 0; i < 1024; i++)
         {
             v->push_back( i );
-        }
-
-        delete v;
-    }
-
-    void testRandomAccess()
-    {
-        static const int SPACE = 1024 * 1024;
-        static const int NUM_SAMPLES = 1024;
-
-        Vector* v = create();
-        std::vector<T> realv;
-
-        realv.resize( SPACE );
-
-        for( int i = 0; i < NUM_SAMPLES; i++ )
-        {
-            int idx = ::rand() % SPACE;
-
-            v->at( idx ) = i;
-            realv.at( idx ) = i;
-        }
-
-        for( int idx = 0; idx < SPACE; idx++ )
-        {
-            BOOST_CHECK_EQUAL( v->at( idx ), realv.at( idx ) );
         }
 
         delete v;
@@ -148,10 +84,9 @@ boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
         typedef libecs::VVectorTest<int> IntVVectorTest;
         boost::unit_test::test_suite* suite =
                 BOOST_TEST_SUITE( "VVectorTest<int>" );
-        boost::shared_ptr<IntVVector> inst( new IntVVectorTest() );
+        boost::shared_ptr<IntVVectorTest> inst( new IntVVectorTest() );
 
         add_test( IntVVectorTest, test );
-        add_test( IntVVectorTest, testRandomAccess );
         suites->add(suite);
     }
 
