@@ -48,9 +48,6 @@ namespace libecs
    :\
   public BASE 
 
-//,\
-//  private PropertyInterface<CLASSNAME>
-
 
 #define LIBECS_DM_OBJECT_ABSTRACT( CLASSNAME )\
   LIBECS_DM_OBJECT_DEF_ABSTRACT( CLASSNAME );\
