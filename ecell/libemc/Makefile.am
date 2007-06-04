@@ -1,3 +1,4 @@
+abs_top_builddir=@abs_top_builddir@
 libdir=@libdir@
 
 if OS_WIN32

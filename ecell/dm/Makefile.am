@@ -1,3 +1,4 @@
+abs_top_builddir=@abs_top_builddir@
 
 LTDL_SHLIB_EXT := $(shell echo @LTDL_SHLIB_EXT@)
 
