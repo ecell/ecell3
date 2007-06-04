@@ -9,7 +9,6 @@ include_dirs = [
     '@NUMPY_INCLUDE_DIR@',
     '@INCLTDL@'[2:],
     '@top_srcdir@',
-    '@top_srcdir@/../osdep/win32',
     '@top_srcdir@/libecs',
     '@top_srcdir@/libemc',
     ]
