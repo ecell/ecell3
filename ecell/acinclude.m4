@@ -73,6 +73,13 @@ $2])
 CPPFLAGS="$save_CPPFLAGS"
 ])
 
+
+AC_DEFUN([ECELL_CHECK_PYTHON_LIBS], [
+  AC_REQUIRE([AM_PATH_PYTHON])
+  PYTHON_LIBNAME=`$PYTHON -c 'import sys; print "python%d.%d" % (sys.hexversion >> 24, (sys.hexversion >> 16) & 0xff)'`
+  PYTHON_LIBS="-l$PYTHON_LIBNAME"
+])
+
 dnl numpy package.
 dnl find arrayobject.h.
 dnl
