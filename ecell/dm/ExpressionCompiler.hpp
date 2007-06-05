@@ -892,7 +892,8 @@ void ExpressionCompiler::compileTree
 
     case CompileGrammar::CALL_FUNC :
       {
-	Integer aChildTreeSize( aTreeIterator->children.size() );
+	parse_tree_match_t::container_t::size_type
+	    aChildTreeSize( aTreeIterator->children.size() );
 	  
 	const String aFunctionString( aTreeIterator->value.begin(),
 				      aTreeIterator->value.end() );
@@ -1050,7 +1051,8 @@ void ExpressionCompiler::compileTree
     case CompileGrammar::SYSTEM_FUNC :
       {
 	assert( aTreeIterator->children.size() >= 3 );
-	Integer aChildTreeSize( aTreeIterator->children.size() );
+	parse_tree_match_t::container_t::size_type
+	    aChildTreeSize( aTreeIterator->children.size() );
 
 	TreeIterator const& 
 	  aChildTreeIterator( aTreeIterator->children.begin() );
