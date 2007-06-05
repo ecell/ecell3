@@ -180,8 +180,7 @@ namespace libecs
 
     DECLARE_TYPE( DynamicPriorityQueue<Event>, EventPriorityQueue );
 
-    typedef typename DynamicPriorityQueue<Event>::Index EventIndex_;
-    DECLARE_TYPE( EventIndex_, EventIndex );
+    DECLARE_TYPE( typename DynamicPriorityQueue<Event>::Index, EventIndex );
 
     typedef std::vector<EventIndex> EventIndexVector;
     typedef std::vector<EventIndexVector> EventIndexVectorVector;

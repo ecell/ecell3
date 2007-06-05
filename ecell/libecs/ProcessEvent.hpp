@@ -100,22 +100,49 @@ namespace libecs
 	{
 	  return false;
 	}
-      else if( getTime() < rhs.getTime() )
+      if( getTime() < rhs.getTime() )
 	{
 	  return true;
 	}
-      else // if theTime == rhs.theTime,
-	{  // then higher priority comes first.  
-	  if( theProcess->getPriority() < rhs.getProcess()->getPriority() )
-	    {
-	      return true;
-	    }
-	  else
-	    {
-	      return false;
-	    }
+      if( theProcess->getPriority() < rhs.getProcess()->getPriority() )
+	{
+	  return true;
 	}
+      return false;
     }
+
+
+    const bool operator> ( ProcessEventCref rhs ) const
+    {
+      // return theTime < rhs.theTime;
+
+      if( getTime() < rhs.getTime() )
+	{
+	  return false;
+	}
+      if( getTime() > rhs.getTime() )
+	{
+	  return true;
+	}
+      if( theProcess->getPriority() > rhs.getProcess()->getPriority() )
+	{
+	  return true;
+	}
+      return false;
+    }
+
+
+    const bool operator<= ( ProcessEventCref rhs ) const
+    {
+      return !( *this > rhs );
+    }
+
+
+    const bool operator>= ( ProcessEventCref rhs ) const
+    {
+      return !( *this < rhs );
+    }
+
 
     const bool operator!= ( ProcessEventCref rhs ) const
     {

@@ -57,7 +57,7 @@ class PersistentIDPolicy
 
 public:
 
-    typedef long long unsigned int ID;
+    typedef unsigned long long ID;
 
     typedef std::vector< ID >      IDVector;
     typedef IDVector::size_type    Index;
@@ -398,7 +398,7 @@ private:
     IndexVector   positionVector;
 
 
-    static std::less_equal< const Item > comp;
+    std::less_equal< const Item > comp;
 };
 
 

@@ -104,22 +104,42 @@ namespace libecs
 	{
 	  return false;
 	}
-      else if( getTime() < rhs.getTime() )
+      if( getTime() < rhs.getTime() )
 	{
 	  return true;
 	}
-      else // if theTime == rhs.theTime,
-	{  // then higher priority comes first 
-	  //	  return false;
-	  if( theStepper->getPriority() < rhs.getStepper()->getPriority() )
-	    {
-	      return true;
-	    }
-	  else
-	    {
-	      return false;
-	    }
+      if( theStepper->getPriority() < rhs.getStepper()->getPriority() )
+	{
+	  return true;
 	}
+      return false;
+    }
+
+    const bool operator> ( StepperEventCref rhs ) const
+    {
+      if( getTime() < rhs.getTime() )
+	{
+	  return false;
+	}
+      if( getTime() > rhs.getTime() )
+	{
+	  return true;
+	}
+      if( theStepper->getPriority() > rhs.getStepper()->getPriority() )
+	{
+	  return true;
+	}
+      return false;
+    }
+
+    const bool operator<= ( StepperEventCref rhs ) const
+    {
+      return !( *this > rhs );
+    }
+
+    const bool operator>= ( StepperEventCref rhs ) const
+    {
+      return !( *this < rhs );
     }
 
     const bool operator!= ( StepperEventCref rhs ) const
