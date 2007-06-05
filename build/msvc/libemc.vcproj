@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib libgsl.dll.a compat.lib ltdl.lib"
+				AdditionalDependencies="ecs.lib libgsl_dll.lib compat.lib ltdl.lib"
 				OutputFile="$(OutDir)\emc.dll"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(LIB)"
@@ -138,7 +138,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib libgsl.dll.a compat.lib ltdl.lib"
+				AdditionalDependencies="ecs.lib libgsl_dll.lib compat.lib ltdl.lib"
 				OutputFile="$(OutDir)\emc.dll"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(LIB)"

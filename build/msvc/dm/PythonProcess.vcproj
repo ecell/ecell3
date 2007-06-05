@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib libgsl.dll.a python25_d.lib boost_python_debug.lib"
+				AdditionalDependencies="ecs.lib libgsl_dll.lib python25_d.lib boost_python_debug.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(LIB)"
 				IgnoreDefaultLibraryNames=""
@@ -138,7 +138,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib libgsl.dll.a python25.lib boost_python.lib"
+				AdditionalDependencies="ecs.lib libgsl_dll.lib python25.lib boost_python.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(LIB)"
 				GenerateDebugInformation="true"
