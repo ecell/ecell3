@@ -27,7 +27,7 @@
 			<Tool
 				Name="VCCustomBuildTool"
 				Description=""
-				CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecell&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET INCLUDE=%INCLUDE%;$(INCLUDE)&#x0D;&#x0A;SET LIB=$(SolutionDir)$(ConfigurationName);%LIB%;$(LIB)&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; $(SolutionDir)..\..\ecell\pyecell\setup.py build -g -b $(OutDir)\$(ProjectName).build &amp;&amp; ECHO &quot;1&quot; &gt; $(OutDir)\$(ProjectName).stamp&#x0D;&#x0A;"
+				CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecell&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET INCLUDE=%INCLUDE%;$(INCLUDE)&#x0D;&#x0A;SET LIB=$(SolutionDir)$(ConfigurationName);%LIB%;$(LIB)&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecell\setup.py&quot; build -g -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
 				AdditionalDependencies=""
 				Outputs=""
 			/>
@@ -467,7 +467,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecell&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET INCLUDE=%INCLUDE%;$(INCLUDE)&#x0D;&#x0A;SET LIB=$(SolutionDir)$(ConfigurationName);%LIB%;$(LIB)&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; $(SolutionDir)..\..\ecell\pyecell\setup.py build -g -b $(OutDir)\$(ProjectName).build &amp;&amp; ECHO &quot;1&quot; &gt; $(OutDir)\$(ProjectName).stamp&#x0D;&#x0A;"
+					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecell&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET INCLUDE=%INCLUDE%;$(INCLUDE)&#x0D;&#x0A;SET LIB=$(SolutionDir)$(ConfigurationName);%LIB%;$(LIB)&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecell\setup.py&quot; build -g -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
 					Outputs="$(OutDir)\$(ProjectName).stamp"
 				/>
 			</FileConfiguration>
@@ -477,7 +477,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecell&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET INCLUDE=%INCLUDE%;$(INCLUDE)&#x0D;&#x0A;SET LIB=$(SolutionDir)$(ConfigurationName);%LIB%;$(LIB)&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; $(SolutionDir)..\..\ecell\pyecell\setup.py build -b $(OutDir)\$(ProjectName).build &amp;&amp; ECHO &quot;1&quot; &gt; $(OutDir)\$(ProjectName).stamp&#x0D;&#x0A;"
+					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecell&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET INCLUDE=%INCLUDE%;$(INCLUDE)&#x0D;&#x0A;SET LIB=$(SolutionDir)$(ConfigurationName);%LIB%;$(LIB)&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecell\setup.py&quot; build -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
 					Outputs="$(OutDir)\$(ProjectName).stamp"
 				/>
 			</FileConfiguration>
@@ -491,7 +491,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Generating setup.py..."
-					CommandLine="cscript $(ProjectDir)\gen_file.wsf $(OutDir) $(ProjectDir)\..\.. $(InputDir)$(InputName)&#x0D;&#x0A;"
+					CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\.. $(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 					Outputs="$(ProjectDir)..\..\ecell\pyecs\setup.py"
 				/>
 			</FileConfiguration>
@@ -501,7 +501,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Generating setup.py..."
-					CommandLine="cscript $(ProjectDir)\gen_file.wsf $(OutDir) $(ProjectDir)\..\.. $(InputDir)$(InputName)&#x0D;&#x0A;"
+					CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 					Outputs="$(ProjectDir)..\..\ecell\pyecs\setup.py"
 				/>
 			</FileConfiguration>
