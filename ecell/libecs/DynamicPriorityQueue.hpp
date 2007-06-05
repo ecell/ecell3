@@ -57,10 +57,10 @@ class PersistentIDPolicy
 
 public:
 
-    typedef unsigned long long ID;
-
+    typedef size_t                 ID;
     typedef std::vector< ID >      IDVector;
     typedef IDVector::size_type    Index;
+
 
 #if defined( HAVE_UNORDERED_MAP ) || defined( HAVE_TR1_UNORDERED_MAP )
 
