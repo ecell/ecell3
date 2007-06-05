@@ -583,7 +583,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="copy $(InputPath) $(ProjectDir)..\..\ecell\ecell_config.h&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(ProjectDir)..\..\ecell\ecell_config.h&quot;&#x0D;&#x0A;"
 						Outputs="$(ProjectDir)..\..\ecell\ecell_config.h"
 					/>
 				</FileConfiguration>
@@ -593,7 +593,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="copy $(InputPath) $(ProjectDir)..\..\ecell\ecell_config.h&#x0D;&#x0A;"
+						CommandLine="copy &quot;$(InputPath)&quot; &quot;$(ProjectDir)..\..\ecell\ecell_config.h&quot;&#x0D;&#x0A;"
 						Outputs="$(ProjectDir)..\..\ecell\ecell_config.h"
 					/>
 				</FileConfiguration>
