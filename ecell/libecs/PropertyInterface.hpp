@@ -234,6 +234,7 @@ namespace libecs
 	{
 	  throwNoSlot( anObject.getClassName(), aPropertyName );
 	}
+      return 0; // never get here
     }
 
 
@@ -341,6 +342,7 @@ namespace libecs
 	{
 	  return anObject.defaultGetProperty( aPropertyName );
 	}
+      return Polymorph(); // never get here
     }
 
     static const Polymorph getPropertyList( const T& anObject )
