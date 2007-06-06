@@ -437,10 +437,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ltdl.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ecell\libecs\MethodProxy.hpp"
 				>
 			</File>
@@ -559,7 +555,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputDir)$(InputName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(ProjectDir)..\..\ecell\libecs\Defs.hpp"
 					/>
 				</FileConfiguration>
@@ -569,7 +565,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputDir)\$(InputName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(ProjectDir)..\..\ecell\libecs\Defs.hpp"
 					/>
 				</FileConfiguration>

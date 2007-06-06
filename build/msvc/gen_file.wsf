@@ -16,6 +16,7 @@ var buildInfo = {
     <script language="JScript"><![CDATA[
 buildInfo.env = buildInfo.env.mix({
     STD_MATH_HEADER: '<math.h>',
+    INT64_T_DECLARATION: 'typedef __int64 int64_t; typedef unsigned __int64 uint64_t;',
     HIGHREAL_TYPE: 'double',
     HIGHREAL_IS_REAL: '1',
     INFINITY_VAL: 'std::numeric_limits<double>::infinity()'
