@@ -188,8 +188,8 @@ namespace libecs
     LongDataPoint() //constructor with no arguments
       :
     theAvg( 0.0 ),
-    theMax( 0.0 ),
-    theMin( 0.0 )
+    theMin( 0.0 ),
+    theMax( 0.0 )
     {
       ; // do nothing
     }
@@ -199,8 +199,8 @@ namespace libecs
       :
     DataPoint( aTime, aValue ),
     theAvg( aValue ),
-    theMax( aValue ),
-    theMin( aValue )
+    theMin( aValue ),
+    theMax( aValue )
     {
       ; // do nothing
     }
