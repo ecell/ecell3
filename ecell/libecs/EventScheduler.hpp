@@ -34,8 +34,7 @@
 
 #include "libecs.hpp"
 #include "DynamicPriorityQueue.hpp"
-
-#include <map>
+#include "AssocVector.h"
 
 namespace libecs
 {
@@ -185,7 +184,7 @@ namespace libecs
     typedef typename EventPriorityQueue::ID EventID;
 
     typedef std::vector<EventID> EventIDVector;
-    typedef std::map<EventID, EventIDVector> EventIDVectorMap;
+    typedef Loki::AssocVector<EventID, EventIDVector> EventIDVectorMap;
 
     EventScheduler()
     {
