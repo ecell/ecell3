@@ -59,7 +59,7 @@ namespace libecs
   protected:
 
     typedef EventScheduler<ProcessEvent> ProcessEventScheduler;
-    typedef ProcessEventScheduler::EventIndex EventIndex;
+    typedef ProcessEventScheduler::EventID EventID;
 
 
 
@@ -114,7 +114,7 @@ namespace libecs
     //    Real            theTimeScale;
     Real            theTolerance;
 
-    EventIndex      theLastEventIndex;
+    EventID         theLastEventID;
 
 
 

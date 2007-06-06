@@ -52,18 +52,17 @@ namespace libecs
     :
     //    theTimeScale( 0.0 ),
     theTolerance( 0.0 ),
-    theLastEventIndex( -1 )
+    theLastEventID( -1 )
   {
     ; // do nothing
   }
 
   GET_METHOD_DEF( String, LastProcess, DiscreteEventStepper )
   {
-    if( theLastEventIndex != -1 )
+    if( theLastEventID != -1 )
       {
-	const ProcessCptr 
-	  aLastProcess( theScheduler.
-			getEvent( theLastEventIndex ).getProcess() );
+	const ProcessCptr aLastProcess(
+	    theScheduler.getEvent( theLastEventID ).getProcess() );
 	
 	return aLastProcess->getFullID().getString();
       }
@@ -128,8 +127,7 @@ namespace libecs
 
   void DiscreteEventStepper::step()
   {
-    const EventIndex aTopIndex( theScheduler.getTopIndex() );
-    theLastEventIndex = aTopIndex;
+    theLastEventID = theScheduler.getTopID();
 
     // assert( getCurrentTime() == theScheduler.getTopEvent().getTime() )
 
@@ -186,7 +184,7 @@ namespace libecs
     const Real aCurrentTime( getCurrentTime() );
 
     ProcessEventCref 
-      aLastEvent( theScheduler.getEvent( theLastEventIndex ) );
+      aLastEvent( theScheduler.getEvent( theLastEventID ) );
     const ProcessCptr aLastProcess( aLastEvent.getProcess() );
 
     LoggerVectorCref aProcessLoggerVector( aLastProcess->getLoggerVector() );
@@ -201,17 +199,15 @@ namespace libecs
     // this will become unnecessary, in future versions,
     // in which Loggers log only Variables.
     //
-    const ProcessEventScheduler::EventIndexVector& anEventIndexVector
-      ( theScheduler.getDependencyVector( theLastEventIndex ) );
+    typedef ProcessEventScheduler::EventIDVector EventIDVector;
+    const EventIDVector& anEventIDVector(
+	theScheduler.getDependencyVector( theLastEventID ) );
 
-    for ( ProcessEventScheduler::EventIndexVector::const_iterator 
-	    i( anEventIndexVector.begin() );
-	  i != anEventIndexVector.end(); ++i ) 
+    for ( EventIDVector::const_iterator i( anEventIDVector.begin() );
+	  i != anEventIDVector.end(); ++i ) 
       {
-	const EventIndex anIndex( *i );
-
 	ProcessEventCref 
-	  aDependentEvent( theScheduler.getEvent( anIndex ) );
+	  aDependentEvent( theScheduler.getEvent( *i ) );
 	ProcessPtr const aDependentProcess( aDependentEvent.getProcess() );
 
 

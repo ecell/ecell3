@@ -35,6 +35,8 @@
 #include "libecs.hpp"
 #include "DynamicPriorityQueue.hpp"
 
+#include <map>
+
 namespace libecs
 {
 
@@ -62,7 +64,7 @@ namespace libecs
        (2) setTime( next scheduled time of this event );
      }
 
-     void update( EventCref anEvent )
+     void update( const Event& anEvent )
      {
        Given the last fired Event (anEvent) that this Event
        depends on,
@@ -71,7 +73,7 @@ namespace libecs
        (2) setTime( new scheduled time ).
      }
 
-     const bool isDependentOn( EventCref anEvent )
+     const bool isDependentOn( const Event& anEvent )
      {
        Return true if this Event must be updated when the
        given Event (anEvent) fired.  Otherwise return false;
@@ -176,18 +178,14 @@ namespace libecs
 
   public:
 
-    DECLARE_TYPE( Event_, Event );
+    typedef Event_ Event;
+    typedef DynamicPriorityQueue<Event, VolatileIDPolicy> EventPriorityQueue;
 
-    DECLARE_TYPE( DynamicPriorityQueue<Event>, EventPriorityQueue );
+    typedef typename EventPriorityQueue::Index EventIndex;
+    typedef typename EventPriorityQueue::ID EventID;
 
-    DECLARE_TYPE( typename DynamicPriorityQueue<Event>::Index, EventIndex );
-
-    typedef std::vector<EventIndex> EventIndexVector;
-    typedef std::vector<EventIndexVector> EventIndexVectorVector;
-
-    //DECLARE_VECTOR( EventIndex, EventIndexVector );
-    //DECLARE_VECTOR( EventIndexVector, EventIndexVectorVector );
-
+    typedef std::vector<EventID> EventIDVector;
+    typedef std::map<EventID, EventIDVector> EventIDVectorMap;
 
     EventScheduler()
     {
@@ -205,67 +203,66 @@ namespace libecs
       return theEventPriorityQueue.getSize();
     }
 
-    EventCref getTopEvent() const
+    const Event& getTopEvent() const
     {
       return theEventPriorityQueue.getTop();
     }
 
-    EventRef getTopEvent()
+    Event& getTopEvent()
     {
       return theEventPriorityQueue.getTop();
     }
 
-    EventIndex getTopIndex()
+    EventID getTopID()
     {
-      return theEventPriorityQueue.getTopIndex();
+      return theEventPriorityQueue.getTopID();
     }
 
-    EventCref getEvent( const EventIndex anIndex ) const
+    const Event& getEvent( const EventID anID ) const
     {
-      return theEventPriorityQueue.get( anIndex );
+      return theEventPriorityQueue.get( anID );
     }
 
-    EventRef getEvent( const EventIndex anIndex )
+    Event& getEvent( const EventID anID )
     {
-      return theEventPriorityQueue.get( anIndex );
+      return theEventPriorityQueue.get( anID );
     }
 
     void step()
     {
-      EventRef aTopEvent( theEventPriorityQueue.getTop() );
+      Event& aTopEvent( theEventPriorityQueue.getTop() );
       const Time aCurrentTime( aTopEvent.getTime() );
-      const EventIndex aTopEventIndex( getTopIndex() );
+      const EventID aTopEventID( getTopID() );
 
       // fire top
       aTopEvent.fire();
-      theEventPriorityQueue.moveDown( aTopEventIndex );
+      theEventPriorityQueue.moveDown( aTopEventID );
 
       // update dependent events
-      const EventIndexVector&
-	anEventIndexVector( theEventDependencyArray[ aTopEventIndex ] );
+      const EventIDVector&
+	anEventIDVector( theEventDependencyMap[ aTopEventID ] );
 
-      for( typename EventIndexVector::const_iterator 
-	     i( anEventIndexVector.begin() );
-	   i != anEventIndexVector.end(); ++i )
+      for( typename EventIDVector::const_iterator 
+	     i( anEventIDVector.begin() );
+	   i != anEventIDVector.end(); ++i )
 	{
-	  const EventIndex anIndex( *i );
-
-	  updateEvent( anIndex, aCurrentTime );
+	  updateEvent( *i, aCurrentTime );
 	}
     }
 
     void updateAllEvents( TimeParam aCurrentTime )
     {
-      const EventIndex aSize( getSize() );
-      for( EventIndex anIndex( 0 ); anIndex != aSize; ++anIndex )
+      typedef typename EventPriorityQueue::IDIterator IDIterator;
+      for( IDIterator i( theEventPriorityQueue.begin() );
+	   i != theEventPriorityQueue.end(); ++i )
 	{
-	  updateEvent( anIndex, aCurrentTime );
+	  updateEvent( *i, aCurrentTime );
 	}
     }
 
-    void updateEvent( const EventIndex anIndex, TimeParam aCurrentTime )
+    void updateEvent( const EventID anID, TimeParam aCurrentTime )
     {
-      EventRef anEvent( theEventPriorityQueue.get( anIndex ) );
+      Event& anEvent( theEventPriorityQueue.get( anID ) );
       const Time anOldTime( anEvent.getTime() );
       anEvent.update( aCurrentTime );
       const Time aNewTime( anEvent.getTime() );
@@ -273,26 +270,26 @@ namespace libecs
       // theEventPriorityQueue.move( anIndex );
       if( aNewTime >= anOldTime )
 	{
-	  theEventPriorityQueue.moveDown( anIndex );
+	  theEventPriorityQueue.moveDown( anID );
 	}
       else
 	{
-	  theEventPriorityQueue.moveUp( anIndex );
+	  theEventPriorityQueue.moveUp( anID );
 	}
     }
 
 
     void updateEventDependency();  // update all
 
-    void updateEventDependency( const EventIndex anIndex );
+    void updateEventDependency( const EventID anID );
     
     void clear()
     {
       theEventPriorityQueue.clear();
-      theEventDependencyArray.clear();
+      theEventDependencyMap.clear();
     }
 
-    const EventIndex addEvent( EventCref anEvent )
+    const EventID addEvent( const Event& anEvent )
     {
       return theEventPriorityQueue.push( anEvent );
     }
@@ -300,17 +297,15 @@ namespace libecs
 
     // this is here for DiscreteEventStepper::log().
     // should be removed in future. 
-    const EventIndexVector& getDependencyVector( const EventIndex anIndex )
+    const EventIDVector& getDependencyVector( const EventID& anID )
     {
-      return theEventDependencyArray[ anIndex ] ;
+      return theEventDependencyMap[ anID ] ;
     }
 
   private:
 
-    EventPriorityQueue       theEventPriorityQueue;
-
-    EventIndexVectorVector   theEventDependencyArray;
-
+    EventPriorityQueue theEventPriorityQueue;
+    EventIDVectorMap theEventDependencyMap;
   };
 
   
@@ -319,40 +314,42 @@ namespace libecs
   template < class Event >
   void EventScheduler<Event>::updateEventDependency()
   {
-    theEventDependencyArray.resize( theEventPriorityQueue.getSize() );
-    
-    for( EventIndex i1( 0 ); i1 != theEventPriorityQueue.getSize(); ++i1 )
+    typedef typename EventPriorityQueue::IDIterator IDIterator;
+    for( IDIterator i( theEventPriorityQueue.begin() );
+	 i != theEventPriorityQueue.end(); ++i )
       {
-	updateEventDependency( i1 );
+	updateEventDependency( *i );
       }
   }
 
   template < class Event >
   void EventScheduler<Event>::
-  updateEventDependency( const EventIndex i1 )
+  updateEventDependency( const EventID i1 )
   {
-    EventCref anEvent1( theEventPriorityQueue.get( i1 ) );
+    typedef typename EventPriorityQueue::IDIterator IDIterator;
+    const Event& anEvent1( theEventPriorityQueue.get( i1 ) );
 
-    EventIndexVector& anEventIndexVector( theEventDependencyArray[ i1 ] );
-    anEventIndexVector.clear();
+    EventIDVector& anEventIDVector( theEventDependencyMap[ i1 ] );
+    anEventIDVector.clear();
 
-    for( EventIndex i2( 0 ); i2 < theEventPriorityQueue.getSize(); ++i2 )
+    for( IDIterator i( theEventPriorityQueue.begin() );
+         i != theEventPriorityQueue.end(); ++i )
       {
-	if( i1 == i2 )
+	if( i1 == *i )
 	  {
 	    // don't include itself
 	    continue;
 	  }
 	
-	EventCref anEvent2( theEventPriorityQueue.get( i2 ) );
+	const Event& anEvent2( theEventPriorityQueue.get( *i ) );
 	
 	if( anEvent2.isDependentOn( anEvent1 ) )
 	  {
-	    anEventIndexVector.push_back( i2 );
+	    anEventIDVector.push_back( *i );
 	  }
       }
     
-    std::sort( anEventIndexVector.begin(), anEventIndexVector.end() );
+    std::sort( anEventIDVector.begin(), anEventIDVector.end() );
   }
 
 

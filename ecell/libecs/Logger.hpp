@@ -259,13 +259,13 @@ namespace libecs
 
     PhysicalLogger              thePhysicalLogger;
 
-    LoggerAdapterPtr                     theLoggerAdapter;
+    LoggerAdapterPtr            theLoggerAdapter;
 
     PhysicalLogger::size_type   theStepCounter;
-    Integer                              theMinimumStep; 
+    PhysicalLogger::size_type   theMinimumStep; 
 
-    Real                                 theLastTime;
-    Real                                 theMinimumInterval;
+    Real                        theLastTime;
+    Real                        theMinimumInterval;
 
   };
 

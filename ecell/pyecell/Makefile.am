@@ -8,7 +8,7 @@ mostlyclean-local:
 	$(PYTHON) setup.py clean
 
 install-exec-local:
-	$(PYTHON) setup.py install --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )
+	$(PYTHON) setup.py install -f --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )
 
 # Windows py2exe setup options, ignore for Unix based systems
 PY2EXE_SETUP = ../pyecs/windows/py2exeSetup

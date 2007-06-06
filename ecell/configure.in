@@ -42,11 +42,9 @@ AC_SUBST(PREFIX)
 dnl
 AC_ARG_WITH(gtk,
   AC_HELP_STRING([--without-gtk],
-                 [build ecell without gtk library.]),
-  [ECELL_SUBDIRS="libecs libemc pyecs pyecell bin dm"],
-  [ECELL_SUBDIRS="libecs libemc pyecs pyecell bin dm session-monitor model-editor toollauncher"]
+                 [build ecell without gtk library.])
 )
-AC_SUBST( ECELL_SUBDIRS )
+AM_CONDITIONAL(WITH_GTK, test "$with_GTK" != "no")
 dnl
 
 
@@ -167,6 +165,22 @@ AC_HEADER_STDC
 
 AC_CHECK_HEADERS([fcntl.h unistd.h memory.h sys/stat.h sys/types.h sys/mman.h sys/param.h sys/statvfs.h sys/statfs.h sys/mount.h sys/vfs.h])
 AC_CHECK_HEADERS([unordered_map tr1/unordered_map])
+AC_CHECK_HEADERS([windows.h])
+
+AC_CHECK_HEADERS([stdint.h], [
+  INT64_T_DECLARATION="#include <stdint.h>"
+], [
+  AC_CHECK_TYPE([long long], [
+    INT64_T_DECLARATION="typedef long long int64_t; typedef unsigned long long uint64_t;"
+  ], [
+    AC_CHECK_TYPE([__int64], [
+      INT64_T_DECLARATION="typedef __int64 int64_t; typedef unsigned __int64 uint64_t;"
+    ], [
+      INT64_T_DECLARATION=
+    ])
+  ])
+])
+AC_SUBST([INT64_T_DECLARATION])
 
 ECELL_CHECK_MATH_HEADER
 ECELL_CHECK_INFINITY
@@ -182,7 +196,6 @@ elif test "$HAVE_HUGE_VAL" = 1; then
 fi
 AC_SUBST([INFINITY_VAL])
 
-AC_CHECK_HEADERS([windows.h])
 ECELL_CHECK_PRETTY_FUNCTION
 
 AC_ARG_WITH(msvc, [  --with-msvc             create dmtool_config.h 4 MSVC])

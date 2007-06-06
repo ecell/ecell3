@@ -33,6 +33,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <typeinfo>
+#include <iostream>
 
 #include "Util.hpp"
 #include "Exceptions.hpp"
@@ -85,7 +86,9 @@ namespace libecs
       {
 	return NONE;
       }
-    
+   
+    std::cout << typeid( *theValue ).name();
+
     NEVER_GET_HERE;
   }
 
