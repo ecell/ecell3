@@ -37,7 +37,12 @@ AM_CONFIG_HEADER(ecell3_config.h)
 dnl
 dnl Create the top-level Makefile.
 dnl
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([
+Makefile
+build/Makefile
+build/msvc/Makefile
+build/msvc/dm/Makefile
+])
 dnl
 AC_OUTPUT(ecell3.doxy)
 

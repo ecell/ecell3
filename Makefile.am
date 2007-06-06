@@ -1,7 +1,7 @@
 
 #AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = libltdl dmtool ecell
+SUBDIRS = libltdl dmtool ecell build
 
 EXTRA_DIST = autogen.sh\
 depcomp\
