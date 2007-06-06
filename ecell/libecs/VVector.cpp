@@ -136,6 +136,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif /* HAVE_SYS_STAT_H */
+
 #ifdef _MSC_VER
 #define strdup( x ) _strdup( x )
 #endif /* _MSC_VER */

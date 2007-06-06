@@ -143,14 +143,14 @@
 #ifdef HAVE_SYS_STATVFS_H
 #include <sys/statvfs.h>
 #define statfs statvfs
+#else
+#ifdef HAVE_SYS_MOUNT_H
+#include <sys/mount.h>
+#endif /* HAVE_SYS_MOUNT_H */
 #endif /* HAVE_SYS_STATVFS_H */
 
 #ifdef HAVE_SYS_VFS_H
 #include <sys/vfs.h>
-#endif
-
-#ifdef HAVE_SYS_MOUNT_H
-#include <sys/mount.h>
 #endif
 
 #include <ctype.h>
