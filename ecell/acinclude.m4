@@ -76,8 +76,42 @@ CPPFLAGS="$save_CPPFLAGS"
 
 AC_DEFUN([ECELL_CHECK_PYTHON_LIBS], [
   AC_REQUIRE([AM_PATH_PYTHON])
+  AC_MSG_CHECKING([for python library location])
   PYTHON_LIBNAME=`$PYTHON -c 'import sys; print "python%d.%d" % (sys.hexversion >> 24, (sys.hexversion >> 16) & 0xff)'`
-  PYTHON_LIBS="-l$PYTHON_LIBNAME"
+  PYTHON_PREFIX=`$PYTHON -c 'import sys; print sys.prefix'`
+  if test -x "$PYTHON_PREFIX/bin/python-config"; then
+    PYTHON_LIBS=`$PYTHON_PREFIX/bin/python-config --ldflags`
+  else
+    PYTHON_LIBS="-L$PYTHON_PREFIX/lib -l$PYTHON_LIBNAME"
+
+    ac_save_LIBS="$LIBS"
+    ac_save_CPPFLAGS="$CPPFLAGS"
+    LIBS="$PYTHON_LIBS"
+    CPPFLAGS="$PYTHON_INCLUDES"
+    AC_TRY_LINK([
+#include <Python.h>
+    ], [
+Py_Initialize();
+    ],, [
+      LIBS="-F$PYTHON_PREFIX/../.."
+      case $host_os in
+      darwin* | rhapsody*)
+        AC_TRY_LINK([
+#include <python/Python.h>
+        ], [
+Py_Initialize();
+        ], [
+          PYTHON_LIBS="$LIBS -framework Python"
+        ], [
+          AC_MSG_ERROR([Could not detect python library location])
+        ])
+        ;;
+      esac
+    ])
+    LIBS="$ac_save_LIBS"
+    CPPFLAGS="$ac_save_CPPFLAGS"
+  fi
+  AC_MSG_RESULT([$PYTHON_LIBS])
 ])
 
 dnl numpy package.
