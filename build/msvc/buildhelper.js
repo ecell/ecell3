@@ -82,7 +82,7 @@ BuildHelper.prototype = {
     },
 
     execPythonScript: function(args) {
-        BuildHelper.exec(this.pythonHome + 'python', args);
+        BuildHelper.exec(this.pythonHome + 'python', 'unixlike', args);
     },
 
     run: function(tasks, method) {
@@ -170,15 +170,23 @@ BuildHelper.chdir = function(dir) {
     return true;
 };
 
-BuildHelper.escapeCommandlineArgument = function(arg) {
-    return /\s/.test(arg) ?  '"' + arg.replace(/"/, '""') + '"': arg;
+BuildHelper.CommandlineArgumentEscapers = {
+    winstd: function(arg) {
+        return /\s/.test(arg) ? '"' + arg.replace(/"/g, '""') + '"': arg;
+    },
+    unixlike: function(arg) {
+        return /[\\\s]/.test(arg) ? '"'
+            + arg.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
+            + '"': arg;
+    }
 };
 
-BuildHelper.exec = function(prog, args) {
-    var cmdline = BuildHelper.escapeCommandlineArgument(prog);
-
+BuildHelper.exec = function(prog, flavor, args) {
+    var cmdline = BuildHelper.CommandlineArgumentEscapers.winstd(prog);
+    var escapeCommandlineArgument = BuildHelper.CommandlineArgumentEscapers[flavor];
+ 
     for (var i = 0; i < args.length; i++) {
-        cmdline += ' ' + BuildHelper.escapeCommandlineArgument(args[i]);
+        cmdline += ' ' + escapeCommandlineArgument(args[i]);
     }
 
     var ex = WshShell.Exec(cmdline);
