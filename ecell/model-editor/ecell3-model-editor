@@ -14,8 +14,7 @@ os.environ['SESSIONMONITORPATH'] = SESSIONMONITORPATH
 os.environ['PYTHONPATH'] =  MEPATH + os.pathsep + SESSIONMONITORPATH + os.pathsep + os.environ['PYTHONPATH'] 
 os.environ['MEPATH'] = MEPATH
 
-if os.name == 'nt':
-    os.popen('python' + ' ' + '\"' + MEPATH + '\"' + os.sep + 'opengui.py' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')
-else:
-    os.system('python' + ' ' + '\"' + MEPATH + '\"' + os.sep + 'opengui.py' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')
-
+os.execve(sys.executable, [
+    '-',
+    MEPATH + os.sep + 'opengui.py'
+    ] + sys.argv[1:], os.environ)

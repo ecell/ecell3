@@ -15,8 +15,7 @@ PYTHONPATH = os.environ['PYTHONPATH']
 os.environ['PYTHONPATH'] = SESSIONMONITORPATH + os.pathsep + TLPATH + os.pathsep + TL_MISC_PATH + os.pathsep + PYTHONPATH
 os.environ['TLPATH'] = TLPATH
 
-if os.name == 'nt':
-    os.popen('python ' + '\"' + TLPATH + '\"' + os.sep + 'ToolLauncher.py ' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')
-else:
-    os.system('python ' + '\"' + TLPATH + '\"' + os.sep + 'ToolLauncher.py ' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')
-
+os.execve(sys.executable, [
+    '-',
+    TLPATH + os.sep + 'ToolLauncher.py'
+    ] + sys.argv[1:], os.environ)

@@ -12,7 +12,7 @@ os.environ['SESSIONMONITORPATH'] = SESSIONMONITORPATH
 os.environ['PYTHONPATH'] = SESSIONMONITORPATH + os.pathsep + PYTHONPATH
 os.environ['LANG'] = 'C'
 
-if os.name == 'nt':
-    os.popen('python' + ' ' + '\"' + SESSIONMONITORPATH + '\"' + os.sep + 'opengui.py' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')
-else:
-    os.system('python' + ' ' + '\"' + SESSIONMONITORPATH + '\"' + os.sep + 'opengui.py' + ' \"' + string.join( sys.argv[1:], '\" \"' ) + '\"')
+os.execve(sys.executable, [
+    '-',
+    SESSIONMONITORPATH + os.sep + 'opengui.py'
+    ] + sys.argv[1:], os.environ)
