@@ -964,12 +964,12 @@ libecs_win32_io_calculate_file_offset(HANDLE hdl,
 
             if (offset > 0) {                  
                 retval->Offset = (DWORD)(offset & (off_t)((DWORD)~0)) + l;
-                retval->OffsetHigh = (DWORD)(offset >> (sizeof(DWORD) * 8));
+                retval->OffsetHigh = (DWORD)(offset >> (sizeof(DWORD) * 8))
                         + (retval->Offset < (DWORD)l ? 1: 0);
             } else {
                 retval->Offset = (DWORD)l - (DWORD)(offset & (off_t)((DWORD)~0));
-                retval->OffsetHigh = (DWORD)(offset >> (sizeof(DWORD) * 8));
-                        - (retval->OffsSet > (DWORD)l ? 1: 0);
+                retval->OffsetHigh = (DWORD)(offset >> (sizeof(DWORD) * 8))
+                        - (retval->Offset > (DWORD)l ? 1: 0);
             }
 #endif
         }
@@ -994,12 +994,12 @@ libecs_win32_io_calculate_file_offset(HANDLE hdl,
 
             if (offset > 0) {
                 retval->Offset = (DWORD)(offset & (off_t)((DWORD)~0)) + l;
-                retval->OffsetHigh = (DWORD)(offset >> (sizeof(DWORD) * 8));
+                retval->OffsetHigh = (DWORD)(offset >> (sizeof(DWORD) * 8))
                         + (retval->Offset < (DWORD)l ? 1: 0);
             } else {
                 retval->Offset = (DWORD)l - (DWORD)(offset & (off_t)((DWORD)~0));
-                retval->OffsetHigh = (DWORD)(offset >> (sizeof(DWORD) * 8));
-                        - (retval->OffsSet > (DWORD)l ? 1: 0);
+                retval->OffsetHigh = (DWORD)(offset >> (sizeof(DWORD) * 8))
+                        - (retval->Offset > (DWORD)l ? 1: 0);
             }
 #endif
         }
@@ -1127,7 +1127,7 @@ off_t libecs_win32_io_seek(int fd, off_t offset, int whence)
         return _offset.QuadPart;
 #else
         LONG new_offset;
-        if (!SetFilePointer(hdl, offset, &new_offset,
+        if (!SetFilePointer(hdl, (LONG)offset, &new_offset,
                 libecs_win32_io_get_whence_code(whence))) {
             __libecs_errno = libecs_win32_translate_errno(GetLastError());
             return -1;
@@ -1211,14 +1211,6 @@ int libecs_win32_io_truncate(int fd, off_t length)
         }
 
         _length.QuadPart = length;
-#else
-        LONG _length = length, current_offset;
-        if (!SetFilePointer(hdl, 0, &current_offset,
-                FILE_CURRENT)) {
-            __libecs_errno = libecs_win32_translate_errno(GetLastError());
-            return -1;
-        }
-#endif
 
         if (!SetFilePointerEx(hdl, _length, NULL,
                 FILE_BEGIN)) {
@@ -1239,6 +1231,34 @@ int libecs_win32_io_truncate(int fd, off_t length)
             __libecs_errno = libecs_win32_translate_errno(GetLastError());
             return -1;
         }
+#else
+        LONG _length = (LONG)length, current_offset;
+        if (!SetFilePointer(hdl, 0, &current_offset,
+                FILE_CURRENT)) {
+            __libecs_errno = libecs_win32_translate_errno(GetLastError());
+            return -1;
+        }
+
+        if (!SetFilePointer(hdl, _length, NULL,
+                FILE_BEGIN)) {
+            __libecs_errno = libecs_win32_translate_errno(GetLastError());
+            return -1;
+        }
+
+        if (!SetEndOfFile(hdl)) {
+            DWORD last_error = GetLastError();
+            SetFilePointer(hdl, current_offset,
+                    NULL, FILE_BEGIN);
+            __libecs_errno = libecs_win32_translate_errno(last_error);
+            return -1;
+        }
+
+        if (!SetFilePointer(hdl, current_offset,
+                NULL, FILE_BEGIN)) {
+            __libecs_errno = libecs_win32_translate_errno(GetLastError());
+            return -1;
+        }
+#endif
     }
 
     return 0;
