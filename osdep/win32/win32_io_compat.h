@@ -53,6 +53,7 @@ extern "C" {
 #define O_NOFOLLOW  0x2000
 #define O_NONBLOCK  0x4000
 #define O_SYNC      0x8000
+#define O_BINARY    0x10000
 #define O_NDELAY    O_NONBLOCK
 
 #define S_IRWXU     00700 

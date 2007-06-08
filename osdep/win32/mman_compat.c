@@ -203,6 +203,9 @@ libecs_win32_mmap_hdl_list_find(libecs_win32_mmap_hdl_list_t *self,
 {
     int e = self->num_entries, s = 0, l = 0;
 
+    if (e == 0)
+        return NULL;
+
     while (s <= e) { 
         void *p;
         libecs_win32_mmap_hdl_list_entry_t *entry = &self->entries[l];

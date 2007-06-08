@@ -739,7 +739,7 @@ int libecs_win32_io_open(const char *pathname, int flags, ...)
             creation_disposition = CREATE_NEW;
         else {
             if (flags & O_TRUNC)
-                creation_disposition = TRUNCATE_EXISTING;
+                creation_disposition = CREATE_ALWAYS;
             else
                 creation_disposition = OPEN_ALWAYS;
         }
@@ -753,7 +753,11 @@ int libecs_win32_io_open(const char *pathname, int flags, ...)
         sec_attr.lpSecurityDescriptor = NULL;
 #endif
     } else {
-        creation_disposition = OPEN_EXISTING;
+        if (flags & O_TRUNC)
+            creation_disposition = TRUNCATE_EXISTING;
+        else
+            creation_disposition = OPEN_EXISTING;
+
         sec_attr.lpSecurityDescriptor = NULL;
     }
 
