@@ -7,5 +7,3 @@ GLADEFILE_PATH = SESSIONMONITORPATH
 
 # where to look at when loading plug-ins
 PLUGIN_PATH = [ SESSIONMONITORPATH + os.sep + 'plugins', '.' ]
-GNOME_INSTALLED = '@GNOME_INSTALLED@'
-

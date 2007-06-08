@@ -320,8 +320,7 @@ AC_CONFIG_FILES([bin/Makefile
                  bin/ecell3-em2eml],
                  [chmod +x bin/ecell3-dmc bin/ecell3-em2eml bin/ecell3-eml2em])
 AC_CONFIG_FILES([session-monitor/Makefile
-                 session-monitor/plugins/Makefile
-                 session-monitor/config.py],
+                 session-monitor/plugins/Makefile],
                  [chmod +x session-monitor/ecell3-session-monitor session-monitor/gecell])
 AC_CONFIG_FILES([model-editor/Makefile
                  model-editor/glade/Makefile
