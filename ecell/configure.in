@@ -308,9 +308,6 @@ AC_CONFIG_FILES([Makefile
                  libemc/Makefile
                  pyecs/setup.py
                  pyecs/Makefile
-                 pyecs/windows/Makefile
-                 pyecs/windows/ecell3-installer.iss
-                 pyecs/windows/pathVariables
                  pyecell/setup.py
                  pyecell/Makefile
                  dm/Makefile])
