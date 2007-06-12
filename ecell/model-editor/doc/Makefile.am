@@ -3,7 +3,7 @@ AUTOMAKE_OPTIONS = foreign
 PACKAGE=@PACKAGE@
 VERSION=@VERSION@
 
-docdir=${datadir}/doc/${PACKAGE}-${VERSION}
+docdir=${datadir}/doc/${ECELL_DIRNAME}
 
 modeleditordocdir = ${docdir}/model-editor
 

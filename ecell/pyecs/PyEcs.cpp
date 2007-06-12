@@ -68,6 +68,18 @@ static PyObject* getLibECSVersionInfo()
   return aPyTuple;
 }
 
+static const std::string EntityTypeString( int typecode )
+{
+  return EntityType( static_cast<enum EntityType::Type>( typecode ) ).getString();
+};
+
+template<typename _T, _T _code>
+static const int& ConstantFixer()
+{
+    static const int val = static_cast<int>( _code );
+    return val;
+}
+
 BOOST_PYTHON_MODULE( _ecs )
 {
   using namespace boost::python;
@@ -181,5 +193,23 @@ BOOST_PYTHON_MODULE( _ecs )
     ;
 
 
+  class_<EntityType>( "EntityType" )
+
+    // properties
+    .def_readonly( "NONE",
+        ConstantFixer< EntityType::Type, EntityType::NONE     >() )
+    .def_readonly( "ENTITY",
+        ConstantFixer< EntityType::Type, EntityType::ENTITY   >() )
+    .def_readonly( "VARIABLE",
+        ConstantFixer< EntityType::Type, EntityType::VARIABLE >() )
+    .def_readonly( "PROCESS",
+        ConstantFixer< EntityType::Type, EntityType::PROCESS  >() )
+    .def_readonly( "SYSTEM",
+        ConstantFixer< EntityType::Type, EntityType::SYSTEM   >() )
+
+    // methods
+    .def( "getString", &EntityTypeString )
+    .staticmethod( "getString" )
+    ;
 }
 

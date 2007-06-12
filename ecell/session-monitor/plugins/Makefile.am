@@ -1,12 +1,7 @@
 AUTOMAKE_OPTIONS = foreign
 
-
-ECELL_DIRNAME=@ECELL_DIRNAME@
-ECELL_LIB_DIR=${libdir}/${ECELL_DIRNAME}
-osogopluginsdir = ${ECELL_LIB_DIR}/session-monitor/plugins
-
-
-osogoplugins_DATA = BargraphWindow.glade\
+EXTRA_DIST = \
+BargraphWindow.glade\
 BargraphWindow.py\
 BargraphWindow.xpm\
 DigitalWindow.glade\
@@ -42,6 +37,3 @@ navy.xpm\
 green.xpm\
 orangesq.xpm\
 orange.xpm
-
-EXTRA_DIST=${osogoplugins_DATA}
-

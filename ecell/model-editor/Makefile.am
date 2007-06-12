@@ -1,29 +1,24 @@
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = glade doc plugin  # plugin's'!
+SUBDIRS = glade doc plugins  # plugin's'!
 
-
-ECELL_DIRNAME=@ECELL_DIRNAME@
-ECELL_LIB_DIR=${libdir}/${ECELL_DIRNAME}
-modeleditordir = ${ECELL_LIB_DIR}/model-editor
-
-modeleditor_PYTHON=\
+EXTRA_DIST = \
 preferences.ini\
-ShapePluginManager.py\
 AboutModelEditor.py\
 AutoLayout.py\
 AutosaveWindow.py\
 Buffer.py\
 BufferFactory.py\
 ClassEditor.py\
-ClassList.py\
 ClassEditorWindow.py\
+ClassList.py\
 ClassPropertyList.py\
 Clipboard.py\
 Command.py\
+CommandMultiplexer.py\
 CommandQueue.py\
-ComplexShape.py\
 ComplexLine.py\
+ComplexShape.py\
 ConfirmWindow.py\
 ConnectionObject.py\
 ConnectionObjectEditorWindow.py\
@@ -36,6 +31,7 @@ EntityList.py\
 EntityListTab.py\
 Error.py\
 FullIDBrowserWindow.py\
+GraphicalUtils.py\
 Layout.py\
 LayoutBuffer.py\
 LayoutBufferFactory.py\
@@ -43,22 +39,29 @@ LayoutCommand.py\
 LayoutEml.py\
 LayoutManager.py\
 LayoutXML.py\
-LinePropertyEditor.py\
 LineDescriptor.py\
+LinePropertyComponent.py\
+LinePropertyEditor.py\
 ListWindow.py\
 MEMainWindow.py\
+MEVariableReferenceEditor.py\
 ModelEditor.py\
 ModelStore.py\
 MultiLineEditor.py\
 NestedListEditor.py\
 ObjectEditorWindow.py\
+PackingStrategy.py\
+PathwayCanvas.py\
 PathwayEditor.py\
 PopupMenu.py\
 ProcessObject.py\
 PropertyEditor.py\
 PropertyList.py\
 ResizeableText.py\
+RunTester.py\
 Runtime.py\
+ShapeDescriptor.py\
+ShapePluginManager.py\
 ShapePropertyComponent.py\
 StepperChooser.py\
 StepperCommand.py\
@@ -70,41 +73,35 @@ SystemTree.py\
 TextObject.py\
 Utils.py\
 VariableObject.py\
-MEVariableReferenceEditor.py\
+VariableReferenceEditorComponent.py\
 ViewComponent.py\
 Window.py\
-PathwayCanvas.py\
-Config.py\
-CommandMultiplexer.py\
-PackingStrategy.py\
-ecell3-model-editor\
-opengui.py\
-VariableReferenceEditorComponent.py\
-ShapePropertyComponent.py\
-ShapeDescriptor.py\
-ObjectEditorWindow.py\
-LinePropertyComponent.py\
-GraphicalUtils.py\
-ConnectionObjectEditorWindow.py\
-ComplexShape.py
+config.py
 
-
-EXTRA_DIST=${modeleditor_PYTHON} ${BINS}
-
-# Windows py2exe setup options, ignore for Unix based systems
-PY2EXE_SETUP = ../../ecell/pyecs/windows/py2exeSetup
-WIN_ICON = glade/modeleditor.ico
-PATH_VARIABLES = ../../ecell/pyecs/windows/pathVariables
-
-BINS =\
+EXTRA_DIST +=\
 ecell3-model-editor
 
-EXE = ${BINS:=$(EXEEXT)}
-bin_SCRIPTS = ${EXE}
+all-local:
+	sysconfdir=$(sysconfdir) \
+	datarootdir=$(datarootdir) \
+	libdir=$(libdir) \
+	$(PYTHON) setup.py config
+	sysconfdir=$(sysconfdir) \
+	datarootdir=$(datarootdir) \
+	libdir=$(libdir) \
+	$(PYTHON) setup.py build
 
-%.exe : %
-	python $(PY2EXE_SETUP) --source=$< --icon=$(WIN_ICON) --merge=$(PATH_VARIABLES) --gui py2exe
+mostlyclean-local:
+	sysconfdir=$(sysconfdir) \
+	datarootdir=$(datarootdir) \
+	libdir=$(libdir) \
+	$(PYTHON) setup.py clean
 
-clean-local:
-	${RM} -rf build *.exe *.zip *.dll *.pyd
+install-exec-local:
+	DESTDIR=$(DESTDIR); \
+	sysconfdir=$(sysconfdir) \
+	datarootdir=$(datarootdir) \
+	libdir=$(libdir) \
+	$(PYTHON) setup.py install -f --prefix=$(PREFIX) $${DESTDIR:+--root }$${DESTDIR}
+
 

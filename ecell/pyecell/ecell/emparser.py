@@ -47,8 +47,8 @@ import tempfile
 import ecell.eml
 from ecell.ecssupport import *
 
-import lex
-import yacc
+import ply.lex as lex
+import ply.yacc as yacc
 
 # Reserved words
 reserved = (

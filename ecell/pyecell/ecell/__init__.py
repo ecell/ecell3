@@ -25,16 +25,18 @@
 # 
 #END_HEADER
 
-__all__ = [ 'ECS', 
- 'ECDDataFile',
- 'EntityStub',
- 'StepperStub',
- 'LoggerStub', 
- 'ecssupport', 
- 'eml', 
- 'Session', 
- 'DataFileManager', 
- 'DataFile' ] 
+__all__ = [
+    'ECS', 
+    'ECDDataFile',
+    'EntityStub',
+    'StepperStub',
+    'LoggerStub', 
+    'ecssupport', 
+    'eml', 
+    'Session', 
+    'DataFileManager', 
+    'DataFile'
+    ]
 
 from ecs_constants import *
 from ECDDataFile import *
@@ -46,5 +48,3 @@ from eml import *
 from Session import *
 from DataFileManager import *
 from DataFile import *
-
-

@@ -6,9 +6,7 @@ WIN_ICON = ../pyecs/windows/ecell3-console.ico
 PATH_VARIABLES = ../pyecs/windows/pathVariables
 
 BINS =\
-ecell3-dmc\
-ecell3-em2eml\
-ecell3-eml2em
+ecell3-dmc
 
 EXTRA_DIST=${BINS}
 

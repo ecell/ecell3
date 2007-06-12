@@ -20,12 +20,25 @@ EXTRA_DIST = \
 	ecell/ecsinit.py
 
 all-local:
-	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libdir=$(libdir) $(PYTHON) setup.py config
-	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libdir=$(libdir) $(PYTHON) setup.py build
+	CFLAGS="$(CPPFLAGS) $(CFLAGS)" \
+	LDFLAGS="$(LDFLAGS)" \
+	libdir="$(libdir)" \
+	$(PYTHON) setup.py config
+	CFLAGS="$(CPPFLAGS) $(CFLAGS)" \
+	LDFLAGS="$(LDFLAGS)" \
+	libdir="$(libdir)" \
+	$(PYTHON) setup.py build
 
 mostlyclean-local:
-	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libdir=$(libdir) $(PYTHON) setup.py clean
+	CFLAGS="$(CPPFLAGS) $(CFLAGS)" \
+	LDFLAGS="$(LDFLAGS)" \
+	libdir="$(libdir)" \
+	$(PYTHON) setup.py clean
 	rm -rf build
 
 install-exec-local:
-	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libdir=$(libdir) $(PYTHON) setup.py install -f --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )
+	DESTDIR=$(DESTDIR); \
+	CFLAGS="$(CPPFLAGS) $(CFLAGS)" \
+	LDFLAGS="$(LDFLAGS)" \
+	libdir="$(libdir)" \
+	$(PYTHON) setup.py install -f --prefix=$(PREFIX) $${DESTDIR:+--root }$${DESTDIR}

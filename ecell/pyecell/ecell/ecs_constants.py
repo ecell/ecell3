@@ -28,7 +28,7 @@
 #
 # constants for ecell
 #
-
+from ecell._ecs import EntityType
 
 # boolean constants
 TRUE  = 1
@@ -41,22 +41,23 @@ ID         = 2
 PROPERTY   = 3
 
 # Entity type numbers
-ENTITY     = 1
-VARIABLE  = 2
-PROCESS    = 3
-SYSTEM     = 4
+ENTITY     = EntityType.ENTITY
+VARIABLE   = EntityType.VARIABLE
+PROCESS    = EntityType.PROCESS
+SYSTEM     = EntityType.SYSTEM
 
-ENTITYTYPE_STRING_LIST =\
-( 'NONE', 'Entity', 'Variable', 'Process', 'System' )
+ENTITYTYPE_LIST = (
+    EntityType.NONE,
+    EntityType.ENTITY,
+    EntityType.VARIABLE,
+    EntityType.PROCESS,
+    EntityType.SYSTEM,
+    )
 
+ENTITYTYPE_STRING_LIST = tuple([
+    EntityType.getString( val ) for val in ENTITYTYPE_LIST ])
 
-ENTITYTYPE_DICT =\
-{
-    'Entity'   : ENTITY,
-    'Variable': VARIABLE,
-    'Process'  : PROCESS,
-    'System'   : SYSTEM
-}    
+ENTITYTYPE_DICT = dict( zip( ENTITYTYPE_STRING_LIST, ENTITYTYPE_LIST ) )
 
 # File extension
 

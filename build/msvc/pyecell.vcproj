@@ -459,6 +459,54 @@
 			</Filter>
 		</Filter>
 		<File
+			RelativePath="..\..\ecell\pyecell\ecell\config.py.in"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Generating setup.py..."
+					CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\.. $(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
+					Outputs="$(ProjectDir)..\..\ecell\pyecell\ecell\config.py"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Generating setup.py..."
+					CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
+					Outputs="$(ProjectDir)..\..\ecell\pyeell\ecell\config.py"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
+			RelativePath="..\..\ecell\pyecell\setup.py.in"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Generating setup.py..."
+					CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\.. $(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
+					Outputs="$(ProjectDir)..\..\ecell\pyecell\setup.py"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Generating setup.py..."
+					CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
+					Outputs="$(ProjectDir)..\..\ecell\pyecell\setup.py"
+				/>
+			</FileConfiguration>
+		</File>
+		<File
 			RelativePath="..\..\ecell\pyecell\setup.py"
 			>
 			<FileConfiguration
@@ -479,30 +527,6 @@
 					Description="Running distutils..."
 					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecell&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET INCLUDE=%INCLUDE%;$(INCLUDE)&#x0D;&#x0A;SET LIB=$(SolutionDir)$(ConfigurationName);%LIB%;$(LIB)&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecell\setup.py&quot; build -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
 					Outputs="$(OutDir)\$(ProjectName).stamp"
-				/>
-			</FileConfiguration>
-		</File>
-		<File
-			RelativePath="..\..\ecell\pyecell\setup.py.in"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Generating setup.py..."
-					CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\.. $(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectDir)..\..\ecell\pyecs\setup.py"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Generating setup.py..."
-					CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectDir)..\..\ecell\pyecs\setup.py"
 				/>
 			</FileConfiguration>
 		</File>

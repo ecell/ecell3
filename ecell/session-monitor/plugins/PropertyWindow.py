@@ -26,9 +26,10 @@
 # 
 #END_HEADER
 
-from OsogoPluginWindow import *
-from VariableReferenceEditor import *
-from FullPNQueue import *
+from ecell.osogo.OsogoPluginWindow import OsogoPluginWindow
+from ecell.osogo.VariableReferenceEditor import *
+from ecell.osogo.FullPNQueue import *
+import ecell.osogo.config as config
 
 # column index of clist
 GETABLE_COL   = 0
@@ -167,8 +168,8 @@ class PropertyWindow(OsogoPluginWindow):
         self['checkViewAll'].set_active( False )
 
         self.setIconList(
-            os.environ['SESSIONMONITORPATH'] + os.sep + "ecell.png",
-            os.environ['SESSIONMONITORPATH'] + os.sep + "ecell32.png")
+            os.path.join( config.glade_dir, "ecell.png" ),
+            os.path.join( config.glade_dir, "ecell32.png" ) )
         #self.__setFullPNList()
         self.update(True)
 

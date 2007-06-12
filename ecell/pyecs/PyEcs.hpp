@@ -176,6 +176,7 @@ public:
 			 "Unacceptable type of an object in the tuple." );
 	python::throw_error_already_set();
       }
+    return libecs::Polymorph(); // never get here
   }
 
 

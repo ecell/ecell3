@@ -62,7 +62,7 @@ def createFullPN( fullpnstring ):
 def createFullIDString( fullid ):
 
     validateFullID( fullid )
-    aTypeString = ENTITYTYPE_STRING_LIST[int(fullid[0])]
+    aTypeString = ENTITYTYPE_STRING_LIST[ int( fullid[0] ) ]
     return aTypeString + ':' + string.join( fullid[1:], ':' )
 
 

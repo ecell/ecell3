@@ -31,12 +31,10 @@ import gtk.gdk
 import re
 import string
 import operator
-from Plot import *
 from ecell.ecssupport import *
-#LoggerMinimumInterval=1
-
-from OsogoPluginWindow import *
-from ConfirmWindow import *
+from ecell.osogo.Plot import *
+from ecell.osogo.OsogoPluginWindow import OsogoPluginWindow
+from ecell.osogo.ConfirmWindow import ConfirmWindow
 import os
 import os.path
 
@@ -131,8 +129,8 @@ class TracerWindow( OsogoPluginWindow ):
         self.theListWindow.connect( "button-press-event", self.buttonPressedOnList)
 
         self.setIconList(
-        os.environ['SESSIONMONITORPATH'] + os.sep + "ecell.png",
-        os.environ['SESSIONMONITORPATH'] + os.sep + "ecell32.png")
+            os.path.join( config.glade_dir, "ecell.png" ),
+            os.path.join( config.glade_dir, "ecell32.png" ) )
         #addtrace to plot
         self.addTraceToPlot( self.theFullPNList() )
         #sets stripinterval, disable history buttons

@@ -1,90 +1,61 @@
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = plugins
+SUBDIRS = resources plugins
 
-
-ECELL_DIRNAME=@ECELL_DIRNAME@
-ECELL_LIB_DIR=${libdir}/${ECELL_DIRNAME}
-
-osogodir=${ECELL_LIB_DIR}/session-monitor
-
-osogo_PYTHON=\
+EXTRA_DIST = \
 osogo.ini\
-BoardWindow.py\
-BoardWindow.glade\
-ConfirmWindow.py\
-DataGenerator.py\
-EntityListWindow.glade\
-EntityListWindow.py\
-FullPNQueue.py\
-FullPNQueue.glade\
-InterfaceWindow.py\
-InterfaceWindow.glade\
-LoggerWindow.glade\
-LoggerWindow.py\
-LoggingPolicy.py\
-LoggingPolicy.glade\
-MainWindow.glade\
-MainWindow.py\
-MessageWindow.glade\
-MessageWindow.py\
-OsogoWindow.py\
-OsogoPluginManager.py\
-OsogoPluginWindow.py\
-StepperWindow.glade\
-StepperWindow.py\
-AboutSessionMonitor.glade\
-AboutSessionMonitor.py\
-OsogoUtil.py\
-PluginInstanceSelection.glade\
-PluginInstanceSelection.py\
-PluginWindowPopupMenu.glade\
-VariableReferenceEditor.py\
-Plot.py\
-board.glade\
-config.py\
-main.py\
-opengui.py\
-ecell.png\
-ecell32.png\
-ecell32-1.png\
-ecell32-2.png\
-ecell32-3.png\
-ecell32-4.png\
-ecell32-5.png\
-ecell32-6.png\
-ecell32-7.png\
-ecell32-8.png\
-ecell_large.png\
-icon_board.png\
-icon_ecell.png\
-icon_entity.png\
-icon_interface.png\
-icon_logger.png\
-icon_message.png\
-icon_start.png\
-icon_step.png\
-icon_stepper.png\
-icon_stop.png
+ecell/osogo/AboutSessionMonitor.py\
+ecell/osogo/BoardWindow.py\
+ecell/osogo/ConfirmWindow.py\
+ecell/osogo/DataGenerator.py\
+ecell/osogo/EntityListWindow.py\
+ecell/osogo/FullPNQueue.py\
+ecell/osogo/GtkSessionMonitor.py\
+ecell/osogo/InterfaceWindow.py\
+ecell/osogo/LoggerFactory.py\
+ecell/osogo/LoggerWindow.py\
+ecell/osogo/LoggingPolicy.py\
+ecell/osogo/MainWindow.py\
+ecell/osogo/MessageWindow.py\
+ecell/osogo/OsogoPluginManager.py\
+ecell/osogo/OsogoPluginWindow.py\
+ecell/osogo/OsogoUtil.py\
+ecell/osogo/OsogoWindow.py\
+ecell/osogo/Plot.py\
+ecell/osogo/PluginInstanceSelection.py\
+ecell/osogo/PluginWindow.py\
+ecell/osogo/StepperWindow.py\
+ecell/osogo/VariableReferenceEditor.py\
+ecell/osogo/ViewWindow.py\
+ecell/osogo/Window.py\
+ecell/osogo/__init__.py\
+ecell/osogo/config.py\
+ecell/osogo/constants.py\
+ecell/osogo/main.py
 
+EXTRA_DIST +=\
+ecell3-session-monitor
 
-EXTRA_DIST=${osogo_PYTHON} ${BINS}
+all-local:
+	sysconfdir=$(sysconfdir) \
+	datarootdir=$(datarootdir) \
+	libdir=$(libdir) \
+	$(PYTHON) setup.py config
+	sysconfdir=$(sysconfdir) \
+	datarootdir=$(datarootdir) \
+	libdir=$(libdir) \
+	$(PYTHON) setup.py build
 
-# Windows py2exe setup options, ignore for Unix based systems
-PY2EXE_SETUP = ../../ecell/pyecs/windows/py2exeSetup
-WIN_ICON = plugins/ecell.ico
-PATH_VARIABLES = ../../ecell/pyecs/windows/pathVariables
+mostlyclean-local:
+	sysconfdir=$(sysconfdir) \
+	datarootdir=$(datarootdir) \
+	libdir=$(libdir) \
+	$(PYTHON) setup.py clean
 
-BINS =\
-ecell3-session-monitor\
-gecell
-
-EXE = ${BINS:=$(EXEEXT)}
-bin_SCRIPTS = ${EXE}
-
-%.exe : %
-	python $(PY2EXE_SETUP) --source=$< --icon=$(WIN_ICON) --merge=$(PATH_VARIABLES) --gui py2exe
-
-clean-local:
-	${RM} -rf build *.exe *.zip *.dll *.pyd
+install-exec-local:
+	DESTDIR=$(DESTDIR); \
+	sysconfdir=$(sysconfdir) \
+	datarootdir=$(datarootdir) \
+	libdir=$(libdir) \
+	$(PYTHON) setup.py install -f --prefix=$(PREFIX) $${DESTDIR:+--root }$${DESTDIR}
 

@@ -1,0 +1,105 @@
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#
+#       This file is part of the E-Cell System
+#
+#       Copyright (C) 1996-2007 Keio University
+#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#
+#
+# E-Cell System is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+# 
+# E-Cell System is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public
+# License along with E-Cell System -- see the file COPYING.
+# If not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# 
+#END_HEADER
+import os
+import sys
+
+package = "@PACKAGE@"
+per_app_dir_name = "@ECELL_DIRNAME@"
+version = "@VERSION@"
+version_info = {
+    'major': @ECELL_MAJOR_VERSION@,
+    'minor': @ECELL_MINOR_VERSION@,
+    'micro': @ECELL_MICRO_VERSION@
+}
+
+prefix = '''@PREFIX@'''
+if len( prefix ) == 0 or not os.path.isdir( prefix ):
+    prefix = os.path.dirname(
+        os.path.dirname( get_running_executable() )
+        )
+
+exec_prefix = '''@EXEC_PREFIX@'''
+if len( exec_prefix ) == 0 or not os.path.isdir( exec_prefix ):
+    exec_prefix = prefix
+
+if os.name == 'nt':
+    from win32com.shell import shell, shellcon
+    home_dir = shell.SHGetPathFromIDList(
+        shell.SHGetSpecialFolderLocation( 0, shellcon.CSIDL_PROFILE )
+        )
+    user_prefs_dir = os.path.join(
+        shell.SHGetPathFromIDList(
+            shell.SHGetSpecialFolderLocation( 0, shellcon.CSIDL_APPDATA )
+            ),
+        per_app_dir_name
+        )
+else:
+    home_dir = os.path.expanduser( '~' )
+    user_prefs_dir = os.path.join( home_dir, '.' + per_app_dir_name )
+
+# Inspired by BTL::platform::get_module_filename
+def get_running_executable():
+    if getattr( sys, 'frozen', '' ) == 'windows_exe':
+        import win32api
+        return win32api.GetModuleFileName( 0 )
+    else:
+        return os.path.abspath( sys.argv[0] )
+
+def expand_shell_variables( val, vars ):
+    import re
+    return re.compile( r'\$\{([^}]+)\}' ).sub(
+        lambda m: vars[ m.group( 1 ) ], val )
+
+bin_dir = '''@bindir@'''
+bin_dir = expand_shell_variables( bin_dir, locals() )
+if len( bin_dir ) == 0 or not os.path.isdir( bin_dir ):
+    bin_dir = os.path.join( prefix, 'bin' )
+bin_dir = os.path.join( bin_dir, per_app_dir_name  )
+
+_lib_dir = '''@libdir@'''
+_lib_dir = expand_shell_variables( _lib_dir, locals() )
+if len( _lib_dir ) == 0 or not os.path.isdir( _lib_dir ):
+    _lib_dir = os.path.join( prefix, 'lib' )
+lib_dir = os.path.join( _lib_dir, per_app_dir_name  )
+
+_data_dir = '''@datarootdir@'''
+_data_dir = expand_shell_variables( _data_dir, locals() )
+if len( _data_dir ) == 0 or not os.path.isdir( _data_dir ):
+    _data_dir = os.path.join( prefix, 'share' )
+data_dir = os.path.join( _data_dir, per_app_dir_name  )
+
+_conf_dir = '''@sysconfdir@'''
+_conf_dir = expand_shell_variables( _conf_dir, locals() )
+if len( _conf_dir ) == 0 or not os.path.isdir( _conf_dir ):
+    _conf_dir = os.path.join( prefix, 'etc' )
+conf_dir = os.path.join( _conf_dir, per_app_dir_name )
+
+if os.environ.has_key( 'ECELL3_DM_PATH' ):
+    dm_path = os.environ[ 'ECELL3_DM_PATH' ].split( os.pathsep )
+else:
+    dm_path = []
+dm_path += [ os.path.join( lib_dir, 'dms' ) ]

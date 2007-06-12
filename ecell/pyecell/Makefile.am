@@ -8,28 +8,25 @@ mostlyclean-local:
 	$(PYTHON) setup.py clean
 
 install-exec-local:
-	$(PYTHON) setup.py install -f --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )
+	DESTDIR=$(DESTDIR); \
+	$(PYTHON) setup.py install -f --prefix=$(PREFIX) $${DESTDIR:+--root }$${DESTDIR}
 
-# Windows py2exe setup options, ignore for Unix based systems
-PY2EXE_SETUP = ../pyecs/windows/py2exeSetup
-WIN_ICON = ../pyecs/windows/ecell3-console.ico
-PATH_VARIABLES = ../pyecs/windows/pathVariables
-
-BINS =\
+EXTRA_DIST =\
 ecell3-session\
 ecell3-session-manager\
 ecell3-session-gui\
 ecell3-sbml2eml\
-ecell3-eml2sbml
+ecell3-eml2sbml\
+ecell3-em2eml\
+ecell3-eml2em
 
-EXTRA_DIST = \
+EXTRA_DIST +=\
 ecell/DataFile.py\
 ecell/DataFileManager.py\
 ecell/ECDDataFile.py\
 ecell/EntityStub.py\
 ecell/FullID.py\
-ecell/GtkSessionMonitor.py\
-ecell/LoggerStub.py\
+ecell/GtkSessionMonitor.py\ ecell/LoggerStub.py\
 ecell/ModelWalker.py\
 ecell/ObjectStub.py\
 ecell/Plugin.py\
@@ -55,10 +52,7 @@ ecell/expressionlextab.py\
 ecell/expressionparser.py\
 ecell/expressionparsetab.py\
 ecell/gui_config.py\
-ecell/lex.py\
-ecell/lextab.py\
 ecell/util.py\
-ecell/yacc.py\
 ecell/_tableio.c\
 ecell/README.TableIO\
 ecell/SessionManager/Globus2SessionProxy.py\
@@ -87,13 +81,3 @@ ecell/analysis/emlsupport2.py\
 ecell/analysis/sbmlsupport.py\
 ecell/analysis/util.py\
 setup.py.in
-
-EXE = ${BINS:=$(EXEEXT)}
-bin_SCRIPTS = ${EXE}
-
-%.exe : %
-	python $(PY2EXE_SETUP) --source=$< --icon=$(WIN_ICON) --merge=$(PATH_VARIABLES) --console py2exe
-
-clean-local:
-	${RM} -rf build *.exe *.zip *.dll *.pyd
-

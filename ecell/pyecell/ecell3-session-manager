@@ -1,0 +1,208 @@
+#!/usr/bin/env python
+
+import sys
+import string
+import getopt
+import os
+
+import ecell.emc
+import ecell.Session
+import ecell.SessionManager
+
+DEFAULT_ENVIRONMENT = 'Local'
+
+def usage():
+    aProgramName = os.path.basename( sys.argv[0] )
+    print '''
+%s -- invoke ecell3-session-manager python intract mode or run esm file
+
+Usage:
+
+       %s [-e] [-e esmfile]          : Load script (.esm) file 
+       %s                            : Invoke ecell3-session-manager intract mode
+       %s [-h]                       : Print this message
+       
+Options:
+
+       -e or --exec=[.esm file]           :  load script (.esm) file
+       -c or --concurrency=[int]          :  Set concurrency
+       -E or --environment=[environment]  :  Set environment
+       
+       
+       -DNAME=VALUE                       :  Set session parameter
+       --parameters="[python dictionary]" :  Set session parameters
+        
+       eaxmple: 
+
+       ecell3-session-manager -DNAME1=VALUE1 -DNAME2=VALUE2
+       ecell3-session-manager --parameters="{NAME1:VALUE1,NAME2:VALUE2}"
+
+       Do not use space in Variable.
+
+       -h or --help              :  Print this message.
+
+Configurations:
+
+       If the environment variable ECELL3_DM_PATH is set to a colon (:) 
+       separated directory path, it loads dynamic modules from there.
+       
+       example: 
+        
+       ECELL3_DM_PATH=/home/user/dm:/home/user/dm_other ecell3-session-manager
+
+'''% ( aProgramName, aProgramName, aProgramName, aProgramName  )
+
+def main():
+
+
+	# -------------------------------------
+	# initialize 
+	# -------------------------------------
+	anEmsFile = None
+	aParameters = {}
+	aConcurrency = None
+	anEnvironment = DEFAULT_ENVIRONMENT 
+
+
+
+	# -------------------------------------
+	# gets options
+	# -------------------------------------
+	try:
+		opts , args = getopt.getopt( sys.argv[1:] , 'he:f:D:c:E:',
+		              ["parameters=","help", "exec=", "file=","concurrency=","environment="])
+	except:
+		usage()
+		sys.exit(1)
+
+
+	# -------------------------------------
+	# checks argument
+	# -------------------------------------
+	for anOption, anArg in opts:
+
+		# ------------------------------
+		# prints help message
+		# ------------------------------
+		if anOption in ( '-h', '--help' ):
+			usage()
+			sys.exit(0)
+            
+		# ------------------------------
+		# executes script file (.esm)
+		# ------------------------------
+		if anOption in ( '-e', '--exec'):
+			if not anArg:
+				print "Error: not specify esm file"
+				usage()
+				sys.exit(2)
+			anEmsFile = anArg
+
+		# ------------------------------
+		# set session-manager parameters            
+		# ------------------------------
+		if anOption == '-D':
+			aSplitArgList = string.split(anArg,'=')
+
+			if not aSplitArgList[1]:
+				aSplitArgList[1] = 1
+            
+			try:
+				anEvaluatedString = eval(aSplitArgList[1])
+				aParameters[aSplitArgList[0]] = anEvaluatedString
+			except:
+				aParameters[aSplitArgList[0]] = aSplitArgList[1]
+
+		# ------------------------------
+		# set session-manager parameters            
+		# ------------------------------
+		if anOption == '--parameters':
+			try:
+				anEvaluatedArg = eval(anArg)
+
+			except:
+				import traceback 
+				anErrorMessageList = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
+				for aLine in anErrorMessageList: 
+					print aLine 
+				print 'Error : %s is not evaluate.' %anArg
+				print '%s is not python dictionary and do not use space in variable.' %anArg
+				sys.exit(2)
+
+			# check anEvaluatedArg type
+			if not type(anEvaluatedArg) == dict:
+				print 'Error : %s is not python dictionary.' %aParameters
+				sys.exit(2)
+
+			# add parameters to aParameters 
+			for aKeyString in anEvaluatedArg.keys():
+				aParameters[aKeyString] = anEvaluatedArg[aKeyString]
+
+
+		# ------------------------------
+		# set concurrency
+		# ------------------------------
+		if anOption in ( '-c', '--concurrency' ):
+
+			# ----------------------------
+			# check the existance of value
+			# ----------------------------
+			if not anArg:
+				print "Error: not specify concurrency"
+				usage()
+				sys.exit(2)
+
+			# ----------------------------
+			# convert str to int
+			# ----------------------------
+			try:
+				aConcurrency = string.atoi(anArg)
+			except ValueError:
+				print "Error: invalid parameter --concurrency=int"
+				usage()
+				sys.exit(2)
+
+
+		# ------------------------------
+		# set environment
+		# ------------------------------
+		if anOption in ( '-E', '--environment', ):
+
+			# ----------------------------
+			# check the existance of value
+			# ----------------------------
+			if not anArg:
+				print "Error: not specify environment"
+				usage()
+				sys.exit(2)
+
+			anEnvironment = anArg
+
+
+	# -------------------------------------
+	# check EMS file
+	# -------------------------------------
+	if anEmsFile == None and ( len(sys.argv) >= (len(opts)*2+2)):
+
+		if ( len(sys.argv) != 2 and not sys.argv[-1][0]=="-" ) or \
+	   	     len(sys.argv)==2:
+
+				if not os.path.isfile( sys.argv[-1] ):
+					print "File Name Error: "+ sys.argv[-1] + " is not Exist."
+					sys.exit(1)
+
+				if sys.argv[-1] != sys.argv[0]:
+					anEmsFile = sys.argv[-1]
+
+	aModulePath= [ecell.__path__[0] + os.sep + "SessionManager"]
+
+	aSessionManager = ecell.SessionManager.SessionManager( aModulePath, aConcurrency, anEnvironment )
+
+	if anEmsFile:
+		aSessionManager.loadScript( anEmsFile, aParameters  )
+	else:
+		aSessionManager.interact( aParameters  )
+            
+         
+if __name__ == '__main__':
+	main()
