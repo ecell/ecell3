@@ -265,29 +265,24 @@ vvectorbase::vvectorbase()
 
 vvectorbase::~vvectorbase()
 {
+  if (0 <= _fdr) {
+    close(_fdr);
+    _fdr = -1;
+  }
+  if (0 <= _fdw) {
+    close(_fdw);
+    _fdw = -1;
+  }
   unlinkfile();
-
 }
 
 void vvectorbase::unlinkfile()
 {
-#ifndef OPEN_WHEN_ACCESS
-  if (0 <= _fdr) {
-    close(_fdr);
-  }
-  if (0 <= _fdw) {
-    close(_fdw);
-  }
-#endif /* OPEN_WHEN_ACCESS */
-  if (_file_name != NULL) {
-    if (unlink(_file_name) != 0)
-      {
-	fprintf(stderr, "unlink(%s) failed in VVector.\n", _file_name);
-      }
-
+  if (_file_name) {
+    unlink(_file_name); // ignore error
     free(_file_name);
+    _file_name = NULL;
   }
-
 }
 
 
@@ -295,10 +290,6 @@ void vvectorbase::setTmpDir(char const * const dirname, int priority)
 {
   assert(dirname != NULL);
   assert(dirname[0] != '\0');
-#ifdef DEBUG_DONE
-  fprintf(stderr, "vvectorbase::setTmpdir(\"%s\", %d)\n",
-	  dirname, priority);
-#endif /* DEBUG */
   if (priority < _directoryPriority) {
     _directoryPriority = priority;
     if (_defaultDirectory != NULL) {
@@ -381,7 +372,9 @@ void vvectorbase::initBase(char const * const dirname)
 
  #ifdef OPEN_WHEN_ACCES
  close(_fdw);
+ _fdw = -1;
  close(_fdr);
+ _fdr = -1;
  #endif /*OPEN_WHEN_ACCESS*/
  
 
@@ -453,64 +446,3 @@ void vvectorbase::my_close_write()
 
   }
 }
-
-
-
-
-////////////////////////////////////////////////////////////////////////
-//	for stand alone test
-////////////////////////////////////////////////////////////////////////
-#ifdef TEST
-#include <math.h>
-
-
-void	my_full_handler()
-{
-  printf("my_full_handler() : return key to continue\n");
-  getchar();
-}
-
-
-void	my_error_handler()
-{
-  printf("my_error_handler()\n");
-  abort();
-}
-
-
-typedef	struct	{
-  double	x;
-  double	y;
-  double	z;
-}	test_data_t;
-
-typedef	vvector<test_data_t>	test_vector_t;
-
-
-int	main()
-{
-  vvectorbase::setCBFull(&my_full_handler);
-
-  vvectorbase::margin(1024 * 100); // by K bytes
-  vvectorbase::setTmpDir(".", 1); // top priority
-
-  test_vector_t test_vector;
-  for (test_vector_t::size_type iii = 0; iii < 1000; iii++) {
-    double		xxx = (double)iii * 0.01;
-    test_data_t	test_data;
-    test_data.x = xxx;
-    test_data.y = sin(xxx);
-    test_data.z = cos(xxx);
-    test_vector.push_back(test_data);
-  }
-  for (test_vector_t::size_type iii = 0; iii < 20; iii++) {
-    test_data_t	test_data;
-    test_data = test_vector.at(iii);
-    printf("%d %g %g %g\n",
-	   (int)iii, test_data.x, test_data.y, test_data.z);
-  }
-  return 0;
-}
-
-
-#endif /* TEST */
