@@ -32,7 +32,7 @@
 #include <string>
 #include "ltdl.h"
 
-#ifdef _WIN32
+#if defined(WIN32) || defined(_WIN32)
 #undef GetClassInfo
 #endif /* _WIN32 */
 
@@ -257,16 +257,6 @@ template < class Base, class DMAllocator >
 const std::string SharedDynamicModule<Base,DMAllocator>::getFileName() const
 {
   return this->theFileName;
-  /*
-  const lt_dlinfo* aDlInfo = lt_dlgetinfo( this->theHandle );
-
-  if( aDlInfo == NULL )
-    {
-      throw DMException( lt_dlerror() );
-    }
-
-  return std::string( aDlInfo->filename );
-  */
 }
 
 #endif /* __DYNAMICMODULE_HPP */

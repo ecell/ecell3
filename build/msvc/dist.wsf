@@ -112,42 +112,35 @@ var tasks = {
         BuildHelper.copy(dmToolDir + '*.hpp', destDir);
     },
 
-    installModelEditor: function() {
-        var modelEditorDir = this.projectDir + 'ecell\\model-editor\\';
-        var destDir;
-
-        BuildHelper.mkdir(this.distBinDir);
-        BuildHelper.copy(modelEditorDir + 'ecell3-model-editor',
-                         this.distBinDir + 'ecell3-model-editor.py');
-
-        destDir = this.distLibEcellDir + 'model-editor\\';
-        BuildHelper.mkdir(destDir);
-        BuildHelper.copyMultiple(modelEditorDir, destDir,
-                                 [ '*.py', '*.ini' ]);
-
-        (function(destDir) {
-            destDir = destDir + 'glade\\';
-            BuildHelper.mkdir(destDir);
-            BuildHelper.copyMultiple(modelEditorDir + 'glade' , destDir,
-                                     ['*.glade', '*.png', '*.ico']);
-        })(destDir);
-
-        (function(destDir) {
-            destDir = destDir + 'plugin\\';
-            BuildHelper.mkdir(destDir);
-            BuildHelper.copyMultiple(modelEditorDir + 'plugin', destDir,
-                                     ['*.py', '*.png']);
-        })(destDir);
-
-        (function(destDir) {
-            destDir = destDir + 'model-editor\\';
-            BuildHelper.mkdir(destDir);
-            BuildHelper.copyMultiple(modelEditorDir + 'doc', destDir,
-                                     ['*.gif', '*.jpg', '*.uml', '*.dia',
-                                      '*.htm']);
-        })(this.distDocDir);
+    installSessionMonitor: function() {
+        var sessionMonitorDir = this.projectDir + 'ecell\\model-editor\\';
+        BuildHelper.chdir(sessionMonitorDir);
+        this.execPythonScript(
+            [
+                'setup.py',
+                'build',
+                '-b', this.vcOutDir + 'model-editor.build'
+            ].concat(this.debugBuild ? [ '-g' ]: []).concat([
+                'install',
+                '--prefix', '\\',
+                '--root', this.distDir
+            ]));
     },
 
+    installModelEditor: function() {
+        var modelEditorDir = this.projectDir + 'ecell\\session-monitor\\';
+        BuildHelper.chdir(modelEditorDir);
+        this.execPythonScript(
+            [
+                'setup.py',
+                'build',
+                '-b', this.vcOutDir + 'session-monitor.build'
+            ].concat(this.debugBuild ? [ '-g' ]: []).concat([
+                'install',
+                '--prefix', '\\',
+                '--root', this.distDir
+            ]));
+    },
 
     install: function() {
         this.installECS();
@@ -157,6 +150,7 @@ var tasks = {
         this.installPyECS();
         this.installPyECell();
         this.installModelEditor();
+        this.installSessionMonitor();
     }
 };
 

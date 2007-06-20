@@ -284,21 +284,3 @@ int osif_add_path( const char *dir, int to_first )
     ++num_process_path;
     return 0;
 }
-
-#if defined( WIN32 )
-BOOL WINAPI DllMain( HINSTANCE inst, DWORD reason, LPVOID reserved )
-{
-    switch ( reason )
-    {
-    case DLL_PROCESS_ATTACH:
-        if ( libecs_win32_init() )
-            return FALSE;
-        break;
-    case DLL_PROCESS_DETACH:
-        libecs_win32_fini();
-        break;
-    }
-
-    return TRUE;
-}
-#endif /* defined( WIN32 ) */

@@ -80,6 +80,23 @@ static const int& ConstantFixer()
     return val;
 }
 
+// module initializer / finalizer
+static struct _
+{
+  inline _()
+  {
+    if (!libecs::initialize())
+      {
+	throw std::runtime_error( "Failed to initialize libecs" );
+      }
+  }
+
+  inline ~_()
+  {
+    libecs::finalize();
+  }
+} _;
+
 BOOST_PYTHON_MODULE( _ecs )
 {
   using namespace boost::python;

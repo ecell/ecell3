@@ -28,12 +28,13 @@
 
 #ifndef __MODULEMAKER_HPP
 #define __MODULEMAKER_HPP
+
 #include <iostream>
 #include <map>
 #include <string>
 #include <assert.h>
+#include "ltdl.h"
 #include "DynamicModule.hpp"
-
 
 /// doc needed
 
@@ -81,6 +82,29 @@ public:
       {
 	return aSearchPath;
       }
+  }
+
+  /**
+    Initializes the dynamic module facility.
+    Applications that use this library must call this function
+    prior to any operation involved with the facility.
+    @return true on error, false otherwise.
+   */
+  static bool initialize()
+  {
+    return lt_dlinit() > 0 ? true: false;
+  }
+
+  /**
+    Finalizes the dynamic module facility.
+    Applications that use this library must call this function when
+    the facility is no longer necessary so that allocated resources
+    can be reclaimed.
+    @return true on error, false otherwise.
+   */
+  static void finalize()
+  {
+    lt_dlexit();
   }
 
   /**
@@ -304,23 +328,11 @@ getAllocator( const std::string& aClassname )
 template<class T,class DMAllocator>
 SharedModuleMaker<T,DMAllocator>::SharedModuleMaker()
 {
-  int result = lt_dlinit();
-  if( result != 0 )
-    {
-      std::cerr << "fatal: lt_dlinit() failed." << std::endl;
-      exit( 1 );
-    }
 }
 
 template<class T,class DMAllocator>
 SharedModuleMaker<T,DMAllocator>::~SharedModuleMaker()
 {
-  int result = lt_dlexit();
-  if( result != 0 )
-    {
-      std::cerr << "fatal: lt_dlexit() failed." << std::endl;
-      exit( 1 );
-    }
 }
 
 
