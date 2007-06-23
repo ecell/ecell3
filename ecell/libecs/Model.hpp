@@ -303,6 +303,11 @@ namespace libecs
        @throw InitializationFailed if the check is failed.
     */
 
+
+    void dynamicallyCreateVariable(StringCref aClassname, FullID aFullID, RealParam initialValue);
+    void dynamicallyCreateSystem(StringCref aClassname, FullID aFullID);
+    void dynamicallyCreateSystem(StringCref aClassname, FullID aFullID, Real size);
+
     void checkStepper( SystemCptr const aSystem ) const;
 
     void checkSizeVariable( SystemCptr const aSystem );
