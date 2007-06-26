@@ -50,9 +50,10 @@ namespace libecs
   Variable::Variable()
     : 
     theValue( 0.0 ),  
-    theLastTime( 0.0 ),
+    theLastTime( getSuperSystem()->getModel()->getCurrentTime() ),
     theFixed( false )
   {
+    
     ; // do nothing
   } 
 

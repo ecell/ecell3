@@ -111,8 +111,19 @@ namespace libecs
        @see Scheduler
     */
 
+    bool getRunningFlag() const
+    {
+      return theRunningFlag;
+    }
+
     void step()
     {
+
+      if (!theRunningFlag)
+        {
+          theRunningFlag = true;
+        }
+      
       StepperEventCref aNextEvent( theScheduler.getTopEvent() );
       theCurrentTime = aNextEvent.getTime();
       theLastStepper = aNextEvent.getStepper();
@@ -169,6 +180,8 @@ namespace libecs
     */
 
     LIBECS_API void createEntity( StringCref aClassname, FullIDCref aFullID );
+    LIBECS_API void createStaticEntity( StringCref aClassname, FullIDCref aFullID);
+    LIBECS_API void createDynamicEntity( StringCref aClassname, FullIDCref aFullID);
 
 
     /**
@@ -304,9 +317,9 @@ namespace libecs
     */
 
 
-    void dynamicallyCreateVariable(StringCref aClassname, FullID aFullID, RealParam initialValue);
-    void dynamicallyCreateSystem(StringCref aClassname, FullID aFullID);
-    void dynamicallyCreateSystem(StringCref aClassname, FullID aFullID, Real size);
+    void dynamicallyCreateVariable(StringCref aClassname, FullID aFullID);
+    //void dynamicallyCreateSystem(StringCref aClassname, FullID aFullID);
+    //void dynamicallyCreateSystem(StringCref aClassname, FullID aFullID, Real size);
 
     void checkStepper( SystemCptr const aSystem ) const;
 
@@ -333,6 +346,8 @@ namespace libecs
     SystemMaker         theSystemMaker;
     VariableMaker       theVariableMaker;
     ProcessMaker        theProcessMaker;
+
+    bool theRunningFlag;
 
   };
 

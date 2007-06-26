@@ -58,7 +58,8 @@ namespace libecs
     theStepperMaker(),
     theSystemMaker(),
     theVariableMaker(),
-    theProcessMaker()
+    theProcessMaker(),
+    theRunningFlag( false )
   {
     theLoggerBroker.setModel( this );
     // initialize theRootSystem
@@ -130,10 +131,25 @@ namespace libecs
   void Model::createEntity( StringCref aClassname,
 			    FullIDCref aFullID )
   {
+    if ( !getRunningFlag() )
+      {
+        createStaticEntity( aClassname,
+                            aFullID);
+      }
+    else
+      {
+        createDynamicEntity( aClassname,
+                             aFullID);
+      }
 
-    //NJA: I should do something to check if we're running here or not.
-    //NJA: If so, pass it off to the appropriate dynamically* function.
+    return;
+  }
 
+
+  void Model::createStaticEntity( StringCref aClassname,
+                                  FullIDCref aFullID )
+  {
+   
     if( aFullID.getSystemPath().empty() )
       {
 	THROW_EXCEPTION( BadSystemPath, "Empty SystemPath." );
@@ -156,7 +172,6 @@ namespace libecs
 	aProcessPtr = getProcessMaker().make( aClassname );
 	aProcessPtr->setID( aFullID.getID() );
 	aContainerSystemPtr->registerProcess( aProcessPtr );
-
 	break;
       case EntityType::SYSTEM:
 	aSystemPtr = getSystemMaker().make( aClassname );
@@ -170,9 +185,32 @@ namespace libecs
 			 "bad EntityType specified." );
 
       }
-	
-
   }
+
+  void Model::createDynamicEntity( StringCref aClassname,
+                                   FullIDCref aFullID )
+  {
+
+    switch (aFullID.getEntityType() )
+      {
+      case EntityType::VARIABLE:
+        this->createStaticEntity(aClassname, aFullID);
+        break;
+      case EntityType::PROCESS:
+        this->createStaticEntity(aClassname, aFullID);
+        break;
+      case EntityType::SYSTEM:
+        this->createStaticEntity(aClassname, aFullID);
+        break;
+      default:
+        THROW_EXCEPTION( InvalidEntityType,
+			 "bad EntityType specified." );
+      }
+
+    return;
+  }
+
+
 
 
   SystemPtr Model::getSystem( SystemPathCref aSystemPath ) const
@@ -361,83 +399,89 @@ namespace libecs
     // Get a pointer to the system in which this variable will be installed.
     SystemPathCref parentSystemPathCref( aFullID.getSystemPath() );
     SystemPtr parentSystemPtr( getSystem( parentSystemPathCref ) );
-    //NJA: make sure this ptr is not null.
+    
+    if (!parentSystemPtr)
+      {
+          // NJA: Throw an exception or whatever you are supposed to do....
+        ; // NJA: But do nothing for now.
+      }
+
+    // Get a pointer to the Stepper owned by the containing system.  
+    StepperPtr parentSystemStepperPtr(NULLPTR);
+    aStepperPtr = aContainerSystemPtr->getStepper(); 
 
     VariablePtr theNewVariablePtr(NULLPTR);
-    StepperPtr parentStepperPtr(NULLPTR);
-
     theNewVariablePtr = getVariableMaker().make( aClassname );
+
     theNewVariablePtr->setID( aFullID.getID() );
-    theNewVariablePtr->setValue(initialValue);
-    theNewVariablePtr->setLastTime( theCurrentTime ); // NJA CHECK make sure this time is accurate.
+    theNewVariablePtr->setValue( initialValue );
 
-    theNewVariablePtr->initialize();  // Clear interpolantVector
-    aContainerSystemPtr->registerVariable(theNewVariablePtr); // Puts the ptr in the SystemMap of that system.
+    theNewVariablePtr->initialize();  // Clears the interpolantVector.
+    parentSystemPtr->registerVariable( theNewVariablePtr ); // Puts the ptr in the SystemMap of that system.
 
-    aStepperPtr = aContainerSystemPtr->getStepper(); 
     EntityPtr anEntityPtr(theNewVariablePtr);
     aStepperPtr->dynamicallyUpdateLoggerVector(anEntityPtr);
 
     return;
   }
 
-  void Model::dynamicallyCreateSystem(StringCref aClassname, FullID aFullID)
-  {
+//   void Model::dynamicallyCreateSystem(StringCref aClassname, FullID aFullID)
+//   {
 
-    SystemPtr aContainerSystemPtr(getSystem(aFullID.getSystemPath()));
-    SystemPtr theNewSystemPtr( NULLPTR );
-    StepperPtr aStepperPtr(NULLPTR);
+//     SystemPtr aContainerSystemPtr(getSystem(aFullID.getSystemPath()));
+//     SystemPtr theNewSystemPtr( NULLPTR );
+//     StepperPtr aStepperPtr(NULLPTR);
 
-    theNewSystemPtr = getSystemMaker().make(aClassname);
-    theNewSystemPtr->setID( aFullID.getID());
-    theNewSystemPtr->setModel(this);
+//     theNewSystemPtr = getSystemMaker().make(aClassname);
+//     theNewSystemPtr->setID( aFullID.getID());
+//     theNewSystemPtr->setModel(this);
 
-    aStepperPtr = aContainerSystemPtr->getStepper();
-    theNewSystemPtr->setStepperID(aStepperPtr->getID());
-    aContainerSystemPtr->registerSystem(theNewSystemPtr);
+//     aStepperPtr = aContainerSystemPtr->getStepper();
+//     theNewSystemPtr->setStepperID(aStepperPtr->getID());
+//     aContainerSystemPtr->registerSystem(theNewSystemPtr);
 
-    // Create the SIZE variable with SIZE = sizeof(parentSystem)
-    SystemPath theSystemPath = aFullID.getSystemPath();
-    theSystemPath.push_back(aFullID.getID()); 
-    FullID newSizeVariableFullID(EntityType("Variable"), theSystemPath, "SIZE");
+//     // Create the SIZE variable with SIZE = sizeof(parentSystem)
+//     SystemPath theSystemPath = aFullID.getSystemPath();
+//     theSystemPath.push_back(aFullID.getID()); 
+//     FullID newSizeVariableFullID(EntityType("Variable"), theSystemPath, "SIZE");
 
-    dynamicallyCreateVariable("Variable", newSizeVariableFullID, theNewSystemPtr->findSizeVariable()->getValue());
+//     dynamicallyCreateVariable("Variable", newSizeVariableFullID, theNewSystemPtr->findSizeVariable()->getValue());
 
-    EntityPtr anEntityPtr( theNewSystemPtr);
-    aStepperPtr->dynamicallyUpdateLoggerVector(anEntityPtr);
-    return;
-  }
+//     EntityPtr anEntityPtr( theNewSystemPtr);
+//     aStepperPtr->dynamicallyUpdateLoggerVector(anEntityPtr);
+//     return;
+//   }
 
 
 
-  void Model::dynamicallyCreateSystem(StringCref aClassname, FullID aFullID, Real size)
-  {
+//   void Model::dynamicallyCreateSystem(StringCref aClassname, FullID aFullID, Real size)
+//   {
 
-    SystemPtr aContainerSystemPtr(getSystem(aFullID.getSystemPath()));
-    SystemPtr theNewSystemPtr( NULLPTR );
-    StepperPtr aStepperPtr(NULLPTR);
+//     SystemPtr aContainerSystemPtr(getSystem(aFullID.getSystemPath()));
+//     SystemPtr theNewSystemPtr( NULLPTR );
+//     StepperPtr aStepperPtr(NULLPTR);
 
-    theNewSystemPtr = getSystemMaker().make(aClassname);
-    theNewSystemPtr->setID( aFullID.getID());
-    theNewSystemPtr->setModel(this);
+//     theNewSystemPtr = getSystemMaker().make(aClassname);
+//     theNewSystemPtr->setID( aFullID.getID());
+//     theNewSystemPtr->setModel(this);
 
-    aStepperPtr = aContainerSystemPtr->getStepper();
-    theNewSystemPtr->setStepperID(aStepperPtr->getID());
-    aContainerSystemPtr->registerSystem(theNewSystemPtr);
+//     aStepperPtr = aContainerSystemPtr->getStepper();
+//     theNewSystemPtr->setStepperID(aStepperPtr->getID());
+//     aContainerSystemPtr->registerSystem(theNewSystemPtr);
 
-    if (size <= 0) THROW_EXCEPTION( AssertionFailed  , "Size given is <= 0.");
+//     if (size <= 0) THROW_EXCEPTION( AssertionFailed  , "Size given is <= 0.");
 
-    // Create Size with SIZE = size
-    SystemPath theSystemPath = aFullID.getSystemPath();
-    theSystemPath.push_back(aFullID.getID());
-    FullID newSizeVariableFullID(EntityType("Variable"), theSystemPath, "SIZE");
+//     // Create Size with SIZE = size
+//     SystemPath theSystemPath = aFullID.getSystemPath();
+//     theSystemPath.push_back(aFullID.getID());
+//     FullID newSizeVariableFullID(EntityType("Variable"), theSystemPath, "SIZE");
 
-    dynamicallyCreateVariable("Variable", newSizeVariableFullID, size);
+//     dynamicallyCreateVariable("Variable", newSizeVariableFullID, size);
 
-    EntityPtr anEntityPtr( theNewSystemPtr);
-    aStepperPtr->dynamicallyUpdateLoggerVector(anEntityPtr);
-    return;
-  }
+//     EntityPtr anEntityPtr( theNewSystemPtr);
+//     aStepperPtr->dynamicallyUpdateLoggerVector(anEntityPtr);
+//     return;
+//   }
 
 
 
