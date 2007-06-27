@@ -24,8 +24,8 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # 
 #END_HEADER
-from Constants import *
 from __future__ import division
+from Constants import *
 import numpy as nu
 try:
     import gnomecanvas
