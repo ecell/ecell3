@@ -102,6 +102,7 @@ namespace libecs
     const ProcessVector::size_type 
       aDiscreteProcessOffset( getDiscreteProcessOffset() );
 
+    theVariableReferenceListVector.clear();
     theVariableReferenceListVector.resize( aDiscreteProcessOffset );
     
     for ( ProcessVector::size_type i( 0 ); i < aDiscreteProcessOffset; ++i )
@@ -161,7 +162,7 @@ namespace libecs
       aDiscreteProcessOffset( getDiscreteProcessOffset() );
 
     for ( RealMatrix::index i( 0 );
-	  i < static_cast< RealMatrix::index >( aVelocityBuffer.size());
+	  i < static_cast< RealMatrix::index >( aVelocityBuffer.size() );
 	  ++i )
       {
 	aVelocityBuffer[ i ] = 0.0;
