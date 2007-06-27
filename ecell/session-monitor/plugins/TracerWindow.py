@@ -31,6 +31,8 @@ import gtk.gdk
 import re
 import string
 import operator
+from ecell.osogo.OsogoUtil import *
+import ecell.osogo.config as config
 from ecell.ecssupport import *
 from ecell.osogo.Plot import *
 from ecell.osogo.OsogoPluginWindow import OsogoPluginWindow

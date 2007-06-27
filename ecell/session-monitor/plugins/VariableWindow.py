@@ -28,7 +28,7 @@
 import string
 import operator
 import os
-
+from ecell.osogo.OsogoUtil import *
 import ecell.osogo.config as config
 from ecell.osogo.OsogoPluginWindow import OsogoPluginWindow
 from ecell.ecssupport import *

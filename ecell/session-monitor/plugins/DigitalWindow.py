@@ -26,6 +26,7 @@
 # 
 #END_HEADER
 
+from ecell.osogo.OsogoUtil import *
 from ecell.osogo.OsogoPluginWindow import OsogoPluginWindow
 from ecell.ecssupport import *
 from ecell.osogo.ConfirmWindow import ConfirmWindow
