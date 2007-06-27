@@ -26,12 +26,15 @@
 # 
 #END_HEADER
 
+import os
 import pygtk
 pygtk.require('2.0')
 import gtk
 import getopt
 import sys
 
+import ecell.ecs
+import ecell.ui.model_editor.config as config
 from ecell.ui.model_editor.ModelEditor import ModelEditor
 
 def usage():
@@ -74,6 +77,8 @@ if len( sys.argv )>1:
         if aFileName == None:
             print usageString
             sys.exit(1)
+
+ecell.ecs.setDMSearchPath( os.pathsep.join( config.dm_path ) )
 
 g = ModelEditor()
 if aFileName:

@@ -300,9 +300,8 @@ class DMInfo:
                 className = classProperties[0]
                 #try to load info
                 if len(classProperties) >1:
-                    flagMap[className][DM_CAN_LOADINFO] = True
-                idx = classListStack.index( className )
-                aFileInfoList[ idx ][ 'flags' ]  = flags;
+                    idx = classListStack.index( className )
+                    aFileInfoList[ idx ][ 'flags' ][DM_CAN_LOADINFO] = True
                 del classListStack[ idx ]
                 del typeListStack[ idx ]
    

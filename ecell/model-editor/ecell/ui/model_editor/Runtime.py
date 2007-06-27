@@ -36,7 +36,7 @@ import tempfile
 import traceback
 import config
 
-import ecell.osogo.GtkSessionMonitor
+from ecell.ui.osogo.GtkSessionMonitor import GtkSessionMonitor
 import ecell.ecssupport
 
 from ConfirmWindow import ConfirmWindow
@@ -217,7 +217,7 @@ gtk.main()\n\
         fileName = self.theModelEditor.autoSaveName
         self.theModelEditor.theMainWindow.displayHourglass()
         #instantiate GtkSessionMonitor 
-        self.theSession = ecell.GtkSessionMonitor.GtkSessionMonitor()
+        self.theSession = GtkSessionMonitor()
         self.theSession.setMessageMethod( self.message )
         self.theSession.registerUpdateCallback( self.updateWindows )
         #load model into GtkSessionMonitor
