@@ -221,15 +221,13 @@ namespace libemc
 
     inline void handleEvent()
     {
-      if( (*theEventChecker)() )
+      do
 	{
-	  do
-	    {
-	      (*theEventHandler)();
-	    }	while( (*theEventChecker)() );
-	  
-	  clearDirty();
+	  (*theEventHandler)();
 	}
+	while( (*theEventChecker)() );
+	  
+      clearDirty();
     }
 
     void clearDirty() const
