@@ -149,6 +149,9 @@ namespace libecs
   void Model::createStaticEntity( StringCref aClassname,
                                   FullIDCref aFullID )
   {
+    // This function is used for creating Entities prior to the start of runtime.
+    // That is, this function does not initialize them on the fly, it expects that 
+    // Model::initialize() function will be called prior to runtime.
    
     if( aFullID.getSystemPath().empty() )
       {
@@ -190,7 +193,9 @@ namespace libecs
   void Model::createDynamicEntity( StringCref aClassname,
                                    FullIDCref aFullID )
   {
-
+    // This function will both create and initialize an entity 
+    // on-the-fly.
+    
     switch (aFullID.getEntityType() )
       {
       case EntityType::VARIABLE:
@@ -332,8 +337,13 @@ namespace libecs
       }
   }
 
-  void Model::checkSizeVariable( SystemCptr const aSystem )
+  void Model::checkRootSystemSizeVariable()
   {
+    // Changed from 
+    // void Model::checkSizeVariable( SystemCptr const aSystem )
+    // to void Model::checkRootSystemSize()
+    // in order to eliminate potential confusion.
+
     FullID aRootSizeFullID( "Variable:/:SIZE" );
 
     try
@@ -353,10 +363,9 @@ namespace libecs
   {
     SystemPtr aRootSystem( getRootSystem() );
 
-    checkSizeVariable( aRootSystem );
+    checkRootSystemSizeVariable();
 
     initializeSystems( aRootSystem );
-
     checkStepper( aRootSystem );
 
     // initialization of Stepper needs four stages:
@@ -367,17 +376,16 @@ namespace libecs
     //     - construct stepper dependency graph and
     //     - fill theIntegratedVariableVector.
 
-    /*
-    const Real aCurrentTime( getCurrentTime() );
-    for( StepperMapConstIterator i( theStepperMap.begin() );
-    	 i != theStepperMap.end(); ++i )
-      {
-    	(*i).second->integrate( aCurrentTime );
-      }
-    */
     
+    
+    // The result here is to call process->initialize() for each process in the
+    // Model.  The function actually is blank though.
     FOR_ALL_SECOND( StepperMap, theStepperMap, initializeProcesses );
+
+    
     FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
+    
+
     theSystemStepper.initialize();
 
 
@@ -394,33 +402,33 @@ namespace libecs
 
   }
 
-  void Model::dynamicallyCreateVariable(StringCref aClassname, FullID aFullID, RealParam initialValue)
+  void Model::dynamicallyCreateVariable(StringCref aClassname, FullID aFullID)
   {
-    // Get a pointer to the system in which this variable will be installed.
-    SystemPathCref parentSystemPathCref( aFullID.getSystemPath() );
-    SystemPtr parentSystemPtr( getSystem( parentSystemPathCref ) );
+//     // Get a pointer to the system in which this variable will be installed.
+//     SystemPathCref parentSystemPathCref( aFullID.getSystemPath() );
+//     SystemPtr parentSystemPtr( getSystem( parentSystemPathCref ) );
     
-    if (!parentSystemPtr)
-      {
-          // NJA: Throw an exception or whatever you are supposed to do....
-        ; // NJA: But do nothing for now.
-      }
+//     if (!parentSystemPtr)
+//       {
+//           // NJA: Throw an exception or whatever you are supposed to do....
+//         ; // NJA: But do nothing for now.
+//       }
 
-    // Get a pointer to the Stepper owned by the containing system.  
-    StepperPtr parentSystemStepperPtr(NULLPTR);
-    aStepperPtr = aContainerSystemPtr->getStepper(); 
+//     // Get a pointer to the Stepper owned by the containing system.  
+//     StepperPtr theStepperPtrForParentSystem(NULLPTR);
+//     theStepperPtrForParentSystem = aContainerSystemPtr->getStepper(); 
 
-    VariablePtr theNewVariablePtr(NULLPTR);
-    theNewVariablePtr = getVariableMaker().make( aClassname );
+//     VariablePtr theNewVariablePtr(NULLPTR);
+//     theNewVariablePtr = getVariableMaker().make( aClassname );
 
-    theNewVariablePtr->setID( aFullID.getID() );
-    theNewVariablePtr->setValue( initialValue );
+//     theNewVariablePtr->setID( aFullID.getID() );
+//     theNewVariablePtr->setValue(0.0);
 
-    theNewVariablePtr->initialize();  // Clears the interpolantVector.
-    parentSystemPtr->registerVariable( theNewVariablePtr ); // Puts the ptr in the SystemMap of that system.
+//     theNewVariablePtr->initialize();  // Clears the interpolantVector.
+//     parentSystemPtr->registerVariable( theNewVariablePtr ); // Puts the ptr in the SystemMap of that system.
 
-    EntityPtr anEntityPtr(theNewVariablePtr);
-    aStepperPtr->dynamicallyUpdateLoggerVector(anEntityPtr);
+//     EntityPtr anEntityPtr(theNewVariablePtr);
+//     aStepperPtr->dynamicallyUpdateLoggerVector(anEntityPtr);
 
     return;
   }

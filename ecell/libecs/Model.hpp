@@ -180,9 +180,6 @@ namespace libecs
     */
 
     LIBECS_API void createEntity( StringCref aClassname, FullIDCref aFullID );
-    LIBECS_API void createStaticEntity( StringCref aClassname, FullIDCref aFullID);
-    LIBECS_API void createDynamicEntity( StringCref aClassname, FullIDCref aFullID);
-
 
     /**
        This method finds an Entity object pointed by the FullID.
@@ -317,13 +314,15 @@ namespace libecs
     */
 
 
+    void createStaticEntity( StringCref aClassname, FullIDCref aFullID);
+    void createDynamicEntity( StringCref aClassname, FullIDCref aFullID);
     void dynamicallyCreateVariable(StringCref aClassname, FullID aFullID);
     //void dynamicallyCreateSystem(StringCref aClassname, FullID aFullID);
     //void dynamicallyCreateSystem(StringCref aClassname, FullID aFullID, Real size);
 
     void checkStepper( SystemCptr const aSystem ) const;
 
-    void checkSizeVariable( SystemCptr const aSystem );
+    void checkRootSystemSizeVariable();
 
     static void initializeSystems( SystemPtr const aSystem );
 
