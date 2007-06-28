@@ -221,12 +221,11 @@ namespace libemc
 
     inline void handleEvent()
     {
-      do
+      while( (*theEventChecker)() )
 	{
 	  (*theEventHandler)();
 	}
-	while( (*theEventChecker)() );
-	  
+
       clearDirty();
     }
 
