@@ -45,29 +45,29 @@ from util import RELATIVE_PERTURBATION, ABSOLUTE_PERTURBATION, allzero, createIn
 import numpy
 
 
-def getElasticityArray( aPathwayProxy, fullPN ):
+def getElasticityArray( pathwayProxy, fullPN ):
     '''
     calculate and return the elasticities (array)
     with 1st order Taylor expansion
-    aPathwayProxy: a PathwayProxy instance
+    pathwayProxy: a PathwayProxy instance
     fullPN: (str) the full property name
     return elasticityArray
     '''
 
-    processList = aPathwayProxy.getProcessList()
+    processList = pathwayProxy.getProcessList()
 
     size = len( processList )
     
     # first step
     elasticityArray = numpy.zeros( size, numpy.Float )
     
-    aSession = aPathwayProxy.theEmlSupport.createInstance()
+    aSession = pathwayProxy.theEmlSupport.createSession()
     aSession.step()
     for i in range( size ):
         elasticityArray[ i ] = aSession.theSimulator.getEntityProperty( processList[ i ] + ':Activity' )
     
     # second step
-    aSession = aPathwayProxy.theEmlSupport.createInstance()
+    aSession = pathwayProxy.theEmlSupport.createSession()
 
     value = aSession.theSimulator.getEntityProperty( fullPN )
     aPerturbation = RELATIVE_PERTURBATION * value + ABSOLUTE_PERTURBATION
@@ -83,22 +83,22 @@ def getElasticityArray( aPathwayProxy, fullPN ):
 # end of getElasticityArray
 
 
-def getAcculateElasticityArray( aPathwayProxy, fullPN ):
+def getAcculateElasticityArray( pathwayProxy, fullPN ):
     '''
     calculate and return the elasticities (array)
     with 2nd order Taylor expansion
-    aPathwayProxy: a PathwayProxy instance
+    pathwayProxy: a PathwayProxy instance
     fullPN: (str) the full property name
     return elasticityArray
     '''
 
-    processList = aPathwayProxy.getProcessList()
+    processList = pathwayProxy.getProcessList()
     size = len( processList )
 
     elasticityArray = numpy.zeros( size, numpy.Float )
     
     # first step
-    aSession = aPathwayProxy.theEmlSupport.createInstance()
+    aSession = pathwayProxy.theEmlSupport.createSession()
 
     value = aSession.theSimulator.getEntityProperty( fullPN )
     aPerturbation = RELATIVE_PERTURBATION * value + ABSOLUTE_PERTURBATION
@@ -110,21 +110,21 @@ def getAcculateElasticityArray( aPathwayProxy, fullPN ):
         elasticityArray[ c ] = aSession.theSimulator.getEntityProperty( processList[ c ] + ':Activity' )
 
     # second step    
-    aSession = aPathwayProxy.theEmlSupport.createInstance()
+    aSession = pathwayProxy.theEmlSupport.createSession()
     aSession.theSimulator.setEntityProperty( fullPN, value - aPerturbation )
     aSession.step()
     for c in range( size ):
         elasticityArray[ c ] -= 8.0 * aSession.theSimulator.getEntityProperty( processList[ c ] + ':Activity' )
 
     # third step    
-    aSession = aPathwayProxy.theEmlSupport.createInstance()
+    aSession = pathwayProxy.theEmlSupport.createSession()
     aSession.theSimulator.setEntityProperty( fullPN, value + aPerturbation )
     aSession.step()
     for c in range( size ):
         elasticityArray[ c ] += 8.0 * aSession.theSimulator.getEntityProperty( processList[ c ] + ':Activity' )
 
     # last(fourth) step
-    aSession = aPathwayProxy.theEmlSupport.createInstance()
+    aSession = pathwayProxy.theEmlSupport.createSession()
     aSession.theSimulator.setEntityProperty( fullPN, value + 2.0 * aPerturbation )
     aSession.step()
     for c in range( size ):
@@ -137,45 +137,45 @@ def getAcculateElasticityArray( aPathwayProxy, fullPN ):
 # end of getAcculateElasticityArray
 
 
-def getElasticity( aPathwayProxy, fullPN ):
+def getElasticity( pathwayProxy, fullPN ):
     '''
     default getElasticity function
-    now this is equal to getElasticityArray( aPathwayProxy, fullPN ):
+    now this is equal to getElasticityArray( pathwayProxy, fullPN ):
     '''
 
-    return getElasticityArray( aPathwayProxy, fullPN )
+    return getElasticityArray( pathwayProxy, fullPN )
 
 # end of getElasticity
 
 
-def getEpsilonElasticity( aPathwayProxy, variableFullID ):
+def getEpsilonElasticity( pathwayProxy, variableFullID ):
     '''
     default getEpsilonElasticity function
     variableFullID: the full ID of the variable
-    now this is equal to getElasticityArray( aPathwayProxy, fullPN ):
+    now this is equal to getElasticityArray( pathwayProxy, fullPN ):
     '''
 
-    return getElasticity( aPathwayProxy, variableFullID + ':Value' )
+    return getElasticity( pathwayProxy, variableFullID + ':Value' )
 
 # end of getElasticity
 
 
-def convertToScaled( aPathwayProxy, fullPN, elasticityArray ):
+def convertToScaled( pathwayProxy, fullPN, elasticityArray ):
     '''
     convert an elasticity (dict) or (array) to the scaled elasticity
-    aPathwayProxy: a PathwayProxy instance
+    pathwayProxy: a PathwayProxy instance
     fullPN: (str) the full property name
     elasticityArray: the elasticity (array)
     return the scaled elasticity (array)
     '''
 
-    processList = aPathwayProxy.getProcessList()
+    processList = pathwayProxy.getProcessList()
     size = len( elasticityArray )
     scaledElasticityArray = numpy.zeros( size, numpy.Float )
 
-    aSession = aPathwayProxy.theEmlSupport.createInstance()
+    aSession = pathwayProxy.theEmlSupport.createSession()
     try:
-        value = string.atof( aPathwayProxy.theEmlSupport.getEntityProperty( fullPN )[ -1 ] )
+        value = string.atof( pathwayProxy.theEmlSupport.getEntityProperty( fullPN )[ -1 ] )
     except:
         value = aSession.theSimulator.getEntityProperty( fullPN )
 
@@ -196,62 +196,62 @@ def convertToScaled( aPathwayProxy, fullPN, elasticityArray ):
 # end of convertToScaled
 
 
-def getScaledElasticity( aPathwayProxy, fullPN ):
+def getScaledElasticity( pathwayProxy, fullPN ):
     '''
     calculate and return the scaled elasticities as (array)
-    refer getElasticityArray( aPathwayProxy, fullPN )
+    refer getElasticityArray( pathwayProxy, fullPN )
     '''
     
-    elasticityArray = getElasticity( aPathwayProxy, fullPN )
-    return convertToScaled( aPathwayProxy, fullPN, elasticityArray )
+    elasticityArray = getElasticity( pathwayProxy, fullPN )
+    return convertToScaled( pathwayProxy, fullPN, elasticityArray )
 
 # end of getScaledElasticityArray
 
 
-def getScaledEpsilonElasticity( aPathwayProxy, variableFullID ):
+def getScaledEpsilonElasticity( pathwayProxy, variableFullID ):
     '''
     default getEpsilonElasticity function
     variableFullID: the full ID of the variable
-    now this is equal to getScaledElasticity( aPathwayProxy, fullPN ):
+    now this is equal to getScaledElasticity( pathwayProxy, fullPN ):
     '''
 
-    return getScaledElasticity( aPathwayProxy, variableFullID + ':Value' )
+    return getScaledElasticity( pathwayProxy, variableFullID + ':Value' )
 
 # end of getElasticity
 
 
-def getEpsilonElasticityMatrix( aPathwayProxy ):
+def getEpsilonElasticityMatrix( pathwayProxy ):
     '''
     calculate and return the epsilon elasticities (matrix)
-    aPathwayProxy: a PathwayProxy instance
+    pathwayProxy: a PathwayProxy instance
     return elasticityMatrix
     '''
 
-    variableList = aPathwayProxy.getVariableList()
+    variableList = pathwayProxy.getVariableList()
 
     variableFullPNList = []
     for variableFullID in variableList:
         variableFullPNList.append( variableFullID + ':Value' )
 
-    return getElasticityMatrix( aPathwayProxy, variableFullPNList )
+    return getElasticityMatrix( pathwayProxy, variableFullPNList )
 
 # end of getEpsilonElasticityMatrix
 
 
-def getElasticityMatrix( aPathwayProxy, fullPNList ):
+def getElasticityMatrix( pathwayProxy, fullPNList ):
     '''
     calculate and return the elasticities (matrix)
-    aPathwayProxy: a PathwayProxy instance
+    pathwayProxy: a PathwayProxy instance
     fullPNList: (list) a list of property names
     return elasticityMatrix
     '''
     
-    processList = aPathwayProxy.getProcessList()
+    processList = pathwayProxy.getProcessList()
 
     elasticityMatrix = numpy.zeros( ( len( fullPNList ), len( processList ) ), numpy.Float )
 
     for i in range( len( fullPNList ) ):
-        elasticityArray = getElasticity( aPathwayProxy, fullPNList[ i ] )
+        elasticityArray = getElasticity( pathwayProxy, fullPNList[ i ] )
         numpy.put( elasticityMatrix[ i ], range( len( processList ) ), elasticityArray )
 
     return elasticityMatrix
@@ -259,38 +259,38 @@ def getElasticityMatrix( aPathwayProxy, fullPNList ):
 # end of getElasticityMatrix
 
 
-def getScaledEpsilonElasticityMatrix( aPathwayProxy ):
+def getScaledEpsilonElasticityMatrix( pathwayProxy ):
     '''
     calculate and return the scaled epsilon elasticities (matrix)
-    aPathwayProxy: a PathwayProxy instance
+    pathwayProxy: a PathwayProxy instance
     return scaledElasticityMatrix
     '''
 
-    variableList = aPathwayProxy.getVariableList()
+    variableList = pathwayProxy.getVariableList()
 
     variableFullPNList = []
     for variableFullID in variableList:
         variableFullPNList.append( variableFullID + ':Value' )
 
-    return getScaledElasticityMatrix( aPathwayProxy, variableFullPNList )
+    return getScaledElasticityMatrix( pathwayProxy, variableFullPNList )
 
 # end of getScaledEpsilonElasticityMatrix
 
 
-def getScaledElasticityMatrix( aPathwayProxy, fullPNList ):
+def getScaledElasticityMatrix( pathwayProxy, fullPNList ):
     '''
     calculate and return the scaled elasticities (matrix)
-    aPathwayProxy: a PathwayProxy instance
+    pathwayProxy: a PathwayProxy instance
     fullPNList: (list) of property name
     return scaledElasticityMatrix
     '''
 
-    processList = aPathwayProxy.getProcessList()
+    processList = pathwayProxy.getProcessList()
 
     scaledElasticityMatrix = numpy.zeros( ( len( fullPNList ), len( processList ) ), numpy.Float )
 
     for i in range( len( fullPNList ) ):
-        scaledElasticityArray = getScaledElasticity( aPathwayProxy, fullPNList[ i ] )
+        scaledElasticityArray = getScaledElasticity( pathwayProxy, fullPNList[ i ] )
         numpy.put( scaledElasticityMatrix[ i ], range( len( processList ) ), scaledElasticityArray )
 
     return scaledElasticityMatrix
@@ -298,24 +298,24 @@ def getScaledElasticityMatrix( aPathwayProxy, fullPNList ):
 # end of getScaledEpsilonElasticityMatrix
 
 
-def getEpsilonElasticityMatrix2( aPathwayProxy ):
+def getEpsilonElasticityMatrix2( pathwayProxy ):
     '''
     calculate and return the elasticities (matrix)
-    aPathwayProxy: a PathwayProxy instance
+    pathwayProxy: a PathwayProxy instance
     return elasticityMatrix
     '''
 
-    variableList = aPathwayProxy.getVariableList()
-    processList = aPathwayProxy.getProcessList()
+    variableList = pathwayProxy.getVariableList()
+    processList = pathwayProxy.getProcessList()
 
     elasticityMatrix = numpy.zeros( ( len( variableList ), len( processList ) ), numpy.Float )
 
-    incidentMatrix = aPathwayProxy.getIncidentMatrix()
+    incidentMatrix = pathwayProxy.getIncidentMatrix()
     independentGroupList = createIndependentGroupList( incidentMatrix )
     
     activityBuffer = numpy.zeros( len( processList ), numpy.Float )
 
-    aSession = aPathwayProxy.theEmlSupport.createInstance()
+    aSession = pathwayProxy.theEmlSupport.createSession()
 
     aSession.step()
     for i in range( len( processList ) ):
@@ -323,7 +323,7 @@ def getEpsilonElasticityMatrix2( aPathwayProxy ):
     
     for groupList in independentGroupList:
 
-        aSession = aPathwayProxy.theEmlSupport.createInstance()
+        aSession = pathwayProxy.theEmlSupport.createSession()
 
         perturbationList = []
         for i in groupList:
@@ -359,23 +359,23 @@ if __name__ == '__main__':
     def main( fileName, fullPN=None ):
         
         anEmlSupport = EmlSupport( fileName )
-        aPathwayProxy = anEmlSupport.createPathwayProxy()
+        pathwayProxy = anEmlSupport.createPathwayProxy()
 
         if fullPN != None:
 
             print 'elasticity array for \'%s\' =' % ( fullPN )
-            print getElasticityArray( aPathwayProxy, fullPN )
+            print getElasticityArray( pathwayProxy, fullPN )
             print 'acculate elasticity array for \'%s\' =' % ( fullPN )
-            print getAcculateElasticityArray( aPathwayProxy, fullPN )
+            print getAcculateElasticityArray( pathwayProxy, fullPN )
             print 'scaled elasticity array for \'%s\' =' % ( fullPN )
-            print getScaledElasticity( aPathwayProxy, fullPN )
+            print getScaledElasticity( pathwayProxy, fullPN )
 
         print 'epsilon elasticity matrix ='
-        print getEpsilonElasticityMatrix( aPathwayProxy )
+        print getEpsilonElasticityMatrix( pathwayProxy )
         print 'scaled epsilon elasticity matrix ='
-        print getScaledEpsilonElasticityMatrix( aPathwayProxy )
+        print getScaledEpsilonElasticityMatrix( pathwayProxy )
         print 'epsilon elasticity matrix ='
-        print getEpsilonElasticityMatrix2( aPathwayProxy )
+        print getEpsilonElasticityMatrix2( pathwayProxy )
 
     # end of main
     

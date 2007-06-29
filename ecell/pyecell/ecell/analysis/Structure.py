@@ -360,12 +360,12 @@ if __name__ == '__main__':
     def main( filename ):
         
         anEmlSupport = EmlSupport( filename )
-        aPathwayProxy = anEmlSupport.createPathwayProxy()
+        pathwayProxy = anEmlSupport.createPathwayProxy()
         
-        stoichiometryMatrix = aPathwayProxy.getStoichiometryMatrix()
+        stoichiometryMatrix = pathwayProxy.getStoichiometryMatrix()
 
-        # print aPathwayProxy.getProcessList()        
-        # print aPathwayProxy.getVariableList()
+        # print pathwayProxy.getProcessList()        
+        # print pathwayProxy.getVariableList()
 
 ##         stoichiometryMatrix = array( [ [ 1., 0., 0., 0., 2. ], [ 0., 0., 1.0, 0., 1. ], [ 1.0, 0.0, 1.0, 0.0, 3.0 ], [ -2.0, 0.0, -2.0, 0.0, -6.0 ] ] )
 ##         stoichiometryMatrix = array( [ [ 1., 2., 3., 4. ], [ 1., 1., 1., 1. ], [ 2., 3., 4., 5. ] ] )
@@ -389,7 +389,7 @@ if __name__ == '__main__':
         # print 'null space = '
         # print matrixmultiply( stoichiometryMatrix, kernelMatrix )
 
-        reversibilityList = aPathwayProxy.getReversibilityList()
+        reversibilityList = pathwayProxy.getReversibilityList()
         
 ##         stoichiometryMatrix = numpy.transpose( array( [ [ 0, 0, 1, 0, 0 ], [ 0, -1, 0, 2, 0 ], [ -1, 0, 0, 0, 1 ], [ -2, 0, 2, 1, -1 ], [ 0, 0, 0, -1, 0 ], [ 1, 0, 0, 0, 0 ], [ 0, 1, -1, 0, 0 ], [ 0, -1, 1, 0, 0 ], [ 0, 0, 0, 0, -1 ] ], numpy.Float ) )
 ##         reversibilityList = [ 1, 1, 1, 1, 0, 0, 0, 0, 0 ]

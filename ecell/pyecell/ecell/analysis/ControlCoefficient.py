@@ -49,23 +49,23 @@ from Elasticity import getEpsilonElasticityMatrix2
 GET_ELASTICITY_MATRIX = getEpsilonElasticityMatrix2
 
 
-def calculateControlCoefficient( aPathwayProxy, mode=0 ):
+def calculateControlCoefficient( pathwayProxy, mode=0 ):
     '''
     calculate concentration and flux control coefficients
-    aPathwayProxy: a PathwayProxy instance
+    pathwayProxy: a PathwayProxy instance
     mode: (0 or 1) unscaled or scaled
     return ( CCCMatrix, FCCMatrix )
     '''
 
-    stoichiometryMatrix = aPathwayProxy.getStoichiometryMatrix()
-    elasticityMatrix = GET_ELASTICITY_MATRIX( aPathwayProxy )
+    stoichiometryMatrix = pathwayProxy.getStoichiometryMatrix()
+    elasticityMatrix = GET_ELASTICITY_MATRIX( pathwayProxy )
 
     ( unscaledCCCMatrix, unscaledFCCMatrix ) = calculateUnscaledControlCoefficient( stoichiometryMatrix, elasticityMatrix )
 
     if not mode:
         return ( unscaledCCCMatrix, unscaledFCCMatrix )
     else:
-        return scaleControlCoefficient( aPathwayProxy, \
+        return scaleControlCoefficient( pathwayProxy, \
                                         unscaledCCCMatrix, unscaledFCCMatrix )
 
 # end of calculateControlCoefficient
@@ -128,20 +128,20 @@ def invdiag( traceArray ):
 # end of invdiag
 
 
-def scaleControlCoefficient( aPathwayProxy, unscaledCCCMatrix, unscaledFCCMatrix ):
+def scaleControlCoefficient( pathwayProxy, unscaledCCCMatrix, unscaledFCCMatrix ):
     '''
     scale concentration and flux control coefficients and return scaled matrices
-    aPathwayProxy: a PathwayProxy instance
+    pathwayProxy: a PathwayProxy instance
     unscaledCCCMatrix: (matrix)
     unscaledFCCMatrix: (matrix)
     return ( unscaledCCCMatrix, unscaledFCCMatrix )
     '''
 
     # calculate initial activities and get initial values
-    processList = aPathwayProxy.getProcessList()
-    variableList = aPathwayProxy.getVariableList()
+    processList = pathwayProxy.getProcessList()
+    variableList = pathwayProxy.getVariableList()
     
-    aSession = aPathwayProxy.theEmlSupport.createInstance()
+    aSession = pathwayProxy.theEmlSupport.createSession()
 
     aSession.step()
     
@@ -181,17 +181,17 @@ if __name__ == '__main__':
     def main( filename ):
         
         anEmlSupport = EmlSupport( filename )
-        aPathwayProxy = anEmlSupport.createPathwayProxy()
+        pathwayProxy = anEmlSupport.createPathwayProxy()
 
-        ( unscaledCCCMatrix, unscaledFCCMatrix ) = calculateControlCoefficient( aPathwayProxy )
+        ( unscaledCCCMatrix, unscaledFCCMatrix ) = calculateControlCoefficient( pathwayProxy )
 
         print 'unscaled concentration control coefficients ='
         print unscaledCCCMatrix
         print 'unscaled flux control coefficients ='
         print unscaledFCCMatrix
 
-        ( scaledCCCMatrix, scaledFCCMatrix ) = scaleControlCoefficient( aPathwayProxy, unscaledCCCMatrix, unscaledFCCMatrix )
-        # ( scaledCCCMatrix, scaledFCCMatrix ) = calculateControlCoefficient( aPathwayProxy, 1 )
+        ( scaledCCCMatrix, scaledFCCMatrix ) = scaleControlCoefficient( pathwayProxy, unscaledCCCMatrix, unscaledFCCMatrix )
+        # ( scaledCCCMatrix, scaledFCCMatrix ) = calculateControlCoefficient( pathwayProxy, 1 )
 
         print 'scaled concentration control coefficients ='
         print scaledCCCMatrix

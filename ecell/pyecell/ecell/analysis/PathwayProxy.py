@@ -402,18 +402,18 @@ if __name__ == '__main__':
     def main( filename ):
 
         anEmlSupport = EmlSupport( filename )
-        aPathwayProxy = anEmlSupport.createPathwayProxy()
+        pathwayProxy = anEmlSupport.createPathwayProxy()
 
         print 'process list ='
-        print aPathwayProxy.getProcessList()
+        print pathwayProxy.getProcessList()
         print 'related variable list ='
-        print aPathwayProxy.getVariableList()
+        print pathwayProxy.getVariableList()
         print 'incident matrix ='
-        print aPathwayProxy.getIncidentMatrix()
+        print pathwayProxy.getIncidentMatrix()
         print 'stoichiometry matrix ='
-        print aPathwayProxy.getStoichiometryMatrix()
+        print pathwayProxy.getStoichiometryMatrix()
         print 'reversibility list ='
-        print aPathwayProxy.getReversibilityList()
+        print pathwayProxy.getReversibilityList()
 
     # end of main
     
