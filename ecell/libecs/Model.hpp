@@ -314,11 +314,8 @@ namespace libecs
     */
 
 
-    void createStaticEntity( StringCref aClassname, FullIDCref aFullID);
-    void createDynamicEntity( StringCref aClassname, FullIDCref aFullID);
-    void dynamicallyCreateVariable(StringCref aClassname, FullID aFullID);
-    //void dynamicallyCreateSystem(StringCref aClassname, FullID aFullID);
-    //void dynamicallyCreateSystem(StringCref aClassname, FullID aFullID, Real size);
+    void constructEntity( StringCref aClassname, FullIDCref aFullID );
+    void dynamicallyInitializeEntity( FullIDCref aFullID );
 
     void checkStepper( SystemCptr const aSystem ) const;
 

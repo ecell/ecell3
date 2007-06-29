@@ -43,6 +43,7 @@
 #include "SystemStepper.hpp"
 
 #include "Model.hpp"
+#include <iostream>
 
 namespace libecs
 {
@@ -131,28 +132,22 @@ namespace libecs
   void Model::createEntity( StringCref aClassname,
 			    FullIDCref aFullID )
   {
-    if ( !getRunningFlag() )
+
+    this->constructEntity( aClassname,
+                           aFullID);
+
+    if( getRunningFlag() )
       {
-        createStaticEntity( aClassname,
-                            aFullID);
-      }
-    else
-      {
-        createDynamicEntity( aClassname,
-                             aFullID);
+        dynamicallyInitializeEntity( aFullID );
       }
 
     return;
   }
 
 
-  void Model::createStaticEntity( StringCref aClassname,
-                                  FullIDCref aFullID )
+  void Model::constructEntity( StringCref aClassname,
+                               FullIDCref aFullID )
   {
-    // This function is used for creating Entities prior to the start of runtime.
-    // That is, this function does not initialize them on the fly, it expects that 
-    // Model::initialize() function will be called prior to runtime.
-   
     if( aFullID.getSystemPath().empty() )
       {
 	THROW_EXCEPTION( BadSystemPath, "Empty SystemPath." );
@@ -169,6 +164,7 @@ namespace libecs
       case EntityType::VARIABLE:
 	aVariablePtr = getVariableMaker().make( aClassname );
 	aVariablePtr->setID( aFullID.getID() );
+        aVariablePtr->setCreationTime( getCurrentTime() );
 	aContainerSystemPtr->registerVariable( aVariablePtr );
 	break;
       case EntityType::PROCESS:
@@ -190,32 +186,70 @@ namespace libecs
       }
   }
 
-  void Model::createDynamicEntity( StringCref aClassname,
-                                   FullIDCref aFullID )
+  void Model::dynamicallyInitializeEntity( FullIDCref aFullID )
   {
-    // This function will both create and initialize an entity 
-    // on-the-fly.
+
+    EntityPtr initializingEntity( NULLPTR );
     
-    switch (aFullID.getEntityType() )
+    ProcessPtr   aProcessPtr( NULLPTR );
+    SystemPtr    aSystemPtr ( NULLPTR );
+    VariablePtr aVariablePtr( NULLPTR );
+
+    try
+      {
+        initializingEntity = this->getEntity( aFullID);
+      }
+    catch( BadID )
+      {
+        THROW_EXCEPTION( InitializationFailed,
+                         "Could not dynamically initialze Entity." );
+      }
+
+    switch( aFullID.getEntityType() )
       {
       case EntityType::VARIABLE:
-        this->createStaticEntity(aClassname, aFullID);
+        aVariablePtr = static_cast<VariablePtr>(initializingEntity);
+        // It seems like the variables should be logged here.  Hurm.
         break;
+
       case EntityType::PROCESS:
-        this->createStaticEntity(aClassname, aFullID);
+        aProcessPtr = static_cast<ProcessPtr>(initializingEntity);
+        // procPtr -> initialize();
+        // Make sure that the variables associated with this process get into the 
+        //   owning steppers variable vector properly (worst case scenario I could 
+        //   probably just redo updateVariableVector). (Actually, I could probably 
+        //   just reinitialize the owning Stepper).....
+        // Repeat the stuff in updateIntegratedVariableVector.  This is tougher.  New
+        //   function probably needs to be written.
+        // Now update the EventDependency for the Scheduler...
         break;
+
       case EntityType::SYSTEM:
-        this->createStaticEntity(aClassname, aFullID);
+        aSystemPtr = static_cast<SystemPtr>(initializingEntity);
+        SystemPtr parentSystemPtr = aSystemPtr->getSuperSystem();
+
+        // Find some 
+        this->createEntity(EntityType("Variable"), 
+                           )
+
+
+        // This next line also calls parentStepper->registerThisClass.
+        aSystemPtr->setStepperID(parentSystemPtr->getStepper()->getID());
+
+
+
+        // Create a size variable for the system and by default give it the size 
+        //     of the parent system.
+        // Set the stepper of this system to be the stepper of its parent.
+        // call sysPtr -> initialize()
+        // 
         break;
       default:
         THROW_EXCEPTION( InvalidEntityType,
-			 "bad EntityType specified." );
+                         "bad EntityType specified.");
+        
       }
-
-    return;
   }
-
-
 
 
   SystemPtr Model::getSystem( SystemPathCref aSystemPath ) const
@@ -377,12 +411,7 @@ namespace libecs
     //     - fill theIntegratedVariableVector.
 
     
-    
-    // The result here is to call process->initialize() for each process in the
-    // Model.  The function actually is blank though.
     FOR_ALL_SECOND( StepperMap, theStepperMap, initializeProcesses );
-
-    
     FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
     
 
@@ -402,8 +431,8 @@ namespace libecs
 
   }
 
-  void Model::dynamicallyCreateVariable(StringCref aClassname, FullID aFullID)
-  {
+//  void Model::dynamicallyCreateVariable(StringCref aClassname, FullID aFullID)
+//  {
 //     // Get a pointer to the system in which this variable will be installed.
 //     SystemPathCref parentSystemPathCref( aFullID.getSystemPath() );
 //     SystemPtr parentSystemPtr( getSystem( parentSystemPathCref ) );
@@ -430,8 +459,8 @@ namespace libecs
 //     EntityPtr anEntityPtr(theNewVariablePtr);
 //     aStepperPtr->dynamicallyUpdateLoggerVector(anEntityPtr);
 
-    return;
-  }
+//    return;
+//  }
 
 //   void Model::dynamicallyCreateSystem(StringCref aClassname, FullID aFullID)
 //   {

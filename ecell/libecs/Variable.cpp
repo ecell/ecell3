@@ -41,6 +41,11 @@
 #include "Variable.hpp"
 
 
+// DEBUG
+#include <string>
+#include <iostream>
+// END DEBUG
+
 namespace libecs
 {
 
@@ -50,11 +55,10 @@ namespace libecs
   Variable::Variable()
     : 
     theValue( 0.0 ),  
-    theLastTime(0.0 ),
-    theFixed( false )
+    theLastTime(INF),
+    theFixed( false ),
+    creationTimeInitialized(false)
   {
-    
-    ; // do nothing
   } 
 
 
@@ -66,6 +70,12 @@ namespace libecs
 
   void Variable::initialize()
   {
+    if (!creationTimeInitialized)
+      {
+        // This should never happen....
+        THROW_EXCEPTION( InitializationFailed, "Creation time has not been set.");
+      }
+      
     clearInterpolantVector();
   }
 

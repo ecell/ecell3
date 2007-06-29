@@ -112,7 +112,6 @@ namespace libecs
 
     virtual void initialize();
 
-
     /**
        Clear theVelocity by zero.
     */
@@ -346,7 +345,12 @@ namespace libecs
     void registerInterpolant( InterpolantPtr const anInterpolant );
     //    void removeInterpolant( InterpolantPtr const anInterpolant );
 
-
+    void setCreationTime(Real creationTime)
+    {
+      theLastTime = creationTime;
+      creationTimeInitialized = true;
+    }
+    
   protected:
 
     const Real calculateDifferenceSum( RealParam aCurrentTime, 
@@ -391,6 +395,7 @@ namespace libecs
 	return getSuperSystem()->getSizeVariable()->getValue();
       }
 
+
   protected:
 
     Real theValue;
@@ -402,6 +407,8 @@ namespace libecs
     InterpolantVector theInterpolantVector;
 
     bool theFixed;
+
+    bool creationTimeInitialized;
   };
 
 
