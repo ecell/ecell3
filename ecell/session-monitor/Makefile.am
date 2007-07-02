@@ -1,37 +1,37 @@
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = resources plugins
+SUBDIRS = glade plugins
 
 EXTRA_DIST = \
 osogo.ini\
-ecell/osogo/AboutSessionMonitor.py\
-ecell/osogo/BoardWindow.py\
-ecell/osogo/ConfirmWindow.py\
-ecell/osogo/DataGenerator.py\
-ecell/osogo/EntityListWindow.py\
-ecell/osogo/FullPNQueue.py\
-ecell/osogo/GtkSessionMonitor.py\
-ecell/osogo/InterfaceWindow.py\
-ecell/osogo/LoggerFactory.py\
-ecell/osogo/LoggerWindow.py\
-ecell/osogo/LoggingPolicy.py\
-ecell/osogo/MainWindow.py\
-ecell/osogo/MessageWindow.py\
-ecell/osogo/OsogoPluginManager.py\
-ecell/osogo/OsogoPluginWindow.py\
-ecell/osogo/OsogoUtil.py\
-ecell/osogo/OsogoWindow.py\
-ecell/osogo/Plot.py\
-ecell/osogo/PluginInstanceSelection.py\
-ecell/osogo/PluginWindow.py\
-ecell/osogo/StepperWindow.py\
-ecell/osogo/VariableReferenceEditor.py\
-ecell/osogo/ViewWindow.py\
-ecell/osogo/Window.py\
-ecell/osogo/__init__.py\
-ecell/osogo/config.py\
-ecell/osogo/constants.py\
-ecell/osogo/main.py
+ecell/ui/osogo/AboutSessionMonitor.py\
+ecell/ui/osogo/BoardWindow.py\
+ecell/ui/osogo/ConfirmWindow.py\
+ecell/ui/osogo/DataGenerator.py\
+ecell/ui/osogo/EntityListWindow.py\
+ecell/ui/osogo/FullPNQueue.py\
+ecell/ui/osogo/GtkSessionMonitor.py\
+ecell/ui/osogo/InterfaceWindow.py\
+ecell/ui/osogo/LoggerFactory.py\
+ecell/ui/osogo/LoggerWindow.py\
+ecell/ui/osogo/LoggingPolicy.py\
+ecell/ui/osogo/MainWindow.py\
+ecell/ui/osogo/MessageWindow.py\
+ecell/ui/osogo/OsogoPluginManager.py\
+ecell/ui/osogo/OsogoPluginWindow.py\
+ecell/ui/osogo/OsogoUtil.py\
+ecell/ui/osogo/OsogoWindow.py\
+ecell/ui/osogo/Plot.py\
+ecell/ui/osogo/PluginInstanceSelection.py\
+ecell/ui/osogo/PluginWindow.py\
+ecell/ui/osogo/StepperWindow.py\
+ecell/ui/osogo/VariableReferenceEditor.py\
+ecell/ui/osogo/ViewWindow.py\
+ecell/ui/osogo/Window.py\
+ecell/ui/osogo/__init__.py\
+ecell/ui/osogo/config.py\
+ecell/ui/osogo/constants.py\
+ecell/ui/osogo/main.py
 
 EXTRA_DIST +=\
 ecell3-session-monitor

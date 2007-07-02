@@ -32,11 +32,9 @@ import sys
 import os
 import time
 
-
 from numpy import *
 import ecell.ecs
 import ecell.emc
-
 
 from ecell.ecssupport import *
 from ecell.DataFileManager import *
@@ -57,7 +55,7 @@ More info: http://www.e-cell.org/software'''\
 class Session:
     'Session class'
 
-    def __init__( self, aSimulator=None ):
+    def __init__( self, aSimulator = None ):
         'constructor'
 
         self.theMessageMethod = self.__plainMessageMethod
@@ -69,10 +67,7 @@ class Session:
 
         self.theModelName = ''
 
-    #
     # Session methods
-    #
-
     def loadScript( self, ecs, parameters={} ):
         ( ecsDir, ecsFile ) = os.path.split( ecs )
         if ecsDir != '':
@@ -92,7 +87,6 @@ class Session:
         anInterpreter.runsource( 'import sys; sys.ps1=theSession._prompt; del sys' )
 
         anInterpreter.interact( BANNERSTRING )
-
 
     def loadModel( self, aModel ):
         # aModel : an EML instance, a file name (string) or a file object
@@ -122,14 +116,14 @@ class Session:
         # When the type doesn't match
         else:
             raise TypeError, " The type of aModel must be EML instance, string(file name) or file object "
-	
-	    # change directory to file's home directory
+    
+        # change directory to file's home directory
         if type( aModel ) != type( eml.Eml ) and\
                type( aModel ) != type( eml.Eml() ):
             dirname = os.path.dirname( aModel )
             if dirname != "":
                 os.chdir( dirname )
-	
+    
         # calls load methods
         self.__loadStepper( anEml )
         self.__loadEntity( anEml )
@@ -138,8 +132,8 @@ class Session:
         # saves ModelName 
         self.theModelName = aModelName
 
-    # end of loadModel
-        
+    def isModelLoaded( self ):
+        return len( self.theModelName ) > 0
 
     def saveModel( self , aModel ):
         # aModel : a file name (string) or a file object
@@ -165,7 +159,7 @@ class Session:
 -->
 <eml>
 ''' % ( time.asctime( time.localtime() ) , self.getCurrentTime() )
-       	    aString = anEml.asString()
+            aString = anEml.asString()
             aBuffer = string.join( string.split( aString, '<eml>\n' ), aCurrentInfo )
             aFileObject = open( aModel, 'w' )
             aFileObject.write( aBuffer )
@@ -173,7 +167,7 @@ class Session:
 
         # if the type is file object
         elif type( aModel ) == file:
-       	    aString = anEml.asString()
+            aString = anEml.asString()
             aFileObject = aModel
             aFileObject.write( aString )
             aFileObject.close()
@@ -182,63 +176,6 @@ class Session:
         else:
             raise TypeError, "The type of aModel must be string(file name) or file object "
 
-    # end of saveModel
- 
-##     def importSBML( self, sbml ):
-
-##         #import
-##         try:
-##             from ecell.convertSBML2EML import *
-##         except ImportError:
-##             raise ImportError, "ImportError:can not import convertSBML2EML.\ncan not use importSBML in session."
-        
-##         #type check
-##         if type( sbml ) == str:        
-##             aSbmlFile = open( sbml )
-##             aSbmlString = aSbmlFile.read()
-##             aSbmlFile.close()
-
-##         elif type( sbml ) == file:
-##             aSbmlString = sbml.read()
-##             aSbmlFile.close()
-                                    
-##         else:
-##             raise TypeError, "The type of SBML must be string(file name) or file object "
-        
-##         anEml = convertSBML2EML( aSbmlString )
-##         self.loadModel( anEml )
-
-##     def exportSBML( self, filename ):
-
-##         #import
-##         try:
-##             from ecell.convertEML2SBML import *
-##         except ImportError:
-##             raise ImportError, "ImportError:can not import convertEML2SBML.\ncan not use exportSBML in session."
-        
-##         #type check
-##         if type( filename ) == str:
-##             aFileName = filename
-##         else:
-##             raise TypeError, "The type of SBML must be string(file name)"
-
-##         # creates ana seve an EML instance 
-##         anEml = eml.Eml()
-
-##         # calls save methods
-##         self.__saveAllStepper( anEml )
-##         self.__saveEntity( anEml, 'System::/' )
-##         self.__saveAllEntity( anEml )
-##         self.__saveProperty( anEml )
-
-##         # convert eml to sbml
-##         aSbmlString = convertToSBMLModel( anEml, filename, aLevel=2, aVersion=2 )
-
-##         # save sbml file
-##         aSbmlFIle = open( filename, "w" )
-##         aSbmlFIle.write( aSbmlString )
-##         aSbmlFile.close()
-    
     def restoreMessageMethod( self ):
         self.theMessageMethod=self.__plainMessageMethod
         
@@ -248,11 +185,8 @@ class Session:
     def message( self, message ):
         self.theMessageMethod( message )
 
-    #
     # Simulator methods
-    #
-    
-    def run( self , time='' ):
+    def run( self, time = None ):
         if not time:
             self.theSimulator.run()
         else:
@@ -276,36 +210,21 @@ class Session:
     def setEventHandler( self, event ):
         self.theSimulator.setEventHandler( event )
 
-    # no need to initialize explicitly in the current version
-    # def initialize( self ):
-    #     self.theSimulator.initialize()
-
-
-    #
     # Stepper methods
-    #
-
-
     def getStepperList( self ):
         return self.theSimulator.getStepperList()
 
     def createStepperStub( self, id ):
         return StepperStub( self.theSimulator, id )
 
-    #
     # Entity methods
-    #
-
     def getEntityList( self, entityType, systemPath ):
         return self.theSimulator.getEntityList( entityType, systemPath )
 
     def createEntityStub( self, fullid ):
         return EntityStub( self.theSimulator, fullid )
 
-    #
     # Logger methods
-    #
-
     def getLoggerList( self ):
         return self.theSimulator.getLoggerList()
         
@@ -445,14 +364,8 @@ class Session:
 
         # end of try(1)
 
-	# end of saveData
-
     def plainMessageMethod( self, aMessage ):
         self.__plainMessageMethod( aMessage )
-
-    #
-    # private methods
-    #
 
     def __plainMessageMethod( self, aMessage ):
         print aMessage
@@ -500,7 +413,6 @@ class Session:
             aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
             self.__loadEntity( anEml, aSubSystemPath )
 
-
     def __loadAllProperty( self, anEml, aSystemPath='' ):
         # the default of aSystemPath is empty because
         # unlike __loadEntity() this starts with the root system
@@ -519,8 +431,7 @@ class Session:
             aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
             self.__loadAllProperty( anEml, aSubSystemPath )
 
-    def __loadPropertyList( self, anEml, anEntityTypeString,\
-                            aSystemPath, anIDList ):
+    def __loadPropertyList( self, anEml, anEntityTypeString, aSystemPath, anIDList ):
 
         for anID in anIDList:
             aFullID = anEntityTypeString + ':' + aSystemPath + ':' + anID
@@ -537,8 +448,7 @@ class Session:
                                         + 'value =:\n%s\n' % str( aValue ) +\
                                         str( e ) )
 
-    def __loadEntityList( self, anEml, anEntityTypeString,\
-                          aSystemPath, anIDList ):
+    def __loadEntityList( self, anEml, anEntityTypeString, aSystemPath, anIDList ):
         
         aPrefix = anEntityTypeString + ':' + aSystemPath + ':'
 
@@ -551,8 +461,6 @@ class Session:
             except RuntimeError, e:
                 raise RuntimeError( 'Failed to create Entity [%s]: ' % (aFullID,) +\
                                     str( e ) )
-
-
 
     def __createScriptContext( self, parameters ):
 
@@ -624,11 +532,8 @@ class Session:
             aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
             self.__saveAllEntity( anEml, aSubSystemPath )
             
-    def __saveEntityList( self, anEml, anEntityTypeString, \
-                          aSystemPath, anIDList ):
-
+    def __saveEntityList( self, anEml, anEntityTypeString, aSystemPath, anIDList ):
        for anID in anIDList:
-           
             aFullID = anEntityTypeString + ':' + aSystemPath + ':' + anID
             self.__saveEntity( anEml, aFullID )
 
@@ -636,7 +541,6 @@ class Session:
         aClassName = self.theSimulator.getEntityClassName( aFullID )
         anEml.createEntity( aClassName, aFullID )
             
-
     def __saveProperty( self, anEml, aSystemPath='' ):
         # the default of aSystemPath is empty because
         # unlike __loadEntity() this starts with the root system
@@ -659,12 +563,8 @@ class Session:
             aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
             self.__saveProperty( anEml, aSubSystemPath )
 
-
-    def __savePropertyList( self, anEml, anEntityTypeString, \
-                            aSystemPath, anIDList ):
-
+    def __savePropertyList( self, anEml, anEntityTypeString, aSystemPath, anIDList ):
         for anID in anIDList:
-
             aFullID = anEntityTypeString + ':' + aSystemPath + ':' + anID
             aPropertyList = self.theSimulator.getEntityPropertyList( aFullID )
 
@@ -672,34 +572,23 @@ class Session:
                 aFullPN = aFullID + ':' + aProperty
                 
                 anAttributeList = self.theSimulator.getEntityPropertyAttributes( aFullPN )
-
                 # check savable
                 if anAttributeList[3] != 0:
-                    
                     aValue = self.theSimulator.saveEntityProperty( aFullPN )
-                    #print aValue
-
                     if aValue != '':
-
                         aValueList = list()
                         if type( aValue ) != tuple:
                             aValueList.append( str( aValue ) )
-                            
                         elif aValue == ():
                             # exclude the empty tuple (ad-hoc, Jul. 21, 2004)
                             break
-                        
                         else:
                             # ValueList convert into string for eml
                             aValueList = self.__convertPropertyValueList( aValue )
-
-                            #aValueList = aValue
-                            
                         anEml.setEntityProperty( aFullID, aProperty, 
                                                  aValueList )
  
     def __convertPropertyValueList( self, aValueList ):
-       
         aList = list()
         tmpList = list()
 
@@ -721,14 +610,8 @@ class Session:
 
         if tmpList != []:
             aList.append( tmpList )
-        else:
-            pass
-
 
         return aList
-
-
-
  
     class _session_prompt:
         def __init__( self, aSession ):
@@ -741,6 +624,3 @@ class Session:
                 return '<%s, t=%g>>> ' %\
                        ( self.theSession.theModelName, \
                          self.theSession.getCurrentTime() )
-
-if __name__ == "__main__":
-    pass

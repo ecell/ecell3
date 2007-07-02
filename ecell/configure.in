@@ -329,7 +329,7 @@ AC_CONFIG_FILES([
 AC_CONFIG_FILES([
   session-monitor/Makefile
   session-monitor/plugins/Makefile
-  session-monitor/resources/Makefile
+  session-monitor/glade/Makefile
   session-monitor/setup.py
 ], [
   chmod +x session-monitor/ecell3-session-monitor
@@ -337,8 +337,8 @@ AC_CONFIG_FILES([
 
 AC_CONFIG_FILES([
   model-editor/Makefile
-  model-editor/glade/Makefile
   model-editor/plugins/Makefile
+  model-editor/glade/Makefile
   model-editor/doc/Makefile
   model-editor/setup.py
 ], [

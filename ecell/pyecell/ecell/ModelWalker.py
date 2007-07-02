@@ -38,7 +38,6 @@ def getNextInList(  aList, actualID ):
     else:
         return aList[idx + 1]
 
-        
 def getPreviousInList(  aList, actualID ):
     if actualID == None:
         idx = len(aList)
@@ -50,17 +49,13 @@ def getPreviousInList(  aList, actualID ):
     else:
         return aList[idx - 1]
     
-
-
 class ModelWalker:
-    def __init__( self, aModel  ):
+    def __init__( self, aModel ):
         """ aModel can be any that complies the ecell3 Simulator API"""
 
         self.theModel = aModel
         self.theTreeWalker = TreeWalker( aModel )
         self.reset()
-        
-        
         
     def moveTo( self, aFullID ):
         self.theActualID = list( aFullID )
@@ -69,18 +64,13 @@ class ModelWalker:
         else:
             self.theTreeWalker.moveTo( createFullIDFromSystemPath( self.theActualID[SYSTEMPATH]  ) )
         self.__getEntityLists( )
-         
-        
         
     def reset ( self ):
         self.moveTo( [ SYSTEM, '', '/' ] )
-
         
     def getCurrentFullID( self ):
         return self.theActualID
 
-
-        
     def getNextFullID ( self ):
         """
         moves to next FullID
@@ -92,8 +82,6 @@ class ModelWalker:
             return None
         return self.getCurrentFullID()
         
-        
-        
     def getPreviousFullID( self ):
         """ 
         moves to Previous FullID
@@ -102,7 +90,6 @@ class ModelWalker:
             return None
         self.__moveToPreviousEntity()
         return self.getCurrentFullID()
-        
         
     def __moveToPreviousEntity( self ):
         # order :  System, Process, Variable , System up 
@@ -132,8 +119,6 @@ class ModelWalker:
             return
         # move to actual system
         self.theActualID = createFullIDFromSystemPath( systemPath )
-
-    
 
     def __moveToNextEntity( self ):
         # order : Variable, Process, System, System inside
@@ -165,8 +150,6 @@ class ModelWalker:
         self.theActualID = self.theTreeWalker.getNextSystemFullID()[:]
         self.__getEntityLists()
         
-
-        
     def __getEntityLists( self ):
         if self.theActualID[TYPE] == SYSTEM:
             systemPath = createSystemPathFromFullID( self.theActualID )
@@ -174,9 +157,6 @@ class ModelWalker:
             systemPath = self.theActualID[SYSTEMPATH]
         self.theProcessList = list( self.theModel.getEntityList( ENTITYTYPE_STRING_LIST[PROCESS], systemPath ) )
         self.theVariableList = list( self.theModel.getEntityList( ENTITYTYPE_STRING_LIST[VARIABLE], systemPath ) )
-
-
-
 
 class TreeWalker:
     def __init__( self, aModel ):
@@ -191,7 +171,6 @@ class TreeWalker:
     def reset( self ):
         self.moveTo( [ SYSTEM, '', '/' ] )
         
-        
     def getNextSystemFullID( self ):
         #try to go down
         newID = getNextInList( self.theChildren, None )           
@@ -203,7 +182,6 @@ class TreeWalker:
 
         # go up and forward recursively
         return self.__goForwardAndUp()
-        
     
     def getPreviousSystemFullID( self ):
 
@@ -225,7 +203,6 @@ class TreeWalker:
 
         return self.theActualID
         
-        
     def __goForwardAndUp( self ):
         #try to go forwards
         newID = getNextInList( self.theSiblings, self.theActualID[ID] )
@@ -246,7 +223,6 @@ class TreeWalker:
         # go up and forward recursively
         return self.__goForwardAndUp()
         
-        
     def __goDownAndForward( self ):
         # go down
         newID = getNextInList( self.theChildren, None )           
@@ -262,8 +238,6 @@ class TreeWalker:
             self.__goDownAndForward()
 
         return self.theActualID
-
-
 
     def __getLists( self ):
         if self.theActualID[SYSTEMPATH] == '':

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
 #       This file is part of the E-Cell System
@@ -25,6 +24,27 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # 
 #END_HEADER
+#
+# Author: Moriyoshi Koizumi <mozo@sfc.keio.ac.jp>
+#
 
-# this module is deprecated
-from util import *
+"""
+import gtk.glade as glade
+import sys
+import imp
+
+def customComponentHandler( glade, unknown, id, s1, s2, i1, i2, userData ):
+    aSearchPath = None
+    aModComponents = s1.split( "." )
+    while True:
+        aBaseModuleName = aModComponents.pop( 0 )
+        aModule = imp.load_module(
+            *( aBaseModuleName, ) + imp.find_module(
+                aBaseModuleName, aSearchPath ) )
+        if len( aModComponents ) == 0:
+            break
+        aSearchPath = aModule.__path__ + sys.path
+    return getattr( aModule, s2 )()
+
+glade.set_custom_handler( customComponentHandler, "USER" )
+"""
