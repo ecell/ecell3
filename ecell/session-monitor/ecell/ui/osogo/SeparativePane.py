@@ -77,10 +77,16 @@ class SeparativePane( Pane ):
         # XXX: should not be called asynchronously
         if aParent == None:
             if self.theOuterFrame == None:
-                if self.theParent != None and self.theParentWidgetName != None \
-                   and self.theRootWidget != None:
-                    self.theParent[ self.theParentWidgetName ].remove(
-                        self.theRootWidget )
+                if self.theParent != None and \
+                   self.theParentWidgetName != None and \
+                   self.theRootWidget != None:
+                    aParentWidget =  self.theParent[
+                        self.theParentWidgetName ]
+                    # it is possible that the parent widget is
+                    # already destroyed or unmanaged by the parent
+                    # window wrapper.
+                    if aParentWidget != None:
+                        aParentWidget.remove( self.theRootWidget )
         else:
             if self.theOuterFrame != None:
                 self.theOuterFrame.remove( self.theRootWidget )

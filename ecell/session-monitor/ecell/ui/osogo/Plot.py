@@ -835,7 +835,7 @@ class Plot( gtk.DrawingArea ):
         self.doesRequireScaling=True
 
         self.thePangoCtx = self.get_pango_context()
-        self.thePangoCtx.set_language( pango.pango_language_from_string( 'en' ) )
+        self.thePangoCtx.set_language( pango.Language( 'en' ) )
         self.setFont( self.thePangoCtx.get_font_description() )
         self.theMargin = [
             self.getLineHeight() + 16,

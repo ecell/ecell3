@@ -104,7 +104,6 @@ class BoardWindow( OsogoWindow ):
     def attachPluginWindow( self, aPluginWindowType, aRawFullPNList ):
         aPluginWindow = self.theSession.openPluginWindow(
             aPluginWindowType, aRawFullPNList )
-
         r,c = self.getNextPosition()
         aPluginFrame = gtk.Frame()
         aCellWidgetName = "board(%d,%d)" % ( r, c )
@@ -113,20 +112,20 @@ class BoardWindow( OsogoWindow ):
         aPluginFrame.set_shadow_type( UNSELECTED_SHADOW_TYPE )
         aPluginFrame.connect('set_focus_child',
             lambda w, c: self.selectCell( w ) )
-        self.attachPluginFrame( ( aPluginFrame, aPluginWindow ), r, c )
+        anElement = ( aPluginFrame, aPluginWindow )
+        self.attachPluginFrame( anElement, r, c )
+        def detacher( anInstance ):
+            self.detachPluginFrame( anElement )
+            self.updatePositions()
+        aPluginWindow.registerDestroyHandler( detacher )
+
         self.addChild( aPluginWindow, aCellWidgetName )
         aPluginFrame.show_all()
         self.updatePositions()
         return aPluginWindow
 
     def handleSessionEvent( self, event ):
-        if event.type == 'plugin_instance_removed':
-            for anElement in self.thePluginMap.values():
-                if anElement[1] == event.instance:
-                    self.detachPluginFrame( anElement )
-                    self.updatePositions()
-                    return
-        elif event.type == 'plugin_window_title_changed':
+        if event.type == 'plugin_window_title_changed':
             for anElement in self.thePluginMap.values():
                 if anElement[1] == event.instance:
                     anElement[0].set_label( event.instance.getTitle() )
