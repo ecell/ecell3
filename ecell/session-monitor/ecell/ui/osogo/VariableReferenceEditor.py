@@ -31,8 +31,7 @@ import gtk
 import gtk.gdk
 import operator
 from Pane import Pane
-import ecell.util as util
-from ConfirmWindow import *
+from utils import *
 
 VARREF_NAME = 0
 VARREF_FULLID = 1
@@ -156,9 +155,8 @@ class VariableReferenceEditor( Pane ):
             self.theParent.theSession.message(anErrorMessage)
     
             # creates and display error message dialog.
-            anErrorMessage = "Couldnot change variablereference"
-            anErrorTitle = "Error"
-            anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
+            anErrorMessage = "Could not change variable references"
+            showPopupMessage( OK_MODE, anErrorMessage, "Error" )
             self.update()
         
     def __cellEdited( self, *args ):
@@ -169,7 +167,8 @@ class VariableReferenceEditor( Pane ):
         if column == COEF_COLUMN:
             #check whether it is integer
             if not operator.isNumberType( aNewValue):
-                anErrorWindow = ConfirmWindow(OK_MODE,"Coefficient should be numeric.","Error")
+                showPopupMessage( OK_MODE,
+                    "Coefficient should be numeric.", "Error" )
                 return
         self.theListStore.set_value( anIter, column, aNewValue )
         self.__setValue()

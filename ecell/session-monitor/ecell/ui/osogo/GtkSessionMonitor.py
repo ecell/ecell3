@@ -60,7 +60,6 @@ from EntityListWindow import EntityListWindow
 from OsogoWindow import OsogoWindow
 from ConfigParser import ConfigParser
 from OsogoPluginManager import OsogoPluginManager
-from LoggingPolicy import LoggingPolicy
 
 import traceback
 
@@ -344,25 +343,6 @@ class GtkSessionFacade:
             return None
         return aBoardWindow.addPluginWindows( aType, aFullPNList )
 
-    def openLogPolicyWindow( self, aLogPolicy, aTitle = None ):
-        """ pops up a modal dialog window
-            with aTitle (str) as its title
-            and displaying loggingpolicy
-            and with an OK and a Cancel button
-            users can set logging policy
-            returns:
-            logging policy if OK is pressed
-            None if cancel is pressed
-        """
-        aLogPolicyWindow = LoggingPolicy()
-        aLogPolicyWindow.setSession( self )
-        aLogPolicyWindow.setLoggingPolicy( aLogPolicy )
-        if aTitle != None:
-            assert aLogPolicyWindow.setTitle( aTitle )
-        aLogPolicyWindow.initUI()
-        aLogPolicyWindow.show()
-        return aLogPolicyWindow.return_result()
-
     def createManagedWindow( self, aManagedWindowType ):
         aManagedWindow = aManagedWindowType()
         aManagedWindow.setSession( self )
@@ -457,7 +437,7 @@ class GtkSessionFacade:
                     ), 'w' )
             self.theConfigDB.write( fp )
         except:
-            self.message("Couldnot save preferences into file %s. Please check permissions for home directory." % self.theIniFileName)
+            self.message("Failed to save preferences into file %s. Please check permissions for home directory." % self.theIniFileName)
 
     def getLogPolicyParameters( self ):
         """
@@ -612,6 +592,7 @@ class GtkSessionFacade:
         if not aStub.exists():
             aStub.create()
             aStub.setLoggerPolicy( self.getLogPolicyParameters() )
+            self.fireEvent( 'logger_created', logger = aStub )
         return aStub
 
     def saveLoggerData( self, fullpn=0, aSaveDirectory='./Data', aStartTime=-1, anEndTime=-1, anInterval=-1 ):

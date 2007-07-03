@@ -46,7 +46,6 @@ import traceback
 import ecell.util as util
 from PluginWindow import *
 from utils import *
-from ConfirmWindow import *
 
 class OsogoPluginWindow(PluginWindow):
     """

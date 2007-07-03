@@ -32,7 +32,6 @@ from ecell.ui.osogo.utils import *
 import ecell.util as util
 import ecell.ui.osogo.config as config
 from ecell.ui.osogo.OsogoPluginWindow import OsogoPluginWindow
-from ecell.ui.osogo.ConfirmWindow import *
 
 class VariableWindow( OsogoPluginWindow ):
     """VariableWindow
@@ -73,19 +72,19 @@ class VariableWindow( OsogoPluginWindow ):
         # If this entity does not have 'Value', does not create instance 
         if aValueFlag == False:
             aMessage = "Error: %s does not have \"Value\" property" %self.theFullIDString
-            aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
+            showPopupMessage( OK_MODE, aMessage, 'Error')
             raise TypeError( aMessage )
 
         # If this entity does not have 'MolarConc', does not create instance 
         if aMolarConcFlag == False:
             aMessage = "Error: %s does not have \"MolarConc\" property" %self.theFullIDString
-            aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
+            showPopupMessage( OK_MODE, aMessage, 'Error' )
             raise TypeError( aMessage )
 
         # If this entity does not have 'Fixed', does not create instance 
         if aFixedFlag == False:
             aMessage = "Error: %s does not have \"Fixed\" property" %self.theFullIDString
-            aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
+            showPopupMessage( OK_MODE, aMessage, 'Error' )
             raise TypeError( aMessage )
 
 
@@ -93,13 +92,13 @@ class VariableWindow( OsogoPluginWindow ):
         # If Value is not Number
         if not operator.isNumberType( self.theStub.getProperty('Value') ):
             aMessage = "Error: \"Value\" property is not number" 
-            aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
+            showPopupMessage( OK_MODE, aMessage, 'Error' )
             raise TypeError( aMessage )
 
         # If MolarConc is not Number
         if not operator.isNumberType( self.theStub.getProperty('MolarConc') ):
             aMessage = "Error: \"MolarConc\" property is not number" 
-            aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
+            showPopupMessage( OK_MODE, aMessage, 'Error' )
             raise TypeError( aMessage )
 
     def initUI( self ):
@@ -174,7 +173,7 @@ class VariableWindow( OsogoPluginWindow ):
         except:
             self['value_spinbutton'].set_text( str(self.theStub.getProperty('Value')) )
             # displays confirm window
-            ConfirmWindow(OK_MODE,"Input number.","Value Error!")
+            showPopupMessage( OK_MODE, "Input number.", 'Error' )
 
         # When it is number
         else:

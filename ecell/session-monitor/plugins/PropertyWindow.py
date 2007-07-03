@@ -39,6 +39,7 @@ from ecell.ui.osogo.VariableReferenceEditor import *
 from ecell.ui.osogo.FullPNQueue import *
 import ecell.ui.osogo.config as config
 import ecell.util as util
+from ecell.ui.osogo.utils import *
 
 # column index of clist
 GETABLE_COL   = 0
@@ -512,10 +513,9 @@ class PropertyWindow(OsogoPluginWindow):
                 import sys
                 # creates and display error message dialog.
                 anErrorMessage = "Invalid value format"
-                anErrorTitle = "type error"
                 if self.theStatusBarWidget != None:
                     self.theStatusBarWidget.push(1,anErrorMessage)
-                anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
+                showPopupMessage( OK_MODE, anErrorMessage, 'Error' )
                 return None
         aFullPNString = util.createFullPNString(self.theSelectedFullPN)
 
@@ -536,11 +536,10 @@ class PropertyWindow(OsogoPluginWindow):
             self.theSession.message("---------------------------")
 
             # creates and display error message dialog.
-            anErrorMessage = "An error happened! See MessageWindow."
-            anErrorTitle = "An error happened!"
+            anErrorMessage = "An error occurred. See MessageWindow."
             if self.theStatusBarWidget != None:
-                self.theStatusBarWidget.push(1,anErrorMessage)
-            anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
+                self.theStatusBarWidget.push( 1, anErrorMessage )
+            showPopupMessage( OK_MODE, anErrorMessage, 'Error' )
         else:
 
             self.__updatePropertyList()

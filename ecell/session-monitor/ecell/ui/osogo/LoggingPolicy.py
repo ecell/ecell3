@@ -31,10 +31,10 @@
 
 import gtk 
 import os
-from OsogoWindow import OsogoWindow
-from ConfirmWindow import *
+from Window import Window
+from utils import *
 
-class LoggingPolicy( OsogoWindow ):
+class LoggingPolicy( Window ):
     def __init__( self ):
         """
         This is confirm popup window class.
@@ -45,68 +45,47 @@ class LoggingPolicy( OsogoWindow ):
         When OK is clicked, return OK_PRESSED
         When Cancel is clicked or close Window, return CANCEL_PRESSED
         """
-        OsogoWindow.__init__( self )
-        self.___num = CANCEL_PRESSED
+        Window.__init__( self )
+        self.theLoggingPolicy = None
 
     def setLoggingPolicy( self, aPolicy ):
         self.theLoggingPolicy = aPolicy
 
     def initUI( self ):
-        OsogoWindow.initUI( self )
-        self.populateDialog( self.theLoggingPolicy )
+        Window.initUI( self )
+        self.syncToModel()
 
         # add handlers
-        self.addHandlers(
-            {
-                'on_ok_button_clicked': self.oKButtonClicked,
-                'on_cancel_button_clicked': self.cancelButtonClicked,
-                "on_space_max_toggled" : self.__buttonChosen,
-                "on_space_no_limit_toggled" : self.__buttonChosen,
-                "on_end_overwrite_toggled" : self.__buttonChosen,
-                "on_end_throw_ex_toggled" : self.__buttonChosen,
-                "on_log_by_secs_toggled" : self.__buttonChosen,
-                "on_log_by_step_toggled" : self.__buttonChosen
-                }
-            )
+        self.addHandlersAuto()
 
-    def openConfirmWindow(self,  aMessage, aTitle, isCancel = 1 ):
-        """
-        pops up a modal dialog window with aTitle (str) as its title
-        and displaying aMessage as its message
-        and with an OK and a Cancel button
+    def syncToModel( self ):
+        if not self.exists():
+            return
 
-        returns:
-        True if Ok button is pressed
-        False if cancel button is pressed
-        """
-        aConfirmWindow = ConfirmWindow(isCancel, aMessage, aTitle )
-        return aConfirmWindow.return_result() == OK_PRESSED
-
-    def populateDialog( self, aLoggingPolicy ):
-        if aLoggingPolicy[0]>0:
+        if self.theLoggingPolicy[0] > 0:
             self['log_by_step'].set_active( True )
-            self['step_entry'].set_text( str(aLoggingPolicy[0] ))
+            self['step_entry'].set_text( str(self.theLoggingPolicy[0] ))
             self['second_entry'].set_sensitive( False )
             self['step_entry'].set_sensitive( True )
         else:
             self['log_by_secs'].set_active( True )
-            self['second_entry'].set_text( str(aLoggingPolicy[1] ))
+            self['second_entry'].set_text( str(self.theLoggingPolicy[1] ))
             self['second_entry'].set_sensitive( True )
             self['step_entry'].set_sensitive( False )
-        if aLoggingPolicy[2]== 0:
+        if self.theLoggingPolicy[2]== 0:
             self['end_throw_ex'].set_active( True )
         else:
             self['end_overwrite'].set_active( True )
 
-        if aLoggingPolicy[3] == 0:
+        if self.theLoggingPolicy[3] == 0:
             self['space_no_limit'].set_active ( True )
             self['space_entry'].set_sensitive( False )
         else:
             self['spac_max'].set_active( True )
-            self['space_entry'].set_text( str( aLoggingPolicy[3] ) )
+            self['space_entry'].set_text( str( self.theLoggingPolicy[3] ) )
             self['space_entry'].set_sensitive( True )
             
-    def __depopulateDialog( self ):
+    def syncToView( self ):
         aLoggingPolicy = [1,0,0,0]
         if self['log_by_step'].get_active() == True:
             try:
@@ -116,8 +95,8 @@ class LoggingPolicy( OsogoWindow ):
                     a=1/0
                 aLoggingPolicy[1] = 0
             except:
-                self.openConfirmWindow( "Please enter valid positive integer for minimum step size", "Invalid number format", 0)
-                return None
+                showPopupMessage( "Please enter valid positive integer for minimum step size", "Invalid number format", 0)
+                return False
         else:
             try:
                 aLoggingPolicy[1] = float(self['second_entry'].get_text())
@@ -125,8 +104,8 @@ class LoggingPolicy( OsogoWindow ):
                     a=1/0
                 aLoggingPolicy[0] = 0
             except:
-                self.openConfirmWindow( "Please enter valid non-negative number for minimum timeinterval", "Invalid number format", 0)
-                return None
+                showPopupMessage( "Please enter valid non-negative number for minimum timeinterval", "Invalid number format", 0)
+                return False
         if self['end_overwrite'].get_active() == True :
             aLoggingPolicy[2] = 1
         else:
@@ -137,14 +116,17 @@ class LoggingPolicy( OsogoWindow ):
                 if aLoggingPolicy[3]<0:
                     a=1/0
             except:
-                self.openConfirmWindow( "Please enter valid integer for maximum disk size", "Invalid number format", 0)
-                return None
+                showPopupMessage( "Please enter valid integer for maximum disk size", "Invalid number format", 0)
+                return False
         else:
             aLoggingPolicy[3] = 0
-        return aLoggingPolicy
+        self.theLoggingPolicy = aLoggingPolicy
+        return True  
 
-    def __buttonChosen( self, *args ):
-        aName = args[0].get_name()
+
+    def onRadioToggled( self, aWidget ):
+        aName = aWidget.name
+
         if aName == "log_by_secs":
             self['second_entry'].set_sensitive( True )
             self['step_entry'].set_sensitive( False )
@@ -156,29 +138,27 @@ class LoggingPolicy( OsogoWindow ):
         elif aName == "spac_max":
             self['space_entry'].set_sensitive( True )
 
-    def oKButtonClicked( self, *arg ):
+
+    def doApplyAndClose( self ):
         """
         If OK button clicked or the return pressed, this method is called.
         """
 
         # sets the return number
-        aLogPolicy = self.__depopulateDialog()
-        if aLogPolicy == None:
-            return
-        self.___num = aLogPolicy
-        self.destroy()
+        if self.syncToView():
+            self.destroy()
 
-    def cancelButtonClicked( self, *arg ):
+    def doCancel( self ):
         """
         If Cancel button clicked or the return pressed, this method is called.
         """
 
         # set the return number
-        self.___num = None
+        self.theResult = None
         self.destroy()
     
-    def return_result( self ):
+    def getResult( self ):
         """
         Returns result
         """
-        return self.___num
+        return self.theLoggingPolicy

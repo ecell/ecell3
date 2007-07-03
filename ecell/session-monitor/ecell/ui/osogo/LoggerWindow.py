@@ -45,7 +45,7 @@ from ecell.DataFileManager import *
 from ecell.ECDDataFile import *
 from LoggingPolicy import *
 
-class LoggerWindow(OsogoWindow):
+class LoggerWindow( OsogoWindow ):
     def __init__( self ): 
         """
         constructor
@@ -59,7 +59,7 @@ class LoggerWindow(OsogoWindow):
         self.theSaveDirectorySelection = None
 
     def initUI( self ):
-        OsogoWindow.initUI(self)
+        OsogoWindow.initUI( self )
 
         self.thePopupMenu = PopupMenu( self )
         # Creates save file selection
@@ -111,7 +111,7 @@ class LoggerWindow(OsogoWindow):
 
     def destroy( self ):
         self.theEntryList = None
-        OsogoWindow.destroy(self)
+        OsogoWindow.destroy( self )
 
     def resetAllValues( self, obj=None ):
         """
@@ -193,9 +193,9 @@ class LoggerWindow(OsogoWindow):
         # [1-1] At least, one data must be selected.
         # If no list is selected, exit this method.
         if len(self.theSelectedPropertyName())==0:
-            self["statusbar"].push(1,'Select some data.')
-            aErrorMessage='\nNo data is selected.!\n'
-            aWarningWindow = ConfirmWindow(0,aErrorMessage)
+            self["statusbar"].push( 1, 'Select some data.' )
+            anErrorMessage = 'No data is selected.'
+            showPopupMessage( OK_MODE, anErrorMessage, 'Error' )
             return None
 
         # [1-2] interval must be > 0
@@ -205,8 +205,8 @@ class LoggerWindow(OsogoWindow):
             anInterval = self['datainterval_spinbutton'].get_value()
             if anInterval==0:
                 self["statusbar"].push(1,'Set interval > 0.')
-                aErrorMessage='Interval must be > 0.!\n'
-                aWarningWindow = ConfirmWindow(0,aErrorMessage)
+                anErrorMessage = 'Interval must be > 0.'
+                showPopupMessage( OK_MODE, anErrorMessage, 'Error' )
                 return None
 
 
@@ -218,8 +218,8 @@ class LoggerWindow(OsogoWindow):
             pass
         elif aType == 'binary':
             self["statusbar"].push(1,'Select ecd type.')
-            aErrorMessage = "Sorry, binary format will be supported in the future version."
-            aWarningWindow = ConfirmWindow(0,aErrorMessage)
+            anErrorMessage = "Sorry, binary format will be supported in the future version."
+            showPopupMessage( OK_MODE, anErrorMessage, 'Error' )
             return None
 
         # [1-4] start < end
@@ -232,8 +232,8 @@ class LoggerWindow(OsogoWindow):
 
             if aStartTime >= anEndTime:
                 self["statusbar"].push(1,'Set start time < end time.')
-                aErrorMessage='Start time must be < end time.!\n'
-                aWarningWindow = ConfirmWindow(0,aErrorMessage)
+                anErrorMessage = 'Start time must be < end time.!\n'
+                showPopupMessage( OK_MODE, anErrorMessage, 'Error' )
                 return None
 
         # [2] Creates Data directory.
@@ -242,32 +242,37 @@ class LoggerWindow(OsogoWindow):
         # If same directory exists.
         if os.path.isdir(aSaveDirectory):
             aConfirmMessage = "%s directory already exist.\n Would you like to override it?"%aSaveDirectory
-            self.confirmWindow = ConfirmWindow(1,aConfirmMessage)
-            if self.confirmWindow.return_result() != 0:
-                self["statusbar"].push(1,'Save was canceled.')
-                return None
+            if showPopupMessage( OKCANCEL_MODE, aConfirmMessage ) != \
+               OK_PRESSED:
+                self["statusbar"].push(1, 'Save was canceled.')
+            return None
         # If same directory dose not exists.
         else:
             try:
                 os.mkdir(aSaveDirectory)
                 self["statusbar"].push(1,'Set start time < end time.')
             except:
-                self["statusbar"].push(1,'couldn\'t create %s'%aSaveDirectory)
-                aErrorMessage='couldn\'t create %s!\n'%aSaveDirectory
-                aWarningWindow = ConfirmWindow(0,aErrorMessage)
+                anErrorMessage = "Couldn't create %s!" % aSaveDirectory
+                self["statusbar"].push(1, anErrorMessage )
+                showPopupMessage( OK_MODE, anErrorMessage, 'Error' )
                 return None
             else:
-                self["statusbar"].push(1,'%s was created.'%aSaveDirectory)
+                self["statusbar"].push( 1, '%s was created.' % aSaveDirectory )
 
         # [3] Execute saving.
         try:
-                self.theSession.saveLoggerData( self.theSelectedPropertyName(), aSaveDirectory, aStartTime, anEndTime, anInterval )
+            self.theSession.saveLoggerData(
+                self.theSelectedPropertyName(),
+                aSaveDirectory,
+                aStartTime, anEndTime,
+                anInterval )
         except:
-                anErrorMessage= "Error : could not save "
-                self["statusbar"].push(1,anErrorMessage)
-                return None
+            anErrorMessage =  "Failed to save the specified log to %s" % aSaveDirectory
+            self["statusbar"].push( 1, anErrorMessage )
+            showPopupMessage( OK_MODE, anErrorMessage, 'Error' )
+            return None
         
-        aSuccessMessage= " All files you selected are saved. " 
+        aSuccessMessage = "All the selected files have been saved successfully." 
         self["statusbar"].push( 1 , aSuccessMessage )
 
     def theSelectedPropertyName( self ):
@@ -315,6 +320,12 @@ class LoggerWindow(OsogoWindow):
                 1, str(aValue[1]),
                 2, str(aValue[2])
                 )
+
+    def handleSessionEvent( self, event ):
+        if event.type == 'logger_created' or \
+           event.type == 'logger_deleted':
+            self.update()
+
     def popupMenu( self, aWidget, anEvent ):
         """
         popupMenu

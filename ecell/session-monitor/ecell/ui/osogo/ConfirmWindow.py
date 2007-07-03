@@ -52,8 +52,7 @@ class ConfirmWindow(gtk.Dialog):
 	When Cancel is clicked or close Window, return CANCEL_PRESSED
 	"""
 
-	# ==========================================================================
-	def __init__(self, aMode, aMessage, aTitle='Confirm' ):
+	def __init__( self, aMode, aMessage, aTitle='Confirm' ):
 		"""Constructor
 		aMode    ---  mode number that is 0(OK) or 1(OK and Cancel).
 		aMessage ---  the message that is displayed in the center
@@ -65,55 +64,44 @@ class ConfirmWindow(gtk.Dialog):
 		self.___num = CANCEL_PRESSED
 
 		# Create the Dialog
-		self.win = gtk.Dialog(aTitle, None, gtk.DIALOG_MODAL)
-		self.win.connect("destroy",self.destroy)
+		gtk.Dialog.__init__( self, aTitle, None, gtk.DIALOG_MODAL )
 
 		# Sets size and position
-		self.win.set_border_width(2)
-		self.win.set_default_size(300,75)
-		self.win.set_position(gtk.WIN_POS_MOUSE)
+		self.set_border_width(2)
+		self.set_default_size(300,75)
+		self.set_position(gtk.WIN_POS_MOUSE)
 
 		aPixbuf16 = gtk.gdk.pixbuf_new_from_file(
             os.path.join( config.glade_dir, 'ecell.png') )
 		aPixbuf32 = gtk.gdk.pixbuf_new_from_file(
             os.path.join( config.glade_dir, 'ecell32.png') )
-		self.win.set_icon_list(aPixbuf16, aPixbuf32)		
-		self.win.show()
+		self.set_icon_list(aPixbuf16, aPixbuf32)		
 
 		# Sets title
-		# self.win.set_title(aTitle)
+		# self.set_title(aTitle)
 
 		# Sets message
 		aMessage = '\n' + aMessage + '\n'
 		aMessageLabel = gtk.Label(aMessage)
-		self.win.vbox.pack_start(aMessageLabel)
-		aMessageLabel.show()
+		self.vbox.pack_start(aMessageLabel)
 	
 		# appends ok button
 		ok_button = gtk.Button("  OK  ")
-		self.win.action_area.pack_start(ok_button,False,False,)
+		self.action_area.pack_start(ok_button,False,False,)
 		ok_button.set_flags(gtk.CAN_DEFAULT)
 		ok_button.grab_default()
-		ok_button.show()
 		ok_button.connect("clicked",self.oKButtonClicked)
 
 		# when ok mode 
 		if aMode == OK_MODE:
 			pass
-
 		# when ok cancel mode 
 		else:
-
 			# appends cancel button
 			cancel_button = gtk.Button(" Cancel ")
-			self.win.action_area.pack_start(cancel_button,False,False)
-			cancel_button.show()
+			self.action_area.pack_start(cancel_button,False,False)
 			cancel_button.connect("clicked",self.cancelButtonClicked)	
 
-		gtk.main()
-
-
-	# ==========================================================================
 	def oKButtonClicked( self, *arg ):
 		"""If OK button clicked or the return pressed, this method is called.
 		"""
@@ -122,8 +110,6 @@ class ConfirmWindow(gtk.Dialog):
 		self.___num = OK_PRESSED
 		self.destroy()
 
-
-	# ==========================================================================
 	def cancelButtonClicked( self, *arg ):
 		"""If Cancel button clicked or the return pressed, this method is called.
 		"""
@@ -131,29 +117,9 @@ class ConfirmWindow(gtk.Dialog):
 		# set the return number
 		self.___num = CANCEL_PRESSED
 		self.destroy()
-	
 
-	# ==========================================================================
-	def return_result( self ):
+	def getResult( self ):
 		"""Returns result
 		"""
 
 		return self.___num
-
-
-	# ==========================================================================
-	def destroy( self, *arg ):
-		"""destroy dialog
-		"""
-		self.win.hide()
-		gtk.main_quit()
-
-
-# ----------------------------------------------------
-# Test code
-# ----------------------------------------------------
-if __name__=="__main__":
-	c = ConfirmWindow(1,'hoge\n')
-	print c.return_result()
-
-

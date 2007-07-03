@@ -38,7 +38,7 @@ from constants import *
 from PluginInstanceSelection import *
 from FullPNQueue import FullPNQueue
 from SeparativePane import SeparativePane
-from utils import retrieveValueFromListStore
+from utils import retrieveValueFromListStore, showPopupMessage
 
 DEFAULT_PLUGIN = 'TracerWindow'
 
@@ -961,7 +961,7 @@ class EntityListWindow( SeparativePane ):
         if aSelectedRawFullPNList  == None \
            or len( aSelectedRawFullPNList ) == 0:
             aMessage = 'No entity is selected.'
-            aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+            showPopupMessage( OK_MODE, aMessage, 'Error' )
             self.thePropertyWindow.showMessageOnStatusBar(aMessage)
             return False
 
@@ -996,17 +996,14 @@ class EntityListWindow( SeparativePane ):
 
         # When no FullPN is selected, displays error message.
         if self.__getSelectedRawFullPNList() == None or len( self.__getSelectedRawFullPNList() ) == 0:
-
-            aMessage = 'No entity is selected.'
-            aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+            showMessage(OK_MODE, "No entity selected", 'Error')
             self.thePropertyWindow.showMessageOnStatusBar(aMessage)
             return False
 
         # When no plugin instance is selected, displays error message.
         if len(self.theSelectedPluginInstanceList) == 0:
 
-            aMessage = 'No Plugin Instance is selected.'
-            aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+            showMessage(OK_MODE, "No plugin selected", 'Error')
             self.thePropertyWindow.showMessageOnStatusBar(aMessage)
             return False
 
@@ -1092,7 +1089,7 @@ class EntityListWindow( SeparativePane ):
         if aSelectedRawFullPNList  == None or \
            len( aSelectedRawFullPNList ) == 0:
             aMessage = 'No entity is selected.'
-            aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+            showPopupMessage( OK_MODE, aMessage, 'Error' )
             self.thePropertyWindow.showMessageOnStatusBar(aMessage)
             return False
 
@@ -1117,7 +1114,7 @@ class EntityListWindow( SeparativePane ):
 
             aMessage = 'No Entity is selected.'
             self.thePropertyWindow.showMessageOnStatusBar(aMessage)
-            aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+            showPopupMessage( OK_MODE, aMessage, 'Error' )
             return None
 
         # creates Logger using PropertyWindow
@@ -1158,9 +1155,10 @@ class EntityListWindow( SeparativePane ):
             
 
         if len( aFullPNList ) == 0:
-            aDialog = ConfirmWindow( OK_MODE, 
-                                    "Search string %s not found."%searchString, 
-                                    "Search failed" )
+            showPopupMessage(
+                OK_MODE, 
+                "Search string %s not found." % searchString, 
+                "Search failed" )
             return
         self.searchString = searchString
         self.theQueue.pushFullPNList( aFullPNList )

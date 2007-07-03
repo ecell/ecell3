@@ -39,7 +39,7 @@ import ecell.util as util
 import ecell.ui.osogo.config as config
 from ecell.ui.osogo.constants import *
 from ecell.ui.osogo.OsogoPluginWindow import OsogoPluginWindow
-from ecell.ui.osogo.ConfirmWindow import ConfirmWindow
+from ecell.ui.osogo.utils import *
 
 COL_LOG = 2
 COL_PIX = 1
@@ -442,7 +442,7 @@ class TracerWindow( OsogoPluginWindow ):
             # displays a Confirm Window.
             aMessage = "Cannot create new logger, because simulation is running.\n"
             aMessage += "Please stop simulation if you want to create a logger" 
-            aDialog = ConfirmWindow(OK_MODE,aMessage,'Warning!')
+            showPopupMessage( OK_MODE, aMessage, 'Warning' )
             return True
         return False
 
@@ -539,10 +539,10 @@ class TracerWindow( OsogoPluginWindow ):
             selectedFullPNList.append( anItem[0] )
         # If same directory exists.
         if os.path.isdir(aSaveDirectory):
-            aConfirmMessage = "%s directory already exist.\n Would you like to override it?"%aSaveDirectory
-            confirmWindow = ConfirmWindow(1,aConfirmMessage)
-
-            if confirmWindow.return_result() == 0:
+            aConfirmMessage = "%s directory already exists.\nWould you like to override it?" % aSaveDirectory
+            if showPopupMessage( OKCANCEL_MODE,
+                aConfirmMessage,
+                'Question' ) == OK_PRESSED:
                 pass
             else:
                 return None
@@ -552,16 +552,16 @@ class TracerWindow( OsogoPluginWindow ):
             try:
                 os.mkdir(aSaveDirectory)
             except:
-                aErrorMessage='couldn\'t create %s!\n'%aSaveDirectory
-                aWarningWindow = ConfirmWindow(0,aErrorMessage)
+                aErrorMessage = 'Cooudl not create %s\n'%aSaveDirectory
+                showPopupMessage( OK_MODE, aErrorMessage, 'Error' )
                 return None
 
 
         try:
             self.theSession.saveLoggerData( selectedFullPNList, aSaveDirectory, -1, -1, -1 )
         except:
-            anErrorMessage = "Error : could not save "
-            aWarningWindow = ConfirmWindow(0,anErrorMessage)
+            anErrorMessage = "Failed to save the log data"
+            showPopupMessage( OK_MODE, anErrorMessage, 'Error' )
             return None
         
     def closeParentWindow( self, obj ):

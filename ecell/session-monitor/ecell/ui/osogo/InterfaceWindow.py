@@ -62,7 +62,7 @@ class InterfaceWindow( OsogoWindow ):
         Returns None
         """
         # calls superclass's method
-        OsogoWindow.initUI(self)
+        OsogoWindow.initUI( self )
 
         # sets up plugin instance list
         self.theInterfaceListWidget = self[ 'InterfaceCList' ]
@@ -134,8 +134,8 @@ class InterfaceWindow( OsogoWindow ):
         """
         # if no data is selected, show error message.
         if self.theSelectedRow == None:
-            anErrorMessage='\nNo data is selected!\n'
-            aWarningWindow = ConfirmWindow(OK_MODE,anErrorMessage,"Error!")
+            anErrorMessage='No data is selected.'
+            showPopupMessage( OK_MODE, anErrorMessage, "Error" )
             return
         # if a data is selected, then remove it.
         else:
@@ -144,11 +144,8 @@ class InterfaceWindow( OsogoWindow ):
             aNewTitle = strip( aNewTitle )
             # checks the length of inputted title.
             if len( aNewTitle ) == 0:
-                anErrorMessage='\nTitle is empty!\n'
-                aWarningWindow = ConfirmWindow(
-                    OK_MODE,
-                    anErrorMessage,
-                    "Error!")
+                anErrorMessage='Title is empty.'
+                showPopupMessage( OK_MODE, anErrorMessage, "Error" )
                 return
             # gets current title
             aTitle =  self['InterfaceCList'].get_model().get_value(self.theSelectedRow,TITLE)
@@ -158,7 +155,7 @@ class InterfaceWindow( OsogoWindow ):
                 # should not happen...
                 return
             if not anInstance.setTitle( aNewTitle ):
-                aWarningWindow = ConfirmWindow(
+                showPopupMessage(
                     OK_MODE,
                     "Failed to change the window title to \"%s\"" % aNewTitle,
                     "Error!")
@@ -185,8 +182,8 @@ class InterfaceWindow( OsogoWindow ):
 
         # if no data is selected, show error message.
         if self.theSelectedRow == None:
-            anErrorMessage='\nNothing is selected!\n'
-            aWarningWindow = ConfirmWindow(OK_MODE,anErrorMessage,"Error!")
+            anErrorMessage = 'Nothing is selected.'
+            showPopupMessage( OK_MODE, anErrorMessage, "Error!" )
             return None
 
         aTitle =  self['InterfaceCList'].get_model().get_value(self.theSelectedRow,TITLE)
@@ -202,9 +199,8 @@ class InterfaceWindow( OsogoWindow ):
         # delete an Instance
         # if no data is selected, show error message.
         if self.theSelectedRow == None:
-            anErrorMessage='\nNothing is selected.!\n'
-            #self.theSession.message( anErrorMessage )
-            aWarningWindow = ConfirmWindow(0,anErrorMessage,"!")
+            anErrorMessage = 'Nothing is selected.'
+            showPopupMessage( 0, anErrorMessage, "Error" )
             return None
         # if a data is selected, then remove it.
         else:

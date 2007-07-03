@@ -32,7 +32,7 @@ import operator
 from ecell.ecs_constants import *
 from ecell.ui.osogo.constants import *
 from ecell.ui.osogo.OsogoPluginWindow import OsogoPluginWindow
-from ecell.ui.osogo.ConfirmWindow import ConfirmWindow
+from ecell.ui.osogo.utils import *
 import ecell.util as util
 import ecell.ui.osogo.config as config
 
@@ -53,10 +53,10 @@ class DigitalWindow( OsogoPluginWindow ):
 
         aValue = self.theSession.getEntityProperty( self.getFullPN() )
         if operator.isNumberType( aValue ) == False:
-            aMessage = "Error: (%s) is not numerical data" %\
+            aMessage = "(%s) is not numerical data" % \
                 util.createFullPNString( self.getFullPN() )
             self.theSession.message( aMessage )
-            aDialog = ConfirmWindow(0,aMessage,'Error!')
+            showPopupMessage( OK_MODE, aMessage, 'Error' )
             raise TypeError( aMessage )
 
     def initUI( self ):
@@ -134,7 +134,10 @@ class DigitalWindow( OsogoPluginWindow ):
                 aValue = string.atof( aText )
                 self.setValue( self.getFullPN(), aValue )
             except:
-                ConfirmWindow(0,'Input numerical value.')
+                showPopupMessage(
+                    OK_MODE,
+                    'Input numerical value.',
+                    'Error' )
                 aValue = self.getValue( self.getFullPN() )
                 self["value_frame"].set_text( str( aValue ) )
             return None

@@ -33,7 +33,6 @@
 import gtk
 from ecell.ecssupport import *
 from OsogoWindow import OsogoWindow
-from ConfirmWindow import ConfirmWindow
 from utils import *
 
 from numpy import *
@@ -265,8 +264,7 @@ class BoardWindow( OsogoWindow ):
         aNewTitle = string.strip( aNewTitle )
     
         if len(aNewTitle) == 0:
-            anErrorMessage='\nError text field is blank.!\n'
-            aWarningWindow = ConfirmWindow(OK_MODE,anErrorMessage,"!")
+            showPopupMessage( OK_MODE, "text field is blank", "Error" )
             return None
 
         self.thePluginMap[ self.theSelectedPluginFrame.get_name() ][1].setTitle( aNewTitle )

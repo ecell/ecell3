@@ -146,6 +146,14 @@ class Window:
 
                     aHandlerDict[ handlerName ] = generateHandler(
                         handlerName, aMember )
+            elif aMemberName.startswith( "on" ):
+                aMember = getattr( self, aMemberName, None )
+                if aMember != None and callable( aMember ):
+                    handlerName = '_'.join(
+                        map( string.lower,
+                            outil.splitCamelcasedName( aMemberName[2:] ) ) )
+                    aHandlerDict[ handlerName ] = aMember
+
         self.glade.signal_autoconnect( aHandlerDict )
 
     def addHandlers( self, aHandlerDict ):
@@ -259,6 +267,8 @@ class Window:
             self.initUI()
         self.theRootWidget.show_all()
         self.shown = True
+        if self.theRootWidget.__class__ == gtk.Dialog:
+            self.theRootWidget.run()
 
     def hide( self ):
         if self.theRootWidget == None:

@@ -32,6 +32,7 @@
 #
 
 from ecell.ecssupport import *
+from ConfirmWindow import *
 import string
 import re
 
@@ -100,3 +101,8 @@ def retrieveValueFromListStore( aListStore, anIndex, aColumnIndex = 0 ):
 def splitCamelcasedName( name ):
     return regexForSplitCamelcasedName.findall( name )
 
+def showPopupMessage( aMode, aMessage, aTitle = 'Confirm' ):
+    aDialog = ConfirmWindow( aMode, aMessage, aTitle )
+    aDialog.show_all()
+    aDialog.run()
+    return aDialog.getResult()

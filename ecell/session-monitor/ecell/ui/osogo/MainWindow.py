@@ -48,11 +48,12 @@ from datetime import datetime
 from ecell.ecssupport import *
 from ecell.ecs_constants import *
 
-from ConfirmWindow import *
 from OsogoWindow import OsogoWindow
 from AboutSessionMonitor import AboutSessionMonitor
 from MessageWindow import MessageWindow
 from EntityListWindow import EntityListWindow
+from LoggingPolicy import LoggingPolicy
+from utils import *
 
 import config
 
@@ -277,7 +278,7 @@ class MainWindow( OsogoWindow ):
 
         # append signal handlers
         self.addHandlers( {
-            'exit_menu_activate':           self.handleDeleteEvent,
+            'exit_menu_activate': self.handleDeleteEvent,
             } )
         self.addHandlersAuto()
         self.update()
@@ -677,7 +678,7 @@ class MainWindow( OsogoWindow ):
         else:
             aMessage = ' Error ! No such file. \n[%s]' %aFileName
             self.theSession.message(aMessage)
-            aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+            showPopupMessage( OK_MODE, aMessage, 'Error' )
             self.theFileSelection.present()
             return None
 
@@ -703,7 +704,7 @@ class MainWindow( OsogoWindow ):
 
             # displays confirm window
             aMessage = 'Can\'t load [%s]\nSee MessageWindow for details.' %aFileName
-            aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
+            showPopupMessage( OK_MODE, aMessage, 'Error' )
 
             # displays message on MessageWindow
             aMessage = 'Can\'t load [%s]' %aFileName
@@ -721,11 +722,9 @@ class MainWindow( OsogoWindow ):
 
             # displays confirm window
             aMessage = 'Would you like to replace the existing file? \n[%s]' %aFileName
-            aDialog = ConfirmWindow(OKCANCEL_MODE,aMessage,'Confirm File Overwrite')
-
-            # when canceled, does nothing 
-            if aDialog.return_result() != OK_PRESSED:
-                # does nothing
+            if showPopupMessage(
+                OKCANCEL_MODE, aMessage,
+                'Question' ) != OK_PRESSED:
                 return None
 
         # when ok is pressed, overwrites it.
@@ -745,7 +744,7 @@ class MainWindow( OsogoWindow ):
 
             # displays confirm window
             aMessage = 'Can\'t save [%s]\nSee MessageWindow for details.' %aFileName
-            aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+            aDialog = showPopupMessage( OK_MODE, aMessage, 'Error' )
             # displays error message of MessageWindow
             self.theSession.message('Can\'t save [%s]' %aFileName)
             anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
@@ -761,11 +760,9 @@ class MainWindow( OsogoWindow ):
         if os.path.isfile( aFileName ):
             # displays confirm window
             aMessage = 'Would you like to replace the existing file? \n[%s]' %aFileName
-            aDialog = ConfirmWindow(OKCANCEL_MODE,aMessage,'Confirm File Overwrite')
-
-            # when canceled, does nothing 
-            if aDialog.return_result() != OK_PRESSED:
-                # does nothing
+            if showPopupMessage(
+                OKCANCEL_MODE,
+                aMessage, 'Question' ) != OK_PRESSED:
                 return None
 
         # when ok is pressed, overwrites it.
@@ -786,7 +783,7 @@ class MainWindow( OsogoWindow ):
             # displays confirm window
             aMessage = "Can't save [%s]\nSee MessageWindow for details." % \
                        aFileName
-            aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+            showPopupMessage( OK_MODE, aMessage, 'Error' )
 
             # displays error message of MessageWindow
             self.theSession.message("Can't export [%s]" % aFileName)
@@ -812,14 +809,11 @@ class MainWindow( OsogoWindow ):
         # If there is no logger data, exit this program.
         if len( self.theSession.getLoggerList() ) != 0:
             # Popup confirm window, and check user request
-            aDialog = ConfirmWindow(
-                OK_MODE,
+            if showPopupMessage(
+                OKCANCEL_MODE,
                 'Are you sure to quit the application?',
                 'Question'
-                )
-            # ok is pressed
-            aDialog.destroy()
-            if aDialog.return_result() == OK_PRESSED:
+                ) != OK_PRESSED:
                 if sessionHasBeenRunning:
                     self.theSession.run()
                 return False
@@ -860,8 +854,8 @@ class MainWindow( OsogoWindow ):
             aNewValue = string.atof( aNewValue )
         except ValueError:
             # displays a Confirm Window.
-            aMessage = "\"%s\" is not numerical value." %aNewValue
-            aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+            aMessage = "\"%s\" is not numerical value."  % aNewValue
+            showPopupMessage( OK_MODE, aMessage, 'Error' )
             hasErrorOccurred = True
         # when string can be converted to float
         else:
@@ -876,13 +870,30 @@ class MainWindow( OsogoWindow ):
                     aMessage += "Number of steps must be an integer.\n"
                 aNewValue = int( aNewValue )
             if len(aMessage) > 0:
-                #aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
-                aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+                showPopupMessage( OK_MODE, aMessage, 'Error' )
         # revert the change
         if hasErrorOccurred:
             self['sec_step_entry'].set_text( str( self.theStepSizeOrSec ) )
         else:
             self.theStepSizeOrSec = aNewValue
+
+    def openLogPolicyWindow( self, aLogPolicy, aTitle = None ):
+        """ pops up a modal dialog window
+            with aTitle (str) as its title
+            and displaying loggingpolicy
+            and with an OK and a Cancel button
+            users can set logging policy
+            returns:
+            logging policy if OK is pressed
+            None if cancel is pressed
+        """
+        aLogPolicyWindow = LoggingPolicy()
+        aLogPolicyWindow.setLoggingPolicy( aLogPolicy )
+        if aTitle != None:
+            assert aLogPolicyWindow.setTitle( aTitle )
+        aLogPolicyWindow.initUI()
+        aLogPolicyWindow.show()
+        return aLogPolicyWindow.getResult()
 
     def doOpenLoggingPolicyDialog( self ):
         """
@@ -892,7 +903,8 @@ class MainWindow( OsogoWindow ):
         aLogPolicy = self.theSession.getLogPolicyParameters()
         
         # open logpolicy window
-        newLogPolicy = self.theSession.openLogPolicyWindow( aLogPolicy, "Set default log policy" )
+        newLogPolicy = self.openLogPolicyWindow(
+            aLogPolicy, "Set default log policy" )
         if newLogPolicy != None:
             # save logpolicy
             self.theSession.setLogPolicyParameters( newLogPolicy )

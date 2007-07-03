@@ -41,7 +41,7 @@
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
 	      <property name="response_id">-6</property>
-	      <signal name="clicked" handler="on_cancel_button_clicked" />
+	      <signal name="clicked" handler="cancel" />
 	    </widget>
 	  </child>
 
@@ -55,7 +55,7 @@
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
 	      <property name="response_id">-5</property>
-	      <signal name="clicked" handler="on_ok_button_clicked" />
+	      <signal name="clicked" handler="apply_and_close" />
 	    </widget>
 	  </child>
 	</widget>
@@ -106,7 +106,7 @@
 			  <property name="active">False</property>
 			  <property name="inconsistent">False</property>
 			  <property name="draw_indicator">True</property>
-			  <signal name="toggled" handler="on_log_by_step_toggled" last_modification_time="Sat, 29 May 2004 12:31:00 GMT"/>
+			  <signal name="toggled" handler="radio_toggled" last_modification_time="Sat, 29 May 2004 12:31:00 GMT"/>
 			</widget>
 			<packing>
 			  <property name="left_attach">0</property>
@@ -152,7 +152,7 @@
 			  <property name="inconsistent">False</property>
 			  <property name="draw_indicator">True</property>
 			  <property name="group">log_by_step</property>
-			  <signal name="toggled" handler="on_log_by_secs_toggled" last_modification_time="Sat, 29 May 2004 12:31:11 GMT"/>
+			  <signal name="toggled" handler="radio_toggled" last_modification_time="Sat, 29 May 2004 12:31:11 GMT"/>
 			</widget>
 			<packing>
 			  <property name="left_attach">0</property>
@@ -296,7 +296,7 @@
 			  <property name="active">False</property>
 			  <property name="inconsistent">False</property>
 			  <property name="draw_indicator">True</property>
-			  <signal name="toggled" handler="on_end_throw_ex_toggled" last_modification_time="Sat, 29 May 2004 12:31:19 GMT"/>
+			  <signal name="toggled" handler="radio_toggled" last_modification_time="Sat, 29 May 2004 12:31:19 GMT"/>
 			</widget>
 			<packing>
 			  <property name="padding">0</property>
@@ -317,7 +317,7 @@
 			  <property name="inconsistent">False</property>
 			  <property name="draw_indicator">True</property>
 			  <property name="group">end_throw_ex</property>
-			  <signal name="toggled" handler="on_end_overwrite_toggled" last_modification_time="Sat, 29 May 2004 12:31:26 GMT"/>
+			  <signal name="toggled" handler="radio_toggled" last_modification_time="Sat, 29 May 2004 12:31:26 GMT"/>
 			</widget>
 			<packing>
 			  <property name="padding">0</property>
@@ -382,7 +382,7 @@
 			  <property name="active">False</property>
 			  <property name="inconsistent">False</property>
 			  <property name="draw_indicator">True</property>
-			  <signal name="toggled" handler="on_space_no_limit_toggled" last_modification_time="Tue, 08 Jun 2004 08:06:15 GMT"/>
+			  <signal name="toggled" handler="radio_toggled" last_modification_time="Tue, 08 Jun 2004 08:06:15 GMT"/>
 			</widget>
 			<packing>
 			  <property name="padding">0</property>
@@ -409,7 +409,7 @@
 			      <property name="inconsistent">False</property>
 			      <property name="draw_indicator">True</property>
 			      <property name="group">space_no_limit</property>
-			      <signal name="toggled" handler="on_space_max_toggled" last_modification_time="Tue, 08 Jun 2004 08:11:14 GMT"/>
+			      <signal name="toggled" handler="radio_toggled" last_modification_time="Tue, 08 Jun 2004 08:11:14 GMT"/>
 			    </widget>
 			    <packing>
 			      <property name="padding">0</property>

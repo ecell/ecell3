@@ -41,7 +41,6 @@ from constants import *
 from utils import *
 from OsogoWindow import *
 from ecell.ecssupport import *
-from ConfirmWindow import *
 
 # Constant value of this class
 PROPERTY_INDEX = 0
@@ -353,7 +352,7 @@ class StepperWindow(OsogoWindow):
 
         if iter == None:
             aMessage = 'Select a property.'
-            aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+            showPopupMessage( OK_MODE, aMessage, 'Error' )
             self['statusbar'].push(1,'property is not selected.')
             return None
 
@@ -381,7 +380,11 @@ class StepperWindow(OsogoWindow):
                     # displays confirm window
                     anErrorMessage = "Input float value."
                     self['statusbar'].push(1,anErrorMessage)
-                    aDialog = ConfirmWindow(OK_MODE,"Can't set property!\n" + anErrorMessage,'Error!')
+                    showPopupMessage(
+                        OK_MODE,
+                        'Could not set property (reason: %s)' % \
+                            anErrorMessage,
+                        'Error' )
                     return None
             # int
             if type(anOldValue) == int:
@@ -391,7 +394,11 @@ class StepperWindow(OsogoWindow):
                     # displays confirm window
                     anErrorMessage = "Input int value."
                     self['statusbar'].push(1,anErrorMessage)
-                    aDialog = ConfirmWindow(OK_MODE,"Can't set property!\n" + anErrorMessage,'Error!')
+                    showPopupMessage(
+                        OK_MODE,
+                        'Could not set property (reason: %s)' % \
+                            anErrorMessage,
+                        'Error' )
                     return None
 
             # sets new value
@@ -405,7 +412,11 @@ class StepperWindow(OsogoWindow):
                 # displays confirm window
                 anErrorMessage = "See MessageWindow for details."
                 self['statusbar'].push(1,anErrorMessage)
-                aDialog = ConfirmWindow(OK_MODE,aMessage,"Can't set property!\n" + anErrorMessage)
+                showPopupMessage(
+                    OK_MODE,
+                    'Could not set property (reason: %s)' % \
+                        anErrorMessage,
+                    'Error' )
                 return None
 
             # when to set property is succeeded,
@@ -444,8 +455,12 @@ class StepperWindow(OsogoWindow):
 
                 # displays confirm window
                 anErrorMessage = "See MessageWindow for details."
-                aDialog = ConfirmWindow(OK_MODE,aMessage,"Can't set property!\n" + anErrorMessage)
                 self['statusbar'].push(1,anErrorMessage)
+                showPopupMessage(
+                    OK_MODE,
+                    'Could not set property (reason: %s)' % \
+                        anErrorMessage,
+                    'Error' )
                 return None
 
     def update( self ):
