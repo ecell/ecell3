@@ -389,7 +389,7 @@ class GtkSessionFacade:
 
     def fireEvent( self, type, **options ):
         def broadcaster():
-            print type
+            # print type
             event = GtkSessionEvent( type, options )
             if event.type in ( 'simulation_updated', 'simulation_started', \
                                'simulation_stopped' ):
