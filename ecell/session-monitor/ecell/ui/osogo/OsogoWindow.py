@@ -40,7 +40,7 @@ import gtk.glade
 import config
 from Window import *
 from ConfirmWindow import *
-from OsogoUtil import *
+from utils import *
 
 class OsogoWindow(Window):
     """OsogoWindow

@@ -34,7 +34,7 @@ import gtk
 from ecell.ecssupport import *
 from OsogoWindow import OsogoWindow
 from ConfirmWindow import ConfirmWindow
-from OsogoUtil import *
+from utils import *
 
 from numpy import *
 
@@ -71,7 +71,9 @@ class BoardWindow( OsogoWindow ):
         self.addHandlersAuto()
 
         self['board_table'].resize( MAXROW, MAXCOL )
-        self['size_spinbutton'].set_text( str(self.theColSize) )
+        self['size_spinbutton'].set_value(
+            self.alignmentIsForward and self.theColSize or \
+                                        self.theRowSize )
         self.theScrolledWindow = self['scrolledwindow1']
         self.theViewPort = self['viewport1']
 
@@ -217,13 +219,13 @@ class BoardWindow( OsogoWindow ):
 
         #calculate dimensions
         if self.theRowSize == -1:
-            rowsize = ceil( len( anElementList ) / self.theColSize )
+            rowsize = int( ceil( len( anElementList ) / self.theColSize ) )
             colsize = self.theColSize
         else:
             rowsize = self.theRowSize
-            colsize = ceil( len( anElementList ) / self.theRowSize )
+            colsize = int( ceil( len( anElementList ) / self.theRowSize ) )
         #init requisitionlist
-        matrixsize = max (rowsize, colsize)
+        matrixsize = max(rowsize, colsize)
         for i in range(0 , matrixsize * matrixsize ):
             aRequisitionList.append(None)
         
@@ -248,9 +250,11 @@ class BoardWindow( OsogoWindow ):
             self.theRowSize = aSize
             self.theColSize = -1
             self['size_label'].set_text('Rows :')
+        self['size_spinbutton'].set_text( str(aSize) )
 
     def doSetTableSize( self, aSize ):
-        self.setAlignmentAndTableSize( self.alignmentIsForward, int( aSize ) )
+        self.setAlignmentAndTableSize(
+            self.alignmentIsForward, int( aSize ) )
         self.updatePositions()
 
     def doToggleAlignment( self, state ):
@@ -293,11 +297,4 @@ class BoardWindow( OsogoWindow ):
             self['forward_radiobutton'].set_active( False )
 
         self.changeAlignment( None )                
-
-    def setTableSize( self, aSize ):
-        """ sets row or column size of BoardWindow 
-           depening on packing strategy
-        """
-        self['size_spinbutton'].set_text( str(aSize) )
-        self.changeAlignment()
 

@@ -27,7 +27,7 @@
 
 from OsogoWindow import *
 from constants import *
-from OsogoUtil import *
+from utils import *
 
 import gtk
 from ecell.ecssupport import *

@@ -38,7 +38,7 @@ from constants import *
 from PluginInstanceSelection import *
 from FullPNQueue import FullPNQueue
 from SeparativePane import SeparativePane
-from OsogoUtil import retrieveValueFromListStore
+from utils import retrieveValueFromListStore
 
 DEFAULT_PLUGIN = 'TracerWindow'
 
@@ -151,11 +151,7 @@ class PluginWindowMenu( gtk.Menu ):
             else:
                 aMenuItem.set_sensitive( False )
         self.append( aMenuItem )
-        self.connect( 'selection-done', lambda x: self.destroy() )
-        def show_aho():
-            print "CANCEL"
-        self.connect( 'cancel', show_aho )
-        self.connect( 'cancel', lambda x: self.destroy() )
+        self.connect( 'cancel', lambda x: gobject.idle_add( self.destroy ) )
 
 gobject.type_register(
     PluginWindowMenu,

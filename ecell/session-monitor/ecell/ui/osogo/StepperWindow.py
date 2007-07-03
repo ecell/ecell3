@@ -38,7 +38,7 @@ import traceback
 import gobject
 
 from constants import *
-from OsogoUtil import *
+from utils import *
 from OsogoWindow import *
 from ecell.ecssupport import *
 from ConfirmWindow import *

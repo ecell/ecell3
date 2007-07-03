@@ -43,7 +43,7 @@ import gtk.gdk
 import gtk.glade
 import string
 
-import OsogoUtil as outil
+import utils as outil
 
 # Register Custom component
 import Plot
