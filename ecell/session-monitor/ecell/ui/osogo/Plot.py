@@ -1379,7 +1379,7 @@ class Plot( gtk.DrawingArea ):
 
     def printTraceLabels(self):
         #FIXME goes to 2ndary layer
-        if not self.isControlShown:
+        if self.isControlShown:
             return
         textShift = self.theAscent + self.theDescent + 5
         seriesCount = self.getSeriesCount()
