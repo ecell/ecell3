@@ -316,6 +316,8 @@ class EntityListWindow( SeparativePane ):
     def handleSessionEvent( self, event ):
         if event.type == 'model_loaded':
             self.setButtonState( True )
+        elif event.type == 'simulation_updated':
+            self.updateLists()
 
     def setButtonState( self, aState ):
         self['search_button'].set_sensitive( aState )

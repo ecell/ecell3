@@ -824,7 +824,6 @@ class Plot( gtk.DrawingArea ):
         self.theZoomLevel = 0
         self.theZoomBuffer = []
         self.theZoomKeyPressed = False
-        self.theButtonTimeStamp = None
         self.theOwner = None
         self.isControlShown = True
         #initializes variables
@@ -853,9 +852,9 @@ class Plot( gtk.DrawingArea ):
 
         self.connect_after( 'show', self.onRealize )
         self.connect( 'expose-event', self.expose )
-        self.connect( 'button-press-event', self.press )
+        self.connect( 'button-press-event', self.onButtonPressed )
         self.connect( 'motion-notify-event', self.motion )
-        self.connect( 'button-release-event', self.release )
+        self.connect( 'button-release-event', self.onButtonReleased )
         self.connect( 'size-allocate', self.onAllocate )
 
         self.resize( self.thePlotMinWidth, self.thePlotMinHeight )
@@ -917,7 +916,14 @@ class Plot( gtk.DrawingArea ):
        # take this out if phase plotting history is supported in datagenerator
         self.setStripMode( self.theStripMode )
 
-    def changeScale(self, anOrientation, aScaleType ):
+    def getScaleType( self, anOrientation ):
+        if anOrientation == PLOT_HORIZONTAL_AXIS:
+            anAxis = self.theXAxis
+        else:
+            anAxis = self.theYAxis
+        return anAxis.getScaleType()
+
+    def changeScale( self, anOrientation, aScaleType ):
         #change variable
         if anOrientation == PLOT_HORIZONTAL_AXIS:
             anAxis = self.theXAxis
@@ -1235,23 +1241,12 @@ class Plot( gtk.DrawingArea ):
             self.theRanges[3] = anArray[ nu.argmax( anArray[:,DP_TIME] ), DP_TIME ] # maximum time
         return self.theRanges
 
-    def press(self,obj, event):
+    def onButtonPressed(self,obj, event):
         x = event.x
         y = event.y
         button=event.button
-        #if button is 1
-        if button==1:
+        if button == 1: # left-clicked 
             self.showPersistentCoordinates( x, y )
-            # if inside plotarea, display 
-            tstamp=event.get_time()
-            if self.theButtonTimeStamp == tstamp: 
-                if not self.isControlShown:
-                    self.maximize()
-                else:
-                    self.minimize()
-                return
-
-            self.theButtonTimeStamp=tstamp                 
             if self.theStripMode==MODE_HISTORY and self.theXAxis.getFullPNString() == TIME_AXIS:
                 #check that mode is history 
                 self.theZoomKeyPressed=True
@@ -1267,73 +1262,6 @@ class Plot( gtk.DrawingArea ):
                 self.realx1 = self.x0
                 self.realy0 = self.y0
                 self.realy1 = self.y0
-            #create self.x0, y0
-        #if button is 3 and zoomlevel>0
-        elif button==3:
-            self.showMenu()
-            #call zoomOut
-
-    def showMenu( self ):
-        theMenu = gtk.Menu()
-        if self.theZoomLevel > 0:
-            zoomUt = gtk.MenuItem( "Zoom out" )
-            zoomUt.connect ("activate", self.__zoomOut )
-            theMenu.append( zoomUt )
-            theMenu.append( gtk.SeparatorMenuItem() )
-
-        if self.isControlShown:
-            guiMenuItem = gtk.MenuItem( "Hide Control" )
-            guiMenuItem.connect ( "activate", self.__minimize_action )
-        else:
-            guiMenuItem = gtk.MenuItem( "Show Control" )
-            guiMenuItem.connect ( "activate", self.__maximize_action )
-         
-        xToggle = gtk.MenuItem ( "Toggle X axis" )
-        xToggle.connect( "activate", self.__toggleXAxis )
-        yToggle = gtk.MenuItem ( "Toggle Y axis" )
-        yToggle.connect( "activate", self.__toggleYAxis )
-        #take this condition out if phase plotting works for history
-        if self.theOwner.allHasLogger():
-            if self.theStripMode == MODE_STRIP:
-                toggleStrip = gtk.MenuItem("History mode")
-            else:
-                toggleStrip = gtk.MenuItem( "Strip mode" )
-            toggleStrip.connect( "activate", self.__toggleStripMode )
-            theMenu.append( toggleStrip )
-            theMenu.append( gtk.SeparatorMenuItem() )   
-        theMenu.append( xToggle )
-        theMenu.append( yToggle )
-        theMenu.append( gtk.SeparatorMenuItem() )
-        theMenu.append( guiMenuItem )
-        theMenu.show_all()
-        theMenu.popup( None, None, None, 1, 0 )
-
-    def __zoomOut( self, *args ):
-        self.zoomOut()
-
-    def __toggleStripMode( self, *args ):
-        if self.theStripMode == MODE_STRIP:
-            self.setStripMode( MODE_HISTORY )
-        else:
-            self.setStripMode( MODE_STRIP )
-
-    def __toggleXAxis( self, *args ):
-        if self.theXAxis.theScaleType == SCALE_LINEAR:
-            self.changeScale( PLOT_HORIZONTAL_AXIS, SCALE_LOG10) 
-        else:
-            self.changeScale( PLOT_HORIZONTAL_AXIS, SCALE_LINEAR )
-            
-    def __toggleYAxis( self, *args ):
-        if self.theYAxis.theScaleType == SCALE_LINEAR:
-            self.changeScale( PLOT_VERTICAL_AXIS, SCALE_LOG10) 
-        else:
-            self.changeScale( PLOT_VERTICAL_AXIS, SCALE_LINEAR )
-
-    def __minimize_action( self, *args ):
-        self.minimize()
-
-    def __maximize_action( self, *args ):
-        self.maximize()
 
     def showPersistentCoordinates( self, x, y ):
         self.displayCoordinates( x, y, self.persistentCoordArea )
@@ -1389,16 +1317,15 @@ class Plot( gtk.DrawingArea ):
                 #draw new rectangle
                 self.drawInvertedBox(self.realx0,self.realy0,self.realx1,self.realy1)
 
-    def release(self,obj,event):
-        #check that button 1 is released and previously keypressed was set
-        if self.theZoomKeyPressed and event.button==1:
+    def onButtonReleased( self, obj, event ):
+        # check if this has been left-clicked
+        if self.theZoomKeyPressed and event.button == 1:
             #draw old inverz rectangle
             self.drawInvertedBox(
                 self.realx0, self.realy0,
                 self.realx1, self.realy1)
-
             #call zoomIn    
-            self.theZoomKeyPressed=False            
+            self.theZoomKeyPressed = False            
             if self.realx0 < self.realx1 and self.realy0 < self.realy1:
                 coords0 = self.convertPlotCoordinates(
                     self.realx0, self.realy0 )
@@ -1408,7 +1335,7 @@ class Plot( gtk.DrawingArea ):
                 if coords0 != None and coords1 != None:
                     newxframe = [ coords0[0], coords1[0] ]
                     newyframe = [ coords0[1], coords1[1] ]
-                    self.zoomIn(newxframe,newyframe)
+                    self.zoomIn( newxframe, newyframe )
 
     def zoomIn(self, newxframe, newyframe):
         #increase zoomlevel
@@ -1528,5 +1455,3 @@ class Plot( gtk.DrawingArea ):
         return self.theAscent + self.theDescent
 
 gobject.type_register( Plot, 'ecell-ui-osogo-Plot' )
-# plot display coordinates
-

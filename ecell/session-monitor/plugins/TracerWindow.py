@@ -40,6 +40,7 @@ import ecell.ui.osogo.config as config
 from ecell.ui.osogo.constants import *
 from ecell.ui.osogo.OsogoPluginWindow import OsogoPluginWindow
 from ecell.ui.osogo.utils import *
+from ecell.ui.osogo.Plot import *
 
 COL_LOG = 2
 COL_PIX = 1
@@ -60,7 +61,7 @@ class TracerWindow( OsogoPluginWindow ):
         self.thePixmapDict = {} #key is color, value pixmap
         
         #get session
-        self.isControlShown = False
+        self.isControlShown = True
         self.theSaveDirectorySelection = gtk.FileSelection( 'Select File' )
         self.theSaveDirectorySelection.ok_button.connect('clicked', self.changeSaveDirectory)
         self.theSaveDirectorySelection.cancel_button.connect('clicked', self.closeParentWindow)
@@ -74,6 +75,8 @@ class TracerWindow( OsogoPluginWindow ):
         self.thePaned = self['vpaned1']
         self.thePlotInstance = self['drawingarea1'] 
         self.thePlotInstance.setOwner( self )
+        self.thePlotInstance.connect( 'button-press-event',
+            lambda w, e: e.button == 3 and self.showMenu() )
         self.thePlotInstance.show()
         self.theEntry = self['entry1']
         self.theListStore = gtk.ListStore(gobject.TYPE_BOOLEAN,\
@@ -295,36 +298,81 @@ class TracerWindow( OsogoPluginWindow ):
     def shrink_to_fit(self):
         pass
 
-    def maximize(self):
+    def maximize( self ):
         if self.theTopFrame!= self.theVbox2.get_parent():
             if self.isStandAlone():
                 self.__adjustWindowHeight(  - self.shiftWindow )
             self.theTopFrame.remove( self.thePlotInstance )
             self.thePaned.add( self.thePlotInstance )
             self.theTopFrame.add( self.theVbox2 )
-        
+        self.isControlShown = True
         self.thePlotInstance.showControl( True )
 
-    def minimize(self):
-
+    def minimize( self ):
         self.thePlotInstance.showControl( False )
         if self.theTopFrame== self.theVbox2.get_parent():
             if self.isStandAlone():
                 dividerPos = self.thePaned.get_position()
                 panedHeight = self.thePaned.allocation.height
                 self.shiftWindow = panedHeight - dividerPos
-
             self.theTopFrame.remove( self.theVbox2 )
             self.thePaned.remove( self.thePlotInstance )
             self.theTopFrame.add( self.thePlotInstance )
             if self.isStandAlone():
-                self.__adjustWindowHeight(  self.shiftWindow )
+                self.__adjustWindowHeight( self.shiftWindow )
+        self.isControlShown = False
+
+    def showMenu( self ):
+        theMenu = gtk.Menu()
+        if self.thePlotInstance.theZoomLevel > 0:
+            zoomUt = gtk.MenuItem( "Zoom out" )
+            zoomUt.connect ("activate", lambda w: self.zoomOut() )
+            theMenu.append( zoomUt )
+            theMenu.append( gtk.SeparatorMenuItem() )
+
+        if self.isControlShown:
+            guiMenuItem = gtk.MenuItem( "Hide Control" )
+            guiMenuItem.connect( "activate", lambda w: self.minimize() )
+        else:
+            guiMenuItem = gtk.MenuItem( "Show Control" )
+            guiMenuItem.connect( "activate", lambda w: self.maximize() )
+
+        def generate( anOrientation ):
+            return lambda w: self.thePlotInstance.changeScale(
+                anOrientation,
+                self.thePlotInstance.getScaleType( anOrientation ) == \
+                    SCALE_LINEAR and SCALE_LOG10 or SCALE_LINEAR
+                )
+
+        xToggle = gtk.MenuItem ( "Toggle X axis" )
+        xToggle.connect( "activate", generate( PLOT_HORIZONTAL_AXIS ) )
+        yToggle = gtk.MenuItem ( "Toggle Y axis" )
+        yToggle.connect( "activate", generate( PLOT_VERTICAL_AXIS ) )
+
+        #take this condition out if phase plotting works for history
+        if self.allHasLogger():
+            if self.thePlotInstance.getStripMode() == MODE_STRIP:
+                toggleStrip = gtk.MenuItem("History mode")
+                toggleStrip.connect( "activate", 
+                    lambda w: self.thePlotInstance.setStripMode( MODE_HISTORY )  )
+            else:
+                toggleStrip = gtk.MenuItem( "Strip mode" )
+                toggleStrip.connect( "activate", 
+                    lambda w: self.thePlotInstance.setStripMode( MODE_STRIP )  )
+            theMenu.append( toggleStrip )
+            theMenu.append( gtk.SeparatorMenuItem() )   
+        theMenu.append( xToggle )
+        theMenu.append( yToggle )
+        theMenu.append( gtk.SeparatorMenuItem() )
+        theMenu.append( guiMenuItem )
+        theMenu.show_all()
+        theMenu.popup( None, None, None, 1, 0 )
                 
     def __adjustWindowHeight ( self, deltaHeight ):
-        aWindow = self.getParent()['TracerWindow']
-        aWindow.resize(
-            aWindow.allocation.width,
-            aWindow.allocation.height - deltaHeight )
+        if self.theOuterFrame != None:
+            self.theOuterFrame.resize(
+                self.theOuterFrame.allocation.width,
+                self.theOuterFrame.allocation.height - deltaHeight )
         
     def setScale( self, theOrientation, theScaleType ):
         """
@@ -428,14 +476,6 @@ class TracerWindow( OsogoPluginWindow ):
         """
         for i in range(0, aNum):
             self.thePlotInstance.zoomOut()
-
-    def showControl ( self ):
-        """ shows Control and sets plot to its normal size """
-        self.maximize()
-
-    def hideControl (self ):
-        """doesn't change Plot size, but hides Control components """
-        self.minimize()
 
     def checkRun( self ):
         if self.theSession.isRunning():
@@ -672,10 +712,6 @@ class TracerWindow( OsogoPluginWindow ):
                 self.thePlotInstance.setStripMode( 'history' )
             else:
                 self.theSession.message("can't change to history mode, because not every trace has logger.\n")
-
-    def hideControlAction(self,button_obj):
-        """ this signal handler is called when "Minimize" button is pressed"""
-        self.minimize()
 
     def getPixmap( self, aColor ):
         if self.thePixmapDict.has_key( aColor ):
