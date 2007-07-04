@@ -52,48 +52,38 @@ INFO_LOADABLE = 3
 INFO_SAVEABLE = 4
 INFO_DEFAULT_VALUE = 5
 
-TESTCODE ='\
-    if mode == "instantiate":\n\
-        if aType == "Stepper":\n\
-            try:\n\
-                theSimulator.createStepper( aClass, aClass )\n\
-                print "instantiated"\n\
-                theSimulator.setStepperProperty( aClass, "uu", 1 )\n\
-                print "property added"\n\
-            except:\n\
-                pass\n\
-        else:\n\
-            fpn = aType + ":/:" + aClass\n\
-            try:\n\
-                theSimulator.createEntity( aClass, fpn )\n\
-                print "instantiated"\n\
-                theSimulator.setEntityProperty( fpn+":uu", 1 )\n\
-                print "property added"\n\
-            except:\n\
-                pass\n\
-    else:\n\
-        try:\n\
-            theSimulator.getClassInfo( aType, aClass )\n\
-            print "info loaded"\n\
-        except:\n\
-            pass\n'
+MASSTESTFILE = '''
+from ecell.emc import *
+import sys
+aInfoList = %s
 
-TESTFILE = 'import sys\n\
-print "started"\n\
-aType="%s"\n\
-aClass="%s"\n\
-mode = "%s"\n\
-if True:\n' + TESTCODE 
-
-MASSTESTFILE = 'import sys\n\
-typeList=%s\n\
-classList=%s\n\
-mode="%s"\n\
-for i in range( 0, len( typeList ) ):\n\
-    aType = typeList[i]\n\
-    aClass = classList[i]\n\
-    print aClass\n' + TESTCODE + '\
-    print "*"\n'
+aSimulator = Simulator()
+for aType, aClass in aInfoList:
+    diag = []
+    try:
+        aSimulator.getClassInfo( aType, aClass )
+        diag.append( 'info' )
+    except:
+        pass
+    if aType == "Stepper":
+        try:
+            aSimulator.createStepper( aClass, aClass )
+            diag.append( 'create' )
+            aSimulator.setStepperProperty( aClass, "uu", 1 )
+            diag.append( 'prop' )
+        except:
+            pass
+    else:
+        fpn = aType + ":/:" + aClass
+        try:
+            aSimulator.createEntity( aClass, fpn )
+            diag.append( 'create' )
+            aSimulator.setEntityProperty( fpn+":uu", 1 )
+            diag.append( 'prop' )
+        except:
+            pass
+    print aClass + "\t" + "\t".join( diag )
+'''
     
 
 class DMInfo:
@@ -255,7 +245,7 @@ class DMInfo:
                         'fileName': aFileName,
                         'className': baseName,
                         'typeName': aType,
-                        'flags': [ 0, 0, 0, 0 ]
+                        'flags': [ False, False, False, False ]
                         })
 
         self.populateBinaryProperties( aFileInfoList )
@@ -266,89 +256,41 @@ class DMInfo:
                 builtin, aFileInfo['flags'] )
 
     def populateBinaryProperties( self, aFileInfoList ):
-        classNameList = map( lambda i: i['className'], aFileInfoList )
-        typeNameList = map( lambda i: i['typeName'], aFileInfoList )
-        classListStack = classNameList[:]
-        typeListStack = typeNameList[:]
-
         #first instantiate
-        while len( classNameList ) != 0:
-            result = self.__testFile(
-                typeNameList,
-                classNameList,
-                "instantiate")
-            for classProperty in result:
-                flags = [False, False, False]
-                classProperties = classProperty.strip().split('\n')
-                className = classProperties[0]
-                if len(classProperties) > 1:
-                    flags[DM_CAN_INSTANTIATE] = True
-                    if len(classProperties) > 2:
-                        flags[DM_CAN_ADDPROPERTY] = True
-                idx = classNameList.index( className )
-                aFileInfoList[ idx ][ 'flags' ]  = flags;
-                del classNameList[ idx ]
-                del typeNameList[ idx ]
-                    
-        while len( classListStack ) != 0:
-            result = self.__testFile(
-                typeListStack,
-                classListStack,
-                "loadinfo")
-            for classProperty in result:
-                classProperties = classProperty.strip().split('\n')
-                className = classProperties[0]
-                #try to load info
-                if len(classProperties) >1:
-                    idx = classListStack.index( className )
-                    aFileInfoList[ idx ][ 'flags' ][DM_CAN_LOADINFO] = True
-                del classListStack[ idx ]
-                del typeListStack[ idx ]
-   
-    def __getBinaryProperties( self, aType, aName ):
-        # return  CAN_INSTANTIATE, CAN_LOADINFO, CAN_ADDPROPERTY in a list
-        flags = [False, False, False]
-        #first instantiate
-        result = self.__testFile( aType, aName, "instantiate" )
-        if len(result) > 1:
-            flags[DM_CAN_INSTANTIATE] = True
-            if len(result) > 2:
+        aInfoListStr = '[' + reduce(
+            lambda o, aFileInfo:
+                o + '("%s", "%s"), ' % ( aFileInfo[ 'typeName' ],
+                                     aFileInfo[ 'className' ] ),
+            aFileInfoList, '' ) + ']'
+        ( sout, sin ) = os.popen2( sys.executable )
+        sout.write( MASSTESTFILE % aInfoListStr )
+        sout.close()
+        result = sin.readlines()
+        sin.close()
+        classPropertyList = map(
+            lambda s: s.strip( "\n" ).split( "\t" ),
+            result )
+        for idx in range( 0, len( classPropertyList ) ):
+            classProperty = classPropertyList[ idx ]
+            classProperty.pop( 0 ) # class name
+            flags = aFileInfoList[ idx ][ 'flags' ]
+            if 'info' in classProperty:
+                flags[DM_CAN_LOADINFO] = True
+            if 'create' in classProperty:
+                flags[DM_CAN_INSTANTIATE] = True
+            if 'prop' in classProperty:
                 flags[DM_CAN_ADDPROPERTY] = True
-            
-        #try to load info
-        result = self.__testFile( aType, aName, "loadinfo" )
-        if len(result) >1:
-            flags[DM_CAN_LOADINFO] = True
-        return flags
-        
-        
-    def __testFile( self, aType, aName, mode ):
-        massMode = False
-        if type( aType ) == type( [] ):
-            aType = '["' +  '","'.join( aType ) + '"]'
-            aName = '["' + '","'.join( aName ) + '"]'
-            testText = MASSTESTFILE
-            massMode = True
-        else:
-            testText = TESTFILE
-            massMode = False
-        testFileName = "__checkBinary___" + str(os.getpid())
-        resultFileName = "__checkResult___" + str(os.getpid())
+             
 
-        tf = open( testFileName , "w" )
-        tf.write( testText % ( aType, aName, mode) )
-        tf.close()
-        os.system( 'ecell3-session "' + testFileName + '" > "' + resultFileName + '"' )
-        os.unlink( testFileName )
-        rf=open( resultFileName , 'r' )
-        result = rf.readlines()
-        rf.close()
-        os.unlink( resultFileName )
-
-        if massMode:
-            result = "".join(result).strip("*\n").split("*")
-        return result
-    
+    def __getBinaryProperties( self, aType, aName ):
+        aFileInfoList = [
+            {
+                'typeName': aType, 'className': aName,
+                'flags': [ False, False, False, False ]
+                }
+            ]
+        self.populateBinaryProperties( aFileInfoList )
+        return aFileInfoList[0]['flags']
 
     def loadModule( self, aType, aName, builtin = False, aFlags = None ):
         # loads module and fills out masterlist
@@ -389,8 +331,6 @@ class DMInfo:
             anInfo[DM_BASECLASS] = "Unknown."
             
         self.theMasterList[ aName ] = [ aType, builtin, anInfo, propertyList ]
-        
-        
 
     def __getClassDescriptor( self, aClassName ):
         if aClassName in self.theMasterList.keys():
@@ -400,7 +340,6 @@ class DMInfo:
             raise "The type of class %s is unknown!"%aClassName
         return self.__dummiesList[ aType ]
         
-        
     # SECOND DO THIS
     def getClassList( self, aType ):
         classNames = []
@@ -408,7 +347,6 @@ class DMInfo:
             if self.theMasterList[ aClassName ][MASTERLIST_TYPE] == aType:
                 classNames.append( aClassName )
         return classNames
-
 
     #THIRD
     def getClassInfoList( self, aClass ):
@@ -481,7 +419,6 @@ def DMTypeCheck( aValue, aType ):
     elif aType == DM_PROPERTY_MULTILINE:
         if type(aValue) == type([]):
             aValue = '/n'.join(aValue)
-
         return str( aValue )
     elif aType == DM_PROPERTY_NESTEDLIST:
         if type(aValue) in ( type( () ), type( [] ) ):
