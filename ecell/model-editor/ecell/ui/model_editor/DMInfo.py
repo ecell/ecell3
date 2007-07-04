@@ -29,6 +29,7 @@
 import os
 import sys
 
+import ecell.ecs
 import ecell.emc
 from Constants import *
 from Utils import *
@@ -53,9 +54,11 @@ INFO_SAVEABLE = 4
 INFO_DEFAULT_VALUE = 5
 
 MASSTESTFILE = '''
+from ecell.ecs import *
 from ecell.emc import *
 import sys
 aInfoList = %s
+setDMSearchPath('%s')
 
 aSimulator = Simulator()
 for aType, aClass in aInfoList:
@@ -248,14 +251,14 @@ class DMInfo:
                         'flags': [ False, False, False, False ]
                         })
 
-        self.populateBinaryProperties( aFileInfoList )
+        self.populateBinaryProperties( aFileInfoList, os.sep.join( aPathList ) )
 
         for aFileInfo in aFileInfoList:
             self.loadModule(
                 aFileInfo['typeName'], aFileInfo['className'], 
                 builtin, aFileInfo['flags'] )
 
-    def populateBinaryProperties( self, aFileInfoList ):
+    def populateBinaryProperties( self, aFileInfoList, aDMPath ):
         #first instantiate
         aInfoListStr = '[' + reduce(
             lambda o, aFileInfo:
@@ -263,7 +266,7 @@ class DMInfo:
                                      aFileInfo[ 'className' ] ),
             aFileInfoList, '' ) + ']'
         ( sout, sin ) = os.popen2( sys.executable )
-        sout.write( MASSTESTFILE % aInfoListStr )
+        sout.write( MASSTESTFILE % ( aInfoListStr, aDMPath ) )
         sout.close()
         result = sin.readlines()
         sin.close()
@@ -280,7 +283,6 @@ class DMInfo:
                 flags[DM_CAN_INSTANTIATE] = True
             if 'prop' in classProperty:
                 flags[DM_CAN_ADDPROPERTY] = True
-             
 
     def __getBinaryProperties( self, aType, aName ):
         aFileInfoList = [
@@ -289,7 +291,9 @@ class DMInfo:
                 'flags': [ False, False, False, False ]
                 }
             ]
-        self.populateBinaryProperties( aFileInfoList )
+        self.populateBinaryProperties(
+            aFileInfoList,
+            ecell.ecs.getDMSearchPath() )
         return aFileInfoList[0]['flags']
 
     def loadModule( self, aType, aName, builtin = False, aFlags = None ):
