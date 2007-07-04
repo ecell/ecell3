@@ -154,7 +154,7 @@ class LoggingPolicy( Window ):
         """
 
         # set the return number
-        self.theResult = None
+        self.theLoggingPolicy = None
         self.destroy()
     
     def getResult( self ):
