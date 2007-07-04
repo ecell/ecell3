@@ -427,17 +427,20 @@ class GtkSessionFacade:
 
     def saveParameters( self ):
         """
-        tries to save all parameters into a config file in home directory
+        tries to save all parameters to a config file in home directory
         """
         try:
-            fp = open(
-                os.path.join(
-                    self.theUserPreferencesDir,
-                    CONFIG_FILE_NAME
-                    ), 'w' )
+            if not os.path.exists( self.theUserPreferencesDir ):
+                os.mkdir( self.theUserPreferencesDir ) 
+            aConfigFilePath = os.path.join(
+                self.theUserPreferencesDir,
+                CONFIG_FILE_NAME
+                )
+            fp = open( aConfigFilePath, 'w' )
             self.theConfigDB.write( fp )
+            self.message("Preferences were saved to file %s." % aConfigFilePath )
         except:
-            self.message("Failed to save preferences into file %s. Please check permissions for home directory." % self.theIniFileName)
+            self.message("Failed to save preferences to file %s.\nPlease check permissions for home directory." % aConfigFilePath )
 
     def getLogPolicyParameters( self ):
         """
@@ -454,11 +457,11 @@ class GtkSessionFacade:
 
     def setLogPolicyParameters( self, logPolicy ):
         """
-        saves logging policy into config database
+        saves logging policy to config database
         """
         self.setParameter( 'logger_min_step', logPolicy[0] )
         self.setParameter( 'logger_min_interval', logPolicy[1] ) 
-        self.setParameter( 'end_policy' , logPolicy[2] )
+        self.setParameter( 'end_policy', logPolicy[2] )
         self.setParameter( 'available_space' ,logPolicy[3] )
         self.saveParameters()
 
