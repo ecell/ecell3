@@ -261,9 +261,6 @@ class MainWindow( OsogoWindow ):
         # initializes FileSelection reference
         self.theFileSelection = None
 
-        # initializes AboutDialog reference
-        self.theAboutSessionMonitor = None
-
         # initialize Timer
         self.theTimerUpdateCount = 0
         self.theTimer = Timer(
@@ -596,9 +593,8 @@ class MainWindow( OsogoWindow ):
                    self.__resizeVertically( 0 )
 
     def showAboutSessionMonitor( self ):
-        if not self.theAboutSessionMonitor:
-            self.theAboutSessionMonitor = AboutSessionMonitor(self)
-            self.theAboutSessionMonitor
+        aWindow = AboutSessionMonitor()
+        aWindow.show()
 
     def show( self ):
         OsogoWindow.show( self )
@@ -610,11 +606,6 @@ class MainWindow( OsogoWindow ):
             self['message_handlebox'].hide()
         if not self.theEntityListWindowVisible:
             self['entitylistarea']. hide()
-
-    def hideAboutSessionMonitor( self ):
-        if self.theAboutSessionMonitor:
-            self.theAboutSessionMonitor.destroy()
-            self.theAboutSessionMonitor = None
 
     def __resizeVertically( self, height ): #gets entitylistarea or messagebox height
         """__resizeVertically
@@ -943,11 +934,8 @@ class MainWindow( OsogoWindow ):
     def doToggleEntityListPane( self, state ):
         self.setEntityListWindowActive( state )
 
-    def doDisplayAbout ( self ):
-        if not self.tryLock():
-            return
+    def doDisplayAbout( self ):
         self.showAboutSessionMonitor()
-        self.unlock()
 
     def doClearTimer( self ):
         self.theTimer.reset()

@@ -100,6 +100,8 @@ class SeparativePane( Pane ):
         Pane.show( self )
         if self.theParent == None and self.theOuterFrame == None:
             anOuterFrame = gtk.Window()
+            anOuterFrame.set_position( gtk.WIN_POS_MOUSE )
+            anOuterFrame.set_icon_list( *self.loadWindowIcons() )
             anOuterFrame.set_title( self.theTitle )
             anOuterFrame.add( self.theRootWidget )
             anOuterFrame.connect(

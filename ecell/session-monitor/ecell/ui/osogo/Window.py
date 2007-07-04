@@ -1,11 +1,11 @@
-#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
 #       This file is part of the E-Cell System
 #
 #       Copyright (C) 1996-2007 Keio University
 #       Copyright (C) 2005-2007 The Molecular Sciences Institute
 #
-#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
 #
 # E-Cell System is free software; you can redistribute it and/or
@@ -96,6 +96,14 @@ class Window:
         """
         return self.theRootWidget != None
 
+    def loadWindowIcons( self ):
+        return (
+            gtk.gdk.pixbuf_new_from_file(
+                os.path.join( config.glade_dir, 'ecell.png') ),
+            gtk.gdk.pixbuf_new_from_file(
+                os.path.join( config.glade_dir, 'ecell32.png') )
+            )
+
     def initUI( self ):
         """
         loads Glade file
@@ -108,6 +116,8 @@ class Window:
 
         self.glade = gtk.glade.XML( self.gladeFile, self.theRootWidgetName )
         self.theRootWidget = self.glade.get_widget( self.theRootWidgetName )
+        if isinstance( self.theRootWidget, gtk.Window ):
+            self.theRootWidget.set_icon_list( *self.loadWindowIcons() )
 
         for aChild, aParentWidgetName in self.theChildWindowList:
             aChild.initUI()
