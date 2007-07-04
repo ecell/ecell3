@@ -129,8 +129,11 @@ class OsogoPluginWindow(PluginWindow):
         return -> FullPN
         This method can throw an exception.
         """
+        if len( self.theRawFullPNList ) <= self.theSelectedFullPNIndex:
+            return None
+
         return self.supplementFullPN(
-            self.theRawFullPNList[self.theSelectedFullPNIndex] )
+            self.theRawFullPNList[ self.theSelectedFullPNIndex ] )
 
     def getFullID( self ):
         """
@@ -140,7 +143,9 @@ class OsogoPluginWindow(PluginWindow):
         return -> FullID
         This method can throw an exception.
         """
-        return util.convertFullPNToFullID( self.getFullPN() )
+        aFullPN = self.getFullPN()
+        return aFullPN != None and util.convertFullPNToFullID( aFullPN )\
+                               or None
 
     def supplementFullPN( self, aFullPN ):
         """

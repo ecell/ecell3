@@ -1,11 +1,11 @@
-#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
 #       This file is part of the E-Cell System
 #
 #       Copyright (C) 1996-2007 Keio University
 #       Copyright (C) 2005-2007 The Molecular Sciences Institute
 #
-#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
 #
 # E-Cell System is free software; you can redistribute it and/or
@@ -24,25 +24,27 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # 
 #END_HEADER
+#
+#'Design: Kenta Hashimoto <kem@e-cell.org>',
+#'Design and application Framework: Koichi Takahashi <shafi@e-cell.org>',
+#'Programming: Yuki Fujita',
+#             'Yoshiya Matsubara',
+#             'Yuusuke Saito'
+#
+# modified by Masahiro Sugimoto <sugi@bioinformatics.org> at
+# E-Cell Project, Lab. for Bioinformatics, Keio University.
+#
 
-import os
-import config
-import gtk
-from Dialog import Dialog
+from Window import Window
 
-class AboutSessionMonitor( Dialog ):
-    def __init__( self ):
-        """
-        sets up a modal dialogwindow displaying 
-        the AboutSessionMonitor window
-             
-        """ 
-        Dialog.__init__( self )
+class Dialog( Window ):
+    def run( self ):
+        self.show()
+        aResponseCode = self.theRootWidget.run()
+        self.destroy()
+        return aResponseCode
 
-    def initUI( self ):
-        Dialog.initUI( self )
-        self.addHandlersAuto()
-        self['version_label'].set_text( "Version: " + config.version )
-
-    def doClose( self ):
-        self.response( gtk.RESPONSE_OK )
+    def response( self, aResponseID ):
+        if self.theRootWidget == None:
+            return None
+        self.theRootWidget.response( aResponseID )

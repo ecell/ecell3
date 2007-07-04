@@ -277,8 +277,6 @@ class Window:
             self.initUI()
         self.theRootWidget.show_all()
         self.shown = True
-        if self.theRootWidget.__class__ == gtk.Dialog:
-            self.theRootWidget.run()
 
     def hide( self ):
         if self.theRootWidget == None:

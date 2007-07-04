@@ -39,87 +39,53 @@ OK_MODE = 0
 OKCANCEL_MODE = 1
 
 # Constans for result
-OK_PRESSED = 0
-CANCEL_PRESSED = -1
+OK_PRESSED = gtk.RESPONSE_OK
+CANCEL_PRESSED = gtk.RESPONSE_CANCEL
 
 class ConfirmWindow(gtk.Dialog):
-	"""This is confirm popup window class.
+    """This is confirm popup window class.
 
-	OK_MODE        : The window has 'OK' button.
-	OK_CANCEL_MODE : The window has 'OK' and 'Cancel' button.
+    OK_MODE        : The window has 'OK' button.
+    OK_CANCEL_MODE : The window has 'OK' and 'Cancel' button.
 
-	When OK is clicked, return OK_PRESSED
-	When Cancel is clicked or close Window, return CANCEL_PRESSED
-	"""
+    When OK is clicked, return OK_PRESSED
+    When Cancel is clicked or close Window, return CANCEL_PRESSED
+    """
 
-	def __init__( self, aMode, aMessage, aTitle='Confirm' ):
-		"""Constructor
-		aMode    ---  mode number that is 0(OK) or 1(OK and Cancel).
-		aMessage ---  the message that is displayed in the center
-		              of this window
-		aTitle   ---  the title of this window
-		"""
+    def __init__( self, aMode, aMessage, aTitle='Confirm' ):
+        """Constructor
+        aMode    ---  mode number that is 0(OK) or 1(OK and Cancel).
+        aMessage ---  the message that is displayed in the center
+                      of this window
+        aTitle   ---  the title of this window
+        """
 
-		# Sets the return number
-		self.___num = CANCEL_PRESSED
+        # Sets the return number
+        self.___num = CANCEL_PRESSED
 
-		# Create the Dialog
-		gtk.Dialog.__init__( self, aTitle, None, gtk.DIALOG_MODAL )
+        # Create the Dialog
+        if aMode == OK_MODE:
+            aButtonSpec = (
+                gtk.STOCK_OK, gtk.RESPONSE_OK
+                )
+        else:
+            aButtonSpec = (
+                gtk.STOCK_OK, gtk.RESPONSE_OK,
+                gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL
+                )
+        gtk.Dialog.__init__(
+            self, aTitle, None, gtk.DIALOG_MODAL, aButtonSpec )
 
-		# Sets size and position
-		self.set_border_width(2)
-		self.set_default_size(300,75)
-		self.set_position(gtk.WIN_POS_MOUSE)
+        # Sets size and position
+        self.set_default_size(300,75)
+        self.set_position( gtk.WIN_POS_CENTER )
+        self.action_area.homogeneous = True
 
-		aPixbuf16 = gtk.gdk.pixbuf_new_from_file(
+        aPixbuf16 = gtk.gdk.pixbuf_new_from_file(
             os.path.join( config.glade_dir, 'ecell.png') )
-		aPixbuf32 = gtk.gdk.pixbuf_new_from_file(
+        aPixbuf32 = gtk.gdk.pixbuf_new_from_file(
             os.path.join( config.glade_dir, 'ecell32.png') )
-		self.set_icon_list(aPixbuf16, aPixbuf32)		
+        self.set_icon_list( aPixbuf16, aPixbuf32 )
 
-		# Sets title
-		# self.set_title(aTitle)
-
-		# Sets message
-		aMessage = '\n' + aMessage + '\n'
-		aMessageLabel = gtk.Label(aMessage)
-		self.vbox.pack_start(aMessageLabel)
-	
-		# appends ok button
-		ok_button = gtk.Button("  OK  ")
-		self.action_area.pack_start(ok_button,False,False,)
-		ok_button.set_flags(gtk.CAN_DEFAULT)
-		ok_button.grab_default()
-		ok_button.connect("clicked",self.oKButtonClicked)
-
-		# when ok mode 
-		if aMode == OK_MODE:
-			pass
-		# when ok cancel mode 
-		else:
-			# appends cancel button
-			cancel_button = gtk.Button(" Cancel ")
-			self.action_area.pack_start(cancel_button,False,False)
-			cancel_button.connect("clicked",self.cancelButtonClicked)	
-
-	def oKButtonClicked( self, *arg ):
-		"""If OK button clicked or the return pressed, this method is called.
-		"""
-
-		# sets the return number
-		self.___num = OK_PRESSED
-		self.destroy()
-
-	def cancelButtonClicked( self, *arg ):
-		"""If Cancel button clicked or the return pressed, this method is called.
-		"""
-
-		# set the return number
-		self.___num = CANCEL_PRESSED
-		self.destroy()
-
-	def getResult( self ):
-		"""Returns result
-		"""
-
-		return self.___num
+        # Sets message
+        self.vbox.pack_start( gtk.Label( aMessage ) )

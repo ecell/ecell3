@@ -104,5 +104,6 @@ def splitCamelcasedName( name ):
 def showPopupMessage( aMode, aMessage, aTitle = 'Confirm' ):
     aDialog = ConfirmWindow( aMode, aMessage, aTitle )
     aDialog.show_all()
-    aDialog.run()
-    return aDialog.getResult()
+    aResponseCode = aDialog.run()
+    aDialog.destroy()
+    return aResponseCode

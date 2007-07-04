@@ -255,12 +255,17 @@ class PropertyWindow(OsogoPluginWindow):
 
         if self.theSession.theModelWalker == None:
             return
+
+        aFullID = self.getFullID()
+        if aFullID == None:
+            return
+
         # checks a value is changed or not
-        if self.thePreFullID != self.getFullID():
+        if self.thePreFullID != aFullID:
             fullUpdate = True
-            
+
         # creates EntityStub
-        anEntityStub = self.theSession.createEntityStub( self.getFullID() )
+        anEntityStub = self.theSession.createEntityStub( aFullID )
 
         if fullUpdate == False:
             # gets propery values for thePreProperyMap in case value is not tuple

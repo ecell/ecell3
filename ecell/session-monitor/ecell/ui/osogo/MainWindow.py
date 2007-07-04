@@ -594,7 +594,8 @@ class MainWindow( OsogoWindow ):
 
     def showAboutSessionMonitor( self ):
         aWindow = AboutSessionMonitor()
-        aWindow.show()
+        aWindow.run()
+        aWindow.destroy()
 
     def show( self ):
         OsogoWindow.show( self )

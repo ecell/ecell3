@@ -31,10 +31,10 @@
 
 import gtk 
 import os
-from Window import Window
+from Dialog import Dialog
 from utils import *
 
-class LoggingPolicy( Window ):
+class LoggingPolicy( Dialog ):
     def __init__( self ):
         """
         This is confirm popup window class.
@@ -45,14 +45,14 @@ class LoggingPolicy( Window ):
         When OK is clicked, return OK_PRESSED
         When Cancel is clicked or close Window, return CANCEL_PRESSED
         """
-        Window.__init__( self )
+        Dialog.__init__( self )
         self.theLoggingPolicy = None
 
     def setLoggingPolicy( self, aPolicy ):
         self.theLoggingPolicy = aPolicy
 
     def initUI( self ):
-        Window.initUI( self )
+        Dialog.initUI( self )
         self.syncToModel()
 
         # add handlers
@@ -123,7 +123,6 @@ class LoggingPolicy( Window ):
         self.theLoggingPolicy = aLoggingPolicy
         return True  
 
-
     def onRadioToggled( self, aWidget ):
         aName = aWidget.name
 
@@ -137,7 +136,6 @@ class LoggingPolicy( Window ):
             self['space_entry'].set_sensitive( False )
         elif aName == "spac_max":
             self['space_entry'].set_sensitive( True )
-
 
     def doApplyAndClose( self ):
         """
