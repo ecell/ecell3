@@ -304,6 +304,14 @@ namespace libecs
 
   private:
 
+
+    void constructEntity( StringCref aClassname, FullIDCref aFullID );
+
+    void dynamicallyInitializeEntity( FullIDCref aFullID );
+    void dynamicallyInitializeVariable( VariablePtr aVariablePtr );
+    void dynamicallyInitializeProcess( ProcessPtr aProcessPtr );
+    void dynamicallyInitializeSystem( SystemPtr aSystemPtr);
+
     /**
        This method checks recursively if all systems have Steppers
        connected.
@@ -312,10 +320,6 @@ namespace libecs
        
        @throw InitializationFailed if the check is failed.
     */
-
-
-    void constructEntity( StringCref aClassname, FullIDCref aFullID );
-    void dynamicallyInitializeEntity( FullIDCref aFullID );
 
     void checkStepper( SystemCptr const aSystem ) const;
 
