@@ -70,12 +70,26 @@ namespace libecs
 
   void Variable::initialize()
   {
-    if (!creationTimeInitialized)
+    if (getModel()->getRunningFlag())
       {
-        // This should never happen....
-        THROW_EXCEPTION( InitializationFailed, "Creation time has not been set.");
+        this->dynamicallyInitialize();
       }
-      
+    else
+      {
+        this->staticallyInitialize();
+      }
+  }
+
+  void Variable::dynamicallyInitialize()
+  {
+    this->staticallyInitialize();
+  }
+
+  void Variable::staticallyInitialize()
+  {
+    // Is this correct???  Should I be getting the time from a Stepper or something?
+    this->setCreationTime( getModel()->getCurrentTime() );
+
     clearInterpolantVector();
   }
 

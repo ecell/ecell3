@@ -416,6 +416,9 @@ namespace libecs
 
   protected:
 
+    void dynamicallyInitialize();
+    void staticallyInitialize();
+
     LIBECS_API VariableReferenceVectorIterator findVariableReference( StringCref aName );
 
     void updateVariableReferenceVector();

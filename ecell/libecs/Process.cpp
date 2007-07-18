@@ -425,8 +425,32 @@ namespace libecs
 
   void Process::initialize()
   {
-    ; // do nothing
+    if (getModel()->getRunningFlag())
+      {
+        this->dynamicallyInitialize();
+      }
+    else
+      {
+        this->staticallyInitialize();
+      }
   }
+
+  void Process::dynamicallyInitialize()
+  {
+    // Set the Stepper that owns this process to the stepper of the system.
+    this->setStepperID( getSuperSystem()->getStepperID() );
+    this->staticallyInitialize();
+
+    // Now get the stepper to register this process et al.
+    this->getStepper()->initialize();
+
+  }
+
+  void Process::staticallyInitialize()
+  {
+    ; // Do nothing.
+  }
+
 
 
 } // namespace libecs

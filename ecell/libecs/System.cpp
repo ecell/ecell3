@@ -181,6 +181,41 @@ namespace libecs
 
   void System::initialize()
   {
+    if (getModel()->getRunningFlag())
+      {
+        this->dynamicallyInitialize();
+      }
+    else
+      {
+        this->staticallyInitialize();
+      }
+  }
+
+  void System::dynamicallyInitialize()
+  {
+
+    // Set the appropriate stepper.
+    this->setStepperID( this->getSuperSystem()->getStepperID() );
+
+    // Create the SIZE variable.
+    FullID newSystemFullID = this->getFullID();
+    SystemPath aSystemPath = newSystemFullID.getSystemPath();
+    aSystemPath.push_back( newSystemFullID.getID() );
+
+    FullID newSizeVariableFullID(EntityType("Variable"), 
+                                 aSystemPath,
+                                 "SIZE");
+
+    getModel()->createEntity( "Variable", newSizeVariableFullID);
+
+    this->staticallyInitialize();
+
+    
+  }
+
+  void System::staticallyInitialize()
+  {
+
     // no need to call subsystems' initialize() -- the Model does this
 
     //
@@ -208,6 +243,8 @@ namespace libecs
       }
 
     configureSizeVariable();
+
+    return;
   }
 
   ProcessPtr System::getProcess( StringCref anID ) const
