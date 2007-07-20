@@ -138,7 +138,9 @@ namespace libecs
 
      if( getRunningFlag() )
        {
-         dynamicallyInitializeEntity( aFullID );
+         // dynamicallyInitializeEntity( aFullID );
+
+         initialize();
        }
 
     return;
@@ -187,17 +189,18 @@ namespace libecs
 
   void Model::dynamicallyInitializeVariable( VariablePtr aVariablePtr )
   {
-    aVariablePtr->initialize();
+    // These initializations are different
+    aVariablePtr->dynamicallyInitialize();
   }
 
   void Model::dynamicallyInitializeProcess( ProcessPtr aProcessPtr )
   {
-    aProcessPtr->initialize();    
+    aProcessPtr->dynamicallyInitialize();    
   }
 
   void Model::dynamicallyInitializeSystem( SystemPtr aSystemPtr )
   {
-    aSystemPtr->initialize();
+    aSystemPtr->dynamicallyInitialize();
   }
 
   void Model::dynamicallyInitializeEntity( FullIDCref aFullID )

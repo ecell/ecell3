@@ -289,8 +289,8 @@ namespace libecs
 
   protected:
 
-    void dynamicallyInitialize();
-    void staticallyInitialize();
+
+
 
     StepperPtr   theStepper;
 

@@ -179,17 +179,6 @@ namespace libecs
     theSizeVariable = findSizeVariable();
   }
 
-  void System::initialize()
-  {
-    if (getModel()->getRunningFlag())
-      {
-        this->dynamicallyInitialize();
-      }
-    else
-      {
-        this->staticallyInitialize();
-      }
-  }
 
   void System::dynamicallyInitialize()
   {
@@ -209,11 +198,10 @@ namespace libecs
     getModel()->createEntity( "Variable", newSizeVariableFullID);
 
     this->staticallyInitialize();
-
     
   }
 
-  void System::staticallyInitialize()
+  void System::initialize()
   {
 
     // no need to call subsystems' initialize() -- the Model does this
