@@ -46,5 +46,9 @@ namespace libecs
     ; // do nothing
   }
 
+  ProcessMaker::~ProcessMaker()
+  {
+    ; // do nothing
+  }
 
 } // namespace libecs

@@ -48,9 +48,8 @@ namespace libecs
   {
 
   public:
-
-    VariableMaker() { makeClassList(); }
-    virtual ~VariableMaker() {}
+    VariableMaker();
+    virtual ~VariableMaker();
 
   protected:
 

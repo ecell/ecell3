@@ -55,8 +55,7 @@ namespace libecs
   public:
 
     StepperMaker();
-    ~StepperMaker() {}
-
+    virtual ~StepperMaker();
   };
 
 

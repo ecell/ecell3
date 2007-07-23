@@ -57,7 +57,7 @@ namespace libecs
   public:
 
     ProcessMaker();
-    virtual ~ProcessMaker() {}
+    virtual ~ProcessMaker();
   };
 
 #define NewProcessModule(CLASS) NewDynamicModule(Process,CLASS)

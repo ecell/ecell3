@@ -37,6 +37,15 @@
 
 namespace libecs
 {
+  VariableMaker::VariableMaker()
+  {
+    makeClassList();
+  }
+
+  VariableMaker::~VariableMaker()
+  {
+    ; // do nothing
+  }
 
   void VariableMaker::makeClassList()
   {

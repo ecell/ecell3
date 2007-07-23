@@ -36,12 +36,14 @@
 
 namespace libecs
 {
-
-  ////////////////////// SystemMaker
- 
   SystemMaker::SystemMaker()
   {
     makeClassList();
+  }
+
+  SystemMaker::~SystemMaker()
+  {
+    ; // do nothing
   }
 
   void SystemMaker::makeClassList()

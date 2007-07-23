@@ -50,6 +50,10 @@ namespace libecs
     makeClassList();
   }
 
+  StepperMaker::~StepperMaker()
+  {
+  }
+
   void StepperMaker::makeClassList()
   {
     NewStepperModule( DiscreteEventStepper );

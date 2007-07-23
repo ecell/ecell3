@@ -50,7 +50,7 @@ namespace libecs
   public:
 
     SystemMaker();
-    virtual ~SystemMaker() {}
+    virtual ~SystemMaker();
 
   protected:
 
