@@ -60,7 +60,6 @@ namespace libemc
 
   LocalSimulatorImplementation::~LocalSimulatorImplementation()
   {
-    delete &theModel;
   }
 
   inline LoggerPtr LocalSimulatorImplementation::
