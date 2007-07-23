@@ -34,7 +34,7 @@
 
 #ifdef WIN32
 #include "win32_utils.h"
-#endif /" WIN32 "/
+#endif /* WIN32 */
 
 #include "dmtool/ModuleMaker.hpp"
 
