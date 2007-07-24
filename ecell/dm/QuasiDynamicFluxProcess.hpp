@@ -44,7 +44,7 @@ LIBECS_DM_CLASS( QuasiDynamicFluxProcess, ContinuousProcess )
 
   LIBECS_DM_OBJECT( QuasiDynamicFluxProcess, Process )
     {
-      INHERIT_PROPERTIES( Process );
+      INHERIT_PROPERTIES( ContinuousProcess );
       PROPERTYSLOT_SET_GET( Integer, Irreversible );
       PROPERTYSLOT_SET_GET( Real, Vmax );
       PROPERTYSLOT_SET_GET( Polymorph, FluxDistributionList );
