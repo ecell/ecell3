@@ -80,13 +80,19 @@ private:
   Common base class of DynamicModule and SharedDynamicModule
 */
   
-template <class Base,class DMAllocator = SimpleAllocator( Base )>
+template <class Base,class _TAllocator = SimpleAllocator( Base )>
 class DynamicModuleBase
 {
+public:
+
+  typedef _TAllocator DMAllocator;
 
 public:		
 
-  DynamicModuleBase( const std::string& Modulename, DMAllocator Allocator, InfoLoaderType InfoLoader );
+  DynamicModuleBase( const std::string& moduleName,
+                     DMAllocator allocator,
+                     InfoLoaderType infoLoader,
+                     const std::string& typeName = "" );
   virtual ~DynamicModuleBase(){}
   
   const std::string& getModuleName() const
@@ -109,12 +115,17 @@ public:
 	return this->theInfoLoader;
   }
 
+  const std::string getTypeName() const
+  {
+    return this->theTypeName;
+  }
+
 protected:
 
-  std::string theModuleName;
+  const std::string theModuleName;
   DMAllocator theAllocator;
   InfoLoaderType theInfoLoader;
-
+  const std::string theTypeName;
 };
 
 
@@ -125,12 +136,13 @@ protected:
 template <class Base,class Derived,class DMAllocator = SimpleAllocator( Base )>
 class DynamicModule
   :
-  public DynamicModuleBase< Base,DMAllocator >
+  public DynamicModuleBase< Base, DMAllocator >
 {
 
 public:
 
-  DynamicModule( const std::string& modulename );
+  DynamicModule( const std::string& moduleName,
+		 const std::string& typeName = "" );
   virtual ~DynamicModule(){}
 };
 
@@ -156,7 +168,9 @@ class SharedDynamicModule : public DynamicModuleBase< Base >
 
 public:
 
-  SharedDynamicModule( const std::string& classname ); 
+  SharedDynamicModule( const std::string& classname, DMAllocator allocator,
+                       InfoLoaderType infoLoader, const std::string& typeName,
+                       const std::string& fileName, lt_dlhandle handle );
   virtual ~SharedDynamicModule();
   const std::string getFileName() const;
 
@@ -164,7 +178,7 @@ private:
 
   lt_dlhandle theHandle;
   std::string theFileName;
-
+  std::string theTypeName;
 };
 
 /**
@@ -172,7 +186,7 @@ private:
 */
 
 #define NewDynamicModule( BASE, DERIVED )\
-addClass( new DynamicModule< BASE, DERIVED >( #DERIVED ) )
+addClass( new DynamicModule< BASE, DERIVED >( #DERIVED, DERIVED::getTypeName() ) )
 
 /**
    comments needed
@@ -186,58 +200,42 @@ addClass( new DynamicModule< BASE, DERIVED, ALLOC >( #DERIVED ) )
 
 template < class Base, class DMAllocator >
 DynamicModuleBase< Base, DMAllocator >::
-DynamicModuleBase( const std::string& modulename,
-		   DMAllocator allocator, InfoLoaderType infoLoader )
+DynamicModuleBase( const std::string& moduleName,
+		   DMAllocator allocator, InfoLoaderType infoLoader,
+		   const std::string& typeName )
   : 
-  theModuleName( modulename ),
+  theModuleName( moduleName ),
   theAllocator( allocator ),
-  theInfoLoader( infoLoader )
+  theInfoLoader( infoLoader ),
+  theTypeName( typeName )
 {
   ; // do nothing
 }
 
 template < class Base, class Derived, class DMAllocator >
 DynamicModule< Base, Derived, DMAllocator >::
-DynamicModule( const std::string& modulename )
+DynamicModule( const std::string& moduleName, const std::string& typeName )
   : 
-  DynamicModuleBase<Base,DMAllocator>( modulename, &Derived::createInstance, &Derived::getClassInfoPtr )
+  DynamicModuleBase<Base,DMAllocator>( moduleName,
+				       reinterpret_cast< DMAllocator >(
+                         &Derived::createInstance ),
+				       &Derived::getClassInfoPtr,
+				       typeName )
 {
-  
   ; // do nothing
 }
 
 template < class Base, class DMAllocator >
 SharedDynamicModule< Base, DMAllocator >::
-SharedDynamicModule( const std::string& classname )
+SharedDynamicModule( const std::string& classname, DMAllocator allocator,
+                     InfoLoaderType infoLoader, const std::string& typeName,
+                     const std::string& fileName, lt_dlhandle handle )
   :
-  DynamicModuleBase<Base,DMAllocator>( classname, NULL, NULL ), 
-  theHandle( NULL )
+  DynamicModuleBase<Base,DMAllocator>( classname, allocator, infoLoader,
+                                       typeName ), 
+  theFileName( fileName ),
+  theHandle( handle )
 {
-  std::string filename( classname );
-  this->theFileName = filename;
-  this->theHandle = lt_dlopenext( filename.c_str() );
-  if( this->theHandle == NULL ) 
-    {
-      throw DMException( "Failed to find or load a DM [" + classname + 
-			 "]: " + lt_dlerror() );
-    }
-
-  this->theAllocator = 
-    *((DMAllocator*)( lt_dlsym( this->theHandle, "CreateObject" ) ));
-
-  if( this->theAllocator == NULL )
-    {
-      throw DMException( "[" + getFileName() + "] is not a valid DM file: "
-			  + lt_dlerror() );  
-    }
-  this->theInfoLoader = 
-    *((InfoLoaderType*)( lt_dlsym( this->theHandle, "GetClassInfo" ) ));
-
-  if( this->theInfoLoader == NULL )
-    {
-      throw DMException( "[" + getFileName() + "] is not a valid DM file: "
-			  + lt_dlerror() );  
-    }
 }
 
 template < class Base, class DMAllocator >
@@ -246,9 +244,8 @@ SharedDynamicModule<Base,DMAllocator>::~SharedDynamicModule()
 
   if( this->theHandle != NULL )
     {
-            lt_dlclose( this->theHandle );
+      lt_dlclose( this->theHandle );
     }
-
 }
 
 

@@ -172,24 +172,6 @@ namespace libecs
 } // namespace libecs
 
 
-#ifdef UTIL_TEST
-
-#include <iostream>
-
-using namespace std;
-using namespace libecs;
-
-main()
-{
-  String str( "  \t  a bcde f\tghi\n\t jkl\n \tmnopq     \n   \t " );
-  eraseWhiteSpaces( str );
-  cerr << '[' << str << ']' << endl;
-
-}
-
-#endif /* UTIL_TEST */
-
-
 /*
   Do not modify
   $Author$

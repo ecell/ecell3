@@ -57,7 +57,8 @@ Base* ObjectAllocator()
 
 
 #define DM_OBJECT( CLASSNAME, TYPE )\
- static TYPE* createInstance() { return new CLASSNAME ; }
+ static TYPE* createInstance() { return new CLASSNAME ; }\
+ static const char *getTypeName() { return #TYPE; }
 
 
 #define DM_BASECLASS( CLASSNAME )\

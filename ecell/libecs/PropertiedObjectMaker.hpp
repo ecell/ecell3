@@ -29,11 +29,12 @@
 // E-Cell Project.
 //
 
-#ifndef ___PROCESSMAKER_H___
-#define ___PROCESSMAKER_H___
+#ifndef ___PROPERTIEDOBJECTMAKER_H___
+#define ___PROPERTIEDOBJECTMAKER_H___
 
-#include "Process.hpp"
-#include "PropertiedObjectMaker.hpp"
+#include "PropertiedClass.hpp"
+#include "dmtool/ModuleMaker.hpp"
+
 
 namespace libecs
 {
@@ -43,23 +44,19 @@ namespace libecs
    * @{ 
    */ 
   
-  class ProcessMaker 
+  class PropertiedObjectMaker 
+    : 
+    public SharedModuleMaker<PropertiedClass>
   {
-  private:
-    PropertiedObjectMaker& theBackend;
-
   public:
-    ProcessMaker( PropertiedObjectMaker& maker );
-    virtual ~ProcessMaker();
-    Process* make( const std::string& aClassName );
-    const PropertiedObjectMaker::SharedModule& getModule(
-	const std::string& aClassName, bool forceReload );
+    PropertiedObjectMaker();
+    virtual ~PropertiedObjectMaker();
   };
 
-#define NewProcessModule(CLASS) NewDynamicModule(Process,CLASS)
+#define NewPropertiedObjectModule(CLASS) NewDynamicModule(PropertiedObject,CLASS)
 
   /** @} */ //end of libecs_module 
 
 } // namespace libecs
 
-#endif /* ___PROCESSMAKER_H___ */
+#endif /* ___PROPERTIEDOBJECTMAKER_H___ */

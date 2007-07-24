@@ -37,7 +37,8 @@
 
 namespace libecs
 {
-  VariableMaker::VariableMaker()
+  VariableMaker::VariableMaker( PropertiedObjectMaker& maker )
+    : theBackend( maker )
   {
     makeClassList();
   }
@@ -47,9 +48,32 @@ namespace libecs
     ; // do nothing
   }
 
+  Variable* VariableMaker::make( const std::string& aClassName )
+  {
+    const PropertiedObjectMaker::SharedModule& mod(
+	theBackend.getModule( aClassName, false ) );
+    if ( mod.getTypeName() != "Variable" )
+      {
+	throw TypeError( "specified class is not a Variable" );
+      }
+    return reinterpret_cast< Variable* >( theBackend.make( aClassName ) );
+  }
+
+  const PropertiedObjectMaker::SharedModule& VariableMaker::getModule(
+      const std::string& aClassName, bool forceReload )
+  {
+    const PropertiedObjectMaker::SharedModule& mod(
+	theBackend.getModule( aClassName, forceReload ) );
+    if ( mod.getTypeName() != "Variable" )
+      {
+	throw TypeError( "specified class is not a Variable" );
+      }
+    return mod;
+  }
+
   void VariableMaker::makeClassList()
   {
-    NewVariableModule( Variable );
+    theBackend.NewDynamicModule( PropertiedClass, Variable );
   }
 
 } // namespace libecs

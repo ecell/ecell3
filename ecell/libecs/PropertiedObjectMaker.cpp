@@ -1,6 +1,6 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-//       This file is part of the E-Cell System
+//       This file is part of the E-Cell PropertiedObjectMaker
 //
 //       Copyright (C) 1996-2007 Keio University
 //       Copyright (C) 2005-2007 The Molecular Sciences Institute
@@ -8,18 +8,18 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
-// E-Cell System is free software; you can redistribute it and/or
+// E-Cell PropertiedObjectMaker is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
-// E-Cell System is distributed in the hope that it will be useful,
+// E-Cell PropertiedObjectMaker is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
 // 
 // You should have received a copy of the GNU General Public
-// License along with E-Cell System -- see the file COPYING.
+// License along with E-Cell PropertiedObjectMaker -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
@@ -28,38 +28,20 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
 
-#ifndef ___PROCESSMAKER_H___
-#define ___PROCESSMAKER_H___
-
-#include "Process.hpp"
 #include "PropertiedObjectMaker.hpp"
 
 namespace libecs
 {
-  
-  /* *defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
-  class ProcessMaker 
+  PropertiedObjectMaker::PropertiedObjectMaker()
   {
-  private:
-    PropertiedObjectMaker& theBackend;
+  }
 
-  public:
-    ProcessMaker( PropertiedObjectMaker& maker );
-    virtual ~ProcessMaker();
-    Process* make( const std::string& aClassName );
-    const PropertiedObjectMaker::SharedModule& getModule(
-	const std::string& aClassName, bool forceReload );
-  };
-
-#define NewProcessModule(CLASS) NewDynamicModule(Process,CLASS)
-
-  /** @} */ //end of libecs_module 
-
+  PropertiedObjectMaker::~PropertiedObjectMaker()
+  {
+    ; // do nothing
+  }
 } // namespace libecs
-
-#endif /* ___PROCESSMAKER_H___ */

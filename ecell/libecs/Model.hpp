@@ -81,7 +81,7 @@ namespace libecs
 
   public:
 
-    LIBECS_API Model();
+    LIBECS_API Model( PropertiedObjectMaker& maker );
     LIBECS_API ~Model();
 
     /**
@@ -324,10 +324,11 @@ namespace libecs
 
     StepperMap          theStepperMap;
 
-    StepperMaker        theStepperMaker;
-    SystemMaker         theSystemMaker;
-    VariableMaker       theVariableMaker;
-    ProcessMaker        theProcessMaker;
+    PropertiedObjectMaker thePropertiedObjectMaker;
+    StepperMaker          theStepperMaker;
+    SystemMaker           theSystemMaker;
+    VariableMaker         theVariableMaker;
+    ProcessMaker          theProcessMaker;
 
   };
 

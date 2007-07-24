@@ -31,8 +31,9 @@
 
 #ifndef ___SYSTEMMAKER_H___
 #define ___SYSTEMMAKER_H___
+
 #include "System.hpp"
-#include "dmtool/ModuleMaker.hpp"
+#include "PropertiedObjectMaker.hpp"
 
 namespace libecs
 {
@@ -43,22 +44,21 @@ namespace libecs
    */ 
   
   class SystemMaker 
-    : 
-    public SharedModuleMaker<System>
   {
-
-  public:
-
-    SystemMaker();
-    virtual ~SystemMaker();
+  private:
+    PropertiedObjectMaker& theBackend;
 
   protected:
-
     void makeClassList();
 
-  };
+  public:
+    SystemMaker( PropertiedObjectMaker& maker );
+    virtual ~SystemMaker();
+    System* make( const std::string& aClassName );
+    const PropertiedObjectMaker::SharedModule& getModule(
+	const std::string& aClassName, bool forceReload );
 
-#define NewSystemModule(CLASS) NewDynamicModule(System,CLASS)
+  };
 
   /** @} */ //end of libecs_module 
 

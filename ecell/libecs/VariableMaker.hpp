@@ -31,8 +31,9 @@
 
 #ifndef ___VARIABLEMAKER_H___
 #define ___VARIABLEMAKER_H___
+
 #include "Variable.hpp"
-#include "dmtool/ModuleMaker.hpp"
+#include "PropertiedObjectMaker.hpp"
 
 namespace libecs
 {
@@ -43,13 +44,16 @@ namespace libecs
    */ 
   
   class VariableMaker 
-    : 
-    public SharedModuleMaker<Variable>
   {
+  private:
+    PropertiedObjectMaker& theBackend;
 
   public:
-    VariableMaker();
+    VariableMaker( PropertiedObjectMaker& maker );
     virtual ~VariableMaker();
+    Variable* make( const std::string& aClassName );
+    const PropertiedObjectMaker::SharedModule& getModule(
+	const std::string& aClassName, bool forceReload );
 
   protected:
 

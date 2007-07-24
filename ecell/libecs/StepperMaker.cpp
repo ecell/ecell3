@@ -40,12 +40,8 @@
 
 namespace libecs
 {
-
-
-  ////////////////////// StepperMaker
- 
-
-  StepperMaker::StepperMaker()
+  StepperMaker::StepperMaker( PropertiedObjectMaker& maker )
+    : theBackend( maker )
   {
     makeClassList();
   }
@@ -54,11 +50,35 @@ namespace libecs
   {
   }
 
+  Stepper* StepperMaker::make( const std::string& aClassName )
+  {
+    const PropertiedObjectMaker::SharedModule& mod(
+	theBackend.getModule( aClassName, false ) );
+    if ( mod.getTypeName() != "Stepper" )
+      {
+	throw TypeError( "specified class is not a Stepper" );
+      }
+    return reinterpret_cast< Stepper* >( theBackend.make( aClassName ) );
+  }
+
+  const PropertiedObjectMaker::SharedModule& StepperMaker::getModule(
+      const std::string& aClassName, bool forceReload )
+  {
+    const PropertiedObjectMaker::SharedModule& mod(
+	theBackend.getModule( aClassName, forceReload ) );
+
+    if ( mod.getTypeName() != "Stepper" )
+      {
+	throw TypeError( "specified class is not a Stepper" );
+      }
+    return mod;
+  }
+
   void StepperMaker::makeClassList()
   {
-    NewStepperModule( DiscreteEventStepper );
-    NewStepperModule( DiscreteTimeStepper );
-    NewStepperModule( PassiveStepper );
+    theBackend.NewDynamicModule( PropertiedClass, DiscreteEventStepper );
+    theBackend.NewDynamicModule( PropertiedClass, DiscreteTimeStepper );
+    theBackend.NewDynamicModule( PropertiedClass, PassiveStepper );
   }
 
 

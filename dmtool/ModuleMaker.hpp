@@ -376,18 +376,39 @@ SharedModuleMaker<T,DMAllocator>::loadModule( const std::string& aClassname )
     }
     
   SharedModule* aSharedModule( NULL );
-  try 
+  std::string filename( aClassname );
+  lt_dlhandle handle( lt_dlopenext( filename.c_str() ) );
+  if ( handle == NULL ) 
     {
-      aSharedModule = new SharedModule( aClassname );
-      addClass
-( aSharedModule );
+      throw DMException( "Failed to find or load a DM [" + aClassname + 
+			 "]: " + lt_dlerror() );
     }
-  catch ( const DMException& )
+  typename SharedModule::DMAllocator anAllocator(
+      *reinterpret_cast< DMAllocator* >(
+	lt_dlsym( handle, "CreateObject" ) ) );
+  if ( anAllocator == NULL )
     {
-      delete aSharedModule;
-      
-      throw;
+      throw DMException( "[" + filename + "] is not a valid DM file: "
+			  + lt_dlerror() );  
     }
+  InfoLoaderType anInfoLoader(
+      *reinterpret_cast< InfoLoaderType* >(
+	lt_dlsym( handle, "GetClassInfo" ) ) );
+  if ( anInfoLoader == NULL )
+    {
+      throw DMException( "[" + filename + "] is not a valid DM file: "
+			  + lt_dlerror() );  
+    }
+
+  const char* typeString = *reinterpret_cast< const char ** >(
+      lt_dlsym( handle, "__DM_TYPE" ) );
+  if ( typeString == NULL )
+    {
+      throw DMException( "[" + filename + "] is not a valid DM file: "
+			  + lt_dlerror() );  
+    }
+  addClass( new SharedModule( aClassname, anAllocator, anInfoLoader,
+                              typeString, filename, handle ) );
 }
 
 #endif /* __MODULEMAKER_HPP */

@@ -62,7 +62,8 @@ LoggerAdapter.cpp\
 PhysicalLogger.cpp\
 VariableReference.cpp\
 LoggerBroker.cpp\
-Exceptions.cpp
+Exceptions.cpp\
+PropertiedObjectMaker.cpp
 
 
 libecsdir=${ECELL_INCLUDE_DIR}/libecs
@@ -109,7 +110,8 @@ Util.hpp\
 VariableReference.hpp\
 DynamicPriorityQueue.hpp\
 FluxProcess.hpp\
-MethodProxy.hpp
+MethodProxy.hpp\
+PropertiedObjectMaker.hpp
 
 noinst_HEADERS=\
 osif.h\

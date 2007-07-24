@@ -37,11 +37,8 @@
 
 namespace libecs
 {
-
-  ////////////////////// ProcessMaker
- 
-
-  ProcessMaker::ProcessMaker()
+  ProcessMaker::ProcessMaker( PropertiedObjectMaker& maker )
+    : theBackend( maker )
   {
     ; // do nothing
   }
@@ -49,6 +46,29 @@ namespace libecs
   ProcessMaker::~ProcessMaker()
   {
     ; // do nothing
+  }
+
+  Process* ProcessMaker::make( const std::string& aClassName )
+  {
+    const PropertiedObjectMaker::SharedModule& mod(
+	theBackend.getModule( aClassName, false ) );
+    if ( mod.getTypeName() != "Process" )
+      {
+	throw TypeError( "specified class is not a Process" );
+      }
+    return reinterpret_cast< Process* >( theBackend.make( aClassName ) );
+  }
+
+  const PropertiedObjectMaker::SharedModule& ProcessMaker::getModule(
+      const std::string& aClassName, bool forceReload )
+  {
+    const PropertiedObjectMaker::SharedModule& mod(
+	theBackend.getModule( aClassName, forceReload ) );
+    if ( mod.getTypeName() != "Process" )
+      {
+	throw TypeError( "specified class is not a Process" );
+      }
+    return mod;
   }
 
 } // namespace libecs

@@ -36,7 +36,8 @@
 
 namespace libecs
 {
-  SystemMaker::SystemMaker()
+  SystemMaker::SystemMaker( PropertiedObjectMaker& maker )
+    : theBackend( maker )
   {
     makeClassList();
   }
@@ -46,15 +47,39 @@ namespace libecs
     ; // do nothing
   }
 
+  System* SystemMaker::make( const std::string& aClassName )
+  {
+    const PropertiedObjectMaker::SharedModule& mod(
+	theBackend.getModule( aClassName, false ) );
+    if ( mod.getTypeName() != "System" )
+      {
+	throw TypeError( "specified class is not a System" );
+      }
+    return reinterpret_cast< System* >( theBackend.make( aClassName ) );
+  }
+
+  const PropertiedObjectMaker::SharedModule& SystemMaker::getModule(
+      const std::string& aClassName, bool forceReload )
+  {
+    const PropertiedObjectMaker::SharedModule& mod(
+	theBackend.getModule( aClassName, forceReload ) );
+    if ( mod.getTypeName() != "System" )
+      {
+	throw TypeError( "specified class is not a System" );
+      }
+    return mod;
+  }
+
   void SystemMaker::makeClassList()
   {
+    // XXX: get rid of this workaround in the near future.
+    theBackend.addClass( new PropertiedObjectMaker::Module(
+	"CompartmentSystem",
+	reinterpret_cast< PropertiedObjectMaker::Module::DMAllocator >(
+	    System::createInstance ),
+	System::getClassInfoPtr, "System" ) );
 
-    //temporary workaround
-    addClass( new Module( "CompartmentSystem", System::createInstance, System::getClassInfoPtr ) );
-
-    NewSystemModule( System );
-    //    NewSystemModule( VirtualSystem );
-    //    NewSystemModule( CompartmentSystem );
+    theBackend.NewDynamicModule( PropertiedClass, System );
   }
 
 } // namespace libecs
