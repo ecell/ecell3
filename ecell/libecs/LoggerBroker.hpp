@@ -39,6 +39,8 @@
 #include "FullID.hpp"
 #include "Logger.hpp"
 
+#include <iostream>
+
 namespace libecs
 {
   // forward declaration

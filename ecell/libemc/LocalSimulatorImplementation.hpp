@@ -249,6 +249,11 @@ namespace libemc
       theRunningFlag = true;
     }
 
+    void initialize()
+    {
+      theModel.initialize();
+    }
+
     void runWithEvent();
     void runWithoutEvent();
 

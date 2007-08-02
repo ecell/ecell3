@@ -195,6 +195,8 @@ BOOST_PYTHON_MODULE( _emc )
 	  &libemc::Simulator::setEventChecker )
     .def( "setEventHandler",
 	  &libemc::Simulator::setEventHandler )
+    .def( "initialize",
+          &libemc::Simulator::initialize)
     ;  
 }
 

@@ -180,32 +180,8 @@ namespace libecs
   }
 
 
-  void System::dynamicallyInitialize()
+  void System::initializeVariables()
   {
-
-    // Set the appropriate stepper.
-    this->setStepperID( this->getSuperSystem()->getStepperID() );
-
-    // Create the SIZE variable.
-    FullID newSystemFullID = this->getFullID();
-    SystemPath aSystemPath = newSystemFullID.getSystemPath();
-    aSystemPath.push_back( newSystemFullID.getID() );
-
-    FullID newSizeVariableFullID(EntityType("Variable"), 
-                                 aSystemPath,
-                                 "SIZE");
-
-    getModel()->createEntity( "Variable", newSizeVariableFullID);
-
-    this->staticallyInitialize();
-    
-  }
-
-  void System::initialize()
-  {
-
-    // no need to call subsystems' initialize() -- the Model does this
-
     //
     // Variable::initialize()
     //
@@ -214,7 +190,10 @@ namespace libecs
       {
 	i->second->initialize();
       }
+  }
 
+  void System::checkProcessesHaveSteppers()
+  {
     //
     // Set Process::theStepper.
     // Process::initialize() is called in Stepper::initialize()
@@ -229,10 +208,25 @@ namespace libecs
 	    aProcessPtr->setStepper( getStepper() );
 	  }
       }
+  }
+
+  void System::initialize()
+  {
+
+    // no need to call subsystems' initialize() -- the Model does this
+    this->initializeVariables();
+    this->checkProcessesHaveSteppers();
 
     configureSizeVariable();
-
     return;
+  }
+
+  void System::configureStepper()
+  {
+    if ( this->getStepper() == NULLPTR )
+      {
+        this->setStepperID( this->getSuperSystem()->getStepperID() );
+      }
   }
 
   ProcessPtr System::getProcess( StringCref anID ) const

@@ -70,29 +70,11 @@ namespace libecs
 
   void Variable::initialize()
   {
-    if (getModel()->getRunningFlag())
-      {
-        this->dynamicallyInitialize();
-      }
-    else
-      {
-        this->staticallyInitialize();
-      }
-  }
-
-  void Variable::dynamicallyInitialize()
-  {
-    this->staticallyInitialize();
-  }
-
-  void Variable::staticallyInitialize()
-  {
     // Is this correct???  Should I be getting the time from a Stepper or something?
     this->setCreationTime( getModel()->getCurrentTime() );
 
     clearInterpolantVector();
   }
-
 
   LOAD_METHOD_DEF( Real, NumberConc, Variable )
   {

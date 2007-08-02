@@ -358,9 +358,6 @@ namespace libecs
       return getSuperSystem()->getModel();
     }
 
-    void dynamicallyInitialize();
-    void staticallyInitialize();
-
     const Real calculateDifferenceSum( RealParam aCurrentTime, 
 				       RealParam anInterval ) const
     {

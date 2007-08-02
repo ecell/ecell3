@@ -661,6 +661,11 @@ namespace libemc
       return theSimulatorImplementation->getDMInfo();
     }
 
+    void initialize()
+    {
+      theSimulatorImplementation->initialize();
+    }
+
   //@}
 
   private:

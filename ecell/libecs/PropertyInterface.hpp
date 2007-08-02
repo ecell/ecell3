@@ -120,7 +120,7 @@ namespace libecs
 
     PropertyInterface()
     {
-	  theInfoMap[ String( PROPERTYLIST_FIELD )] = Polymorph( PolymorphVector() ) ;
+      theInfoMap[ String( PROPERTYLIST_FIELD )] = Polymorph( PolymorphVector() ) ;
       T::initializePropertyInterface( Type2Type<T>() );
     }
 

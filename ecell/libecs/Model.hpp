@@ -116,12 +116,22 @@ namespace libecs
       return theRunningFlag;
     }
 
+    bool getDirtyBit() const
+    {
+      return this->theDirtyBit;
+    }
+
     void step()
     {
 
       if (!theRunningFlag)
         {
           theRunningFlag = true;
+        }
+
+      if ( getDirtyBit() )
+        {
+          THROW_EXCEPTION( SimulationError, "Objects uninitialized at step().");
         }
       
       StepperEventCref aNextEvent( theScheduler.getTopEvent() );
@@ -304,13 +314,25 @@ namespace libecs
 
   private:
 
+    void clearUninitialized()
+    {
+      uninitializedSteppers.clear();
+      uninitializedSystems.clear();
+      uninitializedVariables.clear();
+      uninitializedProcesses.clear();
 
+      theDirtyBit = false;
+    }
+
+    void recordUninitializedVariable( VariablePtr aVariablePtr );
+    void recordUninitializedSystem( SystemPtr aSystemPtr );
+    void recordUninitializedProcess( ProcessPtr aProcessPtr );
+    void recordUninitializedStepper( StepperPtr aStepperPtr );
+
+    void staticInitialize();
+    void runningInitialize();
+    
     void constructEntity( StringCref aClassname, FullIDCref aFullID );
-
-    void dynamicallyInitializeEntity( FullIDCref aFullID );
-    void dynamicallyInitializeVariable( VariablePtr aVariablePtr );
-    void dynamicallyInitializeProcess( ProcessPtr aProcessPtr );
-    void dynamicallyInitializeSystem( SystemPtr aSystemPtr);
 
     /**
        This method checks recursively if all systems have Steppers
@@ -348,6 +370,23 @@ namespace libecs
     ProcessMaker        theProcessMaker;
 
     bool theRunningFlag;
+    bool theDirtyBit;
+
+    StepperVector uninitializedSteppers;
+    SystemVector uninitializedSystems;
+    VariableVector uninitializedVariables;
+    ProcessVector uninitializedProcesses;
+
+    template <typename T>
+    void PRINT_ALL(const T& athing)
+    {
+      for(typename T::const_iterator i = athing.begin();
+          i != athing.end();
+          ++i)
+        {
+          std::cout << "Initializing " << (*i)->getFullID().getString() << std::endl;
+        }
+    }
 
   };
 

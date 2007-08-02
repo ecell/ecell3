@@ -82,6 +82,9 @@ namespace libecs
 
   LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,   PolymorphVectorCref aParamList ) 
   {
+    
+    std::cout<< "LoggerBroker::createLogger" << std::endl;
+
     if( theLoggerMap.find( aFullPN ) != theLoggerMap.end() )
       {
 	THROW_EXCEPTION( AlreadyExist, "Logger [" + aFullPN.getString()

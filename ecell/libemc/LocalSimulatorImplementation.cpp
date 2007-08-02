@@ -282,7 +282,11 @@ namespace libemc
   {
     FullPN aFullPN( aFullPNString );
     EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
-	
+    
+    // I think this is here mostly to make sure the Systems have had
+    // their size variables configured properly.  Or at least that is one
+    // thing that can fail.
+
     clearDirty();
 
     return anEntityPtr->getProperty( aFullPN.getPropertyName() );
@@ -344,7 +348,7 @@ namespace libemc
   createLogger( libecs::StringCref aFullPNString, 
 		libecs::Polymorph aParamList )
   {
-    if( theRunningFlag )
+    if( getModel().getRunningFlag() )
       {
 	THROW_EXCEPTION( libecs::Exception, 
 			 "Cannot create a Logger while running." );

@@ -82,6 +82,10 @@ namespace libecs
     }
 
     virtual void initialize();
+    void initializeVariables();
+    void checkProcessesHaveSteppers();
+    void configureStepper();
+
 
     /**
        Get a pointer to a Stepper object that this System belongs.
@@ -288,9 +292,6 @@ namespace libecs
     GET_METHOD( Polymorph, ProcessList );
 
   protected:
-
-
-
 
     StepperPtr   theStepper;
 

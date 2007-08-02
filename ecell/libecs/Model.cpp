@@ -60,7 +60,8 @@ namespace libecs
     theSystemMaker(),
     theVariableMaker(),
     theProcessMaker(),
-    theRunningFlag( false )
+    theRunningFlag( false ),
+    theDirtyBit( false )
   {
     theLoggerBroker.setModel( this );
     // initialize theRootSystem
@@ -128,28 +129,88 @@ namespace libecs
 	return *(reinterpret_cast<const PolymorphMap*>( InfoPtrFunc() ) );
   }
 
+  void Model::recordUninitializedStepper( StepperPtr aStepperPtr )
+  {
+    theDirtyBit = true;
+    // Duplication is checked when the object is originally created, therefore
+    // we know this cannot be found in the uninitializedVector.
+
+    uninitializedSteppers.push_back( aStepperPtr );
+  }
+
+  void Model::recordUninitializedVariable( VariablePtr aVariablePtr )
+  {
+    theDirtyBit = true;
+    // Duplication is checked when the object is originally created, therefore
+    // we know this cannot be found in the uninitializedVector.
+
+    uninitializedVariables.push_back( aVariablePtr );
+  }
+
+  void Model::recordUninitializedSystem( SystemPtr aSystemPtr )
+  {
+    theDirtyBit = true;
+    // Duplication is checked when the object is originally created, therefore
+    // we know this cannot be found in the uninitializedVector.
+
+    uninitializedSystems.push_back( aSystemPtr );
+  }
+
+  void Model::recordUninitializedProcess( ProcessPtr aProcessPtr )
+  {
+    theDirtyBit = true;
+    // Duplication is checked when the object is originally created, therefore
+    // we know this cannot be found in the uninitializedVector.
+
+    uninitializedProcesses.push_back( aProcessPtr );
+  }
+
+  void Model::staticInitialize()
+  {
+    std::cout << "Model::staticInitialize" << std::endl;
+
+    SystemPtr aRootSystem( getRootSystem() );
+
+    checkRootSystemSizeVariable();
+
+    initializeSystems( aRootSystem );
+    checkStepper( aRootSystem );
+
+    // initialization of Stepper needs four stages:
+    // (1) update current times of all the steppers, and integrate Variables.
+    // (2) call user-initialization methods of Processes.
+    // (3) call user-defined initialize() methods.
+    // (4) post-initialize() procedures:
+    //     - construct stepper dependency graph and
+    //     - fill theIntegratedVariableVector.
+
+    
+    FOR_ALL_SECOND( StepperMap, theStepperMap, initializeProcesses );
+    FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
+
+    theSystemStepper.initialize();
+
+
+    FOR_ALL_SECOND( StepperMap, theStepperMap, 
+		    updateIntegratedVariableVector );
+
+    theScheduler.updateEventDependency();
+    //    theScheduler.updateAllEvents( getCurrentTime() );
+
+    for( EventIndex c( 0 ); c != theScheduler.getSize(); ++c )
+      {
+	theScheduler.getEvent(c).reschedule();
+      }
+
+    clearUninitialized();
+  }
+  
 
   void Model::createEntity( StringCref aClassname,
 			    FullIDCref aFullID )
   {
+    std::cout << "Model::createEntity(" << aFullID.getID() << ")" << std::endl;
 
-    this->constructEntity( aClassname,
-                           aFullID);
-
-     if( getRunningFlag() )
-       {
-         // dynamicallyInitializeEntity( aFullID );
-
-         initialize();
-       }
-
-    return;
-  }
-
-
-  void Model::constructEntity( StringCref aClassname,
-                               FullIDCref aFullID )
-  {
     if( aFullID.getSystemPath().empty() )
       {
 	THROW_EXCEPTION( BadSystemPath, "Empty SystemPath." );
@@ -168,85 +229,28 @@ namespace libecs
 	aVariablePtr->setID( aFullID.getID() );
         aVariablePtr->setCreationTime( getCurrentTime() );
 	aContainerSystemPtr->registerVariable( aVariablePtr );
+        recordUninitializedVariable( aVariablePtr );
 	break;
       case EntityType::PROCESS:
 	aProcessPtr = getProcessMaker().make( aClassname );
 	aProcessPtr->setID( aFullID.getID() );
 	aContainerSystemPtr->registerProcess( aProcessPtr );
+        recordUninitializedProcess( aProcessPtr );
 	break;
       case EntityType::SYSTEM:
 	aSystemPtr = getSystemMaker().make( aClassname );
 	aSystemPtr->setID( aFullID.getID() );
 	aSystemPtr->setModel( this );
 	aContainerSystemPtr->registerSystem( aSystemPtr );
+        recordUninitializedSystem( aSystemPtr );
 	break;
 
       default:
 	THROW_EXCEPTION( InvalidEntityType,
 			 "bad EntityType specified." );
       }
-  }
 
-  void Model::dynamicallyInitializeVariable( VariablePtr aVariablePtr )
-  {
-    // These initializations are different
-    aVariablePtr->dynamicallyInitialize();
-  }
-
-  void Model::dynamicallyInitializeProcess( ProcessPtr aProcessPtr )
-  {
-    aProcessPtr->dynamicallyInitialize();    
-  }
-
-  void Model::dynamicallyInitializeSystem( SystemPtr aSystemPtr )
-  {
-    aSystemPtr->dynamicallyInitialize();
-  }
-
-  void Model::dynamicallyInitializeEntity( FullIDCref aFullID )
-  {
-
-    EntityPtr initializingEntity( NULLPTR );
-    
-    ProcessPtr   aProcessPtr( NULLPTR );
-    SystemPtr    aSystemPtr ( NULLPTR );
-    VariablePtr aVariablePtr( NULLPTR );
-
-    try
-      {
-        initializingEntity = this->getEntity( aFullID);
-      }
-    catch( BadID )
-      {
-        THROW_EXCEPTION( InitializationFailed,
-                         "Could not dynamically initialze Entity." );
-      }
-
-    switch( aFullID.getEntityType() )
-      {
-      case EntityType::VARIABLE:
-        {
-          aVariablePtr = static_cast<VariablePtr>(initializingEntity);
-          this->dynamicallyInitializeVariable(aVariablePtr);
-          break;
-        }
-      case EntityType::PROCESS:
-        {
-          aProcessPtr = static_cast<ProcessPtr>(initializingEntity);
-          this->dynamicallyInitializeProcess(aProcessPtr);
-          break;
-        }
-      case EntityType::SYSTEM:
-        {
-          aSystemPtr = static_cast<SystemPtr>(initializingEntity);
-          this->dynamicallyInitializeSystem(aSystemPtr);
-          break;
-        }
-      default:
-        THROW_EXCEPTION( InvalidEntityType,
-                         "bad EntityType specified.");
-        
-      }
+    return;
   }
 
   SystemPtr Model::getSystem( SystemPathCref aSystemPath ) const
@@ -390,42 +394,75 @@ namespace libecs
       }
   }
 
-  void Model::initialize()
+  void Model::runningInitialize()
   {
-    SystemPtr aRootSystem( getRootSystem() );
+    std::cout<< "Model::runningInitialize() is being called" << std::endl;
 
-    checkRootSystemSizeVariable();
-
-    initializeSystems( aRootSystem );
-    checkStepper( aRootSystem );
-
-    // initialization of Stepper needs four stages:
-    // (1) update current times of all the steppers, and integrate Variables.
-    // (2) call user-initialization methods of Processes.
-    // (3) call user-defined initialize() methods.
-    // (4) post-initialize() procedures:
-    //     - construct stepper dependency graph and
-    //     - fill theIntegratedVariableVector.
-
-    
-    FOR_ALL_SECOND( StepperMap, theStepperMap, initializeProcesses );
-    FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
-    
-
-    theSystemStepper.initialize();
-
-
-    FOR_ALL_SECOND( StepperMap, theStepperMap, 
-		    updateIntegratedVariableVector );
-
-    theScheduler.updateEventDependency();
-    //    theScheduler.updateAllEvents( getCurrentTime() );
-
-    for( EventIndex c( 0 ); c != theScheduler.getSize(); ++c )
+    // Everything has been created at this point.  We may also assume that all property values that have 
+    for(SystemVector::iterator i = uninitializedSystems.begin();
+        i != uninitializedSystems.end();
+        ++i)
       {
-	theScheduler.getEvent(c).reschedule();
+        // This ensures that a stepper has been set (if one has not, the system
+        // is given to it's supersystem's stepper).
+        (*i)->configureStepper();
+        (*i)->configureSizeVariable();
       }
 
+    for(VariableVector::iterator i = uninitializedVariables.begin();
+        i != uninitializedVariables.end();
+        ++i)
+      {
+        (*i)->initialize();
+      }
+
+    for(ProcessVector::iterator i = uninitializedProcesses.begin();
+        i != uninitializedProcesses.end();
+        ++i)
+      {
+        if ( (*i)->getStepper() == NULLPTR )
+          {
+            (*i)->setStepper( (*i)->getSuperSystem()->getStepper() );
+          }
+
+        (*i)->initialize();
+      }
+
+    // Now do all the stepper initialization stuff.....
+    // corresponds to Model::staticInitialize() lines 197-
+
+    {
+      // Here we must do what corresponds to initializing each of the steppers.
+      // We can reinitialize *ALL* of them, but this is quite slow.  What is needed
+      // here (desperately) is a method to tell which Steppers have been fucked with.
+
+      FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
+      FOR_ALL_SECOND( StepperMap, theStepperMap, 
+                      updateIntegratedVariableVector );
+
+      theScheduler.updateEventDependency();
+      for( EventIndex c( 0 ); c != theScheduler.getSize(); ++c )
+        {
+          theScheduler.getEvent(c).reschedule();
+        }
+    }
+    
+    clearUninitialized();
+    return;
+  }
+
+  void Model::initialize()
+  {
+    if ( getRunningFlag() )
+      {
+        this->runningInitialize();
+      }
+    else
+      {
+        this->staticInitialize();
+      }
+
+    return;
   }
 
 } // namespace libecs

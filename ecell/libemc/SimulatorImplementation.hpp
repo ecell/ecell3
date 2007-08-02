@@ -101,7 +101,6 @@ namespace libemc
 		    		libecs::StringCref aClassname,
 		    		const libecs::Integer forceReload  ) = 0;
 
-    
     virtual void createEntity( libecs::StringCref   aClassname, 
 			       libecs::StringCref   aFullIDString ) = 0;
 
@@ -194,6 +193,8 @@ namespace libemc
     virtual void setEventHandler( EventHandlerSharedPtrCref anEventHandler ) = 0;
 
     virtual const libecs::Polymorph getDMInfo() = 0;
+
+    virtual void initialize() = 0;
 
   };   //end of class Simulator
 
