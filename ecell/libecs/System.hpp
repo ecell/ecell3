@@ -102,7 +102,7 @@ namespace libecs
     /**
        Set a StepperID.
 
-       This provides a default Stepper to Processes holded by this System.
+       This provides a default Stepper to Processes held by this System.
 
        @param anID Stepper ID.
     */

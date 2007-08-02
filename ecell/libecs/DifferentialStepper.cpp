@@ -102,6 +102,8 @@ namespace libecs
     const ProcessVector::size_type 
       aDiscreteProcessOffset( getDiscreteProcessOffset() );
 
+    // HOLY FUCKING SHIT!!!!!
+    theVariableReferenceListVector.clear();
     theVariableReferenceListVector.resize( aDiscreteProcessOffset );
     
     for ( ProcessVector::size_type i( 0 ); i < aDiscreteProcessOffset; ++i )
