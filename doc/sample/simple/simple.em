@@ -10,6 +10,7 @@ Stepper FixedODE1Stepper( DE1 )
 
 System System( / )
 {
+        Name "The root system";
 	StepperID	DE1;
 
 	Variable Variable( SIZE )
@@ -39,6 +40,7 @@ System System( / )
 					[ C0 :.:E 0 ];
 		KmS	1;
 		KcF	10;
+
 	}
 
 	
