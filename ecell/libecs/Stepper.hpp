@@ -575,6 +575,10 @@ namespace libecs
 
     RealVector theValueBuffer;
 
+    SystemVector uninitializedSystems;
+    VariableVector variablesWithInterpolants;
+    ProcessVector uninitializedProcesses;
+
 
 
   private:

@@ -256,6 +256,11 @@ namespace libecs
     std::unary_function< GIVEN, NEW >
   {
   public:
+    DynamicCaster()
+    {
+      ; // Dummy
+    }
+    
     NEW operator()( const GIVEN& aPtr )
     {
       NEW aNew( dynamic_cast<NEW>( aPtr ) );

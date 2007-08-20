@@ -82,28 +82,17 @@ namespace libecs
     gsl_rng_free( theRng );
   }
 
-
   void Stepper::initialize()
   {
-    //    if( isEntityListChanged() )
-    //      {
 
-    //
-    // Update theVariableVector.  This also calls updateInterpolantVector.
-    //
     updateVariableVector();
 
-
-    //    clearEntityListChanged();
-    //      }
-
-    // size of the value buffer == the number of *all* variables.
+    // The size of the value buffer == the number of *all* variables.
     // (not just read or write variables)
     theValueBuffer.resize( theVariableVector.size() );
 
     updateLoggerVector();
 
-    
     //  Don't call
     //    createInterpolants();
     //  here:  only DifferentialSteppers need this.
@@ -253,12 +242,27 @@ namespace libecs
 
   void Stepper::createInterpolants()
   {
+
+    // Should probably be optimized....
+    
     // create Interpolants.
     for( VariableVector::size_type c( 0 );  
 	 c != theReadOnlyVariableOffset; ++c )
       {
+
 	VariablePtr aVariablePtr( theVariableVector[ c ] );
-	aVariablePtr->registerInterpolant( createInterpolant( aVariablePtr ) );
+
+
+        // We wish to register each interpolant once and only once, so we register
+        // the variable pointers for which we have registered this guy.  
+        if( std::find( variablesWithInterpolants.begin(), 
+                       variablesWithInterpolants.end(), 
+                       aVariablePtr) == variablesWithInterpolants.end() )
+          {
+
+            aVariablePtr->registerInterpolant( createInterpolant( aVariablePtr ) );
+            variablesWithInterpolants.push_back( aVariablePtr );
+          }
       }
   }
 
@@ -394,6 +398,7 @@ namespace libecs
 	== theSystemVector.end() )
       {
    	theSystemVector.push_back( aSystemPtr );
+        uninitializedSystems.push_back( aSystemPtr );
       }
   }
 
@@ -422,6 +427,7 @@ namespace libecs
 		   aProcessPtr ) == theProcessVector.end() )
       {
    	theProcessVector.push_back( aProcessPtr );
+        uninitializedProcesses.push_back( aProcessPtr );
       }
 
     updateProcessVector();

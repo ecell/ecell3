@@ -244,8 +244,9 @@ void ODEStepper::setJacobianMatrix()
 void ODEStepper::decompJacobianMatrix()
 {
   int aSignNum;
-  
+
   gsl_linalg_LU_decomp( theJacobianMatrix1, thePermutation1, &aSignNum );
+
   gsl_linalg_complex_LU_decomp( theJacobianMatrix2, thePermutation2, &aSignNum );
 }
 

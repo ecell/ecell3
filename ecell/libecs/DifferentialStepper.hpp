@@ -93,7 +93,7 @@ namespace libecs
     public:
 
       Interpolant( DifferentialStepperRef aStepper, 
-		     VariablePtr const aVariablePtr )
+                   VariablePtr const aVariablePtr )
 	:
 	libecs::Interpolant( aVariablePtr ),
 	theStepper( aStepper ),

@@ -67,6 +67,23 @@ namespace libecs
     ; // do nothing
   }
 
+//   void DifferntialStepper::new_initialize()
+//   {
+//     Stepper::new_initialize();
+
+//     // Create an Interpolant only for those variables which this Stepper has not yet 
+//     // processed....
+
+//     theTaylorSeries.resize( boost::extents[ getStage() ][
+//             static_cast< RealMatrix::index >(
+//                 getReadOnlyVariableOffset() ) ] );
+
+    
+//     //Is this correct?
+//     initializeVariableReferenceList();
+
+//   }
+
   void DifferentialStepper::initialize()
   {
     Stepper::initialize();

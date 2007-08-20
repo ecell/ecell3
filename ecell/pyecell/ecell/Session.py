@@ -129,7 +129,7 @@ class Session:
             dirname = os.path.dirname( aModel )
             if dirname != "":
                 os.chdir( dirname )
-	
+
         # calls load methods
         self.__loadStepper( anEml )
         self.__loadEntity( anEml )

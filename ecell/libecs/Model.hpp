@@ -377,17 +377,6 @@ namespace libecs
     VariableVector uninitializedVariables;
     ProcessVector uninitializedProcesses;
 
-    template <typename T>
-    void PRINT_ALL(const T& athing)
-    {
-      for(typename T::const_iterator i = athing.begin();
-          i != athing.end();
-          ++i)
-        {
-          std::cout << "Initializing " << (*i)->getFullID().getString() << std::endl;
-        }
-    }
-
   };
 
   

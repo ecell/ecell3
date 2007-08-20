@@ -167,8 +167,6 @@ namespace libecs
 
   void Model::staticInitialize()
   {
-    std::cout << "Model::staticInitialize" << std::endl;
-
     SystemPtr aRootSystem( getRootSystem() );
 
     checkRootSystemSizeVariable();
@@ -209,8 +207,6 @@ namespace libecs
   void Model::createEntity( StringCref aClassname,
 			    FullIDCref aFullID )
   {
-    std::cout << "Model::createEntity(" << aFullID.getID() << ")" << std::endl;
-
     if( aFullID.getSystemPath().empty() )
       {
 	THROW_EXCEPTION( BadSystemPath, "Empty SystemPath." );
@@ -396,8 +392,6 @@ namespace libecs
 
   void Model::runningInitialize()
   {
-    std::cout<< "Model::runningInitialize() is being called" << std::endl;
-
     // Everything has been created at this point.  We may also assume that all property values that have 
     for(SystemVector::iterator i = uninitializedSystems.begin();
         i != uninitializedSystems.end();
@@ -428,13 +422,10 @@ namespace libecs
         (*i)->initialize();
       }
 
-    // Now do all the stepper initialization stuff.....
-    // corresponds to Model::staticInitialize() lines 197-
-
     {
       // Here we must do what corresponds to initializing each of the steppers.
       // We can reinitialize *ALL* of them, but this is quite slow.  What is needed
-      // here (desperately) is a method to tell which Steppers have been fucked with.
+      // here is a method to tell which Steppers have had Processes added to them...  
 
       FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
       FOR_ALL_SECOND( StepperMap, theStepperMap, 
