@@ -33,6 +33,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <algorithm>
+#include <iostream>
 
 #include "Process.hpp"
 #include "Model.hpp"
@@ -112,7 +113,8 @@ namespace libecs
     theStepper( NULLPTR ),
     theSizeVariable( NULLPTR ),
     theModel( NULLPTR ),
-    theEntityListChanged( false )
+    theEntityListChanged( false ),
+    sizeInitialized( false )
   {
     ; // do nothing
   }
@@ -177,7 +179,31 @@ namespace libecs
   void System::configureSizeVariable()
   {
     theSizeVariable = findSizeVariable();
+    sizeInitialized = true;
   }
+
+  void System::printSystems() const
+  {
+    String name = this->getFullID().getString();
+
+    if (this->theSizeVariable)
+      {
+        std::cout << name << " with size " << this->theSizeVariable->getValue() << std::endl;
+      }
+    else
+      {
+        std::cout << "ERROR - " << name << " has no 'theSizeVariable'" << std::endl;
+      }
+    
+    for (SystemMap::const_iterator i = theSystemMap.begin();
+         i != theSystemMap.end();
+         ++i)
+      {
+        i->second->printSystems();
+      }
+
+    return;
+    }
 
 
   void System::initializeVariables()

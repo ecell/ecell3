@@ -87,10 +87,7 @@ namespace libecs
 
     updateVariableVector();
 
-    // The size of the value buffer == the number of *all* variables.
-    // (not just read or write variables)
     theValueBuffer.resize( theVariableVector.size() );
-
     updateLoggerVector();
 
     //  Don't call
@@ -286,7 +283,6 @@ namespace libecs
     // append theSystemVector
     std::copy( theSystemVector.begin(), theSystemVector.end(),
 	       std::back_inserter( anEntityVector ) );
-
 
     theLoggerVector.clear();
 
@@ -543,10 +539,18 @@ namespace libecs
 
   void Stepper::fireProcesses()
   {
-    FOR_ALL( ProcessVector, theProcessVector )
+//     FOR_ALL( ProcessVector, theProcessVector )
+//       {
+// 	(*i)->fire();
+//       }
+
+    // This is a temporary fix to a silly problem..
+    unsigned int maxSize = theProcessVector.size();
+    for(unsigned int ndx = 0; ndx != maxSize; ++ndx)
       {
-	(*i)->fire();
+        theProcessVector[ndx]->fire();
       }
+
   }
 
 

@@ -83,6 +83,8 @@ namespace libecs
   LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,   PolymorphVectorCref aParamList ) 
   {
     
+    this->dirtyBit = true;
+
     if( theLoggerMap.find( aFullPN ) != theLoggerMap.end() )
       {
 	THROW_EXCEPTION( AlreadyExist, "Logger [" + aFullPN.getString()
@@ -114,6 +116,16 @@ namespace libecs
 
 
     return aNewLogger;
+  }
+
+  bool LoggerBroker::getDirtyBit() const
+  {
+    return dirtyBit;
+  }
+  
+  void LoggerBroker::clearDirtyBit()
+  {
+    this->dirtyBit = false;
   }
 
   

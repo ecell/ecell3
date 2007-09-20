@@ -43,7 +43,6 @@
 #include "SystemStepper.hpp"
 
 #include "Model.hpp"
-#include <iostream>
 
 namespace libecs
 {
@@ -71,7 +70,6 @@ namespace libecs
     theRootSystemPtr->setName( "The Root System" );
     // super system of the root system is itself.
     theRootSystemPtr->setSuperSystem( theRootSystemPtr );
-
    
     // initialize theSystemStepper
     theSystemStepper.setModel( this );
@@ -170,9 +168,10 @@ namespace libecs
     SystemPtr aRootSystem( getRootSystem() );
 
     checkRootSystemSizeVariable();
-
-    initializeSystems( aRootSystem );
     checkStepper( aRootSystem );
+    
+    initializeSystems( aRootSystem );
+
 
     // initialization of Stepper needs four stages:
     // (1) update current times of all the steppers, and integrate Variables.
@@ -200,7 +199,6 @@ namespace libecs
 	theScheduler.getEvent(c).reschedule();
       }
 
-    clearUninitialized();
   }
   
 
@@ -225,20 +223,26 @@ namespace libecs
 	aVariablePtr->setID( aFullID.getID() );
         aVariablePtr->setCreationTime( getCurrentTime() );
 	aContainerSystemPtr->registerVariable( aVariablePtr );
+
         recordUninitializedVariable( aVariablePtr );
+
 	break;
       case EntityType::PROCESS:
 	aProcessPtr = getProcessMaker().make( aClassname );
 	aProcessPtr->setID( aFullID.getID() );
 	aContainerSystemPtr->registerProcess( aProcessPtr );
+
         recordUninitializedProcess( aProcessPtr );
+
 	break;
       case EntityType::SYSTEM:
 	aSystemPtr = getSystemMaker().make( aClassname );
 	aSystemPtr->setID( aFullID.getID() );
 	aSystemPtr->setModel( this );
 	aContainerSystemPtr->registerSystem( aSystemPtr );
+
         recordUninitializedSystem( aSystemPtr );
+
 	break;
 
       default:
@@ -398,15 +402,18 @@ namespace libecs
         ++i)
       {
         // This ensures that a stepper has been set (if one has not, the system
-        // is given to it's supersystem's stepper).
+        // is given to it's supersystem's stepper).  It is the 'dynamic' analogue 
+        // to 'chaeckStepper'
         (*i)->configureStepper();
-        (*i)->configureSizeVariable();
+        (*i)->initialize();
       }
 
     for(VariableVector::iterator i = uninitializedVariables.begin();
         i != uninitializedVariables.end();
         ++i)
       {
+        // Although Variable::initialize isn't idempotent, it is idempotent on new
+        // variables...
         (*i)->initialize();
       }
 
@@ -423,9 +430,6 @@ namespace libecs
       }
 
     {
-      // Here we must do what corresponds to initializing each of the steppers.
-      // We can reinitialize *ALL* of them, but this is quite slow.  What is needed
-      // here is a method to tell which Steppers have had Processes added to them...  
 
       FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
       FOR_ALL_SECOND( StepperMap, theStepperMap, 
@@ -438,20 +442,24 @@ namespace libecs
         }
     }
     
-    clearUninitialized();
+
     return;
   }
 
   void Model::initialize()
   {
+
     if ( getRunningFlag() )
       {
         this->runningInitialize();
       }
+
     else
       {
         this->staticInitialize();
       }
+
+    clearGlobalDirtyState();
 
     return;
   }

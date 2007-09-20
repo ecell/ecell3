@@ -998,9 +998,9 @@ void ODEStepper::step()
 	{
 	  if ( isStiff ) setSpectralRadius( calculateJacobianNorm() );
 	  
-	  const Real lambdah( getSpectralRadius() * getStepInterval() );
+	  const Real lambda( getSpectralRadius() * getStepInterval() );
 
-	  if ( isStiff == ( lambdah < 3.3 * 0.8 ) )
+	  if ( isStiff == ( lambda < 3.3 * 0.8 ) )
 	    {
 	      if ( theStiffnessCounter 
 		   > getCheckIntervalCount() * getSwitchingCount() )

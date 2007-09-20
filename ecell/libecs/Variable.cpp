@@ -59,20 +59,17 @@ namespace libecs
     theFixed( false ),
     creationTimeInitialized(false)
   {
-  } 
-
+  }
 
   Variable::~Variable()
   {
     clearInterpolantVector();
   }
 
-
   void Variable::initialize()
   {
-    // Is this correct???  Should I be getting the time from a Stepper or something?
-    this->setCreationTime( getModel()->getCurrentTime() );
-
+    // Should this be here?  If something is initialized while running, nothing 
+    // should happen...
     clearInterpolantVector();
   }
 

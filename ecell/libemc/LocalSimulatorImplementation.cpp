@@ -143,7 +143,7 @@ namespace libemc
   {
     StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
 
-//     clearDirty();
+    clearDirty();
 
     return aStepperPtr->getProperty( aPropertyName );
   }

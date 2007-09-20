@@ -104,6 +104,11 @@ namespace libecs
 
     LIBECS_API LoggerPtr createLogger( FullPNCref aFullPN, PolymorphVectorCref aParamList );
 
+    bool getDirtyBit() const;
+    void clearDirtyBit();
+
+
+
     /**
        Flush the data in all the Loggers immediately.
 
@@ -146,6 +151,8 @@ namespace libecs
 
     LoggerMap     theLoggerMap;
     Model*        theModel;
+
+    bool dirtyBit;
 
   };
 

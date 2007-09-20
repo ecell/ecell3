@@ -116,22 +116,50 @@ namespace libecs
       return theRunningFlag;
     }
 
+    // MINE
+
+    bool getGlobalDirtyState() const
+    {
+      return (this->getDirtyBit() || this->getLoggerBroker().getDirtyBit() );
+    }
+
+    void clearGlobalDirtyState()
+    {
+      clearUninitialized();
+      clearDirtyBit();
+      getLoggerBroker().clearDirtyBit();
+      
+    }
+
     bool getDirtyBit() const
     {
       return this->theDirtyBit;
     }
+
+    void setDirtyBit()
+    {
+      theDirtyBit = true;
+    }
+
+    void clearDirtyBit()
+    {
+      theDirtyBit = false;
+    }
+
+    // ENDM
 
     void step()
     {
 
       if (!theRunningFlag)
         {
+          this->initialize();
           theRunningFlag = true;
         }
-
-      if ( getDirtyBit() )
+      
+      if ( this->getGlobalDirtyState() )
         {
-          THROW_EXCEPTION( SimulationError, "Objects uninitialized at step().");
+          this->initialize();
         }
       
       StepperEventCref aNextEvent( theScheduler.getTopEvent() );
@@ -320,8 +348,6 @@ namespace libecs
       uninitializedSystems.clear();
       uninitializedVariables.clear();
       uninitializedProcesses.clear();
-
-      theDirtyBit = false;
     }
 
     void recordUninitializedVariable( VariablePtr aVariablePtr );
@@ -376,6 +402,7 @@ namespace libecs
     SystemVector uninitializedSystems;
     VariableVector uninitializedVariables;
     ProcessVector uninitializedProcesses;
+    
 
   };
 

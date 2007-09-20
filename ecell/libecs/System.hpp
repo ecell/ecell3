@@ -35,6 +35,7 @@
 #include "libecs.hpp"
 
 #include "Entity.hpp"
+#include <iostream>
 
 namespace libecs
 {
@@ -86,6 +87,7 @@ namespace libecs
     void checkProcessesHaveSteppers();
     void configureStepper();
 
+    void printSystems() const;
 
     /**
        Get a pointer to a Stepper object that this System belongs.
@@ -306,6 +308,7 @@ namespace libecs
     VariableCptr  theSizeVariable;
 
     bool         theEntityListChanged;
+    bool sizeInitialized;
 
   };
 

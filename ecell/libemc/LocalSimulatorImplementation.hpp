@@ -234,13 +234,13 @@ namespace libemc
 
     void clearDirty() const
     {
+      // Going to put all the clean dirty stuff under the 
+      // control of the libecs layer.
       if( isDirty() )
-	{
-	  initialize();
-	  // interruptAll();
-	  
-	  theDirtyFlag = false;
-	}
+        {
+ 	  // initialize();
+ 	  theDirtyFlag = false;
+ 	}
     }
 
     void start()
@@ -251,7 +251,7 @@ namespace libemc
 
     void initialize()
     {
-      theModel.initialize();
+      // theModel.initialize();
     }
 
     void runWithEvent();
