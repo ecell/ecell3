@@ -234,11 +234,9 @@ namespace libemc
 
     void clearDirty() const
     {
-      // Going to put all the clean dirty stuff under the 
-      // control of the libecs layer.
       if( isDirty() )
         {
- 	  // initialize();
+ 	  initialize();
  	  theDirtyFlag = false;
  	}
     }
