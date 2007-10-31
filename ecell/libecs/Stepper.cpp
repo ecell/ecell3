@@ -240,8 +240,10 @@ namespace libecs
   void Stepper::createInterpolants()
   {
 
+    // ADDING...
+    variablesWithInterpolants.clear();
+
     // Should probably be optimized....
-    
     // create Interpolants.
     for( VariableVector::size_type c( 0 );  
 	 c != theReadOnlyVariableOffset; ++c )

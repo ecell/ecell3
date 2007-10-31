@@ -348,11 +348,11 @@ namespace libemc
   createLogger( libecs::StringCref aFullPNString, 
 		libecs::Polymorph aParamList )
   {
-    if( getModel().getRunningFlag() )
-      {
-	THROW_EXCEPTION( libecs::Exception, 
-			 "Cannot create a Logger while running." );
-      }
+//     if( getModel().getRunningFlag() )
+//       {
+// 	THROW_EXCEPTION( libecs::Exception, 
+// 			 "Cannot create a Logger while running." );
+//       }
 
     if ( aParamList.getType() != libecs::Polymorph::POLYMORPH_VECTOR )
       {

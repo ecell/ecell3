@@ -68,8 +68,6 @@ namespace libecs
 
   void Variable::initialize()
   {
-    // Should this be here?  If something is initialized while running, nothing 
-    // should happen...
     clearInterpolantVector();
   }
 

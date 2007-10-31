@@ -40,6 +40,7 @@
 
 #include "DiscreteEventStepper.hpp"
 
+#include "Debug.hpp"
 
 namespace libecs
 {
@@ -84,6 +85,7 @@ namespace libecs
 			 "must be defined in this Stepper." );
       }
 
+    // Is this right?
     const Real aCurrentTime( getCurrentTime() );
 
 
@@ -127,6 +129,7 @@ namespace libecs
 
   void DiscreteEventStepper::step()
   {
+
     theLastEventID = theScheduler.getTopID();
 
     // assert( getCurrentTime() == theScheduler.getTopEvent().getTime() )

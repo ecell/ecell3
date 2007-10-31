@@ -4,6 +4,7 @@ import sys
 import string
 import getopt
 import os
+import pdb
 
 import ecell.config as config
 import ecell.ecs

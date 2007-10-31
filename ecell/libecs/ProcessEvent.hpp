@@ -36,7 +36,8 @@
 #include "Process.hpp"
 
 #include "EventScheduler.hpp"
-
+#include "FullID.hpp"
+#include "Debug.hpp"
 
 namespace libecs
 {

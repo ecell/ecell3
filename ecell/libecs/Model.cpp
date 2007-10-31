@@ -43,6 +43,7 @@
 #include "SystemStepper.hpp"
 
 #include "Model.hpp"
+#include <iostream>
 
 namespace libecs
 {
@@ -189,7 +190,7 @@ namespace libecs
 
 
     FOR_ALL_SECOND( StepperMap, theStepperMap, 
-		    updateIntegratedVariableVector );
+                    updateIntegratedVariableVector );
 
     theScheduler.updateEventDependency();
     //    theScheduler.updateAllEvents( getCurrentTime() );
@@ -346,9 +347,10 @@ namespace libecs
   {
     if( aSystem->getStepper() == NULLPTR )
       {
-	THROW_EXCEPTION( InitializationFailed,
-			 "No stepper is connected with [" +
-			 aSystem->getFullID().getString() + "]." );
+        
+        THROW_EXCEPTION( InitializationFailed,
+                         "No stepper is connected with [" +
+                         aSystem->getFullID().getString() + "]." );
       }
 
     for( SystemMapConstIterator i( aSystem->getSystemMap().begin() ) ;
@@ -448,15 +450,50 @@ namespace libecs
 
   void Model::initialize()
   {
+    std::cout << "Model::initialize()" << std::endl;
 
     if ( getRunningFlag() )
       {
-        this->runningInitialize();
+        // Should this be kept?
+        for(SystemVector::iterator i = uninitializedSystems.begin();
+            i != uninitializedSystems.end();
+            ++i)
+          {
+            (*i)->configureStepper();
+          }
       }
 
-    else
+    SystemPtr aRootSystem( getRootSystem() );
+
+    checkRootSystemSizeVariable();
+    checkStepper( aRootSystem );
+    
+    initializeSystems( aRootSystem );
+
+
+    // initialization of Stepper needs four stages:
+    // (1) update current times of all the steppers, and integrate Variables.
+    // (2) call user-initialization methods of Processes.
+    // (3) call user-defined initialize() methods.
+    // (4) post-initialize() procedures:
+    //     - construct stepper dependency graph and
+    //     - fill theIntegratedVariableVector.
+    
+    FOR_ALL_SECOND( StepperMap, theStepperMap, initializeProcesses );
+    FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
+
+    theSystemStepper.initialize();
+
+
+    FOR_ALL_SECOND( StepperMap, theStepperMap, 
+                    updateIntegratedVariableVector );
+
+    theScheduler.updateEventDependency();
+    //    theScheduler.updateAllEvents( getCurrentTime() );
+
+    for( EventIndex c( 0 ); c != theScheduler.getSize(); ++c )
       {
-        this->staticInitialize();
+	theScheduler.getEvent(c).reschedule();
       }
 
     clearGlobalDirtyState();

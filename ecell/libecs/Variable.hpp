@@ -87,6 +87,7 @@ namespace libecs
 				&Variable::getMolarConc,
 				&Variable::loadMolarConc,
 				NOMETHOD );
+
 	//	PROPERTYSLOT_NO_LOAD_SAVE( Real, MolarConc,
 	//				   &Variable::setMolarConc,
 	//				   &Variable::getMolarConc );

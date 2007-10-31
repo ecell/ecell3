@@ -36,7 +36,9 @@
 #include <libecs/Stepper.hpp>
 #include <libecs/FullID.hpp>
 #include <libecs/MethodProxy.hpp>
-
+#include <iostream>
+using std::cout;
+using std::endl;
 
 USE_LIBECS;
 
@@ -153,6 +155,9 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
 
   DM_IF virtual void initialize()
   {
+
+    cout << "GillespieProcess " << getFullID().getID() << " is initializing..." << endl;
+
     Process::initialize();
     declareUnidirectional();
   
@@ -169,6 +174,9 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
 
   DM_IF virtual void fire()
   {
+
+    cout << "GillespieProcess " << getFullID().getID() << " is firing..." << endl;
+
     Real velocity( getk() * N_A );
     velocity *= getSuperSystem()->getSize();
 

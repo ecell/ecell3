@@ -32,7 +32,6 @@ import sys
 import os
 import time
 
-
 from numpy import *
 import ecell.ecs
 import ecell.emc
@@ -487,7 +486,6 @@ class Session:
                                         str( e ) )
 
     def __loadEntity( self, anEml, aSystemPath='/' ):
-
         aVariableList = anEml.getEntityList( 'Variable', aSystemPath )
         aProcessList   = anEml.getEntityList( 'Process',   aSystemPath )
         aSubSystemList = anEml.getEntityList( 'System',    aSystemPath )
