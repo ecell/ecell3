@@ -40,9 +40,6 @@ System System( / )
 					[ C0 :.:E 0 ];
 		KmS	1;
 		KcF	10;
-
-	}
-
-	
+	}	
 }
 

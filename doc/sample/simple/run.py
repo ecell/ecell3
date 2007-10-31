@@ -1,12 +1,13 @@
+import pdb
 
 # load the model
 loadModel( 'simple.eml' )
+
 
 # create stubs
 S_Logger = createLoggerStub( 'Variable:/:S:Value' )
 S_Logger.create()
 S = createEntityStub( 'Variable:/:S' )
-
 
 # print some values
 message( 't= \t%s' % getCurrentTime() )
