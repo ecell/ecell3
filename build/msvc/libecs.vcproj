@@ -466,6 +466,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ecell\libecs\PropertiedObjectMaker.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ecell\libecs\PropertyInterface.cpp"
 				>
 			</File>
@@ -649,6 +653,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ecell\libecs\PropertiedClass.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\libecs\PropertiedObjectMaker.hpp"
 				>
 			</File>
 			<File
