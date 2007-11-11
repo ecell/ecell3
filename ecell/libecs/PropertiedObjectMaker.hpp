@@ -49,8 +49,8 @@ namespace libecs
     public SharedModuleMaker<PropertiedClass>
   {
   public:
-    PropertiedObjectMaker();
-    virtual ~PropertiedObjectMaker();
+    LIBECS_API PropertiedObjectMaker();
+    LIBECS_API virtual ~PropertiedObjectMaker();
   };
 
 #define NewPropertiedObjectModule(CLASS) NewDynamicModule(PropertiedObject,CLASS)
