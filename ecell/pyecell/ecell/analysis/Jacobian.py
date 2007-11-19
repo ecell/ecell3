@@ -54,9 +54,9 @@ def getJacobianMatrix( pathwayProxy ):
 
     size = len( variableList )
 
-    aJacobianMatrix = numpy.zeros( ( size, size ), numpy.Float )
+    aJacobianMatrix = numpy.zeros( ( size, size ), float )
 
-    velocityBuffer = numpy.zeros( size, numpy.Float )
+    velocityBuffer = numpy.zeros( size, float )
 
     aSession = pathwayProxy.theEmlSupport.createSession()
     aSession.step()
@@ -94,12 +94,12 @@ def getJacobianMatrix2( pathwayProxy ):
 
     size = len( variableList )
 
-    aJacobianMatrix = numpy.zeros( ( size, size ), numpy.Float )
+    aJacobianMatrix = numpy.zeros( ( size, size ), float )
 
-    incidentMatrix = numpy.matrixmultiply( pathwayProxy.getIncidentMatrix(), numpy.transpose( pathwayProxy.getIncidentMatrix( 1 ) ) )
+    incidentMatrix = numpy.dot( pathwayProxy.getIncidentMatrix(), numpy.transpose( pathwayProxy.getIncidentMatrix( 1 ) ) )
     independentGroupList = createIndependentGroupList( incidentMatrix )
 
-    velocityBuffer = numpy.zeros( size, numpy.Float )
+    velocityBuffer = numpy.zeros( size, float )
 
     aSession = pathwayProxy.theEmlSupport.createSession()
 
@@ -151,6 +151,9 @@ if __name__ == '__main__':
         print getJacobianMatrix( pathwayProxy )
         print 'Jacobian matrix ='
         print getJacobianMatrix2( pathwayProxy )
+
+        # import numpy.linalg
+        # print numpy.linalg.inv( getJacobianMatrix( pathwayProxy ) )
 
     # end of main
     

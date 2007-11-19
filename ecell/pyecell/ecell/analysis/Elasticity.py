@@ -59,7 +59,7 @@ def getElasticityArray( pathwayProxy, fullPN ):
     size = len( processList )
     
     # first step
-    elasticityArray = numpy.zeros( size, numpy.Float )
+    elasticityArray = numpy.zeros( size, float )
     
     aSession = pathwayProxy.theEmlSupport.createSession()
     aSession.step()
@@ -95,7 +95,7 @@ def getAcculateElasticityArray( pathwayProxy, fullPN ):
     processList = pathwayProxy.getProcessList()
     size = len( processList )
 
-    elasticityArray = numpy.zeros( size, numpy.Float )
+    elasticityArray = numpy.zeros( size, float )
     
     # first step
     aSession = pathwayProxy.theEmlSupport.createSession()
@@ -171,7 +171,7 @@ def convertToScaled( pathwayProxy, fullPN, elasticityArray ):
 
     processList = pathwayProxy.getProcessList()
     size = len( elasticityArray )
-    scaledElasticityArray = numpy.zeros( size, numpy.Float )
+    scaledElasticityArray = numpy.zeros( size, float )
 
     aSession = pathwayProxy.theEmlSupport.createSession()
     try:
@@ -248,7 +248,7 @@ def getElasticityMatrix( pathwayProxy, fullPNList ):
     
     processList = pathwayProxy.getProcessList()
 
-    elasticityMatrix = numpy.zeros( ( len( fullPNList ), len( processList ) ), numpy.Float )
+    elasticityMatrix = numpy.zeros( ( len( fullPNList ), len( processList ) ), float )
 
     for i in range( len( fullPNList ) ):
         elasticityArray = getElasticity( pathwayProxy, fullPNList[ i ] )
@@ -287,7 +287,7 @@ def getScaledElasticityMatrix( pathwayProxy, fullPNList ):
 
     processList = pathwayProxy.getProcessList()
 
-    scaledElasticityMatrix = numpy.zeros( ( len( fullPNList ), len( processList ) ), numpy.Float )
+    scaledElasticityMatrix = numpy.zeros( ( len( fullPNList ), len( processList ) ), float )
 
     for i in range( len( fullPNList ) ):
         scaledElasticityArray = getScaledElasticity( pathwayProxy, fullPNList[ i ] )
@@ -308,12 +308,12 @@ def getEpsilonElasticityMatrix2( pathwayProxy ):
     variableList = pathwayProxy.getVariableList()
     processList = pathwayProxy.getProcessList()
 
-    elasticityMatrix = numpy.zeros( ( len( variableList ), len( processList ) ), numpy.Float )
+    elasticityMatrix = numpy.zeros( ( len( variableList ), len( processList ) ), float )
 
     incidentMatrix = pathwayProxy.getIncidentMatrix()
     independentGroupList = createIndependentGroupList( incidentMatrix )
     
-    activityBuffer = numpy.zeros( len( processList ), numpy.Float )
+    activityBuffer = numpy.zeros( len( processList ), float )
 
     aSession = pathwayProxy.theEmlSupport.createSession()
 

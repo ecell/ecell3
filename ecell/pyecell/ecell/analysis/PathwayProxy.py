@@ -331,7 +331,7 @@ class PathwayProxy:
         return stoichiometryMatrix
         '''
 
-        stoichiometryMatrix = numpy.zeros( ( len( self.__variableList ), len( self.__processList ) ), numpy.Float )
+        stoichiometryMatrix = numpy.zeros( ( len( self.__variableList ), len( self.__processList ) ), float )
 
         for j in range( len( self.__processList ) ):
 
@@ -376,8 +376,9 @@ class PathwayProxy:
             propertyList = ecell.eml.Eml.getEntityPropertyList( self.theEmlSupport, processFullID )
 
             if propertyList.count( 'isReversible' ) != 0:
-                isReversible = string.atoi( ecell.Eml.getEntityProperty( self.theEmlSupport, processFullID + ':isReversible' )[ 0 ] )
-                reversibilityList.append( isReversible )
+                # isReversible is handled as float
+                isReversible = string.atof( ecell.Eml.getEntityProperty( self.theEmlSupport, processFullID + ':isReversible' )[ 0 ] )
+                reversibilityList.append( int( isReversible ) )
                 
             else:
                 # default value, irreversible

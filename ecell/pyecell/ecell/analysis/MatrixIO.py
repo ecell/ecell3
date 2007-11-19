@@ -74,7 +74,7 @@ def writeArrayWithMathematicaFormat( data, fout=sys.stdout ):
 
     for c in range( size ):
         value = data[ c ]
-        if type( value ) == numpy.ArrayType:
+        if type( value ) == numpy.ndarray:
             writeArrayWithMathematicaFormat( value, fout )
         elif type( value ) == int or type( value ) == float:
             fout.write( '%.8e' % value )
