@@ -67,7 +67,7 @@ public:
 
   const char* what() const throw()
   { 
-    return ( "DMException: " + theMessage ).c_str();
+    return theMessage.c_str();
   }
 
 private:
