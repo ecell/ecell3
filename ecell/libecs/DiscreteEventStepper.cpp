@@ -40,8 +40,6 @@
 
 #include "DiscreteEventStepper.hpp"
 
-#include "Debug.hpp"
-
 namespace libecs
 {
 
