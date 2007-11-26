@@ -31,6 +31,7 @@ import eml
 import sys
 import os
 import time
+import pdb
 
 from numpy import *
 import ecell.ecs

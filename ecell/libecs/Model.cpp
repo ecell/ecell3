@@ -43,7 +43,7 @@
 #include "SystemStepper.hpp"
 
 #include "Model.hpp"
-#include <iostream>
+
 
 namespace libecs
 {
@@ -450,8 +450,6 @@ namespace libecs
 
   void Model::initialize()
   {
-    std::cout << "Model::initialize()" << std::endl;
-
     if ( getRunningFlag() )
       {
         // Should this be kept?
