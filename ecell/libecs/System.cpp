@@ -305,6 +305,38 @@ namespace libecs
     notifyChangeOfEntityList();
   }
 
+  void System::removeSystem( SystemPtr aSystem )
+  {
+    uint systemSize =
+      aSystem->getProcessMap().size() + 
+      aSystem->getSystemMap().size() + 
+      aSystem->getVariableMap().size();
+    
+    if (systemSize)
+      {
+        THROW_EXCEPTION( AssertionFailed,
+                         "[" + getFullID().getString() + 
+			 "]: System [" + aSystem->getID() + "] is not empty." );
+      }
+
+    const String anID( aSystem->getID() );
+
+    // Find it and remove it...
+    SystemMap::iterator i = theSystemMap.find( anID );
+
+    if (i == theSystemMap.end() )
+      {
+        THROW_EXCEPTION( NotFound, 
+                         "[" + getFullID().getString() +
+                         "]: System [" + anID + "] does not exist.");
+      }
+
+    theSystemMap.erase(i);
+    delete aSystem;
+
+    getModel()->setDirtyBit();
+  }
+
   SystemPtr System::getSystem( SystemPathCref aSystemPath ) const
   {
     if( aSystemPath.empty() )
@@ -389,7 +421,7 @@ namespace libecs
 	delete aProcess;
 
 	THROW_EXCEPTION( AlreadyExist, 
-			 "[" + getFullID().getString() + 
+	 		 "[" + getFullID().getString() + 
 			 "]: Process [" + anID + "] already exists." );
       }
 
@@ -399,6 +431,27 @@ namespace libecs
     notifyChangeOfEntityList();
   }
 
+  void System::removeProcess( ProcessPtr aProcess)
+  {
+    // Remove it from the Stepper.
+    aProcess->getStepper()->removeProcess( aProcess );
+
+
+    // Remove it from the System.
+    const String anID( aProcess->getID() );
+    ProcessMap::iterator i = theProcessMap.find( anID );
+    
+    if (i == theProcessMap.end() )
+      {
+        THROW_EXCEPTION( NotFound, 
+                         "[" + getFullID().getString() +
+                         "]: Process [" + anID + "] does not exist.");
+      }
+    
+    theProcessMap.erase(i);
+    //    delete aProcess;
+    getModel()->setDirtyBit();
+  }
 
   void System::registerVariable( VariablePtr aVariable )
   {
@@ -420,6 +473,47 @@ namespace libecs
   }
 
 
+  void System::removeVariable( VariablePtr aVariable)
+  {
+    const String anID( aVariable->getID() );
+    VariableMap::iterator i = theVariableMap.find( anID );
+
+    if (i == theVariableMap.end() )
+      {
+        THROW_EXCEPTION( NotFound, 
+                         "[" + getFullID().getString() +
+                         "]: Variable [" + anID + "] does not exist.");
+      }
+    
+    theVariableMap.erase( i );
+
+    delete aVariable;
+    getModel()->setDirtyBit();
+  }
+
+  void System::removeContents()
+  {
+    for( SystemMapIterator i = theSystemMap.begin();
+         i != theSystemMap.end();
+         ++i)
+      {
+        getModel()->removeEntity( i->first );
+      }
+    
+    for (ProcessMapIterator i = theProcessMap.begin();
+         i != theProcessMap.end();
+         ++i)
+      {
+        removeProcess( i->second );
+      }
+    
+    for (VariableMapIterator i = theVariableMap.begin();
+         i != theVariableMap.end();
+         ++i)
+      {
+        removeVariable( i->second );
+      }
+  }
 
 } // namespace libecs
 

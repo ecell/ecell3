@@ -84,7 +84,7 @@ namespace libecs
 
   void Stepper::initialize()
   {
-
+    updateProcessVector();
     updateVariableVector();
 
     theValueBuffer.resize( theVariableVector.size() );

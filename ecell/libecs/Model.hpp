@@ -150,10 +150,9 @@ namespace libecs
 
     void step()
     {
-
       if (!theRunningFlag)
         {
-          this->initialize();
+          // this->initialize();
           theRunningFlag = true;
         }
       
@@ -219,6 +218,14 @@ namespace libecs
 
     LIBECS_API void createEntity( StringCref aClassname, FullIDCref aFullID );
 
+    /** 
+        This method removes the Entity object pointed to by the FullID.
+        
+        @param aFullID FullID of the Entity to be deleted.
+    **/
+
+    LIBECS_API void removeEntity( FullIDCref aFullID );
+	
     /**
        This method finds an Entity object pointed by the FullID.
 
@@ -272,8 +279,6 @@ namespace libecs
     {
       return theStepperMap;
     }
-
-
 
 
     /**
@@ -342,6 +347,8 @@ namespace libecs
 
   private:
 
+    void recordProcessesDependentOnVariable( SystemPtr aSystem, VariablePtr aVariable, std::vector<FullID>& refVector);
+
     void clearUninitialized()
     {
       uninitializedSteppers.clear();
@@ -354,11 +361,12 @@ namespace libecs
     void recordUninitializedSystem( SystemPtr aSystemPtr );
     void recordUninitializedProcess( ProcessPtr aProcessPtr );
     void recordUninitializedStepper( StepperPtr aStepperPtr );
-
-    void staticInitialize();
-    void runningInitialize();
     
-    void constructEntity( StringCref aClassname, FullIDCref aFullID );
+    void removeVariable( FullIDCref aFullID );
+    void removeProcess( FullIDCref aFullID );
+    void removeSystem( FullIDCref aFullID );
+
+    //    void constructEntity( StringCref aClassname, FullIDCref aFullID );
 
     /**
        This method checks recursively if all systems have Steppers

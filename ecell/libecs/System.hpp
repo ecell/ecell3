@@ -211,6 +211,7 @@ namespace libecs
 
     SystemPtr getSystem( StringCref id ) const;
 
+    void removeContents();
 
     /**
        Register a Process object in this System.
@@ -222,6 +223,8 @@ namespace libecs
     void registerProcess( ProcessPtr aProcess );
   
 
+    void removeProcess( ProcessPtr aProcess);
+
     /**
        Register a Variable object in this System.
 
@@ -231,6 +234,7 @@ namespace libecs
 
     void registerVariable( VariablePtr aVariable );
   
+    void removeVariable( VariablePtr aVariable );
 
     /**
        Register a System object in this System.
@@ -240,6 +244,8 @@ namespace libecs
     */
 
     void registerSystem( SystemPtr aSystem );
+
+    void removeSystem( SystemPtr aSystem );
 
     /**
        Check if this is a root System.

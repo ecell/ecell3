@@ -130,78 +130,27 @@ namespace libecs
 
   void Model::recordUninitializedStepper( StepperPtr aStepperPtr )
   {
-    theDirtyBit = true;
-    // Duplication is checked when the object is originally created, therefore
-    // we know this cannot be found in the uninitializedVector.
-
+    setDirtyBit();
     uninitializedSteppers.push_back( aStepperPtr );
   }
 
   void Model::recordUninitializedVariable( VariablePtr aVariablePtr )
   {
-    theDirtyBit = true;
-    // Duplication is checked when the object is originally created, therefore
-    // we know this cannot be found in the uninitializedVector.
-
+    setDirtyBit();
     uninitializedVariables.push_back( aVariablePtr );
   }
 
   void Model::recordUninitializedSystem( SystemPtr aSystemPtr )
   {
-    theDirtyBit = true;
-    // Duplication is checked when the object is originally created, therefore
-    // we know this cannot be found in the uninitializedVector.
-
+    setDirtyBit();
     uninitializedSystems.push_back( aSystemPtr );
   }
 
   void Model::recordUninitializedProcess( ProcessPtr aProcessPtr )
   {
-    theDirtyBit = true;
-    // Duplication is checked when the object is originally created, therefore
-    // we know this cannot be found in the uninitializedVector.
-
+    setDirtyBit();
     uninitializedProcesses.push_back( aProcessPtr );
   }
-
-  void Model::staticInitialize()
-  {
-    SystemPtr aRootSystem( getRootSystem() );
-
-    checkRootSystemSizeVariable();
-    checkStepper( aRootSystem );
-    
-    initializeSystems( aRootSystem );
-
-
-    // initialization of Stepper needs four stages:
-    // (1) update current times of all the steppers, and integrate Variables.
-    // (2) call user-initialization methods of Processes.
-    // (3) call user-defined initialize() methods.
-    // (4) post-initialize() procedures:
-    //     - construct stepper dependency graph and
-    //     - fill theIntegratedVariableVector.
-
-    
-    FOR_ALL_SECOND( StepperMap, theStepperMap, initializeProcesses );
-    FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
-
-    theSystemStepper.initialize();
-
-
-    FOR_ALL_SECOND( StepperMap, theStepperMap, 
-                    updateIntegratedVariableVector );
-
-    theScheduler.updateEventDependency();
-    //    theScheduler.updateAllEvents( getCurrentTime() );
-
-    for( EventIndex c( 0 ); c != theScheduler.getSize(); ++c )
-      {
-	theScheduler.getEvent(c).reschedule();
-      }
-
-  }
-  
 
   void Model::createEntity( StringCref aClassname,
 			    FullIDCref aFullID )
@@ -252,6 +201,121 @@ namespace libecs
       }
 
     return;
+  }
+
+  void Model::removeEntity( FullIDCref aFullID)
+  {
+    
+    switch( aFullID.getEntityType() )
+      {
+      case EntityType::VARIABLE:
+        removeVariable( aFullID );
+        break;
+
+      case EntityType::PROCESS:
+        removeProcess( aFullID );
+        break;
+
+      case EntityType::SYSTEM:
+        removeSystem( aFullID );
+        break;
+
+      default:
+        THROW_EXCEPTION( InvalidEntityType,
+			 "bad EntityType specified." );
+      }
+    return;
+  }
+
+  void Model::removeVariable( FullIDCref aFullID)
+  {
+    // For any process that has this Variable in it's Variable reference list
+    //     Remove it.
+    // Remove the variable from the system.
+    
+    SystemPtr aSystem ( getSystem( aFullID.getSystemPath() ) );
+    VariablePtr aVariable ( aSystem->getVariable( aFullID.getID() ) );
+    
+    
+    std::vector<FullID> markedProcesses;
+
+    SystemPtr rootSystemPtr = getRootSystem();
+
+    recordProcessesDependentOnVariable( rootSystemPtr, aVariable, markedProcesses);
+
+    for(std::vector<FullID>::iterator i = markedProcesses.begin();
+        i != markedProcesses.end();
+        ++i)
+      {
+        removeProcess( *i );
+      }
+    
+    // Now we can remove the variable itself.
+    
+    aSystem->removeVariable( aVariable );
+    
+    initialize();
+  }
+  
+  void Model::recordProcessesDependentOnVariable( SystemPtr aSystem, VariablePtr aVariable, std::vector<FullID>& refVector)
+  {
+    for (ProcessMapConstIterator i = aSystem->getProcessMap().begin();
+         i != aSystem->getProcessMap().end();
+         ++i)
+      {
+        for( VariableReferenceVectorConstIterator j = i->second->getVariableReferenceVector().begin();
+             j != i->second->getVariableReferenceVector().end();
+             ++j)
+          {
+            if (j->getVariable() == aVariable)
+              {
+                refVector.push_back( i->second->getFullID() );
+                break;
+              }
+          }
+        
+      }
+
+    for( SystemMapConstIterator i( aSystem->getSystemMap().begin() );
+	 i != aSystem->getSystemMap().end() ; ++i )
+      {
+        // Check things recursively.
+	recordProcessesDependentOnVariable( i->second, aVariable, refVector);
+      }
+  }
+  
+
+  void Model::removeProcess( FullIDCref aFullID )
+  {
+    // Remove the Process from the system and from the stepper.
+    // Delete it.  
+    // Reinitialize (set the dirty bit).
+
+    SystemPtr aSystem ( getSystem( aFullID.getSystemPath() ) );
+    ProcessPtr aProcess ( aSystem->getProcess( aFullID.getID() ) );
+
+    aSystem->removeProcess( aProcess );
+
+    initialize();
+  }
+
+  void Model::removeSystem( FullIDCref aFullID )
+  {
+    // For each subsystem, call removeSystem on that, first.
+
+    SystemPtr parentSystem ( getSystem( aFullID.getSystemPath() ) );
+    SystemPtr aSystem ( parentSystem->getSystem( aFullID.getID() ) );
+
+    aSystem->removeContents();
+    
+    // Now the system has nothing at all within it.  Time to remove....
+    
+    aSystem->getStepper()->removeSystem( aSystem );
+    
+    parentSystem->removeSystem( aSystem );
+    
+    initialize();
+    
   }
 
   SystemPtr Model::getSystem( SystemPathCref aSystemPath ) const
@@ -396,60 +460,10 @@ namespace libecs
       }
   }
 
-  void Model::runningInitialize()
-  {
-    // Everything has been created at this point.  We may also assume that all property values that have 
-    for(SystemVector::iterator i = uninitializedSystems.begin();
-        i != uninitializedSystems.end();
-        ++i)
-      {
-        // This ensures that a stepper has been set (if one has not, the system
-        // is given to it's supersystem's stepper).  It is the 'dynamic' analogue 
-        // to 'chaeckStepper'
-        (*i)->configureStepper();
-        (*i)->initialize();
-      }
-
-    for(VariableVector::iterator i = uninitializedVariables.begin();
-        i != uninitializedVariables.end();
-        ++i)
-      {
-        // Although Variable::initialize isn't idempotent, it is idempotent on new
-        // variables...
-        (*i)->initialize();
-      }
-
-    for(ProcessVector::iterator i = uninitializedProcesses.begin();
-        i != uninitializedProcesses.end();
-        ++i)
-      {
-        if ( (*i)->getStepper() == NULLPTR )
-          {
-            (*i)->setStepper( (*i)->getSuperSystem()->getStepper() );
-          }
-
-        (*i)->initialize();
-      }
-
-    {
-
-      FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
-      FOR_ALL_SECOND( StepperMap, theStepperMap, 
-                      updateIntegratedVariableVector );
-
-      theScheduler.updateEventDependency();
-      for( EventIndex c( 0 ); c != theScheduler.getSize(); ++c )
-        {
-          theScheduler.getEvent(c).reschedule();
-        }
-    }
-    
-
-    return;
-  }
-
   void Model::initialize()
   {
+
+    // This is added
     if ( getRunningFlag() )
       {
         // Should this be kept?
@@ -494,6 +508,7 @@ namespace libecs
 	theScheduler.getEvent(c).reschedule();
       }
 
+    // This is added...
     clearGlobalDirtyState();
 
     return;

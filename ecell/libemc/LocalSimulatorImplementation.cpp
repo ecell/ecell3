@@ -201,10 +201,7 @@ namespace libemc
 
   void LocalSimulatorImplementation::deleteEntity( StringCref aFullIDString )
   {
-    THROW_EXCEPTION( libecs::NotImplemented,
-		     "deleteEntity() method is not supported yet." );
-
-    setDirty();
+    getModel().removeEntity( FullID( aFullIDString) );
   }
 
   const libecs::Polymorph LocalSimulatorImplementation::

@@ -83,7 +83,7 @@ namespace libecs
   LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,   PolymorphVectorCref aParamList ) 
   {
     
-    this->dirtyBit = true;
+    dirtyBit = true;
 
     if( theLoggerMap.find( aFullPN ) != theLoggerMap.end() )
       {
