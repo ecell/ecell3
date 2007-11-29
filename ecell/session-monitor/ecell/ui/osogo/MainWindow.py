@@ -831,12 +831,11 @@ class MainWindow( OsogoWindow ):
         if step measure is step than Session.step ()
         """
         if self.getStepType():
-            print "!"
             self.theSession.run( self.getStepSize() )
         else:
             self.theSession.step( self.getStepSize() )
 
-    def doSetStepSizeOrSec( self ):
+    def doInputStepSizeOrSec( self ):
         # gets the inputerd characters from the GtkEntry. 
         aNewValue = string.strip( self['sec_step_entry'].get_text() )
         hasErrorOccurred = False

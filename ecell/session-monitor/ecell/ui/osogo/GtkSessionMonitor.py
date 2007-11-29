@@ -367,10 +367,9 @@ class GtkSessionFacade:
         print aMessage
         self.fireEvent( 'message', content = aMessage )
 
-    def fireEvent( self, type, **options ):
+    def fireEvent( self, aType, **options ):
         def broadcaster():
-            # print type
-            event = GtkSessionEvent( type, options )
+            event = GtkSessionEvent( aType, options )
             if event.type in ( 'simulation_updated', 'simulation_started', \
                                'simulation_stopped' ):
                 self.theDataGenerator.update()
@@ -504,6 +503,9 @@ class GtkSessionFacade:
                 self.fireEvent( 'simulation_started' )
                 if time:
                     self.theSession.run( time )
+                    self.fireEvent( 'simulation_updated' )
+                    self.theRunningFlag = False
+                    self.message( "%15s:Stop" % self.getCurrentTime() )
                 else:
                     aCounter = 0
                     while self.theRunningFlag:
@@ -512,6 +514,7 @@ class GtkSessionFacade:
                         if ( aCounter > self.theUpdateInterval ):
                             self.fireEvent( 'simulation_updated' )
                             aCounter = 0
+
                 self.fireEvent( 'simulation_stopped' )
 
             thread.start_new_thread( thread_proc, () )
