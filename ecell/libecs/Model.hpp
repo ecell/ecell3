@@ -324,7 +324,7 @@ namespace libecs
 
     StepperMap          theStepperMap;
 
-    PropertiedObjectMaker thePropertiedObjectMaker;
+    PropertiedObjectMaker& thePropertiedObjectMaker;
     StepperMaker          theStepperMaker;
     SystemMaker           theSystemMaker;
     VariableMaker         theVariableMaker;
