@@ -63,6 +63,7 @@ namespace libecs
   DECLARE_ASSOCVECTOR( String, StepperPtr, std::less< const String >,
 		       StepperMap ); 
 
+  DECLARE_VECTOR( FullID, FullIDVector );
 
   /**
      Model class represents a simulation model.
@@ -152,7 +153,6 @@ namespace libecs
     {
       if (!theRunningFlag)
         {
-          // this->initialize();
           theRunningFlag = true;
         }
       
@@ -166,6 +166,9 @@ namespace libecs
       theLastStepper = aNextEvent.getStepper();
 
       theScheduler.step();
+
+      this->eliminateAllFlagged();
+
     }
 
 
@@ -225,7 +228,8 @@ namespace libecs
     **/
 
     LIBECS_API void removeEntity( FullIDCref aFullID );
-	
+
+
     /**
        This method finds an Entity object pointed by the FullID.
 
@@ -244,7 +248,7 @@ namespace libecs
     */
 
 
-    LIBECS_API SystemPtr getSystem( SystemPathCref aSystemPath ) const;;
+    LIBECS_API SystemPtr getSystem( SystemPathCref aSystemPath ) const;
 
 
     /**
@@ -347,7 +351,9 @@ namespace libecs
 
   private:
 
-    void recordProcessesDependentOnVariable( SystemPtr aSystem, VariablePtr aVariable, std::vector<FullID>& refVector);
+    void recordProcessesDependentOnVariable( SystemPtr aSystem, FullID aVariable, FullIDVector& refVector);
+
+    void eliminateAllFlagged();
 
     void clearUninitialized()
     {
@@ -410,6 +416,10 @@ namespace libecs
     SystemVector uninitializedSystems;
     VariableVector uninitializedVariables;
     ProcessVector uninitializedProcesses;
+
+    FullIDVector flaggedVariables;
+    FullIDVector flaggedProcesses;
+    FullIDVector flaggedSystems;
     
 
   };

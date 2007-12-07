@@ -19,7 +19,7 @@ System System( / )
 
 	Variable Variable( S )
 	{
-		Value	1000000;
+		MolarConc 1.0;
 	}
 	
 	Variable Variable( P )

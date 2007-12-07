@@ -205,117 +205,188 @@ namespace libecs
 
   void Model::removeEntity( FullIDCref aFullID)
   {
-    
-    switch( aFullID.getEntityType() )
+
+    // Put the entity in a list of things to be deleted....
+    switch (aFullID.getEntityType() )
       {
       case EntityType::VARIABLE:
-        removeVariable( aFullID );
-        break;
+        // Check to make sure it isn't found..
+        if ( std::find( flaggedVariables.begin(),
+                        flaggedVariables.end(),
+                        aFullID ) == flaggedVariables.end() )
+          {
+            flaggedVariables.push_back( aFullID );
 
+            // Find all the dependant processes by scanning through all the systems.
+
+            FullIDVector dependantProcesses;
+            SystemPtr rootSystemPtr = getRootSystem();
+            recordProcessesDependentOnVariable( rootSystemPtr, aFullID, dependantProcesses);
+            
+            for(FullIDVectorIterator i = dependantProcesses.begin();
+                i != dependantProcesses.end();
+                ++i)
+              {
+                removeEntity( *i );
+              }
+          }
+
+        break;
+        
       case EntityType::PROCESS:
-        removeProcess( aFullID );
+        if (std::find( flaggedProcesses.begin(),
+                       flaggedProcesses.end(),
+                       aFullID ) == flaggedProcesses.end() )
+          {
+            flaggedProcesses.push_back( aFullID );
+          }
         break;
 
       case EntityType::SYSTEM:
-        removeSystem( aFullID );
+        if (std::find( flaggedSystems.begin(),
+                       flaggedSystems.end(),
+                       aFullID ) == flaggedSystems.end() )
+          {
+            
+            // Get a pointer to the system.
+            // Call remove contents.  
+
+            SystemPtr parentSystem = getSystem( aFullID.getSystemPath() );
+            SystemPtr aSystem = parentSystem->getSystem( aFullID.getID() );
+            aSystem->removeContents();
+
+            flaggedSystems.push_back( aFullID );
+          }
         break;
 
       default:
-        THROW_EXCEPTION( InvalidEntityType,
+       THROW_EXCEPTION( InvalidEntityType,
 			 "bad EntityType specified." );
-      }
-    return;
+      } 
   }
 
-  void Model::removeVariable( FullIDCref aFullID)
+
+  void Model::eliminateAllFlagged()
   {
-    // For any process that has this Variable in it's Variable reference list
-    //     Remove it.
-    // Remove the variable from the system.
-    
-    SystemPtr aSystem ( getSystem( aFullID.getSystemPath() ) );
-    VariablePtr aVariable ( aSystem->getVariable( aFullID.getID() ) );
-    
-    
-    std::vector<FullID> markedProcesses;
+    // Iterate over flagged Processes, calling 
+    // removeProcess( aFullID );
 
-    SystemPtr rootSystemPtr = getRootSystem();
-
-    recordProcessesDependentOnVariable( rootSystemPtr, aVariable, markedProcesses);
-
-    for(std::vector<FullID>::iterator i = markedProcesses.begin();
-        i != markedProcesses.end();
+    for(FullIDVector::iterator i = flaggedProcesses.begin();
+        i != flaggedProcesses.end();
         ++i)
       {
-        removeProcess( *i );
+        this->removeProcess( *i );
+
+      }
+
+    // Iterate over flagged Variables, removing them one by one.
+    // remove Variable.
+
+    for(FullIDVector::iterator i = flaggedVariables.begin();
+        i != flaggedVariables.end();
+        ++i)
+      {
+        this->removeVariable( *i );
+      }
+
+    // Iterate over systems, removing them one by one.
+    // removeSystem( aFullID );
+
+    for(FullIDVector::iterator i = flaggedSystems.begin();
+        i != flaggedSystems.end();
+        ++i)
+      {
+        this->removeSystem( *i );
       }
     
-    // Now we can remove the variable itself.
-    
-    aSystem->removeVariable( aVariable );
-    
-    initialize();
+    flaggedProcesses.clear();
+    flaggedVariables.clear();
+    flaggedSystems.clear();
   }
-  
-  void Model::recordProcessesDependentOnVariable( SystemPtr aSystem, VariablePtr aVariable, std::vector<FullID>& refVector)
+    
+
+  void Model::recordProcessesDependentOnVariable( SystemPtr aSystem, FullID aVariableID, FullIDVector& refDependantProcessesVector)
   {
-    for (ProcessMapConstIterator i = aSystem->getProcessMap().begin();
-         i != aSystem->getProcessMap().end();
-         ++i)
+    for (ProcessMapConstIterator processMapIter = aSystem->getProcessMap().begin();
+         processMapIter != aSystem->getProcessMap().end();
+         ++processMapIter)
       {
-        for( VariableReferenceVectorConstIterator j = i->second->getVariableReferenceVector().begin();
-             j != i->second->getVariableReferenceVector().end();
-             ++j)
+        FullID currentProcessFullID = processMapIter->second->getFullID();
+        ProcessPtr currentProcessPtr = processMapIter->second;
+
+        for( VariableReferenceVectorConstIterator variableReferenceIter = currentProcessPtr->getVariableReferenceVector().begin();
+             variableReferenceIter != currentProcessPtr->getVariableReferenceVector().end();
+             ++variableReferenceIter)
           {
-            if (j->getVariable() == aVariable)
+            if (variableReferenceIter->getVariable()->getFullID() == aVariableID )
               {
-                refVector.push_back( i->second->getFullID() );
+                refDependantProcessesVector.push_back( currentProcessFullID );
                 break;
               }
           }
         
       }
 
-    for( SystemMapConstIterator i( aSystem->getSystemMap().begin() );
-	 i != aSystem->getSystemMap().end() ; ++i )
+    for( SystemMapConstIterator i = aSystem->getSystemMap().begin() ;
+	 i != aSystem->getSystemMap().end() ; 
+         ++i )
       {
         // Check things recursively.
-	recordProcessesDependentOnVariable( i->second, aVariable, refVector);
+	recordProcessesDependentOnVariable( i->second, aVariableID, refDependantProcessesVector);
       }
   }
-  
 
+
+  void Model::removeVariable( FullIDCref aFullID)
+  {
+    // We are now *assuming* that nothing that depends on this system
+    // exists in the model.  We should assert this somehow....
+
+    SystemPtr aSystem ( getSystem( aFullID.getSystemPath() ) );
+    VariablePtr aVariable ( aSystem->getVariable( aFullID.getID() ) );
+
+    aSystem->deleteVariable( aVariable );
+    initialize();
+  }
+  
   void Model::removeProcess( FullIDCref aFullID )
   {
-    // Remove the Process from the system and from the stepper.
-    // Delete it.  
-    // Reinitialize (set the dirty bit).
+    // We are now *assuming* that nothing that depends on this process
+    // exists in the model.  We should assert this somehow....
 
     SystemPtr aSystem ( getSystem( aFullID.getSystemPath() ) );
     ProcessPtr aProcess ( aSystem->getProcess( aFullID.getID() ) );
 
-    aSystem->removeProcess( aProcess );
+    // This apparently does not have to be done here, as deleting the pointer
+    // (which is done in aSystem->deleteProcess) appears to remove the process 
+    // from it's stepper.
+    // 
+    // Remove the Process from the Stepper. 
+    // aProcess->getStepper()->removeProcess( aProcess );
 
+    // Remove the Process from the system.
+    aSystem->deleteProcess( aProcess );
+    
+    // Reinitialize.
     initialize();
   }
 
   void Model::removeSystem( FullIDCref aFullID )
   {
-    // For each subsystem, call removeSystem on that, first.
+    // We are now *assuming* that nothing that depends on this system
+    // exists in the model.  We should assert this somehow....
 
     SystemPtr parentSystem ( getSystem( aFullID.getSystemPath() ) );
     SystemPtr aSystem ( parentSystem->getSystem( aFullID.getID() ) );
 
-    aSystem->removeContents();
+    // This is unnecessary I think.
+    // Remove the system from it's stepper.
+    // aSystem->getStepper()->removeSystem( aSystem );
     
-    // Now the system has nothing at all within it.  Time to remove....
-    
-    aSystem->getStepper()->removeSystem( aSystem );
-    
-    parentSystem->removeSystem( aSystem );
+    // Delete the system.
+    parentSystem->deleteSystem( aSystem );
     
     initialize();
-    
   }
 
   SystemPtr Model::getSystem( SystemPathCref aSystemPath ) const

@@ -305,8 +305,10 @@ namespace libecs
     notifyChangeOfEntityList();
   }
 
-  void System::removeSystem( SystemPtr aSystem )
+  void System::deleteSystem( SystemPtr aSystem )
   {
+
+    // Assert the system is empty.
     uint systemSize =
       aSystem->getProcessMap().size() + 
       aSystem->getSystemMap().size() + 
@@ -318,6 +320,7 @@ namespace libecs
                          "[" + getFullID().getString() + 
 			 "]: System [" + aSystem->getID() + "] is not empty." );
       }
+
 
     const String anID( aSystem->getID() );
 
@@ -431,12 +434,8 @@ namespace libecs
     notifyChangeOfEntityList();
   }
 
-  void System::removeProcess( ProcessPtr aProcess)
+  void System::deleteProcess( ProcessPtr aProcess)
   {
-    // Remove it from the Stepper.
-    aProcess->getStepper()->removeProcess( aProcess );
-
-
     // Remove it from the System.
     const String anID( aProcess->getID() );
     ProcessMap::iterator i = theProcessMap.find( anID );
@@ -448,8 +447,9 @@ namespace libecs
                          "]: Process [" + anID + "] does not exist.");
       }
     
+    delete i->second;
     theProcessMap.erase(i);
-    //    delete aProcess;
+
     getModel()->setDirtyBit();
   }
 
@@ -473,7 +473,7 @@ namespace libecs
   }
 
 
-  void System::removeVariable( VariablePtr aVariable)
+  void System::deleteVariable( VariablePtr aVariable)
   {
     const String anID( aVariable->getID() );
     VariableMap::iterator i = theVariableMap.find( anID );
@@ -485,33 +485,44 @@ namespace libecs
                          "]: Variable [" + anID + "] does not exist.");
       }
     
+    delete i->second;
     theVariableMap.erase( i );
 
-    delete aVariable;
     getModel()->setDirtyBit();
   }
 
   void System::removeContents()
   {
+    ModelPtr theModel = getModel();
+
     for( SystemMapIterator i = theSystemMap.begin();
          i != theSystemMap.end();
          ++i)
       {
-        getModel()->removeEntity( i->first );
+        SystemPtr aSystem = i->second;
+        FullID aFullID = aSystem->getFullID();
+        String theFullIDString = aFullID.getString();
+        theModel->removeEntity( aFullID );
       }
     
     for (ProcessMapIterator i = theProcessMap.begin();
          i != theProcessMap.end();
          ++i)
       {
-        removeProcess( i->second );
+        ProcessPtr aProcessPtr = i->second;
+        FullID aFullID = aProcessPtr->getFullID();
+        String theFullString = aFullID.getString();
+        theModel->removeEntity( aFullID );
       }
     
     for (VariableMapIterator i = theVariableMap.begin();
          i != theVariableMap.end();
          ++i)
       {
-        removeVariable( i->second );
+        VariablePtr aVariablePtr = i->second;
+        FullID aFullID = aVariablePtr->getFullID();
+        String theFullIDString = aFullID.getString();
+        theModel->removeEntity( aFullID );
       }
   }
 

@@ -223,7 +223,7 @@ namespace libecs
     void registerProcess( ProcessPtr aProcess );
   
 
-    void removeProcess( ProcessPtr aProcess);
+    void deleteProcess( ProcessPtr aProcess);
 
     /**
        Register a Variable object in this System.
@@ -234,7 +234,7 @@ namespace libecs
 
     void registerVariable( VariablePtr aVariable );
   
-    void removeVariable( VariablePtr aVariable );
+    void deleteVariable( VariablePtr aVariable );
 
     /**
        Register a System object in this System.
@@ -245,7 +245,7 @@ namespace libecs
 
     void registerSystem( SystemPtr aSystem );
 
-    void removeSystem( SystemPtr aSystem );
+    void deleteSystem( SystemPtr aSystem );
 
     /**
        Check if this is a root System.

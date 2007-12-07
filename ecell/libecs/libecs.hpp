@@ -94,9 +94,10 @@ namespace libecs
 
 
   // string STL containers.
-  typedef std::list<String> StringList;
-  typedef std::vector<String> StringVector;
-  typedef std::map<const String, String, std::less<const String> > StringMap;
+  DECLARE_LIST( String, StringList);
+  DECLARE_VECTOR( String, StringVector);
+  DECLARE_MAP( const String, String, std::less<const String>, StringMap );
+
   DECLARE_SHAREDPTR( StringList );
   DECLARE_SHAREDPTR( StringVector );
 
