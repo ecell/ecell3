@@ -34,98 +34,48 @@
 #include <libecs/Model.hpp>
 #include <sstream>
 #include <string>
+#include <iostream>
 #include "ApoptosisProcess.hpp"
+#include <boost/python/object.hpp>
+#include <boost/python/extract.hpp>
+
+using namespace std;
+USE_LIBECS;
+namespace python = boost::python;
 
 LIBECS_DM_INIT( ApoptosisProcess, Process);
 
-ApoptosisProcess::ApoptosisProcess()
-  :
-  expressionChecksConcentration( true ),
-  apoptosisThreshold( 0.0f )
-{
-}
-
-
-SET_METHOD_DEF( String, Type, ApoptosisProcess)
-{
-  if (value == String("Concentration") )
-    {
-      expressionChecksConcentration = true;
-    }
-  else if (value == String("Population"))
-    {
-      expressionChecksConcentration = false;
-    }
-  else throw 0;
-}
-
-GET_METHOD_DEF( String, Type, ApoptosisProcess )
-{
-  if (expressionChecksConcentration)
-    {
-      return String("Concentration");
-    }
-  else
-    {
-      return String("Population");
-    }
-}
-
-
-SET_METHOD_DEF( String, GreaterOrLessThan, ApoptosisProcess )
-{
-  if (value[0] == '<' )
-    {
-      apoptosisBelowThreshold = true;
-    }
-  else if (value[0] == '>')
-    {
-      apoptosisBelowThreshold = false;
-    }
-  else throw 0;
-}
-
-GET_METHOD_DEF( String, GreaterOrLessThan, ApoptosisProcess )
-{
-  if( apoptosisBelowThreshold )
-    {
-      return String("<");
-    }
-  else
-    {
-      return String(">");
-    }
-}
-
-
-SET_METHOD_DEF( Real, Expression, ApoptosisProcess )
-{
-  apoptosisThreshold = value;
-}
-
-GET_METHOD_DEF( Real, Expression, ApoptosisProcess )
-{
-  return apoptosisThreshold;
-}
-
-
 void ApoptosisProcess::initialize()
 {
+
+  PythonProcessBase::initialize();
+  
+
+  python::handle<> a( PyEval_EvalCode( (PyCodeObject*)
+  				       theCompiledInitializeMethod.ptr(),
+  				       theGlobalNamespace.ptr(), 
+  				       theLocalNamespace.ptr() ) );
 }
 
 
 void ApoptosisProcess::fire()
 {
-  // Check to see if the value of the variable is greater or less than the 
-  // threshold.  
+  
+  python::object a( python::eval( theExpression.c_str(),
+                                  theGlobalNamespace, 
+                                  theLocalNamespace ) );
 
-  destroyCell();
+  bool apoptosis = python::extract<bool>(a)();
+  
+  if (apoptosis) 
+    {
+      this->destroyCell();
+    }
+  
 }
+ 
 
-
-void ApoptosisProcess::destroyCell()
+void ApoptosisProcess::destroyCell() 
 {
-  SystemPtr theParentSystem( cellToBeKilled->getParent() );
-
-  this->getModel()->removeSystem( cellToBeKilled );
+  getModel()->removeEntity( getSuperSystem()->getFullID() );
 }

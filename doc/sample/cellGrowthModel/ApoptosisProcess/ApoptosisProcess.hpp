@@ -36,6 +36,7 @@
 
 #include <libecs/libecs.hpp>
 #include <libecs/Process.hpp>
+#include <dm/PythonProcessBase.hpp>
 
 USE_LIBECS;
 
@@ -45,45 +46,71 @@ USE_LIBECS;
 
 **************************************************************/
 
-LIBECS_DM_CLASS( ApoptosisProcess, Process )
+LIBECS_DM_CLASS( ApoptosisProcess, PythonProcessBase )
 {
 
  public:
 
   LIBECS_DM_OBJECT( ApoptosisProcess, Process)
     {
-      INHERIT_PROPERTIES( Process );
+      INHERIT_PROPERTIES( PythonProcessBase );
 
-      PROPERTYSLOT_SET_GET( String, Type );
-cd      PROPERTYSLOT_SET_GET( String, GreaterOrLessThan );
-      PROPERTYSLOT_SET_GET( Real, Expression );
+      PROPERTYSLOT_SET_GET( String, Expression );
+      PROPERTYSLOT_SET_GET( String, InitializeMethod );
     }
 
+  ApoptosisProcess()
+    {
+      setInitializeMethod( "" );
+      setExpression( "" );
+    }
 
-
-  ApoptosisProcess();
-  ~ApoptosisProcess();
+  ~ApoptosisProcess()
+    {
+    }
 
   virtual void initialize();
   virtual void fire();
 
-  SET_METHOD( String, Type);
-  SET_METHOD( String, GreaterOrLessThan );
-  SET_METHOD( Real, Expression );
+  SET_METHOD( String, InitializeMethod )
+    {
+      theInitializeMethod = value;
+      
+      theCompiledInitializeMethod = compilePythonCode( theInitializeMethod,
+                                                       getFullID().getString() +
+                                                       ":InitializeMethod",
+                                                       Py_file_input );
+    }
 
-  GET_METHOD( String, Type);
-  GET_METHOD( String, GreaterOrLessThan );
-  GET_METHOD( Real, Expression );
+  SET_METHOD( String, Expression )
+    {
+      theExpression = value;
 
+      theCompiledExpressionMethod = compilePythonCode( theExpression,
+                                                       getFullID().getString() +
+                                                       ":FireMethod",
+                                                       Py_file_input );      
+    }
+
+  GET_METHOD( String, InitializeMethod )
+    {
+      return theInitializeMethod;
+    }
+
+  GET_METHOD( String, Expression )
+    {
+      return theExpression;
+    }
 
  private:
 
   void destroyCell();
 
-  // Corresponds to "Type".
-  bool expressionChecksConcentration;
-  Real apoptosisThreshold;
-  bool apoptosisBelowThreshold;
+  String theExpression;
+  String theInitializeMethod;
+
+  python::object theCompiledExpressionMethod;
+  python::object theCompiledInitializeMethod;
 
   SystemPtr cellToBeKilled;
 
