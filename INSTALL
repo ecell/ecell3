@@ -99,10 +99,9 @@ Install
 
 You may find the following options to configure are useful.
  
-  --with-boost-root-dir=PATH   configure option to specify non-standard root
-                               installation directory for boost.
-
-  --disable-gui                configure option.
+  --with-boost-root-dir=PATH   Specify this when boost is installed
+                               under non-standard installation directory.
+  --disable-gui                Specify to disable building GUI frontends.
 
 
 $Id$

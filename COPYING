@@ -1,19 +1,17 @@
-
-This software is licensed under GPL, in which subclasses are
+This software is licensed under the GPL, in which subclasses are
 considered 'derived works'.  
 
 As a special exception, dynamically loadable subclasses of classes
 defined in libecs, which are developed as part of simulation models or
-algorithm modules, are not covered by the license even if resulting
-binary includes code from libecs by inlining, template instantiation,
-and subclassing.  Modifications and additions which are included in
-libecs itself are coverd by GPL.
+algorithm modules, are not covered by the license even if the resulting
+binary happens to include portions originated from this software through
+inlining, template instantiation, or subclassing done by the compiler
+and linker. Derivative works resulted from any other activities are covered
+by the GPL.
 
-
-ecell/libecs/ includes some files from Loki C++ library by 
-             Andrei Alexandrescu (http://www.moderncppdesign.com/).
-             The license for Loki is MIT license.
-
+Please notee that This package contains several third-party softwares
+that are licensed under the terms different from the GPL. See README for
+details of these softwares.
 
 =========================================================================
 		    GNU GENERAL PUBLIC LICENSE

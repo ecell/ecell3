@@ -150,7 +150,7 @@ To use Session Monitor, type::
 Sample Models
 =============
 
-Sample models are installed under {PREFIX}/share/doc/samples. Each model is
+Sample models are installed under {PREFIX}/share/doc/samples.  Each model is
 stored as a EM script, while ecell toolsuite only accept XML-based EML files.
 
 EM scripts can be converted to EML files through the program ``ecell3-em2eml``::
@@ -166,6 +166,120 @@ which can be compiled using ``ecell3-dmc``::
    $ ecell3-dmc SomeModule.cpp
 
 For more information about the dynamic module, refer to the users manual.
+
+
+Copyright Notice
+================
+This package includes the following softwares for convenience.
+
+* PLY
+
+  PLY is written by David M. Beazley and distributed under the GNU
+  Lesser General Public License.  See COPYING.LGPLv2 or COPYING.LGPLv3 for the
+  full license terms of the LGPL(s).
+
+    Author: David M. Beazley (beazley@cs.uchicago.edu)
+            Department of Computer Science
+            University of Chicago
+            Chicago, IL  60637
+    
+    Copyright (C) 2001, David M. Beazley
+    
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+    
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+    
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+  The website for this software is located at:
+
+    http://www.dabeaz.com/ply/
+
+* EmPy 
+
+  EmPy is written by Erik Max Francis and distributed under the GNU Lesser
+  General Public License.  See COPYING.LGPLv2 or COPYING.LGPLv3 for the full
+  license terms of the LGPL(s).
+
+    Copyright (C) 2002-2003 Erik Max Francis <max@alcyone.com>
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+    
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+    
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+  The website for this software is located at:
+
+    http://www.alcyone.com/software/empy/
+
+* libltdl
+
+  libltdl is part of libtool, whose copyright is held by Free Software
+  Foundation.  See COPYING.LGPLv2 or COPYING.LGPLv3 for the full license terms
+  of the LGPL(s).
+
+    Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
+    Originally by Thomas Tanner <tanner@ffii.org>
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+     
+    As a special exception to the GNU Lesser General Public License,
+    if you distribute this file as part of a program or library that
+    is built using GNU libtool, you may include it under the same
+    distribution terms that you use for the rest of that program.
+       
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+  The website for this software is located at:
+
+    http://www.gnu.org/software/libtool/
+
+* The Loki Library
+
+  Libecs contains part of The Loki Library, which is writen by Andrei 
+  Alexandrescu and the contributors.
+
+    Copyright (c) 2001 by Andrei Alexandrescu
+
+    This code accompanies the book:
+    Alexandrescu, Andrei. "Modern C++ Design: Generic Programming and Design 
+    Patterns Applied". Copyright (c) 2001. Addison-Wesley.
+
+    Permission to use, copy, modify, distribute and sell this software for any 
+    purpose is hereby granted without fee, provided that the above copyright 
+    notice appear in all copies and that both that copyright notice and this 
+    permission notice appear in supporting documentation.
+
+    The author or Addison-Wesley Longman make no representations about the 
+    suitability of this software for any purpose. It is provided "as is" 
+    without express or implied warranty.
+
+  The website for this software is located at:
+
+    http://loki-lib.sourceforge.net/
 
 $Id$
 
