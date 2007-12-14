@@ -1,4 +1,4 @@
-SUBDIRS = users-manual
+SUBDIRS = users-manual samples
 
 EXTRA_DIST = \
 	ecell3.doxy.in \

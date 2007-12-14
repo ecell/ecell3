@@ -10,7 +10,7 @@ E-Cell is a generic software package for cellular modeling and simulation.
 
 Files and directories
 =====================
-::
+In the package, files are organized as follows::
 
   -+- README:    This file
    |
@@ -50,6 +50,52 @@ Files and directories
    |
    +- libltdl/         --> Libtool's dynamic module loader library
 
+And installed in the following structure::
+
+ PREFIX -+- bin/       --> E-Cell system toolsuite
+         |
+         +- include/   --> Header files (for developers)
+         |  |
+         |  +- dmtool/
+         |  |
+         |  +- ecell-3.1/
+         |     |
+         |     +- libecs/
+         |     |
+         |     +- libemc/
+         |
+         +- lib/       --> Shared libraries and python modules
+         |  |
+         |  +- python?.?/  --> Python modules
+         |  |
+         |  +- ecell-3.1/
+         |     |
+         |     +- dms      --> Standard dynamic modules
+         |     |
+         |     +- model-editor     --> Scripts and data for Model Editor
+         |     |
+         |     +- session-monitor  --> Scripts and data for Session Monitor
+         |     |
+         |     +- toollauncher     --> Scripts and data for Tool Launcher
+         |
+         +- share/
+            |
+            +- ecell-3.1/
+            |  |
+            |  +- dms/     --> Sources for the standard dynamic modules.
+            |
+            +- doc/
+               |
+               +- ecell/   --> E-Cell Documents
+                  |
+                  +- samples/      --> Sample models
+                  |
+                  +- users-manual* --> Users manual
+                  |
+                  +- api           --> API reference
+                  |
+                  +- model-editor  --> Model Editor documentation
+
 
 About the code names
 --------------------
@@ -60,7 +106,12 @@ Koyurugi
 Osogo
     Code name for the GUI Session monitor (gecell)
 
-$Id$
+Documentation
+=============
+The E-Cell 3 users manual is placed under {PREFIX}/share/doc/eusers-manual .
+
+If you have doxygen, API reference will be built and installed in
+{PREFIX}/share/doc/api.
 
 Basic Usage
 ===========
@@ -69,7 +120,7 @@ Basic Usage
 ---------------------------------------
 By default a python binding (pyecs) is built.
 
-To invoke a E-Cell Session Script interpreter in interactive mode, use 'ecell3-sesion' script. Note that the script expects {PREFIX}/bin is included in PATH environment, where {PREFIX} is the directory path that was specified to configure. 
+To invoke a E-Cell Session Script interpreter in interactive mode, use ``ecell3-sesion`` script. Note that the script expects {PREFIX}/bin is included in PATH environment, where {PREFIX} is the directory path that was specified to configure. 
 (If you have not specified it, it falls back to /usr/local.)
 
 A typical command-line session is as follows::
@@ -80,7 +131,7 @@ A typical command-line session is as follows::
    Send feedback to Koichi Takahashi <shafi@e-cell.org>
    ecell3-session>>>
 
-In the above output, 'ecell3-session>>>' is the prompt of ecell3-session. That accepts almost everything of interactive Python.
+In the above output, ``ecell3-session>>>`` is the prompt of ecell3-session. That accepts almost everything of interactive Python.
 
 The below example first loads a model that is stored in simple.eml, and then run it for 10 seconds in simulation time::
 
@@ -94,12 +145,27 @@ If you have python, and pygtk2 installed, a GUI session monitor, is built.
 
 To use Session Monitor, type::
 
-   $ {PREFIX}/bin/gecell
+   $ ecell3-session-monitor
 
-Documentation
--------------
-The E-Cell 3 users manual is placed under {PREFIX}/share/doc/eusers-manual .
+Sample Models
+=============
 
-If you have doxygen, API reference will be built and installed in
-{PREFIX}/share/doc/api.
+Sample models are installed under {PREFIX}/share/doc/samples. Each model is
+stored as a EM script, while ecell toolsuite only accept XML-based EML files.
+
+EM scripts can be converted to EML files through the program ``ecell3-em2eml``::
+
+   $ ecell3-em2eml Drosophila.em
+
+This will create Drosophila.eml in the current working directory.
+
+Some samples require that the accompanying dynamic modules (DM's) be
+built before running simulation.  These modules are provided as C++ sources
+which can be compiled using ``ecell3-dmc``::
+
+   $ ecell3-dmc SomeModule.cpp
+
+For more information about the dynamic module, refer to the users manual.
+
+$Id$
 
