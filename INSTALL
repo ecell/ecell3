@@ -93,9 +93,9 @@ Install
 2. make
 3. make install
 
- NOTE:
- you need to run ./autogen.sh before running configure in case you have
- obtained the source from the repository.
+  NOTE:
+  you need to run ./autogen.sh before running configure in case you have
+  obtained the source from the repository.
 
 You may find the following options to configure are useful.
  
