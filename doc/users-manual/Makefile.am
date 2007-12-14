@@ -3,28 +3,34 @@ DOC_ps = users-manual.ps
 DOC_pdf = users-manual.pdf
 DOC_dvi = users-manual.dvi
 
-MANUAL_TARGETS =
-
 _htmldir = $(htmldir)/$(DOC_html)
 _html_DATA = $(DOC_html)/*
 
 if BUILD_USERS_MANUAL_html
-MANUAL_TARGETS += $(DOC_html)
+$(DOC_html)/*: users-manual.xml
+	$(DB2HTML) -o $(DOC_html) $<
+else
+$(DOC_html)/*:
+	$(RM) -rf $(DOC_html)
+	mkdir $(DOC_html)
 endif
 
 if BUILD_USERS_MANUAL_ps
-MANUAL_TARGETS += $(DOC_ps)
 ps_DATA   = $(DOC_ps)
+$(DOC_ps): users-manual.xml
+	$(DB2PS) $<
 endif
 
 if BUILD_USERS_MANUAL_pdf
-MANUAL_TARGETS += $(DOC_pdf)
 pdf_DATA  = $(DOC_pdf)
+$(DOC_pdf): users-manual.xml
+	$(DB2PDF) $<
 endif
 
 if BUILD_USERS_MANUAL_dvi
-MANUAL_TARGETS += $(DOC_dvi)
 dvi_DATA  = $(DOC_dvi)
+$(DOC_dvi): users-manual.xml
+	$(DB2DVI) $<
 endif
 
 EXTRA_DIST = \
@@ -48,20 +54,6 @@ EXTRA_DIST = \
 if BUILD_USERS_MANUAL_html
 EXTRA_DIST += $(DOC_html)
 endif
-
-all: $(MANUAL_TARGETS)
-
-$(DOC_html)/*: users-manual.xml
-	$(DB2HTML) -o $(DOC_html) $<
-
-$(DOC_ps): users-manual.xml
-	$(DB2PS) $<
-
-$(DOC_pdf): users-manual.xml
-	$(DB2PDF) $<
-
-$(DOC_dvi): users-manual.xml
-	$(DB2DVI) $<
 
 distclean:
 	$(RM) -f $(DOC_PS) $(DOC_PDF) $(DOC_DVI)
