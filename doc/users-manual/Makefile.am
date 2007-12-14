@@ -5,24 +5,25 @@ DOC_dvi = users-manual.dvi
 
 MANUAL_TARGETS =
 
-if BUILD_USERS_MANUAL_html
 _htmldir = $(htmldir)/$(DOC_html)
 _html_DATA = $(DOC_html)/*
+ps_DATA   = $(DOC_ps)
+pdf_DATA  = $(DOC_pdf)
+dvi_DATA  = $(DOC_dvi)
+
+if BUILD_USERS_MANUAL_html
 MANUAL_TARGETS += $(DOC_html)
 endif
 
 if BUILD_USERS_MANUAL_ps
-ps_DATA   = $(DOC_ps)
 MANUAL_TARGETS += $(DOC_ps)
 endif
 
 if BUILD_USERS_MANUAL_pdf
-pdf_DATA  = $(DOC_pdf)
 MANUAL_TARGETS += $(DOC_pdf)
 endif
 
 if BUILD_USERS_MANUAL_dvi
-dvi_DATA  = $(DOC_dvi)
 MANUAL_TARGETS += $(DOC_dvi)
 endif
 
