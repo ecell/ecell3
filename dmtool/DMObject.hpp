@@ -50,14 +50,15 @@ Base* ObjectAllocator()
   {\
     DM_IF TYPE::AllocatorFuncPtr CreateObject =\
     &ObjectAllocator<TYPE,CLASSNAME>;\
-    const char* __DM_CLASSNAME = #CLASSNAME;\
-    const char* __DM_TYPE = #TYPE;\
+    DM_IF const char* __DM_CLASSNAME = #CLASSNAME;\
+    DM_IF const char* __DM_TYPE = #TYPE;\
     DM_IF const void *(*GetClassInfo)() = &CLASSNAME::getClassInfoPtr;\
   } // 
 
 
 #define DM_OBJECT( CLASSNAME, TYPE )\
- static TYPE* createInstance() { return new CLASSNAME ; }
+ static TYPE* createInstance() { return new CLASSNAME ; }\
+ static const char *getTypeName() { return #TYPE; }
 
 
 #define DM_BASECLASS( CLASSNAME )\

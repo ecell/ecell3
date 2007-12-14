@@ -37,9 +37,13 @@
 #include "libecs.hpp"
 #include "PropertySlot.hpp"
 #include "PropertySlotProxy.hpp"
+#include "EntityType.hpp"
+
+#include <boost/assert.hpp>
 
 #define PROPERTY_FIELD  "Property__"
 #define PROPERTYLIST_FIELD  "PropertyList"
+#define TYPENAME_FIELD "TypeName"
 
 namespace libecs
 {
@@ -74,34 +78,10 @@ namespace libecs
 				  StringCref aPropertyName );
     static void throwNotSavable( PropertiedClassCref aClassName, 
 				 StringCref aPropertyName );
-
-
-
-    // info-related helper methods.
-
-    /*
-    static void setInfoField( StringMapRef anInfoMap,
-			      StringCref aFieldName, StringCref anInfoString );
-
-    Polymorph getClassInfoAsPolymorph()
-    {
-      return convertInfoMapToPolymorph( getClassInfoMap() );
-    }
-
-    static const Polymorph 
-    convertInfoMapToPolymorph( StringMap const& anInfoMap );
-
-    virtual StringMap const& getClassInfoMap() = 0;
-
-    */
-
   };
 
 
-  template
-  <
-    class T
-  >
+  template < class T >
   class PropertyInterface
     :
     public PropertyInterfaceBase
@@ -120,7 +100,7 @@ namespace libecs
 
     PropertyInterface()
     {
-	  theInfoMap[ String( PROPERTYLIST_FIELD )] = Polymorph( PolymorphVector() ) ;
+      theInfoMap[ String( PROPERTYLIST_FIELD ) ] = Polymorph( PolymorphVector() ) ;
       T::initializePropertyInterface( Type2Type<T>() );
     }
 
@@ -137,70 +117,65 @@ namespace libecs
     }
 
 
-	/**
-	   get InfoMap 
-
-	*/
-	static PolymorphMapCref getInfoMap( void ) 
-	{
+    /**
+      get InfoMap 
+    */
+    static PolymorphMapCref getInfoMap( void ) 
+    {
       static PolymorphMap aPolymorphMap;
       for (PolymorphAssocVectorIterator i(theInfoMap.begin()); i != theInfoMap.end() ; ++i)
       {
-        aPolymorphMap[i->first] = i->second;
+	aPolymorphMap[i->first] = i->second;
       }
       return aPolymorphMap;
-	}
+    }
 
-	/** 
-		set Info field
-		if info field key begins with "Property_" then append PropertyName to "PropertyList" infofield
-		
-	*/
-	static void setInfoField( StringCref aFieldName, PolymorphCref aValue )
-	{
-	  theInfoMap[ aFieldName ] = aValue;
+    /** 
+      set Info field
+      if info field key begins with "Property_" then append PropertyName to "PropertyList" infofield
+	    
+    */
+    static void setInfoField( StringCref aFieldName, PolymorphCref aValue )
+    {
+      theInfoMap[ aFieldName ] = aValue;
+    }
 
-	}
+    /**
+       set property info field ( type, setflag, getflag, saveflag, loadflag are the params
 
-	/**
-	   set property info field ( type, setflag, getflag, saveflag, loadflag are the params
+    */
+    static void setPropertyInfoField( StringCref aPropertyName,
+			              StringCref aTypeString,
+				      Integer setFlag, Integer getFlag, 
+				      Integer saveFlag, Integer loadFlag )
+    {
+      String PROP_FIELD( PROPERTY_FIELD );
+      String PROPLIST_FIELD ( PROPERTYLIST_FIELD );
 
-	*/
-
-
-	static void setPropertyInfoField( StringCref aPropertyName, StringCref aTypeString,
-									  Integer setFlag, Integer getFlag, 
-									  Integer saveFlag, Integer loadFlag )
-	{
-	  String PROP_FIELD( PROPERTY_FIELD );
-	  String PROPLIST_FIELD ( PROPERTYLIST_FIELD );
-
-	  PolymorphVector aPropertyDescriptor;
-	  aPropertyDescriptor.push_back( aTypeString );
-	  aPropertyDescriptor.push_back( setFlag );
-	  aPropertyDescriptor.push_back( getFlag );
-	  aPropertyDescriptor.push_back( saveFlag );
-	  aPropertyDescriptor.push_back( loadFlag );
-	  String aPropertyNameField( aPropertyName );
-	  aPropertyNameField.insert( 0, PROP_FIELD );
-	  setInfoField( aPropertyNameField, aPropertyDescriptor );
+      PolymorphVector aPropertyDescriptor;
+      aPropertyDescriptor.push_back( aTypeString );
+      aPropertyDescriptor.push_back( setFlag );
+      aPropertyDescriptor.push_back( getFlag );
+      aPropertyDescriptor.push_back( saveFlag );
+      aPropertyDescriptor.push_back( loadFlag );
+      String aPropertyNameField( aPropertyName );
+      aPropertyNameField.insert( 0, PROP_FIELD );
+      setInfoField( aPropertyNameField, aPropertyDescriptor );
 
 
-	  PolymorphVector aPolymorphVector( getInfoField(  PROPLIST_FIELD  ).asPolymorphVector());
-	  aPolymorphVector.push_back( aPropertyName );
-	  setInfoField( PROPLIST_FIELD, Polymorph( aPolymorphVector ) );
-		
-	}
+      PolymorphVector aPolymorphVector( getInfoField(  PROPLIST_FIELD  ).asPolymorphVector());
+      aPolymorphVector.push_back( aPropertyName );
+      setInfoField( PROPLIST_FIELD, Polymorph( aPolymorphVector ) );
+	    
+    }
 
-	/**
-	   get Field from info map
-	*/
-
-	static PolymorphCref getInfoField( StringCref aFieldName ) 
-	  {
-		return theInfoMap[ aFieldName ];
-	  }
-
+    /**
+       get Field from info map
+    */
+    static PolymorphCref getInfoField( StringCref aFieldName ) 
+    {
+      return theInfoMap[ aFieldName ];
+    }
 
     /**
        Get a PropertySlot by name.

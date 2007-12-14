@@ -5,7 +5,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT
 AC_CONFIG_SRCDIR([libecs/Entity.hpp])
 
-source ../ecell_version.sh
+sinclude([../ecell_version.sh])
 
 
 AM_CONFIG_HEADER(ecell_config.h)
@@ -294,37 +294,34 @@ AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(mkdir select strdup strerror strtod uname modf modfl)
 AC_CHECK_FUNCS(strdup strstr)
 
+AC_CONFIG_FILES([
+    Makefile
+    bin/Makefile
+    dm/Makefile
+    libecs/Defs.hpp  
+    libecs/Makefile
+    libecs/tests/Makefile
+    libemc/Makefile
+    model-editor/Makefile
+    model-editor/doc/Makefile
+    model-editor/glade/Makefile
+    model-editor/plugins/Makefile
+    pyecell/Makefile
+    pyecell/setup.py
+    pyecs/Makefile
+    pyecs/setup.py
+    session-monitor/Makefile
+    session-monitor/plugins/Makefile
+    toollauncher/Makefile
+    toollauncher/misc/Makefile
+])
+AC_CONFIG_FILES([bin/ecell3-dmc], [chmod +x bin/ecell3-dmc])
+AC_CONFIG_FILES([bin/ecell3-em2eml], [chmod +x bin/ecell3-em2eml])
+AC_CONFIG_FILES([bin/ecell3-eml2em], [chmod +x bin/ecell3-eml2em])
 AC_CONFIG_FILES([pyecs/ecell3-python], [chmod +x pyecs/ecell3-python])
 AC_CONFIG_FILES([pyecell/ecell3-eml2sbml], [chmod +x pyecell/ecell3-eml2sbml])
 AC_CONFIG_FILES([pyecell/ecell3-sbml2eml], [chmod +x pyecell/ecell3-sbml2eml])
 AC_CONFIG_FILES([pyecell/ecell3-session], [chmod +x pyecell/ecell3-session])
 AC_CONFIG_FILES([pyecell/ecell3-session-gui], [chmod +x pyecell/ecell3-session-gui])
-AC_CONFIG_FILES([pyecell/ecell3-session-manager],
-                [chmod +x pyecell/ecell3-session-manager])
-AC_CONFIG_FILES([Makefile
-                 libecs/Defs.hpp  
-                 libecs/Makefile
-                 libecs/tests/Makefile
-                 libemc/Makefile
-                 pyecs/setup.py
-                 pyecs/Makefile
-                 pyecell/setup.py
-                 pyecell/Makefile
-                 dm/Makefile])
-AC_CONFIG_FILES([bin/Makefile
-                 bin/ecell3-dmc
-                 bin/ecell3-eml2em
-                 bin/ecell3-em2eml],
-                 [chmod +x bin/ecell3-dmc bin/ecell3-em2eml bin/ecell3-eml2em])
-AC_CONFIG_FILES([session-monitor/Makefile
-                 session-monitor/plugins/Makefile],
-                 [chmod +x session-monitor/ecell3-session-monitor session-monitor/gecell])
-AC_CONFIG_FILES([model-editor/Makefile
-                 model-editor/glade/Makefile
-                 model-editor/plugin/Makefile
-                 model-editor/doc/Makefile],
-                [chmod +x model-editor/ecell3-model-editor])
-AC_CONFIG_FILES([toollauncher/Makefile
-                 toollauncher/misc/Makefile],
-                [chmod +x toollauncher/ecell3-toollauncher])
+AC_CONFIG_FILES([pyecell/ecell3-session-manager], [chmod +x pyecell/ecell3-session-manager])
 AC_OUTPUT

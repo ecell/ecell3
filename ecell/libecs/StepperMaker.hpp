@@ -31,8 +31,9 @@
 
 #ifndef ___STEPPERMAKER_H___
 #define ___STEPPERMAKER_H___
+
 #include "Stepper.hpp"
-#include "dmtool/ModuleMaker.hpp"
+#include "PropertiedObjectMaker.hpp"
 
 namespace libecs
 {
@@ -44,23 +45,20 @@ namespace libecs
   
 
   class StepperMaker 
-    : 
-    public SharedModuleMaker<Stepper>
   {
+  private:
+    PropertiedObjectMaker& theBackend;
 
   protected:
-
     virtual void makeClassList();
 
   public:
-
-    StepperMaker();
-    ~StepperMaker() {}
-
+    StepperMaker( PropertiedObjectMaker& maker );
+    virtual ~StepperMaker();
+    Stepper* make( const std::string& aClassName );
+    const PropertiedObjectMaker::SharedModule& getModule(
+	const std::string& aClassName, bool forceReload );
   };
-
-
-#define NewStepperModule(CLASS) NewDynamicModule(Stepper,CLASS)
 
   /** @} */ //end of libecs_module 
   

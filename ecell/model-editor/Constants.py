@@ -29,7 +29,7 @@
 
 from ConfirmWindow import *
 import os
-SHAPE_PLUGIN_PATH=os.environ['MEPATH']+os.sep+"plugin"+os.sep
+SHAPE_PLUGIN_PATH=os.environ['MEPATH']+os.sep+"plugins"+os.sep
 
 ME_DESIGN_MODE = "Design"
 ME_RUN_MODE = "Run"

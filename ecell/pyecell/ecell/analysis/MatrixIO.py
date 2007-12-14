@@ -74,7 +74,7 @@ def writeArrayWithMathematicaFormat( data, fout=sys.stdout ):
 
     for c in range( size ):
         value = data[ c ]
-        if type( value ) == numpy.ArrayType:
+        if type( value ) == numpy.ndarray:
             writeArrayWithMathematicaFormat( value, fout )
         elif type( value ) == int or type( value ) == float:
             fout.write( '%.8e' % value )
@@ -144,36 +144,36 @@ def writeMatrix( outputFile, matrix, rowList=None, columnList=None ):
 # end of writeMatrix
 
 
-def writeGraphViz( aPathwayProxy, fout=sys.stdout ):
+def writeGraphViz( pathwayProxy, fout=sys.stdout ):
     '''
     write the stoichiometry matrix to a file with GraphViz Dot format.
     a Dot format file can be converted into some image file.
     % dot -Tps [model].dot -o [model].eps
-    aPathwayProxy: a PathwayProxy instance
+    pathwayProxy: a PathwayProxy instance
     fout: (str) output stream for the result
     '''
 
-    variableList = aPathwayProxy.getVariableList()
-    processList = aPathwayProxy.getProcessList()
+    variableList = pathwayProxy.getVariableList()
+    processList = pathwayProxy.getProcessList()
 
-    stoichiometryMatrix = aPathwayProxy.getStoichiometryMatrix()
+    stoichiometryMatrix = pathwayProxy.getStoichiometryMatrix()
     ( m, n ) = numpy.shape( stoichiometryMatrix )
 
     fout.write( 'digraph G {\n' )
 
     for processFullID in processList:
-        processID = string.split( processFullID, ':' )[ 1 ]
+        processID = string.split( processFullID, ':' )[ 2 ]
         fout.write( '\t%s [shape=box,style=filled,color=lightgrey];\n' % processID )
     fout.write( '\n' )
 
     for j in range( n ):
-        processID = string.split( processList[ j ], ':' )[ 1 ]
+        processID = string.split( processList[ j ], ':' )[ 2 ]
 
         substrateString = ''
         productString = ''
 
         for i in range( m ):
-            variableID = string.split( variableList[ i ], ':' )[ 1 ]
+            variableID = string.split( variableList[ i ], ':' )[ 2 ]
             
             if stoichiometryMatrix[ i ][ j ] > 0:
                 productString += '%s; ' % variableID

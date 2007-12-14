@@ -1,89 +1,75 @@
-AUTOMAKE_OPTIONS = foreign
-
 SUBDIRS = plugins
 
+ECELL_LIB_DIR = $(libdir)/$(ECELL_DIRNAME)
 
-ECELL_DIRNAME=@ECELL_DIRNAME@
-ECELL_LIB_DIR=${libdir}/${ECELL_DIRNAME}
+sessionmonitordir = $(ECELL_LIB_DIR)/session-monitor
 
-osogodir=${ECELL_LIB_DIR}/session-monitor
+sessionmonitor_DATA = \
+	AboutSessionMonitor.glade \
+	BoardWindow.glade \
+	EntityListWindow.glade \
+	FullPNQueue.glade \
+	InterfaceWindow.glade \
+	LoggerWindow.glade \
+	LoggingPolicy.glade \
+	MainWindow.glade \
+	MessageWindow.glade \
+	PluginInstanceSelection.glade \
+	PluginWindowPopupMenu.glade \
+	StepperWindow.glade \
+	board.glade \
+	osogo.ini \
+	ecell.png \
+	ecell32-1.png \
+	ecell32-2.png \
+	ecell32-3.png \
+	ecell32-4.png \
+	ecell32-5.png \
+	ecell32-6.png \
+	ecell32-7.png \
+	ecell32-8.png \
+	ecell32.png \
+	ecell_large.png \
+	icon_board.png \
+	icon_ecell.png \
+	icon_entity.png \
+	icon_interface.png \
+	icon_logger.png \
+	icon_message.png \
+	icon_start.png \
+	icon_step.png \
+	icon_stepper.png \
+	icon_stop.png
 
-osogo_PYTHON=\
-osogo.ini\
-BoardWindow.py\
-BoardWindow.glade\
-ConfirmWindow.py\
-DataGenerator.py\
-EntityListWindow.glade\
-EntityListWindow.py\
-FullPNQueue.py\
-FullPNQueue.glade\
-InterfaceWindow.py\
-InterfaceWindow.glade\
-LoggerWindow.glade\
-LoggerWindow.py\
-LoggingPolicy.py\
-LoggingPolicy.glade\
-MainWindow.glade\
-MainWindow.py\
-MessageWindow.glade\
-MessageWindow.py\
-OsogoWindow.py\
-OsogoPluginManager.py\
-OsogoPluginWindow.py\
-StepperWindow.glade\
-StepperWindow.py\
-AboutSessionMonitor.glade\
-AboutSessionMonitor.py\
-OsogoUtil.py\
-PluginInstanceSelection.glade\
-PluginInstanceSelection.py\
-PluginWindowPopupMenu.glade\
-VariableReferenceEditor.py\
-Plot.py\
-board.glade\
-config.py\
-main.py\
-opengui.py\
-ecell.png\
-ecell32.png\
-ecell32-1.png\
-ecell32-2.png\
-ecell32-3.png\
-ecell32-4.png\
-ecell32-5.png\
-ecell32-6.png\
-ecell32-7.png\
-ecell32-8.png\
-ecell_large.png\
-icon_board.png\
-icon_ecell.png\
-icon_entity.png\
-icon_interface.png\
-icon_logger.png\
-icon_message.png\
-icon_start.png\
-icon_step.png\
-icon_stepper.png\
-icon_stop.png
+sessionmonitor_PYTHON= \
+	AboutSessionMonitor.py \
+	BoardWindow.py \
+	ConfirmWindow.py \
+	DataGenerator.py \
+	EntityListWindow.py \
+	FullPNQueue.py \
+	InterfaceWindow.py \
+	LoggerFactory.py \
+	LoggerWindow.py \
+	LoggingPolicy.py \
+	MainWindow.py \
+	MessageWindow.py \
+	OsogoPluginManager.py \
+	OsogoPluginWindow.py \
+	OsogoUtil.py \
+	OsogoWindow.py \
+	Plot.py \
+	PluginInstanceSelection.py \
+	StepperWindow.py \
+	VariableReferenceEditor.py \
+	ViewWindow.py \
+	config.py \
+	main.py \
+	opengui.py
 
+bin_SCRIPTS = ecell3-session-monitor gecell
 
-EXTRA_DIST=${osogo_PYTHON} ${BINS}
-
-# Windows py2exe setup options, ignore for Unix based systems
-PY2EXE_SETUP = ../../ecell/pyecs/windows/py2exeSetup
-WIN_ICON = plugins/ecell.ico
-PATH_VARIABLES = ../../ecell/pyecs/windows/pathVariables
-
-BINS =\
-ecell3-session-monitor\
-gecell
-
-EXE = ${BINS:=$(EXEEXT)}
-bin_SCRIPTS = ${EXE}
-
-%.exe : %
-	python $(PY2EXE_SETUP) --source=$< --icon=$(WIN_ICON) --merge=$(PATH_VARIABLES) --gui py2exe
+EXTRA_DIST = $(sessionmonitor_DATA) $(bin_SCRIPTS)
 
 clean-local:
 	${RM} -rf build *.exe *.zip *.dll *.pyd

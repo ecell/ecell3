@@ -134,16 +134,12 @@ NOTE: If you get this package via cvs, run ./autogen.sh before configure.
   
    == Users Manual ==
 
-   The E-Cell 3 users manual is placed under doc/users-manual/.
+   The E-Cell 3 users manual is placed under doc/users-manual/ .
 
-   To render it as a pdf file, use the following command:
-
-   ecell3/doc/users-manual$ db2pdf ecell3-users-manual.xml
-
-   Then you get ecell3-users-manual.pdf.
+   You need docbook-tools (http://sources.redhat.com/docbook-tools/ )
+   to render it.
 
    The manual is still incomplete.
-
 
    == Reference Manual (by Chris Pickett) ==
 
@@ -151,11 +147,6 @@ NOTE: If you get this package via cvs, run ./autogen.sh before configure.
    You can get it at:
 
     http://www.stack.nl/~dimitri/doxygen/
-
-   Read the installation instructions, make sure to get GraphViz.  To
-   generate documentation, type 
-
-    % make doc 
 
    Browsable html is in 'doc/refman/html' and latex source is in 
    'doc/latex'.
@@ -166,7 +157,7 @@ NOTE: If you get this package via cvs, run ./autogen.sh before configure.
    generates a gzipped tarball of the html manual.  These files are 
    placed at doc/refman/.
 
-   Edit ecell3.doxy to configure the documentation generated. 
+   Edit doc/ecell3.doxy.in to configure the documentation generated. 
 
    The documentation is currently incomplete.
  

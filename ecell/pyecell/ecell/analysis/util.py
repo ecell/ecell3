@@ -46,7 +46,7 @@ from ecell.ecssupport import *
 import numpy
 
 
-RELATIVE_PERTURBATION = 0.001
+RELATIVE_PERTURBATION = 1e-6
 ABSOLUTE_PERTURBATION = 1e-6
 
 
@@ -77,7 +77,7 @@ def allzero( a, err=0 ):
     '''
 
     for element in a:
-        if type( element ) == numpy.ArrayType or type( element ) == list:
+        if type( element ) == numpy.ndarray or type( element ) == list:
             if not allzero( element ):
                 return 0
         elif abs( element ) > err:

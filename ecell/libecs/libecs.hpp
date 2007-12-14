@@ -76,9 +76,11 @@ namespace libecs
   }
 
 
+  LIBECS_API bool initialize();
+  LIBECS_API void finalize();
   LIBECS_API void setDMSearchPath( const String& path );
   LIBECS_API const String getDMSearchPath();
-  LIBECS_API const String getLoadedDMList();
+  // LIBECS_API const String getLoadedDMList(); // XXX: not implemented
 
   //  DECLARE_CLASS( Polymorph );
   //  const Polymorph getDMInfoList( const String& aDMName );

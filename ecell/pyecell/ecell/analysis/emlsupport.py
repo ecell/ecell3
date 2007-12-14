@@ -77,7 +77,7 @@ class EmlSupport( ecell.eml.Eml ):
     # end of __init__
 
 
-    def createInstance( self ):
+    def createSession( self ):
         '''
         create and return the instance from file name
         return aSession
@@ -100,7 +100,7 @@ class EmlSupport( ecell.eml.Eml ):
         
         return aSession
 
-    # end of createInstance
+    # end of createSession
 
 
     def createPathwayProxy( self, indexList=None ):

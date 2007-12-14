@@ -1,12 +1,11 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="ISO-8859-1" ?>
 
 <!-- "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"  -->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN" 
 [
   <!ENTITY legal SYSTEM "legal.xml">
-  <!ENTITY appversion "3.1.100">
-  <!ENTITY manrevision "0.1">
-  <!ENTITY date "Dec. 18, 2003">
+  <!ENTITY % info SYSTEM "info.ent">
+  %info;
   <!ENTITY app "<application>E-Cell Simulation Environment</application>">
   <!ENTITY ecell "<productname>E-Cell</productname>">
   <!-- Information about the entities
@@ -47,29 +46,6 @@
   <!ENTITY EM "<acronym>EM</acronym>">
   <!ENTITY DM "<acronym>DM</acronym>">
   <!ENTITY ESS "<acronym>ESS</acronym>">
-
-<!--
-
-  <!ENTITY Entity "<classname>Entity</classname>">
-  <!ENTITY Polymorph "<classname>Polymorph</classname>">
-  <!ENTITY PolymorphVector "<classname>PolymorphVector</classname>">
-  <!ENTITY Process "<classname>Process</classname>">
-  <!ENTITY PropertySlot "<classname>PropertySlot</classname>">
-  <!ENTITY PropertyInterface "<classname>PropertyInterface</classname>">
-  <!ENTITY System "<classname>System</classname>">
-  <!ENTITY Stepper "<classname>Stepper</classname>">
-  <!ENTITY Session "<classname>Session</classname>">
-  <!ENTITY SessionManager "<classname>SessionManager</classname>">
-  <!ENTITY Simulator "<classname>Simulator</classname>">
-  <!ENTITY String "<classname>String</classname>">
-  <!ENTITY Logger "<classname>Logger</classname>">
-  <!ENTITY ObjectStub "<classname>ObjectStub</classname>">
-  <!ENTITY EntityStub "<classname>EntityStub</classname>">
-  <!ENTITY LoggerStub "<classname>LoggerStub</classname>">
-  <!ENTITY StepperStub "<classname>StepperStub</classname>">
-  <!ENTITY Variable "<classname>Variable</classname>">
--->
-
 
   <!ENTITY Entity "Entity">
   <!ENTITY Polymorph "Polymorph">
@@ -149,7 +125,7 @@
     <title>E-Cell Simulation Environment Version &appversion; User's Manual (Draft: &date;)</title>       
 
     <copyright> 
-      <year>2002-2003</year> 
+      <year>2002-2007</year> 
       <holder>Keio University</holder> 
     </copyright> 
 

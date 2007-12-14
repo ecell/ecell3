@@ -28,12 +28,13 @@
 
 #ifndef __MODULEMAKER_HPP
 #define __MODULEMAKER_HPP
+
 #include <iostream>
 #include <map>
 #include <string>
 #include <assert.h>
+#include "ltdl.h"
 #include "DynamicModule.hpp"
-
 
 /// doc needed
 
@@ -81,6 +82,29 @@ public:
       {
 	return aSearchPath;
       }
+  }
+
+  /**
+    Initializes the dynamic module facility.
+    Applications that use this library must call this function
+    prior to any operation involved with the facility.
+    @return true on error, false otherwise.
+   */
+  static bool initialize()
+  {
+    return lt_dlinit() > 0 ? true: false;
+  }
+
+  /**
+    Finalizes the dynamic module facility.
+    Applications that use this library must call this function when
+    the facility is no longer necessary so that allocated resources
+    can be reclaimed.
+    @return true on error, false otherwise.
+   */
+  static void finalize()
+  {
+    lt_dlexit();
   }
 
   /**
@@ -304,23 +328,11 @@ getAllocator( const std::string& aClassname )
 template<class T,class DMAllocator>
 SharedModuleMaker<T,DMAllocator>::SharedModuleMaker()
 {
-  int result = lt_dlinit();
-  if( result != 0 )
-    {
-      std::cerr << "fatal: lt_dlinit() failed." << std::endl;
-      exit( 1 );
-    }
 }
 
 template<class T,class DMAllocator>
 SharedModuleMaker<T,DMAllocator>::~SharedModuleMaker()
 {
-  int result = lt_dlexit();
-  if( result != 0 )
-    {
-      std::cerr << "fatal: lt_dlexit() failed." << std::endl;
-      exit( 1 );
-    }
 }
 
 
@@ -364,18 +376,39 @@ SharedModuleMaker<T,DMAllocator>::loadModule( const std::string& aClassname )
     }
     
   SharedModule* aSharedModule( NULL );
-  try 
+  std::string filename( aClassname );
+  lt_dlhandle handle( lt_dlopenext( filename.c_str() ) );
+  if ( handle == NULL ) 
     {
-      aSharedModule = new SharedModule( aClassname );
-      addClass
-( aSharedModule );
+      throw DMException( "Failed to find or load a DM [" + aClassname + 
+			 "]: " + lt_dlerror() );
     }
-  catch ( const DMException& )
+  typename SharedModule::DMAllocator anAllocator(
+      *reinterpret_cast< DMAllocator* >(
+	lt_dlsym( handle, "CreateObject" ) ) );
+  if ( anAllocator == NULL )
     {
-      delete aSharedModule;
-      
-      throw;
+      throw DMException( "[" + filename + "] is not a valid DM file: "
+			  + lt_dlerror() );  
     }
+  InfoLoaderType anInfoLoader(
+      *reinterpret_cast< InfoLoaderType* >(
+	lt_dlsym( handle, "GetClassInfo" ) ) );
+  if ( anInfoLoader == NULL )
+    {
+      throw DMException( "[" + filename + "] is not a valid DM file: "
+			  + lt_dlerror() );  
+    }
+
+  const char* typeString = *reinterpret_cast< const char ** >(
+      lt_dlsym( handle, "__DM_TYPE" ) );
+  if ( typeString == NULL )
+    {
+      throw DMException( "[" + filename + "] is not a valid DM file: "
+			  + lt_dlerror() );  
+    }
+  addClass( new SharedModule( aClassname, anAllocator, anInfoLoader,
+                              typeString, filename, handle ) );
 }
 
 #endif /* __MODULEMAKER_HPP */

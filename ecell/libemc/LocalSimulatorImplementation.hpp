@@ -221,15 +221,12 @@ namespace libemc
 
     inline void handleEvent()
     {
-      if( (*theEventChecker)() )
+      while( (*theEventChecker)() )
 	{
-	  do
-	    {
-	      (*theEventHandler)();
-	    }	while( (*theEventChecker)() );
-	  
-	  clearDirty();
+	  (*theEventHandler)();
 	}
+
+      clearDirty();
     }
 
     void clearDirty() const
@@ -254,16 +251,17 @@ namespace libemc
 
   private:
 
-    bool                       theRunningFlag;
+    bool                          theRunningFlag;
 
-    mutable bool               theDirtyFlag;
+    mutable bool                  theDirtyFlag;
 
-    libecs::Integer            theEventCheckInterval;
+    libecs::Integer               theEventCheckInterval;
 
-    libecs::Model              theModel;
+    libecs::PropertiedObjectMaker thePropertiedObjectMaker;
+    libecs::Model                 theModel;
 
-    EventCheckerSharedPtr      theEventChecker;
-    EventHandlerSharedPtr      theEventHandler;
+    EventCheckerSharedPtr         theEventChecker;
+    EventHandlerSharedPtr         theEventHandler;
 
   };  
 

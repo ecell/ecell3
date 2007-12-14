@@ -46,7 +46,7 @@ LIBECS_DM_INIT( DAEStepper, Stepper );
 
 DAEStepper::DAEStepper()
   :
-  theSystemSize( 0 ),
+  theSystemSize( -1 ),
   theJacobianMatrix1( NULLPTR ),
   thePermutation1( NULLPTR ),
   theVelocityVector1( NULLPTR ),
@@ -131,39 +131,106 @@ void DAEStepper::initialize()
       for ( VariableVector::size_type c( 0 ); c < aSize; c++ )
 	theJacobian[ c ].resize( aSize );
 
-      if ( theJacobianMatrix1 )
-	gsl_matrix_free( theJacobianMatrix1 );
-      theJacobianMatrix1 = gsl_matrix_calloc( aSize, aSize );
+      {
+	if ( theJacobianMatrix1 )
+	  {
+	    gsl_matrix_free( theJacobianMatrix1 );
+	    theJacobianMatrix1 = NULLPTR;
+	  }
 
-      if ( thePermutation1 )
-	gsl_permutation_free( thePermutation1 );
-      thePermutation1 = gsl_permutation_alloc( aSize );
+	if ( aSize > 0 )
+	  {
+	    theJacobianMatrix1 = gsl_matrix_calloc( aSize, aSize );
+	  }
+      }
 
-      if ( theVelocityVector1 )
-	gsl_vector_free( theVelocityVector1 );
-      theVelocityVector1 = gsl_vector_calloc( aSize );
+      {
+	if ( thePermutation1 )
+	  {
+	    gsl_permutation_free( thePermutation1 );
+	    thePermutation1 = NULLPTR;
+	  }
 
-      if ( theSolutionVector1 )
-	gsl_vector_free( theSolutionVector1 );
-      theSolutionVector1 = gsl_vector_calloc( aSize );
+	if ( aSize > 0 )
+	  {
+	    thePermutation1 = gsl_permutation_alloc( aSize );
+	  }
+      }
+
+      {
+	if ( theVelocityVector1 )
+	  {
+	    gsl_vector_free( theVelocityVector1 );
+	    theVelocityVector1 = NULLPTR;
+	  }
+	if ( aSize > 0 )
+	  {
+	    theVelocityVector1 = gsl_vector_calloc( aSize );
+	  }
+      }
+
+      {
+	if ( theSolutionVector1 )
+	  {
+	    gsl_vector_free( theSolutionVector1 );
+	    theSolutionVector1 = NULLPTR;
+	  }
+	if ( aSize > 0 )
+	  {
+	    theSolutionVector1 = gsl_vector_calloc( aSize );
+	  }
+      }
 
       theW.resize( aSize * 3 );
 
-      if ( theJacobianMatrix2 )
-	gsl_matrix_complex_free( theJacobianMatrix2 );
-      theJacobianMatrix2 = gsl_matrix_complex_calloc( aSize, aSize );
+      {
+	if ( theJacobianMatrix2 )
+	  {
+	    gsl_matrix_complex_free( theJacobianMatrix2 );
+	    theJacobianMatrix2 = NULLPTR;
+	  }
+	if ( aSize > 0 )
+	  {
+	    theJacobianMatrix2 = gsl_matrix_complex_calloc( aSize, aSize );
+	  }
+      }
 
-      if ( thePermutation2 )
-	gsl_permutation_free( thePermutation2 );
-      thePermutation2 = gsl_permutation_alloc( aSize );
+      {
+	if ( thePermutation2 )
+	  {
+	    gsl_permutation_free( thePermutation2 );
+	    thePermutation2 = NULLPTR;
+	  }
+	if ( aSize > 0 )
+	  {
+	    thePermutation2 = gsl_permutation_alloc( aSize );
+	  }
+      }
 
-      if ( theVelocityVector2 )
-	gsl_vector_complex_free( theVelocityVector2 );
-      theVelocityVector2 = gsl_vector_complex_calloc( aSize );
+      {
+	if ( theVelocityVector2 )
+	  {
+	    gsl_vector_complex_free( theVelocityVector2 );
+	    theVelocityVector2 = NULLPTR;
+	  }
+	if ( aSize > 0 )
+	  {
+	    theVelocityVector2 = gsl_vector_complex_calloc( aSize );
+	  }
+      }
 
-      if ( theSolutionVector2 )
-	gsl_vector_complex_free( theSolutionVector2 );
-      theSolutionVector2 = gsl_vector_complex_calloc( aSize );
+      {
+
+	if ( theSolutionVector2 )
+	  {
+	    gsl_vector_complex_free( theSolutionVector2 );
+	    theSolutionVector2 = NULLPTR;
+	  }
+	if ( aSize > 0 )
+	  {
+	    theSolutionVector2 = gsl_vector_complex_calloc( aSize );
+	  }
+      }
     }
 }
 
@@ -273,32 +340,6 @@ void DAEStepper::setJacobianMatrix()
   const Real alphah( alpha / aStepInterval );
   const Real betah( beta / aStepInterval );
   const Real gammah( gamma / aStepInterval );
-
-  /**
-    gsl_complex comp;
-     
-    for ( VariableVector::size_type i( 0 ); i < aSize; ++i )
-      for ( VariableVector::size_type j( 0 ); j < aSize; ++j )
-	{
-	  const Real aPartialDerivative( theJacobian[ i ][ j ] );
-
-	  if ( i == j ) {
-	    gsl_matrix_set( theJacobianMatrix1, i, j,
-			    gammah - aPartialDerivative );
-
-	    GSL_SET_COMPLEX( &comp, alphah - aPartialDerivative, betah );
-	    gsl_matrix_complex_set( theJacobianMatrix2, i, j, comp );
-	  }
-	  else {
-	    gsl_matrix_set( theJacobianMatrix1, i, j,
-			    -1.0 * aPartialDerivative );
-
-	    GSL_SET_COMPLEX( &comp, -1.0 * aPartialDerivative, 0.0 );
-	    gsl_matrix_complex_set( theJacobianMatrix2, i, j, comp );
-	  }
-	}
-    */
-
   gsl_complex comp1, comp2;
   
   for ( RealVector::size_type i( 0 ); i < theSystemSize; i++ )
@@ -335,8 +376,15 @@ void DAEStepper::decompJacobianMatrix()
 {
   int aSignNum;
 
-  gsl_linalg_LU_decomp( theJacobianMatrix1, thePermutation1, &aSignNum );
-  gsl_linalg_complex_LU_decomp( theJacobianMatrix2, thePermutation2, &aSignNum );
+  if ( theSystemSize == 0 )
+    return;
+
+  gsl_linalg_LU_decomp( theJacobianMatrix1,
+			thePermutation1,
+			&aSignNum );
+  gsl_linalg_complex_LU_decomp( theJacobianMatrix2,
+				thePermutation2,
+				&aSignNum );
 }
 
 void DAEStepper::calculateRhs()
@@ -502,6 +550,9 @@ void DAEStepper::calculateRhs()
 
 Real DAEStepper::solve()
 {
+  if ( theSystemSize == 0 )
+    return 0.0;
+
   const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
   gsl_linalg_LU_solve( theJacobianMatrix1, thePermutation1,
@@ -710,6 +761,9 @@ bool DAEStepper::calculate()
 
 Real DAEStepper::estimateLocalError()
 {
+  if ( theSystemSize == 0 )
+    return 0.0;
+
   const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
   const ProcessVector::size_type 
     aDiscreteProcessOffset( getDiscreteProcessOffset() );

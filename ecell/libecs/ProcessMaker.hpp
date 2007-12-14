@@ -33,8 +33,7 @@
 #define ___PROCESSMAKER_H___
 
 #include "Process.hpp"
-#include "dmtool/ModuleMaker.hpp"
-
+#include "PropertiedObjectMaker.hpp"
 
 namespace libecs
 {
@@ -45,19 +44,16 @@ namespace libecs
    */ 
   
   class ProcessMaker 
-    : 
-    public SharedModuleMaker<Process>
   {
   private:
-
-  protected:
-
-    //  virtual void makeClassList();
+    PropertiedObjectMaker& theBackend;
 
   public:
-
-    ProcessMaker();
-    virtual ~ProcessMaker() {}
+    ProcessMaker( PropertiedObjectMaker& maker );
+    virtual ~ProcessMaker();
+    Process* make( const std::string& aClassName );
+    const PropertiedObjectMaker::SharedModule& getModule(
+	const std::string& aClassName, bool forceReload );
   };
 
 #define NewProcessModule(CLASS) NewDynamicModule(Process,CLASS)

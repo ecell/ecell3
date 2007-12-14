@@ -43,22 +43,22 @@ from util import RELATIVE_PERTURBATION, ABSOLUTE_PERTURBATION, allzero, createIn
 import numpy
 
 
-def getJacobianMatrix( aPathwayProxy ):
+def getJacobianMatrix( pathwayProxy ):
     '''
     calculate and return the Jacobian matrix (array)
-    aPathwayProxy: a PathwayProxy instance
+    pathwayProxy: a PathwayProxy instance
     return aJacobian
     '''
 
-    variableList = aPathwayProxy.getVariableList()
+    variableList = pathwayProxy.getVariableList()
 
     size = len( variableList )
 
-    aJacobianMatrix = numpy.zeros( ( size, size ), numpy.Float )
+    aJacobianMatrix = numpy.zeros( ( size, size ), float )
 
-    velocityBuffer = numpy.zeros( size, numpy.Float )
+    velocityBuffer = numpy.zeros( size, float )
 
-    aSession = aPathwayProxy.theEmlSupport.createInstance()
+    aSession = pathwayProxy.theEmlSupport.createSession()
     aSession.step()
     
     for i in range( size ):
@@ -67,7 +67,7 @@ def getJacobianMatrix( aPathwayProxy ):
     # calculate derivatives
     for i in range( size ):
 
-        aSession = aPathwayProxy.theEmlSupport.createInstance()
+        aSession = pathwayProxy.theEmlSupport.createSession()
 
         value = aSession.theSimulator.getEntityProperty( variableList[ i ] + ':Value' )
         aPerturbation = value * RELATIVE_PERTURBATION + ABSOLUTE_PERTURBATION
@@ -83,25 +83,25 @@ def getJacobianMatrix( aPathwayProxy ):
 # end of getJacobianMatrix
 
 
-def getJacobianMatrix2( aPathwayProxy ):
+def getJacobianMatrix2( pathwayProxy ):
     '''
     calculate and return the Jacobian matrix (array)
-    aPathwayProxy: a PathwayProxy instance
+    pathwayProxy: a PathwayProxy instance
     return aJacobian
     '''
 
-    variableList = aPathwayProxy.getVariableList()
+    variableList = pathwayProxy.getVariableList()
 
     size = len( variableList )
 
-    aJacobianMatrix = numpy.zeros( ( size, size ), numpy.Float )
+    aJacobianMatrix = numpy.zeros( ( size, size ), float )
 
-    incidentMatrix = numpy.matrixmultiply( aPathwayProxy.getIncidentMatrix(), numpy.transpose( aPathwayProxy.getIncidentMatrix( 1 ) ) )
+    incidentMatrix = numpy.dot( pathwayProxy.getIncidentMatrix(), numpy.transpose( pathwayProxy.getIncidentMatrix( 1 ) ) )
     independentGroupList = createIndependentGroupList( incidentMatrix )
 
-    velocityBuffer = numpy.zeros( size, numpy.Float )
+    velocityBuffer = numpy.zeros( size, float )
 
-    aSession = aPathwayProxy.theEmlSupport.createInstance()
+    aSession = pathwayProxy.theEmlSupport.createSession()
 
     aSession.step()
     for i in range( size ):
@@ -109,7 +109,7 @@ def getJacobianMatrix2( aPathwayProxy ):
 
     for groupList in independentGroupList:
 
-        aSession = aPathwayProxy.theEmlSupport.createInstance()
+        aSession = pathwayProxy.theEmlSupport.createSession()
 
         perturbationList = []
         for i in groupList:
@@ -145,12 +145,15 @@ if __name__ == '__main__':
     def main( filename ):
         
         anEmlSupport = EmlSupport( filename )
-        aPathwayProxy = anEmlSupport.createPathwayProxy()
+        pathwayProxy = anEmlSupport.createPathwayProxy()
 
         print 'Jacobian matrix ='
-        print getJacobianMatrix( aPathwayProxy )
+        print getJacobianMatrix( pathwayProxy )
         print 'Jacobian matrix ='
-        print getJacobianMatrix2( aPathwayProxy )
+        print getJacobianMatrix2( pathwayProxy )
+
+        # import numpy.linalg
+        # print numpy.linalg.inv( getJacobianMatrix( pathwayProxy ) )
 
     # end of main
     

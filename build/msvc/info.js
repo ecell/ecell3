@@ -1,5 +1,6 @@
 buildInfo.env = (function() {
     var sh = new BuildHelper.BourneShellNotationReader();
+    WScript.Echo(buildInfo.projectDir + '\\ecell_version.sh');
     sh.eval(FileSystemObject.GetFile(
             buildInfo.projectDir + '\\ecell_version.sh'));
     return sh.env.mix({

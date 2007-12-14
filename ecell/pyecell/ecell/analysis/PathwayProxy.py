@@ -331,7 +331,7 @@ class PathwayProxy:
         return stoichiometryMatrix
         '''
 
-        stoichiometryMatrix = numpy.zeros( ( len( self.__variableList ), len( self.__processList ) ), numpy.Float )
+        stoichiometryMatrix = numpy.zeros( ( len( self.__variableList ), len( self.__processList ) ), float )
 
         for j in range( len( self.__processList ) ):
 
@@ -376,8 +376,9 @@ class PathwayProxy:
             propertyList = ecell.eml.Eml.getEntityPropertyList( self.theEmlSupport, processFullID )
 
             if propertyList.count( 'isReversible' ) != 0:
-                isReversible = string.atoi( ecell.Eml.getEntityProperty( self.theEmlSupport, processFullID + ':isReversible' )[ 0 ] )
-                reversibilityList.append( isReversible )
+                # isReversible is handled as float
+                isReversible = string.atof( ecell.Eml.getEntityProperty( self.theEmlSupport, processFullID + ':isReversible' )[ 0 ] )
+                reversibilityList.append( int( isReversible ) )
                 
             else:
                 # default value, irreversible
@@ -402,18 +403,18 @@ if __name__ == '__main__':
     def main( filename ):
 
         anEmlSupport = EmlSupport( filename )
-        aPathwayProxy = anEmlSupport.createPathwayProxy()
+        pathwayProxy = anEmlSupport.createPathwayProxy()
 
         print 'process list ='
-        print aPathwayProxy.getProcessList()
+        print pathwayProxy.getProcessList()
         print 'related variable list ='
-        print aPathwayProxy.getVariableList()
+        print pathwayProxy.getVariableList()
         print 'incident matrix ='
-        print aPathwayProxy.getIncidentMatrix()
+        print pathwayProxy.getIncidentMatrix()
         print 'stoichiometry matrix ='
-        print aPathwayProxy.getStoichiometryMatrix()
+        print pathwayProxy.getStoichiometryMatrix()
         print 'reversibility list ='
-        print aPathwayProxy.getReversibilityList()
+        print pathwayProxy.getReversibilityList()
 
     # end of main
     

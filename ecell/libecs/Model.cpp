@@ -46,19 +46,17 @@
 
 namespace libecs
 {
-
-  ////////////////////////// Model
-
-  Model::Model()
+  Model::Model( PropertiedObjectMaker& maker )
     :
     theCurrentTime( 0.0 ),
     theLoggerBroker(),
     theRootSystemPtr(0),
     theSystemStepper(),
-    theStepperMaker(),
-    theSystemMaker(),
-    theVariableMaker(),
-    theProcessMaker()
+    thePropertiedObjectMaker( maker ),
+    theStepperMaker( thePropertiedObjectMaker ),
+    theSystemMaker( thePropertiedObjectMaker ),
+    theVariableMaker( thePropertiedObjectMaker ),
+    theProcessMaker( thePropertiedObjectMaker )
   {
     theLoggerBroker.setModel( this );
     // initialize theRootSystem

@@ -10,7 +10,7 @@ setup(
     author = 'E-Cell project',
     author_email = 'info@e-cell.org',
     url = 'http://www.e-cell.org/',
-    packages = [ 'ecell' ],
+    packages = [ 'ecell', 'ecell.SessionManager', 'ecell.analysis' ],
     ext_modules = [
         Extension( 'ecell._tableio',
 			sources = [ 'ecell/_tableio.c' ],

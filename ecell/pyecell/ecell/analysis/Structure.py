@@ -51,7 +51,7 @@ def generateFullRankMatrix( inputMatrix ):
 
     reducedMatrix = inputMatrix.copy()
     ( m, n ) = numpy.shape( reducedMatrix )
-    pivotMatrix = numpy.identity( m, numpy.Float )
+    pivotMatrix = numpy.identity( m, float )
 
     dependentList = range( m )
     independentList = []
@@ -91,12 +91,12 @@ def generateFullRankMatrix( inputMatrix ):
         else:
             skippedBuffer.append( j )
 
-    linkMatrix = numpy.identity( m, numpy.Float )
+    linkMatrix = numpy.identity( m, float )
     for i in dependentList:
         linkMatrix[ i ] -= pivotMatrix[ i ]
 
     rank = len( independentList )
-    kernelMatrix = numpy.zeros( ( n, n - rank ), numpy.Float )
+    kernelMatrix = numpy.zeros( ( n, n - rank ), float )
     parsedRank = rank + len( skippedList )
     reducedMatrix = numpy.take( reducedMatrix, range( parsedRank, n ) + skippedList, 1 )
 
@@ -360,12 +360,12 @@ if __name__ == '__main__':
     def main( filename ):
         
         anEmlSupport = EmlSupport( filename )
-        aPathwayProxy = anEmlSupport.createPathwayProxy()
+        pathwayProxy = anEmlSupport.createPathwayProxy()
         
-        stoichiometryMatrix = aPathwayProxy.getStoichiometryMatrix()
+        stoichiometryMatrix = pathwayProxy.getStoichiometryMatrix()
 
-        # print aPathwayProxy.getProcessList()        
-        # print aPathwayProxy.getVariableList()
+        # print pathwayProxy.getProcessList()        
+        # print pathwayProxy.getVariableList()
 
 ##         stoichiometryMatrix = array( [ [ 1., 0., 0., 0., 2. ], [ 0., 0., 1.0, 0., 1. ], [ 1.0, 0.0, 1.0, 0.0, 3.0 ], [ -2.0, 0.0, -2.0, 0.0, -6.0 ] ] )
 ##         stoichiometryMatrix = array( [ [ 1., 2., 3., 4. ], [ 1., 1., 1., 1. ], [ 2., 3., 4., 5. ] ] )
@@ -375,7 +375,7 @@ if __name__ == '__main__':
         print stoichiometryMatrix
 
         ( linkMatrix, kernelMatrix, independentList ) = generateFullRankMatrix( stoichiometryMatrix )
-        reducedMatrix = numpy.take( stoichiometryMatrix, independentList )
+        reducedMatrix = numpy.take( stoichiometryMatrix, independentList, 0 )
 
         print 'link matrix = '
         print linkMatrix
@@ -385,13 +385,13 @@ if __name__ == '__main__':
         print reducedMatrix
 
         # print 'reconstructed input matrix = '
-        # print matrixmultiply( linkMatrix, reducedMatrix )
+        # print numpy.dot( linkMatrix, reducedMatrix )
         # print 'null space = '
-        # print matrixmultiply( stoichiometryMatrix, kernelMatrix )
+        # print numpy.dot( stoichiometryMatrix, kernelMatrix )
 
-        reversibilityList = aPathwayProxy.getReversibilityList()
+        reversibilityList = pathwayProxy.getReversibilityList()
         
-##         stoichiometryMatrix = numpy.transpose( array( [ [ 0, 0, 1, 0, 0 ], [ 0, -1, 0, 2, 0 ], [ -1, 0, 0, 0, 1 ], [ -2, 0, 2, 1, -1 ], [ 0, 0, 0, -1, 0 ], [ 1, 0, 0, 0, 0 ], [ 0, 1, -1, 0, 0 ], [ 0, -1, 1, 0, 0 ], [ 0, 0, 0, 0, -1 ] ], numpy.Float ) )
+##         stoichiometryMatrix = numpy.transpose( array( [ [ 0, 0, 1, 0, 0 ], [ 0, -1, 0, 2, 0 ], [ -1, 0, 0, 0, 1 ], [ -2, 0, 2, 1, -1 ], [ 0, 0, 0, -1, 0 ], [ 1, 0, 0, 0, 0 ], [ 0, 1, -1, 0, 0 ], [ 0, -1, 1, 0, 0 ], [ 0, 0, 0, 0, -1 ] ], float ) )
 ##         reversibilityList = [ 1, 1, 1, 1, 0, 0, 0, 0, 0 ]
 
         print 'input list ='

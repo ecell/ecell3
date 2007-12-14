@@ -49,23 +49,23 @@ from Elasticity import getEpsilonElasticityMatrix2
 GET_ELASTICITY_MATRIX = getEpsilonElasticityMatrix2
 
 
-def calculateControlCoefficient( aPathwayProxy, mode=0 ):
+def calculateControlCoefficient( pathwayProxy, mode=0 ):
     '''
     calculate concentration and flux control coefficients
-    aPathwayProxy: a PathwayProxy instance
+    pathwayProxy: a PathwayProxy instance
     mode: (0 or 1) unscaled or scaled
     return ( CCCMatrix, FCCMatrix )
     '''
 
-    stoichiometryMatrix = aPathwayProxy.getStoichiometryMatrix()
-    elasticityMatrix = GET_ELASTICITY_MATRIX( aPathwayProxy )
+    stoichiometryMatrix = pathwayProxy.getStoichiometryMatrix()
+    elasticityMatrix = GET_ELASTICITY_MATRIX( pathwayProxy )
 
     ( unscaledCCCMatrix, unscaledFCCMatrix ) = calculateUnscaledControlCoefficient( stoichiometryMatrix, elasticityMatrix )
 
     if not mode:
         return ( unscaledCCCMatrix, unscaledFCCMatrix )
     else:
-        return scaleControlCoefficient( aPathwayProxy, \
+        return scaleControlCoefficient( pathwayProxy, \
                                         unscaledCCCMatrix, unscaledFCCMatrix )
 
 # end of calculateControlCoefficient
@@ -85,24 +85,24 @@ def calculateUnscaledControlCoefficient( stoichiometryMatrix, elasticityMatrix )
     # and get reduced stoichiometry, kernel and link matrix
     # see util.generateFullRankMatrix for the details
     ( linkMatrix, kernelMatrix, independentList ) = generateFullRankMatrix( stoichiometryMatrix )
-    reducedMatrix = numpy.take( stoichiometryMatrix, independentList )
+    reducedMatrix = numpy.take( stoichiometryMatrix, independentList, 0 )
 
     # constract Jacobian matrix from reduced, link matrix and elasticities,
     # M0 = N0 * epsilon * L
-    epsilonLMatrix = numpy.matrixmultiply( numpy.transpose( elasticityMatrix ), linkMatrix )
-    aJacobianMatrix = numpy.matrixmultiply( reducedMatrix, epsilonLMatrix )
+    epsilonLMatrix = numpy.dot( numpy.transpose( elasticityMatrix ), linkMatrix )
+    aJacobianMatrix = numpy.dot( reducedMatrix, epsilonLMatrix )
 
     # calculate unscaled concentration control coefficients
     # CS = -L * (M0)^(-1) * N0
     invJacobian = numpy.linalg.inv( aJacobianMatrix )
 
-    unscaledCCCMatrix = numpy.matrixmultiply( -1.0 * linkMatrix, invJacobian )
-    unscaledCCCMatrix = numpy.matrixmultiply( unscaledCCCMatrix, reducedMatrix )
+    unscaledCCCMatrix = numpy.dot( -1.0 * linkMatrix, invJacobian )
+    unscaledCCCMatrix = numpy.dot( unscaledCCCMatrix, reducedMatrix )
 
     # calculate unscaled flux control coefficients
     # CJ = I - epsilon * CS
 
-    unscaledFCCMatrix = numpy.identity( n ) + numpy.matrixmultiply( numpy.transpose( elasticityMatrix ), unscaledCCCMatrix )
+    unscaledFCCMatrix = numpy.identity( n ) + numpy.dot( numpy.transpose( elasticityMatrix ), unscaledCCCMatrix )
 
     return ( unscaledCCCMatrix, unscaledFCCMatrix )
 
@@ -118,7 +118,7 @@ def invdiag( traceArray ):
     '''
 
     size = len( traceArray )
-    invArray = numpy.zeros( size, numpy.Float )
+    invArray = numpy.zeros( size, float )
     for i in range( size ):
         if abs( traceArray[ i ] ) > 0.0:
             invArray[ i ] = 1.0 / traceArray[ i ]
@@ -128,42 +128,42 @@ def invdiag( traceArray ):
 # end of invdiag
 
 
-def scaleControlCoefficient( aPathwayProxy, unscaledCCCMatrix, unscaledFCCMatrix ):
+def scaleControlCoefficient( pathwayProxy, unscaledCCCMatrix, unscaledFCCMatrix ):
     '''
     scale concentration and flux control coefficients and return scaled matrices
-    aPathwayProxy: a PathwayProxy instance
+    pathwayProxy: a PathwayProxy instance
     unscaledCCCMatrix: (matrix)
     unscaledFCCMatrix: (matrix)
     return ( unscaledCCCMatrix, unscaledFCCMatrix )
     '''
 
     # calculate initial activities and get initial values
-    processList = aPathwayProxy.getProcessList()
-    variableList = aPathwayProxy.getVariableList()
+    processList = pathwayProxy.getProcessList()
+    variableList = pathwayProxy.getVariableList()
     
-    aSession = aPathwayProxy.theEmlSupport.createInstance()
+    aSession = pathwayProxy.theEmlSupport.createSession()
 
     aSession.step()
     
-    activityBuffer = numpy.zeros( len( processList ), numpy.Float )
+    activityBuffer = numpy.zeros( len( processList ), float )
     for i in range( len( processList ) ):
         activityBuffer[ i ] = aSession.theSimulator.getEntityProperty( processList[ i ] + ':Activity' )
 
-    valueBuffer = numpy.zeros( len( variableList ), numpy.Float )
+    valueBuffer = numpy.zeros( len( variableList ), float )
     for i in range( len( variableList ) ):
         valueBuffer[ i ] = aSession.theSimulator.getEntityProperty( variableList[ i ] + ':Value' )
 
     # calculate scaled concentration control coefficient
     # ( scaled CS_ij ) = E_j / S_i * ( unscaled CS_ij )
 
-    scaledCCCMatrix = numpy.matrixmultiply( invdiag( valueBuffer ), unscaledCCCMatrix )
-    scaledCCCMatrix = numpy.matrixmultiply( scaledCCCMatrix, numpy.lib.twodim_base.diag( activityBuffer ) )
+    scaledCCCMatrix = numpy.dot( invdiag( valueBuffer ), unscaledCCCMatrix )
+    scaledCCCMatrix = numpy.dot( scaledCCCMatrix, numpy.lib.twodim_base.diag( activityBuffer ) )
 
     # calculate scaled flux control coefficient
     # ( scaled CJ_ij ) = E_j / E_i * ( unscaled CJ_ij )
 
-    scaledFCCMatrix = numpy.matrixmultiply( invdiag( activityBuffer ), unscaledFCCMatrix )
-    scaledFCCMatrix = numpy.matrixmultiply( scaledFCCMatrix, numpy.lib.twodim_base.diag( activityBuffer ) )
+    scaledFCCMatrix = numpy.dot( invdiag( activityBuffer ), unscaledFCCMatrix )
+    scaledFCCMatrix = numpy.dot( scaledFCCMatrix, numpy.lib.twodim_base.diag( activityBuffer ) )
 
     return ( scaledCCCMatrix, scaledFCCMatrix )
 
@@ -181,17 +181,17 @@ if __name__ == '__main__':
     def main( filename ):
         
         anEmlSupport = EmlSupport( filename )
-        aPathwayProxy = anEmlSupport.createPathwayProxy()
+        pathwayProxy = anEmlSupport.createPathwayProxy()
 
-        ( unscaledCCCMatrix, unscaledFCCMatrix ) = calculateControlCoefficient( aPathwayProxy )
+        ( unscaledCCCMatrix, unscaledFCCMatrix ) = calculateControlCoefficient( pathwayProxy )
 
         print 'unscaled concentration control coefficients ='
         print unscaledCCCMatrix
         print 'unscaled flux control coefficients ='
         print unscaledFCCMatrix
 
-        ( scaledCCCMatrix, scaledFCCMatrix ) = scaleControlCoefficient( aPathwayProxy, unscaledCCCMatrix, unscaledFCCMatrix )
-        # ( scaledCCCMatrix, scaledFCCMatrix ) = calculateControlCoefficient( aPathwayProxy, 1 )
+        ( scaledCCCMatrix, scaledFCCMatrix ) = scaleControlCoefficient( pathwayProxy, unscaledCCCMatrix, unscaledFCCMatrix )
+        # ( scaledCCCMatrix, scaledFCCMatrix ) = calculateControlCoefficient( pathwayProxy, 1 )
 
         print 'scaled concentration control coefficients ='
         print scaledCCCMatrix

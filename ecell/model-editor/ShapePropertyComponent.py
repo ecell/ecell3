@@ -40,7 +40,7 @@ import os.path
 
 from ModelEditor import *
 from ViewComponent import *
-from whrandom import randint
+from random import randint
 from SystemObject import *
 from EditorObject import *
 

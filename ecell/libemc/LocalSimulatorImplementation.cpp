@@ -53,14 +53,15 @@ namespace libemc
     theDirtyFlag( true ),
     theEventCheckInterval( 20 ),
     theEventChecker(),
-    theEventHandler()
+    theEventHandler(),
+    thePropertiedObjectMaker(),
+    theModel( thePropertiedObjectMaker )
   {
     clearEventChecker();
   }
 
   LocalSimulatorImplementation::~LocalSimulatorImplementation()
   {
-    delete &theModel;
   }
 
   inline LoggerPtr LocalSimulatorImplementation::
@@ -663,60 +664,13 @@ namespace libemc
   {
     libecs::PolymorphVector aVector;
 
-    
-    // ugly hack...
-    // ModuleMaker should be reconstructed to make this clean.
-
-    ProcessMakerRef aProcessMaker( getModel().getProcessMaker() );
-    for( libecs::ProcessMaker::ModuleMap::const_iterator
-	   i( aProcessMaker.getModuleMap().begin() ); 
-	 i != aProcessMaker.getModuleMap().end(); ++i )
+    for( libecs::PropertiedObjectMaker::ModuleMap::const_iterator
+	   i( thePropertiedObjectMaker.getModuleMap().begin() ); 
+	 i != thePropertiedObjectMaker.getModuleMap().end(); ++i )
       {
 	libecs::PolymorphVector anInnerVector;
 
-	anInnerVector.push_back( Polymorph( "Process" ) );
-	anInnerVector.push_back( Polymorph( i->first ) );
-	anInnerVector.push_back( Polymorph( i->second->getFileName() ) );
-
-	aVector.push_back( anInnerVector );
-      }
-
-    StepperMakerRef aStepperMaker( getModel().getStepperMaker() );
-    for( libecs::StepperMaker::ModuleMap::const_iterator
-	   i( aStepperMaker.getModuleMap().begin() ); 
-	 i != aStepperMaker.getModuleMap().end(); ++i )
-      {
-	libecs::PolymorphVector anInnerVector;
-
-	anInnerVector.push_back( Polymorph( "Stepper" ) );
-	anInnerVector.push_back( Polymorph( i->first ) );
-	anInnerVector.push_back( Polymorph( i->second->getFileName() ) );
-
-	aVector.push_back( anInnerVector );
-      }
-
-    SystemMakerRef aSystemMaker( getModel().getSystemMaker() );
-    for( libecs::SystemMaker::ModuleMap::const_iterator
-	   i( aSystemMaker.getModuleMap().begin() ); 
-	 i != aSystemMaker.getModuleMap().end(); ++i )
-      {
-	libecs::PolymorphVector anInnerVector;
-
-	anInnerVector.push_back( Polymorph( "System" ) );
-	anInnerVector.push_back( Polymorph( i->first ) );
-	anInnerVector.push_back( Polymorph( i->second->getFileName() ) );
-
-	aVector.push_back( anInnerVector );
-      }
-
-    VariableMakerRef aVariableMaker( getModel().getVariableMaker() );
-    for( libecs::VariableMaker::ModuleMap::const_iterator
-	   i( aVariableMaker.getModuleMap().begin() ); 
-	 i != aVariableMaker.getModuleMap().end(); ++i )
-      {
-	libecs::PolymorphVector anInnerVector;
-
-	anInnerVector.push_back( Polymorph( "Variable" ) );
+	anInnerVector.push_back( Polymorph( i->second->getTypeName() ) );
 	anInnerVector.push_back( Polymorph( i->first ) );
 	anInnerVector.push_back( Polymorph( i->second->getFileName() ) );
 

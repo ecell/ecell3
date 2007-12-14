@@ -1804,7 +1804,7 @@ Process PythonProcess( PY1 )
 	<title>Generic ordinary differential Steppers</title>
 
 	<para>If your model is a system of ODEs, then in this version
-of the software (version 3.1.100) the recommended choice is
+of the software (version &appversion;) the recommended choice is
 <classname>ODE45Stepper</classname>.  A current drawback of this
 &Stepper; is that it is not good at solving stiff systems.  In near
 future, a high-performance replacement of this,
@@ -2274,7 +2274,7 @@ Process PythonProcess( PY )
 <!--
 Local Variables:
 mode: sgml
-sgml-parent-document: ("ecell3-users-manual.xml" "book" "chapter")
+sgml-parent-document: ("users-manual.xml" "book" "chapter")
 End:
 -->
 

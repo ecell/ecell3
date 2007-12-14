@@ -1284,7 +1284,7 @@ It automatically runs the program with the commandline options with '<parameter>
 <!--
 Local Variables:
 mode: sgml
-sgml-parent-document: ("ecell3-users-manual.xml" "book" "chapter")
+sgml-parent-document: ("users-manual.xml" "book" "chapter")
 End:
 -->
 
