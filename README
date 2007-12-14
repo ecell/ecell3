@@ -1,64 +1,105 @@
-$Id$
+=======================================================================
+Release notes for E-Cell Simulation Environment Version 3 (E-Cell SE 3)
+=======================================================================
 
-      Release notes for E-Cell Simulation Environment Version 3 (E-Cell SE 3)
-                                        Koichi Takahashi <shafi@e-cell.org>
+Koichi Takahashi <shafi@e-cell.org>
 
-
-
-== About ==
-
+What is E-Cell System?
+======================
 E-Cell is a generic software package for cellular modeling and simulation.  
 
+Files and directories
+=====================
+::
+
+  -+- README:    This file
+   |
+   +- INSTALL:   Installation instructions
+   |
+   +- ChangeLog: Automatically generated cvs log 
+   |
+   +- NEWS:      Project log
+   |
+   +- COPYING:   License
+   |
+   +- AUTHORS:   List of authors
+   |
+   +- ecell/ --> Core portion of E-Cell SE 3, or Hekkoro
+   |  |
+   |  +- libecs/       --> Koyurugi: Class library for cell modeling and
+   |  |                    simulation (E-Cell SE 3's innermost core)
+   |  +- libemc/       --> E-Cell Micro Core (EMC): C++ Facade API of Koyurugi
+   |  |
+   |  +- pyecs/        --> Python binding of EMC and Koyurugi
+   |  |
+   |  +- pyecell/      --> Python E-Cell library
+   |  |
+   |  +- session-monitor/  --> GUI session monitor (gecell)
+   |  |
+   |  +- model-editor/ --> GUI model editor (ecell3-modeleditor)
+   |  |
+   |  +- toollauncher/ --> GUI tool launcher 
+   |
+   +- dmtool/          --> C++ class library for dynamic loading of object
+   |
+   +- doc/             --> Documentations 
+   |  |
+   |  +- users-manual/ --> Users manual
+   |  |
+   |  +- samples/      --> Sample models
+   |
+   +- libltdl/         --> Libtool's dynamic module loader library
 
 
+About the code names
+--------------------
+Hekkoro
+    Code name for E-Cell SE Version 3 (libecs, libemc and pyecs)
+Koyurugi
+    Code name for the libecs class library
+Osogo
+    Code name for the GUI Session monitor (gecell)
 
+$Id$
 
-== Files and directories ==
+Basic Usage
+===========
 
-README:    This file
-INSTALL:   Installation instructions
-ChangeLog: Automatically generated cvs log 
-NEWS:      Project log
-COPYING:   License
-AUTHORS:   List of authors
+1. Using E-Cell from python interpreter
+---------------------------------------
+By default a python binding (pyecs) is built.
 
+To invoke a E-Cell Session Script interpreter in interactive mode, use 'ecell3-sesion' script. Note that the script expects {PREFIX}/bin is included in PATH environment, where {PREFIX} is the directory path that was specified to configure. 
+(If you have not specified it, it falls back to /usr/local.)
 
+A typical command-line session is as follows::
 
-ecell/       --> Core portion of E-Cell SE 3, or Hekkoro
-ecell/libecs --> Koyurugi: Class library for cell modeling and simulation
-                           (E-Cell SE 3's innermost core)
-ecell/libemc --> E-Cell Micro Core (EMC): C++ API of Koyurugi
-ecell/pyecs  --> Python binding of EMC and Koyurugi
-ecell/pyecell--> Python E-Cell library
+   $ ecell3-session
+   ecell3-session [ E-Cell SE Version 3.1.106, on Python Version 2.3.4 ]
+   Copyright (C) 1996-2007 Keio University.
+   Send feedback to Koichi Takahashi <shafi@e-cell.org>
+   ecell3-session>>>
 
-osogo/       --> GUI session monitor (gecell)
+In the above output, 'ecell3-session>>>' is the prompt of ecell3-session. That accepts almost everything of interactive Python.
 
-modeleditor/ --> GUI model editor (ecell3-modeleditor)
+The below example first loads a model that is stored in simple.eml, and then run it for 10 seconds in simulation time::
 
-toollauncher/--> GUI tool launcher 
+   ecell3-session>>> loadModel( 'simple.eml' )
+   <simple.eml, t=0>>> run( 10 )
+   <simple.eml, t=10.001>>>
 
-dmtool/      --> C++ class library for dynamic loading of object classes
+2. Using E-Cell from Session Monitor GUI
+----------------------------------------
+If you have python, and pygtk2 installed, a GUI session monitor, is built.
 
-doc/         --> Documentations 
-doc/users_manual -> Users manual
-doc/sample/* --> Sample models
+To use Session Monitor, type::
 
+   $ {PREFIX}/bin/gecell
 
-(Below are third-party packages)
+Documentation
+-------------
+The E-Cell 3 users manual is placed under {PREFIX}/share/doc/eusers-manual .
 
-libltdl/     --> Libtool's dynamic module loader library
-
-
-
-
-== About code names ==
-
-
-  Hekkoro  -- Code name for E-Cell SE Version 3 (libecs, libemc and pyecs)
-  Koyurugi -- Code name for the libecs class library
-  Osogo    -- Code name for the GUI Session monitor (gecell)
-
-  (Serizawa -- Code name for E-Cell 1)
-
-
+If you have doxygen, API reference will be built and installed in
+{PREFIX}/share/doc/api.
 
