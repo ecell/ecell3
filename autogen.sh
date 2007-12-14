@@ -44,7 +44,7 @@ for dir in . libltdl dmtool ecell
   { echo -n 'libtoolize '; $LIBTOOLIZE -c --force --automake; } && \
   { echo -n 'aclocal '; aclocal; } && \
   { echo -n 'autoheader '; autoheader -f ; } && \
-  { echo -n 'automake ';  automake --add-missing --gnu $am_opt; } && \
+  { echo -n 'automake ';  automake -c --add-missing --gnu $am_opt; } && \
   { echo -n 'autoconf '; autoconf; } && \
   echo )
   
