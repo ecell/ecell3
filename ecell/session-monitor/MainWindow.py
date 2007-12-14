@@ -625,12 +625,6 @@ class MainWindow(OsogoWindow):
                         self.theSession.updateFundamentalWindows()
                         self.theEntityListWindow.theQueue.applyFullPNList()
 		except:
-                        # set load command not to be operated 
-                        self['load_model_button'].set_sensitive(0)
-                        self['load_script_button'].set_sensitive(0)
-                        self['load_model_menu'].set_sensitive(0)
-                        self['load_script_menu'].set_sensitive(0)
-
                         # expants message window, when it is folded.
 			if self.exists():
 				if ( self['message_togglebutton'].get_child() ).get_active() == FALSE:
