@@ -99,7 +99,7 @@ Install
 
 You may find the following options to configure are useful.
  
-  --with-boost-root-dir=PATH   Specify this when boost is installed
+  --with-numpy-includes=DIR    Specify this when numpy is installed
                                under non-standard installation directory.
   --disable-gui                Specify to disable building GUI frontends.
 

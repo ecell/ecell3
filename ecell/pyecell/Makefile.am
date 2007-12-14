@@ -77,9 +77,12 @@ EXTRA_DIST = \
 bin_SCRIPTS = \
 	ecell3-session \
 	ecell3-session-manager \
-	ecell3-session-gui \
 	ecell3-sbml2eml \
 	ecell3-eml2sbml
+
+if ENABLE_GUI
+bin_SCRIPTS += ecell3-session-gui
+endif
 
 clean-local:
 	${RM} -rf build *.exe *.zip *.dll *.pyd

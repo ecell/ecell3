@@ -7,9 +7,6 @@ MANUAL_TARGETS =
 
 _htmldir = $(htmldir)/$(DOC_html)
 _html_DATA = $(DOC_html)/*
-ps_DATA   = $(DOC_ps)
-pdf_DATA  = $(DOC_pdf)
-dvi_DATA  = $(DOC_dvi)
 
 if BUILD_USERS_MANUAL_html
 MANUAL_TARGETS += $(DOC_html)
@@ -17,14 +14,17 @@ endif
 
 if BUILD_USERS_MANUAL_ps
 MANUAL_TARGETS += $(DOC_ps)
+ps_DATA   = $(DOC_ps)
 endif
 
 if BUILD_USERS_MANUAL_pdf
 MANUAL_TARGETS += $(DOC_pdf)
+pdf_DATA  = $(DOC_pdf)
 endif
 
 if BUILD_USERS_MANUAL_dvi
 MANUAL_TARGETS += $(DOC_dvi)
+dvi_DATA  = $(DOC_dvi)
 endif
 
 EXTRA_DIST = \
@@ -43,13 +43,16 @@ EXTRA_DIST = \
 	running.xml \
 	scripting.xml \
 	session-class-api.xml \
-	stddmlib.xml \
-	$(MANUAL_TARGETS)
+	stddmlib.xml
+
+if BUILD_USERS_MANUAL_html
+EXTRA_DIST += $(DOC_html)
+endif
 
 all: $(MANUAL_TARGETS)
 
-$(DOC_html): users-manual.xml
-	$(DB2HTML) -o $@ $<
+$(DOC_html)/*: users-manual.xml
+	$(DB2HTML) -o $(DOC_html) $<
 
 $(DOC_ps): users-manual.xml
 	$(DB2PS) $<

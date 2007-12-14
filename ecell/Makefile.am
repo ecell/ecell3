@@ -1,8 +1,7 @@
-
 AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = libecs libemc pyecs pyecell bin dm
-if WITH_GTK
+if ENABLE_GUI
 SUBDIRS += session-monitor model-editor toollauncher
 endif
 

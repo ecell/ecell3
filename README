@@ -108,10 +108,10 @@ Osogo
 
 Documentation
 =============
-The E-Cell 3 users manual is placed under {PREFIX}/share/doc/eusers-manual .
+E-Cell 3 users manual is placed under ``{PREFIX}/share/doc/users-manual``.
 
 If you have doxygen, API reference will be built and installed in
-{PREFIX}/share/doc/api.
+``{PREFIX}/share/doc/api`` .
 
 Basic Usage
 ===========
@@ -121,7 +121,7 @@ Basic Usage
 By default a python binding (pyecs) is built.
 
 To invoke a E-Cell Session Script interpreter in interactive mode, use ``ecell3-sesion`` script. Note that the script expects {PREFIX}/bin is included in PATH environment, where {PREFIX} is the directory path that was specified to configure. 
-(If you have not specified it, it falls back to /usr/local.)
+(If you have not specified it, it falls back to ``/usr/local``.)
 
 A typical command-line session is as follows::
 
