@@ -14,3 +14,6 @@ EXTRA_DIST = \
 	ecell_version.sh
 
 doc_DATA = $(BASIC_DOCS)
+
+dist-hook:
+	cp py-compile $(distdir)
