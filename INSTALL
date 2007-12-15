@@ -62,11 +62,31 @@ Building Prerequisite
 
   http://www.gnu.org/software/gsl/
 
-5. NumPy (version 1.0.3 or later)
+5. NumPy (version 1.0 or later, >= 1.0.3 is recommended)
 
   http://numpy.scipy.org/
 
-6. (optional) libsbml (version 2.x) -- needed for SBML support.
+6. (optional) PyGTK (version 2.0 or later, >= 2.6 is recommended)
+   -- only needed to build GUI frontends. 
+
+  http://www.pygtk.org/
+
+  Notes:
+
+  * Glade support is also needed to get the frontend to work, so
+    libglade of a version that satisifies the PyGTK requisuite
+    has to be installed beforehand.
+
+  * if you wish to use E-Cell on a headless environment, specify
+    ``--disable-gui`` option to configure script.  Otherwise
+    configure will fail with an error in the check of PyGTK installation.
+
+7. (optional) GNOME-Python (version 2.0 or later, >= 2.6 is recommended)
+   -- only needed to build GUI frontends. 
+
+  http://www.pygtk.org/
+
+8. (optional) libsbml (version 2.x) -- needed for SBML support.
 
   http://sourceforge.net/projects/sbml
 
@@ -74,13 +94,13 @@ Building Prerequisite
 
   libsbml 3.x series are not supported due to significant API differences.
 
-7. (optional) doxygen -- neeeded to generate API reference
+9. (optional) doxygen -- neeeded to generate API reference
 
   http://www.stack.nl/~dimitri/doxygen/
 
   The documentation is currently incomplete.
 
-8. (optional) docbook-tools -- needed to generate users manual
+10. (optional) docbook-tools -- needed to generate users manual
 
   http://sources.redhat.com/docbook-tools/
 
