@@ -55,7 +55,6 @@ if BUILD_USERS_MANUAL_html
 EXTRA_DIST += $(DOC_html)
 endif
 
-distclean:
-	$(RM) -f $(DOC_PS) $(DOC_PDF) $(DOC_DVI)
-	$(RM) -rf $(DOC_HTML)
+clean-local:
+	$(RM) -f $(DOC_ps) $(DOC_pdf) $(DOC_dvi)
 	$(RM) -rf *.junk *.tex
