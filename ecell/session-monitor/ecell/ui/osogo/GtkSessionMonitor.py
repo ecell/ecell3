@@ -503,7 +503,6 @@ class GtkSessionFacade:
                 self.fireEvent( 'simulation_started' )
                 if time:
                     self.theSession.run( time )
-                    self.fireEvent( 'simulation_updated' )
                     self.theRunningFlag = False
                     self.message( "%15s:Stop" % self.getCurrentTime() )
                 else:
@@ -515,6 +514,7 @@ class GtkSessionFacade:
                             self.fireEvent( 'simulation_updated' )
                             aCounter = 0
 
+                self.fireEvent( 'simulation_updated' )
                 self.fireEvent( 'simulation_stopped' )
 
             thread.start_new_thread( thread_proc, () )
@@ -678,8 +678,8 @@ class GtkSessionFacade:
         if anAttribute[ SETTABLE ]:
             self.theSession.theSimulator.setEntityProperty(
                 aFullPNString, aValue )
-            self.theSession.fireEvent( 'entity_property_changed',
-                fullPN = fullPN, value = aValue )
+            self.fireEvent( 'entity_property_changed',
+                            fullPN = aFullPNString, value = aValue )
         else:
             self.message('%s is not settable' % aFullPNString )
 
