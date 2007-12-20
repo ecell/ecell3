@@ -3,6 +3,8 @@ SUBDIRS = libltdl dmtool ecell osdep doc build
 BASIC_DOCS = \
 	AUTHORS \
 	COPYING \
+	COPYING.LGPLv2 \
+	COPYING.LGPLv3 \
 	INSTALL \
 	NEWS \
 	README \
