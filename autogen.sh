@@ -37,6 +37,8 @@ case $CC in
 *xlc | *xlc\ * | *lcc | *lcc\ *) am_opt=--include-deps;;
 esac
 
+[ ! -e doc/users-manual/users-manual ] && mkdir -p doc/users-manual/users-manual
+
 for dir in . libltdl dmtool ecell
   do 
   echo -n "Running autotools for $dir ... "
