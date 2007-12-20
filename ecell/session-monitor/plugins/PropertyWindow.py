@@ -525,7 +525,7 @@ class PropertyWindow(OsogoPluginWindow):
         aFullPNString = util.createFullPNString(self.theSelectedFullPN)
 
         try:
-            self.setValue( self.theSelectedFullPN, aValue ) 
+            self.setValue( self.theSelectedFullPN, aValue )
             lockCursor = self.lockCursor
             self.lockCursor = True
             self['theTreeView'].get_selection().select_iter( anIter )
@@ -548,6 +548,13 @@ class PropertyWindow(OsogoPluginWindow):
         else:
 
             self.__updatePropertyList()
+
+    def setValue( self, aFullPN, aValue ):
+
+        self.thePrePropertyMap[ aFullPN[ 3 ] ][ 0 ] = aValue
+        return OsogoPluginWindow.setValue( self, aFullPN, aValue )
+
+    # end of setValue
 
     def getSelectedFullPN( self ):
 
