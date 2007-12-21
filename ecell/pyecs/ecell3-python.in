@@ -20,7 +20,6 @@ ECELL_DIRNAME=@ECELL_DIRNAME@
 
 ECELL3_PREFIX=${prefix}
 PYTHONDIR=${pyexecdir}
-LD_LIBRARY_PATH="${libdir}:${LD_LIBRARY_PATH}"
 
 # make a __init__.py file in ecell/SessionManager!
 PYTHONPATH="$PYTHONDIR:${PYTHONPATH}"
@@ -38,7 +37,6 @@ ECELL3_LIBDIR="${libdir}/${ECELL_DIRNAME}"
 export ECELL3_PREFIX
 export ECELL_DIRNAME
 export PYTHONDIR
-export LD_LIBRARY_PATH
 export PYTHONPATH
 export PYTHON_INCLUDES
 export BOOST_LIBRARIES
