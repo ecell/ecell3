@@ -32,7 +32,7 @@ opengui.py  - to start up E-Cell3 GUI
 
 __program__ = 'opengui.py'
 __author__ = 'Koichi Takahashi <shafi@e-cell.org>, zhaiteng and sugi'
-__copyright__ = 'Copyright (C) 2002-2006 Keio University'
+__copyright__ = 'Copyright (C) 2002-2007 Keio University'
 __license__ = 'GPL'
 
 import sys
