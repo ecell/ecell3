@@ -64,7 +64,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib libgsl_dll.lib"
+				AdditionalDependencies="ecs.lib gsl_dll.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(LIB)"
 				IgnoreAllDefaultLibraries="false"
@@ -141,7 +141,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib libgsl_dll.lib"
+				AdditionalDependencies="ecs.lib gsl_dll.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(LIB)"
 				GenerateDebugInformation="true"
@@ -222,7 +222,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib libgsl_dll.lib"
+				AdditionalDependencies="ecs.lib gsl_dll.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(LIB)"
 				IgnoreAllDefaultLibraries="false"
@@ -300,7 +300,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib libgsl_dll.lib"
+				AdditionalDependencies="ecs.lib gsl_dll.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(LIB)"
 				GenerateDebugInformation="true"

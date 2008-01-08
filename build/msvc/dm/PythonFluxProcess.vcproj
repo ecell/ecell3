@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib libgsl_dll.lib"
+				AdditionalDependencies="ecs.lib gsl_dll.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(LIB)"
 				GenerateDebugInformation="true"
