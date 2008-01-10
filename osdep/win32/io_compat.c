@@ -61,6 +61,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <ctype.h>
+#include <limits.h>
 #include "errno.h"
 #include "private.h"
 #include "win32_utils.h"
