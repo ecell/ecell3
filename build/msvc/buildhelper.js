@@ -125,10 +125,10 @@ BuildHelper.mkdir = function(path) {
     if (FileSystemObject.FolderExists(path))
         return true;
 
-    var parentDir = FileSystemObject.GetParentFolderName(path);
+    var parent_dir = FileSystemObject.GetParentFolderName(path);
 
-    if (parentDir != '')
-        this.mkdir(parentDir);
+    if (parent_dir != '')
+        this.mkdir(parent_dir);
 
     WScript.Echo('Creating directory ' + path);
     FileSystemObject.CreateFolder(path);
@@ -137,8 +137,23 @@ BuildHelper.mkdir = function(path) {
 };
 
 BuildHelper.copy = function(src, dest) {
-    WScript.Echo('Copying ' + src + ' => ' + dest);
-    FileSystemObject.CopyFile(src, dest);
+    var parent_dir = FileSystemObject.GetParentFolderName(src);
+    if (parent_dir == '')
+        parent_dir = '.';
+    var matcher = new this.GlobMatcher(
+            FileSystemObject.GetFileName(src));
+    var dest_is_dir = FileSystemObject.FolderExists(dest);
+    for (var i = new Enumerator(FileSystemObject.GetFolder(
+            parent_dir).Files); !i.atEnd(); i.moveNext()) {
+        var file = i.item();
+        if (matcher.match(file.Name)) {
+            WScript.Echo('Copying ' + file.Path + ' => ' + dest);
+            var dest_file = dest_is_dir ?
+                FileSystemObject.BuildPath(dest, file.Name):
+                dest;
+            FileSystemObject.CopyFile(file, dest_file);
+        }
+    }
 
     return true;
 };
@@ -147,7 +162,7 @@ BuildHelper.copyMultiple = function(src_dir, dest, files) {
     var error = false;
 
     for (var i = 0; i < files.length; i++) {
-        var src = src_dir + '\\' + files[i];
+        var src = FileSystemObject.BuildPath(src_dir, files[i]);
         try {
             this.copy(src, dest);
         } catch (e) {
@@ -163,6 +178,40 @@ BuildHelper.copyMultiple = function(src_dir, dest, files) {
 
     return true;
 };
+
+BuildHelper.copyRecursively = function(src_dir, dest_dir) {
+    var files = '*', excludes = [];
+    if (arguments.length >= 3)
+        files = arguments[2];
+    if (arguments.length >= 4)
+        excludes = arguments[3];
+
+    var ex_matcher = [];
+    for (var i = 0; i < excludes.length; ++i)
+        ex_matcher[i] = new this.GlobMatcher(excludes[i]);
+
+    this.copyMultiple(src_dir, dest_dir, files);
+
+    for (var i = new Enumerator(
+            FileSystemObject.GetFolder(src_dir).SubFolders);
+            !i.atEnd(); i.moveNext()) {
+        var subdir = i.item();
+        for (var j = 0; j < ex_matcher.length; ++j) {
+            if (ex_matcher[j].match(subdir.Name)) {
+                subdir = null;
+                break;
+            }
+        }
+        if (subdir == null)
+            continue;
+        var dest_subdir = FileSystemObject.BuildPath(
+                dest_dir, subdir.Name);
+        this.mkdir(dest_subdir);
+        this.copyRecursively(subdir, dest_subdir, files, excludes);
+    } 
+    return true;
+};
+
 
 BuildHelper.chdir = function(dir) {
     WshShell.CurrentDirectory = dir;
@@ -431,5 +480,25 @@ BuildHelper.BourneShellNotationReader.prototype = {
                 break; 
             }
         }
+    }
+};
+
+BuildHelper.GlobMatcher = function() {
+    this.initialize.apply(this, arguments);
+};
+
+BuildHelper.GlobMatcher.prototype = {
+    initialize: function(pattern) {
+        pattern = pattern.replace(/\./g, '\\.');
+        pattern = pattern.replace(/\?+/g,
+            function($0) {
+                return '(' + $0.replace(/\?/g, '.') + ')';
+            });
+        pattern = pattern.replace(/\*/g, '(.+)');
+        this.pattern = new RegExp('^' + pattern + '$');
+    },
+
+    match: function(str) {
+        return str.match(this.pattern);
     }
 };
