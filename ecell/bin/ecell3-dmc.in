@@ -180,10 +180,9 @@ def main():
         CLASSNAME, ext = os.path.splitext(ext)
         CLASSNAMEDEFINE = '-D_ECELL3_DM_CLASSNAME=' + CLASSNAME
         argList = []
-        argList.append( '\"' + cmdList[0] + '\"' )
+        argList.append( cmdList[0] )
         argList.extend( cmdList[1:] )
-        argList.extend( [ '\"' + SRC + '\"',
-                          '\"' + CLASSNAMEDEFINE + '\"' ] )
+        argList.extend( [ SRC, CLASSNAMEDEFINE ] )
         argList.extend( STDINCLUDE )
         argList.extend( CXXCOMPILEFLAGS )
 
