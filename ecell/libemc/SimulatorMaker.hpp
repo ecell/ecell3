@@ -29,12 +29,21 @@
 // E-Cell Project.
 //
 
-
 #ifndef __SIMULATORMAKER_HPP
 #define __SIMULATORMAKER_HPP
+
+#ifdef DLL_EXPORT
+#undef DLL_EXPORT
+#define _DLL_EXPORT
+#endif /* DLL_EXPORT */
+
 #include "Simulator.hpp"
-//FIXME: should be dmtool/ModuleMaker.hpp
 #include "dmtool/ModuleMaker.hpp"
+
+#ifdef _DLL_EXPORT
+#define DLL_EXPORT
+#undef _DLL_EXPORT
+#endif /* _DLL_EXPORT */
 
 namespace libemc
 {

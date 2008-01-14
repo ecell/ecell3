@@ -15,6 +15,7 @@ include_dirs = [
 
 common_libraries = [
     'boost_python',
+    'gsl'
     ]
 
 ecell_staging_home = '@abs_top_builddir@/tmp'

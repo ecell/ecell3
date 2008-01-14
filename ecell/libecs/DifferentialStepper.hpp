@@ -275,9 +275,9 @@ namespace libecs
 
   public:
 
-    LIBECS_API DifferentialStepper();
+    DifferentialStepper();
 
-    LIBECS_API virtual ~DifferentialStepper();
+    virtual ~DifferentialStepper();
 
     SET_METHOD( Real, NextStepInterval )
     {
@@ -306,19 +306,19 @@ namespace libecs
       setNextStepInterval( aStepInterval );
     }
 
-    LIBECS_API void resetAll();
+    void resetAll();
 
-    LIBECS_API void interIntegrate();
+    void interIntegrate();
 
     void initializeVariableReferenceList();
 
-    LIBECS_API void setVariableVelocity( boost::detail::multi_array::sub_array<Real, 1> aVelocityBuffer );
+    void setVariableVelocity( boost::detail::multi_array::sub_array<Real, 1> aVelocityBuffer );
  
-    LIBECS_API virtual void initialize();
+    virtual void initialize();
 
-    LIBECS_API virtual void reset();
+    virtual void reset();
 
-    LIBECS_API virtual void interrupt( TimeParam aTime );
+    virtual void interrupt( TimeParam aTime );
 
     virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
     {
@@ -390,9 +390,9 @@ namespace libecs
 
   public:
 
-    LIBECS_API AdaptiveDifferentialStepper();
+    AdaptiveDifferentialStepper();
 
-    LIBECS_API virtual ~AdaptiveDifferentialStepper();
+    virtual ~AdaptiveDifferentialStepper();
 
     /**
        Adaptive stepsize control.
@@ -489,9 +489,9 @@ namespace libecs
       return theRelativeEpsilon;
     }
 
-    LIBECS_API virtual void initialize();
+    virtual void initialize();
 
-    LIBECS_API virtual void step();
+    virtual void step();
 
     virtual bool calculate() = 0;
 

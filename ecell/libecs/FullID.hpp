@@ -54,7 +54,7 @@ namespace libecs
       SystemPath 
   */
 
-  class SystemPath : public StringList
+  class LIBECS_API SystemPath : public StringList
   {
 
   public:
@@ -101,7 +101,7 @@ namespace libecs
     //    SystemPath();
 
 
-    LIBECS_API void parse( StringCref systempathstring );
+    void parse( StringCref systempathstring );
 
   public:
 

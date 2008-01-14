@@ -28,16 +28,24 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
-
-
 #ifndef __SIMULATOR_HPP
 #define __SIMULATOR_HPP
+
+#ifdef DLL_EXPORT
+#undef DLL_EXPORT
+#define _DLL_EXPORT
+#endif /* DLL_EXPORT */
 
 #include "libecs/libecs.hpp"
 #include "libecs/EntityType.hpp"
 #include "libecs/Polymorph.hpp"
 #include "libecs/DataPointVector.hpp"
 #include "libecs/Logger.hpp"
+
+#ifdef _DLL_EXPORT
+#define DLL_EXPORT
+#undef _DLL_EXPORT
+#endif /* _DLL_EXPORT */
 
 #include "libemc.hpp"
 #include "SimulatorImplementation.hpp"

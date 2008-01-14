@@ -32,7 +32,7 @@
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( __CYGWIN__ )
 #include "win32_utils.h"
 #endif /* WIN32 */
 
@@ -62,7 +62,7 @@ namespace libecs
       {
 	return false;
       }
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( __CYGWIN__ )
     if ( libecs_win32_init() )
       {
 	ModuleMaker::finalize();
@@ -80,7 +80,7 @@ namespace libecs
     else
       isInitialized = false;
 
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( __CYGWIN__ )
     libecs_win32_fini();
 #endif
     ModuleMaker::finalize();

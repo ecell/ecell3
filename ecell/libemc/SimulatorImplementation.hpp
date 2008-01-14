@@ -29,14 +29,23 @@
 // E-Cell Project.
 //
 
-
 #ifndef __SIMULATORIMPLEMENTATION_HPP
 #define __SIMULATORIMPLEMENTATION_HPP
 
+#ifdef DLL_EXPORT
+#undef DLL_EXPORT
+#define _DLL_EXPORT
+#endif /* DLL_EXPORT */
+
 #include "libecs/libecs.hpp"
 #include "libecs/Logger.hpp"
-#include "libemc.hpp"
 
+#ifdef _DLL_EXPORT
+#define DLL_EXPORT
+#undef _DLL_EXPORT
+#endif /* _DLL_EXPORT */
+
+#include "libemc.hpp"
 
 namespace libemc
 {
@@ -202,4 +211,3 @@ namespace libemc
 } // namespace libemc
 
 #endif   /* ___SIMULATOR_IMPLEMENTATION_H___ */
-

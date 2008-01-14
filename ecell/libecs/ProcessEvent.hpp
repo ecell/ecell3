@@ -45,7 +45,7 @@ namespace libecs
 
   DECLARE_CLASS( ProcessEvent );
 
-  class ProcessEvent
+  class LIBECS_API ProcessEvent
     :
     public EventBase
   {

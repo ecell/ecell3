@@ -50,7 +50,7 @@ namespace libecs
 
   */
 
-  class EntityType
+  class LIBECS_API EntityType
   {
 
   public:
@@ -64,7 +64,7 @@ namespace libecs
 	SYSTEM    = 4
       };
 
-    LIBECS_API EntityType( StringCref typestring );
+    EntityType( StringCref typestring );
 
     EntityType( const int number );
 

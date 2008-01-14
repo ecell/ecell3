@@ -29,12 +29,21 @@
 // E-Cell Project.
 //
 
-
 #ifndef __LOCALSIMULATORIMPLEMENTATION_HPP
 #define __LOCALSIMULATORIMPLEMENTATION_HPP
 
+#ifdef DLL_EXPORT
+#undef DLL_EXPORT
+#define _DLL_EXPORT
+#endif /* DLL_EXPORT */
+
 #include "libecs/libecs.hpp"
 #include "libecs/Model.hpp"
+
+#ifdef _DLL_EXPORT
+#define DLL_EXPORT
+#undef _DLL_EXPORT
+#endif /* _DLL_EXPORT */
 
 #include "libemc.hpp"
 #include "SimulatorImplementation.hpp"

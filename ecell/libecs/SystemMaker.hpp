@@ -43,7 +43,7 @@ namespace libecs
    * @{ 
    */ 
   
-  class SystemMaker 
+  class LIBECS_API SystemMaker 
   {
   private:
     PropertiedObjectMaker& theBackend;
@@ -57,7 +57,6 @@ namespace libecs
     System* make( const std::string& aClassName );
     const PropertiedObjectMaker::SharedModule& getModule(
 	const std::string& aClassName, bool forceReload );
-
   };
 
   /** @} */ //end of libecs_module 

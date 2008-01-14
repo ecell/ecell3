@@ -133,15 +133,15 @@ namespace libecs
 
   public:
 
-    LIBECS_API Process();
-    LIBECS_API virtual ~Process();
+    Process();
+    virtual ~Process();
 
     virtual const EntityType getEntityType() const
     {
       return EntityType( EntityType::PROCESS );
     }
 
-    LIBECS_API virtual void initialize();
+    virtual void initialize();
     
     virtual void fire() = 0;
     
@@ -293,7 +293,7 @@ namespace libecs
        @see VariableReference
     */
 
-    LIBECS_API VariableReferenceCref getVariableReference( StringCref aVariableReferenceName );
+    VariableReferenceCref getVariableReference( StringCref aVariableReferenceName );
 
     /**
        @return a const reference to the VariableReferenceVector
@@ -402,7 +402,7 @@ namespace libecs
 
     */
 
-    LIBECS_API void declareUnidirectional();
+    void declareUnidirectional();
 
 
     /**
@@ -416,7 +416,7 @@ namespace libecs
 
   protected:
 
-    LIBECS_API VariableReferenceVectorIterator findVariableReference( StringCref aName );
+    VariableReferenceVectorIterator findVariableReference( StringCref aName );
 
     void updateVariableReferenceVector();
 

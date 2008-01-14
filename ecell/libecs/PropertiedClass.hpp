@@ -45,7 +45,7 @@ namespace libecs
 
 #define LIBECS_DM_CLASS( CLASSNAME, BASE )\
   DECLARE_CLASS( CLASSNAME );\
-  class CLASSNAME\
+  class DM_IF CLASSNAME\
    :\
   public BASE 
 
@@ -320,7 +320,7 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
 
   */
 
-  class PropertiedClass
+  class LIBECS_API PropertiedClass
   {
 
   public:
@@ -361,15 +361,15 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
     virtual const Polymorph 
     getPropertyAttributes( StringCref aPropertyName ) const = 0;
 
-    LIBECS_API virtual void defaultSetProperty( StringCref aPropertyName, 
+    virtual void defaultSetProperty( StringCref aPropertyName, 
 				     PolymorphCref aValue );
     
-    LIBECS_API virtual const Polymorph 
+    virtual const Polymorph 
     defaultGetProperty( StringCref aPorpertyName ) const;
     
-    LIBECS_API virtual const Polymorph defaultGetPropertyList() const;
+    virtual const Polymorph defaultGetPropertyList() const;
     
-    LIBECS_API virtual const Polymorph 
+    virtual const Polymorph 
     defaultGetPropertyAttributes( StringCref aPropertyName ) const;
 
     void registerLogger( LoggerPtr aLogger );

@@ -66,7 +66,7 @@ namespace libecs
    
   */
 
-  class Logger
+  class LIBECS_API Logger
     :
     private boost::noncopyable
   {
@@ -122,7 +122,7 @@ namespace libecs
     
     */
 
-    LIBECS_API void setLoggerPolicy( PolymorphCref aParamList );
+    void setLoggerPolicy( PolymorphCref aParamList );
 
 
     /**
@@ -131,7 +131,7 @@ namespace libecs
 
     */
 
-    LIBECS_API const Polymorph getLoggerPolicy( void );
+    const Polymorph getLoggerPolicy( void );
 
     /**
 
@@ -147,14 +147,14 @@ namespace libecs
 
     */
 
-    LIBECS_API DataPointVectorSharedPtr getData( void ) const;
+    DataPointVectorSharedPtr getData( void ) const;
 
     /**
        Returns a slice of the data from aStartTime to anEndTime.
 
     */
 
-    LIBECS_API DataPointVectorSharedPtr getData( RealParam aStartTime,
+    DataPointVectorSharedPtr getData( RealParam aStartTime,
 				      RealParam anEndTime ) const;
 
     /**
@@ -162,7 +162,7 @@ namespace libecs
        intervals anInterval between data elements.
     */
 
-    LIBECS_API DataPointVectorSharedPtr getData( RealParam aStartTime,
+    DataPointVectorSharedPtr getData( RealParam aStartTime,
 				      RealParam anEndTime, 
 				      RealParam anInterval ) const;
     
@@ -172,13 +172,13 @@ namespace libecs
        Returns time of the first element  in Logger.
     */
 
-    LIBECS_API const Real getStartTime( void ) const;
+    const Real getStartTime( void ) const;
 
     /**
        Returns time of the last element in Logger
     */
 
-    LIBECS_API const Real getEndTime( void ) const;
+    const Real getEndTime( void ) const;
 
     /**
       Returns size of logger
@@ -193,7 +193,7 @@ namespace libecs
        DEPRECATED - Use setLoggerPolicy 
     */
 
-    LIBECS_API void setMinimumInterval( RealParam anInterval );
+    void setMinimumInterval( RealParam anInterval );
 
     /**
        DEPRECATED - Use getLoggerPolicy

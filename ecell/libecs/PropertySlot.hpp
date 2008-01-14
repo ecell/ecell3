@@ -64,7 +64,7 @@ namespace libecs
      @see PropertyInterface
   */
 
-  class PropertySlotBase
+  class DM_IF PropertySlotBase
   {
 
   public:
@@ -74,13 +74,13 @@ namespace libecs
       ; // do nothing
     }
     
-    DM_IF virtual ~PropertySlotBase();
+    virtual ~PropertySlotBase();
 
-    DM_IF virtual const bool isSetable() const = 0;
-    DM_IF virtual const bool isGetable() const = 0;
+    virtual const bool isSetable() const = 0;
+    virtual const bool isGetable() const = 0;
 
-    DM_IF virtual const bool isLoadable() const;
-    DM_IF virtual const bool isSavable()  const;
+    virtual const bool isLoadable() const;
+    virtual const bool isSavable()  const;
 
   };
 

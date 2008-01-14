@@ -32,7 +32,7 @@
 #ifndef __DEFS_HPP
 #define __DEFS_HPP
 
-#if defined(WIN32)
+#if defined( WIN32 ) && !defined( __CYGWIN__ )
 #if defined(_MSC_VER)
 #define _USE_MATH_DEFINES
 #if _MANAGED
@@ -500,9 +500,9 @@ typedef const mytype & mytype ## Cref;
 } // namespace libecs
 
 // WIN32 stuff
-#if defined(WIN32)
+#if defined( WIN32 )
 
-#ifdef LIBECS_EXPORTS
+#if defined( LIBECS_EXPORTS ) || defined( DLL_EXPORT )
 #define LIBECS_API __declspec(dllexport)
 #else
 #define LIBECS_API __declspec(dllimport)

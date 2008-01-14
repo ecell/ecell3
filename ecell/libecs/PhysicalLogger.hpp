@@ -49,7 +49,7 @@ namespace libecs
   /** @file */
 
 
-  class PhysicalLogger
+  class LIBECS_API PhysicalLogger
   {
 
     //    DECLARE_TYPE( _DATAPOINT, DATAPOINT );
@@ -62,59 +62,59 @@ namespace libecs
     DECLARE_TYPE( size_t, VectorIterator );
     DECLARE_TYPE( size_t, size_type );
 
-    LIBECS_API PhysicalLogger();
+    PhysicalLogger();
     virtual ~PhysicalLogger();
 	
-    LIBECS_API void push( DataPointCref aDataPoint );
+    void push( DataPointCref aDataPoint );
 
-    LIBECS_API void setEndPolicy( Integer anEndPolicy );
+    void setEndPolicy( Integer anEndPolicy );
 
-    LIBECS_API int getEndPolicy() const;
+    int getEndPolicy() const;
 
     /// set max storage size in Kbytes.
-    LIBECS_API void setMaxSize( size_type aMaxSize );
+    void setMaxSize( size_type aMaxSize );
 
     size_type getMaxSize() const
     {
       return theMaxSize;
     }
 
-    LIBECS_API size_type lower_bound( const size_type start,
+    size_type lower_bound( const size_type start,
 			   const size_type end,
 			   const Real time ) const;
 
-    LIBECS_API size_type upper_bound( const size_type start,
+    size_type upper_bound( const size_type start,
 			   const size_type end,
 			   const Real time ) const;
 
-    LIBECS_API size_type lower_bound_linear( const size_type start,
+    size_type lower_bound_linear( const size_type start,
 				  const size_type end,
 				  const Real time ) const;
 
-    LIBECS_API size_type upper_bound_linear( const size_type start,
+    size_type upper_bound_linear( const size_type start,
 				  const size_type end,
 				  const Real time ) const;
 
-    LIBECS_API size_type lower_bound_linear_backwards( const size_type start,
+    size_type lower_bound_linear_backwards( const size_type start,
 					    const size_type end,
 					    const Real time ) const;
 
-    LIBECS_API size_type lower_bound_linear_estimate( const size_type start,
+    size_type lower_bound_linear_estimate( const size_type start,
 					   const size_type end,
 					   const Real time,
 					   const Real time_per_step ) const;
 
-    LIBECS_API size_type upper_bound_linear_estimate( const size_type start,
+    size_type upper_bound_linear_estimate( const size_type start,
 					   const size_type end,
 					   const Real time,
 					   const Real time_per_step ) const;
     
-    LIBECS_API DataPointVectorSharedPtr getVector( const size_type start,
+    DataPointVectorSharedPtr getVector( const size_type start,
 					const size_type end ) const;
 
-    LIBECS_API size_type size() const;
+    size_type size() const;
 
-    LIBECS_API bool empty() const;
+    bool empty() const;
 
 
     LongDataPoint at( size_type index) const;
@@ -158,7 +158,7 @@ namespace libecs
       return at( end() );
     }
   
-    LIBECS_API Real getAverageInterval() const;
+    Real getAverageInterval() const;
 
   private:
 

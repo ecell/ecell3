@@ -45,18 +45,18 @@ namespace libecs
 
   /** @file */
 
-  class LoggerAdapter
+  class LIBECS_API LoggerAdapter
   {
 
   public:
 
-    LIBECS_API virtual ~LoggerAdapter();
+    virtual ~LoggerAdapter();
 
     virtual const Real getValue() const = 0;
 
   protected:
 
-    LIBECS_API LoggerAdapter();
+    LoggerAdapter();
 
   };
 

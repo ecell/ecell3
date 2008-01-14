@@ -28,6 +28,11 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+#ifdef DLL_EXPORT
+#undef DLL_EXPORT
+#define _DLL_EXPORT
+#endif /* DLL_EXPORT */
+
 #include "libecs/libecs.hpp"
 #include "libecs/Stepper.hpp"
 #include "libecs/System.hpp"
@@ -39,6 +44,11 @@
 #include "libecs/SystemMaker.hpp"
 #include "libecs/VariableMaker.hpp"
 #include "libecs/SystemStepper.hpp"
+
+#ifdef _DLL_EXPORT
+#define DLL_EXPORT
+#undef _DLL_EXPORT
+#endif /* _DLL_EXPORT */
 
 #include "LocalSimulatorImplementation.hpp"
 
@@ -682,5 +692,3 @@ namespace libemc
 
 
 } // namespace libemc,
-
-

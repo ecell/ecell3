@@ -131,24 +131,7 @@ AC_CHECK_LIB(c, open, LIBC="-lc")
 AC_SUBST(LIBC)
 dnl
 
-dnl disable checking dlopen for windows
-case ${host_os} in
-  *cygwin* | *mingw* | *win32*)
-    os_win32=yes
-    AM_CHECK_PYMOD(py2exe,,,[AC_MSG_ERROR([could not find py2exe module])])
-    ;;
-  *)
-    AC_CHECK_LIB(dl, dlopen, LIBDL="-ldl")
-    AC_SUBST(LIBDL) 
-    os_win32=no
-    ;;
-esac
-AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
-
-
-AC_CHECK_LIB(gslcblas,cblas_dgemm,,[AC_MSG_ERROR([The libgslcblas (part of GNU Scientific Library) could not be found.])])
-
-AC_CHECK_LIB(gsl,gsl_block_alloc,,[AC_MSG_ERROR([The libgsl (GNU Scientific Library) could not be found.])])
+ECELL_CHECK_GSL
 
 AM_CHECK_PYMOD(numpy,,,[AC_MSG_ERROR([could not find Python numpy module])])
 AM_CHECK_PYMOD(xml,,,[AC_MSG_ERROR([could not find Python xml module])])
@@ -233,6 +216,7 @@ AC_SUBST(DMTOOL_INCLUDE_DIR)
 
 AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR([Failed to find Python headers.])])
 ECELL_CHECK_PYTHON_LIBS
+AM_CONDITIONAL([HAVE_PYTHON_LIB], [test ! -z "$PYTHIN_LIBS"])
 AC_SUBST([PYTHON_LIBS])
 
 ECELL_CHECK_NUMPY

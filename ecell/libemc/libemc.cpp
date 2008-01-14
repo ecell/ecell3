@@ -28,8 +28,8 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
-#include <signal.h>
 
+#include <signal.h>
 
 #include "libemc.hpp"
 

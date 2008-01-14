@@ -55,7 +55,7 @@ namespace libecs
   /** @file */
 
 
-  class PropertySlotProxy
+  class LIBECS_API PropertySlotProxy
   {
 
   public:
@@ -65,7 +65,7 @@ namespace libecs
       ; // do nothing
     }
     
-    LIBECS_API virtual ~PropertySlotProxy();
+    virtual ~PropertySlotProxy();
 
     virtual SET_METHOD( Polymorph, Polymorph ) = 0;
     virtual GET_METHOD( Polymorph, Polymorph ) = 0;

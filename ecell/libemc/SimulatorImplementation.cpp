@@ -28,8 +28,8 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
-#include "SimulatorImplementation.hpp"
 
+#include "SimulatorImplementation.hpp"
 
 // nothing here
 

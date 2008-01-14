@@ -51,7 +51,7 @@ namespace libecs
 
   DECLARE_SHAREDPTR( DataPointVector );
 
-  class DataPointVector
+  class LIBECS_API DataPointVector
   {
 
   public:
@@ -60,11 +60,11 @@ namespace libecs
 
     ~DataPointVector();
 
-    LIBECS_API DataPointRef asShort( DataPointVectorIterator aPosition );
+    DataPointRef asShort( DataPointVectorIterator aPosition );
 
     DataPointCref asShort( DataPointVectorIterator aPosition ) const;
 
-    LIBECS_API LongDataPointRef asLong( DataPointVectorIterator aPosition );
+    LongDataPointRef asLong( DataPointVectorIterator aPosition );
 
     LongDataPointCref asLong( DataPointVectorIterator aPosition ) const;
 
@@ -73,7 +73,7 @@ namespace libecs
       return theSize;
     }
 
-    LIBECS_API size_t getElementSize() const;
+    size_t getElementSize() const;
 	
     DataPointVectorIterator begin() const
     {
@@ -85,9 +85,9 @@ namespace libecs
       return getSize();
     }
 	
-    LIBECS_API const void* getRawArray() const;
+    const void* getRawArray() const;
 
-    LIBECS_API Integer getPointSize();
+    Integer getPointSize();
 
   private:
 

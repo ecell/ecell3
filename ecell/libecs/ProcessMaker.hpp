@@ -43,7 +43,7 @@ namespace libecs
    * @{ 
    */ 
   
-  class ProcessMaker 
+  class LIBECS_API ProcessMaker 
   {
   private:
     PropertiedObjectMaker& theBackend;

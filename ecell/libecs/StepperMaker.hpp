@@ -44,7 +44,7 @@ namespace libecs
    */ 
   
 
-  class StepperMaker 
+  class LIBECS_API StepperMaker 
   {
   private:
     PropertiedObjectMaker& theBackend;

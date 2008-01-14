@@ -61,7 +61,7 @@ namespace libecs
 
   */
 
-  class LoggerBroker
+  class LIBECS_API LoggerBroker
   {
 
   public:
@@ -98,9 +98,9 @@ namespace libecs
        
     */
 
-    LIBECS_API LoggerPtr getLogger( FullPNCref aFullPN ) const;
+    LoggerPtr getLogger( FullPNCref aFullPN ) const;
 
-    LIBECS_API LoggerPtr createLogger( FullPNCref aFullPN, PolymorphVectorCref aParamList );
+    LoggerPtr createLogger( FullPNCref aFullPN, PolymorphVectorCref aParamList );
 
     /**
        Flush the data in all the Loggers immediately.

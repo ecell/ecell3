@@ -45,7 +45,7 @@ namespace libecs
 
   /** @file */
 
-  class VariableReference
+  class LIBECS_API VariableReference
   {
 
   public:

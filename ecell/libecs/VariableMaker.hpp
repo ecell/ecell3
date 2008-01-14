@@ -43,10 +43,13 @@ namespace libecs
    * @{ 
    */ 
   
-  class VariableMaker 
+  class LIBECS_API VariableMaker 
   {
   private:
     PropertiedObjectMaker& theBackend;
+
+  protected:
+    void makeClassList();
 
   public:
     VariableMaker( PropertiedObjectMaker& maker );
@@ -54,11 +57,6 @@ namespace libecs
     Variable* make( const std::string& aClassName );
     const PropertiedObjectMaker::SharedModule& getModule(
 	const std::string& aClassName, bool forceReload );
-
-  protected:
-
-    void makeClassList();
-
   };
 
 #define NewVariableModule( CLASS ) NewDynamicModule( Variable, CLASS )

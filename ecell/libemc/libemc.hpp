@@ -29,18 +29,27 @@
 // E-Cell Project.
 //
 
-
 #ifndef __LIBEMC_HPP
 #define __LIBEMC_HPP
 
 #include <functional>
 
+#ifdef DLL_EXPORT
+#undef DLL_EXPORT
+#define _DLL_EXPORT
+#endif /* DLL_EXPORT */
+
 #include "libecs/libecs.hpp"
 
-// WIN32 stuff
-#if defined(WIN32)
+#ifdef _DLL_EXPORT
+#define DLL_EXPORT
+#undef _DLL_EXPORT
+#endif /* _DLL_EXPORT */
 
-#ifdef LIBEMC_EXPORTS
+// WIN32 stuff
+#if defined( WIN32 )
+
+#if defined( LIBEMC_EXPORTS ) || defined( DLL_EXPORT )
 #define LIBEMC_API __declspec(dllexport)
 #else
 #define LIBEMC_API __declspec(dllimport)

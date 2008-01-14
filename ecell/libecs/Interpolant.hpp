@@ -37,7 +37,7 @@
 namespace libecs
 {
 
-  class Interpolant
+  class LIBECS_API Interpolant
   {
     friend class libecs::Stepper;
 
@@ -85,9 +85,9 @@ namespace libecs
     };
 
 
-    LIBECS_API Interpolant( VariablePtr const aVariable );
+    Interpolant( VariablePtr const aVariable );
 
-    LIBECS_API virtual ~Interpolant();
+    virtual ~Interpolant();
     
     virtual 
     const Real getVelocity( RealParam aTime ) const

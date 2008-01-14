@@ -144,7 +144,7 @@
 #define strdup( x ) _strdup( x )
 #endif /* _MSC_VER */
 
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( __CYGWIN__ )
 #define PATH_SEPARATOR '\\'
 #else
 #define PATH_SEPARATOR '/'
@@ -194,7 +194,7 @@ static void checkDiskFull(char const * const path, int mustCheck)
 
 static const char* get_temp_dir()
 {
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( __CYGWIN__ )
     return libecs_win32_get_temporary_directory();
 #else
     static volatile const char *val = NULL;
