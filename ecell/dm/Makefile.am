@@ -113,8 +113,8 @@ SOS = \
 
 if HAVE_PYTHON_LIB
 SOS += \
-	PythonFluxProcess.$(LTDL_SHLIB_EXT) \
-	PythonProcess.$(LTDL_SHLIB_EXT)
+	PythonFluxProcess$(LTDL_SHLIB_EXT) \
+	PythonProcess$(LTDL_SHLIB_EXT)
 endif
 
 EXTRA_DIST = ${DMS} ${DMH} ${DESCS}
