@@ -7,7 +7,7 @@ LIBLTDL=@LIBLTDL@
 
 INCLUDES = -I${top_srcdir}  -I${top_srcdir}/.. -I.. ${DMTOOL_INCLUDE} ${INCLTDL}
 LIBS=../libecs.la -lboost_unit_test_framework -lgsl -lgslcblas -lstdc++
-AM_CXXFLAGS=@CXXFLAGS@
+AM_CXXFLAGS=@CXXFLAGS@ -DBOOST_TEST_DYN_LINK=1 -DBOOST_TEST_MAIN=1
 
 check_PROGRAMS=
 
