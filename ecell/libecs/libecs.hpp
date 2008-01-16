@@ -55,40 +55,16 @@ namespace libecs
   LIBECS_API extern char const* const VERSION_STRING;
 
 
-  inline const int getMajorVersion()
-  {
-    return MAJOR_VERSION;
-  }
-
-  inline const int getMinorVersion()
-  {
-    return MINOR_VERSION;
-  }
-
-  inline const int getMicroVersion()
-  {
-    return MICRO_VERSION;
-  }
-
-  inline const std::string getVersion()
-  {
-    return VERSION_STRING;
-  }
-
+  LIBECS_API const int getMajorVersion();
+  LIBECS_API const int getMinorVersion();
+  LIBECS_API const int getMicroVersion();
+  LIBECS_API const std::string getVersion();
 
   LIBECS_API bool initialize();
   LIBECS_API void finalize();
   LIBECS_API void setDMSearchPath( const String& path );
   LIBECS_API const String getDMSearchPath();
   // LIBECS_API const String getLoadedDMList(); // XXX: not implemented
-
-  //  DECLARE_CLASS( Polymorph );
-  //  const Polymorph getDMInfoList( const String& aDMName );
-  //  const String getDMInfo( const String& aDMName,
-  //			  const String& aFieldName );
-
-  
-
 
   // Forward declarations.
 

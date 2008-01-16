@@ -96,4 +96,24 @@ namespace libecs
     return ModuleMaker::getSearchPath();
   }
 
+  const int getMajorVersion()
+  {
+    return MAJOR_VERSION;
+  }
+
+  const int getMinorVersion()
+  {
+    return MINOR_VERSION;
+  }
+
+  const int getMicroVersion()
+  {
+    return MICRO_VERSION;
+  }
+
+  const std::string getVersion()
+  {
+    return VERSION_STRING;
+  }
+
 } // namespace libecs
