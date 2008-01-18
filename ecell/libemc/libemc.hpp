@@ -80,29 +80,29 @@ namespace libemc
   DECLARE_SHAREDPTR( EventChecker );
   DECLARE_SHAREDPTR( EventHandler );
 
-  class EventHandler
+  class LIBEMC_API EventHandler
     :
     public std::unary_function<void,void> 
   {
   public:
     EventHandler() {}
-    LIBEMC_API virtual ~EventHandler() {}
+    virtual ~EventHandler() {}
 
-    LIBEMC_API virtual void operator()( void ) const = 0;
+    virtual void operator()( void ) const = 0;
   };
 
-  class EventChecker
+  class LIBEMC_API EventChecker
     :
     public std::unary_function<bool,void>
   {
   public:
     EventChecker() {}
-    LIBEMC_API virtual ~EventChecker() {}
+    virtual ~EventChecker() {}
 
-    LIBEMC_API virtual bool operator()( void ) const = 0;
+    virtual bool operator()( void ) const = 0;
   };
 
-  class DefaultEventChecker
+  class LIBEMC_API DefaultEventChecker
     :
     public EventChecker
   {
@@ -110,7 +110,7 @@ namespace libemc
     DefaultEventChecker() {}
     //    virtual ~DefaultEventChecker() {}
 
-    LIBEMC_API virtual bool operator()( void ) const
+    virtual bool operator()( void ) const
     {
       return false;
     }

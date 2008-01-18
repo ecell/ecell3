@@ -81,13 +81,13 @@ namespace libemc
      @see SimulatorImplementation
   */
 
-  class Simulator
+  class LIBEMC_API Simulator
   {
 
   public:
 
-    LIBEMC_API Simulator();
-    LIBEMC_API virtual ~Simulator() {}
+    Simulator();
+    virtual ~Simulator() {}
 
 
     /**
