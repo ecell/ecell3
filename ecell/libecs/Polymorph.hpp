@@ -196,7 +196,7 @@ namespace libecs
 
 
 
-  class Polymorph
+  class LIBECS_API Polymorph
   {
 
   public:

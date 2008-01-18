@@ -122,7 +122,7 @@ dmdir = ${DM_SRC_DIR}
 dm_DATA = ${DMS} ${DMH}
 
 dmsodir = ${DM_SO_DIR}
-dmso_DATA = ${SOS} ${DESCS}
+dmso_DATA = ${DESCS}
 
 PythonFluxProcess$(LTDL_SHLIB_EXT) : PythonFluxProcess.cpp
 	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L$(abs_top_builddir)/tmp$(libdir) $(PYTHON_LIBS)" --cxxflags='${CPPFLAGS} ${CXXFLAGS} -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} -I${top_srcdir}/../libltdl  ${PYTHON_INCLUDES} ' $< 
@@ -133,7 +133,22 @@ PythonProcess$(LTDL_SHLIB_EXT) : PythonProcess.cpp
 .cpp$(LTDL_SHLIB_EXT):
 	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L$(abs_top_builddir)/tmp$(libdir) " --cxxflags='${CPPFLAGS} ${CXXFLAGS} -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} -I${top_srcdir}/../libltdl  ${PYTHON_INCLUDES} ' $< 
 
+install-data-local:
+	test -z "$(dmsodir)" || $(MKDIR_P) "$(DESTDIR)$(dmsodir)"
+	@for p in $(SOS); do \
+		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+		f=$(am__strip_dir) \
+		echo " ${INSTALL} -m 755 '$$d$$p' '$(DESTDIR)$(dmsodir)/$$f'"; \
+		${INSTALL} -m 755 "$$d$$p" "$(DESTDIR)$(dmsodir)/$$f"; \
+	done
+
+uninstall-local:
+	@for p in $(SOS); do \
+		f=$(am__strip_dir) \
+		echo " rm -f '$(DESTDIR)$(dmsodir)/$$f'"; \
+		$(RM) "$(DESTDIR)$(dmsodir)/$$f"; \
+	done
+
 clean-local:
 	${RM} -rf ${SOS}
-
 

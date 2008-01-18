@@ -31,8 +31,12 @@
 
 #ifndef __DEFS_HPP
 #define __DEFS_HPP
+ 
+#if defined( __CYGWIN__ )
+#define WIN32 __CYGWIN__
+#endif /* __CYGWIN __ */
 
-#if defined( WIN32 ) && !defined( __CYGWIN__ )
+#if defined( WIN32 )
 #if defined(_MSC_VER)
 #define _USE_MATH_DEFINES
 #if _MANAGED
