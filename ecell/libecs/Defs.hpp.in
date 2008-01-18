@@ -524,8 +524,8 @@ typedef const mytype & mytype ## Cref;
 
 /*
   Do not modify
-  $Author: sachiboo $
-  $Revision: 2616 $
+  $Author$
+  $Revision$
   $Date$
   $Locker$
 */
