@@ -133,6 +133,8 @@ PythonProcess$(LTDL_SHLIB_EXT) : PythonProcess.cpp
 .cpp$(LTDL_SHLIB_EXT):
 	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L$(abs_top_builddir)/tmp$(libdir) " --cxxflags='${CPPFLAGS} ${CXXFLAGS} -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} -I${top_srcdir}/../libltdl  ${PYTHON_INCLUDES} ' $< 
 
+# This install customization is needed because DLL's cannot be loaded by
+# LoadLibrary() without executable flags set to them under Windows NT.
 install-data-local:
 	test -z "$(dmsodir)" || $(MKDIR_P) "$(DESTDIR)$(dmsodir)"
 	@for p in $(SOS); do \
