@@ -12,6 +12,7 @@ BASIC_DOCS = \
 
 EXTRA_DIST = \
 	$(BASIC_DOCS) \
+	depcomp \
 	autogen.sh \
 	ecell_version.sh
 
