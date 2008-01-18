@@ -13,6 +13,5 @@ EXTRA_DIST=\
 	libltdl.vcproj\
 	pyecell.vcproj\
 	pyecs.vcproj\
-	pyemc.vcproj\
 	ecell_config.h\
 	ltdl_config.h
