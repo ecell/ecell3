@@ -124,6 +124,8 @@ dm_DATA = ${DMS} ${DMH}
 dmsodir = ${DM_SO_DIR}
 dmso_DATA = ${DESCS}
 
+all-local: $(SOS)
+
 PythonFluxProcess$(LTDL_SHLIB_EXT) : PythonFluxProcess.cpp
 	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L$(abs_top_builddir)/tmp$(libdir) $(PYTHON_LIBS)" --cxxflags='${CPPFLAGS} ${CXXFLAGS} -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} -I${top_srcdir}/../libltdl  ${PYTHON_INCLUDES} ' $< 
 
