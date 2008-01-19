@@ -5,6 +5,8 @@ import string
 import getopt
 import os
 
+import ecell.config
+import ecell.ecs
 import ecell.emc
 import ecell.Session
 
@@ -13,47 +15,46 @@ import ecell.Session
 def usage():
     aProgramName = os.path.basename( sys.argv[0] )
     print '''
-%s -- invoke ecell3 python interactive mode or run ess file
+%(appname)s -- invoke ecell3 python interactive mode or run ess file
 
 Usage:
 
-       %s [-f] [-f emlfile]          : Load eml file 
-				       and invoke ecell3 intract mode
-       %s [essfile] [-e essfile]     : Run ess file
-       %s                            : Invoke ecell3 intract mode
-       %s [-h]                       : Print this message
-       
+    %(appname)s [-f] [-f EMLFILE]          : Load EMLFILE and then
+                                             switch to intractive mode
+    %(appname)s [ESSFILE] [-e ESSFILE]     : Run an ess file
+    %(appname)s                            : Run in intractive mode
+    %(appname)s [-h]                       : Print this message
+
 Options:
 
-       -e or --exec=[.ess file]           :  load script (.ess) file
-       -f or --file=[.eml file]           :  load model (.eml) file
-       
-       Do not use -e and -f at same time.
-       
-       -DNAME=VALUE                       :  Set session parameter
-       --parameters="[python dictionary]" :  Set session parameters
+    -e or --exec=[.ess file]           :  load script (.ess) file
+    -f or --file=[.eml file]           :  load model (.eml) file
+    
+    Either -e or -f option can be specified at once. 
+
+    -DNAME=VALUE                       :  Set session parameter
+    --parameters="[python dictionary]" :  Set session parameters
         
-       example: 
+    -h or --help              :  Print this message.
 
-       ecell3-session -DNAME1=VALUE1 -DNAME2=VALUE2
-       ecell3-session --parameters="{NAME1:VALUE1,NAME2:VALUE2}"
+    Example: 
+       %(appname)s -DNAME1=VALUE1 -DNAME2=VALUE2
+       %(appname)s --parameters="{NAME1:VALUE1,NAME2:VALUE2}"
 
-       Do not use space in Variable.
-
-       -h or --help              :  Print this message.
+    Note that spaces are not allowed in names and values.
 
 Configurations:
+    If ECELL3_DM_PATH environment variable is set to a colon (%(pathsep)s)
+    separated directory path, it tries to find dynamic modules within the
+    locations referred to by it.
 
-       If the environment variable ECELL3_DM_PATH is set to a colon (:) 
-       separated directory path, it loads dynamic modules from there.
-       
-       example: 
-        
-       ECELL3_DM_PATH=/home/user/dm:/home/user/dm_other ecell3-session
+    Example: 
+      ECELL3_DM_PATH=/home/user/dm%(pathsep)s/home/user/dm_other %(appname)s
 
-'''% ( aProgramName, aProgramName, aProgramName, aProgramName, aProgramName )
+'''% { 'appname': aProgramName, 'pathsep': os.pathsep }
 
 def main():
+    ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
 
     # -------------------------------------
     # initialize file names
@@ -69,26 +70,26 @@ def main():
     # and set anESSfile 
     # -------------------------------------
 
-    for i in range(len(sys.argv)-1):
+    for i in range( len( sys.argv ) - 1 ):
         i = i + 1
-        if not (sys.argv[i])[0] == "-":
-	    if os.path.isfile( sys.argv[i] ):
-	        if (sys.argv[i-1]) != "-e" and (sys.argv[i-1]) != "-f" :
-		    anEssFile = sys.argv[i]
-	    else:
-	        print "File Name Error: "+ sys.argv[1] + " does not exist."
-                sys.exit(1)
-	
+        if not sys.argv[ i ][0] == "-":
+            if os.path.isfile( sys.argv[ i ] ):
+                if sys.argv[ i - 1 ] != "-e" and sys.argv[ i - 1 ] != "-f":
+                    anEssFile = sys.argv[i]
+            else:
+                sys.stderr.write( "Error: %s does not exist.\n" % sys.argv[ i ] )
+                sys.exit( 1 ) 
 
     # -------------------------------------
     # gets options
     # -------------------------------------
     try:
-	opts , args = getopt.getopt( sys.argv[1:] , 'he:f:D:',
-                                     ["parameters=","help", "exec=", "file="])
+        opts, args = getopt.getopt(
+            sys.argv[ 1: ] , 'he:f:D:',
+            [ "parameters=", "help", "exec=", "file=" ] )
     except:
         usage()
-        sys.exit(1)
+        sys.exit( -1 ) 
         
     # -------------------------------------
     # checks argument
@@ -98,27 +99,27 @@ def main():
         # prints help message
         if anOption in ( "-h", '--help' ):
             usage()
-            sys.exit(0)
+            sys.exit( 0 )
             
         # executes script file (.ess)
         if anOption in ( "-e", '--exec'):
             if not anArg:
-                print "Warning: not specify ess file"
+                sys.stderr.write( "Error: ess file not specified.\n" )
                 usage()
-		sys.exit(0)
-	    anEssFile = anArg
+                sys.exit( -1 )
+            anEssFile = anArg
             
         # load model file (.eml)
         if anOption in ( "-f", '--file' ):
             if not anArg:
-                print "Warning: not specify eml file"
+                sys.stderr.write( "Error: eml file not specified.\n" )
                 usage()
-		sys.exit(0)
+                sys.exit( -1 )
             anEmlFile = anArg            
 
-	# set session parameters            
+        # set session parameters            
         if anOption == "-D":
-            aSplitArgList = string.split(anArg,'=')
+            aSplitArgList = string.split( anArg, '=' )
 
             if not aSplitArgList[1]:
                 aSplitArgList[1] = 1
@@ -129,35 +130,35 @@ def main():
             except:
                 aParameters[aSplitArgList[0]] = aSplitArgList[1]
 
-	# set session parameters            
+        # set session parameters            
         if anOption == "--parameters":
             try:
                 anEvaluatedArg = eval(anArg)
 
             except:
                 import traceback 
-                aErrorMessageList = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
+                aErrorMessageList = traceback.format_exception(
+                    sys.exc_type,sys.exc_value,sys.exc_traceback )
                 for aLine in aErrorMessageList: 
-                    print aLine 
-                print 'Error : %s is not evaluate.' %anArg
-                print '%s is not python dictionary and do not use space in variable.' %anArg
-                sys.exit(0)
+                    sys.stderr.write( aLine )
+                sys.stderr.write( "Error: %s is not a valid python expression.\n" % anArg );
+                sys.exit( -1 )
 
             # check anEvaluatedArg type
             if not type(anEvaluatedArg) == dict:
-                print 'Error : %s is not python dictionary.' %aParameters
-                sys.exit(0)
+                sys.stderr.write( "Error: %s does not result in a python dictionary.\n" % aParameters )
+                sys.exit( -1 )
 
             # add parameters to aParameters 
             for aKeyString in anEvaluatedArg.keys():
-                aParameters[aKeyString] = anEvaluatedArg[aKeyString]
+                aParameters[ aKeyString ] = anEvaluatedArg[ aKeyString ]
                 
             
     aSimulator = ecell.emc.Simulator()
     aSession = ecell.Session( aSimulator )
 
     if anEmlFile:
-        aSession.loadModel(anEmlFile)
+        aSession.loadModel( anEmlFile )
 
     if anEssFile:
         aSession.loadScript( anEssFile, aParameters )
@@ -165,4 +166,5 @@ def main():
         aSession.interact( aParameters )
          
 if __name__ == '__main__':
-	main()
+    main()
+    sys.exit( 0 )

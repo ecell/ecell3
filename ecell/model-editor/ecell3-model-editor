@@ -4,17 +4,14 @@ import os
 import sys
 import string
 
-ECELL3_LIBDIR = os.environ['ECELL3_LIBDIR']
-MEPATH = ECELL3_LIBDIR + os.sep + 'model-editor'
-# remove this!!
-SESSIONMONITORPATH = ECELL3_LIBDIR + os.sep + 'session-monitor'
+import ecell.ecs
+import ecell.config
 
+ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
 
-os.environ['SESSIONMONITORPATH'] = SESSIONMONITORPATH
-os.environ['PYTHONPATH'] =  MEPATH + os.pathsep + SESSIONMONITORPATH + os.pathsep + os.environ['PYTHONPATH'] 
-os.environ['MEPATH'] = MEPATH
+os.environ[ 'MEPATH' ] = os.path.join( ecell.config.lib_dir, 'model-editor' )
+os.environ[ 'SESSIONMONITORPATH' ] = os.path.join( ecell.config.lib_dir, 'session-monitor' )
+sys.path[ 0: 0 ] = [ os.environ[ 'MEPATH' ], os.environ[ 'SESSIONMONITORPATH' ] ]
 
-os.execve(sys.executable, [
-    '-',
-    MEPATH + os.sep + 'opengui.py'
-    ] + sys.argv[1:], os.environ)
+import opengui
+opengui.main()

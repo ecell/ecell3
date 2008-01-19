@@ -24,6 +24,8 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # 
 #END_HEADER
+
+from config import *
 import ecell.Window
 import gtk
 
@@ -33,7 +35,10 @@ class FullPNQueue:
         self.backwardQueue = []
         self.forwardQueue = []
         self.theRawFullPNList = aFullPNList
-        aWindow = ecell.Window.Window( self.__class__.__name__ + '.glade', "hbox1" )
+        aWindow = ecell.Window.Window(
+            os.path.join( GLADEFILE_PATH, self.__class__.__name__ + '.glade'),
+            "hbox1"
+            )
         aWindow.openWindow()
         aFrame = aWindow['hbox1']
         self.backButton = aWindow['backbutton']

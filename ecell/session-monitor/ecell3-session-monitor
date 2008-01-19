@@ -4,15 +4,18 @@ import os
 import sys
 import string
 
-ECELL3_LIBDIR = os.environ['ECELL3_LIBDIR']
-SESSIONMONITORPATH = ECELL3_LIBDIR + os.sep + 'session-monitor'
-PYTHONPATH = SESSIONMONITORPATH + os.pathsep + os.environ['PYTHONPATH']
+import ecell.ecs
+import ecell.config
 
-os.environ['SESSIONMONITORPATH'] = SESSIONMONITORPATH
-os.environ['PYTHONPATH'] = SESSIONMONITORPATH + os.pathsep + PYTHONPATH
-os.environ['LANG'] = 'C'
+ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
 
-os.execve(sys.executable, [
-    '-',
-    SESSIONMONITORPATH + os.sep + 'opengui.py'
-    ] + sys.argv[1:], os.environ)
+os.environ[ 'SESSIONMONITORPATH' ] = os.path.join( ecell.config.lib_dir, 'session-monitor' )
+
+sys.path.insert( 0, os.environ[ 'SESSIONMONITORPATH' ] )
+
+import opengui
+try:
+    opengui.main()
+except KeyboardInterrupt:
+    sys.exit(1)
+

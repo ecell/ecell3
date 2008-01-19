@@ -57,9 +57,15 @@ class OsogoWindow(Window):
 		aSession  -- a reference to Session (Session)
 		aGladeFile   -- a glade file name (str)
 		"""
+		if gladeFile == None:
+			gladeFile = self.__class__.__name__ + '.glade'
 
 		# calls superclass's constructor
-		Window.__init__( self, gladeFile, rootWidget=rootWidget )
+		Window.__init__(
+			self,
+			os.path.join( GLADEFILE_PATH, gladeFile ),
+			rootWidget=rootWidget
+			)
 
 		# saves a reference to Session
 		self.theSession = session

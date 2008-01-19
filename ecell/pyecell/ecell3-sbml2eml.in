@@ -20,6 +20,8 @@ import time
 import getopt
 import types
 
+import ecell.ecs
+import ecell.config
 from ecell.eml import *
 from ecell.convertSBML2EML import *
 
@@ -31,28 +33,30 @@ if __name__ == '__main__':
         aProgramName = os.path.basename( sys.argv[0] )
 
         print '''
-%s -- conver sbml to eml (for E-Cell SE version 3 user)
+%(appname)s -- convert a SBML file to eml file
 
 Usage:
-       %s [-h] [-f] [-o outfile] infile
+    %(appname)s [-h] [-f] [-o EMLFILE] infile
 
 Options:
-       -h or --help    : Print this message.
-       -f or --force   : Force overwrite even if outfile already exists.
-       -o or --outfile=: specify output file name. '-' means stdout.
+    -h or --help             : Print this message.
+    -f or --force            : Forcefully overwrite the output file
+                               even if it already exists.
+    -o or --outfile=EMLFILE  : Specify the output file name. '-' means stdout.
        
-''' % ( aProgramName, aProgramName )
+''' % { 'appname': aProgramName }
 
+    ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
 
     # commandline processing
     try:
-        opts, args = getopt.getopt( sys.argv[1:], "hfo:",
-                                    ["help","force","outfile="] )
-	
+        opts, args = getopt.getopt(
+            sys.argv[ 1: ], "hfo:",
+            [ "help", "force", "outfile=" ] )
+
     except getopt.GetoptError:
         usage()
-        sys.exit( 1 )
-
+        sys.exit( -1 )
 
     anEmlFileName = None
     aForceFlag = 0
@@ -71,7 +75,7 @@ Options:
     if len( args ) == 0:
         sys.stderr.write("No input File.\n")
         usage()
-        sys.exit( 1 )
+        sys.exit( -1 )
 
     aSbmlFileName = args[0]
 
@@ -87,7 +91,6 @@ Options:
             anExt = '.eml'
         else:
             anExt += '.eml'
-
         anEmlFileName = aBaseName + anExt
 
     # ----------------    sbml2eml main    ------------------  

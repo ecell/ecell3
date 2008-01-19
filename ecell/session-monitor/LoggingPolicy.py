@@ -31,6 +31,7 @@
 
 import gtk 
 import os
+from config import *
 from ecell.Window import *
 from ConfirmWindow import *
 # Constants for ConfirmWindow
@@ -41,7 +42,7 @@ OKCANCEL_MODE = 1
 OK_PRESSED = 0
 CANCEL_PRESSED = -1
 
-class LoggingPolicy(Window):
+class LoggingPolicy( Window ):
 	"""This is confirm popup window class.
 
 	OK_MODE        : The window has 'OK' button.
@@ -57,7 +58,11 @@ class LoggingPolicy(Window):
 		aLoggingPolicy tuple containing logging policy
 		"""
 
-		Window.__init__(self, "LoggingPolicy.glade", "top_frame")
+		Window.__init__(
+			self,
+			os.path.join( GLADEFILE_PATH, "LoggingPolicy.glade" ),
+			"top_frame"
+			)
 		self.theSession = aSession
 		# Sets the return number
 		self.___num = CANCEL_PRESSED

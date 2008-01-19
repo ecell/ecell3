@@ -71,30 +71,10 @@ class Window:
 		[Note]:If IOError happens during reading Glade file,
 		       throws an exception.
 		"""
-
-		# ------------------------------------------------
-		# loads GLADEFILE_PATH/CLASSNAME.glade by default
-		# ------------------------------------------------
-		if self.gladeFile == None:
-			self.gladeFile = GLADEFILE_PATH
-			self.gladeFile += os.sep + self.__class__.__name__ + ".glade"
-		else:
-
-			# ------------------------------------------------
-			# When abusolute path
-			# ------------------------------------------------
-			if os.path.isabs( self.gladeFile ) :
-				pass
-			# ------------------------------------------------
-			# When relative path
-			# ------------------------------------------------
-			else:
-				self.gladeFile = GLADEFILE_PATH + os.sep + self.gladeFile
-
 		# ------------------------------------------------
 		# checks and loads glade file
 		# ------------------------------------------------
-		if os.access( os.path.join( GLADEFILE_PATH, self.gladeFile ), os.R_OK ):
+		if os.access( self.gladeFile, os.R_OK ):
 			if self.rootWidget != None:
 				self.widgets = gtk.glade.XML( self.gladeFile, root= str( self.rootWidget ) )
 			else:

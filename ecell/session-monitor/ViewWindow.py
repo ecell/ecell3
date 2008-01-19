@@ -30,6 +30,7 @@ from Window import *
 
 import string
 import sys
+from config import *
 from ecell.ecssupport import *
 
 class ViewWindow( Window ):
@@ -37,8 +38,9 @@ class ViewWindow( Window ):
     theFullPNListClipBoard = []
 
     def __init__( self, gladefile=None, rootWidget=None ):
-
-        self.theGladeFile = gladefile
+        if gladefile == None:
+            gladefile = self.__class__.__name__ + '.glade'
+        self.theGladeFile = os.path.join( GLADEFILE_PATH, gladefile )
         self.theRoot = root
         
 

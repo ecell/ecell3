@@ -41,8 +41,6 @@ import os
 import imp
 import glob
 from ecell.ecs_constants import *
-from config import *
-
 
 # ---------------------------------------------------------------
 # PluginModule 
@@ -60,13 +58,10 @@ class PluginModule:
 	# return -> None
 	# This method is throwable exception.
 	# ---------------------------------------------------------------
-	def __init__( self, aModuleName, aModulePath=PLUGIN_PATH ):
-	
+	def __init__( self, aModuleName, aModulePath ):
 		self.theName = aModuleName
-
 		aFp, aPath, self.theDescription\
-			= imp.find_module( self.theName, PLUGIN_PATH )
-			#= imp.find_module( self.theName, aModulePath )
+			= imp.find_module( self.theName, aModulePath )
 
 		self.theDirectoryName = os.path.dirname( aPath )
 
@@ -114,8 +109,8 @@ class PluginManager:
 	#  - initializes pluginmap and instancelist
 	#
 	# ---------------------------------------------------------------
-	def __init__( self ):
-
+	def __init__( self, pluginPath ):
+		self.thePluginPath = pluginPath
 		self.thePluginMap = {}
 		self.theInstanceList = []
 
@@ -155,7 +150,7 @@ class PluginManager:
 	# ---------------------------------------------------------------
 	def loadModule( self, aClassname ):
 
-		aPlugin = PluginModule( aClassname )
+		aPlugin = PluginModule( aClassname, self.thePluginPath )
 		self.thePluginMap[ aClassname ] = aPlugin
 
 	# end of loadModule
@@ -169,7 +164,7 @@ class PluginManager:
 	# ---------------------------------------------------------------
 	def loadAll( self ):
 	
-		for aPath in PLUGIN_PATH:
+		for aPath in self.thePluginPath:
 			aFileList = glob.glob( os.path.join( aPath, '*.glade' ) )
 			for aFile in aFileList:
 				aModulePath = os.path.splitext( aFile )[0]

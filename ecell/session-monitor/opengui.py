@@ -200,30 +200,25 @@ def main():
 def usage():
 	aProgramName = 'ecell3-session-monitor'
 	print '''
-%s -- E-Cell3 Session Monitor
+%(appname)s -- E-Cell3 Session Monitor
 
-Usage: %s [-h] ([-e EmlFile]|[-f ModelFile])
+Usage:
+    %(appname)s [-h] ([-e ESSFILE]|[-f EMLFILE])
 
 Options:
-        -e or --exec=[.ess file]  :  load script (.ess) file
-        -f or --file=[.eml file]  :  load model (.eml) file
-        -h or --help              :  print this message.
+    -e or --exec=[ESSFILE]  : Load a script (.ess) file on startup
+    -f or --file=[EMLFILE]  : Load a model (.eml) file on startup
+    -h or --help            : Print this message
 
-	Do not use -e and -f at the same time.
+    Either -e or -f option can be specified at once.
 
 Configurations:
+    If ECELL3_DM_PATH environment variable is set to a colon (%(pathsep)s)
+    separated directory path, it tries to find dynamic modules within the
+    locations referred to by it.
 
-	If the environment variable ECELL3_DM_PATH is set to a colon (:) 
-        separated directory path, it loads dynamic modules from there.
-	
-	example: 
-        
-	ECELL3_DM_PATH=/home/user/dm:/home/user/dm_other
-''' % ( aProgramName, aProgramName )
+    Example: 
+      ECELL3_DM_PATH=/home/user/dm%(pathsep)s/home/user/dm_other %(appname)s
 
+''' % { 'appname': aProgramName, 'pathsep': os.pathsep }
 
-if __name__ == '__main__':
-	try:
-		main()
-	except KeyboardInterrupt:
-		sys.exit(1)

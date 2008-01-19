@@ -22,6 +22,7 @@ import getopt
 import types
 import re
 
+import ecell.config
 from ecell.ecssupport import *
 from ecell.eml import *
 
@@ -176,29 +177,25 @@ def createSystemList( anEml, aSystemPath='/' ):
 
     return aBuffer
 
-
 if __name__ == '__main__':
-
-
     def usage():
         aProgramName = os.path.basename( sys.argv[0] )
 
         print '''
-%s -- convert eml to em
+%(appname)s -- convert a EML file to a EM file
         
 Usage:
-        %s [-h] [-f] [-o outfile] infile
+    %(appname)s [-h] [-f] [-o EMFILE] infile.eml
 
-        
 Options:
-        -h or --help    :  Print this message.
-        -f or --force   :  Force overwrite even if outfile already exists.
-        -o or --outfile=:  Specify output file name.  '-' means stdout.
-        
-''' % ( aProgramName, aProgramName )
+    -h or --help           : Print this message.
+    -f or --force          : Forcefully overwrite EMLFILE
+                             even if it already exists.
+    -o or --outfile=EMFILE : Specify output file name. '-' means stdout.
 
+''' % { 'appname': aProgramName }
 
-
+    ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
 
 
     # commandline processing
@@ -262,14 +259,8 @@ Options:
 
 ''' % ( anEmlFileName, time.asctime( time.localtime() ) )
 
-#    try:
     aBuffer += createStepperList( anEml )
     aBuffer += createSystemList( anEml )
-
-#    except:
-#        sys.stderr.write( 'Error: ' + str( sys.exc_type ) + '\n' )
-#        sys.exit( 1 )
-
 
     anEmFile.write( aBuffer )
 

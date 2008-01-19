@@ -56,7 +56,7 @@ class OsogoPluginManager(PluginManager):
         aSession   ---  the instance of Session (Session)
         """
 
-        PluginManager.__init__(self)
+        PluginManager.__init__( self, PLUGIN_PATH )
 
         self.theSession = aSession
         self.theDataGenerator = DataGenerator( self.theSession )
@@ -143,7 +143,7 @@ class OsogoPluginManager(PluginManager):
         aClassname   ---   a class name of PluginWindow
         """
 
-        PluginManager.loadModule(self,aClassname)
+        PluginManager.loadModule( self, aClassname )
 
     # ========================================================================
     def loadAll( self ):
