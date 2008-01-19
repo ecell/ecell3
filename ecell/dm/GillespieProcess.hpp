@@ -79,7 +79,7 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
       ; // do nothing
   }
 
-  DM_IF virtual ~GillespieProcess()
+  virtual ~GillespieProcess()
   {
       ; // do nothing
   }
@@ -118,12 +118,12 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
       }
   }
 
-  DM_IF const Real getPD( VariablePtr aVariable ) const
+  const Real getPD( VariablePtr aVariable ) const
   {
     return ( this->*theGetPDMethodPtr )( aVariable );
   }
 
-  DM_IF virtual const bool isContinuous() const
+  virtual const bool isContinuous() const
   {
     return true;
   }
@@ -151,7 +151,7 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
 
   void calculateOrder();
 
-  DM_IF virtual void initialize()
+  virtual void initialize()
   {
     Process::initialize();
     declareUnidirectional();
@@ -167,7 +167,7 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
       }
   }
 
-  DM_IF virtual void fire()
+  virtual void fire()
   {
     Real velocity( getk() * N_A );
     velocity *= getSuperSystem()->getSize();

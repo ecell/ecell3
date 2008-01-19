@@ -66,12 +66,12 @@ public:
     //                     if this is set
   }
 
-  DM_IF virtual ~PythonProcess()
+  virtual ~PythonProcess()
   {
     ; // do nothing
   }
 
-  DM_IF virtual const bool isContinuous() const
+  virtual const bool isContinuous() const
   {
     return theIsContinuous;
   }
@@ -114,8 +114,8 @@ public:
     return theInitializeMethod;
   }
 
-  DM_IF virtual void initialize();
-  DM_IF virtual void fire();
+  virtual void initialize();
+  virtual void fire();
 
 
 protected:

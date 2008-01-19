@@ -62,7 +62,7 @@ namespace libemc
      implementation.
   */
 
-  class SimulatorImplementation
+  class LIBEMC_API SimulatorImplementation
   {
 
   public:

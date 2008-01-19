@@ -32,9 +32,14 @@
 #ifndef __PROPERTIEDCLASS_HPP
 #define __PROPERTIEDCLASS_HPP
 
-#include "dmtool/DMObject.hpp"
-
 #include "libecs.hpp"
+
+#if defined( WIN32 )
+// a bit hackish, but works.
+class LIBECS_API ModuleMaker;
+#endif /* WIN32 */
+
+#include "dmtool/DMObject.hpp"
 
 namespace libecs
 {
@@ -245,10 +250,10 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
   //
 
 #define SET_SLOT( TYPE, METHODNAME )\
-  DM_IF void METHODNAME( libecs::Param<TYPE>::type value )
+  void METHODNAME( libecs::Param<TYPE>::type value )
 
 #define GET_SLOT( TYPE, METHODNAME )\
-  DM_IF const TYPE METHODNAME() const
+  const TYPE METHODNAME() const
 
 #define SET_SLOT_DEF( TYPE, METHODNAME, CLASS )\
   SET_SLOT( TYPE, CLASS::METHODNAME )

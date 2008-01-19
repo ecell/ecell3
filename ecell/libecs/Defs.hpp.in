@@ -45,6 +45,8 @@
 #endif /* _MANAGED */
 /* suppress deprecation warnings */
 #pragma warning(disable:4996)
+/* suppress DLL import warnings */
+#pragma warning(disable:4251)
 #endif /* _MSC_VER */
 #endif /* WIN32 */
 
@@ -512,7 +514,9 @@ typedef const mytype & mytype ## Cref;
 #define LIBECS_API __declspec(dllimport)
 #endif /* LIBECS_EXPORTS */
 
+#if !defined( __CYGWIN__ )
 #define fmin(x, y) __min(x, y)
+#endif /* __CYGWIN__ */
 
 #else
 

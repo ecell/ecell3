@@ -79,7 +79,7 @@ namespace libecs
      }
   */
 
-  class EventBase
+  class LIBECS_API EventBase
   {
 
   public:

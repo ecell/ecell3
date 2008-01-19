@@ -66,7 +66,7 @@ namespace libecs
    
   */
 
-  class LIBECS_API Logger
+  class Logger
     :
     private boost::noncopyable
   {
@@ -94,11 +94,11 @@ namespace libecs
 
     */
   
-    Logger( LoggerAdapterPtr aLoggerAdapter );
+    LIBECS_API Logger( LoggerAdapterPtr aLoggerAdapter );
   
     /// Destructor
 
-    ~Logger( void );
+    LIBECS_API ~Logger( void );
 
 
     /**
@@ -111,7 +111,7 @@ namespace libecs
     
     */
 
-    void setLoggerPolicy( IntegerParam aMinimumStep,
+    LIBECS_API void setLoggerPolicy( IntegerParam aMinimumStep,
 			  RealParam    aMinimumTimeInterval,
 			  IntegerParam anEndPolicy,
 			  IntegerParam aMaxSpace );
@@ -122,7 +122,7 @@ namespace libecs
     
     */
 
-    void setLoggerPolicy( PolymorphCref aParamList );
+    LIBECS_API void setLoggerPolicy( PolymorphCref aParamList );
 
 
     /**
@@ -131,7 +131,7 @@ namespace libecs
 
     */
 
-    const Polymorph getLoggerPolicy( void );
+    LIBECS_API const Polymorph getLoggerPolicy( void );
 
     /**
 
@@ -139,7 +139,7 @@ namespace libecs
 
     */
 
-    void log( RealParam aTime );
+    LIBECS_API void log( RealParam aTime );
 
 
     /**
@@ -147,14 +147,14 @@ namespace libecs
 
     */
 
-    DataPointVectorSharedPtr getData( void ) const;
+    LIBECS_API DataPointVectorSharedPtr getData( void ) const;
 
     /**
        Returns a slice of the data from aStartTime to anEndTime.
 
     */
 
-    DataPointVectorSharedPtr getData( RealParam aStartTime,
+    LIBECS_API DataPointVectorSharedPtr getData( RealParam aStartTime,
 				      RealParam anEndTime ) const;
 
     /**
@@ -162,7 +162,7 @@ namespace libecs
        intervals anInterval between data elements.
     */
 
-    DataPointVectorSharedPtr getData( RealParam aStartTime,
+    LIBECS_API DataPointVectorSharedPtr getData( RealParam aStartTime,
 				      RealParam anEndTime, 
 				      RealParam anInterval ) const;
     
@@ -172,13 +172,13 @@ namespace libecs
        Returns time of the first element  in Logger.
     */
 
-    const Real getStartTime( void ) const;
+    LIBECS_API const Real getStartTime( void ) const;
 
     /**
        Returns time of the last element in Logger
     */
 
-    const Real getEndTime( void ) const;
+    LIBECS_API const Real getEndTime( void ) const;
 
     /**
       Returns size of logger
@@ -193,7 +193,7 @@ namespace libecs
        DEPRECATED - Use setLoggerPolicy 
     */
 
-    void setMinimumInterval( RealParam anInterval );
+    LIBECS_API void setMinimumInterval( RealParam anInterval );
 
     /**
        DEPRECATED - Use getLoggerPolicy
@@ -245,7 +245,7 @@ namespace libecs
       thePhysicalLogger.push( DataPoint( aTime, aValue ) );
     }
 
-    static DataPointVectorSharedPtr createEmptyVector();
+    LIBECS_API static DataPointVectorSharedPtr createEmptyVector();
 
   private:
 
