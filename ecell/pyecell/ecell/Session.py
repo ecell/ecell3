@@ -3,8 +3,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2008 Keio University
+#       Copyright (C) 2005-2008 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -48,8 +48,8 @@ from ecell.ECDDataFile import *
 
 BANNERSTRING =\
 '''ecell3-session [ E-Cell SE Version %s, on Python Version %d.%d.%d ]
-Copyright (C) 1996-2007 Keio University.
-Copyright (C) 2005-2007 The Molecular Sciences Institute.
+Copyright (C) 1996-2008 Keio University.
+Copyright (C) 2005-2008 The Molecular Sciences Institute.
 More info: http://www.e-cell.org/software'''\
 % ( ecell.ecs.getLibECSVersion(), sys.version_info[0], sys.version_info[1], sys.version_info[2] )
 
