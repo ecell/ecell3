@@ -47,6 +47,11 @@ Object.prototype.map = function(f) {
     return Object.map(this, f);
 };
 
+Array.prototype.apply = function(f) {
+    for (var i = 0; i < this.length; ++i)
+        f(this[i]);
+};
+
 var BuildHelper = function () {
     this.initialize.apply(this, arguments);
 };
@@ -83,6 +88,29 @@ BuildHelper.prototype = {
 
     execPythonScript: function(args) {
         BuildHelper.exec(this.pythonHome + 'python', 'unixlike', args);
+    },
+
+    getPythonVersion: function() {
+        return BuildHelper.invoke(
+                this.pythonHome + 'python', 'unixlike',
+                ['-c', 'import sys; print sys.version[0:3]']);
+    },
+
+    makePythonLauncher: function(path) {
+        var flavor = 'python';
+        if (arguments.length > 1)
+            flavor = arguments[1];
+        var scr = '';
+        scr += '@ECHO OFF\n';
+        scr += 'SET PWD=%~dp$PATH:0\n';
+        scr += 'SET ECELL_HOME=%PWD%\\..\n';
+        scr += 'SET PYTHONPATH=%PYTHONHOME%;%ECELL_HOME%\\lib\\site-packages\n';
+        scr += 'SET PATH=%PWD%;%PATH%\n';
+        scr += '"%PYTHONHOME%\\' + flavor + '" "%PWD%\\'
+                + FileSystemObject.GetFileName(path) + '" %*\n';
+        var f = FileSystemObject.OpenTextFile(path + ".cmd", 2, true);
+        f.Write(scr);
+        f.Close();
     },
 
     run: function(tasks, method) {
@@ -251,6 +279,32 @@ BuildHelper.exec = function(prog, flavor, args) {
     if (ex.Status != 1)
         throw "Failed to execute " + prog;
 };
+
+BuildHelper.invoke = function(prog, flavor, args) {
+    var cmdline = BuildHelper.CommandlineArgumentEscapers.winstd(prog);
+    var escapeCommandlineArgument = BuildHelper.CommandlineArgumentEscapers[flavor];
+ 
+    for (var i = 0; i < args.length; i++) {
+        cmdline += ' ' + escapeCommandlineArgument(args[i]);
+    }
+
+    var retval = '';
+    var ex = WshShell.Exec(cmdline);
+    while (ex.Status == 0) {
+        WScript.Echo(cmdline);
+        if (!ex.StdOut.AtEndOfStream)
+            retval += ex.StdOut.ReadAll();
+        if (!ex.StdErr.AtEndOfStream)
+            WScript.Echo(ex.StdErr.ReadAll());
+        WScript.Sleep(100);
+    }
+
+    if (ex.Status != 1)
+        throw "Failed to execute " + prog;
+        
+    return retval;
+};
+
 
 BuildHelper.ArgsParser = function() {
     this.initialize.apply(this, arguments);

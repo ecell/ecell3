@@ -68,22 +68,24 @@ var tasks = {
         var pyECellDir = this.projectDir + 'ecell\\pyecell\\';
         var binDir = this.projectDir + 'ecell\\bin\\';
         var destDir = this.distBinDir;
+        var binDirScripts = [
+            'ecell3-em2eml',
+            'ecell3-eml2em',
+        ];
+        var pyECellDirScripts = [
+            'ecell3-session',
+            'ecell3-session-manager',
+            'ecell3-eml2sbml',
+            'ecell3-sbml2eml'
+        ];
         BuildHelper.copyMultiple(
-            binDir, destDir,
-            [
-                'ecell3-em2eml',
-                'ecell3-eml2em',
-            ]
-        ); 
+            binDir, destDir, binDirScripts); 
         BuildHelper.copyMultiple(
-            pyECellDir, destDir,
-            [
-                'ecell3-session',
-                'ecell3-session-manager',
-                'ecell3-eml2sbml',
-                'ecell3-sbml2eml'
-            ]
-        );
+            pyECellDir, destDir, pyECellDirScripts);
+        var self = this;
+        binDirScripts.concat(pyECellDirScripts).apply(function(fname) {
+                self.makePythonLauncher(destDir + '\\' + fname);
+            });
         BuildHelper.chdir(pyECellDir);
         this.execPythonScript(
             [
@@ -134,12 +136,16 @@ var tasks = {
         var destDir;
         var sessionMonitorDir = this.projectDir + 'ecell\\session-monitor\\';
         var distSessionMonitorDir = this.distLibDir + 'ecell-3.1\\session-monitor\\';
+        var executableScripts = [ 'ecell3-session-monitor' ];
 
         destDir = this.distBinDir;
         BuildHelper.mkdir(destDir);
         BuildHelper.copyMultiple(
-            sessionMonitorDir, destDir,
-            ['ecell3-session-monitor']);
+                sessionMonitorDir, destDir, executableScripts);
+        var self = this;
+        executableScripts.apply(function(fname) {
+                self.makePythonLauncher(destDir + '\\' + fname, 'pythonw');
+            });
 
         destDir = distSessionMonitorDir;
         BuildHelper.mkdir(destDir);
@@ -158,12 +164,16 @@ var tasks = {
         var destDir;
         var modelEditorDir = this.projectDir + 'ecell\\model-editor\\';
         var distModelEditorDir = this.distLibDir + 'ecell-3.1\\model-editor\\';
+        var executableScripts = [ 'ecell3-model-editor' ];
 
         destDir = this.distBinDir;
         BuildHelper.mkdir(destDir);
         BuildHelper.copyMultiple(
-            modelEditorDir, destDir,
-            ['ecell3-model-editor']);
+            modelEditorDir, destDir, executableScripts);
+        var self = this;
+        executableScripts.apply(function(fname) {
+                self.makePythonLauncher(destDir + '\\' + fname, 'pythonw');
+            });
 
         destDir = distModelEditorDir;
         BuildHelper.mkdir(destDir);
@@ -189,15 +199,14 @@ var tasks = {
         var destDir;
 
         destDir = this.distDocDir;
-        BuildHelper.copyRecursively(
+        BuildHelper.copyMultiple(
             this.projectDir, destDir,
             [
                 'README', 'AUTHORS', 'COPYING',
                 'COPYING.GPLv2', 'COPYING.GPLv3',
                 'COPYING.LGPLv2', 'COPYING.LGPLv3',
                 'INSTALL', 'NEWS', 'README', 'ChangeLog'
-            ],
-            [ '.svn' ]);
+            ]);
 
         destDir = this.distDocDir+ 'samples\\';
         BuildHelper.mkdir(destDir);
