@@ -737,7 +737,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="Generating $(InputDir)$(InputName)..."
+						Description="Generating $(InputDir)\$(InputName)..."
 						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(ProjectDir)..\..\ecell\libecs\Defs.hpp"
 					/>
@@ -747,7 +747,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						Description="Generating $(InputDir)$(InputName)..."
+						Description="Generating $(InputDir)\$(InputName)..."
 						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(ProjectDir)..\..\ecell\libecs\Defs.hpp"
 					/>

@@ -5,6 +5,12 @@ buildInfo.env = (function() {
             buildInfo.projectDir + '\\ecell_version.sh'));
     return sh.env.mix({
         top_srcdir: buildInfo.projectDir + '\\ecell',
+        bindir: '${prefix}/bin',
+        libdir: '${prefix}/lib',
+        datadir: '${prefix}/share/ecell',
+        confdir: '${prefix}/etc',
+        ECELL_DIRNAME: 'ecell-'
+            + sh.env.ECELL_MAJOR_VERSION + '.' + sh.env.ECELL_MINOR_VERSION,
         ECELL_VERSION_STRING: BuildHelper.replacePlaceholders(
             '"@ECELL_MAJOR_VERSION@.@ECELL_MINOR_VERSION@.@ECELL_MICRO_VERSION@"', sh.env),
         INCLTDL: '/I' + buildInfo.projectDir + '\\libltdl',
