@@ -144,7 +144,7 @@ var tasks = {
                 sessionMonitorDir, destDir, executableScripts);
         var self = this;
         executableScripts.apply(function(fname) {
-                self.makePythonLauncher(destDir + '\\' + fname, 'pythonw');
+                self.makePythonLauncher(destDir + '\\' + fname, 'pythonw', 1);
             });
 
         destDir = distSessionMonitorDir;
@@ -172,7 +172,7 @@ var tasks = {
             modelEditorDir, destDir, executableScripts);
         var self = this;
         executableScripts.apply(function(fname) {
-                self.makePythonLauncher(destDir + '\\' + fname, 'pythonw');
+                self.makePythonLauncher(destDir + '\\' + fname, 'pythonw', 2);
             });
 
         destDir = distModelEditorDir;

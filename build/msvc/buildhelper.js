@@ -98,14 +98,22 @@ BuildHelper.prototype = {
 
     makePythonLauncher: function(path) {
         var flavor = 'python';
+        var use_launcher = 0;
         if (arguments.length > 1)
             flavor = arguments[1];
+        if (arguments.length > 2)
+            use_launcher = arguments[2];
         var scr = '';
         scr += '@ECHO OFF\n';
-        scr += 'SET PWD=%~dp$PATH:0\n';
+        scr += 'SET PWD=%~dp0\n';
         scr += 'SET ECELL_HOME=%PWD%\\..\n';
         scr += 'SET PYTHONPATH=%PYTHONHOME%;%ECELL_HOME%\\lib\\site-packages\n';
         scr += 'SET PATH=%PWD%;%PATH%\n';
+        if (use_launcher > 0) {
+            scr += 'START "' + FileSystemObject.GetFileName(path) + '" ';
+            if ((use_launcher & 2) != 0)
+                scr += '/MIN ';
+        }
         scr += '"%PYTHONHOME%\\' + flavor + '" "%PWD%\\'
                 + FileSystemObject.GetFileName(path) + '" %*\n';
         var f = FileSystemObject.OpenTextFile(path + ".cmd", 2, true);
