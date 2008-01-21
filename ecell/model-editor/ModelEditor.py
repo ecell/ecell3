@@ -1740,7 +1740,7 @@ class ModelEditor:
             except:
                 self.message("Couldnot save preferences into file %s.\n Please check permissions for home directory.\n"%self.theIniFileName)
         else:
-            os.system('mkdir ' + self.theIniFolderName)
+            os.mkdir(self.theIniFolderName)
   
     def getParameter(self, aParameter):
         """tries to get a parameter from ConfigDB
