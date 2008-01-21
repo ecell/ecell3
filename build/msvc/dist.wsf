@@ -174,7 +174,7 @@ var tasks = {
         destDir = distModelEditorDir + 'glade\\';
         BuildHelper.mkdir(destDir);
         BuildHelper.copyMultiple(
-            distModelEditorDir + 'glade\\', destDir,
+            modelEditorDir + 'glade\\', destDir,
             ['*.glade', '*.png']);
 
         destDir = distModelEditorDir + 'plugins\\'
