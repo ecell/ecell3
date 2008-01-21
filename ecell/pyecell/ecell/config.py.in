@@ -43,6 +43,14 @@ __all__ = (
     'dm_path'
     )
 
+# Inspired by BTL::platform::get_module_filename
+def get_running_executable():
+    if getattr( sys, 'frozen', '' ) == 'windows_exe':
+        import win32api
+        return win32api.GetModuleFileName( 0 )
+    else:
+        return os.path.abspath( sys.argv[0] )
+
 package = "@PACKAGE@"
 per_app_dir_name = "@ECELL_DIRNAME@"
 version = "@VERSION@"
@@ -76,14 +84,6 @@ if os.name == 'nt':
 else:
     home_dir = os.path.expanduser( '~' )
     user_prefs_dir = os.path.join( home_dir, '.' + per_app_dir_name )
-
-# Inspired by BTL::platform::get_module_filename
-def get_running_executable():
-    if getattr( sys, 'frozen', '' ) == 'windows_exe':
-        import win32api
-        return win32api.GetModuleFileName( 0 )
-    else:
-        return os.path.abspath( sys.argv[0] )
 
 def expand_shell_variables( val, vars ):
     import re
