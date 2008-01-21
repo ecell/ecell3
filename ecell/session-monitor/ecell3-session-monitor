@@ -10,6 +10,9 @@ import ecell.config
 ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
 
 os.environ[ 'SESSIONMONITORPATH' ] = os.path.join( ecell.config.lib_dir, 'session-monitor' )
+os.environ[ 'ECELL3_PREFIX' ] = ecell.config.prefix
+os.environ[ 'ECELL3_LIBDIR' ] = ecell.config.lib_dir
+os.environ[ 'VERSION' ] = ecell.config.version
 
 sys.path.insert( 0, os.environ[ 'SESSIONMONITORPATH' ] )
 
