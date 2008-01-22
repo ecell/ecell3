@@ -71,16 +71,20 @@ if len( exec_prefix ) == 0 or not os.path.isdir( exec_prefix ):
     exec_prefix = prefix
 
 if os.name == 'nt':
-    from win32com.shell import shell, shellcon
-    home_dir = shell.SHGetPathFromIDList(
-        shell.SHGetSpecialFolderLocation( 0, shellcon.CSIDL_PROFILE )
-        )
-    user_prefs_dir = os.path.join(
-        shell.SHGetPathFromIDList(
-            shell.SHGetSpecialFolderLocation( 0, shellcon.CSIDL_APPDATA )
-            ),
-        per_app_dir_name
-        )
+    try:
+        from win32com.shell import shell, shellcon
+        home_dir = shell.SHGetPathFromIDList(
+            shell.SHGetSpecialFolderLocation( 0, shellcon.CSIDL_PROFILE )
+            )
+        user_prefs_dir = os.path.join(
+            shell.SHGetPathFromIDList(
+                shell.SHGetSpecialFolderLocation( 0, shellcon.CSIDL_APPDATA )
+                ),
+            per_app_dir_name
+            )
+    except:
+        home_dir = os.environ['USERPROFILE']
+        user_prefs_dir = os.environ['APPDATA']
 else:
     home_dir = os.path.expanduser( '~' )
     user_prefs_dir = os.path.join( home_dir, '.' + per_app_dir_name )
