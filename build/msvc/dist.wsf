@@ -172,7 +172,7 @@ var tasks = {
             modelEditorDir, destDir, executableScripts);
         var self = this;
         executableScripts.apply(function(fname) {
-                self.makePythonLauncher(destDir + '\\' + fname, 'pythonw', 2);
+                self.makePythonLauncher(destDir + '\\' + fname, 'python', 2);
             });
 
         destDir = distModelEditorDir;
