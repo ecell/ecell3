@@ -70,7 +70,7 @@ var tasks = {
         var destDir = this.distBinDir;
         var binDirScripts = [
             'ecell3-em2eml',
-            'ecell3-eml2em',
+            'ecell3-eml2em'
         ];
         var pyECellDirScripts = [
             'ecell3-session',

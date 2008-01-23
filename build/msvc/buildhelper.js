@@ -103,6 +103,8 @@ BuildHelper.prototype = {
             flavor = arguments[1];
         if (arguments.length > 2)
             use_launcher = arguments[2];
+        var script_file_name = path + ".cmd";
+        WScript.Echo("Creating launcher script " + script_file_name);
         var scr = '';
         scr += '@ECHO OFF\n';
         scr += 'SET PWD=%~dp0\n';
@@ -116,7 +118,7 @@ BuildHelper.prototype = {
         }
         scr += '"%PYTHONHOME%\\' + flavor + '" "%PWD%\\'
                 + FileSystemObject.GetFileName(path) + '" %*\n';
-        var f = FileSystemObject.OpenTextFile(path + ".cmd", 2, true);
+        var f = FileSystemObject.OpenTextFile(script_file_name, 2, true);
         f.Write(scr);
         f.Close();
     },
