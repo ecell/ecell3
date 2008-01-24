@@ -239,6 +239,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="&quot;.\release\ltdl.lib&quot; &quot;.\release\compat.lib&quot;"
 				AdditionalDependencies="libgsl_dll.lib compat.lib ltdl.lib"
 				OutputFile="$(OutDir)\ecs.dll"
 				LinkIncremental="1"
@@ -276,8 +277,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
+			OutputDirectory="$(SolutionDir)\$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
@@ -325,10 +326,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="&quot;.\release\ltdl.lib&quot; &quot;.\release\compat.lib&quot;"
 				AdditionalDependencies="libgsl_dll.lib compat.lib ltdl.lib"
 				OutputFile="$(OutDir)\ecs.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(LIB)"
+				AdditionalLibraryDirectories="$(SolutionDir)\$(ConfigurationName);$(LIB)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

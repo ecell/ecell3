@@ -204,8 +204,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="4"
 			CharacterSet="2"
 			WholeProgramOptimization="0"
@@ -229,7 +229,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..;..\..\libltdl"
-				PreprocessorDefinitions="WIN64;NDEBUG;_LIB;_WIN64_WINNT=0x500;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WIN64_WINNT=0x500;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H"
 				RuntimeLibrary="2"
 			/>
 			<Tool
