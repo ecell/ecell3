@@ -38,18 +38,16 @@ from Constants import *
 import os
 import sys
 import traceback
+try:
+    # subprocess became a default module since 2.4
+    import subprocess
+except:
+    pass
 import ecell.GtkSessionMonitor
 import ecell.ecssupport
 import time
 
-if os.name == 'nt':
-    try:
-        import win32api
-    except:
-        pass
-    ecell3_session_filename = "ecell3-session.exe"
-else:
-    ecell3_session_filename = "ecell3-session"
+ecell3_session_filename = "ecell3-session"
 
 ecell3_session_path = os.environ["ECELL3_PREFIX"] + os.sep + "bin" + os.sep + ecell3_session_filename
 TIME_THRESHOLD = 5
@@ -68,30 +66,43 @@ class Runtime:
         
     def createNewProcess( self, testPyFile ):
         if os.name == 'nt':
-            return os.spawnl( os.P_NOWAIT, ecell3_session_path, '"' + ecell3_session_path + '"', '"' + testPyFile + '"' )
+            processHdl, threadHdl, dummy, dummy = subprocess.CreateProcess(
+                os.environ['COMSPEC'],
+                '- /C ""%s" "%s""' % (
+                    ecell3_session_path + ".cmd", testPyFile
+                    ),
+                0, 0, False, 0, None, None, {
+                    'dwFlags': 0,
+                    'wShowWindow': 0,
+                    'hStdInput': None,
+                    'hStdOutput': None,
+                    'hStdError': None
+                    }
+                )
+            return processHdl
         else:
-            return os.spawnl( os.P_NOWAIT, ecell3_session_path,  ecell3_session_path ,  testPyFile )
+            return os.spawnl( os.P_NOWAIT, ecell3_session_path,  ecell3_session_path, testPyFile )
         
-    def killProcess ( self, processID ):
+    def killProcess( self, processID ):
         if os.name == 'nt':
             try:
-                win32api.TerminateProcess( processID,0 )
+                subprocess.TerminateProcess( processID, 0 )
             except:
                 pass
         else:
             os.kill( processID,9 )
-        
+
+    def waitForProcessTermination( self, processID ):
+        if os.name == 'nt':
+            subprocess.WaitForSingleObject( processID, subprocess.INFINITE )
+        else:
+            os.waitpid( processID, 0 )
+
     def __preRun( self ):
-        # THIS FUNCTION IS LINUX DEPENDENT!!!!
-        # a possible workaround for using it under Windows is
-        # use os.spawnl instead of os.spawnlp - the concrete path for ecell3-session must be found!
-        # use import winapi32, winapi32.TerminateProcess( pid) instead of os.kill
-        
-        #attempting loading and executing model on a separate thread and check whether it is wise to run it in this thread
         if self.preRunSuccessful:
             return True
         tempDir = os.getcwd()
-        processID = str(os.getpid() )
+        processID = str( os.getpid() )
         fileName = self.theModelEditor.autoSaveName
         testPyFile = tempDir + os.sep + "test" + processID + ".py"
         testOutFile = tempDir + os.sep + "test" + processID + ".out"
@@ -121,79 +132,72 @@ def mainfunction():\n\
 gtk.timeout_add( 10, mainfunction )\n\
 gtk.main()\n\
 "
-        fd=open( testPyFile,'w' )
+        fd = open( testPyFile,'w' )
         fd.write( testFile )
         fd.close()
-        fd=open( testOutFile, 'w' )
+        fd = open( testOutFile, 'w' )
         fd.close()
         pid = self.createNewProcess( testPyFile )
-        # first get started signal
-        startedTime = time.time()
-        startstr = ''
-        a=[]
-        while len(a)<1 and (time.time()-startedTime )< TIME_THRESHOLD:
-            try:
-                fd=open( testOutFile,'r' )
-                a=fd.readlines(  )
-                fd.close()
-            except:
-                pass
-            if len(a)>0:
-                startstr=a[0].strip()
-        if startstr!="started":
-            try:
-                os.remove( testOutFile )
-                os.remove( testPyFile )
-            except:
-                pass
-            return False
-            
-        # must load it!!!
-        lastReadTime = time.time()
-        lastLength = 0
-        while len(a)<3 and lastReadTime-time.time()<TIME_THRESHOLD:
-            fd=open( testOutFile,'r' )
-            a=fd.readlines(  )
-            fd.close()
-            if len(a)>1:
-                newLength=len(a[1].strip())
-                if newLength > lastLength:
-                    lastLength = newLength
-                    lastReadTime = time.time()
-        if len(a) > 2:
-            self.preLoadSuccessful = True
-        else:
-            try:
-                os.remove( testOutFile )
-                os.remove( testPyFile )
-            except:
-                pass
-
-            self.killProcess( pid)            
-            return False
-                
-        loadedTime = time.time()
-        while startstr!='finished' and (time.time()-loadedTime )< TIME_THRESHOLD:
-            fd=open( testOutFile,'r' )
-            a=fd.readlines(  )
-            fd.close()
-            if len(a)>3:
-                startstr=a[3].strip()
         try:
-            os.remove( testOutFile )
-            os.remove( testPyFile )
-        except:
-            pass
+            # first get started signal
+            startedTime = time.time()
+            a = []
+            try:
+                while len( a ) < 1:
+                    if ( time.time() - startedTime ) >= TIME_THRESHOLD:
+                        raise RuntimeError, "Timed out"
+                    if not os.path.exists( testOutFile ):
+                        continue
+                    fd = open( testOutFile,'r' )
+                    a = fd.readlines()
+                    fd.close()
+            except RuntimeError:
+                self.killProcess( pid )
+                raise
+            if a[ 0 ].strip() != "started":
+                raise RuntimeError, "Subprocess returned an unexpected result"
 
-
-        if len(a)<4:
-            # hanging or segfault
-            self.killProcess( pid )
-
-            return False
-        else:
-            self.preRunSuccessful = True
-            return True
+            # must load it!!!
+            lastReadTime = time.time()
+            lastLength = 0
+            try:
+                while len( a ) < 3:
+                    if ( lastReadTime - time.time() ) >= TIME_THRESHOLD:
+                        raise RuntimeError, "Timed out"
+                    fd = open( testOutFile,'r' )
+                    a = fd.readlines()
+                    fd.close()
+            except:
+                self.killProcess( pid )
+                raise
+            newLength = len(a[ 1 ].strip())
+            if newLength > lastLength:
+                lastLength = newLength
+                lastReadTime = time.time()
+            self.preLoadSuccessful = True
+                    
+            loadedTime = time.time()
+            try:
+                while len( a ) <= 3:
+                    if ( time.time() - loadedTime ) >= TIME_THRESHOLD:
+                        raise RuntimeError, "Timed out"
+                    fd = open( testOutFile,'r' )
+                    a = fd.readlines()
+                    fd.close()
+                if a[ 3 ].strip() != 'finished':
+                    raise RuntimeError, 'Subprocess returned an error: ' + ''.join(a[ 3: ])
+            except:
+                self.killProcess( pid )
+                raise
+        finally:
+            self.waitForProcessTermination( pid )
+            try:
+                os.remove( testOutFile )
+                os.remove( testPyFile )
+            except:
+                pass
+        self.preRunSuccessful = True
+        return True
 
     #====================================================================================        
                 
