@@ -144,7 +144,7 @@ gtk.main()\n\
             a = []
             try:
                 while len( a ) < 1:
-                    if ( time.time() - startedTime ) >= TIME_THRESHOLD:
+                    if ( time.time() - startedTime ) >= TIME_THRESHOLD * 2:
                         raise RuntimeError, "Timed out"
                     if not os.path.exists( testOutFile ):
                         continue
@@ -174,7 +174,6 @@ gtk.main()\n\
             if newLength > lastLength:
                 lastLength = newLength
                 lastReadTime = time.time()
-            self.preLoadSuccessful = True
                     
             loadedTime = time.time()
             try:
@@ -203,7 +202,6 @@ gtk.main()\n\
                 
     def changeToRunMode( self ):
         self.preRunSuccessful= False
-        self.preLoadSuccessful = False
         # DO VALIDATION first!!!
 
         # destroy BoardWindow, save tracerlist
@@ -227,8 +225,9 @@ gtk.main()\n\
         self.theSession.setMessageMethod( self.message )
         self.theSession.registerUpdateCallback( self.updateWindows )
         #load model into GtkSessionMonitor
-        self.__preRun()
-        if not self.preLoadSuccessful:
+        try:
+            self.__preRun()
+        except:
             dialog = ConfirmWindow(1,"This operation needs loading model into Simulator, but your model is not stable!\nTest load hanged or crashed! Are you sure you want to load model into Simulator?\nIf you choose yes, ModelEditor can hang or crash.\n(Changes are saved)", "CRITICAL" )
             if dialog.return_result() != 0:
                 self.theModelEditor.theMainWindow.resetCursor()
@@ -309,7 +308,7 @@ gtk.main()\n\
 
     def __canRun( self ):
         if not self.preRunSuccessful :
-            dialog = ConfirmWindow(1,"Your model is not stable for runnig! Test run hanged or crashed!\nAre you sure you want to run in ModelEditor?\nIf you choose yes, ModelEditor can hang or crash.\n(Changes are saved)", "CRITICAL" )
+            dialog = ConfirmWindow(1,"Your model is not stable for running! Test run hanged or crashed!\nAre you sure you want to run in ModelEditor?\nIf you choose yes, ModelEditor can hang or crash.\n(Changes are saved)", "CRITICAL" )
             if dialog.return_result() != 0:
                 return False
         return True
