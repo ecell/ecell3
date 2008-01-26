@@ -68,7 +68,7 @@
 #include "win32_io_compat.h"
 
 
-#ifdef _WIN32_WINNT
+#if defined(_WIN32_WINNT) || defined(_WIN64_WINNT)
 #include <aclapi.h>
 #include <sddl.h>
 #include <accctrl.h>
@@ -745,7 +745,7 @@ int libecs_win32_io_open(const char *pathname, int flags, ...)
                 creation_disposition = OPEN_ALWAYS;
         }
 
-#ifdef _WIN32_WINNT
+#if defined(_WIN32_WINNT) || defined(_WIN64_WINNT)
         err = libecs_win32_io_build_security_attributes(
                 &sec_attr.lpSecurityDescriptor, modes);
         if (err)
@@ -783,7 +783,7 @@ out:
     if (real_pathname)
         libecs_win32_free(real_pathname);
 
-#ifdef _WIN32_WINNT
+#if defined(_WIN32_WINNT) || defined(_WIN64_WINNT)
     if (sec_attr.lpSecurityDescriptor) {
         libecs_win32_io_free_security_attributes(
             sec_attr.lpSecurityDescriptor);
@@ -949,7 +949,7 @@ libecs_win32_io_calculate_file_offset(HANDLE hdl,
 
     case SEEK_CUR:
         {
-#if _WIN32_WINNT >= 0x500
+#if _WIN32_WINNT >= 0x500 || _WIN64_WINNT >= 0x500
             LARGE_INTEGER l;
             static const LARGE_INTEGER li_zero = { 0, 0 };
             if (!SetFilePointerEx(hdl, li_zero,
@@ -981,7 +981,7 @@ libecs_win32_io_calculate_file_offset(HANDLE hdl,
         break;
     case SEEK_END:
         {
-#if _WIN32_WINNT >= 0x500
+#if _WIN32_WINNT >= 0x500 || _WIN64_WINNT >= 0x500
             LARGE_INTEGER l;
 
             if (!GetFileSizeEx(hdl, &l)) {
@@ -1119,7 +1119,7 @@ off_t libecs_win32_io_seek(int fd, off_t offset, int whence)
     }
 
     {
-#if _WIN32_WINNT >= 0x500
+#if _WIN32_WINNT >= 0x500 || _WIN64_WINNT >= 0x500
         LARGE_INTEGER _offset, new_offset;
         _offset.QuadPart = offset;
 
@@ -1205,7 +1205,7 @@ int libecs_win32_io_truncate(int fd, off_t length)
     }
 
     {
-#if _WIN32_WINNT >= 0x500
+#if _WIN32_WINNT >= 0x500 || _WIN64_WINNT >= 0x500
         LARGE_INTEGER _length, current_offset;
         static LARGE_INTEGER li_zero = { 0, 0 };
 
