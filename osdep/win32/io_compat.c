@@ -541,22 +541,21 @@ static DWORD libecs_win32_io_convert_path(char **retval, const char* path)
     src = path;
     dst = result;
 
-    if (path_len == 2) {
+    if (path_len >= 2) {
         if (path[0] == '/') {
             if (path[1] == '/') {
                 // an UNC path
                 result[0] = result[1] = '\\';
                 src += 2;
                 dst += 2;
-            } else if (isalpha((int)((unsigned char *)path)[1])) {
+            } else if (isalpha((int)((unsigned char *)path)[1]) &&
+                    (path_len <=2 || path[2] == '/')) {
                 // mingw compatibility stuff
                 dst[0] = path[1];
                 dst[1] = ':';
                 dst[2] = '\\';
-                src += 2;
+                src += 3;
                 dst += 3;
-                if (path_len > 2 && path[2] == '/')
-                    src++;
             }
         }
     }
