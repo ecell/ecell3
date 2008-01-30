@@ -21,7 +21,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\dm"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
@@ -43,7 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(INCLUDE)"
+				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GSL_DLL;NOMINMAX;__STDC__=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -64,9 +64,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib gsl_dll.lib"
+				AdditionalDependencies="ecs.lib gsl.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(LIB)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -99,7 +99,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\dm"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -121,7 +121,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(INCLUDE)"
+				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GSL_DLL;NOMINMAX;__STDC__=1"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -140,9 +140,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib gsl_dll.lib"
+				AdditionalDependencies="ecs.lib gsl.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(LIB)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -177,7 +177,7 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\dm"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
@@ -200,8 +200,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(INCLUDE)"
-				PreprocessorDefinitions="WIN64;_DEBUG;_WINDOWS;_USRDLL;GSL_DLL;NOMINMAX;__STDC__=1"
+				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GSL_DLL;NOMINMAX;__STDC__=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -221,9 +221,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib gsl_dll.lib"
+				AdditionalDependencies="ecs.lib gsl.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(LIB64)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="17"
@@ -256,7 +256,7 @@
 		<Configuration
 			Name="Release|x64"
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\dm"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="2"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -279,8 +279,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(INCLUDE)"
-				PreprocessorDefinitions="WIN64;NDEBUG;_WINDOWS;_USRDLL;GSL_DLL;NOMINMAX;__STDC__=1"
+				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GSL_DLL;NOMINMAX;__STDC__=1"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -298,9 +298,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib gsl_dll.lib"
+				AdditionalDependencies="ecs.lib gsl.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(LIB64)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

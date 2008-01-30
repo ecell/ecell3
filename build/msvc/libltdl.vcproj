@@ -21,7 +21,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -44,7 +44,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..;..\..\libltdl"
-				PreprocessorDefinitions="WIN32;_DEBUG;_DEBUG_LEVEL=2;_LIB;_WIN32_WINNT=0x500;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H"
+				PreprocessorDefinitions="WIN32;_DEBUG;_DEBUG_LEVEL=2;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -83,7 +83,7 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="4"
 			CharacterSet="2"
 			>
@@ -107,7 +107,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..;..\..\libltdl"
-				PreprocessorDefinitions="WIN32;_DEBUG;_DEBUG_LEVEL=2;_LIB;_WIN32_WINNT=0x500;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H"
+				PreprocessorDefinitions="WIN32;_DEBUG;_DEBUG_LEVEL=2;_LIB;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -146,7 +146,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="4"
 			CharacterSet="2"
 			WholeProgramOptimization="0"
@@ -169,7 +169,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..;..\..\libltdl"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_WIN32_WINNT=0x500;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H"
 				RuntimeLibrary="2"
 			/>
 			<Tool
@@ -205,7 +205,7 @@
 		<Configuration
 			Name="Release|x64"
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="4"
 			CharacterSet="2"
 			WholeProgramOptimization="0"
@@ -229,7 +229,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..;..\..\libltdl"
-				PreprocessorDefinitions="WIN64;NDEBUG;_LIB;_WIN64_WINNT=0x500;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H"
 				RuntimeLibrary="2"
 			/>
 			<Tool

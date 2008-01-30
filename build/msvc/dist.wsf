@@ -199,6 +199,7 @@ var tasks = {
         var destDir;
 
         destDir = this.distDocDir;
+        BuildHelper.mkdir(destDir);
         BuildHelper.copyMultiple(
             this.projectDir, destDir,
             [

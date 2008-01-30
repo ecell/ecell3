@@ -14,7 +14,7 @@ include_dirs = [
     ]
 
 common_libraries = [
-    'boost_python',
+    os.environ.get('BOOST_PYTHON_LIB_NAME', 'boost_python'),
     'gsl'
     ]
 
@@ -35,7 +35,7 @@ setup(
             library_dirs = [ ecell_staging_home + os.environ['libdir'] ],
             libraries = common_libraries + [ 'ecs' ],
             define_macros = sys.platform == 'win32' and
-				[ ('BOOST_AUTO_LINK_NOMANGLE', '1'), ('WIN32','1'), ('_WIN32','1'), ('__STDC__', 1) ],
+				[ ('BOOST_ALL_NO_LIB', '1'), ('WIN32','1'), ('_WIN32','1'), ('__STDC__', 1) ],
             sources = [ 'PyEcs.cpp' ] ),
         Extension(
             'ecell._emc',
@@ -43,7 +43,7 @@ setup(
             library_dirs = [ ecell_staging_home + os.environ['libdir'] ],
             libraries = common_libraries + [ 'ecs', 'emc' ],
             define_macros = sys.platform == 'win32' and
-				[ ('BOOST_AUTO_LINK_NOMANGLE', '1'), ('WIN32','1'), ('_WIN32','1'), ('__STDC__', 1) ],
+				[ ('BOOST_ALL_NO_LIB', '1'), ('WIN32','1'), ('_WIN32','1'), ('__STDC__', 1) ],
             sources = [ 'PyEmc.cpp' ] )
         ]
     )
