@@ -72,20 +72,8 @@ public:
   {
     if( ! Py_IsInitialized() )
       {
-	THROW_EXCEPTION( UnexpectedError, getClassNameString() + 
-			 ": Python interpreter is not initialized." );
+        Py_Initialize();
       }
-
-    python::handle<> aHandle( python::borrowed( PyImport_GetModuleDict() ) );
-    python::dict aModuleList( aHandle );
-
-    if( ! aModuleList.has_key( python::str( "ecell.ecs" ) ) )
-      {
-	THROW_EXCEPTION( UnexpectedError, getClassNameString() + 
-			 ": ecell.ecs module must be imported before" +
-			 " using this class." );
-      }
-
   }
 
   virtual ~PythonProcessBase()
