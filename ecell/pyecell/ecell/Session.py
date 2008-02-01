@@ -83,11 +83,10 @@ class Session:
             
     def interact( self, parameters={} ):
         aContext = self.__createScriptContext( parameters )
-        if os.name != "nt":
-            try:
-                import readline # to provide convenient commandline editing :)
-            except:
-                pass
+        try:
+            import readline # to provide convenient commandline editing :)
+        except:
+            pass
         import code
         anInterpreter = code.InteractiveConsole( aContext )
 
