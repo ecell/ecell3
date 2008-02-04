@@ -106,7 +106,8 @@ VariableReference.hpp\
 DynamicPriorityQueue.hpp\
 FluxProcess.hpp\
 MethodProxy.hpp\
-PropertiedObjectMaker.hpp
+PropertiedObjectMaker.hpp\
+PropertySlotProxyLoggerAdapter.hpp
 
 noinst_HEADERS=\
 osif.h\

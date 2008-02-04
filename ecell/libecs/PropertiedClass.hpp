@@ -305,6 +305,7 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
   SIMPLE_SET_METHOD( TYPE, NAME )\
   SIMPLE_GET_METHOD( TYPE, NAME )
 
+  template<typename T> class PropertyInterface;
 
   /** @addtogroup property The Inter-object Communication.
    *  The Interobject Communication.
@@ -444,7 +445,6 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
   /*@}*/
   
 } // namespace libecs
-
 
 #endif /* __PROPERTIEDCLASS_HPP */
 

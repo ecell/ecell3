@@ -35,7 +35,6 @@
 #include <functional>
 
 #include "libecs.hpp"
-//#include "Util.hpp"
 #include "PropertiedClass.hpp"
 #include "convertTo.hpp"
 #include "Polymorph.hpp"

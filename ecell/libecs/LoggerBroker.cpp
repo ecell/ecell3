@@ -41,7 +41,7 @@
 #include "FullID.hpp"
 #include "Model.hpp"
 #include "PropertySlot.hpp"
-
+#include "PropertySlotProxyLoggerAdapter.hpp"
 #include "LoggerBroker.hpp"
 
 

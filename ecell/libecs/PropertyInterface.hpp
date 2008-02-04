@@ -37,7 +37,6 @@
 #include "libecs.hpp"
 #include "PropertySlot.hpp"
 #include "PropertySlotProxy.hpp"
-#include "EntityType.hpp"
 
 #include <boost/assert.hpp>
 

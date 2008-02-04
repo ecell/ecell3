@@ -672,6 +672,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ecell\libecs\PropertySlotProxyLoggerAdapter.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ecell\libecs\Stepper.hpp"
 				>
 			</File>

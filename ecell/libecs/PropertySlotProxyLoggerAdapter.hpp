@@ -26,42 +26,54 @@
 //END_HEADER
 
 
-#if !defined(__LOGGERADAPTER_HPP)
-#define __LOGGERADAPTER_HPP
+#if !defined(__PROPERTYSLOTLOGGERADAPTER_HPP)
+#define __PROPERTYSLOTLOGGERADAPTER_HPP
 
-#include "libecs.hpp"
+#include "PropertySlotProxy.hpp"
+#include "LoggerAdapter.hpp"
 
 namespace libecs
 {
-  /**@addtogroup logging The Data Logging Module.
-      The Data Logging Module.
-
-      @ingroup libecs
-      @{ 
-  */ 
+  /** @addtogroup property
+      
+  @ingroup libecs
+  @{
+  */
 
   /** @file */
 
-  class LIBECS_API LoggerAdapter
+  class PropertySlotProxyLoggerAdapter
+    :
+    public LoggerAdapter
   {
 
   public:
 
-    virtual ~LoggerAdapter();
+    DM_IF PropertySlotProxyLoggerAdapter( PropertySlotProxyPtr aPropertySlotProxy )
+      :
+      thePropertySlotProxy( aPropertySlotProxy )
+    {
+      ; // do nothing
+    }
 
-    virtual const Real getValue() const = 0;
+    DM_IF virtual ~PropertySlotProxyLoggerAdapter()
+    {
+      delete thePropertySlotProxy;
+    }
 
-  protected:
+    DM_IF virtual const Real getValue() const
+    {
+      return thePropertySlotProxy->getReal();
+    }
 
-    LoggerAdapter();
+  private:
+
+    PropertySlotProxyPtr thePropertySlotProxy;
 
   };
-
 
   /** @} */ // logging module
 
 } // namespace libecs
 
-
-#endif /* __LOGGERADAPTER_HPP */
-
+#endif /* __PROPERTYSLOTLOGGERADAPTER_HPP */

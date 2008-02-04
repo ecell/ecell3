@@ -37,9 +37,7 @@
 #include "libecs.hpp"
 #include "Util.hpp"
 #include "PropertySlot.hpp"
-#include "LoggerAdapter.hpp"
 #include "convertTo.hpp"
-
 #include "Polymorph.hpp"
 
 namespace libecs
@@ -229,40 +227,7 @@ namespace libecs
 
   };
 
-
-
-  class PropertySlotProxyLoggerAdapter
-    :
-    public LoggerAdapter
-  {
-
-  public:
-
-    DM_IF PropertySlotProxyLoggerAdapter( PropertySlotProxyPtr aPropertySlotProxy )
-      :
-      thePropertySlotProxy( aPropertySlotProxy )
-    {
-      ; // do nothing
-    }
-
-    DM_IF virtual ~PropertySlotProxyLoggerAdapter()
-    {
-      delete thePropertySlotProxy;
-    }
-
-    DM_IF virtual const Real getValue() const
-    {
-      return thePropertySlotProxy->getReal();
-    }
-
-  private:
-
-    PropertySlotProxyPtr thePropertySlotProxy;
-
-  };
-
-  /*@}*/
-
+  /** @}*/
 }
 
 
