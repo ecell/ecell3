@@ -82,6 +82,11 @@ namespace libecs
   Model::~Model()
   {
     delete theRootSystemPtr;
+    for ( StepperMapConstIterator i( theStepperMap.begin() );
+          i != theStepperMap.end(); ++i)
+    {
+      delete i->second;
+    }
   }
 
 
