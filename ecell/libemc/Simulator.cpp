@@ -41,5 +41,9 @@ namespace libemc
     theSimulatorImplementation = new LocalSimulatorImplementation();
   }
 
+  Simulator::~Simulator()
+  {
+    delete theSimulatorImplementation;
+  }
 
 } // namespace libemc

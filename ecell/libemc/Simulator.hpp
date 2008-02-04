@@ -87,7 +87,7 @@ namespace libemc
   public:
 
     Simulator();
-    virtual ~Simulator() {}
+    virtual ~Simulator();
 
 
     /**
