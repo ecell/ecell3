@@ -511,8 +511,6 @@ class Eml:
             pass
 
         for aSystemNode in self.__theEmlNode.childNodes:
-            print aSystemNode
-
             if aSystemNode.nodeName == 'system' and \
                    str( aSystemNode.getAttribute( 'id' ) ) == aSystemPath:
                 self.__addToCache( aFullID, aSystemNode )
