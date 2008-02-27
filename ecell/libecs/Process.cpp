@@ -210,7 +210,7 @@ namespace libecs
   }
 
   VariableReferenceCref Process::getVariableReference( StringCref 
-						   aVariableReferenceName )
+						   aVariableReferenceName ) const
   {
     VariableReferenceVectorConstIterator 
       anIterator( findVariableReference( aVariableReferenceName ) );

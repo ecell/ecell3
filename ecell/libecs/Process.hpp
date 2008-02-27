@@ -293,7 +293,8 @@ namespace libecs
        @see VariableReference
     */
 
-    VariableReferenceCref getVariableReference( StringCref aVariableReferenceName );
+    VariableReferenceCref getVariableReference(
+        StringCref aVariableReferenceName ) const;
 
     /**
        @return a const reference to the VariableReferenceVector

@@ -9,8 +9,7 @@
 //
 //
 // E-Cell System is free software; you can redistribute it and/or
-// modify it under the terms of the GNU General Public
-// License as published by the Free Software Foundation; either
+// modify it under the terms of the GNU General Public // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
 // 
 // E-Cell System is distributed in the hope that it will be useful,
@@ -83,7 +82,7 @@ namespace libecs
   // (2) thePropertyInterface static variable must also be instantiated.
 
 #define LIBECS_DM_INIT_STATIC( CLASSNAME, DMTYPE )\
-  template class PropertyInterface<CLASSNAME>;\
+  template class libecs::PropertyInterface<CLASSNAME>;\
   libecs::PropertyInterface<CLASSNAME> CLASSNAME::thePropertyInterface
 
   ///@internal
@@ -93,54 +92,54 @@ namespace libecs
 
 #define LIBECS_DM_OBJECT_DEF_ABSTRACT( CLASSNAME )\
   typedef CLASSNAME _LIBECS_CLASS_;\
-  virtual StringLiteral getClassName() const { return XSTR( CLASSNAME ); } //
+  virtual libecs::StringLiteral getClassName() const { return XSTR( CLASSNAME ); } //
 
   ///@internal
 #define LIBECS_DM_EXPOSE_PROPERTYINTERFACE( CLASSNAME )\
 private:\
- static PropertyInterface<CLASSNAME> thePropertyInterface;\
+ static libecs::PropertyInterface<CLASSNAME> thePropertyInterface;\
 public:\
- virtual PropertySlotBasePtr getPropertySlot( StringCref aPropertyName ) const\
+ virtual libecs::PropertySlotBasePtr getPropertySlot( libecs::StringCref aPropertyName ) const\
  {\
   return thePropertyInterface.getPropertySlot( aPropertyName );\
  }\
- virtual void setProperty( StringCref aPropertyName, PolymorphCref aValue )\
+ virtual void setProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue )\
  {\
   thePropertyInterface.setProperty( *this, aPropertyName, aValue );\
  }\
- virtual const Polymorph getProperty( StringCref aPropertyName ) const\
+ virtual const libecs::Polymorph getProperty( libecs::StringCref aPropertyName ) const\
  {\
   return thePropertyInterface.getProperty( *this, aPropertyName );\
  }\
- virtual void loadProperty( StringCref aPropertyName, PolymorphCref aValue )\
+ virtual void loadProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue )\
  {\
   thePropertyInterface.loadProperty( *this, aPropertyName, aValue );\
  }\
- virtual const Polymorph saveProperty( StringCref aPropertyName ) const\
+ virtual const libecs::Polymorph saveProperty( libecs::StringCref aPropertyName ) const\
  {\
   return thePropertyInterface.saveProperty( *this, aPropertyName );\
  }\
- virtual const Polymorph getPropertyList() const\
+ virtual const libecs::Polymorph getPropertyList() const\
  {\
   return thePropertyInterface.getPropertyList( *this );\
  }\
- virtual PropertySlotProxyPtr\
- createPropertySlotProxy( StringCref aPropertyName )\
+ virtual libecs::PropertySlotProxyPtr\
+ createPropertySlotProxy( libecs::StringCref aPropertyName )\
  {\
   return thePropertyInterface.createPropertySlotProxy( *this, aPropertyName );\
  }\
- virtual const Polymorph\
- getPropertyAttributes( StringCref aPropertyName ) const\
+ virtual const libecs::Polymorph\
+ getPropertyAttributes( libecs::StringCref aPropertyName ) const\
  {\
   return thePropertyInterface.getPropertyAttributes( *this, aPropertyName );\
  } \
-static PolymorphMapCref getClassInfo( void )\
+static libecs::PolymorphMapCref getClassInfo( void )\
 {\
   return thePropertyInterface.getInfoMap();\
 }\
 static const void* getClassInfoPtr()\
 {\
-return reinterpret_cast<const void*>(&thePropertyInterface.getInfoMap());\
+  return reinterpret_cast<const void*>(&thePropertyInterface.getInfoMap());\
 }//
 
 
@@ -149,7 +148,7 @@ return reinterpret_cast<const void*>(&thePropertyInterface.getInfoMap());\
   //
 
 #define INHERIT_PROPERTIES( BASECLASS )\
-    BASECLASS::initializePropertyInterface( Type2Type<TT>() );\
+    BASECLASS::initializePropertyInterface( libecs::Type2Type<TT>() );\
     CLASS_INFO( "Baseclass", # BASECLASS )
     
 #define CLASS_DESCRIPTION( DESCRIPTION )\
@@ -172,7 +171,9 @@ return reinterpret_cast<const void*>(&thePropertyInterface.getInfoMap());\
   */
 
 #define CLASS_INFO( FIELDNAME, FIELDVALUE) \
- PropertyInterface<TT>::setInfoField( String ( FIELDNAME ), String( FIELDVALUE ) )
+ libecs::PropertyInterface<TT>::setInfoField( \
+  libecs::String( FIELDNAME ), \
+  libecs::String( FIELDVALUE ) )
 
 
   /** 
@@ -180,24 +181,28 @@ return reinterpret_cast<const void*>(&thePropertyInterface.getInfoMap());\
 	 PropertyName, Type, set_flag, get_flag, save_flag, load_flag
   */
 #define CLASSPROPERTY_INFO( PROPERTYNAME, TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD ) \
- PropertyInterface<TT>::setPropertyInfoField( String( PROPERTYNAME ), String( TYPE ), \
-											  METHODFLAG(SETMETHOD, NULLPTR ), METHODFLAG( GETMETHOD, NULLPTR ), \
-METHODFLAG( SAVEMETHOD, NULLPTR ), METHODFLAG( LOADMETHOD, NULLPTR ) )
+ libecs::PropertyInterface<TT>::setPropertyInfoField( \
+  libecs::String( PROPERTYNAME ), \
+  libecs::String( libecs::PropertiedClass::TypeName<TYPE>::name ), \
+  METHODFLAG(SETMETHOD, NULLPTR ), \
+  METHODFLAG( GETMETHOD, NULLPTR ), \
+  METHODFLAG( SAVEMETHOD, NULLPTR ), \
+  METHODFLAG( LOADMETHOD, NULLPTR ) )
 
 
 
 
 #define PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
-  PropertyInterface<TT>::registerPropertySlot( # NAME,\
-         new ConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD ) );\
-CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SETMETHOD, GETMETHOD )
+  libecs::PropertyInterface<TT>::registerPropertySlot( # NAME,\
+         new libecs::ConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD ) );\
+CLASSPROPERTY_INFO( # NAME, TYPE, SETMETHOD, GETMETHOD, SETMETHOD, GETMETHOD )
 
 #define PROPERTYSLOT_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD,\
 				LOADMETHOD, SAVEMETHOD )\
-  PropertyInterface<TT>::registerPropertySlot( # NAME,\
-         new LoadSaveConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD,\
+  libecs::PropertyInterface<TT>::registerPropertySlot( # NAME,\
+         new libecs::LoadSaveConcretePropertySlot<TT,TYPE>( SETMETHOD, GETMETHOD,\
 						    LOADMETHOD, SAVEMETHOD ) );\
-CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD )
+CLASSPROPERTY_INFO( # NAME, TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD )
 
 
 #define PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD )\
@@ -241,7 +246,7 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
   ///@internal
 #define LIBECS_DM_DEFINE_PROPERTIES()\
   template<class TT>\
-  static void initializePropertyInterface( Type2Type<TT> )
+  static void initializePropertyInterface( libecs::Type2Type<TT> )
 
 
 
@@ -328,6 +333,11 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
 
   class LIBECS_API PropertiedClass
   {
+  public:
+    template<typename T> struct TypeName
+    {
+      static const char name[];
+    };
 
   public:
 
@@ -426,7 +436,7 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
   // inline copies of them around.  This reduces sizes of DM .so files a bit.
 
 #define NULLSET_SPECIALIZATION( TYPE )\
-  template <> LIBECS_API void PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )
+  template <> LIBECS_API void libecs::PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )
 
   NULLSET_SPECIALIZATION( Real );
   NULLSET_SPECIALIZATION( Integer );
@@ -434,12 +444,24 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
   NULLSET_SPECIALIZATION( Polymorph );
 
 #define NULLGET_SPECIALIZATION( TYPE )\
-  template <> LIBECS_API const TYPE PropertiedClass::nullGet<TYPE>() const
+  template <> LIBECS_API const TYPE libecs::PropertiedClass::nullGet<TYPE>() const
 
   NULLGET_SPECIALIZATION( Real );
   NULLGET_SPECIALIZATION( Integer );
   NULLGET_SPECIALIZATION( String );
   NULLGET_SPECIALIZATION( Polymorph );
+
+
+#define DEFINE_TYPE_NAME(n) \
+  template struct PropertiedClass::TypeName<libecs::n>; \
+  template<> const char PropertiedClass::TypeName<libecs::n>::name[] = #n;
+
+  DEFINE_TYPE_NAME(Integer)
+  DEFINE_TYPE_NAME(String)
+  DEFINE_TYPE_NAME(Real)
+
+#undef DEFINE_TYPE_NAME
+
 
 
   /*@}*/
