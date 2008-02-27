@@ -37,13 +37,15 @@
 import os
 
 from gtk import *
-from ecell.ecs_constants import *
-from constants import *
 import string
 import sys
 import traceback
+from warnings import *
 
+from ecell.ecs_constants import *
 import ecell.util as util
+
+from constants import *
 from PluginWindow import *
 from utils import *
 
@@ -143,9 +145,9 @@ class OsogoPluginWindow(PluginWindow):
         return -> FullID
         This method can throw an exception.
         """
+        warn( 'DEPRECATED', DeprecationWarning, stacklevel = 2 )
         aFullPN = self.getFullPN()
-        return aFullPN != None and util.convertFullPNToFullID( aFullPN )\
-                               or None
+        return aFullPN != None and aFullPN.fullID
 
     def supplementFullPN( self, aFullPN ):
         """
@@ -155,18 +157,16 @@ class OsogoPluginWindow(PluginWindow):
         
         return -> supplemented FullID
         """
-        if aFullPN[PROPERTY] != '' :
+        if aFullPN.propertyName != '' :
             return aFullPN
-        else :
-            if aFullPN[TYPE] == VARIABLE :
-                aPropertyName = 'Value'
-            elif aFullPN[TYPE] == PROCESS :
-                aPropertyName = 'Activity'
-            elif aFullPN[TYPE] == SYSTEM :
-                aPropertyName = 'Size'
-            aNewFullPN = util.convertFullIDToFullPN(
-                util.convertFullPNToFullID( aFullPN ), aPropertyName )
-            return aNewFullPN
+        else:
+            if aFullPN[TYPE] == VARIABLE:
+                aPropertyName = DEFAULT_VARIABLE_PROPERTY
+            elif aFullPN[TYPE] == PROCESS:
+                aPropertyName = DEFAULT_PROCESS_PROPERTY
+            elif aFullPN[TYPE] == SYSTEM:
+                aPropertyName = DEFAULT_SYSTEM_PROPERTY
+            return aFullPN.fullID.createFullPN( aPropertyName )
 
     def getValue( self, aFullPN ):
         """

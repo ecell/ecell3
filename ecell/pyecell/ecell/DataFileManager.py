@@ -31,112 +31,82 @@
 # E-Cell Project, Lab. for Bioinformatics, Keio University.
 #
 
-from DataFile import *
-from string import *
+from ecell.DataFile import DataFile
 
-# ------------------------------------------------------------------
-# DataFileManager (This is abstract class)
-#   - manages some DataFile objects
-# ------------------------------------------------------------------
+__all__ = (
+    'DataFileManager'
+    )
+
 class DataFileManager:
+    """
+    DataFileManager (This is abstract class)
+      - manages some DataFile objects
+    """
 
-	# ------------------------------------------------------------------
-	# Constructor
-	#
-	# return  -> None
-	# ------------------------------------------------------------------
-	def __init__(self):
+    def __init__(self):
+        """
+        Constructor
+        
+        return  -> None
+        """
+        self.theFileMap = {}
+        self.theRootDirectory = '.'
 
-		self.theFileMap = {}
-		self.theRootDirectory = '.'
+    def getFileMap(self):
+        """
+        getFileMap()
+        
+        return -> None
+        """
+        return self.theFileMap
 
-	# end of __init__
+    def setRootDirectory( self, aRootDirectory ):
+        """
+        setRootDirectory()
+        
+        aRootDirectory : directory to save files
+        
+        return -> None
+        """
+        self.theRootDirectory = aRootDirectory
 
+    def getRootDirectory( self ):
+        """
+        getRootDirectory()
+        
+        return -> aRootDirectory(string) 
+        """
+        return self.theRootDirectory 
 
-	# ------------------------------------------------------------------
-	# getFileMap()
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def getFileMap(self):
+    def saveAll(self):
+        """
+        saveAll()
+        
+        return -> None
+        """
+        for aKey in self.theFileMap.keys():
+            aFileName = self.theFileMap[aKey].getFileName()
+            aFileName = split(aFileName,'/')[-1]
+            aFileName = self.theRootDirectory + '/' + aFileName
+            self.theFileMap[aKey].save(aFileName)
 
-		return self.theFileMap
-
-	# end of getFileMap
-
-
-	# ------------------------------------------------------------------
-	# setRootDirectory()
-	#
-	# aRootDirectory : directory to save files
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def setRootDirectory( self, aRootDirectory ):
-
-		self.theRootDirectory = aRootDirectory
-
-	# end of setRootDirectory
-
-
-	# ------------------------------------------------------------------
-	# getRootDirectory()
-	#
-	# return -> aRootDirectory(string) 
-	# ------------------------------------------------------------------
-	def getRootDirectory( self ):
-
-		return self.theRootDirectory 
-
-	# end of getRootDirectory
-
-
-	# ------------------------------------------------------------------
-	# saveAll()
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def saveAll(self):
-
-		for aKey in self.theFileMap.keys():
-			aFileName = self.theFileMap[aKey].getFileName()
-			aFileName = split(aFileName,'/')[-1]
-			aFileName = self.theRootDirectory + '/' + aFileName
-			self.theFileMap[aKey].save(aFileName)
-
-	# end of saveAll()
-
-
-	# ------------------------------------------------------------------
-	# loadAll()
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def loadAll(self):
-
-		for aKey in self.theFileMap.keys():
-			self.theFileMap[aKey].load()
-
-	# end of loadAll()
-
-
-# end of DataFile
+    def loadAll(self):
+        """
+        loadAll()
+        
+        return -> None
+        """
+        for aKey in self.theFileMap.keys():
+            self.theFileMap[aKey].load()
 
 if __name__ == "__main__":
+    from ECDDataFile import *
+    ecdFile = ECDDataFile()
+    ecdFile.setFileName('hoge')
 
-	from ECDDataFile import *
+    dm = DataFileManager()
+    dm.getFileMap()['file'] = ecdFile 
+    dm.loadAll()
 
-	def main():
-
-		ecdFile = ECDDataFile()
-		ecdFile.setFileName('hoge')
-
-		dm = DataFileManager()
-		dm.getFileMap()['file'] = ecdFile 
-		dm.loadAll()
-
-		dm.getFileMap()['file'].setFileName('hoge1')
-		dm.saveAll()
-
-	main()
-
+    dm.getFileMap()['file'].setFileName('hoge1')
+    dm.saveAll()

@@ -27,4 +27,4 @@
 #END_HEADER
 
 # this module is deprecated
-from util import *
+from ecell.util import *

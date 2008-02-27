@@ -31,257 +31,126 @@
 # E-Cell Project, Lab. for Bioinformatics, Keio University.
 #
 
-#from ecell.ObjectStub import *
+import warnings
 from ObjectStub import *
 
-# ---------------------------------------------------------------
-# LoggerStub -> ObjectStub
-#   - provides an object-oriented appearance to the ecs.Simulator's Logger API
-#   - does not check validation of each argument.
-# ---------------------------------------------------------------
-
+"""
+- provides an object-oriented appearance to the ecs.Simulator's Logger API
+- does not check validation of each argument.
+"""
 # FIXME: Logger isn't a PropertyInterface
 class LoggerStub( ObjectStub ):
-
-
-	# ---------------------------------------------------------------
-	# Constructor
-	#
-	# aSimulator : a reference to a Simulator
-	# aFullPNString : a FullID of the Entity as a String.
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-	def __init__( self, aSimulator, aFullPNString ):
-
-		ObjectStub.__init__( self, aSimulator )
-		self.theLoggingPolicy = None
-		
-		self.theFullPNString = aFullPNString
-
-	# end of __init__
-
-	def getName( self ):
-		return self.theFullPNString
-
-
-	# ---------------------------------------------------------------
-	# getLogger
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def create( self ):
-		if self.exists():
-			return
-		if self.theLoggingPolicy != None:
-			self.theSimulator.createLogger( self.theFullPNString, self.theLoggingPolicy )
-		else:
-			self.theSimulator.createLogger( self.theFullPNString )
-
-	# end of createLogger
-
-	# ---------------------------------------------------------------
-	# deleteLogger
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def delete( self ):
-
-		self.theSimulator.deleteLogger( self.theFullPNString )
-
-	# end of createLogger
-
-
-	# ---------------------------------------------------------------
-	# exists
-	#
-	# return -> exist:TRUE / not exist:FALSE
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def exists( self ):
-
-		# When the FullPN of this instance exists in 
-		# the FullPN list, returns TRUE
-		if self.theFullPNString in self.theSimulator.getLoggerList():
-			return TRUE
-		else:
-			return FALSE
-
-	# end of exists
-
-
-	# ---------------------------------------------------------------
-	# getData
-	#
-	# return -> data (matrix of double)
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def getData( self, aStartTime=None, anEndTime=None, anInterval=None ):
-
-		if aStartTime == None:
-			aStartTime = self.getStartTime()
-
-		if anEndTime == None:
-			anEndTime = self.getEndTime()
-
-		if anInterval == None:
-
-			return self.theSimulator.getLoggerData( self.theFullPNString,
-			                                        aStartTime,
-			                                        anEndTime )
-
-		else:
-
-			return self.theSimulator.getLoggerData( self.theFullPNString,
-			                                        aStartTime,
-			                                        anEndTime,
-			                                        anInterval )
-			                                        
-
-	# end of getData
-
-	# ---------------------------------------------------------------
-	# getDataWithStartEnd
-	#
-	# aStartTime : a start time
-	# anEndTime  : an end time
-	#
-	# return -> data (matrix of double)
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def getDataWithStartEnd( self, aStartTime, anEndTime ):
-
-		return self.theSimulator.getLoggerData( self.theFullPNString, aStartTime, anEndTime )
-
-	# end of getDataWithStartEnd
-
-
-	# ---------------------------------------------------------------
-	# getDataWithStartEndInterval
-	#
-	# aStartTime : a start time
-	# anEndTime  : an end time
-	# anInterval : an interval
-	#
-	# return -> data (matrix of double)
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def getDataWithStartEndInterval( self, aStartTime, anEndTime, anInterval ):
-
-		return self.theSimulator.getLoggerData( self.theFullPNString, aStartTime, anEndTime, anInterval )
-
-	# end of getDataWithStartEndInterval
-
-
-	# ---------------------------------------------------------------
-	# getStartTime
-	#
-	# return -> the start time
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def getStartTime( self ):
-
-		return self.theSimulator.getLoggerStartTime( self.theFullPNString )
-
-	# end of getStartTime
-
-
-	# ---------------------------------------------------------------
-	# getEndTime
-	#
-	# return -> the end time
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def getEndTime( self ):
-
-		return self.theSimulator.getLoggerEndTime( self.theFullPNString )
-
-	# end of getEndTime
-
-
-	# ---------------------------------------------------------------
-	# getSize
-	#
-	# return -> the end time
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def getSize( self ):
-
-		return self.theSimulator.getLoggerSize( self.theFullPNString )
-
-	# end of getSize
-
-
-	# ---------------------------------------------------------------
-	# setMinimumInterval
-	#
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def setMinimumInterval( self, anInterval ):
-		print "setMinimumInterval will be deprecated. use setLoggerPolicy instead."
-		return self.theSimulator.setLoggerMinimumInterval( self.theFullPNString, anInterval )
-
-	# end of setMinimumInterval
-
-
-	# ---------------------------------------------------------------
-	# getMinimumInterval
-	#
-	# return -> the minimum interval
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def getMinimumInterval( self ):
-		print "getMinimumInterval will be deprecated. use getLoggerPolicy instead."
-		return self.theSimulator.getLoggerMinimumInterval( self.theFullPNString )
-
-	# end of getMinimumInterval
-
-	# ---------------------------------------------------------------
-	# getLoggerPolicy
-	#
-	# return -> the logger policy
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def getLoggerPolicy( self ):
-		return self.theSimulator.getLoggerPolicy( self.theFullPNString )
-
-	#end of getLoggerPolicy
-
-	# ---------------------------------------------------------------
-	# setLoggerPolicy
-	#
-	# return -> the logger policy
-	# tuple of 4 numbers 
-	# first number : minimum step count
-	# second number : minimum time interval
-	# third number : policy when disk space or allocataed storage is used up : 0 throw exeption, 1 overwrite old data
-	# fourth number : max allocated space by logger in kilobytes.
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def setLoggerPolicy( self, aLoggingPolicy ):
-		if self.exists():
-			self.theSimulator.setLoggerPolicy( self.theFullPNString, aLoggingPolicy)
-		else:
-			self.theLoggingPolicy = aLoggingPolicy
-
-	#end of setLoggerPolicy
-
-# end of LoggerStub
-
+    def __init__( self, aSimulator, aFullPNString ):
+        """
+        aSimulator : a reference to a Simulator
+        aFullPNString : a FullID of the Entity as a String.
+       
+        This method can throw exceptions.
+        """
+        ObjectStub.__init__( self, aSimulator )
+        self.theLoggingPolicy = None
+        
+        self.theFullPNString = aFullPNString
+
+    def getName( self ):
+        return self.theFullPNString
+
+    def create( self ):
+        """
+        Actually creates a logger instance.
+        """
+        if self.exists():
+            return
+        if self.theLoggingPolicy != None:
+            self.theSimulator.createLogger( self.theFullPNString, self.theLoggingPolicy )
+        else:
+            self.theSimulator.createLogger( self.theFullPNString )
+
+    def delete( self ):
+        """
+        Deletes the logger created by create()
+        """
+        self.theSimulator.deleteLogger( self.theFullPNString )
+
+    def exists( self ):
+        """
+        Checks if the logger is created. Returns true if created,
+        false otherwise.
+        """
+        # When the FullPN of this instance exists in 
+        # the FullPN list, returns TRUE
+        if self.theFullPNString in self.theSimulator.getLoggerList():
+            return True
+        else:
+            return False
+
+    def getData( self, aStartTime=None, anEndTime=None, anInterval=None ):
+        """
+        Retrieves the logged data from the associated logger.
+        """
+        if aStartTime == None:
+            aStartTime = self.getStartTime()
+
+        if anEndTime == None:
+            anEndTime = self.getEndTime()
+        if anInterval == None:
+            return self.theSimulator.getLoggerData( self.theFullPNString,
+                                                    aStartTime,
+                                                    anEndTime )
+        else:
+            return self.theSimulator.getLoggerData( self.theFullPNString,
+                                                    aStartTime,
+                                                    anEndTime,
+                                                    anInterval )
+                                                    
+    def getDataWithStartEnd( self, aStartTime, anEndTime ):
+        warnings.warn( "Use getData() instead", DeprecationWarning )
+        return self.getData( aStartTime, anEndTime )
+
+    def getDataWithStartEndInterval( self, aStartTime, anEndTime, anInterval ):
+        warnings.warn( "Use getData() instead", DeprecationWarning )
+        return self.getData( aStartTime, anEndTime, anInterval )
+
+    def getStartTime( self ):
+        return self.theSimulator.getLoggerStartTime( self.theFullPNString )
+
+    def getEndTime( self ):
+        return self.theSimulator.getLoggerEndTime( self.theFullPNString )
+
+    def getSize( self ):
+        return self.theSimulator.getLoggerSize( self.theFullPNString )
+
+    def setMinimumInterval( self, anInterval ):
+        warnings.warn( "Use setLoggerPolicy instead", DeprecationWarning )
+        return self.theSimulator.setLoggerMinimumInterval( self.theFullPNString, anInterval )
+
+    def getMinimumInterval( self ):
+        """
+        Returns the minimum interval
+        This method can throw exceptions.
+        """
+        warnings.warn( "Use getLoggerPolicy() instead", DeprecationWarning )
+        return self.theSimulator.getLoggerMinimumInterval( self.theFullPNString )
+
+    def getLoggerPolicy( self ):
+        """
+        Returns the logger policy
+        This method can throw exceptions.
+        """
+        return self.theSimulator.getLoggerPolicy( self.theFullPNString )
+
+    def setLoggerPolicy( self, aLoggingPolicy ):
+        """
+        Takes a tuple of 4 numbers.
+          first number: minimum step count.
+          second number: minimum time interval.
+          third number: policy when disk space or allocataed storage is used up : 0 throw exeption, 1 overwrite old data.
+          fourth number: max allocated space by logger in kilobytes.
+        Returns the logger policy.
+        This method can throw exceptions.
+        """
+        if self.exists():
+            self.theSimulator.setLoggerPolicy( self.theFullPNString, aLoggingPolicy)
+        else:
+            self.theLoggingPolicy = aLoggingPolicy
 

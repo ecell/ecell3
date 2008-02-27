@@ -25,104 +25,160 @@
 # 
 #END_HEADER
 
-import string
+import re
+import weakref
+from warnings import warn
 
-from EntityStub import *
-from LoggerStub import *
-from StepperStub import *
-from ecs_constants import *
+import ecell.identifiers as identifiers
+from ecell.EntityStub import EntityStub
+from ecell.LoggerStub import LoggerStub
+from ecell.StepperStub import StepperStub
+from ecell.ecs_constants import *
 
 def createFullID( fullidstring ):
-    aFullID = string.split( fullidstring, ':' )
-    try:
-        aFullID[0] = ENTITYTYPE_DICT[aFullID[0]]
-    except IndexError:
-        raise ValueError( "Invalid EntityTYpe string (%s)." % aFullID[0] )
-    validateFullID( aFullID )
-    return  tuple( aFullID )
+    return identifiers.FullID( fullidstring )
+
+def createFullID_M( aType, aSystemPath, anID ):
+    return identifiers.FullID( aType, aSystemPath, anID )
 
 def createFullPN( fullpnstring ):
-
-    aFullPN = string.split( fullpnstring, ':' )
-    try:
-        aFullPN[0] = ENTITYTYPE_DICT[aFullPN[0]]
-    except IndexError:
-        raise ValueError( "Invalid EntityTYpe string (%s)." %\
-                          aFullPN[0] )
-    validateFullPN( aFullPN )
-    return tuple( aFullPN )
+    return identifiers.FullPN( fullpnstring )
 
 def createFullIDString( fullid ):
-
-    validateFullID( fullid )
-    aTypeString = ENTITYTYPE_STRING_LIST[ int( fullid[0] ) ]
-    return aTypeString + ':' + string.join( fullid[1:], ':' )
+    return identifiers.FullID( fullid )
 
 def createFullPNString( fullpn ):
-
-    validateFullPN( fullpn )
-    aTypeString = ENTITYTYPE_STRING_LIST[fullpn[0]]
-    return aTypeString + ':' + string.join( fullpn[1:], ':' )
+    return identifiers.FullPN( fullpn )
 
 def convertFullIDToFullPN( fullid, property='' ):
-    validateFullID( fullid )
-    # must be deep copy
-    fullpn = tuple( fullid ) + (property,)
-    return fullpn
+    return identifiers.FullPN( identifiers.FullID( fullid ), property )
 
 def convertFullPNToFullID( fullpn ):
-
-    validateFullPN( fullpn )
-    fullid = tuple( fullpn[:3] )
-    return fullid
+    return identifiers.FullPN( fullpn ).fullID
 
 def validateFullID( fullid ):
-
-    aLength = len( fullid )
-    if aLength != 3:
-        raise ValueError(
-            "FullID has 3 fields. ( %d given )" % aLength )
+    identifiers.FullID( fullid )
 
 def validateFullPN( fullpn ):
+    identifiers.FullPN( fullid )
 
-    aLength = len( fullpn )
-    if aLength != 4:
-        raise ValueError(
-            "FullPN has 4 fields. ( %d given )" % aLength )
+def getPropertyName( fullpn ):
+    return fullpn[ PROPERTY ]
 
-def createSystemPathFromFullID( aSystemFullID ):
-    # root system?
-    if aSystemFullID[SYSTEMPATH] == '':
-        if aSystemFullID[ID] == '/':
-            aNewSystemPath = '/'
-    elif aSystemFullID[SYSTEMPATH] == '/':
-        aNewSystemPath = aSystemFullID[SYSTEMPATH] + aSystemFullID[ID]
-    else:
-        aNewSystemPath = aSystemFullID[SYSTEMPATH] + '/' + aSystemFullID[ID]
+def getSystemPath( opaque ):
+    return opaque[ SYSTEMPATH ]
 
-    return aNewSystemPath
+def convertFullIDToSystemPath( aSystemFullID ):
+    return identifiers.FullID( aSystemFullID ).toSystemPath()
 
-def createFullIDFromSystemPath( aSystemPath ):
-    if aSystemPath == '/':
-        return  [ SYSTEM, '', '/' ]
-        
-    aPos = aSystemPath.rfind('/')
-    newSysID = [SYSTEM, aSystemPath[0:aPos], aSystemPath[aPos+1:len(aSystemPath) ] ]
-    if newSysID[1] == '':
-        newSysID[1] = '/'
-    return newSysID
+def convertSystemPathToFullID( aSystemPath ):
+    return identifiers.SystemPath( aSystemPath ).toFullID()
+
+def convertSystemFullID2SystemID( aSystemFullID ):
+    return identifiers.FullID( aSystemFullID ).toSystemPath()
+
+def convertSystemID2SystemFullID( aSystemPath ):
+    return identifiers.SystemPath( aSystemPath ).toFullID()
 
 def joinSystemPath( aSystemPath1, aSystemPath2 ):
-    if len( aSystemPath1 ) == 0:
-        return aSystemPath2
+    a = identifiers.SystemPath( aSystemPath1 )
+    a.append( identifiers.SystemPath( aSystemPath2 ) )
+    return a
 
-    if aSystemPath1[ -1 ] == '/':
-        return aSystemPath1 + aSystemPath2
-    else:
-        return aSystemPath1 + '/' + aSystemPath2
+def getSuperSystemPath( aSystemPath ):
+    return identifiers.SystemPath( aSystemPath ).getSuperSystemPath()
+
+def validateIDString( aString ):
+    return re.match( ".*[^A-Z|_|a-z|0-9]+", aString ) == None
+
+def validateFullIDString( aString ):
+    identifiers.FullID( aString )
+
+def convertFullIDStringToFullPNString( aFullID, aPropertyName ):
+    return identifiers.FullPN( identifiers.FullID( aFullID ), aPropertyName )
+
+def convertFullPNStringToFullIDString( aFullPN ):
+    return identifiers.FullPN( aFullPN ).fullID
+
+def getPropertyNameFromFullPNString( aFullPN ):
+    return identifiers.FullPN( aFullPN ).propertyName
+
+def convertIDListToFullIDList( aType, aParentFullID, anIDList ):
+    aParentPath = identifiers.FullID( aParentFullID ).toSystemPath()
+    retval = []
+    for anID in anIDList:
+        retval.append( identifiers.FullID( aType, aParentPath, anID ) )
+    return retval
+
+def createFullIDStringFromVariableReference( aProcessFullID, aVarref ):
+    #aVarref: containing all 3 components
+    aVarrefFullID = aVarref[ MS_VARREF_FULLID ]
+    aVarrefFullID = getAbsoluteReference( aProcessFullID,  aVarrefFullID )
+    aVarrefTuple = aVarrefFullID.split( ':' )
+    aVarrefTuple[0] = 'Variable'
+    return identifiers.FullID( aVarrefTuple )
+
+def getParentSystemIDStringFromFullIDString( aFullID ):
+    return identifiers.FullID( aFullID ).getSuperSystemPath()
+
+def convertFullIDStringToSystemPath( aSystemFullID ):
+    return identifiers.FullID( aSystemFullID ).toSystemPath()
+
+def convertSystemPathToFullIDString( aSystemPath ):
+    return identifiers.SystemPath( aSystemPath ).toFullID()
+
+def getTypeFromFullIDString( aFullID ):
+    return identifiers.FullID( aFullID ).getTypeName()
+
+__deprecated__ = (
+    createFullID,
+    createFullID_M,
+    createFullPN,
+    createFullIDString,
+    createFullPNString,
+    convertFullIDToFullPN,
+    convertFullPNToFullID,
+    validateFullID,
+    validateFullPN,
+    getPropertyName,
+    getSystemPath,
+    convertFullIDToSystemPath,
+    convertSystemPathToFullID,
+    convertSystemFullID2SystemID,
+    convertSystemID2SystemFullID,
+    joinSystemPath,
+    getSuperSystemPath,
+    validateIDString,
+    validateFullIDString,
+    convertFullIDStringToFullPNString,
+    convertFullPNStringToFullIDString,
+    getPropertyNameFromFullPNString,
+    convertIDListToFullIDList,
+    createFullIDStringFromVariableReference,
+    getParentSystemIDStringFromFullIDString,
+    convertFullIDStringToSystemPath,
+    convertSystemPathToFullIDString,
+    getTypeFromFullIDString
+)
+
+__stack_depth = 0
+
+for aFunc in __deprecated__:
+    def gen( aFunc ):
+        def deprecated( *args ):
+            global __stack_depth
+            __stack_depth += 1
+            if __stack_depth > 1:
+                return
+            warn( 'DEPRECATED', DeprecationWarning, stacklevel = 2 )
+            retval = aFunc( *args )
+            __stack_depth -= 1
+            return retval
+        return deprecated
+    globals()[ aFunc.__name__ ] = gen( aFunc )
+
 
 def printProperty( s, fullpn ):
-    
     value = s.getEntityProperty( fullpn )
     print fullpn, '\t=\t', value
 
@@ -149,3 +205,302 @@ def printAllStepperProperties( s, id ):
             printStepperProperty( s, id, property )
         except:
             print "failed to print %s:%s" % ( id, property )
+
+def copyValue ( aValue ):
+    """
+    in: anytype aValue
+    return copy of aValue (coverts tuples to list)
+    """
+    if type( aValue ) == tuple or type( aValue ) == list:
+        retval = []        
+        for anElement in aValue:
+            retval.append( copyValue( anElement ) )             
+        if type( aValue ) == tuple:
+            retval = tuple( retval )
+        return retval
+    else:
+        return aValue
+
+def guessDMTypeFromClassName( aClassName ):
+    for aSuffix in [ 'Process', 'Variable', 'System', 'Stepper' ]:
+        if aClassName.endswith( aSuffix ):
+            return aSuffix
+    return None
+
+def getAbsoluteReference( aProcessFullID, aVariableRef ):
+    if isAbsoluteVariableReference( aVariableRef ):
+        return aVariableRef
+    aVariable = aVariableRef.split(':')
+    if aVariable[1][0] == '/':
+        # absolute ref
+        absolutePath = aVariable[1]
+    elif aVariable[1][0] == '.':
+        aProcess = aProcessFullID.split(':')[1]
+        aProcessPath = aProcess.split('/')
+        while True:
+            if len(aProcessPath) == 0:
+                break
+            if aProcessPath[0] == '':
+                aProcessPath.__delitem__(0)
+            else:
+                break
+        aVariablePath = aVariable[1].split('/')
+        absolutePath = ''
+        while aVariablePath != []:
+            pathString =  aVariablePath.pop()
+            if pathString == '.':
+                break
+            elif pathString == '..':
+                if len(aProcessPath) == 0:
+                    raise Exception("BROKEN REFERENCE")
+                aProcessPath.pop()
+            else:
+                absolutePath =  pathString + '/' + absolutePath
+        oldPath = '/' + '/'.join(aProcessPath)
+        absolutePath = absolutePath.rstrip('/')
+        if oldPath != '/' and absolutePath != '':
+            oldPath +='/'
+        absolutePath =  oldPath + absolutePath
+
+    else:
+        raise Exception("INVALID REFERENCE")
+
+    return aVariable[0] + ':' + absolutePath + ':' + aVariable[2]
+
+def getRelativeReference( aProcessFullID, aVariableFullID ):
+    return identifiers.FullID(
+        aVariableFullID.typeCode,
+        aVariableFullID.getSuperSystemPath().toRelative(
+            aProcessFullID.getSuperSystemPath() ),
+        aVariableFullID.id )
+
+def findCommonPath( path1, path2 ):
+    list1 = path1.split('/')
+    list2 = path2.split('/')
+    list3 = []
+    while len(list1)>0 and len(list2)>0:
+        if list1[0] == list2[0]:
+            list3.append( list1[0] )
+            list1.pop( 0 )
+            list2.pop( 0 )
+        else:
+            break
+    if len(list3) == 1:
+        return '/'
+    return '/'.join(list3)
+
+def isAbsoluteVariableReference( aVariableRef ):
+    aList = aVariableRef.split(':')
+    return aList[1][0] == '/'
+
+def isRelativeVariableReference( aVariableRef ):
+    aList = aVariableRef.split(':')
+    return aList[1][0] == '.'
+
+def toNative( i ):
+    if type( i ) == unicode:
+        return str( i )
+    elif type( i ) == list:
+        return map( toNative, i )
+    elif type( i ) == tuple:
+        return tuple( map( toNative, i ) )
+
+class WeakSet:
+    def __init__( self ):
+        self.data = {}
+
+    def __contains__( self, item ):
+        return weakref.ref( item ) in self.data
+
+    def __len__( self ):
+        return len( self.data )
+
+    def __iter__( self ):
+        for ref in self.data:
+            yield ref()
+
+    def add( self, item ):
+        self.data[ weakref.ref( item ) ] = True
+
+    def remove( self, item ):
+        del self.data[ weakref.ref( item ) ]
+
+    def discard( self, item ):
+        try:
+            del self.data[ weakref.ref( item ) ]
+        except:
+            pass
+
+    def issubset( self, container ):
+        if hasattr( container, '__len__' ):
+            if len( container ) < len( self.data ):
+                return False
+
+        if hasattr( container, '__contains__' ):
+            for ref in self.data:
+                if ref() not in container:
+                    return False
+        else:
+            count = len( self.data )
+            for item in container:
+                if weakref.ref( item ) in self.data:
+                    count -= 1
+            return count == 0
+        return True
+
+    def issuperset( self, container ):
+        if hasattr( container, '__len__' ):
+            if len( container ) > len( self.data ):
+                return False
+
+        for item in container:
+            if weakref.ref( item ) not in self.data:
+                return False
+        return True
+
+    def update( self, container ):
+        for item in container:
+            self.add( item )
+
+    def union( self, container ):
+        retval = WeakSet()
+        retval.data = dict( self.data )
+        retval.update( container )
+        return retval
+
+    def intersection( self, container ):
+        retval = WeakSet()
+
+        if hasattr( container, '__len__' ) and \
+           len( container ) > len( self.data ):
+            if hasattr( container, '__contains__' ):
+                for ref in self.data:
+                    if ref() in container:
+                        retval.data[ ref ] = True
+                return retval
+
+        for item in container:
+            ref = weakref.ref( item )
+            if ref in self.data:
+                retval.data[ ref ] = True
+        return retval
+
+    def intersection_update( self, container ):
+        if hasattr( container, '__len__' ) and \
+           len( container ) > len( self.data ):
+            if hasattr( container, '__contains__' ):
+                for ref in self.data:
+                    if ref() not in container:
+                        del retval.data[ ref ]
+                return
+
+        for item in container:
+            ref = weakref.ref( item )
+            try:
+                del self.data[ ref ]
+            except:
+                pass
+
+    def difference( self, container ):
+        retval = WeakSet()
+
+        if hasattr( container, '__contains__' ) and \
+           ( not hasattr( container, '__len__' ) \
+               or len( container ) < len( self.data ) ):
+                for ref in self.data:
+                    if not ref() in container:
+                        retval.data[ ref ] = True
+                return retval
+
+        retval.data = dict( self.data )
+        for item in container:
+            try:
+                del retval.data[ weakref.ref( item ) ]
+            except:
+                pass
+        return retval
+
+    def difference_update( self, container ):
+        if hasattr( container, '__contains__' ) and \
+           ( not hasattr( container, '__len__' ) \
+               or len( container ) < len( self.data ) ):
+            for ref in self.data:
+                if ref() in container:
+                    del self.data[ ref ]
+            return
+
+        for item in container:
+            try:
+                del self.data[ weakref.ref( item ) ]
+            except:
+                pass
+
+    def symmetric_difference( self, container ):
+        retval = WeakSet()
+        retval.data = dict( self.data )
+        for item in container:
+            ref = weakref.ref( item )
+            if ref in self.data:
+                del retval.data[ ref ]
+            else:
+                retval.data[ ref ] = True
+        return retval
+
+    def symmetric_difference_update( self, container ):
+        for item in container:
+            ref = weakref.ref( item )
+            if ref in self.data:
+                del self.data[ ref ]
+            else:
+                self.data[ ref ] = True
+
+    def copy( self ):
+        retval = WeakSet()
+        retval.data = dict( self.data )
+        return retval
+
+    def pop( self ):
+        ref, dummy = self.popitem()
+        return ref()
+
+    def __le__( self, container ):
+        return self.issubset( container )
+
+    def __ge__( self, container ):
+        return self.issuperset( container )
+
+    def __or__( self, container ):
+        return self.union( container )
+
+    def __ior__( self, container ):
+        self.update( container )
+        return self
+
+    def __and__( self, container ):
+        return self.intersection( container )
+
+    def __iand__( self, container ):
+        self.intersect_update( container )
+        return self
+
+    def __sub__( self, container ):
+        return self.difference( container )
+
+    def __isub__( self, container ):
+        self.difference_update( container )
+        return self
+
+    def __xor__( self, container ):
+        return self.symmetric_difference( container )
+
+    def __ixor__( self, container ):
+        self.symmetric_difference_update( container )
+        return self
+
+    def __repr__( self ):
+        return 'WeakSet([' \
+            + reduce(
+                lambda s, i:
+                    ( s != '' and s + ', ' or '' ) + repr( i() ),
+                self.data.keys(), '' ) \
+            + '])'

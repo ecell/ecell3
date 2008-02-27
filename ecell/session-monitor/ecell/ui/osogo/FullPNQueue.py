@@ -25,6 +25,7 @@
 # 
 #END_HEADER
 import gtk
+
 from Pane import Pane
 
 class FullPNQueue( Pane ):
@@ -45,19 +46,19 @@ class FullPNQueue( Pane ):
 
     def registerCallback( self, aFunction ):
         self.callbackList.append( aFunction )
-        apply( aFunction, [self.theRawFullPNList] )
+        aFunction( self.theRawFullPNList )
 
     def pushFullPNList( self, aRawFullPNList ):
-        self.backwardQueue.append( FullPNQueue.copyList ( self.theRawFullPNList  ) )
+        self.backwardQueue.append( self.theRawFullPNList )
         self.forwardQueue = []
         self.__applyFullPNList( aRawFullPNList )
         self.__updateNavigatorButtons()
         
     def getActualFullPNList( self ):
-        return FullPNQueue.copyList( self.theRawFullPNList )
+        return self.theRawFullPNList
 
     def __applyFullPNList( self, aRawFullPNList ):
-        self.theRawFullPNList = FullPNQueue.copyList( aRawFullPNList )
+        self.theRawFullPNList = aRawFullPNList
         for aFunction in self.callbackList:
             aFunction( aRawFullPNList )
 
@@ -65,21 +66,11 @@ class FullPNQueue( Pane ):
         for aFunction in self.callbackList:
             aFunction( self.theRawFullPNList )
 
-    def copyList( aList ):
-        newList = []
-        for anItem in aList:
-            if type( anItem ) in ( type( [] ) , type( () ) ):
-                newList.append( FullPNQueue.copyList( anItem ) )
-            else:
-                newList.append( anItem )
-        return newList
-    copyList = staticmethod( copyList )
-
     def __goBack(self, *args):
         if len( self.backwardQueue ) == 0:
             return
         rawFullPNList = self.backwardQueue.pop()
-        self.forwardQueue.append( FullPNQueue.copyList( self.theRawFullPNList ) )
+        self.forwardQueue.append( self.theRawFullPNList )
         self.__applyFullPNList( rawFullPNList )
         self.__updateNavigatorButtons()
 
@@ -87,7 +78,7 @@ class FullPNQueue( Pane ):
         if len( self.forwardQueue ) == 0:
             return
         rawFullPNList = self.forwardQueue.pop()
-        self.backwardQueue.append( FullPNQueue.copyList( self.theRawFullPNList ) )
+        self.backwardQueue.append( self.theRawFullPNList )
         self.__applyFullPNList( rawFullPNList )
         self.__updateNavigatorButtons()
         

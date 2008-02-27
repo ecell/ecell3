@@ -27,8 +27,8 @@
 
 from numpy import *
 from random import *
-import gtk
-import gtk.gdk
+
+import ecell.identifiers as identifiers
 
 # aggregate so many points at any one level
 AGGREGATE_POINTS = 200
@@ -59,22 +59,17 @@ class DataGenerator:
         '''
         Constructor
         '''
-
-        self.__theSession = aSession
-        self.theLoggerAdapter = CachedLoggerAdapter( self.__theSession )
+        self.theSession = aSession
+        self.theLoggerAdapter = LoggerManager( self.theSession )
         self.lastTime = 0.0
         self.dataProxy = {}
-        
-    # end of __init__
 
     def update( self ):
         self.theLoggerAdapter.update()
-        
 
-    def hasLogger( self, aFullPNString ):
-        return aFullPNString in self.__theSession.theSimulator.getLoggerList()
-
-
+    def handleSessionEvent( self, event ):
+        if event.type == 'simulation_updated':
+            self.theLoggerAdapter.update()
 
     def requestNewData( self, aDataSeries, dataPointWidth ):
         '''
@@ -82,232 +77,183 @@ class DataGenerator:
         '''
         dataList = zeros( (0,5), LOGGER_TYPECODE )
         xAxis = aDataSeries.getXAxis()
-        fullPNString = aDataSeries.getFullPNString()
-        currentTime = self.__theSession.theSimulator.getCurrentTime()
+        aFullPN = aDataSeries.getFullPN()
+        currentTime = self.theSession.getCurrentTime()
 
         if xAxis == "Time":
-
-            if not self.hasLogger( fullPNString ):
-                currentValue = self.__theSession.theSimulator.getEntityProperty( fullPNString )
-                dataList = zeros( (1,5), LOGGER_TYPECODE )
-                dataList[0][0] = currentTime
-                dataList[0][1] = currentValue
-                dataList[0][2] = currentValue
-                dataList[0][3] = currentValue
-                dataList[0][4] = currentValue
-                
+            dataList = aDataSeries.getAllData()
+            if len( dataList ) > 0:
+                lastTime = dataList[ len( dataList ) - 1 ][0]
             else:
-                dataList = aDataSeries.getAllData()
-                lastTime = dataList[ len( dataList) -1 ][0]
-                dataRange =  currentTime - lastTime 
+                lastTime = currentTime
+            dataRange =  currentTime - lastTime 
 
-                requiredResolution = dataPointWidth
-                if (dataRange/ requiredResolution)>100:
-                    requiredResolution = dataRange/100
-                dataList = self.theLoggerAdapter.getData( fullPNString, 
-                            lastTime, currentTime,requiredResolution )
-                
-                # I havent yet updated the new logger code from CVS, but isn't changed to getDigest?
-                
+            requiredResolution = dataPointWidth
+            if dataRange / requiredResolution > 100:
+                requiredResolution = dataRange / 100
+            dataList = self.theLoggerAdapter.getData(
+                aFullPN, lastTime, currentTime, requiredResolution )
             size = len( dataList )
-                
-            if ( size == 0 ):
+            if size == 0:
                 dataList = zeros( (0,5), LOGGER_TYPECODE )
-        
-
-        else: #xaxis is fullpn, so this dataseries is used for phase plotting
-
-            x = self.__theSession.theSimulator.getEntityProperty( xAxis )
-            y = self.__theSession.theSimulator.getEntityProperty( fullPNString )
-            dataList = zeros( (1,5), LOGGER_TYPECODE )
-            dataList[0][0] = x
-            dataList[0][1] = y
-            dataList[0][2] = y
-            dataList[0][3] = y
-            dataList[0][4] = y
+        else:
+            assert isinstance( xAxis, identifiers.FullPN )
+            # xaxis is fullpn, so this dataseries is used for phase plotting
+            x = self.theLoggerAdapter.getCurrentValue( xAxis )
+            y = self.theLoggerAdapter.getCurrentValue( aFullPN )
+            dataList = zeros( ( 1, 5 ), LOGGER_TYPECODE )
+            dataList[ 0 ][ 0 ] = x
+            dataList[ 0 ][ 1 ] = y
+            dataList[ 0 ][ 2 ] = y
+            dataList[ 0 ][ 3 ] = y
+            dataList[ 0 ][ 4 ] = y
             # do interpolation here
         self.lastTime = currentTime
-        
         aDataSeries.addPoints( dataList )
-
-    # end of requestNewData
 
     def __checkDataSeries( self, aDataSeries ):
         pass
-
 
     def requestData( self, aDataSeries, numberOfElements ):
         '''
         update aDataSeries with new data points gotten from whole Logger
         '''
-
         xAxis = aDataSeries.getXAxis()
-        dataList = zeros( (0,5), LOGGER_TYPECODE )
-        fullPNString = aDataSeries.getFullPNString()
+        dataList = zeros( ( 0, 5 ), LOGGER_TYPECODE )
+        aFullPN = aDataSeries.getFullPN()
         if xAxis == "Time":
-            if  self.hasLogger( fullPNString ) :
-                aStartTime = self.theLoggerAdapter.getStartTime( fullPNString )
-                anEndTime = self.theLoggerAdapter.getEndTime ( fullPNString )
-
-                if anEndTime > aStartTime:
-                    requiredResolution = ( anEndTime - aStartTime ) / numberOfElements
-                else:
-                    requiredResolution = 1
-                dataList = self.theLoggerAdapter.getData(
-                    fullPNString, 
-                    aStartTime,
-                    anEndTime,
-                    requiredResolution )
-
+            aLogger = self.theLoggerAdapter.getLogger( aFullPN )
+            aStartTime = aLogger.getStartTime()
+            anEndTime = aLogger.getEndTime()
+            if anEndTime > aStartTime:
+                requiredResolution = ( anEndTime - aStartTime ) / numberOfElements
+            else:
+                requiredResolution = 1
+            dataList = aLogger.getData(
+                aStartTime, anEndTime, requiredResolution )
         else:
-            aGDKWindow = aDataSeries.thePlot.get_root_window()
-            if aGDKWindow != None:
-                aGDKWindow.set_cursor( gtk.gdk.Cursor( gtk.gdk.WATCH ) )
-                while gtk.events_pending():
-                    gtk.main_iteration_do()
             aRandom = Random()
+            anXAxisLogger = self.theLoggerAdapter.getLogger( xAxis ) 
+            aLogger = self.theLoggerAdapter.getLogger( aFullPN )
+            yStartTime = aLogger.getStartTime()
+            yWalker = LoggerWalker( aLogger )
+            xWalker = LoggerWalker( anXAxisLogger )
+            xstartpoint = xWalker.findPrevious( yStartTime )
 
-            if self.hasLogger( fullPNString ) and self.hasLogger( xAxis ):
-                aSimulator = self.__theSession.theSimulator
-                yStartTime = aSimulator.getLoggerStartTime( fullPNString )
-                yWalker = LoggerWalker( aSimulator, fullPNString )
-                xWalker = LoggerWalker( aSimulator, xAxis )
-                xSize = aSimulator.getLoggerSize( xAxis )
-                
-                xstartpoint = xWalker.findPrevious( yStartTime )
-                print xstartpoint
-                if  xstartpoint != 1:
-                    writeCache = zeros( ( CACHE_INCREMENT, 5 ) )
-                    writeIndex = 0
-                    readIndex = 0
-                    xPoint = xWalker.getNext()
-                    while xPoint != 1:
-                        if aRandom.randint( 0, xSize ) < HISTORY_SAMPLE:
-                            aTime = xPoint[DP_TIME]
-                            yPoint1 = yWalker.findPrevious( aTime )
-                            if yPoint1 == 1:
-                                break
-                            newDataPoint = zeros( ( 5 ) )
-                            newDataPoint[DP_TIME] = xPoint[DP_VALUE]
-                            if yPoint1[DP_TIME] != aTime:
-                                while True:
-                                    yPoint2 = yWalker.getNext( )
-                                    if yPoint2 == 1:
-                                        break
-                                    if yPoint2[DP_TIME] > yPoint1[DP_TIME]:
-                                        break
-
-                                if yPoint2 == 1:
+            if  type( xstartpoint ) != int or xstartpoint != 1:
+                writeCache = zeros( ( CACHE_INCREMENT, 5 ) )
+                writeIndex = 0
+                readIndex = 0
+                xPoint = xWalker.getNext()
+                while type( xPoint ) != int or xPoint != 1:
+                    if aRandom.randint( 0, anXAxisLogger.getSize() ) < HISTORY_SAMPLE:
+                        aTime = xPoint[DP_TIME]
+                        yPoint1 = yWalker.findPrevious( aTime )
+                        if type( yPoint1 ) == int and yPoint1 == 1:
+                            break
+                        newDataPoint = zeros( ( 5 ) )
+                        newDataPoint[DP_TIME] = xPoint[DP_VALUE]
+                        if yPoint1[DP_TIME] != aTime:
+                            while True:
+                                yPoint2 = yWalker.getNext( )
+                                if type( yPoint2 ) == int and yPoint2 == 1:
                                     break
-                                # interpolate
-                                lowerTime = yPoint1[DP_TIME]
-                                lowerValue = yPoint1[DP_VALUE]
-                                upperTime = yPoint2[DP_TIME]
-                                upperValue = yPoint2[DP_VALUE]
-                                newDataPoint[DP_VALUE] = ( ( aTime - lowerTime ) * lowerValue + \
-                                                        ( upperTime - aTime ) * upperValue ) / \
-                                                           ( upperTime - lowerTime )
+                                if yPoint2[DP_TIME] > yPoint1[DP_TIME]:
+                                    break
+                            if yPoint2 == 1:
+                                break
+                            # interpolate
+                            lowerTime = yPoint1[DP_TIME]
+                            lowerValue = yPoint1[DP_VALUE]
+                            upperTime = yPoint2[DP_TIME]
+                            upperValue = yPoint2[DP_VALUE]
+                            newDataPoint[DP_VALUE] = ( ( aTime - lowerTime ) * lowerValue + \
+                                                    ( upperTime - aTime ) * upperValue ) / \
+                                                       ( upperTime - lowerTime )
 
-                            else:
-                                newDataPoint[DP_VALUE] = yPoint1[DP_VALUE]
-                            if writeIndex == len( writeCache):
-                                writeCache = concatenate( ( writeCache, zeros( ( CACHE_INCREMENT, 5 ) ) ) )
-                            writeCache[ writeIndex ] = newDataPoint
-                            writeIndex += 1
-                        xPoint = xWalker.getNext()
-                    dataList = writeCache[:writeIndex] 
-                    dataList [ :, 2 ] = dataList[ :, 1 ]
-                    dataList [ :, 3 ] = dataList[ :, 1 ]
-                    dataList [ :, 4 ] = dataList[ :, 1 ]
-
-            if aWindow != None:
-                aWindow.window.set_cursor( gtk.gdk.Cursor( gtk.gdk.TOP_LEFT_ARROW ) )
+                        else:
+                            newDataPoint[DP_VALUE] = yPoint1[DP_VALUE]
+                        if writeIndex == len( writeCache):
+                            writeCache = concatenate( ( writeCache, zeros( ( CACHE_INCREMENT, 5 ) ) ) )
+                        writeCache[ writeIndex ] = newDataPoint
+                        writeIndex += 1
+                    xPoint = xWalker.getNext()
+                dataList = writeCache[:writeIndex] 
+                dataList [ :, 2 ] = dataList[ :, 1 ]
+                dataList [ :, 3 ] = dataList[ :, 1 ]
+                dataList [ :, 4 ] = dataList[ :, 1 ]
 
             # do interpolation on X axis
         aDataSeries.replacePoints( dataList )
 
-    # end of requestData
-
-
-    def requestDataSlice( self, aDataSeries, \
-                          startX, endX, requiredResolution ):
+    def requestDataSlice( self, aDataSeries, startX, endX, requiredResolution ):
         '''
         request a slice from the Logger
         '''
-        dataList = zeros( (0,5), LOGGER_TYPECODE )
+        dataList = zeros( ( 0, 5 ), LOGGER_TYPECODE )
         xAxis = aDataSeries.getXAxis()
-        fullPNString = aDataSeries.getFullPNString()
+        aFullPN = aDataSeries.getFullPN()
         if xAxis == "Time":
-
-            if not ( self.hasLogger( fullPNString ) ):
-                dataList =  zeros( (0,5 ), LOGGER_TYPECODE )
+            if not self.theLoggerAdapter.loggerExists( aFullPN ):
+                dataList = zeros( ( 0, 5 ), LOGGER_TYPECODE )
             else:
-                dataList = self.theLoggerAdapter.getData( fullPNString, startX, endX, requiredResolution )
-
-        else:
-            pass
-            #return
-            # do Xaxis interpolation here for phase plotting
+                dataList = self.theLoggerAdapter.getData(
+                    aFullPN, startX, endX, requiredResolution )
         aDataSeries.replacePoints( dataList )
 
-    # end of requestDataSlice
-
-# end of DataGenerator
-
-
-class CachedLoggerAdapter:
+class LoggerManager:
     def __init__ ( self, aSession ):
         self.theSession = aSession
-        self.theCachedLoggerDict = {}
-
+        self.theManagedLoggers = {}
 
     def update( self ):
-        for aCachedLogger in self.theCachedLoggerDict.values():
-            aCachedLogger.update()
+        for aCachedLogger in self.theManagedLoggers.values():
+            aCachedLogger[ 1 ].update()
 
+    def loggerExists( self, aFullPN ):
+        return self.theManagedLoggers.has_key( str( aFullPN ) )
 
-    def getData( self, fullPNString, start, end, interval ):
-        if fullPNString not in self.theCachedLoggerDict.keys():
-            self.theCachedLoggerDict[ fullPNString ] = CachedLogger( self.theSession, fullPNString )
-        ret = self.theCachedLoggerDict[ fullPNString ].getData( start, end, interval )
-        return ret 
+    def get( self, aFullPN ):
+        aFullPNString = str( aFullPN )
+        if aFullPNString not in self.theManagedLoggers.keys():
+            self.theManagedLoggers[ aFullPNString ] = (
+                self.theSession.createEntityStub( aFullPN.fullID ),
+                CachedLogger( self.theSession.createLoggerStub( aFullPN ) )
+                )
+        return self.theManagedLoggers[ aFullPNString ]
 
+    def getLogger( self, aFullPN ):
+        return self.get( aFullPN )[ 1 ]
 
+    def getData( self, aFullPN, start, end, interval ):
+        return self.get( aFullPN )[ 1 ].getData( start, end, interval )
 
-    def getStartTime( self, fullPNString ):
-        if fullPNString not in self.theCachedLoggerDict.keys():
-            self.theCachedLoggerDict[ fullPNString ] = CachedLogger( self.theSession, fullPNString )
-        return self.theCachedLoggerDict[ fullPNString ].getStartTime( )
+    def getStartTime( self, aFullPN ):
+        return self.get( aFullPN )[ 1 ].getStartTime()
 
+    def getEndTime( self, aFullPN ):
+        return self.get( aFullPN )[ 1 ].getEndTime( )
 
-    def getEndTime( self, fullPNString ):
-        if fullPNString not in self.theCachedLoggerDict.keys():
-            self.theCachedLoggerDict[ fullPNString ] = CachedLogger( self.theSession, fullPNString )
-        return self.theCachedLoggerDict[ fullPNString ].getEndTime( )
+    def getSize( self, aFullPN ):
+        return self.get( aFullPN )[ 1 ].getSize()
 
-
-    def getSize( self, fullPNString ):
-        if fullPNString not in self.theCachedLoggerDict.keys():
-            self.theCachedLoggerDict[ fullPNString ] = CachedLogger( self.theSession, fullPNString )
-        return self.theCachedLoggerDict[ fullPNString ].getSize( )
-
+    def getCurrentValue( self, aFullPN ):
+        return self.get( aFullPN )[ 0 ].getProperty( aFullPN.propertyName )
 
 class CachedLogger:
-
-    def __init__( self, aSession, fullPNString ):
-        self.theFullPNString = fullPNString
-        self.theSimulator = aSession.theSimulator
-        if fullPNString not in self.theSimulator.getLoggerList():
-            self.theSession.createLogger( fullPNString )
+    def __init__( self, aStub ):
+        self.theStub = aStub
+        if not self.theStub.exists():
+            self.theStub.create()
         self.theLoggerCacheList = []
         self.cachedTill = 0.0
         self.update()
 
     def update( self ):
         # calculate how many points should be read
-        loggerSize = self.theSimulator.getLoggerSize( self.theFullPNString )
-        startTime = self.theSimulator.getLoggerStartTime( self.theFullPNString )
-        endTime = self.theSimulator.getLoggerEndTime( self.theFullPNString )
+        loggerSize = self.theStub.getSize()
+        startTime = self.theStub.getStartTime()
+        endTime = self.theStub.getEndTime()
         if loggerSize == 0:
             averageDistance = -1
         else:
@@ -321,41 +267,33 @@ class CachedLogger:
         else:
             readFrame = averageDistance * READ_CACHE
         #call addpoints
-
         readStart = self.cachedTill
         if startTime == endTime:
-
-            dataPoints = self.theSimulator.getLoggerData( self.theFullPNString )
-
-            valueColumn = take( dataPoints , (1, ), 1 )
-            dataPoints = concatenate( ( dataPoints, valueColumn, valueColumn, valueColumn ) , 1 )
-
+            dataPoints = self.theStub.getData()
+            valueColumn = take( dataPoints, (1, ), 1 )
+            dataPoints = concatenate(
+                ( dataPoints, valueColumn, valueColumn, valueColumn ), 1 )
             self.theLoggerCacheList[0].addPoints( dataPoints )
-
         else:
-            while ( readStart < endTime ):
-
+            while readStart < endTime:
                 readEnd = min( readFrame, endTime - readStart ) + readStart
-                dataPoints = self.theSimulator.getLoggerData( self.theFullPNString, readStart, readEnd )
-
+                dataPoints = self.theStub.getData( readStart, readEnd )
                 valueColumn = take( dataPoints , (1, ), 1 )
-                dataPoints = concatenate( ( dataPoints, valueColumn, valueColumn, valueColumn ) , 1 )
-
-                self.theLoggerCacheList[0].addPoints( dataPoints )
+                dataPoints = concatenate(
+                    ( dataPoints, valueColumn, valueColumn, valueColumn ), 1 )
+                self.theLoggerCacheList[ 0 ].addPoints( dataPoints )
                 readStart = readEnd
-
         self.cachedTill = readStart            
-        newPoints = self.theLoggerCacheList[0].getNewPoints()
+        newPoints = self.theLoggerCacheList[ 0 ].getNewPoints()
         i = 1
         while len( newPoints ) > 1:
             if len(self.theLoggerCacheList) == i:
-                self.theLoggerCacheList.append(  LoggerCache() )
+                self.theLoggerCacheList.append( LoggerCache() )
             self.theLoggerCacheList[i].addPoints( newPoints )
             newPoints = self.theLoggerCacheList[i].getNewPoints()
             i += 1
         
-        
-    def getData( self, start, end, interval ):
+    def getData( self, start, end, interval = 1 ):
         if interval == 0:
             vectorLength = 1
         else:
@@ -366,61 +304,48 @@ class CachedLogger:
             cacheStart = self.theLoggerCacheList[i].getStartTime()
             cacheEnd = self.theLoggerCacheList[i].getEndTime()
             if aDistance > 0 and \
-                    self.theLoggerCacheList[i].getSize() > vectorLength and \
-                    aDistance <= interval /3 :
-#                    start >= cacheStart and end<= cacheEnd and 
-#                return self.theLoggerCacheList[i].getData( start, end, interval )
+               self.theLoggerCacheList[i].getSize() > vectorLength and \
+               aDistance <= interval / 3:
                 a=self.theLoggerCacheList[i].getData( start, end, interval )
                 return a
             i -= 1
         # use logger
-
-#        return self.theSimulator.getLoggerData(self.theFullPNString, start, end, interval )
-
-        a=self.theSimulator.getLoggerData(self.theFullPNString, start, end, interval )
+        a = self.theStub.getData( start, end, interval )
         return a
 
-
     def getStartTime( self ):
-        return self.theSimulator.getLoggerStartTime(self.theFullPNString)
-
+        return self.theStub.getStartTime()
 
     def getEndTime( self ):
-        return self.theSimulator.getLoggerEndTime(self.theFullPNString)
-
+        return self.theStub.getEndTime()
 
     def getSize( self ):
-        return self.theSimulator.getLoggerSize(self.theFullPNString)
-
+        return self.theStub.getSize()
 
 class LoggerCache:
-    
     def __init__( self ):
-        self.theCache  = zeros( ( 0, 5 ), LOGGER_TYPECODE )
+        self.theManagedLoggers  = zeros( ( 0, 5 ), LOGGER_TYPECODE )
         self.theResidue = zeros( ( 0, 5 ), LOGGER_TYPECODE ) # this contains the last unprocessed points
         self.cachedTill = 0
         self.residueEnd = 0
         self.cacheEnd = 0
 
-
     def getNewPoints( self ):
         #returns points that hasn't yet been cached
         cachedTill = self.cachedTill
         self.cachedTill = self.cacheEnd
-        return  self.theCache[ cachedTill:self.cacheEnd] 
-
+        return  self.theManagedLoggers[ cachedTill:self.cacheEnd] 
 
     def addPoints( self, anArray ):
         #first add to residue
-
         requiredLength = len( anArray ) + self.residueEnd
         if len(self.theResidue) < requiredLength:
             self.theResidue = resize( self.theResidue, ( requiredLength, 5 )  )
         self.theResidue[self.residueEnd:self.residueEnd + len(anArray) ]= anArray[:]
         self.residueEnd += len( anArray )
         
-        if len( self.theCache ) == 0:
-            self.theCache = concatenate( ( self.theCache, [ anArray[0] ] ) )
+        if len( self.theManagedLoggers ) == 0:
+            self.theManagedLoggers = concatenate( ( self.theManagedLoggers, [ anArray[0] ] ) )
         # process residue
         offset = 0
         while ( offset + AGGREGATE_POINTS ) <  self.residueEnd:
@@ -433,15 +358,13 @@ class LoggerCache:
         self.theResidue[0:residue] = self.theResidue[ offset:self.residueEnd]
         self.residueEnd = residue
 
-
     def __addToCache( self, anArray ):
         requiredLength = len( anArray ) + self.cacheEnd
-        if len( self.theCache) < requiredLength:
+        if len( self.theManagedLoggers) < requiredLength:
             addition = (int(requiredLength / CACHE_INCREMENT) + 1 ) * CACHE_INCREMENT
-            self.theCache = resize( self.theCache, ( len( self.theCache) + addition, 5 ) )
-        self.theCache[self.cacheEnd:requiredLength] = anArray
+            self.theManagedLoggers = resize( self.theManagedLoggers, ( len( self.theManagedLoggers) + addition, 5 ) )
+        self.theManagedLoggers[self.cacheEnd:requiredLength] = anArray
         self.cacheEnd = requiredLength
-        
 
     def __aggregateVector( self, anArray ):
         newPoint = zeros( ( 1, 5 ), LOGGER_TYPECODE )
@@ -455,9 +378,7 @@ class LoggerCache:
         newPoint[0][ DP_AVG ] = theSum / len( anArray )
         return newPoint
 
-
-    def getData( self, start, end, interval ):
-
+    def getData( self, start, end, interval = 1 ):
         vectorLength = ( end - start ) / interval
 
         if vectorLength > int( vectorLength ):
@@ -465,36 +386,30 @@ class LoggerCache:
         vectorLength = int(vectorLength )
         aVector = zeros( ( vectorLength, 5 ), LOGGER_TYPECODE )
         timeCounter = start
-        lastPoint = self.theCache[ self.cacheEnd - 1 ]
+        lastPoint = self.theManagedLoggers[ self.cacheEnd - 1 ]
         for anIndex in range(0, vectorLength):
-            startOffset = searchsorted( self.theCache[ : self.cacheEnd, DP_TIME], timeCounter )
+            startOffset = searchsorted( self.theManagedLoggers[ : self.cacheEnd, DP_TIME], timeCounter )
             if startOffset != 0:
                 startOffset -= 1
-            endOffset = searchsorted( self.theCache[ startOffset:self.cacheEnd, DP_TIME], timeCounter + interval ) + startOffset
+            endOffset = searchsorted( self.theManagedLoggers[ startOffset:self.cacheEnd, DP_TIME], timeCounter + interval ) + startOffset
             if startOffset != self.cacheEnd:
                 startOffset += 1
-            aggregatedSlice =  self.theCache[ startOffset: endOffset ] 
+            aggregatedSlice =  self.theManagedLoggers[ startOffset: endOffset ] 
 
             if len(aggregatedSlice) > 0:
                 lastPoint = self.__aggregateVector( aggregatedSlice )[0]
             aVector[anIndex] = lastPoint
             timeCounter += interval
-
         return aVector
             
-
-
     def getStartTime( self ):
-        return self.theCache[0, DP_TIME]
-
+        return self.theManagedLoggers[0, DP_TIME]
 
     def getEndTime( self ):
-        return self.theCache[ self.cacheEnd - 1, DP_TIME ]
-
+        return self.theManagedLoggers[ self.cacheEnd - 1, DP_TIME ]
 
     def getSize( self ):
         return  self.cacheEnd 
-
 
     def getAverageDistance( self ):
         if self.getSize() != 0:
@@ -502,22 +417,18 @@ class LoggerCache:
         else:
             return 0
 
-
 class LoggerWalker:
-
-    def __init__( self, aSimulator, aFullPN):
-        self.theSimulator = aSimulator
-        self.theFullPN = aFullPN
-        self.theStart = aSimulator.getLoggerStartTime( aFullPN )
-        self.theEnd = aSimulator.getLoggerEndTime( aFullPN )
-        size = aSimulator.getLoggerSize( aFullPN )
+    def __init__( self, aLogger ):
+        self.theLogger = aLogger
+        self.theStart = aLogger.getStartTime()
+        self.theEnd = aLogger.getEndTime()
+        size = aLogger.getSize()
         self.theAvgDistance = ( self.theEnd - self.theStart ) / size
         self.cachedTill = -1
         self.theCache = zeros( ( 0,5 ) )
         self.index = 0
         self.__readCache()
 
-        
     def __readCache( self ):
         if self.cachedTill >= self.theEnd:
             return False
@@ -526,29 +437,29 @@ class LoggerWalker:
             readStart = self.theStart
         else:        
             readStart = self.cachedTill
-        readEnd = min( self.theAvgDistance * int(READ_CACHE/2), self.theEnd - self.cachedTill ) + readStart
-        newPoints = self.theSimulator.getLoggerData( self.theFullPN, readStart, readEnd )
+        readEnd = min(
+            self.theAvgDistance * int(READ_CACHE/2),
+            self.theEnd - self.cachedTill ) + readStart
+        newPoints = self.theLogger.getData( readStart, readEnd )
         if len( self.theCache) > 0:
             halfIndex = int(len(self.theCache) /2 )
             self.index = len( self.theCache ) - halfIndex
-            self.theCache = concatenate( ( self.theCache[ halfIndex: ], newPoints ) )
+            self.theCache = concatenate(
+                ( self.theCache[ halfIndex: ], newPoints ) )
         else:
             self.theCache = newPoints
             self.index = 0
         self.cachedTill = readEnd
 
         return True
-
         
     def getNext( self ):
         if self.index == len( self.theCache ):
             if not self.__readCache():
-                return 1
+                return 1 # XXX: this kind of multiplexing is simply evil.
         aDataPoint = self.theCache[ self.index ]
         self.index += 1
         return aDataPoint
-            
-            
     
     def findPrevious( self, aTime ):
         #returns -1 aTime too small
@@ -556,7 +467,7 @@ class LoggerWalker:
         nextIndex = searchsorted( self.theCache[:,DP_TIME], aTime )
         if nextIndex == len( self.theCache ):
             if not self.__readCache():
-                return 1
+                return 1 # XXX: this kind of multiplexing is simply evil.
             return self.findPrevious( aTime )
 
         if aTime < self.theCache[ nextIndex ][DP_TIME]:
@@ -564,6 +475,6 @@ class LoggerWalker:
                 nextIndex -= 1
             else:
                 # smaller then what logger contains
-                return -1
+                return -1 # XXX: this kind of multiplexing is simply evil.
         self.index = nextIndex
-        return self.getNext( )
+        return self.getNext()

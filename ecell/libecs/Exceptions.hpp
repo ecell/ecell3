@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -64,7 +64,7 @@ if( ! ( EXPRESSION ) )\
 
 
   /// Base exception class
-  class Exception 
+  class LIBECS_API Exception 
     : 
     public std::exception 
   {
@@ -79,16 +79,16 @@ if( ! ( EXPRESSION ) )\
       ; // do nothing
     }
 
-    LIBECS_API virtual ~Exception() throw();
+    virtual ~Exception() throw();
 
-    LIBECS_API virtual const String message() const;
+    virtual const String message() const;
 
-    LIBECS_API virtual const char* what() const throw()
+    virtual const char* what() const throw()
     {
       return message().c_str();
     }
 
-    LIBECS_API virtual const char* const getClassName() const
+    virtual const char* const getClassName() const
     {
       return "Exception";
     }
@@ -105,7 +105,7 @@ if( ! ( EXPRESSION ) )\
   */
 
 #define DEFINE_EXCEPTION( CLASSNAME, BASECLASS )\
-class CLASSNAME : public BASECLASS\
+class LIBECS_API CLASSNAME : public BASECLASS\
 {\
 public:\
   CLASSNAME( StringCref method, StringCref message = "" )\

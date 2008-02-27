@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2008 Keio University
+#       Copyright (C) 2005-2008 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -27,6 +27,30 @@
 import os
 import sys
 
+__all__ = (
+    'package',
+    'per_app_dir_name',
+    'version',
+    'version_info',
+    'prefix',
+    'exec_prefix',
+    'home_dir',
+    'user_prefs_dir',
+    'bin_dir',
+    'lib_dir',
+    'data_dir',
+    'conf_dir',
+    'dm_path'
+    )
+
+# Inspired by BTL::platform::get_module_filename
+def get_running_executable():
+    if getattr( sys, 'frozen', '' ) == 'windows_exe':
+        import win32api
+        return win32api.GetModuleFileName( 0 )
+    else:
+        return os.path.abspath( sys.argv[0] )
+
 package = "@PACKAGE@"
 per_app_dir_name = "@ECELL_DIRNAME@"
 version = "@VERSION@"
@@ -47,27 +71,23 @@ if len( exec_prefix ) == 0 or not os.path.isdir( exec_prefix ):
     exec_prefix = prefix
 
 if os.name == 'nt':
-    from win32com.shell import shell, shellcon
-    home_dir = shell.SHGetPathFromIDList(
-        shell.SHGetSpecialFolderLocation( 0, shellcon.CSIDL_PROFILE )
-        )
-    user_prefs_dir = os.path.join(
-        shell.SHGetPathFromIDList(
-            shell.SHGetSpecialFolderLocation( 0, shellcon.CSIDL_APPDATA )
-            ),
-        per_app_dir_name
-        )
+    try:
+        from win32com.shell import shell, shellcon
+        home_dir = shell.SHGetPathFromIDList(
+            shell.SHGetSpecialFolderLocation( 0, shellcon.CSIDL_PROFILE )
+            )
+        user_prefs_dir = os.path.join(
+            shell.SHGetPathFromIDList(
+                shell.SHGetSpecialFolderLocation( 0, shellcon.CSIDL_APPDATA )
+                ),
+            per_app_dir_name
+            )
+    except:
+        home_dir = os.environ['USERPROFILE']
+        user_prefs_dir = os.environ['APPDATA']
 else:
     home_dir = os.path.expanduser( '~' )
     user_prefs_dir = os.path.join( home_dir, '.' + per_app_dir_name )
-
-# Inspired by BTL::platform::get_module_filename
-def get_running_executable():
-    if getattr( sys, 'frozen', '' ) == 'windows_exe':
-        import win32api
-        return win32api.GetModuleFileName( 0 )
-    else:
-        return os.path.abspath( sys.argv[0] )
 
 def expand_shell_variables( val, vars ):
     import re

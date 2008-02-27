@@ -181,16 +181,13 @@ class PropertyWindow(OsogoPluginWindow):
         self.setIconList(
             os.path.join( config.glade_dir, "ecell.png" ),
             os.path.join( config.glade_dir, "ecell32.png" ) )
-        #self.__setFullPNList()
 
-        #if ( len( self.getFullPNList() ) > 1 ) and ( aRoot != 'top_vbox' ):
-        if ( len( self.getFullPNList() ) > 1 ) and ( rootWidget !=
-                                                    'EntityWindow' ):
+        if len( self.getFullPNList() ) > 1 and rootWidget != 'EntityWindow':
             self.thePreFullID = self.getFullID()
             aClassName = self.__class__.__name__
         self.setTitle( "%s - %s" % (
             self.getName(),
-            util.createFullIDString( self.getFullID() ) ) )
+            str( self.getFullPN().fullID ) ) )
         self.update()
 
     def setStatusBar( self, aStatusBarWidget ):
@@ -256,7 +253,7 @@ class PropertyWindow(OsogoPluginWindow):
         if self.theSession.theModelWalker == None:
             return
 
-        aFullID = self.getFullID()
+        aFullID = self.getFullPN().fullID
         if aFullID == None:
             return
 
@@ -284,16 +281,12 @@ class PropertyWindow(OsogoPluginWindow):
             # updates each widget
             # Type, ID, Path, Classname
             # -----------------------------------------------
-            anEntityType = ENTITYTYPE_STRING_LIST[self.getFullID()[TYPE]]
-            anID = self.getFullID()[ID]
-            aSystemPath = str( self.getFullID()[SYSTEMPATH] )
-            
+            anEntityType = self.getFullPN().fullID.getTypeName()
+
             self['labelEntityType'].set_text( anEntityType + ' Property' )
             self['entryClassName'].set_text( anEntityStub.getClassname() )
-            self['entryFullID'].set_text( string.join( [ anEntityType,
-                                                         aSystemPath,
-                                                         anID], ':' ) )
-            
+            self['entryFullID'].set_text( str( self.getFullPN().fullID ) )
+
             # saves properties to buffer
             self.thePrePropertyMap = {}
             for aProperty in anEntityStub.getPropertyList():
@@ -306,13 +299,13 @@ class PropertyWindow(OsogoPluginWindow):
             # update Summary tab for unique fields of each entity type
             # update the respective Entity's PropertyList
             self.__setDiscardList()
-            if self.getFullID()[TYPE] == PROCESS:
+            if self.getFullPN().fullID.typeCode == PROCESS:
                 self.showVariableReferenceListTab()
                 self.__updateProcess()
-            elif self.getFullID()[TYPE] == VARIABLE:
+            elif self.getFullPN().fullID.typeCode == VARIABLE:
                 self.hideVariableReferenceListTab()
                 self.__updateVariable()
-            elif self.getFullID()[TYPE] == SYSTEM:
+            elif self.getFullPN().fullID.typeCode == SYSTEM:
                 self.hideVariableReferenceListTab()
                 self.__updateSystem()
 
@@ -321,7 +314,7 @@ class PropertyWindow(OsogoPluginWindow):
                                  self.thePrePropertyMap[ 'Name' ][0] )  )
 
         # save current full id to previous full id.
-        self.preFullID = self.getFullID()
+        self.preFullID = self.getFullPN().fullID
         self.setSelectedFullPN(self.theRawFullPNList[0])
         # updates status bar
         if self.theStatusBarWidget != None:
@@ -439,7 +432,7 @@ class PropertyWindow(OsogoPluginWindow):
 
     def __updateSystem( self ):
         self.__updatePropertyList()
-        aSystemPath = util.createSystemPathFromFullID( self.getFullID() )
+        aSystemPath = self.getFullPN().fullID.toSystemPath()
         aProcessList = self.theSession.getEntityList( 'Process', aSystemPath )
         aVariableList = self.theSession.getEntityList( 'Variable', aSystemPath )
         aSystemList = self.theSession.getEntityList( 'System', aSystemPath ) 
@@ -465,11 +458,11 @@ class PropertyWindow(OsogoPluginWindow):
         if isViewAll:
             self.theDiscardList = []
         else:
-            if self.getFullID()[TYPE] == PROCESS:
+            if self.getFullPN().fullID.typeCode == PROCESS:
                 self.theDiscardList = PROCESS_DISCARD_LIST 
-            elif self.getFullID()[TYPE] == VARIABLE:
+            elif self.getFullPN().fullID.typeCode == VARIABLE:
                 self.theDiscardList = VARIABLE_DISCARD_LIST 
-            elif self.getFullID()[TYPE] == SYSTEM:
+            elif self.getFullPN().fullID.typeCode == SYSTEM:
                 self.theDiscardList = SYSTEM_DISCARD_LIST 
         
     def __valueEdited( self, *args ):
@@ -483,8 +476,8 @@ class PropertyWindow(OsogoPluginWindow):
         aPath = args[1]
         anIter = self.theListStore.get_iter_from_string( aPath )
         aSelectedProperty = self.theListStore.get_value( anIter, PROPERTY_COL )
-        self.theSelectedFullPN = util.convertFullIDToFullPN(
-            self.getFullID(), aSelectedProperty )
+        self.theSelectedFullPN = self.getFullPN().fullID.createFullPN(
+            aSelectedProperty )
         
         # disable VariableReferenceList editing because of a bug when
         # saving changes
@@ -564,8 +557,8 @@ class PropertyWindow(OsogoPluginWindow):
         else:
             aSelectedProperty = self.theListStore.get_value( anIter,
                                                             PROPERTY_COL )
-            self.theSelectedFullPN = util.convertFullIDToFullPN(
-                self.getFullID(), aSelectedProperty )
+            self.theSelectedFullPN = self.getFullPN().fullID.createFullPN(
+                aSelectedProperty )
         return self.theSelectedFullPN
 
     def setSelectedFullPN( self, aFullPN ):
@@ -617,8 +610,8 @@ class PropertyWindow(OsogoPluginWindow):
             aVarrefEditor.initUI()
             aVarrefEditor.show()
             self.theVarrefEditor = aVarrefEditor
-        if self.theVarrefEditor.getProcessFullID() != self.getFullID():
-            self.theVarrefEditor.setDisplayedFullID( self.getFullID() )
+        if self.theVarrefEditor.getProcessFullID() != self.getFullPN().fullID:
+            self.theVarrefEditor.setDisplayedFullID( self.getFullPN().fullID )
         self['varref_area'].show()
 
     def hideVariableReferenceListTab( self ):

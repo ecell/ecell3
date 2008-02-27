@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -29,18 +29,27 @@
 // E-Cell Project.
 //
 
-
 #ifndef __LIBEMC_HPP
 #define __LIBEMC_HPP
 
 #include <functional>
 
+#ifdef DLL_EXPORT
+#undef DLL_EXPORT
+#define _DLL_EXPORT
+#endif /* DLL_EXPORT */
+
 #include "libecs/libecs.hpp"
 
-// WIN32 stuff
-#if defined(WIN32)
+#ifdef _DLL_EXPORT
+#define DLL_EXPORT
+#undef _DLL_EXPORT
+#endif /* _DLL_EXPORT */
 
-#ifdef LIBEMC_EXPORTS
+// WIN32 stuff
+#if defined( WIN32 )
+
+#if defined( LIBEMC_EXPORTS ) || defined( DLL_EXPORT )
 #define LIBEMC_API __declspec(dllexport)
 #else
 #define LIBEMC_API __declspec(dllimport)
@@ -71,29 +80,29 @@ namespace libemc
   DECLARE_SHAREDPTR( EventChecker );
   DECLARE_SHAREDPTR( EventHandler );
 
-  class EventHandler
+  class LIBEMC_API EventHandler
     :
     public std::unary_function<void,void> 
   {
   public:
     EventHandler() {}
-    LIBEMC_API virtual ~EventHandler() {}
+    virtual ~EventHandler() {}
 
-    LIBEMC_API virtual void operator()( void ) const = 0;
+    virtual void operator()( void ) const = 0;
   };
 
-  class EventChecker
+  class LIBEMC_API EventChecker
     :
     public std::unary_function<bool,void>
   {
   public:
     EventChecker() {}
-    LIBEMC_API virtual ~EventChecker() {}
+    virtual ~EventChecker() {}
 
-    LIBEMC_API virtual bool operator()( void ) const = 0;
+    virtual bool operator()( void ) const = 0;
   };
 
-  class DefaultEventChecker
+  class LIBEMC_API DefaultEventChecker
     :
     public EventChecker
   {
@@ -101,7 +110,7 @@ namespace libemc
     DefaultEventChecker() {}
     //    virtual ~DefaultEventChecker() {}
 
-    LIBEMC_API virtual bool operator()( void ) const
+    virtual bool operator()( void ) const
     {
       return false;
     }

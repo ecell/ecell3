@@ -5,7 +5,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT
 AC_CONFIG_SRCDIR([libecs/Entity.hpp])
 
-source ../ecell_version.sh
+sinclude([../ecell_version.sh])
 
 
 AM_CONFIG_HEADER(ecell_config.h)
@@ -16,37 +16,45 @@ ECELL_DIRNAME=${PACKAGE}-${ECELL_MAJOR_VERSION}.${ECELL_MINOR_VERSION}
 
 ECELL_VERSION_STRING=\"${ECELL_VERSION_NUMBER}\"
 
-AC_DEFINE_UNQUOTED( ECELL_MAJOR_VERSION, ${ECELL_MAJOR_VERSION},[] )
-AC_DEFINE_UNQUOTED( ECELL_MINOR_VERSION, ${ECELL_MINOR_VERSION},[] )
-AC_DEFINE_UNQUOTED( ECELL_MICRO_VERSION, ${ECELL_MICRO_VERSION},[] )
-AC_DEFINE_UNQUOTED( ECELL_VERSION_STRING, ${ECELL_VERSION_STRING},[] )
-AC_SUBST( ECELL_DIRNAME )
-AC_SUBST( ECELL_MAJOR_VERSION )
-AC_SUBST( ECELL_MINOR_VERSION )
-AC_SUBST( ECELL_MICRO_VERSION )
-AC_SUBST( ECELL_VERSION_STRING )
+AC_DEFINE_UNQUOTED(ECELL_MAJOR_VERSION, ${ECELL_MAJOR_VERSION}, [Major version of the software.])
+AC_DEFINE_UNQUOTED(ECELL_MINOR_VERSION, ${ECELL_MINOR_VERSION}, [Minor version of the software.])
+AC_DEFINE_UNQUOTED(ECELL_MICRO_VERSION, ${ECELL_MICRO_VERSION}, [Micro version of the software.])
+AC_DEFINE_UNQUOTED(ECELL_VERSION_STRING, ${ECELL_VERSION_STRING}, [Full version string of the software.])
+AC_SUBST([ECELL_DIRNAME])
+AC_SUBST([ECELL_MAJOR_VERSION])
+AC_SUBST([ECELL_MINOR_VERSION])
+AC_SUBST([ECELL_MICRO_VERSION])
+AC_SUBST([ECELL_VERSION_STRING])
 
 
 AM_SANITY_CHECK
 
 AC_CANONICAL_HOST
 
-if test $prefix = "NONE" ; then
-        PREFIX=$ac_default_prefix
+if test "$prefix" = "NONE" ; then
+  PREFIX="$ac_default_prefix"
 else
-        PREFIX=$prefix
+  PREFIX="$prefix"
 fi
 
-AC_SUBST(PREFIX)
+AC_SUBST([PREFIX])
 
-dnl
-AC_ARG_WITH(gtk,
-  AC_HELP_STRING([--without-gtk],
-                 [build ecell without gtk library.])
+AC_ARG_ENABLE([gui], [
+  AC_HELP_STRING([--disable-gui],
+                 [build ecell without gui frontends.])
+  ], [],
+  [enable_gui=yes]
 )
-AM_CONDITIONAL(WITH_GTK, test "$with_GTK" != "no")
-dnl
 
+AC_MSG_CHECKING([whether to build GUI frontends])
+if test "$enable_gui" = "yes"; then
+  AC_MSG_RESULT([yes])
+else
+  AC_MSG_RESULT([no])
+fi
+
+AM_CONDITIONAL([ENABLE_GUI], [test "$enable_gui" = "yes"])
+dnl
 
 dnl Checks for programs.
 
@@ -60,13 +68,18 @@ AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 
 AM_DISABLE_STATIC
-dnl AC_LIBLTDL_INSTALLABLE(../libltdl)
 AC_LIBLTDL_CONVENIENCE(../libltdl)
 AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 
+dnl to circumvent libltdl weirdness (already fixed in the newer versions)
+case $host_os in
+  *cygwin* | *mingw* | *win32*)
+    CPPFLAGS="$CPPFLAGS -DLT_SCOPE=extern"
+    ;;
+esac
 
 rm -f conftest
 ./libtool --config > conftest
@@ -77,7 +90,7 @@ dnl compatibility for libtool 1.5.6
 
 LTDL_SHLIB_EXT=""
 if test -n "$shrext_cmds"; then
-    eval LTDL_SHLIB_EXT=\"$shrext_cmds\"
+    module=yes eval LTDL_SHLIB_EXT=\"$shrext_cmds\"
     AC_SUBST(LTDL_SHLIB_EXT)
 dnl compatibility for libtool 1.5.0
 elif test -n "$shrext"; then
@@ -123,29 +136,12 @@ AC_CHECK_LIB(c, open, LIBC="-lc")
 AC_SUBST(LIBC)
 dnl
 
-dnl disable checking dlopen for windows
-case ${host_os} in
-  *cygwin* | *mingw* | *win32*)
-    os_win32=yes
-    AM_CHECK_PYMOD(py2exe,,,[AC_MSG_ERROR([could not find py2exe module])])
-    ;;
-  *)
-    AC_CHECK_LIB(dl, dlopen, LIBDL="-ldl")
-    AC_SUBST(LIBDL) 
-    os_win32=no
-    ;;
-esac
-AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
-
-
-AC_CHECK_LIB(gslcblas,cblas_dgemm,,[AC_MSG_ERROR([The libgslcblas (part of GNU Scientific Library) could not be found.])])
-
-AC_CHECK_LIB(gsl,gsl_block_alloc,,[AC_MSG_ERROR([The libgsl (GNU Scientific Library) could not be found.])])
+ECELL_CHECK_GSL
 
 AM_CHECK_PYMOD(numpy,,,[AC_MSG_ERROR([could not find Python numpy module])])
 AM_CHECK_PYMOD(xml,,,[AC_MSG_ERROR([could not find Python xml module])])
 
-if test -n "$with_gtk"; then
+if test "$enable_gui" = 'yes'; then
    AM_CHECK_PYMOD(pygtk,,,[AC_MSG_ERROR([could not find Python pygtk module])])
    AM_CHECK_PYMOD(gtk,,,[AC_MSG_ERROR([could not find Python gtk module])])
    AM_CHECK_PYMOD(gtk.gdk,,,
@@ -198,12 +194,6 @@ AC_SUBST([INFINITY_VAL])
 
 ECELL_CHECK_PRETTY_FUNCTION
 
-AC_ARG_WITH(msvc, [  --with-msvc             create dmtool_config.h 4 MSVC])
-if test "${with_msvc}" == "yes"; then
-    msvcFlag=1
-    AC_DEFINE_UNQUOTED(USE_MSVC, ${msvcFlag}, The Flag of the Compiler)
-fi
-
 EXT_GUESS="../../../.. ../../.. ../.. ../ ./ $prefix /usr /usr/local /opt"
 
 dnl dmtool package
@@ -231,6 +221,7 @@ AC_SUBST(DMTOOL_INCLUDE_DIR)
 
 AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR([Failed to find Python headers.])])
 ECELL_CHECK_PYTHON_LIBS
+AM_CONDITIONAL([HAVE_PYTHON_LIB], [test ! -z "$PYTHON_LIBS"])
 AC_SUBST([PYTHON_LIBS])
 
 ECELL_CHECK_NUMPY
@@ -295,59 +286,27 @@ AC_CHECK_FUNCS(mkdir select strdup strerror strtod uname modf modfl)
 AC_CHECK_FUNCS(strdup strstr)
 
 AC_CONFIG_FILES([
-  Makefile
+    Makefile
+    bin/Makefile
+    dm/Makefile
+    libecs/Defs.hpp  
+    libecs/Makefile
+    libecs/tests/Makefile
+    libemc/Makefile
+    pyecell/Makefile
+    pyecell/setup.py
+    pyecell/ecell/config.py
+    pyecs/Makefile
+    pyecs/setup.py
+    session-monitor/Makefile
+    session-monitor/plugins/Makefile
 ])
-AC_CONFIG_FILES([
-  libecs/Defs.hpp  
-  libecs/Makefile
-  libecs/tests/Makefile
-])
-AC_CONFIG_FILES([
-  libemc/Makefile
-])
-AC_CONFIG_FILES([
-  pyecs/setup.py
-  pyecs/Makefile
-  pyecs/ecell3-python
-], [
-  chmod +x pyecs/ecell3-python
-])
-AC_CONFIG_FILES([
-  pyecell/setup.py
-  pyecell/ecell/config.py
-  pyecell/Makefile
-])
-AC_CONFIG_FILES([
-  dm/Makefile
-])
-AC_CONFIG_FILES([
-  bin/Makefile
-  bin/ecell3-dmc
-], [
-  chmod +x bin/ecell3-dmc
-])
-AC_CONFIG_FILES([
-  session-monitor/Makefile
-  session-monitor/plugins/Makefile
-  session-monitor/glade/Makefile
-  session-monitor/setup.py
-], [
-  chmod +x session-monitor/ecell3-session-monitor
-])
-
-AC_CONFIG_FILES([
-  model-editor/Makefile
-  model-editor/plugins/Makefile
-  model-editor/glade/Makefile
-  model-editor/doc/Makefile
-  model-editor/setup.py
-], [
-  chmod +x model-editor/ecell3-model-editor
-])
-AC_CONFIG_FILES([
-  toollauncher/Makefile
-  toollauncher/misc/Makefile
-], [
-  chmod +x toollauncher/ecell3-toollauncher
-])
+AC_CONFIG_FILES([bin/ecell3-dmc], [chmod +x bin/ecell3-dmc])
+AC_CONFIG_FILES([bin/ecell3-em2eml], [chmod +x bin/ecell3-em2eml])
+AC_CONFIG_FILES([bin/ecell3-eml2em], [chmod +x bin/ecell3-eml2em])
+AC_CONFIG_FILES([pyecs/ecell3-python], [chmod +x pyecs/ecell3-python])
+AC_CONFIG_FILES([pyecell/ecell3-eml2sbml], [chmod +x pyecell/ecell3-eml2sbml])
+AC_CONFIG_FILES([pyecell/ecell3-sbml2eml], [chmod +x pyecell/ecell3-sbml2eml])
+AC_CONFIG_FILES([pyecell/ecell3-session], [chmod +x pyecell/ecell3-session])
+AC_CONFIG_FILES([pyecell/ecell3-session-manager], [chmod +x pyecell/ecell3-session-manager])
 AC_OUTPUT

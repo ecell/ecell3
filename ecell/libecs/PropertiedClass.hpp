@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -32,9 +32,14 @@
 #ifndef __PROPERTIEDCLASS_HPP
 #define __PROPERTIEDCLASS_HPP
 
-#include "dmtool/DMObject.hpp"
-
 #include "libecs.hpp"
+
+#if defined( WIN32 )
+// a bit hackish, but works.
+class LIBECS_API ModuleMaker;
+#endif /* WIN32 */
+
+#include "dmtool/DMObject.hpp"
 
 namespace libecs
 {
@@ -45,7 +50,7 @@ namespace libecs
 
 #define LIBECS_DM_CLASS( CLASSNAME, BASE )\
   DECLARE_CLASS( CLASSNAME );\
-  class CLASSNAME\
+  class DM_IF CLASSNAME\
    :\
   public BASE 
 
@@ -245,10 +250,10 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
   //
 
 #define SET_SLOT( TYPE, METHODNAME )\
-  DM_IF void METHODNAME( libecs::Param<TYPE>::type value )
+  void METHODNAME( libecs::Param<TYPE>::type value )
 
 #define GET_SLOT( TYPE, METHODNAME )\
-  DM_IF const TYPE METHODNAME() const
+  const TYPE METHODNAME() const
 
 #define SET_SLOT_DEF( TYPE, METHODNAME, CLASS )\
   SET_SLOT( TYPE, CLASS::METHODNAME )
@@ -300,6 +305,7 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
   SIMPLE_SET_METHOD( TYPE, NAME )\
   SIMPLE_GET_METHOD( TYPE, NAME )
 
+  template<typename T> class PropertyInterface;
 
   /** @addtogroup property The Inter-object Communication.
    *  The Interobject Communication.
@@ -320,7 +326,7 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
 
   */
 
-  class PropertiedClass
+  class LIBECS_API PropertiedClass
   {
 
   public:
@@ -361,15 +367,15 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
     virtual const Polymorph 
     getPropertyAttributes( StringCref aPropertyName ) const = 0;
 
-    LIBECS_API virtual void defaultSetProperty( StringCref aPropertyName, 
+    virtual void defaultSetProperty( StringCref aPropertyName, 
 				     PolymorphCref aValue );
     
-    LIBECS_API virtual const Polymorph 
+    virtual const Polymorph 
     defaultGetProperty( StringCref aPorpertyName ) const;
     
-    LIBECS_API virtual const Polymorph defaultGetPropertyList() const;
+    virtual const Polymorph defaultGetPropertyList() const;
     
-    LIBECS_API virtual const Polymorph 
+    virtual const Polymorph 
     defaultGetPropertyAttributes( StringCref aPropertyName ) const;
 
     void registerLogger( LoggerPtr aLogger );
@@ -439,7 +445,6 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD
   /*@}*/
   
 } // namespace libecs
-
 
 #endif /* __PROPERTIEDCLASS_HPP */
 

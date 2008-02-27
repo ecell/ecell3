@@ -83,36 +83,41 @@ AC_DEFUN([ECELL_CHECK_PYTHON_LIBS], [
     PYTHON_LIBS=`$PYTHON_PREFIX/bin/python-config --ldflags`
   else
     PYTHON_LIBS="-L$PYTHON_PREFIX/lib -l$PYTHON_LIBNAME"
-
-    ac_save_LIBS="$LIBS"
-    ac_save_CPPFLAGS="$CPPFLAGS"
-    LIBS="$PYTHON_LIBS"
-    CPPFLAGS="$PYTHON_INCLUDES"
-    AC_TRY_LINK([
-#include <Python.h>
-    ], [
-Py_Initialize();
-    ],, [
-      LIBS="-F$PYTHON_PREFIX/../.."
-      case $host_os in
-      darwin* | rhapsody*)
-        AC_TRY_LINK([
-#include <python/Python.h>
-        ], [
-Py_Initialize();
-        ], [
-          PYTHON_LIBS="$LIBS -framework Python"
-        ], [
-          AC_MSG_ERROR([Could not detect python library location])
-        ])
-        ;;
-      esac
-    ])
-    LIBS="$ac_save_LIBS"
-    CPPFLAGS="$ac_save_CPPFLAGS"
   fi
-  AC_MSG_RESULT([$PYTHON_LIBS])
+
+  ac_save_LIBS="$LIBS"
+  ac_save_CPPFLAGS="$CPPFLAGS"
+  LIBS="$PYTHON_LIBS"
+  CPPFLAGS="$PYTHON_INCLUDES"
+  AC_TRY_LINK([
+#include <Python.h>
+  ], [
+Py_Initialize();
+  ],, [
+    PYTHON_LIBS=
+    case $host_os in
+    darwin* | rhapsody*)
+      LIBS="-F$PYTHON_PREFIX/../.."
+      AC_TRY_LINK([
+#include <python/Python.h>
+      ], [
+Py_Initialize();
+      ], [
+        PYTHON_LIBS="$LIBS -framework Python"
+      ])
+      ;;
+    esac
+  ])
+  LIBS="$ac_save_LIBS"
+  CPPFLAGS="$ac_save_CPPFLAGS"
+
+  if test -z "$PYTHON_LIBS"; then
+    AC_MSG_RESULT([no])
+  else
+    AC_MSG_RESULT([$PYTHON_LIBS])
+  fi
 ])
+
 
 dnl numpy package.
 dnl find arrayobject.h.
@@ -169,6 +174,7 @@ AC_DEFUN([ECELL_CHECK_NUMPY], [
   AC_SUBST(NUMPY_INCLUDE_DIR)
 ])
 
+
 AC_DEFUN([ECELL_CHECK_MATH_HEADER], [
   STD_MATH_HEADER=
 
@@ -185,6 +191,7 @@ AC_DEFUN([ECELL_CHECK_MATH_HEADER], [
 
   AC_SUBST([STD_MATH_HEADER])
 ])
+
 
 AC_DEFUN([ECELL_CHECK_INFINITY], [
   AC_MSG_CHECKING(for INFINITY)
@@ -208,6 +215,7 @@ AC_DEFUN([ECELL_CHECK_INFINITY], [
   fi
 ])
 
+
 AC_DEFUN([ECELL_CHECK_HUGE_VAL], [
   AC_MSG_CHECKING(for HUGE_VAL)
   AC_CACHE_VAL([ac_cv_func_or_macro_huge_val], [
@@ -229,6 +237,7 @@ AC_DEFUN([ECELL_CHECK_HUGE_VAL], [
     HAVE_HUGE_VAL=
   fi
 ])
+
 
 AC_DEFUN([ECELL_CHECK_NUMERIC_LIMITS_DOUBLE_INFINITY], [
   AC_MSG_CHECKING(for numeric_limits<double>::infinity())
@@ -274,4 +283,43 @@ AC_DEFUN([ECELL_CHECK_PRETTY_FUNCTION], [
   else
     AC_MSG_RESULT(no)
   fi
+])
+
+
+AC_DEFUN([ECELL_CHECK_GSL], [
+  GSL_CONFIG=
+  AC_CHECK_PROGS([GSL_CONFIG], [gsl-config])
+
+  if test -z "$GSL_CONFIG"; then
+    AC_CHECK_LIB([gslcblas], [cblas_dgemm],, [
+      AC_MSG_ERROR([libgslcblas could not be found.])
+    ])
+
+    AC_CHECK_LIB([gsl], [gsl_block_alloc],, [
+      AC_MSG_ERROR([libgsl could not be found.])
+    ])
+  else
+    CPPFLAGS="$CPPFLAGS `$GSL_CONFIG --cflags`"
+    LIBS="$LIBS `$GSL_CONFIG --libs`"
+  fi
+
+  # DLL import spec would be necessary under Win32.
+  case ${host_os} in
+    *cygwin* | *mingw* | *win32*)
+      AC_MSG_CHECKING([if link is performed against dynamic GSL libraries])
+      ac_save_LDFLAGS="$LDFLAGS"
+      LDFLAGS="-Wl,-Bdynamic $LDFLAGS"
+      AC_TRY_LINK([
+#include <gsl/gsl_vector.h>
+      ], [
+gsl_vector_alloc(0);
+      ], [
+        AC_MSG_RESULT([yes])
+        CPPFLAGS="$CPPFLAGS -DGSL_DLL" 
+      ], [
+        AC_MSG_RESULT([no])
+      ])
+      LDFLAGS="$ac_save_LDFLAGS"
+      ;;
+  esac
 ])

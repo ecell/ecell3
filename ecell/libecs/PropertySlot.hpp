@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -35,7 +35,6 @@
 #include <functional>
 
 #include "libecs.hpp"
-//#include "Util.hpp"
 #include "PropertiedClass.hpp"
 #include "convertTo.hpp"
 #include "Polymorph.hpp"
@@ -64,7 +63,7 @@ namespace libecs
      @see PropertyInterface
   */
 
-  class PropertySlotBase
+  class DM_IF PropertySlotBase
   {
 
   public:
@@ -74,13 +73,13 @@ namespace libecs
       ; // do nothing
     }
     
-    DM_IF virtual ~PropertySlotBase();
+    virtual ~PropertySlotBase();
 
-    DM_IF virtual const bool isSetable() const = 0;
-    DM_IF virtual const bool isGetable() const = 0;
+    virtual const bool isSetable() const = 0;
+    virtual const bool isGetable() const = 0;
 
-    DM_IF virtual const bool isLoadable() const;
-    DM_IF virtual const bool isSavable()  const;
+    virtual const bool isLoadable() const;
+    virtual const bool isSavable()  const;
 
   };
 

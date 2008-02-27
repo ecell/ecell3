@@ -18,7 +18,7 @@ setup(
     author = 'E-Cell project',
     author_email = 'info@e-cell.org',
     url = 'http://www.e-cell.org/',
-    packages = [ 'ecell.ui.osogo' ],
+    packages = [ 'ecell.ui', 'ecell.ui.osogo' ],
     scripts = [ 'ecell3-session-monitor' ],
     data_files = [
         ( os.path.join( os.environ['sysconfdir'], '@ECELL_DIRNAME@' ),

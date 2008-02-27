@@ -2,12 +2,7 @@ abs_top_builddir=@abs_top_builddir@
 
 libdir=@libdir@
 
-if OS_WIN32
-  no_undefined = -no-undefined -Wl,--enable-runtime-pseudo-reloc
-  SHLEXT = .dll.a
-else
-  SHLEXT = @LTDL_SHLIB_EXT@
-endif
+SHLEXT = @LTDL_SHLIB_EXT@
 
 SUBDIRS = . tests
 
@@ -24,7 +19,7 @@ lib_LTLIBRARIES = libecs.la
 
 AM_CXXFLAGS = @CXXFLAGS@
 
-libecs_la_LDFLAGS= -version-info 2:0:0 $(no_undefined)
+libecs_la_LDFLAGS= -version-info 2:0:0 -no-undefined
 libecs_la_LIBADD=  -lstdc++ ${LIBLTDL} ${GSL_LIBADD}
 libecs_la_SOURCES=\
 libecs.cpp\
@@ -111,7 +106,8 @@ VariableReference.hpp\
 DynamicPriorityQueue.hpp\
 FluxProcess.hpp\
 MethodProxy.hpp\
-PropertiedObjectMaker.hpp
+PropertiedObjectMaker.hpp\
+PropertySlotProxyLoggerAdapter.hpp
 
 noinst_HEADERS=\
 osif.h\

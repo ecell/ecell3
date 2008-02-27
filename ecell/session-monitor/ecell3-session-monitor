@@ -33,9 +33,9 @@ __license__ = 'GPL'
 
 import sys
 import pygtk
+from signal import SIGTERM, SIGINT, SIG_DFL, signal
 pygtk.require('2.0')
 import os
-import string 
 import getopt
 import traceback
 import gtk
@@ -55,7 +55,8 @@ def loadScript( aTupple ):
         aSession.loadScript( anEssFile )
     except:
         aSession.message(' can\'t load [%s]' %anEssFile)
-        anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+        anErrorMessage = "\n".join( traceback.format_exception(
+            sys.exc_type,sys.exc_value,sys.exc_traceback ) )
         aSession.message("-----------")
         aSession.message(anErrorMessage)
         aSession.message("-----------")
@@ -144,7 +145,9 @@ def main():
         except:
         
             aSession.message(' can\'t load [%s]' %anEmlFile)
-            anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+            anErrorMessage = "\n".join(
+                traceback.format_exception(
+                    sys.exc_type,sys.exc_value,sys.exc_traceback ) )
             aSession.message("-----------")
             aSession.message(anErrorMessage)
             aSession.message("-----------")
@@ -165,9 +168,16 @@ def main():
         gobject.timeout_add( 1, loadScript, [aSession, anEssFile] )
 
     # initialize & update windows
+    def sigHandler( signum, stack ):
+        aSession.terminate()
+
+    signal( SIGINT, sigHandler )
+    signal( SIGTERM, sigHandler )
     aMainWindow = aSession.openFundamentalWindow('MainWindow')
     aSession.updateUI()
     aSessionMonitor.enterEventLoop()
+    signal( SIGINT, SIG_DFL )
+    signal( SIGINT, SIG_DFL )
 
 # -----------------------------------------------------------------
 # usage

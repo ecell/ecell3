@@ -24,12 +24,14 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # 
 #END_HEADER
+import operator
 
-import ecell.util as util
 import gobject
 import gtk
 import gtk.gdk
-import operator
+
+import ecell.util as util
+
 from Pane import Pane
 from utils import *
 
@@ -97,7 +99,6 @@ class VariableReferenceEditor( Pane ):
 
     def setDisplayedFullID ( self, aFullID ):
         self.theFullID = aFullID
-        self.theFullIDString = util.createFullIDString( self.theFullID )
         self.update()
         
     def getProcessFullID( self ):
@@ -106,8 +107,7 @@ class VariableReferenceEditor( Pane ):
     def update( self ):
         # gets varreflist
         theValue = self.theParent.theSession.getEntityProperty(
-                util.convertFullIDToFullPN(
-                    self.theFullID, 'VariableReferenceList' ) )
+                self.theFullID.createFullPN( 'VariableReferenceList' ) )
         
         #redraw whole list
         self.theListStore.clear()
@@ -115,14 +115,14 @@ class VariableReferenceEditor( Pane ):
 
         for aVariableReference in theValue:
             aName = aVariableReference[VARREF_NAME]
-            aFullID = aVariableReference[VARREF_FULLID]
+            aFullIDString = aVariableReference[VARREF_FULLID]
             aCoef = aVariableReference[VARREF_COEF]
             anIter = self.theListStore.append()
             # to make columns editable change False to True 
             self.theListStore.set(
                 anIter,
                 NAME_COLUMN, aName,
-                FULLID_COLUMN, aFullID,
+                FULLID_COLUMN, aFullIDString,
                 COEF_COLUMN, aCoef,
                 EDITABLE_COLUMN, False )
         
@@ -186,10 +186,9 @@ class VariableReferenceEditor( Pane ):
         selectedFullID = self.__getSelectedFullID()
         if selectedFullID == None:
             return None
-        realFullID = self.__getAbsoluteReference( selectedFullID )
         isFullIDReal = self.theParent.theSession.getEntityClassName(
-            util.createFullID( realFullID ) )
-        return isFullIDReal != None and realFullID or None
+            selectedFullID )
+        return isFullIDReal != None and selectedFullID or None
 
     def __popUpMenu(self ):
         selectedIter = self.__getSelectedIter()
@@ -228,14 +227,14 @@ class VariableReferenceEditor( Pane ):
 
     def __openNewAction( self, widget, aFullIDString ):
         theFullPNList =  [
-            util.convertFullIDToFullPN( util.createFullID( aFullIDString ) )
+            identifiers.FullPN( identifiers.FullID( aFullIDString ), '' )
             ]
         self.theParent.theSession.openPluginWindow(
             "PropertyWindow", theFullPNList )
 
     def __openAction ( self, widget, aFullIDString ):
         theFullPNList =  [
-            util.convertFullIDToFullPN( util.createFullID( aFullIDString ) )
+            identifiers.FullPN( identifiers.FullID( aFullIDString ), '' )
             ]
         self.theParent.theQueue.pushFullPNList( theFullPNList )
         self.theParent.update( True )
@@ -250,56 +249,20 @@ class VariableReferenceEditor( Pane ):
         anIter = self.__getSelectedIter()
         if anIter == None:
             return None
-        aVarref = self.theListStore.get_value( anIter, FULLID_COLUMN )
-        return  self.__getAbsoluteReference( aVarref )
+        aVarref = identifiers.FullID(
+            self.theListStore.get_value( anIter, FULLID_COLUMN ) )
+        return self.__getAbsoluteReference( aVarref )
     
     def __getSelectedIter( self ):
         anIter = self.theTreeView.get_selection().get_selected()[1]
         return anIter
         
-    def __getAbsoluteReference( self, aVariableRef ):
-        aVariable = aVariableRef.split(':')
+    def __getAbsoluteReference( self, aFullID ):
+        aVariableSystemPath = aFullID.getSuperSystemPath()
 
-        if self.__isAbsoluteReference( aVariableRef ):
-            aVariable [0] = "Variable"
-            return ":".join( aVariable)
-        if aVariable[1][0] == '/':
-            # absolute ref
-            absolutePath = aVariable[1]
-        elif aVariable[1][0] == '.':
-            aProcess = self.theFullIDString.split(':')[1]
-            aProcessPath = aProcess.split('/')
-            while True:
-                if len(aProcessPath) == 0:
-                    break
-                if aProcessPath[0] == '':
-                    aProcessPath.__delitem__(0)
-                else:
-                    break
-            aVariablePath = aVariable[1].split('/')
-            absolutePath = ''
-            while aVariablePath != []:
-                pathString =  aVariablePath.pop()
-                if pathString == '.':
-                    break
-                elif pathString == '..':
-                    if len(aProcessPath) == 0:
-                        return aVariableRef
-                    aProcessPath.pop()
-                else:
-                    absolutePath =  pathString + '/' + absolutePath
-            oldPath = '/' + '/'.join(aProcessPath)
-            absolutePath = absolutePath.rstrip('/')
-            if oldPath != '/' and absolutePath != '':
-                oldPath +='/'
-            absolutePath =  oldPath + absolutePath
-    
+        if aVariableSystemPath.isAbsolute():
+            aVariableSystemPath = aVariableSystemPath
         else:
-            return aVariableRef
-    
-        return "Variable" + ':' + absolutePath + ':' + aVariable[2]
-    
-    def __isAbsoluteReference(self, aVariableRef ):
-        aList = aVariableRef.split(':')
-        return aList[1][0] == '/'
-    
+            aVariableSystemPath = aVariableSystemPath.toAbsolute(
+                self.theFullID.getSuperSystemPath() )
+        return identifiers.FullID( VARIABLE, aVariableSystemPath, aFullID.id )

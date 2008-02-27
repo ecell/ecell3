@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -44,13 +44,13 @@ namespace libecs
    * @{ 
    */ 
   
-  class PropertiedObjectMaker 
+  class LIBECS_API PropertiedObjectMaker 
     : 
     public SharedModuleMaker<PropertiedClass>
   {
   public:
-    LIBECS_API PropertiedObjectMaker();
-    LIBECS_API virtual ~PropertiedObjectMaker();
+    PropertiedObjectMaker();
+    virtual ~PropertiedObjectMaker();
   };
 
 #define NewPropertiedObjectModule(CLASS) NewDynamicModule(PropertiedObject,CLASS)

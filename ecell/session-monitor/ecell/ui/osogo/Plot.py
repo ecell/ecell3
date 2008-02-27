@@ -35,7 +35,7 @@ from string import *
 from math import *
 import operator
 from ecell.ui.osogo.DataGenerator import *
-
+from ecell.ecs_constants import *
 from ecell.ecssupport import *
 
 #class Plot,
@@ -59,16 +59,28 @@ PEN_COLOR = "black"
 BACKGROUND_COLOR = "grey"
 PLOTAREA_COLOR = "light grey"
 
-ColorList=["pink","cyan","yellow","navy",
-           "brown","white","purple","black",
-           "green", "orange","blue","red"]
-theMeasureDictionary = \
-                     [['System', 'Size' , 'size'],
-                      ['Variable', 'MolarConc', 'molar conc.' ],
-                      ['Variable', 'NumberConc', 'number conc.' ],
-                      ['Variable', 'Value', 'value'],
-                      ['Variable', 'Velocity', 'velocity' ],
-                      ['Process', 'Activity', 'activity'  ]]
+ColorList = [
+    "pink",
+    "cyan",
+    "yellow",
+    "navy",
+    "brown",
+    "white",
+    "purple",
+    "black",
+    "green",
+    "orange",
+    "blue",
+    "red"
+    ]
+theMeasureDictionary = [
+    [ SYSTEM,   'Size' ,      'size'         ],
+    [ VARIABLE, 'MolarConc',  'molar conc.'  ],
+    [ VARIABLE, 'NumberConc', 'number conc.' ],
+    [ VARIABLE, 'Value',      'value'        ],
+    [ VARIABLE, 'Velocity',   'velocity'     ],
+    [ PROCESS,  'Activity',   'activity'     ]
+    ]
             
 def num_to_sci( num ):
     if (num<0.00001 and num>-0.00001 and num!=0) or num >999999 or num<-9999999:
@@ -101,7 +113,7 @@ class Axis:
         self.theScaleType = SCALE_LINEAR
         self.theFrame = [0,0]
         self.theGrid = [0,0]
-        self.theFullPNString = "Time"
+        self.theFullPN = "Time"
         self.setType( aType )
         self.theLength = 0
         self.theParent = aParent
@@ -109,13 +121,13 @@ class Axis:
         self.theLabelArea = [ 0, 0, 0, 0 ]
         self.theRangeRetriever = aRangeRetreiver
 
-    def getFullPNString ( self ):
-        return self.theFullPNString
+    def getFullPN( self ):
+        return self.theFullPN
 
-    def setFullPNString ( self, aFullPNString ):
-        self.theFullPNString = aFullPNString
-        if aFullPNString == TIME_AXIS:
-            self.setType ( PLOT_TIME_AXIS )
+    def setFullPN( self, aFullPN ):
+        self.theFullPN = aFullPN
+        if aFullPN == TIME_AXIS:
+            self.setType( PLOT_TIME_AXIS )
         else:
             self.setType( PLOT_VALUE_AXIS )
 
@@ -169,7 +181,6 @@ class Axis:
         isStripTimeAxis = \
             self.theParent.theStripMode == MODE_STRIP and \
                 self.theType == PLOT_TIME_AXIS
-        isOutOfBounds = self.isOutOfFrame( rangesMin, rangesMax )
         if isStripTimeAxis :
             self.theFrame[0] = rangesMin
             self.theFrame[1] = self.theFrame[0] + \
@@ -177,7 +188,6 @@ class Axis:
             if ( self.theFrame[1] + self.theFrame[0] ) / 2  < rangesMax:
                 self.theFrame[0] = rangesMax - self.theParent.theStripInterval / 2
                 self.theFrame[1] = self.theFrame[0] + self.theParent.theStripInterval
-
 
         if self.theParent.theZoomLevel == 0 and not isStripTimeAxis:
             if rangesMin == rangesMax:
@@ -273,7 +283,7 @@ class Axis:
             self.theGrid[0] = self.theFrame[0]
             self.theGrid[1] = self.theFrame[1]
 
-        else: #if isOutOfBounds: # if zoomlevel > 0
+        else:
             if self.theScaleType == SCALE_LINEAR:
                 ticks=0
                 if self.theFrame[1] == self.theFrame[0]:
@@ -322,9 +332,7 @@ class Axis:
             self.thePixelSize = float( self.theFrame[1] - self.theFrame[0] ) / self.theLength
 
         else:
-            self.thePixelSize  =float( log10( self.theFrame[1] ) - log10( self.theFrame[0] ) ) / self.theLength
-         #reprint_ylabels
-         #self.redrawLabels()
+            self.thePixelSize = float( log10( self.theFrame[1] ) - log10( self.theFrame[0] ) ) / self.theLength
         return 0
 
     def setScaleType( self, aScaleType ):
@@ -339,14 +347,11 @@ class Axis:
         return  ( aMin < self.theFrame[0] + aRange * self.rescaleTriggerMin )  or \
                   ( aMax > self.theFrame[0] + aRange * self.rescaleTriggerMax )
 
-    def findMeasure( self, aFullPNString ):
-        anArray = aFullPNString.split(':')
-        aType = anArray[0]
-        aProperty = anArray[3]
-        aMeasure = "??"
+    def findMeasure( self, aFullPN ):
         for aMeasureItem in theMeasureDictionary:
-            if aMeasureItem[0]==aType and aMeasureItem[1]==aProperty:
-                aMeasure= aMeasureItem[2]
+            if aMeasureItem[0] == aFullPN.fullID.typeCode and \
+               aMeasureItem[1] == aFullPN.propertyName:
+                aMeasure = aMeasureItem[2]
                 break
         return aMeasure
 
@@ -419,10 +424,10 @@ class XAxis( Axis ):
     def drawMeasures ( self ):
         if self.theType == PLOT_TIME_AXIS:
             aMeasureLabel = 'sec'
-        elif self.theFullPNString == "":
+        elif self.theFullPN == "":
             aMeasureLabel = "no trace"
         else:
-            aMeasureLabel = self.findMeasure( self.theFullPNString )
+            aMeasureLabel = self.findMeasure( self.theFullPN )
 
         # add scale information
         scaleLabel = self.theScaleType + " scale"
@@ -479,7 +484,7 @@ class YAxis( Axis ):
         if self.theParent.getSeriesCount() == 1:
             for aSeries in self.theParent.getDataSeriesList():
                 if aSeries.isOn():
-                    aMeasureLabel = self.findMeasure( aSeries.getFullPNString() )
+                    aMeasureLabel = self.findMeasure( aSeries.getFullPN() )
                     break
         else:
             aMeasureLabel = "mixed traces"
@@ -510,10 +515,10 @@ class YAxis( Axis ):
             aLabelPosition[1], aScaleLabelLayout )
 
 class DataSeries:
-    def __init__( self, aFullPNString, aDataSource, aPlot, aColor ):
-        self.theFullPNString = aFullPNString
+    def __init__( self, aFullPN, aDataSource, aPlot, aColor ):
+        self.theFullPN = aFullPN
         self.isOnFlag = True
-        self.theShortName = self.__getShortName ( self.theFullPNString )
+        self.theShortName = self.theFullPN.propertyName
         self.theLastXmax = None
         self.theLastXmin = None
         self.theLastYmin = None
@@ -527,10 +532,10 @@ class DataSeries:
         self.reset()
 
     def getXAxis ( self ):
-        return self.thePlot.getXAxisFullPNString()
+        return self.thePlot.getXAxisFullPN()
                   
-    def getFullPNString( self ):
-        return self.theFullPNString
+    def getFullPN( self ):
+        return self.theFullPN
 
     def reset( self ):
         self.theOldData = nu.zeros( ( 0 , 5 ) ) 
@@ -547,13 +552,6 @@ class DataSeries:
 
     def setSource( self, aSource ):
         self.theSource = aSource
-
-    def __getShortName(self, aFullPNString ):
-        IdString = str( aFullPNString[ID] )
-        PropertyString = str( aFullPNString[PROPERTY] )
-        if PropertyString != 'Value':
-           IdString += '/' + PropertyString[:2]
-        return IdString
             
     def isOn( self ):
         return self.isOnFlag
@@ -566,7 +564,6 @@ class DataSeries:
 
     def addPoints( self, newPoints):
         """ newPoints: Numeric array of new points ( x, y, avg, max, min )"""
-
         self.theNewData = nu.concatenate( (self.theNewData, newPoints) )
 
     def replacePoints( self, newPoints):
@@ -601,8 +598,9 @@ class DataSeries:
         self.theLastYmin = None
         self.theLastYmax = None
         self.theLastY = None
-        self.drawTrace( self.getAllData() )
-        self.theOldData = self.getAllData()
+        retrievedData = self.getAllData()
+        self.drawTrace( retrievedData )
+        self.theOldData = retrievedData
         self.theNewData = nu.zeros( ( 0,5 ) )
 
     def drawTrace( self, aPoints ):
@@ -611,7 +609,6 @@ class DataSeries:
 
             if not self.isOn():
                 return 0
-
             x=self.thePlot.theXAxis.convertNumToCoord( aDataPoint[ DP_TIME ] )
             y=self.thePlot.theYAxis.convertNumToCoord( aDataPoint[ DP_VALUE ] )
             ymax=self.thePlot.theYAxis.convertNumToCoord( aDataPoint[ DP_MAX ] )
@@ -627,12 +624,11 @@ class DataSeries:
             self.theLastY = y
             self.theLastYmax = ymax
             self.theLastYmin = ymin
-            if x == lastx and y==lasty and ymax==lastymax and ymin==lastymin:
+            if x == lastx and y == lasty and \
+               ymax == lastymax and ymin == lastymin:
                 continue
-
             if self.thePlot.getDisplayMinMax():
                 self.drawMinMax( self.getColor(), x, ymax, ymin )
-
             self.drawPoint( self.getColor(), x, y, lastx, lasty )
 
     def drawMinMax(self, aColor, x, ymax, ymin):
@@ -652,7 +648,7 @@ class DataSeries:
         # draw line
         self.thePlot.drawLine( aColor, x, ymin, x, ymax)
 
-    def withinframes( self, point ):
+    def withinFrames( self, point ):
         return point[0] < self.thePlot.thePlotAreaBox[2]  and point[0] > self.thePlot.thePlotAreaBox[0]  and\
                point[1] < self.thePlot.thePlotAreaBox[3]  and point[1] > self.thePlot.thePlotAreaBox[1] 
 
@@ -682,39 +678,33 @@ class DataSeries:
         else:
             dx = 0
 
-        cur_point_within_frame=self.withinframes( [ x , y ] )
-        last_point_within_frame=self.withinframes( [ lastx, lasty ] )
+        cur_point_within_frame = self.withinFrames( [ x , y ] )
+        last_point_within_frame = self.withinFrames( [ lastx, lasty ] )
 
         if lasty != None:
             dy = abs( lasty - y )
         else:
             dy = 0
-        if ( dx<2 and dy<2 ) or not self.thePlot.getConnectPoints():
-            #draw just a point
+        if dx < 2 and dy < 2 or not self.thePlot.getConnectPoints():
+            # draw just a point
             if cur_point_within_frame:
-                self.thePlot.drawpoint_on_plot( self.getColor() ,x, y )
-
+                self.thePlot.drawPoint( self.getColor() ,x, y )
         elif self.thePlot.getConnectPoints():
-            #draw line
+            # draw line
             x0 = lastx
             y0 = lasty
             x1 = x
             y1 = y
-            if cur_point_within_frame and last_point_within_frame:
-                #if both points are in frame no interpolation needed
-                pass
-            else:
+            if not cur_point_within_frame or not last_point_within_frame:
+                # either current or last point gets out of frame
+                # do interpolation:
                 upLimit = self.thePlot.thePlotAreaBox[1] + 1
                 downLimit = self.thePlot.thePlotAreaBox[3] - 1
                 leftLimit = self.thePlot.thePlotAreaBox[0] + 1
                 rightLimit = self.thePlot.thePlotAreaBox[2] - 1
-                #either current or last point out of frame, do interpolation
-                    
-                #interpolation section begins - only in case lastpoint or current point is off limits
-                
-                #there are 2 boundary cases x0=x1 and y0=y1
-                if x0 == x1: 
 
+                # there are 2 boundary cases x0=x1 and y0=y1
+                if x0 == x1: 
                     if x0 < leftLimit or x0 > rightLimit:
                         return
                     #adjust y if necessary
@@ -723,9 +713,7 @@ class DataSeries:
                         return
                     else:
                         y0, y1 = result
-
                 elif y0 == y1: 
-
                     if y0 < downLimit or y0 > upLimit:
                         return
                     result = self.__adjustLimits( x0, x1, leftLimit, rightLimit )
@@ -733,7 +721,6 @@ class DataSeries:
                         return
                     else:
                         x0, x1 = result
-
                 else:
                     #create coordinate equations
                     mx = float( y1 - y0 ) / float( x1 - x0 )
@@ -763,7 +750,6 @@ class DataSeries:
                             x0 = xi + round( ( y0 - yi ) * my )
                         if x0 < leftLimit or x0 > rightLimit or x0 < xi or x0 > x1:
                             return
-
                     #repeat it with x1 and y1, but compare to left side
                     if x1 > rightLimit:
                         if x0 > rightLimit:
@@ -783,8 +769,6 @@ class DataSeries:
                             x1 = xi + round( ( y1 - yi ) * my )
                         if x1 < leftLimit or x1 > rightLimit or x1 < x0 or x1 > xe:
                             return
-
-                #interpolation section ends
             self.thePlot.drawLine( self.getColor(), x0, y0, x1, y1 )
 
     def changeColor( self ):
@@ -886,7 +870,6 @@ class Plot( gtk.DrawingArea ):
         self.resize( self.allocation.width, self.allocation.height )
 
     def size_request( self ):
-        print "!"
         return ( self.thePlotMinWidth, self.thePlotMinHeight )
 
     def showControl( self, aState ):
@@ -899,20 +882,18 @@ class Plot( gtk.DrawingArea ):
     def getMaxTraces( self ):
         return len( ColorList )
 
-    def getXAxisFullPNString ( self ):
-        return self.theXAxis.getFullPNString()
+    def getXAxisFullPN( self ):
+        return self.theXAxis.getFullPN()
 
-    def setXAxis( self, aFullPNString ):
-        oldFullPN = self.theXAxis.getFullPNString()
+    def setXAxis( self, aFullPN ):
+        oldFullPN = self.theXAxis.getFullPN()
         if oldFullPN != TIME_AXIS:
-            #self.theSeriesMap[ oldFullPN ].switchOn()
             pass
-        if aFullPNString == TIME_AXIS:
+        if aFullPN == TIME_AXIS:
             self.doesConnectPoints = True
         else:
-            #self.theSeriesMap[ aFullPNString ].switchOff()
             self.doesConnectPoints = False
-        self.theXAxis.setFullPNString( aFullPNString )
+        self.theXAxis.setFullPN( aFullPN )
        # take this out if phase plotting history is supported in datagenerator
         self.setStripMode( self.theStripMode )
 
@@ -951,7 +932,6 @@ class Plot( gtk.DrawingArea ):
             self.theYAxis.reframe()
             self.theYAxis.draw()
             redrawFlag = True
-
         if self.theXAxis.isOutOfFrame( ranges[2], ranges[3] ):
             redrawFlag = True
             if self.theXAxis.getType() == PLOT_TIME_AXIS:
@@ -961,8 +941,8 @@ class Plot( gtk.DrawingArea ):
                 else:
                     self.requestData()
             self.theXAxis.reframe()
-
             self.theXAxis.draw()
+
         if redrawFlag:
             self.drawWholePlot()
         else:
@@ -978,8 +958,8 @@ class Plot( gtk.DrawingArea ):
 
     def setStripMode(self, aMode):
         self.theStripMode = aMode
-        if self.getXAxisFullPNString() == TIME_AXIS:
-            self.requestData( )
+        if self.getXAxisFullPN() == TIME_AXIS:
+            self.requestData()
             if aMode == MODE_STRIP:
         
                 ranges = self.getRanges()
@@ -1000,27 +980,27 @@ class Plot( gtk.DrawingArea ):
     def getDataSeriesList( self ):
         return self.theSeriesMap.values()
         
-    def getDataSeries( self, aFullPNString ):
-        return self.theSeriesMap[ aFullPNString ]
+    def getDataSeries( self, aFullPN ):
+        return self.theSeriesMap[ aFullPN ]
 
     def getDataSeriesNames( self ):
         return self.theSeriesMap.keys()
         
-    def addTrace( self, aFullPNString ):
+    def addTrace( self, aFullPN ):
         aColor = self.allocateColor( )
         if aColor == None:
             raise RuntimeError( "Cannot allocate a color" )
 
-        aSeries = DataSeries( aFullPNString, self.theOwner, self, aColor )
-        self.theSeriesMap[ aFullPNString ] = aSeries
+        aSeries = DataSeries( aFullPN, self.theOwner, self, aColor )
+        self.theSeriesMap[ aFullPN ] = aSeries
         return aSeries
 
-    def removeTrace(self, FullPNStringList):
+    def removeTrace( self, aFullPNList ):
         #call superclass
         #redraw
-        for fpn in FullPNStringList:
-            self.releaseColor ( self.theSeriesMap[ fpn ].getColor() )
-            self.theSeriesMap.__delitem__( fpn )
+        for aFullPN in aFullPNList:
+            self.releaseColor( self.theSeriesMap[ aFullPN ].getColor() )
+            del self.theSeriesMap[ aFullPN ]
         self.totalRedraw()
   
     def getStripInterval(self):
@@ -1032,26 +1012,34 @@ class Plot( gtk.DrawingArea ):
         if self.theStripMode == MODE_STRIP:
             self.totalRedraw()
 
-    def requestData(self ):
+    def requestData( self ):
         self.theOwner.requestData( self.theXAxis.theLength * 2 )
 
     def sync( self ):
         #if mode is strip
         if self.theStripMode == MODE_STRIP or self.theZoomLevel == 0:
-            self.requestData( ) 
+            self.requestData() 
         else:
-            self.requestDataSlice( self.theXAxis.theFrame[0], self.theXAxis.theFrame[1] )
+            self.requestDataSlice(
+                self.theXAxis.theFrame[0],
+                self.theXAxis.theFrame[1] )
+                
         if self.window != None:
-            self.totalRedraw( )
+            self.totalRedraw()
 
     def requestDataSlice( self, aStart, anEnd ):
-        self.theOwner.requestDataSlice( aStart, anEnd, ( anEnd - aStart ) / ( self.theXAxis.theLength*2) )
+        self.theOwner.requestDataSlice(
+            aStart,
+            anEnd,
+            ( anEnd - aStart ) / ( self.theXAxis.theLength * 2 )
+            )
 
     def requestNewData ( self ):
         self.theOwner.requestNewData( self.getRequiredTimeResolution() )
 
     def getRequiredTimeResolution( self ):
-        return ( self.theXAxis.theFrame[1] - self.theXAxis.theFrame[0] ) / (self.theXAxis.theLength * 2)
+        return ( self.theXAxis.theFrame[1] - self.theXAxis.theFrame[0] ) / \
+               ( self.theXAxis.theLength * 2 )
         
     def doConnectPoints( self, aBool ):
         self.doesConnectPoints = aBool
@@ -1128,7 +1116,7 @@ class Plot( gtk.DrawingArea ):
                 return
         self.theAvailableColors.insert( 0, aColor )
 
-    def clearPlotarea(self):
+    def clearPlotArea(self):
         self.drawBox( PLOTAREA_COLOR, self.thePlotArea[0] + 1, self.thePlotArea[1] + 1,
                       self.thePlotArea[2] - 1, self.thePlotArea[3] -1 )
 
@@ -1143,7 +1131,7 @@ class Plot( gtk.DrawingArea ):
         self.theXAxis.draw()
         self.theYAxis.draw()
 
-    def drawpoint_on_plot( self, aColor, x, y ):
+    def drawPoint( self, aColor, x, y ):
         #uses raw plot coordinates!
         x = int( x )
         y = int( y )
@@ -1247,7 +1235,8 @@ class Plot( gtk.DrawingArea ):
         button=event.button
         if button == 1: # left-clicked 
             self.showPersistentCoordinates( x, y )
-            if self.theStripMode==MODE_HISTORY and self.theXAxis.getFullPNString() == TIME_AXIS:
+            if self.theStripMode==MODE_HISTORY and \
+               self.theXAxis.getFullPN() == TIME_AXIS:
                 #check that mode is history 
                 self.theZoomKeyPressed=True
                 self.x0 = x
@@ -1320,7 +1309,7 @@ class Plot( gtk.DrawingArea ):
     def onButtonReleased( self, obj, event ):
         # check if this has been left-clicked
         if self.theZoomKeyPressed and event.button == 1:
-            #draw old inverz rectangle
+            #draw old inverted rectangle
             self.drawInvertedBox(
                 self.realx0, self.realy0,
                 self.realx1, self.realy1)
@@ -1396,14 +1385,13 @@ class Plot( gtk.DrawingArea ):
                 for oy in range(-2, 2):
                     self.drawText(
                         BACKGROUND_COLOR, x + ox, y + oy,
-                        aSeries.getFullPNString() )
-            self.drawText( aSeries.getColor(), x, y, aSeries.getFullPNString() )
+                        aSeries.getFullPN() )
+            self.drawText( aSeries.getColor(), x, y, aSeries.getFullPN() )
             y += textShift
 
     def drawWholePlot(self):
-
         #clears plotarea
-        self.clearPlotarea()
+        self.clearPlotArea()
         self.drawFrame()
 
         #go trace by trace and redraws plot

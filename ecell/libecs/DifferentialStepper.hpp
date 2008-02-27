@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -101,6 +101,56 @@ namespace libecs
       {
 	; // do nothing
       }
+      
+
+      /*
+	The getDifference() below is an optimized version of
+        the original implementation based on the following two functions.
+	(2004/10/19)
+
+      const Real interpolate( const RealMatrixCref aTaylorSeries,
+			      const Real anInterval,
+			      const Real aStepInterval )
+      {
+	const Real theta( anInterval / aStepInterval );
+
+	Real aDifference( 0.0 );
+	Real aFactorialInv( 1.0 );
+
+	for ( RealMatrix::size_type s( 0 ); s < aTaylorSeries.size(); ++s )
+	  {
+	    //	    aFactorialInv /= s + 1;
+	    aDifference += aTaylorSeries[ s ][ theIndex ] * aFactorialInv;
+	    aFactorialInv *= theta;
+	  }
+
+	return aDifference * anInterval;
+      }
+
+      virtual const Real getDifference( RealParam aTime, 
+					RealParam anInterval )
+      {
+
+	if ( !theStepper.theStateFlag )
+	  {
+	    return 0.0;
+	  }
+
+	const RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
+	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
+	const Real aStepInterval( theStepper.getTolerableStepInterval() );
+	
+
+	const Real i1( interpolate( aTaylorSeries, 
+	                            aTimeInterval, 
+                                    aStepInterval ) );
+	const Real i2( interpolate( aTaylorSeries, 
+                                    aTimeInterval - anInterval, 
+                                    aStepInterval ) );
+	return ( i1 - i2 );
+
+	}
+      */
 
       virtual const Real getDifference( RealParam aTime, 
 					RealParam anInterval ) const
@@ -225,9 +275,9 @@ namespace libecs
 
   public:
 
-    LIBECS_API DifferentialStepper();
+    DifferentialStepper();
 
-    LIBECS_API virtual ~DifferentialStepper();
+    virtual ~DifferentialStepper();
 
     SET_METHOD( Real, NextStepInterval )
     {
@@ -256,19 +306,19 @@ namespace libecs
       setNextStepInterval( aStepInterval );
     }
 
-    LIBECS_API void resetAll();
+    void resetAll();
 
-    LIBECS_API void interIntegrate();
+    void interIntegrate();
 
     void initializeVariableReferenceList();
 
-    LIBECS_API void setVariableVelocity( boost::detail::multi_array::sub_array<Real, 1> aVelocityBuffer );
+    void setVariableVelocity( boost::detail::multi_array::sub_array<Real, 1> aVelocityBuffer );
  
-    LIBECS_API virtual void initialize();
+    virtual void initialize();
 
-    LIBECS_API virtual void reset();
+    virtual void reset();
 
-    LIBECS_API virtual void interrupt( TimeParam aTime );
+    virtual void interrupt( TimeParam aTime );
 
     virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
     {
@@ -340,9 +390,9 @@ namespace libecs
 
   public:
 
-    LIBECS_API AdaptiveDifferentialStepper();
+    AdaptiveDifferentialStepper();
 
-    LIBECS_API virtual ~AdaptiveDifferentialStepper();
+    virtual ~AdaptiveDifferentialStepper();
 
     /**
        Adaptive stepsize control.
@@ -439,9 +489,9 @@ namespace libecs
       return theRelativeEpsilon;
     }
 
-    LIBECS_API virtual void initialize();
+    virtual void initialize();
 
-    LIBECS_API virtual void step();
+    virtual void step();
 
     virtual bool calculate() = 0;
 

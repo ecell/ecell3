@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -32,7 +32,7 @@
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( __CYGWIN__ )
 #include "win32_utils.h"
 #endif /* WIN32 */
 
@@ -62,7 +62,7 @@ namespace libecs
       {
 	return false;
       }
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( __CYGWIN__ )
     if ( libecs_win32_init() )
       {
 	ModuleMaker::finalize();
@@ -80,7 +80,7 @@ namespace libecs
     else
       isInitialized = false;
 
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( __CYGWIN__ )
     libecs_win32_fini();
 #endif
     ModuleMaker::finalize();
@@ -94,6 +94,26 @@ namespace libecs
   const std::string getDMSearchPath()
   {
     return ModuleMaker::getSearchPath();
+  }
+
+  const int getMajorVersion()
+  {
+    return MAJOR_VERSION;
+  }
+
+  const int getMinorVersion()
+  {
+    return MINOR_VERSION;
+  }
+
+  const int getMicroVersion()
+  {
+    return MICRO_VERSION;
+  }
+
+  const std::string getVersion()
+  {
+    return VERSION_STRING;
   }
 
 } // namespace libecs

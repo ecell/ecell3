@@ -31,8 +31,12 @@
 
 #ifndef __DEFS_HPP
 #define __DEFS_HPP
+ 
+#if defined( __CYGWIN__ )
+#define WIN32 __CYGWIN__
+#endif /* __CYGWIN __ */
 
-#if defined(WIN32)
+#if defined( WIN32 )
 #if defined(_MSC_VER)
 #define _USE_MATH_DEFINES
 #if _MANAGED
@@ -41,6 +45,8 @@
 #endif /* _MANAGED */
 /* suppress deprecation warnings */
 #pragma warning(disable:4996)
+/* suppress DLL import warnings */
+#pragma warning(disable:4251)
 #endif /* _MSC_VER */
 #endif /* WIN32 */
 
@@ -500,15 +506,17 @@ typedef const mytype & mytype ## Cref;
 } // namespace libecs
 
 // WIN32 stuff
-#if defined(WIN32)
+#if defined( WIN32 )
 
-#ifdef LIBECS_EXPORTS
+#if defined( LIBECS_EXPORTS ) || defined( DLL_EXPORT )
 #define LIBECS_API __declspec(dllexport)
 #else
 #define LIBECS_API __declspec(dllimport)
 #endif /* LIBECS_EXPORTS */
 
+#if !defined( __CYGWIN__ )
 #define fmin(x, y) __min(x, y)
+#endif /* __CYGWIN__ */
 
 #else
 
@@ -520,9 +528,9 @@ typedef const mytype & mytype ## Cref;
 
 /*
   Do not modify
-  $Author: sachiboo $
-  $Revision: 2616 $
-  $Date$
+  $Author: moriyoshi $
+  $Revision: 2990 $
+  $Date: 2008-01-19 16:36:03 +0900 (土, 19  1月 2008) $
   $Locker$
 */
 

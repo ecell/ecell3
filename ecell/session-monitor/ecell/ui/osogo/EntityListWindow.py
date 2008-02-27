@@ -31,7 +31,9 @@ import operator
 import string
 import re
 import copy
+from warnings import *
 
+import ecell.identifiers as identifiers
 import ecell.util as util
 
 from constants import *
@@ -194,9 +196,6 @@ class EntityListWindow( SeparativePane ):
     '''EntityListWindow
     '''
 
-    DEFAULT_VARIABLE_PROPERTY = 'Value'
-    DEFAULT_PROCESS_PROPERTY = 'Activity'
-
     COMMON_COLUMN_INFO_MAP= {
         'ID':        gobject.TYPE_STRING,
         'Classname': gobject.TYPE_STRING,
@@ -288,7 +287,7 @@ class EntityListWindow( SeparativePane ):
         selection.set_mode( gtk.SELECTION_MULTIPLE )
         selection.connect( 'changed', self.selectVariable )
 
-        aFullPN = util.convertFullIDToFullPN( util.createFullID ( 'System::/' ) )
+        aFullPN = identifiers.FullID( 'System::/' ).createFullPN( '' )
         self.theQueue = FullPNQueue( [ aFullPN ] )
         self.addChild( self.theQueue, 'navigator_area' )
         self.theQueue.initUI()
@@ -297,8 +296,7 @@ class EntityListWindow( SeparativePane ):
 
         # property window
         aPropertyWindow = self.theSession.createPluginWindow(
-            'PropertyWindow',
-            [ ( SYSTEM, '', '/', '' ) ] )
+            'PropertyWindow', [ aFullPN ] )
         aPropertyWindow.setStatusBar( self.theSession.getStatusBar() )
         self.addChild( aPropertyWindow, 'property_area' )
         aPropertyWindow.initUI()
@@ -548,7 +546,7 @@ class EntityListWindow( SeparativePane ):
         self.updateLists()
 
     def constructSystemTree( self, parent, fullID ):
-        newlabel = fullID[ID] 
+        newlabel = fullID.id
 
         systemStore = self.systemTree.get_model()
         iter  = systemStore.append( parent )
@@ -556,15 +554,12 @@ class EntityListWindow( SeparativePane ):
         key = str( systemStore.get_path( iter ) )
         systemStore.set_data( key, fullID )
 
-        systemPath = util.createSystemPathFromFullID( fullID )
+        systemPath = fullID.toSystemPath()
         systemList = self.theSession.getEntityList( 'System', systemPath )
+
         systemListLength = len( systemList )
-
-        if  systemListLength == 0:
-            return
-
         for systemID in systemList:
-            newSystemFullID = ( SYSTEM, systemPath, systemID )
+            newSystemFullID = systemPath.createSystem( systemID )
             self.constructSystemTree( iter, newSystemFullID )
 
             path = systemStore.get_path( iter )
@@ -572,8 +567,7 @@ class EntityListWindow( SeparativePane ):
                 self.systemTree.expand_row( path, True )
 
     def reconstructSystemTree( self ):
-        rootSystemFullID = util.createFullID( 'System::/' )
-        self.constructSystemTree( None, rootSystemFullID )
+        self.constructSystemTree( None, identifiers.FullID( SYSTEM, '', '/' ) )
         self.systemTreeConstructed = True
 
     def reconstructLists( self ):
@@ -598,18 +592,13 @@ class EntityListWindow( SeparativePane ):
             self.PROCESS_COLUMN_INFO_MAP )
         self.updateListLabels()
 
-    def reconstructEntityList( self, type, view, systemList, columnList, columnInfoList ):
-        # get the entity list in the selected system(s)
-        typeID = ENTITYTYPE_DICT[ type ]
-
+    def reconstructEntityList( self, typeID, view, systemList, columnList, columnInfoList ):
         fullIDList = []
         for systemFullID in systemList:
-
-            systemPath = util.createSystemPathFromFullID( systemFullID )
-
-            idList = self.theSession.getEntityList( type, systemPath )
-            fullIDList += [ ( typeID, systemPath, id ) for id in idList ]
-
+            systemPath = systemFullID.toSystemPath()
+            for id in self.theSession.getEntityList( typeID, systemPath ):
+                fullIDList.append(
+                    identifiers.FullID( typeID, systemPath, id ) )
 
         entityStore = view.get_model()
 
@@ -652,7 +641,7 @@ class EntityListWindow( SeparativePane ):
 
             iter = entityStore.append( valueList )
             iterString = entityStore.get_string_from_iter( iter )
-            entityStore.set_data( iterString, util.createFullIDString( fullID ) )
+            entityStore.set_data( iterString, fullID )
 
     def doSelection( self, aFullPNList ):
         if self.theSession.getModelWalker() == None:
@@ -667,11 +656,12 @@ class EntityListWindow( SeparativePane ):
         targetFullIDList = []
 
         if aFullPNList[0][TYPE] != SYSTEM:
-            targetFullIDList += [ util.createFullIDFromSystemPath(
-                aFullPN[SYSTEMPATH] )  for aFullPN in aFullPNList ]
+            for aFullPN in aFullPNList:
+                targetFullIDList.append(
+                    aFullPN.fullID.getSuperSystemPath().toFullID() )
         else:
             for aFullPN in aFullPNList:
-                targetFullIDList.append( util.convertFullPNToFullID( aFullPN ) )
+                targetFullIDList.append( aFullPN.fullID )
 
         # if to slow there should be a check whether this is needed in all cases
         donotHandle = self.donotHandle
@@ -681,7 +671,7 @@ class EntityListWindow( SeparativePane ):
 
         for  targetFullID in targetFullIDList:
             #doselection
-            targetPath = util.createSystemPathFromFullID( targetFullID )
+            targetPath = targetFullID.toSystemPath()
             anIter = self.getSysTreeIter( targetPath )
 
             aPath = self.theSysTreeStore.get_path( anIter )
@@ -692,47 +682,27 @@ class EntityListWindow( SeparativePane ):
 
         self.reconstructLists()
 
-    def getSysTreeIter( self, aSysPath, anIter = None ):
+    def getSysTreeIter( self, aSysPath ):
         """
         returns iter of string aSysPath or None if not available
         """
         systemStore = self.systemTree.get_model()
-        if anIter == None:
-            anIter = systemStore.get_iter_first()
-            if aSysPath == '/':
-                return anIter
+        for aPathComp in aSysPath:
+            if aPathComp == '':
+                anIter = systemStore.get_iter_first()
             else:
-                aSysPath = aSysPath.strip ('/')
-
-        # get first path string
-        anIndex = aSysPath.find( '/' )
-        if anIndex == -1:
-            anIndex = len( aSysPath )
-        firstTag = aSysPath[ 0 : anIndex ]
-
-        # create remaining path string
-        aRemainder = aSysPath[ anIndex + 1 : len( aSysPath ) ]
-
-        # find iter of first path string
-        numChildren = systemStore.iter_n_children( anIter )
-        isFound = False
-        for i in range( 0, numChildren):
-            childIter = systemStore.iter_nth_child( anIter, i )
-
-            if systemStore.get_value( childIter, 0) == firstTag:
-                isFound = True
-                break
-
-        # if not found return None
-        if not isFound:
-            return None
-
-        # if remainder is '' return iter
-        if aRemainder == '':
-            return childIter
-
-        # return recursive remainder with iter
-        return self.getSysTreeIter( aRemainder, childIter )
+                # find iter of first path string
+                numChildren = systemStore.iter_n_children( anIter )
+                found = False
+                for i in range( 0, numChildren ):
+                    childIter = systemStore.iter_nth_child( anIter, i )
+                    if systemStore.get_value( childIter, 0 ) == aPathComp:
+                        found = True
+                        break
+                if not found:
+                    return None
+                anIter = childIter
+        return anIter
 
     def __expandRow( self, aPath ):
         """
@@ -805,7 +775,7 @@ class EntityListWindow( SeparativePane ):
         systemFullIDList = self.getSelectedSystemList()
         fullPNList = []
         for systemFullID in systemFullIDList:
-            fullPNList.append( util.convertFullIDToFullPN( systemFullID ) )
+            fullPNList.append( systemFullID.createFullPN( '' ) )
         self.donotHandle = True
         self.theQueue.pushFullPNList( fullPNList )
         self.donotHandle = False
@@ -856,16 +826,12 @@ class EntityListWindow( SeparativePane ):
             for i in columnInfoMap.keys() ]
         for row in model:
             iter = row.iter
-            aFullIDString = model.get_data( model.get_string_from_iter( iter ) )
-
-            stub = self.theSession.createEntityStub(
-                util.createFullID( aFullIDString ) )
-
+            aFullID = model.get_data( model.get_string_from_iter( iter ) )
+            stub = self.theSession.createEntityStub( aFullID )
             columnList = []
             for propertyColumn in propertyColumnList:
                 newValue = stub[ propertyColumn[1] ]
-                columnList += [ propertyColumn[0], "%g"%(newValue) ] 
-
+                columnList += [ propertyColumn[0], "%g" % newValue ] 
             model.set( iter, *columnList )
 
     def updateListLabels( self ):
@@ -933,11 +899,11 @@ class EntityListWindow( SeparativePane ):
         '''
 
         model = self.variableTree.get_model()
-        data = model.get_data( model.get_string_from_iter( iter ) )
-        assert( data != None )
-        entityFullID = util.createFullID( data )
-        entityFullPN = entityFullID + ( self.DEFAULT_VARIABLE_PROPERTY, )
-        self.theSelectedFullPNList.append( entityFullPN )
+        entityFullID = model.get_data( model.get_string_from_iter( iter ) )
+        assert( isinstance( entityFullID, identifiers.FullID ) )
+        self.theSelectedFullPNList.append(
+            entityFullID.createFullPN(
+                DEFAULT_VARIABLE_PROPERTY ) )
 
     def process_select_func(self,tree,path,iter):
         '''function for process list selection
@@ -945,10 +911,10 @@ class EntityListWindow( SeparativePane ):
         Return None
         '''
         model = self.processTree.get_model()
-        data = model.get_data( model.get_string_from_iter( iter ) )
-        entityFullID = util.createFullID( data )
-        entityFullPN = entityFullID + ( self.DEFAULT_PROCESS_PROPERTY, )
-        self.theSelectedFullPNList.append( entityFullPN )
+        entityFullID = model.get_data( model.get_string_from_iter( iter ) )
+        assert( isinstance( entityFullID, identifiers.FullID ) )
+        self.theSelectedFullPNList.append(
+            entityFullID.createFullPN( DEFAULT_PROCESS_PROPERTY ) )
 
     def createPluginWindow( self, aPluginWindowType ) :
         """creates new PluginWindow instance(s)

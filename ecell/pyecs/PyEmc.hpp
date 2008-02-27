@@ -64,7 +64,6 @@ public:
 
   virtual ~PythonCallable()
   {
-    ; // do nothing
   }
 
 protected:

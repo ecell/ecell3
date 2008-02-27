@@ -307,7 +307,7 @@ class CompartmentImporter( SBaseImporter ):
             return
 
         if fullID[ 1 ] != '':        
-            newSysID = ecell.ecssupport.createFullIDFromSystemPath( fullID[ 1 ] )
+            newSysID = ecell.ecssupport.convertSystemPathToFullID( fullID[ 1 ] )
             newSysIDString = ecell.ecssupport.createFullIDString( newSysID )
             if not anEml.isEntityExist( newSysIDString ):
                 self.createEntity( anEml, newSysIDString )
@@ -336,7 +336,7 @@ class CompartmentImporter( SBaseImporter ):
 
         if self.theSBase.isSetSize():
             fullID = ecell.ecssupport.createFullID( fullIDString )
-            fullPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
+            fullPath = ecell.ecssupport.convertFullIDToSystemPath( fullID )
             sizeFullIDString = 'Variable:%s:SIZE' % ( fullPath )
             if not anEml.isEntityExist( sizeFullIDString ):
                 anEml.createEntity( 'Variable', sizeFullIDString )
@@ -348,7 +348,7 @@ class CompartmentImporter( SBaseImporter ):
 
         else:
             fullID = ecell.ecssupport.createFullID( fullIDString )
-            fullPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
+            fullPath = ecell.ecssupport.convertFullIDToSystemPath( fullID )
             sizeFullIDString = 'Variable:%s:SIZE' % ( fullPath )
             if not anEml.isEntityExist( sizeFullIDString ):
                 anEml.createEntity( 'Variable', sizeFullIDString )
@@ -611,7 +611,7 @@ class RuleImporter( SBaseImporter ):
             
             elif sbaseType == libsbml.SBML_COMPARTMENT:
                 fullID = ecell.ecssupport.createFullID( fullIDString )
-                systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
+                systemPath = ecell.ecssupport.convertFullIDToSystemPath( fullID )
                 fullIDString = 'Variable:%s:SIZE' % ( systemPath )
 
             else:
@@ -707,7 +707,7 @@ class RuleImporter( SBaseImporter ):
                 elif sbaseType == libsbml.SBML_COMPARTMENT:
 
                     fullID = ecell.ecssupport.createFullID( fullIDString )
-                    systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
+                    systemPath = ecell.ecssupport.convertFullIDToSystemPath( fullID )
                     fullIDString = 'Variable:%s:SIZE' % ( systemPath )
                     
                     variableName = self.__addVariableReference( fullIDString )
@@ -973,7 +973,7 @@ class ReactionImporter( SBaseImporter ):
                 elif sbaseType == libsbml.SBML_COMPARTMENT:
 
                     fullID = ecell.ecssupport.createFullID( fullIDString )
-                    systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
+                    systemPath = ecell.ecssupport.convertFullIDToSystemPath( fullID )
                     fullIDString = 'Variable:%s:SIZE' % ( systemPath )
                     
                     variableName = self.__addVariableReference( fullIDString )

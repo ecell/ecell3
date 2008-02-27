@@ -30,418 +30,313 @@
 # E-Cell Project, Lab. for Bioinformatics, Keio University.
 #
 
-import string
-from DataFile import *
 import numpy
 import TableIO
 
-# extension
-ECD_EXTENSION='ecd'
+from ecell.DataFile import DataFile
+import ecell.ecs_constants as consts
 
-# ------------------------------------------------------------------
-# ECDDataFile -> DataFile
-#  - manages one ECD format file object
-# ------------------------------------------------------------------
+__all__ = (
+    'ECDDataFile'
+    )
+
 class ECDDataFile( DataFile ):
-
-
-	# ------------------------------------------------------------------
-	# Constructor
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def __init__(self, data=None, filename=None):
-
-		DataFile.__init__(self)
-		self.theDataName=''
-		self.theSizeOfColumn=0
-		self.theSizeOfLine=0
-		self.theLabel= ( 't', 'value', 'avg', 'min', 'max' )
-		self.theNote=''
-
-		if data is None:
-			self.setData( numpy.array([[]]) )
-		else:
-			self.setData( data )
-
-		if filename is not None:
-			self.setFileName( filename )
-
-	# end of __init__
-
-
-	# ------------------------------------------------------------------
-	# save ( override the method of DataFile class )
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ------------------------------------------------------------------
-	def save( self, aFileName = None ):
-
-		if aFileName is not None:
-			self.setFileName( aFileName )
-
-		# open the file
-		aOutputFile = open(self.theFileName,'w')
-
-		# writes header
-		aOutputFile.write(self.getHeaderString())
-
-                aOutputFile.close()
-		TableIO.writeArray( self.theFileName, self.theData, 1 )
-
-
-	# end of save
-
-
-	# ------------------------------------------------------------------
-	# load ( override the method of DataFile class )
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ------------------------------------------------------------------
-	def load( self, aFileName = None ):
-
-		if aFileName is not None:
-			self.setFileName( aFileName )
-
-		def readOneLineData( aInputFile, aKey ):
-			aBuff = aInputFile.readline() 
-			if aBuff.find( aKey ) != 0:
-				raise "Error: %s is not ECD format. '%s' line can't be found." %aKey
-			return string.strip(aBuff[len(aKey):]) 
-
-
-		if( len(self.theFileName) == 0):
-			raise "Error: empty filename."
-
-		# open the file
-		aInputFile = open(self.theFileName,'r')
-
-		# read header
-
-		#FIXME: do not depend on the order of header elements
-
-		# --------------------------------------------------------
-		# [1] read DATA: 
-		# --------------------------------------------------------
-		self.setDataName( readOneLineData(aInputFile,'#DATA:') )
-
-		# --------------------------------------------------------
-		# [2] read SIZE:
-		# --------------------------------------------------------
-		# ignore SIZE:
-		readOneLineData(aInputFile,'#SIZE:')
-
-		# --------------------------------------------------------
-		# [3] read LABEL:
-		# --------------------------------------------------------
-		self.setLabel( readOneLineData(aInputFile,'#LABEL:') )
-
-		# --------------------------------------------------------
-		# [4] read NOTE:
-		# --------------------------------------------------------
-		self.setNote( readOneLineData(aInputFile,'#NOTE:') )
-
-		# --------------------------------------------------------
-		# [5] read some lines before matrix data
-		# --------------------------------------------------------
-
-		# read matrix
-		while(1):   # while 1
-			aBuff = aInputFile.readline()
-
-			# if EOF is found, breaks this loop.
-			if aBuff == '':
-				break	
-
-		# if separator is found, breaks this loop.
-			if aBuff.find( '#----------------------' ) == 0:
-				break
-
-		# end of while 1
-
-		# ----------------------------------------------------------
-		# [6] reads matrix data
-		# ----------------------------------------------------------
-
- 		#close the file 
-		aInputFile.close()
-
-		self.setData( TableIO.readTableAsArray( self.theFileName, '#' ) )
-
-	# end of load
-
-
-
-
-	# ------------------------------------------------------------------
-	# setFileName ( override method of DataFile)
-	#
-	# aFileName(string) : file name
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def setFileName( self, aFileName ):
-
-		if aFileName.find( ECD_EXTENSION ) == \
-			len( aFileName ) - len( ECD_EXTENSION ) :
-			DataFile.setFileName( self, aFileName )
-		else:
-			DataFile.setFileName( self, aFileName + '.' + ECD_EXTENSION )
-
-	# end of setFileName
-
-	# ------------------------------------------------------------------
-	# setDataName 
-	#
-	# aDataName(string) : a value of DATA
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def setDataName( self, aDataName ):
-		
-		self.theDataName = aDataName
-
-	# end of setDataName
-
-	# ------------------------------------------------------------------
-	# getDataName 
-	#
-	# return -> the value of DATA
-	# ------------------------------------------------------------------
-	def getDataName( self ):
-		
-		return self.theDataName 
-
-	# end of getDataName
-
-
-	# ------------------------------------------------------------------
-	# setLabel
-	#
-	# aLabel(string) : a value of LABEL
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def setLabel( self, aLabel ):
-		
-		self.theLabel = string.split( aLabel )
-
-	# end of setLabel
-
-
-	# ------------------------------------------------------------------
-	# getLabel
-	#
-	# return -> the value of label
-	# ------------------------------------------------------------------
-	def getLabel( self ):
-		
-		return self.theLabel
-
-	# end of getLabel
-
-
-	# ------------------------------------------------------------------
-	# setNote
-	#
-	# aNote(string) : a value of NOTE
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def setNote( self, aNote ):
-
-		self.theNote = aNote
-
-	# end of setNote
-
-
-	# ------------------------------------------------------------------
-	# getNote
-	#
-	# return -> the value of NOTE
-	# ------------------------------------------------------------------
-	def getNote( self ):
-		
-		return self.theNote
-			
-	# end of getNote
-
-	# ------------------------------------------------------------------
-	# setSizeOfColumn
-	#
-	# aSizeOfColumn(integer) : a value of first element of SIZE
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def setSizeOfColumn( self, aSizeOfColumn ):
-
-		if type(aSizeOfColumn) != type(0):
-			raise "Error : aSizeOfColumn(=%s) must be integer." %aSizeOfColumn
-
-		self.theSizeOfColumn = aSizeOfColumn
-
-	# end of setSizeOfColumn
-
-
-	# ------------------------------------------------------------------
-	# getSizeOfColumn
-	#
-	# return -> the value of NOTE
-	# ------------------------------------------------------------------
-	def getSizeOfColumn( self ):
-
-		return self.theSizeOfColumn 
-
-	# end of getSizeOfColumn
-
-
-	# ------------------------------------------------------------------
-	# setSizeOfLine
-	#
-	# aSizeOfLine(integer) : a value of second element of SIZE
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def setSizeOfLine( self, aSizeOfLine ):
-
-		if type(aSizeOfLine) != type(0):
-			raise "Error : aSizeOfLine(=%s) must be integer." %aSizeOfLine
-
-		self.theSizeOfLine = aSizeOfLine
-
-	# end of setSizeOfLine
-
-
-	# ------------------------------------------------------------------
-	# getSizeOfLine
-	#
-	# ------------------------------------------------------------------
-	def getSizeOfLine( self ):
-
-		return self.theSizeOfLine 
-
-	# end of getSizeOfLine
-
-
-	# ------------------------------------------------------------------
-	# setSize
-	#
-	# aSizeOfColumn(string) : a value of first element of SIZE
-	# aSizeOfLine(string) : a value of second element of SIZE
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def setSize( self, aSizeOfColumn, aSizeOfLine ):
-
-		self.setSizeOfColumn( aSizeOfColumn )
-		self.setSizeOfLine( aSizeOfLine )
-
-	# end of setSize
-
-
-	# ------------------------------------------------------------------
-	# getSize
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def getSize( self ):
-
-		return ( self.theSizeOfColumn, self.theSizeOfLine )
-
-	# end of getSize
-
-
-	# ------------------------------------------------------------------
-	# setData
-	#   - checks only aData type
-	#   - does not check each element type.
-	#
-	# aData(tuple of tuple) : a matrix data
-	#
-	# return -> None
-	# This method is throwable exception.
-	# ------------------------------------------------------------------
-	def setData( self, aData ):
-
-		#if type(aData) != type(()):
-		#	raise "Error : aData must be tuple of tuple."
-
-		#if len(aData) > 0 :
-		#	if type(aData[0]) != type(()):
-		#		raise "Error : aData must be tuple of tuple."
-
-		self.theData = aData
-		self.setSize( len( aData[0] ), len( aData ) )
-
-	# end of getData
-
-	def getData( self ):
-		return self.theData
-
-
-	# ------------------------------------------------------------------
-	# getHeaderList
-	#
-	# return -> header (list of string)
-	# ------------------------------------------------------------------
-	def getHeaderList( self ):
-
-		aHeaderList = []		
-		aHeaderList.append( '#DATA: %s' %self.theDataName )
-		aHeaderList.append( '#SIZE: %d %d' %(self.theSizeOfColumn,self.theSizeOfLine) )
-		aHeaderList.append( '#LABEL: %s' % string.join( self.theLabel, '\t' ) )
-		aHeaderList.append( '#NOTE: %s' %self.theNote )
-		aHeaderList.append( '#' )
-		aHeaderList.append( '#----------------------' )
-
-		return aHeaderList
-
-	# end of getHeaderList
-
-
-	# ------------------------------------------------------------------
-	# getHeaderString
-	#
-	# return -> header (string)
-	# ------------------------------------------------------------------
-	def getHeaderString( self ):
-
-		aHeaderList = self.getHeaderList()
-		aHeaderString = ''
-		for line in aHeaderList:
-			aHeaderString = aHeaderString + line + '\n'
-
-		return aHeaderString
-
-	# end of getHeaderString
-
-
-
-# end of ECDDataFile
-
+    """
+    ECDDataFile -> DataFile
+     - manages one ECD format file object
+    """
+    def __init__(self, data=None, filename=None):
+        """
+        Constructor
+        
+        return -> None
+        """
+        DataFile.__init__(self)
+        self.theDataName=''
+        self.theSizeOfColumn=0
+        self.theSizeOfLine=0
+        self.theLabel= ( 't', 'value', 'avg', 'min', 'max' )
+        self.theNote=''
+
+        if data is None:
+            self.setData( numpy.array([[]]) )
+        else:
+            self.setData( data )
+
+        if filename is not None:
+            self.setFileName( filename )
+
+    def save( self, aFileName = None ):
+        """
+        save ( override the method of DataFile class )
+        
+        return -> None
+        This method may throw an exception.
+        """
+        if aFileName is not None:
+            self.setFileName( aFileName )
+
+        # open the file
+        aOutputFile = open(self.theFileName,'w')
+
+        # writes header
+        aOutputFile.write(self.getHeaderString())
+        aOutputFile.close()
+        TableIO.writeArray( self.theFileName, self.theData, 1 )
+
+    def load( self, aFileName = None ):
+        """
+        load ( override the method of DataFile class )
+        
+        return -> None
+        This method may throw an exception.
+        """
+        if aFileName is not None:
+            self.setFileName( aFileName )
+
+        def readOneLineData( aInputFile, aKey ):
+            aBuff = aInputFile.readline() 
+            if aBuff.find( aKey ) != 0:
+                raise "Error: %s is not ECD format. '%s' line can't be found." %aKey
+            return aBuff[len(aKey):].strip()
+
+
+        if( len(self.theFileName) == 0):
+            raise "Error: empty filename."
+
+        # open the file
+        aInputFile = open(self.theFileName,'r')
+
+        # read header
+
+        #FIXME: do not depend on the order of header elements
+
+        # [1] read DATA: 
+        self.setDataName( readOneLineData(aInputFile,'#DATA:') )
+
+        # [2] read SIZE:
+        # ignore SIZE:
+        readOneLineData(aInputFile,'#SIZE:')
+
+        # [3] read LABEL:
+        self.setLabel( readOneLineData(aInputFile,'#LABEL:') )
+
+        # [4] read NOTE:
+        self.setNote( readOneLineData(aInputFile,'#NOTE:') )
+
+        # [5] read some lines before matrix data
+        # read matrix
+        while(1):   # while 1
+            aBuff = aInputFile.readline()
+
+            # if EOF is found, breaks this loop.
+            if aBuff == '':
+                break    
+
+        # if separator is found, breaks this loop.
+            if aBuff.find( '#----------------------' ) == 0:
+                break
+
+        # end of while 1
+
+        # [6] reads matrix data
+        #close the file 
+        aInputFile.close()
+
+        self.setData( TableIO.readTableAsArray( self.theFileName, '#' ) )
+
+    def setFileName( self, aFileName ):
+        """
+        setFileName ( override method of DataFile)
+        
+        aFileName(string) : file name
+        
+        return -> None
+        """
+        if aFileName.find( consts.ECD_EXTENSION ) == \
+            len( aFileName ) - len( consts.ECD_EXTENSION ) :
+            DataFile.setFileName( self, aFileName )
+        else:
+            DataFile.setFileName( self, aFileName + '.' + consts.ECD_EXTENSION )
+
+    def setDataName( self, aDataName ):
+        """
+        setDataName 
+        
+        aDataName(string) : a value of DATA
+        
+        return -> None
+        """
+        self.theDataName = aDataName
+
+    def getDataName( self ):
+        """
+        getDataName 
+        
+        return -> the value of DATA
+        """ 
+        return self.theDataName 
+
+    def setLabel( self, aLabel ):
+        """
+        setLabel
+        
+        aLabel(string) : a value of LABEL
+        
+        return -> None
+        """
+        self.theLabel = aLabel.split()
+
+    def getLabel( self ):
+        """
+        getLabel
+        
+        return -> the value of label
+        """
+        return self.theLabel
+
+    def setNote( self, aNote ):
+        """
+        setNote
+        
+        aNote(string) : a value of NOTE
+        
+        return -> None
+        """
+        self.theNote = aNote
+
+    def getNote( self ):
+        """
+        getNote
+        
+        return -> the value of NOTE
+        """
+        return self.theNote
+
+    def setSizeOfColumn( self, aSizeOfColumn ):
+        """
+        setSizeOfColumn
+        
+        aSizeOfColumn(integer) : a value of first element of SIZE
+        
+        return -> None
+        """
+        if type(aSizeOfColumn) != type(0):
+            raise "Error : aSizeOfColumn(=%s) must be integer." %aSizeOfColumn
+
+        self.theSizeOfColumn = aSizeOfColumn
+
+    def getSizeOfColumn( self ):
+        """
+        getSizeOfColumn
+        
+        return -> the value of NOTE
+        """
+        return self.theSizeOfColumn 
+
+    def setSizeOfLine( self, aSizeOfLine ):
+        """
+        setSizeOfLine
+        
+        aSizeOfLine(integer) : a value of second element of SIZE
+        
+        return -> None
+        """
+        if type(aSizeOfLine) != type(0):
+            raise "Error : aSizeOfLine(=%s) must be integer." %aSizeOfLine
+
+        self.theSizeOfLine = aSizeOfLine
+
+    def getSizeOfLine( self ):
+        """
+        getSizeOfLine
+        """
+        return self.theSizeOfLine 
+
+    def setSize( self, aSizeOfColumn, aSizeOfLine ):
+        """
+        setSize
+        
+        aSizeOfColumn(string) : a value of first element of SIZE
+        aSizeOfLine(string) : a value of second element of SIZE
+        
+        return -> None
+        """
+        self.setSizeOfColumn( aSizeOfColumn )
+        self.setSizeOfLine( aSizeOfLine )
+
+    def getSize( self ):
+        """
+        getSize
+        
+        return -> None
+        """
+        return ( self.theSizeOfColumn, self.theSizeOfLine )
+
+    def setData( self, aData ):
+        """
+        setData
+          - checks only aData type
+          - does not check each element type.
+        
+        aData(tuple of tuple) : a matrix data
+        
+        return -> None
+        This method may throw an exception.
+        """
+        self.theData = aData
+        self.setSize( len( aData[0] ), len( aData ) )
+
+    def getData( self ):
+        return self.theData
+
+    def getHeaderList( self ):
+        """
+        getHeaderList
+        
+        return -> header (list of string)
+        """
+        aHeaderList = []        
+        aHeaderList.append( '#DATA: %s' %self.theDataName )
+        aHeaderList.append( '#SIZE: %d %d' %(self.theSizeOfColumn,self.theSizeOfLine) )
+        aHeaderList.append( '#LABEL: %s' % "\t".join( self.theLabel ) )
+        aHeaderList.append( '#NOTE: %s' %self.theNote )
+        aHeaderList.append( '#' )
+        aHeaderList.append( '#----------------------' )
+
+        return aHeaderList
+
+    def getHeaderString( self ):
+        """
+        getHeaderString
+        
+        return -> header (string)
+        """
+        aHeaderList = self.getHeaderList()
+        aHeaderString = ''
+        for line in aHeaderList:
+            aHeaderString = aHeaderString + line + '\n'
+
+        return aHeaderString
 
 if __name__ == "__main__":
+    a = ECDDataFile()
+    a.setDataName('name')
+    a.setLabel('testlabel')
+    a.setNote('testnote')
 
-	def main():
-		a = ECDDataFile()
-		a.setDataName('name')
-		a.setLabel('testlabel')
-		a.setNote('testnote')
+    aMat = ((3,4),(10,20),(2000,111))
 
-		aMat = ((3,4),(10,20),(2000,111))
+    a.setData( aMat )
+    
+    a.save('hoge')
+    del a
+    
+    b = ECDDataFile()
+    b.load('hoge')
+    print b.getHeaderString()
+    b.save('hoge1')
 
-		a.setData( aMat )
-		
-		a.save('hoge')
-		del a
-		
-		b = ECDDataFile()
-		b.load('hoge')
-		print b.getHeaderString()
-		b.save('hoge1')
-
-	main()
+    main()
 
 

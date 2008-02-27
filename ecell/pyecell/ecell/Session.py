@@ -31,26 +31,24 @@ import eml
 import sys
 import os
 import time
-
+from decimal import Decimal
 from numpy import *
-import ecell.ecs
-import ecell.emc
+from warnings import *
+
+import ecell.identifiers as identifiers
+import ecell.ecs as ecs
+import ecell.emc as emc
+from ecell.EntityStub import EntityStub
 
 from ecell.ecssupport import *
-from ecell.DataFileManager import *
-from ecell.ECDDataFile import *
+from ecell.DataFileManager import DataFileManager
+from ecell.ECDDataFile import ECDDataFile
 
-#from ecell.FullID import *
-#from ecell.util import *
-#from ecell.ECS import *
+import ecell.util as util
 
-BANNERSTRING =\
-'''ecell3-session [ E-Cell SE Version %s, on Python Version %d.%d.%d ]
-Copyright (C) 1996-2006 Keio University.
-Copyright (C) 2005-2006 The Molecular Sciences Institute.
-More info: http://www.e-cell.org/software'''\
-% ( ecell.ecs.getLibECSVersion(), sys.version_info[0], sys.version_info[1], sys.version_info[2] )
-
+__all__ = (
+    'Session'
+    )
 
 class Session:
     'Session class'
@@ -61,37 +59,16 @@ class Session:
         self.theMessageMethod = self.__plainMessageMethod
 
         if aSimulator is None:
-            self.theSimulator = ecell.emc.Simulator()
+            self.theSimulator = emc.Simulator()
         else:
             self.theSimulator = aSimulator
 
         self.theModelName = ''
 
-    # Session methods
-    def loadScript( self, ecs, parameters={} ):
-        ( ecsDir, ecsFile ) = os.path.split( ecs )
-        if ecsDir != '':
-            os.chdir( ecsDir )
-        aContext = self.__createScriptContext( parameters )
-
-        execfile( ecsFile, aContext )
-            
-    def interact( self, parameters={} ):
-        aContext = self.__createScriptContext( parameters )
-        if os.name != "nt":
-            import readline # to provide convenient commandline editing :)
-        import code
-        anInterpreter = code.InteractiveConsole( aContext )
-
-        self._prompt = self._session_prompt( self )
-        anInterpreter.runsource( 'import sys; sys.ps1=theSession._prompt; del sys' )
-
-        anInterpreter.interact( BANNERSTRING )
-
     def loadModel( self, aModel ):
         # aModel : an EML instance, a file name (string) or a file object
         # return -> None
-        # This method can thwor exceptions. 
+        # This method may throw an exception. 
 
         # checks the type of aModel
 
@@ -145,7 +122,7 @@ class Session:
 
         # calls save methods
         self.__saveAllStepper( anEml )
-        self.__saveEntity( anEml, 'System::/' )
+        self.__saveEntity( anEml, 'System:/:' )
         self.__saveAllEntity( anEml )
         self.__saveProperty( anEml )
 
@@ -195,7 +172,7 @@ class Session:
     def stop( self ):
         self.theSimulator.stop()
 
-    def step( self, num=1 ):
+    def step( self, num = 1 ):
         self.theSimulator.step( num )
 
     def getNextEvent( self ):
@@ -219,7 +196,9 @@ class Session:
 
     # Entity methods
     def getEntityList( self, entityType, systemPath ):
-        return self.theSimulator.getEntityList( entityType, systemPath )
+        if type( entityType ) == int or type( entityType ) == Decimal:
+            entityType = ENTITYTYPE_LIST[ entityType ]
+        return self.theSimulator.getEntityList( entityType, str( systemPath or '' ) )
 
     def createEntityStub( self, fullid ):
         return EntityStub( self.theSimulator, fullid )
@@ -227,40 +206,34 @@ class Session:
     # Logger methods
     def getLoggerList( self ):
         return self.theSimulator.getLoggerList()
+
+    def getLoggedPNList( self ):
+        return [ identifiers.FullPN( aFullPNString )
+            for aFullPNString in self.theSimulator.getLoggerList() ]
         
     def createLogger( self, fullpn ):
-        self.message( 'createLogger method will be deprecated. Use LoggerStub.' )
+        warning( 'Use LoggerStub instead', DeprecationWarning, stacklevel = 2 )
         aStub = self.createLoggerStub( fullpn )
         aStub.create()
 
     def createLoggerStub( self, fullpn ):
         return LoggerStub( self.theSimulator, fullpn )
 
-    def saveLoggerData( self, fullpn=0, aSaveDirectory='./Data', aStartTime=-1, anEndTime=-1, anInterval=-1 ):
-        
-        # -------------------------------------------------
-        # Check type.
-        # -------------------------------------------------
-        
-        aLoggerNameList = []
-
-        if type( fullpn ) == str:
-            aLoggerNameList.append( fullpn )
-        elif not fullpn :
+    def saveLoggerData( self, anOpaqueData, aSaveDirectory='./Data', aStartTime = -1, anEndTime = -1, anInterval = -1 ):
+        if anOpaqueData == None:
             aLoggerNameList = self.getLoggerList()
-        elif type( fullpn ) == list: 
-            aLoggerNameList = fullpn
-        elif type( fullpn ) == tuple: 
-            aLoggerNameList = fullpn
+        elif type( anOpaqueData ) == str or type( anOpaqueData ) == unicode:
+            aLoggerNameList = [ anOpaqueData ]
         else:
-            self.message( "%s is not suitable type.\nuse string or list or tuple"%fullpn )
-            return
-            
-        # -------------------------------------------------
-        # Execute saving.
-        # -------------------------------------------------
+            aLoggerNameList = anOpaqueData
+        aLoggerNameList = map( str, aLoggerNameList )
+
         if not os.path.isdir( aSaveDirectory ):
-           os.mkdir( aSaveDirectory )
+            try:
+                os.mkdir( aSaveDirectory )
+            except:
+                self.message( "Failed to create %s." % aSaveDirectory )
+                return
 
         # creates instance datafilemanager
         aDataFileManager = DataFileManager()
@@ -269,16 +242,11 @@ class Session:
         aDataFileManager.setRootDirectory( aSaveDirectory )
         
         aFileIndex=0
-
             
-            # gets all list of selected property name
+        # gets all list of selected property name
         for aFullPNString in aLoggerNameList: #(2)
-
-             # -------------------------------------------------
             # from [Variable:/CELL/CYTOPLASM:E:Value]
             # to   [Variable_CELL_CYTOPLASM_E_Value]
-             # -------------------------------------------------
-
             aRootIndex=find( aFullPNString, ':/' )
             aFileName=aFullPNString[:aRootIndex]+aFullPNString[aRootIndex+1:]
             aFileName=replace( aFileName, ':', '_' )
@@ -287,14 +255,11 @@ class Session:
             aECDDataFile = ECDDataFile()
             aECDDataFile.setFileName( aFileName )
             
-            # -------------------------------------------------
             # Gets logger
-            # -------------------------------------------------
             # need check if the logger exists
             aLoggerStub = self.createLoggerStub( aFullPNString )
             if not aLoggerStub.exists():
-                aErrorMessage='\nLogger doesn\'t exist.!\n'
-                self.message( aErrorMessage )
+                self.message( "Logger does not exist!" )
                 return None
             aLoggerStartTime= aLoggerStub.getStartTime()
             aLoggerEndTime= aLoggerStub.getEndTime()
@@ -309,9 +274,7 @@ class Session:
                 if not ( aLoggerStartTime < anEndTime < aLoggerEndTime ):
                     anEndTime = aLoggerEndTime
 
-            # -------------------------------------------------
             # gets the matrix data from logger.
-            # -------------------------------------------------
             if anInterval == -1:
                 # gets data with specifing interval 
                 aMatrixData = aLoggerStub.getData( aStartTime, anEndTime )
@@ -325,9 +288,7 @@ class Session:
             # sets matrix data
             aECDDataFile.setData(aMatrixData)
 
-            # -------------------------------------------------
             # adds data file to data file manager
-            # -------------------------------------------------
             aDataFileManager.getFileMap()[`aFileIndex`] = aECDDataFile
             
             aFileIndex = aFileIndex + 1
@@ -335,22 +296,16 @@ class Session:
             # for(2)
 
         try: #(1)
-                
             aDataFileManager.saveAll()
-
         except: #try(1)
-
-            # -------------------------------------------------
             # displays error message and exit this method.
-            # -------------------------------------------------
-
             import traceback 
             print __name__,
             aErrorMessageList = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
             for aLine in aErrorMessageList: 
                 self.message( aLine ) 
                 
-            aErrorMessage= "Error : could not save [%s] " %aFullPNString
+            aErrorMessage = "Error : could not save [%s] " %aFullPNString
             self.message( aErrorMessage )
 
 
@@ -359,7 +314,7 @@ class Session:
             # displays error message and exit this method.
             # -------------------------------------------------
             
-            aSuccessMessage= " All files you selected are saved. " 
+            aSuccessMessage = " All files you selected are saved. " 
             self.message( aSuccessMessage )
 
         # end of try(1)
@@ -399,24 +354,29 @@ class Session:
                                         'failed to set property [%s]: ' % (aProperty,) +\
                                         str( e ) )
 
-    def __loadEntity( self, anEml, aSystemPath='/' ):
-
+    def __loadEntity( self, anEml, aSystemPath = None ):
+        if aSystemPath == None:
+            self.__loadEntity( anEml, identifiers.SystemPath( "/" ) )
+            return
+        assert isinstance( aSystemPath, identifiers.SystemPath )
         aVariableList = anEml.getEntityList( 'Variable', aSystemPath )
-        aProcessList   = anEml.getEntityList( 'Process',   aSystemPath )
-        aSubSystemList = anEml.getEntityList( 'System',    aSystemPath )
+        aProcessList   = anEml.getEntityList( 'Process', aSystemPath )
+        aSubSystemList = anEml.getEntityList( 'System',  aSystemPath )
 
         self.__loadEntityList( anEml, 'Variable', aSystemPath, aVariableList )
         self.__loadEntityList( anEml, 'Process',  aSystemPath, aProcessList )
         self.__loadEntityList( anEml, 'System',   aSystemPath, aSubSystemList )
 
-        for aSystem in aSubSystemList:
-            aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
-            self.__loadEntity( anEml, aSubSystemPath )
+        for anID in aSubSystemList:
+            self.__loadEntity( anEml, identifiers.SystemPath( aSystemPath, anID ) )
 
-    def __loadAllProperty( self, anEml, aSystemPath='' ):
+    def __loadAllProperty( self, anEml, aSystemPath = None ):
+        if aSystemPath == None:
+            self.__loadPropertyList( anEml, 'System', '/', [ "" ] )
+            self.__loadAllProperty( anEml, identifiers.SystemPath( "/" ) )
+            return
         # the default of aSystemPath is empty because
         # unlike __loadEntity() this starts with the root system
-
         aVariableList  = anEml.getEntityList( 'Variable',  aSystemPath )
         aProcessList   = anEml.getEntityList( 'Process',   aSystemPath )
         aSubSystemList = anEml.getEntityList( 'System',    aSystemPath )
@@ -427,21 +387,28 @@ class Session:
         self.__loadPropertyList( anEml, 'System',\
                                  aSystemPath, aSubSystemList )
 
-        for aSystem in aSubSystemList:
-            aSubSystemPath = joinSystemPath( aSystemPath, aSystem )
-            self.__loadAllProperty( anEml, aSubSystemPath )
+        for anID in aSubSystemList:
+            self.__loadAllProperty( anEml,
+                identifiers.SystemPath( aSystemPath, anID ) )
 
     def __loadPropertyList( self, anEml, anEntityTypeString, aSystemPath, anIDList ):
 
         for anID in anIDList:
-            aFullID = anEntityTypeString + ':' + aSystemPath + ':' + anID
+            aFullID = identifiers.FullID(
+                anEntityTypeString, aSystemPath, anID )
             aPropertyList = anEml.getEntityPropertyList( aFullID )
 
             for aProperty in aPropertyList:                
-                aFullPN = aFullID + ':' + aProperty
+                aFullPN = identifiers.FullPN( aFullID, aProperty )
                 aValue = anEml.getEntityProperty( aFullPN )
                 try:
-                    self.theSimulator.loadEntityProperty( aFullPN, aValue )
+                    # Enclose it if not a list
+                    if type( aValue ) != list:
+                        aValue = [ aValue ]
+                    # XXX: Unicode to native conversion
+                    aValue = util.toNative( aValue )
+                    self.theSimulator.loadEntityProperty(
+                        str( aFullPN ), aValue )
                 except RuntimeError, e:
                     raise RuntimeError( 'Failed to set Entity property [%s],'
                                         % aFullPN \
@@ -449,38 +416,16 @@ class Session:
                                         str( e ) )
 
     def __loadEntityList( self, anEml, anEntityTypeString, aSystemPath, anIDList ):
-        
-        aPrefix = anEntityTypeString + ':' + aSystemPath + ':'
-
         for anID in anIDList:
-            aClassName = anEml.getEntityClass( aPrefix + anID )
-            aFullID = aPrefix + anID
-            
+            aFullID = identifiers.FullID(
+                anEntityTypeString, aSystemPath, anID )
+            aClassName = anEml.getEntityClass( aFullID )
+
             try:
-                self.theSimulator.createEntity( aClassName, aFullID )
+                self.theSimulator.createEntity( aClassName, str( aFullID ) )
             except RuntimeError, e:
                 raise RuntimeError( 'Failed to create Entity [%s]: ' % (aFullID,) +\
                                     str( e ) )
-
-    def __createScriptContext( self, parameters ):
-
-        # theSession == self in the script
-        aContext = { 'theSession': self, 'self': self }
-        
-        # flatten class methods and object properties so that
-        # 'self.' isn't needed for each method calls in the script
-        aKeyList = list ( self.__dict__.keys() +\
-                          self.__class__.__dict__.keys() )
-        aDict = {}
-        for aKey in aKeyList:
-            aDict[ aKey ] = getattr( self, aKey )
-
-        aContext.update( aDict )
-            
-        # add parameters to the context
-        aContext.update( parameters )
-
-        return aContext
 
     def __saveAllStepper( self , anEml ):
         """stepper loader"""
@@ -613,14 +558,3 @@ class Session:
 
         return aList
  
-    class _session_prompt:
-        def __init__( self, aSession ):
-            self.theSession = aSession
-
-        def __str__( self ):
-            if self.theSession.theModelName == '':
-                return 'ecell3-session>>> '
-            else:
-                return '<%s, t=%g>>> ' %\
-                       ( self.theSession.theModelName, \
-                         self.theSession.getCurrentTime() )

@@ -22,8 +22,8 @@ def usage():
 %s -- Compile dynamic modules for E-Cell Simulation Environment Version 3.
 
 Usage:
-       %s [options] [sourcefile(s)]
-       %s [-h] or [--help]
+    %s [options] [sourcefile(s)]
+    %s [-h] or [--help]
     '''% ( aProgramName, aProgramName, aProgramName )
 
 def help():
@@ -32,15 +32,15 @@ def help():
     aProgramName, ext = os.path.splitext( ext )
     print '''
 %s options:
-        --no-stdinclude          Don't set standard include file path.
-        --no-stdlibdir           Don't set standard library directory path.
-        --ldflags=[ldflags]      Specify options to the linker.
-        --cxxflags=[cxxflags]    Add compiler options.
-        --no-define-cxxflags=[cxxflags]
-                                 Override the default compiler options.
-        --dmcompile=[path]       Specify dmcompile path.
-        -v or --verbose          Be verbose.
-        -h or --help             Print this message.
+    --no-stdinclude          Don't set standard include file path.
+    --no-stdlibdir           Don't set standard library directory path.
+    --ldflags=[ldflags]      Specify options to the linker.
+    --cxxflags=[cxxflags]    Add compiler options.
+    --no-define-cxxflags=[cxxflags]
+                             Override the default compiler options.
+    --dmcompile=[path]       Specify dmcompile path.
+    -v or --verbose          Be verbose.
+    -h or --help             Print this message.
 
 
 This program is part of E-Cell Simulation Environment Version 3.
@@ -82,7 +82,7 @@ def main():
                  "cxxflags=", "no-define-cxxflags=", "dmcompile="])
     except:
         help()
-        sys.exit(1) 
+        sys.exit( 1 ) 
         
     VERBOSE = False
     NO_STDINCLUDE = False
@@ -102,7 +102,7 @@ def main():
         # print help message
         if anOption in ( "-h", '--help' ):
             help()
-            sys.exit(0)
+            sys.exit( -1 )
       
         # be verbose
         if anOption in ( "-v", '--verbose'):
@@ -138,7 +138,7 @@ def main():
     if len( args ) < 1:
         help()
         msg( "Error: source file was not given." )
-        sys.exit(1)
+        sys.exit( 1 )
 
     if os.name == 'nt':
         PYTHON_WIN_VERSION = ( '%d%d' )%( sys.version_info[:2] )
@@ -161,7 +161,7 @@ def main():
     # check if source file is valid
     if len( FILELIST ) < 1:
         msg( "Error: source file "+ args[0] + " was not found." )
-        sys.exit(1)    
+        sys.exit( 1 )    
 
     if NO_STDINCLUDE:
         STDINCLUDE = []
@@ -180,10 +180,9 @@ def main():
         CLASSNAME, ext = os.path.splitext(ext)
         CLASSNAMEDEFINE = '-D_ECELL3_DM_CLASSNAME=' + CLASSNAME
         argList = []
-        argList.append( '\"' + cmdList[0] + '\"' )
+        argList.append( cmdList[0] )
         argList.extend( cmdList[1:] )
-        argList.extend( [ '\"' + SRC + '\"',
-                          '\"' + CLASSNAMEDEFINE + '\"' ] )
+        argList.extend( [ SRC, CLASSNAMEDEFINE ] )
         argList.extend( STDINCLUDE )
         argList.extend( CXXCOMPILEFLAGS )
 
@@ -197,5 +196,5 @@ def main():
             sys.exit( 1 )
 
 if __name__ == '__main__':
-        main()
-
+    main()
+    sys.exit( 0 )

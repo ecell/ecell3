@@ -41,8 +41,8 @@ from os import *
 
 import ecell.util as util
 from OsogoWindow import OsogoWindow
-from ecell.DataFileManager import *
-from ecell.ECDDataFile import *
+from ecell.DataFileManager import DataFileManager
+from ecell.ECDDataFile import ECDDataFile
 from LoggingPolicy import *
 
 class LoggerWindow( OsogoWindow ):
@@ -192,7 +192,7 @@ class LoggerWindow( OsogoWindow ):
 
         # [1-1] At least, one data must be selected.
         # If no list is selected, exit this method.
-        if len(self.theSelectedPropertyName())==0:
+        if len(self.getSelectedPropertyNames()) == 0:
             self["statusbar"].push( 1, 'Select some data.' )
             anErrorMessage = 'No data is selected.'
             showPopupMessage( OK_MODE, anErrorMessage, 'Error' )
@@ -242,11 +242,9 @@ class LoggerWindow( OsogoWindow ):
         # If same directory exists.
         if os.path.isdir(aSaveDirectory):
             aConfirmMessage = "%s directory already exist.\n Would you like to override it?"%aSaveDirectory
-            if showPopupMessage( OKCANCEL_MODE, aConfirmMessage ) != \
-               OK_PRESSED:
-                self["statusbar"].push(1, 'Save was canceled.')
-            return None
-        # If same directory dose not exists.
+            if showPopupMessage( OKCANCEL_MODE, aConfirmMessage ) != OK_PRESSED:
+                self["statusbar"].push(1, 'Saving log data was cancelled.')
+                return None
         else:
             try:
                 os.mkdir(aSaveDirectory)
@@ -262,12 +260,12 @@ class LoggerWindow( OsogoWindow ):
         # [3] Execute saving.
         try:
             self.theSession.saveLoggerData(
-                self.theSelectedPropertyName(),
+                self.getSelectedPropertyNames(),
                 aSaveDirectory,
                 aStartTime, anEndTime,
                 anInterval )
-        except:
-            anErrorMessage =  "Failed to save the specified log to %s" % aSaveDirectory
+        except e:
+            anErrorMessage =  "Failed to save the specified log to %s (reason: %s)" % ( aSaveDirectory, e.message )
             self["statusbar"].push( 1, anErrorMessage )
             showPopupMessage( OK_MODE, anErrorMessage, 'Error' )
             return None
@@ -275,19 +273,17 @@ class LoggerWindow( OsogoWindow ):
         aSuccessMessage = "All the selected files have been saved successfully." 
         self["statusbar"].push( 1 , aSuccessMessage )
 
-    def theSelectedPropertyName( self ):
+    def getSelectedPropertyNames( self ):
         """
         Gets the selected PropertyName
         return -> selected propertyname list
         """
-        self.aSelectedPropertyNameList=[]
-        selection=self['loggerWindow_clist'].get_selection()
-        selection.selected_foreach(self.selection_function)
-        return self.aSelectedPropertyNameList
-        
-    def selection_function(self,tree,path,iter):
-        aPropertyName = self["loggerWindow_clist"].get_model().get_value(iter,0)
-        self.aSelectedPropertyNameList.append(aPropertyName)
+        aSelection = self[ 'loggerWindow_clist' ].get_selection()
+        retval = []
+        aSelection.selected_foreach(
+            lambda aModel, aPath, anIter: retval.append(
+                identifiers.FullPN( aModel.get_value( anIter, 0 ) )) )
+        return retval
 
     def update( self ):
         """
@@ -297,18 +293,17 @@ class LoggerWindow( OsogoWindow ):
         if not self.exists():
             return None
 
-        self.theFullPNList = self.theSession.getLoggerList()
+        self.theFullPNList = self.theSession.getLoggedPNList()
         self.theList = []
 
-        for aFullPNString in self.theFullPNList :
-            aLoggerStub = self.theSession.createLogger(
-                util.createFullPN( aFullPNString ) )
+        for aFullPN in self.theFullPNList :
+            aLoggerStub = self.theSession.createLogger( aFullPN )
             start = str( aLoggerStub.getStartTime() )
             if self.theSession.theRunningFlag:
                 end = 'running'
             else:
                 end = str( aLoggerStub.getEndTime() )
-            aList = [ aFullPNString, start, end ]
+            aList = [ aFullPN, start, end ]
             self.theList.append( aList )
         aModel = self.theEntryList.get_model()
         aModel.clear()
@@ -336,7 +331,7 @@ class LoggerWindow( OsogoWindow ):
         return -> None
         This method is throwable exception.
         """
-        if len(self.theSelectedPropertyName())!=0:
+        if len(self.getSelectedPropertyNames())!=0:
             if anEvent.button == 3:
                 self.thePopupMenu.popup( None, None, None, 1, 0 )
         return False
@@ -363,13 +358,13 @@ class LoggerWindow( OsogoWindow ):
         and saves FullPN into Datafile
         """
         #find FullPM in list
-        aFullPNString = util.createFullPNString ( aFullPN )
         anIter = self.theEntryList.get_model().get_iter_first()
         while True:
             if anIter == None:
                 return None
-            aTitle = self.theEntryList.get_model().get_value(anIter, 0 )
-            if aTitle == aFullPNString:
+            selectedFullPN = identifiers.FullPN(
+                self.theEntryList.get_model().get_value( anIter, 0 ) )
+            if selectedFullPN == aFullPN:
                 aPath = self.theEntryList.get_model().get_path ( anIter )
                 self.theEntryList.set_cursor( aPath, None, False )
                 break

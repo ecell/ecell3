@@ -1,0 +1,102 @@
+#!/usr/bin/env @prefix@/bin/ecell3-python
+
+"""
+This program for converting SBML to EML.
+This program is part of E-Cell Simulation Environment Version 3.
+"""
+
+__program__ = 'ecell3-sbml2eml'
+__version__ = '1 and 2'
+__author__ = 'Tatsuya Ishida'
+__copyright__ = 'Copyright (C) 2002-2004 Keio University'
+__license__ = 'GPL'
+
+
+import sys
+import string
+import re
+import os
+import time
+import getopt
+import types
+
+import ecell.ecs
+import ecell.config
+from ecell.eml import *
+from ecell.convertSBML2EML import *
+
+
+if __name__ == '__main__':
+
+
+    def usage():
+        aProgramName = os.path.basename( sys.argv[0] )
+
+        print '''
+%(appname)s -- convert a SBML file to eml file
+
+Usage:
+    %(appname)s [-h] [-f] [-o EMLFILE] infile
+
+Options:
+    -h or --help             : Print this message.
+    -f or --force            : Forcefully overwrite the output file
+                               even if it already exists.
+    -o or --outfile=EMLFILE  : Specify the output file name. '-' means stdout.
+       
+''' % { 'appname': aProgramName }
+
+    ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
+
+    # commandline processing
+    try:
+        opts, args = getopt.getopt(
+            sys.argv[ 1: ], "hfo:",
+            [ "help", "force", "outfile=" ] )
+
+    except getopt.GetoptError:
+        usage()
+        sys.exit( -1 )
+
+    anEmlFileName = None
+    aForceFlag = 0
+
+    for anOption, anArg in opts:
+        if anOption in ( "-h", '--help' ):
+            usage()
+            sys.exit( 0 )
+
+        if anOption in ( "-f", '--force' ):
+            aForceFlag = 1
+
+        if anOption in ( "-o", "--outfile" ):
+            anEmlFileName = anArg
+
+    if len( args ) == 0:
+        sys.stderr.write("No input File.\n")
+        usage()
+        sys.exit( -1 )
+
+    aSbmlFileName = args[0]
+
+    aSbmlFile = open( aSbmlFileName )
+    aSbmlString = aSbmlFile.read()
+    aSbmlFile.close()
+
+    aBaseName = os.path.basename( aSbmlFileName )
+    aBaseName, anExt = os.path.splitext( aBaseName )
+
+    if anEmlFileName == None:
+        if anExt == '.xml':
+            anExt = '.eml'
+        else:
+            anExt += '.eml'
+        anEmlFileName = aBaseName + anExt
+
+    # ----------------    sbml2eml main    ------------------  
+
+    # convert SBML components into EML
+    anEml = convertSBML2EML( aSbmlString )
+
+    # save Eml File
+    anEml.save( anEmlFileName )

@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -54,7 +54,7 @@ namespace libecs
       SystemPath 
   */
 
-  class SystemPath : public StringList
+  class LIBECS_API SystemPath : public StringList
   {
 
   public:
@@ -101,7 +101,7 @@ namespace libecs
     //    SystemPath();
 
 
-    LIBECS_API void parse( StringCref systempathstring );
+    void parse( StringCref systempathstring );
 
   public:
 

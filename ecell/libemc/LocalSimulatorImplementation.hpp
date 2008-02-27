@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -29,12 +29,21 @@
 // E-Cell Project.
 //
 
-
 #ifndef __LOCALSIMULATORIMPLEMENTATION_HPP
 #define __LOCALSIMULATORIMPLEMENTATION_HPP
 
+#ifdef DLL_EXPORT
+#undef DLL_EXPORT
+#define _DLL_EXPORT
+#endif /* DLL_EXPORT */
+
 #include "libecs/libecs.hpp"
 #include "libecs/Model.hpp"
+
+#ifdef _DLL_EXPORT
+#define DLL_EXPORT
+#undef _DLL_EXPORT
+#endif /* _DLL_EXPORT */
 
 #include "libemc.hpp"
 #include "SimulatorImplementation.hpp"
@@ -48,7 +57,7 @@ namespace libemc
    * @{ 
    */ 
   
-  class LocalSimulatorImplementation
+  class LIBEMC_API LocalSimulatorImplementation
     :
     public SimulatorImplementation
   {
@@ -56,141 +65,141 @@ namespace libemc
   public:
 
     LocalSimulatorImplementation();
-    LIBEMC_API virtual ~LocalSimulatorImplementation();
+    virtual ~LocalSimulatorImplementation();
 
-    LIBEMC_API virtual void createStepper( libecs::StringCref         aClassname,
+    virtual void createStepper( libecs::StringCref         aClassname,
 				libecs::StringCref         anId );
 
-    LIBEMC_API virtual void deleteStepper( libecs::StringCref anID );
+    virtual void deleteStepper( libecs::StringCref anID );
 
-    LIBEMC_API virtual const libecs::Polymorph getStepperList() const;
+    virtual const libecs::Polymorph getStepperList() const;
 
-    LIBEMC_API virtual const libecs::Polymorph 
+    virtual const libecs::Polymorph 
     getStepperPropertyList( libecs::StringCref aStepperID ) const;
 
-    LIBEMC_API virtual const libecs::Polymorph 
+    virtual const libecs::Polymorph 
     getStepperPropertyAttributes( libecs::StringCref aStepperID, 
 				  libecs::StringCref aPropertyName ) const;
 
-    LIBEMC_API virtual void setStepperProperty( libecs::StringCref    aStepperID,
+    virtual void setStepperProperty( libecs::StringCref    aStepperID,
 				     libecs::StringCref    aPropertyName,
 				     libecs::PolymorphCref aValue );
 
-    LIBEMC_API virtual const libecs::Polymorph
+    virtual const libecs::Polymorph
     getStepperProperty( libecs::StringCref aStepperID,
 			libecs::StringCref aPropertyName ) const;
 
-    LIBEMC_API virtual void loadStepperProperty( libecs::StringCref    aStepperID,
+    virtual void loadStepperProperty( libecs::StringCref    aStepperID,
 				      libecs::StringCref    aPropertyName,
 				      libecs::PolymorphCref aValue );
 
-    LIBEMC_API virtual const libecs::Polymorph
+    virtual const libecs::Polymorph
     saveStepperProperty( libecs::StringCref aStepperID,
 			 libecs::StringCref aPropertyName ) const;
 
-    LIBEMC_API virtual const libecs::String
+    virtual const libecs::String
     getStepperClassName( libecs::StringCref aStepperID ) const;
 
 
-    LIBEMC_API virtual const libecs::PolymorphMap
+    virtual const libecs::PolymorphMap
 	   	 getClassInfo( libecs::StringCref aClasstype,
 			       libecs::StringCref aClassname,
 			       const libecs::Integer forceReload );
 
     
-    LIBEMC_API virtual void createEntity( libecs::StringCref aClassname, 
+    virtual void createEntity( libecs::StringCref aClassname, 
 			       libecs::StringCref aFullIDString );
 
-    LIBEMC_API virtual void deleteEntity( libecs::StringCref aFullIDString );
+    virtual void deleteEntity( libecs::StringCref aFullIDString );
 
-    LIBEMC_API virtual const libecs::Polymorph 
+    virtual const libecs::Polymorph 
     getEntityList( libecs::StringCref anEntityTypeString,
 		   libecs::StringCref aSystemPathString ) const;
 
-    LIBEMC_API virtual const libecs::Polymorph 
+    virtual const libecs::Polymorph 
     getEntityPropertyList( libecs::StringCref aFullID ) const;
 
-    LIBEMC_API virtual const bool isEntityExist( libecs::StringCref aFullIDString ) const;
+    virtual const bool isEntityExist( libecs::StringCref aFullIDString ) const;
 
-    LIBEMC_API virtual void setEntityProperty( libecs::StringCref    aFullPNString,
+    virtual void setEntityProperty( libecs::StringCref    aFullPNString,
 				    libecs::PolymorphCref aValue );
 
-    LIBEMC_API virtual const libecs::Polymorph
+    virtual const libecs::Polymorph
     getEntityProperty( libecs::StringCref aFullPNString ) const;
 
-    LIBEMC_API virtual void loadEntityProperty( libecs::StringCref    aFullPNString,
+    virtual void loadEntityProperty( libecs::StringCref    aFullPNString,
 				     libecs::PolymorphCref aValue );
 
-    LIBEMC_API virtual const libecs::Polymorph
+    virtual const libecs::Polymorph
     saveEntityProperty( libecs::StringCref aFullPNString ) const;
 
-    LIBEMC_API virtual const libecs::Polymorph
+    virtual const libecs::Polymorph
     getEntityPropertyAttributes( libecs::StringCref aFullPNString ) const;
 
-    LIBEMC_API virtual const libecs::String
+    virtual const libecs::String
     getEntityClassName( libecs::StringCref aFullIDString ) const;
 
-    LIBEMC_API virtual void createLogger( libecs::StringCref aFullPNString );
+    virtual void createLogger( libecs::StringCref aFullPNString );
 
-    LIBEMC_API virtual void createLogger( libecs::StringCref aFullPNString, libecs::Polymorph aParamList  );
+    virtual void createLogger( libecs::StringCref aFullPNString, libecs::Polymorph aParamList  );
 
-    LIBEMC_API virtual const libecs::Polymorph getLoggerList() const;
+    virtual const libecs::Polymorph getLoggerList() const;
 
-    LIBEMC_API virtual const libecs::DataPointVectorSharedPtr 
+    virtual const libecs::DataPointVectorSharedPtr 
     getLoggerData( libecs::StringCref aFullPNString ) const;
 
-    LIBEMC_API virtual const libecs::DataPointVectorSharedPtr
+    virtual const libecs::DataPointVectorSharedPtr
     getLoggerData( libecs::StringCref aFullPNString, 
 		   libecs::RealCref start, libecs::RealCref end ) const;
 
-    LIBEMC_API virtual const libecs::DataPointVectorSharedPtr
+    virtual const libecs::DataPointVectorSharedPtr
     getLoggerData( libecs::StringCref aFullPNString,
 		   libecs::RealCref start, libecs::RealCref end, 
 		   libecs::RealCref interval ) const;
 
-    LIBEMC_API virtual const libecs::Real 
+    virtual const libecs::Real 
     getLoggerStartTime( libecs::StringCref aFullPNString ) const;
 
-    LIBEMC_API virtual const libecs::Real 
+    virtual const libecs::Real 
     getLoggerEndTime( libecs::StringCref aFullPNString ) const;
 
-    LIBEMC_API virtual void setLoggerMinimumInterval( libecs::StringCref aFullPNString, 
+    virtual void setLoggerMinimumInterval( libecs::StringCref aFullPNString, 
 					   libecs::RealCref anInterval );
 
-    LIBEMC_API virtual const libecs::Real 
+    virtual const libecs::Real 
     getLoggerMinimumInterval( libecs::StringCref aFullPNString ) const;
 
 
-    LIBEMC_API virtual void 
+    virtual void 
     setLoggerPolicy( libecs::StringCref aFullPNString, 
 			      libecs::Polymorph aParamList ) ;
 
-    LIBEMC_API virtual const libecs::Polymorph
+    virtual const libecs::Polymorph
     getLoggerPolicy( libecs::StringCref aFullPNString ) const;
 
 
-    LIBEMC_API virtual const libecs::Logger::size_type 
+    virtual const libecs::Logger::size_type 
     getLoggerSize( libecs::StringCref aFullPNString ) const;
 
-    LIBEMC_API virtual const libecs::Polymorph getNextEvent() const;
+    virtual const libecs::Polymorph getNextEvent() const;
 
-    LIBEMC_API virtual void step( const libecs::Integer aNumSteps );
+    virtual void step( const libecs::Integer aNumSteps );
 
-    LIBEMC_API virtual const libecs::Real getCurrentTime() const;
+    virtual const libecs::Real getCurrentTime() const;
 
-    LIBEMC_API virtual void run();
+    virtual void run();
 
-    LIBEMC_API virtual void run( const libecs::Real aDuration );
+    virtual void run( const libecs::Real aDuration );
 
-    LIBEMC_API virtual void stop();
+    virtual void stop();
 
     void clearEventChecker();
 
-    LIBEMC_API virtual void setEventChecker( EventCheckerSharedPtrCref anEventChecker );
+    virtual void setEventChecker( EventCheckerSharedPtrCref anEventChecker );
 
-    LIBEMC_API virtual void setEventHandler( EventHandlerSharedPtrCref anEventHandler );
+    virtual void setEventHandler( EventHandlerSharedPtrCref anEventHandler );
 
-    LIBEMC_API virtual const libecs::Polymorph getDMInfo();
+    virtual const libecs::Polymorph getDMInfo();
 
   protected:
 

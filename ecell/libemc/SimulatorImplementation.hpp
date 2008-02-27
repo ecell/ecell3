@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -29,14 +29,23 @@
 // E-Cell Project.
 //
 
-
 #ifndef __SIMULATORIMPLEMENTATION_HPP
 #define __SIMULATORIMPLEMENTATION_HPP
 
+#ifdef DLL_EXPORT
+#undef DLL_EXPORT
+#define _DLL_EXPORT
+#endif /* DLL_EXPORT */
+
 #include "libecs/libecs.hpp"
 #include "libecs/Logger.hpp"
-#include "libemc.hpp"
 
+#ifdef _DLL_EXPORT
+#define DLL_EXPORT
+#undef _DLL_EXPORT
+#endif /* _DLL_EXPORT */
+
+#include "libemc.hpp"
 
 namespace libemc
 {
@@ -53,7 +62,7 @@ namespace libemc
      implementation.
   */
 
-  class SimulatorImplementation
+  class LIBEMC_API SimulatorImplementation
   {
 
   public:
@@ -202,4 +211,3 @@ namespace libemc
 } // namespace libemc
 
 #endif   /* ___SIMULATOR_IMPLEMENTATION_H___ */
-

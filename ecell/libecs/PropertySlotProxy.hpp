@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -37,9 +37,7 @@
 #include "libecs.hpp"
 #include "Util.hpp"
 #include "PropertySlot.hpp"
-#include "LoggerAdapter.hpp"
 #include "convertTo.hpp"
-
 #include "Polymorph.hpp"
 
 namespace libecs
@@ -55,7 +53,7 @@ namespace libecs
   /** @file */
 
 
-  class PropertySlotProxy
+  class LIBECS_API PropertySlotProxy
   {
 
   public:
@@ -65,7 +63,7 @@ namespace libecs
       ; // do nothing
     }
     
-    LIBECS_API virtual ~PropertySlotProxy();
+    virtual ~PropertySlotProxy();
 
     virtual SET_METHOD( Polymorph, Polymorph ) = 0;
     virtual GET_METHOD( Polymorph, Polymorph ) = 0;
@@ -229,40 +227,7 @@ namespace libecs
 
   };
 
-
-
-  class PropertySlotProxyLoggerAdapter
-    :
-    public LoggerAdapter
-  {
-
-  public:
-
-    DM_IF PropertySlotProxyLoggerAdapter( PropertySlotProxyPtr aPropertySlotProxy )
-      :
-      thePropertySlotProxy( aPropertySlotProxy )
-    {
-      ; // do nothing
-    }
-
-    DM_IF virtual ~PropertySlotProxyLoggerAdapter()
-    {
-      delete thePropertySlotProxy;
-    }
-
-    DM_IF virtual const Real getValue() const
-    {
-      return thePropertySlotProxy->getReal();
-    }
-
-  private:
-
-    PropertySlotProxyPtr thePropertySlotProxy;
-
-  };
-
-  /*@}*/
-
+  /** @}*/
 }
 
 

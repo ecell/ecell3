@@ -40,8 +40,13 @@ import sys
 import os
 import imp
 import glob
+
 from ecell.ecs_constants import *
-from config import *
+
+__all__ = (
+    'PluginModule',
+    'PluginManager'
+    )
 
 class PluginModule:
     """

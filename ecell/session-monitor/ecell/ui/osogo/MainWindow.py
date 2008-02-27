@@ -47,6 +47,8 @@ from datetime import datetime
 
 from ecell.ecssupport import *
 from ecell.ecs_constants import *
+import ecell.converter.sbml2eml
+import ecell.eml
 
 from OsogoWindow import OsogoWindow
 from AboutSessionMonitor import AboutSessionMonitor
@@ -298,7 +300,8 @@ class MainWindow( OsogoWindow ):
 
             # creates FileSelection
             self.theFileSelection = gtk.FileSelection()
-            self.theFileSelection.connect('delete_event', self.__deleteFileSelection )
+            self.theFileSelection.connect(
+                'delete_event', self.__deleteFileSelection )
             self.theFileSelection.cancel_button.connect(
                 'clicked',
                 self.__deleteFileSelection) 
@@ -310,34 +313,39 @@ class MainWindow( OsogoWindow ):
 
             # when 'Load Model' is selected
             if aType == 'Load' and aTarget == 'Model':
-                self.theFileSelection.ok_button.connect('clicked', self.__loadData, aTarget)
-                self.theFileSelection.complete( '*.'+ MODEL_FILE_EXTENSION )
-                self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,MODEL_FILE_EXTENSION) )
-
+                self.theFileSelection.ok_button.connect(
+                    'clicked', self.__loadData, aTarget)
+                self.theFileSelection.complete( '*.' + MODEL_FILE_EXTENSION )
+                self.theFileSelection.set_title(
+                    "Select %s File (%s)" % ( aTarget,MODEL_FILE_EXTENSION ) )
             # when 'Load Script' is selected
             elif aType == 'Load' and aTarget == 'Script':
-                self.theFileSelection.ok_button.connect('clicked', self.__loadData, aTarget)
-                self.theFileSelection.complete( '*.'+ SCRIPT_FILE_EXTENSION )
-                self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,SCRIPT_FILE_EXTENSION) )
-
+                self.theFileSelection.ok_button.connect(
+                    'clicked', self.__loadData, aTarget )
+                self.theFileSelection.complete( '*.' + SCRIPT_FILE_EXTENSION )
+                self.theFileSelection.set_title(
+                    "Select %s File (%s)" % (aTarget,SCRIPT_FILE_EXTENSION) )
             # when 'Save Model' is selected
             elif aType == 'Save' and aTarget == 'Model':
-                self.theFileSelection.ok_button.connect('clicked', self.__saveModel)
-                self.theFileSelection.complete( '*.'+ MODEL_FILE_EXTENSION )
-                self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,MODEL_FILE_EXTENSION) )
-
+                self.theFileSelection.ok_button.connect(
+                    'clicked', self.__saveModel )
+                self.theFileSelection.complete( '*.' + MODEL_FILE_EXTENSION )
+                self.theFileSelection.set_title(
+                    "Select %s File (%s)" % ( aTarget, MODEL_FILE_EXTENSION ) )
             # when 'Import SBML' is selected
             elif aType == 'Load' and aTarget == 'SBML':
-                self.theFileSelection.ok_button.connect('clicked', self.__loadData, aTarget)
-                self.theFileSelection.complete( '*.'+ MODEL_FILE_EXTENSION )
-                self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,MODEL_FILE_EXTENSION) )
-
+                self.theFileSelection.ok_button.connect(
+                    'clicked', self.__loadData, aTarget)
+                self.theFileSelection.complete( '*.xml' )
+                self.theFileSelection.set_title(
+                    "Select %s File (%s)" % ( aTarget, '.xml' ) )
             # when 'Save Model' is selected
             elif aType == 'Save' and aTarget == 'SBML':
-                self.theFileSelection.ok_button.connect('clicked', self.__exportSBML)
-                self.theFileSelection.complete( '*.'+ MODEL_FILE_EXTENSION )
-                self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,MODEL_FILE_EXTENSION) )
-
+                self.theFileSelection.ok_button.connect(
+                    'clicked', self.__exportSBML)
+                self.theFileSelection.complete( '*.xml' )
+                self.theFileSelection.set_title(
+                    "Select %s File (%s)" % ( aTarget, ".xml" ) )
             else:
                 raise "(%s,%s) does not match." %(aType,aTarget)
 
@@ -404,7 +412,7 @@ class MainWindow( OsogoWindow ):
             self.theSimulationButton.setCurrentState( True )
         elif event.type == 'simulation_updated':
             self.updateTimer()
-            self['time_entry'].set_text( str( self.theSession.getCurrentTime() ) )
+            self['time_entry'].set_text( str( event.simulationTime ) )
             self['sec_step_entry'].set_text( str( self.theStepSizeOrSec ) )
         elif event.type == 'window_shown':
             self.setToolbarButtonState( event.target_name, True )
@@ -651,19 +659,12 @@ class MainWindow( OsogoWindow ):
             self.theFileSelection.destroy()
             self.theFileSelection = None
 
-    def __loadData( self, *arg ) :
+    def __loadData( self, w, aFileType ) :
         """loads model or script file
         arg[0]    ---   ok button of FileSelection
         arg[1]    ---   'Model'/'Script' (str)
         Return None
         """
-
-        # checks the length of argument, but this is verbose
-        if len( arg ) < 2:
-            return None
-
-        aFileType = arg[1]
-
         aFileName = self.theFileSelection.get_filename()
         if os.path.isfile( aFileName ):
             pass
@@ -680,6 +681,14 @@ class MainWindow( OsogoWindow ):
         try:
             if aFileType == 'Model':
                 self.theSession.loadModel( aFileName )
+            elif aFileType == 'SBML':
+                try:
+                    io = open( aFileName, 'r' )
+                except IOError:
+                    self.theSession.message("Failed to load %s" % aFileName)
+                    return
+                aEMLString = ecell.converter.sbml2eml.convert( io.read() )
+                self.theSession.loadModel( ecell.eml.Eml( aEMLString ) )
             elif aFileType == 'Script':
                 self.theSession.loadScript( aFileName )
         except:
@@ -693,7 +702,6 @@ class MainWindow( OsogoWindow ):
             if self.exists():
                 if ( self['message_button'].get_child() ).get_active() == False:
                     ( self['message_button'].get_child() ).set_active(True)
-
             # displays confirm window
             aMessage = 'Can\'t load [%s]\nSee MessageWindow for details.' %aFileName
             showPopupMessage( OK_MODE, aMessage, 'Error' )
@@ -835,9 +843,13 @@ class MainWindow( OsogoWindow ):
         else:
             self.theSession.step( self.getStepSize() )
 
+<<<<<<< .mine
+    def doSetStepSizeOrSec( self, text ):
+=======
     def doInputStepSizeOrSec( self ):
+>>>>>>> .r3007
         # gets the inputerd characters from the GtkEntry. 
-        aNewValue = string.strip( self['sec_step_entry'].get_text() )
+        aNewValue = string.strip( text )
         hasErrorOccurred = False
 
         try:

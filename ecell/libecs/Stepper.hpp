@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -32,7 +32,13 @@
 #ifndef __STEPPER_HPP
 #define __STEPPER_HPP
 
+#ifdef DLL_EXPORT
+#undef DLL_EXPORT
 #include <gsl/gsl_rng.h>
+#define DLL_EXPORT
+#else
+#include <gsl/gsl_rng.h>
+#endif
 
 #include "libecs.hpp"
 
@@ -261,7 +267,7 @@ namespace libecs
 
     virtual void step() = 0;
 
-    LIBECS_API virtual void integrate( RealParam aTime );
+    virtual void integrate( RealParam aTime );
 
     /**
        Let the Loggers log data.
@@ -270,7 +276,7 @@ namespace libecs
        any Entities related to this Stepper.
     */
 
-    LIBECS_API virtual void log();
+    virtual void log();
     
     /**
        Register a System to this Stepper.
@@ -456,7 +462,7 @@ namespace libecs
     }
 
 
-    LIBECS_API const VariableIndex
+    const VariableIndex
       getVariableIndex( VariableCptr const aVariable );
 
 
@@ -512,9 +518,9 @@ namespace libecs
 
   protected:
 
-    LIBECS_API void clearVariables();
+    void clearVariables();
 
-    LIBECS_API void fireProcesses();
+    void fireProcesses();
 
     virtual void reset();
 

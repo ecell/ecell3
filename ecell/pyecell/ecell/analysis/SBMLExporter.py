@@ -49,6 +49,7 @@ import ecell.expressionparser
 import ecell.analysis.emlsupport
 import ecell.analysis.util
 
+from ecell.ecs_constants import *
 from sbmlsupport import *
 
 
@@ -116,13 +117,13 @@ class ExpressionParser:
                           'MolarConc of [%s] is not supported' \
                           % ( referenceName )
                 elif type( sbmlId ) == tuple:
-                    expressionList[ c ] = '%s / %e' % ( sbmlId[ 0 ], AVOGADRO_CONSTANT )
+                    expressionList[ c ] = '%s / %e' % ( sbmlId[ 0 ], N_A )
                     if coeff == 0 \
                            and self.modifierList.count( sbmlId[ 0 ] ) == 0:
                         self.modifierList.append( sbmlId[ 0 ] )         
 
         formulaString = ''.join( expressionList )
-        formulaString = string.replace( formulaString, 'self.getSuperSystem().SizeN_A', '( %s * %e )' % ( self.compartment, AVOGADRO_CONSTANT ) )
+        formulaString = string.replace( formulaString, 'self.getSuperSystem().SizeN_A', '( %s * %e )' % ( self.compartment, N_A ) )
 
         regexpr = re.compile( '([a-zA-Z_][a-zA-Z0-9_]*.Value\s*\/\s*[a-zA-Z_][a-zA-Z0-9_]*.Value)' )
 
@@ -334,7 +335,7 @@ class SBMLExporter:
 
             fullID = ecell.ecssupport.createFullID( fullIDString )
             if fullID[ 0 ] == ecell.ecssupport.SYSTEM:
-                systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
+                systemPath = ecell.ecssupport.convertFullIDToSystemPath( fullID )
                 self.idDict[ 'Variable:%s:SIZE' % ( systemPath ) ] \
                              = ( id, sbmlType )
 
@@ -456,13 +457,13 @@ class CompartmentExporter( SBaseExporter ):
             if aCompartment.isSetOutside():
                 aCompartment.unsetOutside()
         else:
-            outsideFullID = ecell.ecssupport.createFullIDFromSystemPath( fullID[ 1 ] )
+            outsideFullID = ecell.ecssupport.convertSystemPathToFullID( fullID[ 1 ] )
             outside = ecell.ecssupport.createFullIDString( outsideFullID )
             ( outside, sbmlType ) \
               = self.theSBMLExporter.searchIdFromFullID( outside )
             aCompartment.setOutside( outside )
 
-        systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
+        systemPath = ecell.ecssupport.convertFullIDToSystemPath( fullID )
         sizeFullIDString = 'Variable:%s:SIZE' % ( systemPath )
 
         systemSize = 1.0
@@ -483,8 +484,8 @@ class CompartmentExporter( SBaseExporter ):
         else:
             systemFullID = ecell.ecssupport.createFullID( self.fullID )
             while systemFullID[ 1 ] != '':
-                outsideFullID = ecell.ecssupport.createFullIDFromSystemPath( systemFullID[ 1 ] )
-                outsidePath = ecell.ecssupport.createSystemPathFromFullID( outsideFullID )
+                outsideFullID = ecell.ecssupport.convertSystemPathToFullID( systemFullID[ 1 ] )
+                outsidePath = ecell.ecssupport.convertFullIDToSystemPath( outsideFullID )
                 outsideSizeFullIDString = 'Variable:%s:SIZE' % ( outsidePath )
 
                 if self.theSBMLExporter.theEml.isEntityExist( outsideSizeFullIDString ) and self.theSBMLExporter.theEml.getEntityPropertyList( outsideSizeFullIDString ).count( 'Value' ) == 1:
@@ -568,7 +569,7 @@ class SpeciesExporter( SBaseExporter ):
         if self.isSetId():
             setSBaseAnnotation( aSpecies, 'ID', fullID[ 2 ], aSBMLDocument.getNamespaces() )
 
-        compartment = ecell.ecssupport.createFullIDFromSystemPath( fullID[ 1 ] )
+        compartment = ecell.ecssupport.convertSystemPathToFullID( fullID[ 1 ] )
         compartment = ecell.ecssupport.createFullIDString( compartment )
         ( compartment, sbmlType ) \
           = self.theSBMLExporter.searchIdFromFullID( compartment )
@@ -653,7 +654,7 @@ class ParameterExporter( SBaseExporter ):
         if self.isSetId():
             setSBaseAnnotation( aParameter, 'ID', fullID[ 2 ], aSBMLDocument.getNamespaces() )
 
-        compartment = ecell.ecssupport.createFullIDFromSystemPath( fullID[ 1 ] )
+        compartment = ecell.ecssupport.convertSystemPathToFullID( fullID[ 1 ] )
         compartment = ecell.ecssupport.createFullIDString( compartment )
         ( compartment, sbmlType ) \
           = self.theSBMLExporter.searchIdFromFullID( compartment )
@@ -756,7 +757,7 @@ class ReactionExporter( SBaseExporter ):
         if self.isSetId():
             setSBaseAnnotation( aReaction, 'ID', fullID[ 2 ], aSBMLDocument.getNamespaces() )
 
-        compartment = ecell.ecssupport.createFullIDFromSystemPath( fullID[ 1 ] )
+        compartment = ecell.ecssupport.convertSystemPathToFullID( fullID[ 1 ] )
         compartment = ecell.ecssupport.createFullIDString( compartment )
         ( compartment, sbmlType ) \
           = self.theSBMLExporter.searchIdFromFullID( compartment )
@@ -983,7 +984,7 @@ class RuleExporter( SBaseExporter ):
 
         fullID = ecell.ecssupport.createFullID( self.fullID )
 
-        compartment = ecell.ecssupport.createFullIDFromSystemPath( fullID[ 1 ] )
+        compartment = ecell.ecssupport.convertSystemPathToFullID( fullID[ 1 ] )
         compartment = ecell.ecssupport.createFullIDString( compartment )
         ( compartment, sbmlType ) \
           = self.theSBMLExporter.searchIdFromFullID( compartment )

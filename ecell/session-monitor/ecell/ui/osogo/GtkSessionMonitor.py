@@ -41,15 +41,17 @@ import gtk
 import gobject 
 import thread
 from sets import Set
+from time import time
 import re
 
 import config
 from constants import *
 
-from ecell.Session import *
-from ecell.ModelWalker import *
+from ecell.Session import Session
 import ecell.util as util
+import ecell.identifiers as identifiers
 
+from ModelWalker import *
 from DataGenerator import DataGenerator
 from MainWindow import MainWindow
 from LoggerWindow import LoggerWindow
@@ -69,7 +71,11 @@ class GtkSessionMonitor:
 
     def beginSession( self ):
         aSession = Session()
-        aSessionFacade = GtkSessionFacade( self, aSession )
+        aBroadcaster = GtkSessionEventBroadcaster()
+        aSession.setMessageMethod(
+            lambda m: aBroadcaster.fire( 'message', content = m ) )
+        aSessionFacade = GtkSessionFacade( self, aSession, aBroadcaster )
+        aBroadcaster.addObserver( aSessionFacade )
         self.theAliveSessions.add( aSessionFacade )
         return aSessionFacade
 
@@ -103,6 +109,23 @@ class GtkSessionEvent:
         else:
             self.options[ key ] = val
 
+class GtkSessionEventBroadcaster:
+    def __init__( self ):
+        self.handlers = Set()
+
+    def addObserver( self, aHandler ):
+        self.handlers.add( aHandler )
+
+    def removeObserver( self, aHandler ):
+        self.handlers.discard( aHandler )
+
+    def fire( self, type, **options ):
+        def broadcaster():
+            event = GtkSessionEvent( type, options )
+            for aHandler in self.handlers:
+                aHandler.handleSessionEvent( event )
+        gobject.idle_add( broadcaster )
+
 class GtkSessionFacade:
     def findUserPrefsDir( self ):
         if not self.theUserPreferencesDir:
@@ -128,7 +151,7 @@ class GtkSessionFacade:
                 return path
         return None
 
-    def __init__( self, aSessionMonitor, aSession ):
+    def __init__( self, aSessionMonitor, aSession, aBroadcaster ):
         """sets up the osogo session, creates Mainwindow and other fundamental
         windows but doesn't show them"""
 
@@ -137,8 +160,7 @@ class GtkSessionFacade:
         self.theModelWalker = None
         self.theMessageListenerSet = Set()
         self.theManagedWindowSet = Set()
-
-        self.theSession.setMessageMethod( self.fireMessageEvent )
+        self.theBroadcaster = aBroadcaster
 
         self.theUserPreferencesDir = None
 
@@ -150,7 +172,7 @@ class GtkSessionFacade:
         self.theConfigDB = aConfigDB
         self.theIniFileName = aIniFileName
 
-        self.theUpdateInterval = 2000
+        self.theUpdateInterval = 0.25
         self.stuckRequests = 0
         self.theStepSizeOrSec = 1.0
         self.theRunningFlag = False
@@ -160,6 +182,7 @@ class GtkSessionFacade:
         self.thePluginPath = config.plugin_path
         self.thePluginManager = OsogoPluginManager( self.thePluginPath, self )
         self.theDataGenerator = DataGenerator( self.theSession )
+        self.theBroadcaster.addObserver( self.theDataGenerator )
         self.thePluginInstanceList = []
         self.thePluginWindowTitleMap = {}
         self.thePluginWindowPerTypeMap = {}
@@ -170,17 +193,9 @@ class GtkSessionFacade:
         # key:window name(str) value:window instance
         self.theFundamentalWindows = {}
 
-        # key:EntityListWindow instance value:instance
-        # In deleteEntityListWindow method, an instance of EntityListWindow is
-        # accessed directory. The sequence information of EntityListWindow does
-        # not need. So the references to EntityListWindow instances should be 
-        # held dict's key. Values of dict are not also imported.
-
-        self.theManagedWindowSet = Set()
-
         # initializes for run method 
-        #self.theSession.setEventChecker( gtk.events_pending )
-        #self.theSession.setEventHandler( gtk.main_iteration )
+        self.theSession.setEventChecker( gtk.events_pending )
+        self.theSession.setEventHandler( gtk.main_iteration )
 
         self.thePluginManager.loadAllPlugins()
 
@@ -199,7 +214,7 @@ class GtkSessionFacade:
             anInstance.destroy()
 
     def terminate( self ):
-        self.theSession = None
+        self.stop()
         self.theSessionMonitor.closeSession( self )
 
     def openFundamentalWindow( self, aWindowName ):
@@ -330,8 +345,10 @@ class GtkSessionFacade:
         self.fireEvent( 'window_managed', window = anInstance )
         anInstance.registerDestroyHandler( self.unmanageWindow )
         self.theManagedWindowSet.add( anInstance )
+        self.theBroadcaster.addObserver( anInstance )
 
     def unmanageWindow( self, anInstance ):
+        self.theBroadcaster.removeObserver( anInstance )
         self.theManagedWindowSet.discard( anInstance )
         self.fireEvent( 'window_unmanaged', window = anInstance )
 
@@ -363,11 +380,10 @@ class GtkSessionFacade:
         assert self.theMainWindow != None
         return self.theMainWindow.getStatusBar()
 
-    def fireMessageEvent( self, aMessage ):
-        print aMessage
-        self.fireEvent( 'message', content = aMessage )
-
     def fireEvent( self, aType, **options ):
+<<<<<<< .mine
+        self.theBroadcaster.fire( type, **options )
+=======
         def broadcaster():
             event = GtkSessionEvent( aType, options )
             if event.type in ( 'simulation_updated', 'simulation_started', \
@@ -376,14 +392,12 @@ class GtkSessionFacade:
             for aManagedWindow in self.theManagedWindowSet:
                 aManagedWindow.handleSessionEvent( event )
         gobject.idle_add( broadcaster )
+>>>>>>> .r3007
 
     def updateUI( self ):
         # updates all entity list windows
         for aManagedWindow in self.theManagedWindowSet:
             aManagedWindow.update()
-        # updates all plugin windows
-        for aPluginWindow in self.thePluginInstanceList:
-            aPluginWindow.update()
 
     def setUpdateInterval(self, secs):
         "plugins are refreshed every secs seconds"
@@ -474,17 +488,25 @@ class GtkSessionFacade:
     def loadModel( self, aFileName ):
         assert not self.theSession.isModelLoaded()
         self.theSession.loadModel( aFileName )
-        self.theModelWalker = ModelWalker( self.theSession.theSimulator )
+        self.theModelWalker = ModelWalker( self )
         self.fireEvent( 'model_loaded' )
 
     def saveModel( self, aFileName ):
         self.theSession.saveModel( aFileName )
         self.fireEvent( 'model_saved' )
 
+    def handleSessionEvent( self, event ):
+        if event.type == 'message':
+            print event.content
+        elif event.type == 'simulation_started':
+            self.message( 'Simulation started on %f sec.' % event.simulationTime )
+        elif event.type == 'simulation_stopped':
+            self.message( 'Simulation stopped on %f sec.' % event.simulationTime )
+
     def message( self, message ):
         self.theSession.message( message )
 
-    def run( self , time = None ):
+    def run( self, duration = None ):
         """ 
         if already running: do nothing
         if time is given, run for the given time
@@ -496,9 +518,16 @@ class GtkSessionFacade:
             return
         try:
             self.theRunningFlag = True
-            aCurrentTime = self.getCurrentTime()
-            self.message( "%15s" % aCurrentTime + ":Start" )
 
+<<<<<<< .mine
+            def handleTimer():
+                if not self.theRunningFlag:
+                    return False
+                self.fireEvent(
+                    'simulation_updated',
+                    simulationTime = self.getCurrentTime() )
+                return True
+=======
             def thread_proc(): 
                 self.fireEvent( 'simulation_started' )
                 if time:
@@ -516,10 +545,25 @@ class GtkSessionFacade:
 
                 self.fireEvent( 'simulation_updated' )
                 self.fireEvent( 'simulation_stopped' )
+>>>>>>> .r3007
 
-            thread.start_new_thread( thread_proc, () )
+            self.fireEvent(
+                'simulation_started',
+                simulationTime = self.getCurrentTime() )
+            gobject.timeout_add(
+                int( self.theUpdateInterval * 1000 ), handleTimer )
+
+            if duration:
+                self.theSession.run( duration )
+                self.theRunningFlag = False
+            else:
+                self.theSession.run()
+            self.fireEvent(
+                'simulation_stopped',
+                simulationTime = self.getCurrentTime() )
         except:
             self.theRunningFlag = False
+            self.theSession.stop()
             anErrorMessage = traceback.format_exception(
                 sys.exc_type, sys.exc_value, sys.exc_traceback )
             self.message(anErrorMessage)
@@ -531,30 +575,27 @@ class GtkSessionFacade:
         if self.theRunningFlag == True:
             self.theRunningFlag = False
             self.theSession.stop()
-            aCurrentTime = self.getCurrentTime()
-            self.message( "%15s" % aCurrentTime + ":Stop" )
 
-    def step( self, num = None ):
+    def step( self, num = 1 ):
         """
         step according to num, if num is not given,
         according to set step parameters
         """
         if self.theRunningFlag:
             return
-
-        if num == None:
-            #set it to 1
-                num = 1
-                self.message( "Zero step value overridden to 1" )
-
         try:
             self.theRunningFlag = True
 
             self.message( "Step" )
-            self.fireEvent( 'simulation_started' )
+            self.fireEvent(
+                'simulation_started',
+                simulationTime = self.getCurrentTime() )
             self.theSession.step( int( num ) )
-            self.fireEvent( 'simulation_updated' )
-            self.fireEvent( 'simulation_stopped' )
+            self.fireEvent( 'simulation_updated',
+                simulationTime = self.getCurrentTime() )
+            self.fireEvent(
+                'simulation_stopped',
+                simulationTime = self.getCurrentTime() )
 
             self.theRunningFlag = False
         except:
@@ -591,18 +632,21 @@ class GtkSessionFacade:
     def getLoggerList( self ):
         return self.theSession.getLoggerList()
 
+    def getLoggedPNList( self ):
+        return self.theSession.getLoggedPNList()
+
     def createLogger( self, aFullPN ):
         # XXX: remember refresh Tracer and Loggerwindows!!!
-        aFullPNString = util.createFullPNString( aFullPN )
-        aStub = self.theSession.createLoggerStub( aFullPNString )
+        assert isinstance( aFullPN, identifiers.FullPN )
+        aStub = self.theSession.createLoggerStub( aFullPN )
         if not aStub.exists():
             aStub.create()
             aStub.setLoggerPolicy( self.getLogPolicyParameters() )
             self.fireEvent( 'logger_created', logger = aStub )
         return aStub
 
-    def saveLoggerData( self, fullpn=0, aSaveDirectory='./Data', aStartTime=-1, anEndTime=-1, anInterval=-1 ):
-        self.theSession.saveLoggerData( fullpn, aSaveDirectory, aStartTime, anEndTime, anInterval )
+    def saveLoggerData( self, aFullPN, aSaveDirectory, aStartTime=-1, anEndTime=-1, anInterval=-1 ):
+        self.theSession.saveLoggerData( aFullPN, aSaveDirectory, aStartTime, anEndTime, anInterval )
 
     def getDataGenerator( self ):
         return self.theDataGenerator 
@@ -684,19 +728,19 @@ class GtkSessionFacade:
             self.message('%s is not settable' % aFullPNString )
 
     def getEntityProperty( self, aFullPN ):
-        return self.theSession.theSimulator.getEntityProperty(
-            util.createFullPNString( aFullPN ) )
+        assert isinstance( aFullPN, identifiers.FullPN )
+        return self.theSession.theSimulator.getEntityProperty( str( aFullPN ) )
 
     def createEntityStub( self, aFullID ):
-        return self.theSession.createEntityStub(
-            util.createFullIDString( aFullID ))
+        return self.theSession.createEntityStub( aFullID )
 
     def createStepperStub( self, aStepperID ):
         return StepperStub( self.theSession.theSimulator, aStepperID )
 
     def getEntityClassName( self, aFullID ):
+        assert isinstance( aFullID, identifiers.FullID )
         return self.theSession.theSimulator.getEntityClassName(
-            util.createFullIDString( aFullID ) )
+            str( aFullID ) )
 
     def getCurrentTime( self ):
         return self.theSession.getCurrentTime()

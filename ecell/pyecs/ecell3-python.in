@@ -15,21 +15,17 @@ libdir=@libdir@
 pythondir=@pythondir@
 pyexecdir=@pyexecdir@
 PYTHON_INCLUDES="@PYTHON_INCLUDES@"
+BOOST_LIBRARIES="-lboost_python"
 
 ECELL_DIRNAME=@ECELL_DIRNAME@
 
 ECELL3_PREFIX=${prefix}
 PYTHONDIR=${pyexecdir}
-LD_LIBRARY_PATH="${libdir}:${LD_LIBRARY_PATH}"
 
 # make a __init__.py file in ecell/SessionManager!
 PYTHONPATH="$PYTHONDIR:${PYTHONPATH}"
 PYTHON_INCLUDES=${PYTHON_INCLUDES}
-BOOST_LIBRARIES="-lboost_python"
-LTDL_LIBRARY_PATH=".:${ECELL3_DM_PATH}:${prefix}/lib/${ECELL_DIRNAME}/dms:${LTDL_LIBRARY_PATH}"
 
-# what version? not good.
-VERSION=${VERSION}
 CXXFLAGS="@CXXFLAGS@"
 CXX="@CXX@"
 LDFLAGS="@LDFLAGS@"
@@ -38,7 +34,6 @@ ECELL3_LIBDIR="${libdir}/${ECELL_DIRNAME}"
 export ECELL3_PREFIX
 export ECELL_DIRNAME
 export PYTHONDIR
-export LD_LIBRARY_PATH
 export PYTHONPATH
 export PYTHON_INCLUDES
 export BOOST_LIBRARIES
@@ -90,13 +85,13 @@ Configurations:
 
         PACKAGE         = $PACKAGE
         VERSION         = $VERSION
-	PYTHON          = $PYTHON
-	PYTHONPATH      = $PYTHONPATH
+        PYTHON          = $PYTHON
+        PYTHONPATH      = $PYTHONPATH
         DEBUGGER        = $DEBUGGER
-	LD_LIBRARY_PATH = $LD_LIBRARY_PATH
-	prefix          = $prefix
+        LD_LIBRARY_PATH = $LD_LIBRARY_PATH
+        prefix          = $prefix
         pythondir       = $PYTHONDIR
-	ECELL3_DM_PATH  = $ECELL3_DM_PATH
+        ECELL3_DM_PATH  = $ECELL3_DM_PATH
 
         CXX             = $CXX
         CXXFLAGS        = $CXXFLAGS
@@ -106,7 +101,7 @@ Configurations:
         separated directory path, it loads dynamic modules from there.
 
         ex.
-	  ECELL3_DM_PATH=/home/user/dm:/home/user/dm_other
+          ECELL3_DM_PATH=/home/user/dm:/home/user/dm_other
 
 EOT_USAGE
 }
@@ -115,7 +110,7 @@ cleanup()
 {
     echo 'interrupted... cleaning up...'
     if [ $TMPFILE ] ; then
-	rm -f $TMPFILE
+        rm -f $TMPFILE
     fi
     exit 1
 }
@@ -140,8 +135,8 @@ if [ ! $ECELL_DEBUG ] ; then
 else
     TMPFILE=`mktemp -q /tmp/$BASENAME.XXXXXX`
     if [ $? -ne 0 ]; then
-	echo "$BASENAME: Can't create temp file, exiting..."
-	exit 1
+        echo "$BASENAME: Can't create temp file, exiting..."
+        exit 1
     fi
     echo "run "$@"" > $TMPFILE
     echo $DEBUGGER --command=$TMPFILE $PYTHON

@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -71,7 +71,7 @@ namespace libecs
 
   */
 
-  class Model
+  class LIBECS_API Model
   {
 
   protected:
@@ -81,8 +81,8 @@ namespace libecs
 
   public:
 
-    LIBECS_API Model( PropertiedObjectMaker& maker );
-    LIBECS_API ~Model();
+    Model( PropertiedObjectMaker& maker );
+    ~Model();
 
     /**
        Initialize the whole model.
@@ -103,7 +103,7 @@ namespace libecs
        @throw InitializationFailed
     */
 
-    LIBECS_API void initialize();
+    void initialize();
 
     /**
        Conduct a step of the simulation.
@@ -157,7 +157,7 @@ namespace libecs
        @param aClassType
     */
 
-    LIBECS_API PolymorphMap getClassInfo( StringCref aClassType, StringCref aClassname, Integer forceReload );
+    PolymorphMap getClassInfo( StringCref aClassType, StringCref aClassname, Integer forceReload );
 
     /**
        Creates a new Entity object and register it in an appropriate System
@@ -168,7 +168,7 @@ namespace libecs
        @param aName
     */
 
-    LIBECS_API void createEntity( StringCref aClassname, FullIDCref aFullID );
+    void createEntity( StringCref aClassname, FullIDCref aFullID );
 
 
     /**
@@ -178,7 +178,7 @@ namespace libecs
        @return A borrowed pointer to an Entity specified by the FullID.
     */
 
-    LIBECS_API EntityPtr getEntity( FullIDCref aFullID ) const;
+    EntityPtr getEntity( FullIDCref aFullID ) const;
 
     /**
        This method finds a System object pointed by the SystemPath.  
@@ -189,7 +189,7 @@ namespace libecs
     */
 
 
-    LIBECS_API SystemPtr getSystem( SystemPathCref aSystemPath ) const;;
+    SystemPtr getSystem( SystemPathCref aSystemPath ) const;;
 
 
     /**
@@ -201,7 +201,7 @@ namespace libecs
 
     */
 
-    LIBECS_API void createStepper( StringCref aClassname, StringCref anID );
+    void createStepper( StringCref aClassname, StringCref anID );
 
 
     /**
@@ -211,7 +211,7 @@ namespace libecs
        @return a borrowed pointer to the Stepper.
     */
 
-    LIBECS_API StepperPtr getStepper( StringCref anID ) const;
+    StepperPtr getStepper( StringCref anID ) const;
 
 
     /**
@@ -237,7 +237,7 @@ namespace libecs
 
     */
 
-    LIBECS_API void flushLoggers();
+    void flushLoggers();
 
 
     /**

@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -94,11 +94,11 @@ namespace libecs
 
     */
   
-    Logger( LoggerAdapterPtr aLoggerAdapter );
+    LIBECS_API Logger( LoggerAdapterPtr aLoggerAdapter );
   
     /// Destructor
 
-    ~Logger( void );
+    LIBECS_API ~Logger( void );
 
 
     /**
@@ -111,7 +111,7 @@ namespace libecs
     
     */
 
-    void setLoggerPolicy( IntegerParam aMinimumStep,
+    LIBECS_API void setLoggerPolicy( IntegerParam aMinimumStep,
 			  RealParam    aMinimumTimeInterval,
 			  IntegerParam anEndPolicy,
 			  IntegerParam aMaxSpace );
@@ -139,7 +139,7 @@ namespace libecs
 
     */
 
-    void log( RealParam aTime );
+    LIBECS_API void log( RealParam aTime );
 
 
     /**
@@ -245,7 +245,7 @@ namespace libecs
       thePhysicalLogger.push( DataPoint( aTime, aValue ) );
     }
 
-    static DataPointVectorSharedPtr createEmptyVector();
+    LIBECS_API static DataPointVectorSharedPtr createEmptyVector();
 
   private:
 

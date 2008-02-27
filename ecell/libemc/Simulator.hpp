@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -28,16 +28,24 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
-
-
 #ifndef __SIMULATOR_HPP
 #define __SIMULATOR_HPP
+
+#ifdef DLL_EXPORT
+#undef DLL_EXPORT
+#define _DLL_EXPORT
+#endif /* DLL_EXPORT */
 
 #include "libecs/libecs.hpp"
 #include "libecs/EntityType.hpp"
 #include "libecs/Polymorph.hpp"
 #include "libecs/DataPointVector.hpp"
 #include "libecs/Logger.hpp"
+
+#ifdef _DLL_EXPORT
+#define DLL_EXPORT
+#undef _DLL_EXPORT
+#endif /* _DLL_EXPORT */
 
 #include "libemc.hpp"
 #include "SimulatorImplementation.hpp"
@@ -73,13 +81,13 @@ namespace libemc
      @see SimulatorImplementation
   */
 
-  class Simulator
+  class LIBEMC_API Simulator
   {
 
   public:
 
-    LIBEMC_API Simulator();
-    LIBEMC_API virtual ~Simulator() {}
+    Simulator();
+    virtual ~Simulator();
 
 
     /**

@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -43,7 +43,7 @@ namespace libecs
    * @{ 
    */ 
   
-  class SystemMaker 
+  class LIBECS_API SystemMaker 
   {
   private:
     PropertiedObjectMaker& theBackend;
@@ -57,7 +57,6 @@ namespace libecs
     System* make( const std::string& aClassName );
     const PropertiedObjectMaker::SharedModule& getModule(
 	const std::string& aClassName, bool forceReload );
-
   };
 
   /** @} */ //end of libecs_module 

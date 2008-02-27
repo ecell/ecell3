@@ -10,15 +10,15 @@ setup(
     author = 'E-Cell project',
     author_email = 'info@e-cell.org',
     url = 'http://www.e-cell.org/',
-    packages = [ 'ecell', 'ecell.SessionManager', 'ecell.analysis' ],
-    scripts = [
-        'ecell3-em2eml',
-        'ecell3-eml2em',
-        'ecell3-eml2sbml',
-        'ecell3-sbml2eml',
-        'ecell3-session',
-        'ecell3-session-gui',
-        'ecell3-session-manager',
+    packages = [
+        'ecell',
+        'ecell.em',
+        'ecell.eml',
+        'ecell.expr',
+        'ecell.converter',
+        'ecell.SessionManager',
+        'ecell.model',
+        'ecell.analysis'
         ],
     ext_modules = [
         Extension( 'ecell._tableio',

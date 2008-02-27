@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -97,7 +97,7 @@ namespace libecs
        @return a FullID of this Entity.
     */
 
-    LIBECS_API const FullID getFullID() const;
+    const FullID getFullID() const;
 
 
     /**
@@ -126,7 +126,7 @@ namespace libecs
        @return a SystemPath of this Entity.
     */
 
-    LIBECS_API virtual const SystemPath getSystemPath() const;
+    virtual const SystemPath getSystemPath() const;
 
 
     /// \name Properties
@@ -185,7 +185,7 @@ namespace libecs
        @return a FullID string of this Entity.
     */
 
-    LIBECS_API const String getFullIDString() const;
+    const String getFullIDString() const;
 
     //@}
 

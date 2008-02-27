@@ -150,7 +150,7 @@ class Window:
                                         self.checkWidgetState( w.name ) )
                             return toggleHandler
                         elif handlerName.startswith( "set_" ):
-                            return lambda w: aMember( w.get_text() )
+                            return lambda w, *args: aMember( w.get_text() )
                         else:
                             return lambda w: aMember()
 

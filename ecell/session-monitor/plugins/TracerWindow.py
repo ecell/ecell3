@@ -47,6 +47,7 @@ COL_PIX = 1
 COL_ON = 0
 COL_TXT = 4
 COL_X = 3
+COL_FULLPN = 5
 
 class TracerWindow( OsogoPluginWindow ):
     theViewType = MULTIPLE
@@ -57,7 +58,7 @@ class TracerWindow( OsogoPluginWindow ):
         OsogoPluginWindow.__init__(
                 self, dirname, data, aPluginManager.theSession )
         self.theDataGenerator = self.theSession.getDataGenerator()
-        self.displayedFullPNStringList = []
+        self.displayedFullPNList = []
         self.thePixmapDict = {} #key is color, value pixmap
         
         #get session
@@ -147,17 +148,14 @@ class TracerWindow( OsogoPluginWindow ):
     def createLogger( self, fpnlist ):
         if self.theSession.isRunning():
             return
-        for fpn in fpnlist:
-            if not self.hasLogger(fpn):
-
+        for aFullPN in aFullPNlist:
+            if not self.hasLogger( aFullPN ):
                 try:
-                    self.theSession.createLogger(fpn)
+                    self.theSession.createLogger( aFullPN )
                 except:
-                    self.theSession.message( 'Error while creating logger\n logger for ' + fpn + ' not created\n' )
+                    self.theSession.message( 'Error while creating logger\n logger for ' + aFullPN + ' not created\n' )
                 else:
-                    self.theSession.message( "Logger created for " + fpn )
-        #self.checkHistoryButton()
-        self.theSession.updateUI()
+                    self.theSession.message( "Logger created for " + aFullPN )
 
     def requestData( self, numberOfElements ):
         for aSeries in self.thePlotInstance.getDataSeriesList():
@@ -165,22 +163,22 @@ class TracerWindow( OsogoPluginWindow ):
 
     def requestDataSlice( self, aStart, anEnd, aRequiredResolution ):
         for aSeries in self.thePlotInstance.getDataSeriesList(): 
-            self.theDataGenerator.requestDataSlice( aSeries, aStart, anEnd, aRequiredResolution )
+            self.theDataGenerator.requestDataSlice(
+                aSeries, aStart, anEnd, aRequiredResolution )
 
     def requestNewData( self, aRequiredResolution ):
         for aSeries in self.thePlotInstance.getDataSeriesList():
             self.theDataGenerator.requestNewData( aSeries, aRequiredResolution )
 
     def allHasLogger( self ):
-        loggerList = self.theSession.getLoggerList()
+        loggerList = self.theSession.getLoggedPNList()
         for aSeries in self.thePlotInstance.getDataSeriesList():
-            if aSeries.getFullPNString() not in loggerList:
+            if aSeries.getFullPN() not in loggerList:
                 return False
         return True
     
-    def hasLogger(self, aFullPNString):
-        loggerlist=self.theSession.getLoggerList()
-        return aFullPNString in loggerlist
+    def hasLogger(self, aFullPN):
+        return aFullPN in self.theSession.getLoggedPNList()
 
     def appendRawFullPNList( self, aRawFullPNList ):
         """overwrites superclass method
@@ -199,86 +197,85 @@ class TracerWindow( OsogoPluginWindow ):
     def refreshLoggers(self):
         #refreshes loggerlist
         iter = self.theListStore.get_iter_first()
+        aLoggerList = self.theSession.getLoggedPNList()
         while iter != None:
-            text = self.theListStore.get_value( iter, COL_TXT )
-            if self.hasLogger( text ):
-                fixed=True
-            else:
-                fixed=False
-            self.theListStore.set(iter, COL_LOG, fixed)
-            iter = self.theListStore.iter_next(iter)
+            aFullPN = identifiers.FullPN(
+                self.theListStore.get_value( iter, COL_TXT ) )
+            self.theListStore.set( iter, COL_LOG, aFullPN in aLoggerList )
+            iter = self.theListStore.iter_next( iter )
 
-    def addTraceToPlot(self,aFullPNList):
+    def addTraceToPlot( self, aFullPNList ):
         #checks that newpn has logger if mode is history
         #calls superclass
         pass_flag = 0
-        if self.theSession.getParameter('log_all_traces'):
+        if self.theSession.getParameter( 'log_all_traces' ):
             for aFullPN in aFullPNList:
                 self.theSession.createLogger( aFullPN )
+        aLoggerList = self.theSession.getLoggedPNList()
         if self.thePlotInstance.getStripMode() == 'history':
             for aFullPN in aFullPNList:
-                aFullPNString = util.createFullPNString( aFullPN)
-                if not self.hasLogger(aFullPNString):
-                    self.theSession.message(aFullPNString+" doesn't have associated logger.")
+                if not aFullPN in aLoggerList:
+                    self.theSession.message(
+                        str( aFullPN ) + " doesn't have associated logger.")
                     pass_flag = 1
-            if pass_flag==1:
+            if pass_flag == 1:
                 return -1
 
         pass_list = []
         for aFullPN in aFullPNList: 
-            aFullPNString = util.createFullPNString( aFullPN )
-            if aFullPNString in self.displayedFullPNStringList:
+            if aFullPN in self.displayedFullPNList:
                 continue
             #gets most recent value
             #check whether there's enough room left
-            if len(self.displayedFullPNStringList) < self.thePlotInstance.getMaxTraces():
+            if len( self.displayedFullPNList ) < self.thePlotInstance.getMaxTraces():
                 #adds trace to plotinstance,clist, add to displaylist, colorlist
                 aValue = self.getLatestData( aFullPN )
                 if aValue != None:
-                    self.displayedFullPNStringList.append( aFullPNString )
-                    pass_list.append( aFullPNString )
+                    self.displayedFullPNList.append( aFullPN )
+                    pass_list.append( aFullPN )
                 else:
-                    self.theSession.message('%s cannot be displayed, because it is not numeric\n' % aFullPNString)
+                    self.theSession.message(
+                        '%s cannot be displayed, because it is not numeric' % aFullPNS )
 
         added_list = []
-        if len( pass_list ) > 0:
-            try:
-                for aFullPNString in pass_list:
-                    added_list.append(
-                        self.thePlotInstance.addTrace( aFullPNString ) )
-            except RuntimeError:
-                pass
+        try:
+            for aFullPN in pass_list:
+                added_list.append(
+                    self.thePlotInstance.addTrace( aFullPN ) )
+        except RuntimeError:
+            pass
         self.addTraceToList( added_list )
         self.thePlotInstance.sync()
         
     def getLatestData( self, fpn ):
         value = self.theSession.getEntityProperty( fpn )
-        if not operator.isNumberType( value):
+        if not operator.isNumberType( value ):
             return None
         time = self.theSession.getCurrentTime()
         return nu.array( [time,value, value, value, value] )
         
-    def getSelected(self):
-        self.selectionList=[]
-        self.theListSelection.selected_foreach(self.selection_function)
-        return self.selectionList
-        
-    def selection_function( self, model, path, iter ):
-        text = self.theListStore.get_value( iter, COL_TXT )
-        self.selectionList.append([text,iter])
+    def getSelected( self ):
+        selectionList = []
+        self.theListSelection.selected_foreach(
+            lambda model, path, iter: selectionList.append(
+                (
+                    identifiers.FullPN( model.get_value( iter, COL_TXT ) ),
+                    iter
+                    ) ) )
+        return selectionList
         
     def addTraceToList( self, added_list ):
 
-        xAxis = self.thePlotInstance.getXAxisFullPNString()
+        xAxis = self.thePlotInstance.getXAxisFullPN()
         for aSeries in added_list:
             iter = self.theListStore.append()
-            aFullPNString = aSeries.getFullPNString()
+            aFullPN = aSeries.getFullPN()
             self.noHandle = True
             self.theListStore.set_value(
                 iter, COL_PIX, self.getPixmap( aSeries.getColor() ) )
-            self.theListStore.set_value( iter, COL_TXT, aFullPNString )
+            self.theListStore.set_value( iter, COL_TXT, str( aFullPN ) )
             self.theListStore.set_value( iter, COL_ON, aSeries.isOn() )
-            self.theListStore.set_value( iter, COL_X, aFullPNString == xAxis )
+            self.theListStore.set_value( iter, COL_X, aFullPN == xAxis )
             self.noHandle = False
         self.refreshLoggers()
 
@@ -292,7 +289,7 @@ class TracerWindow( OsogoPluginWindow ):
             self.theListStore.set_value( iter, COL_PIX,
                     self.getPixmap( aSeries.getColor() ) )
         
-    def removeTraceFromList(self,aFullPNString):
+    def removeTraceFromList( self,aFullPN ):
         pass
 
     def shrink_to_fit(self):
@@ -395,11 +392,12 @@ class TracerWindow( OsogoPluginWindow ):
         while True:
             if anIter == None:
                 return None
-            aTitle = self.theListStore.get_value(anIter, COL_TXT )
+            aFullPN = identifiers.FullPN(
+                self.theListStore.get_value(anIter, COL_TXT ) )
             self.noHandle = True
-            aSeries = self.thePlotInstance.getDataSeries( aTitle )
+            aSeries = self.thePlotInstance.getDataSeries( aFullPN )
             self.theListStore.set_value( anIter, COL_ON, aSeries.isOn() )
-            self.theListStore.set_value( anIter, COL_X, theFullPN == aTitle )
+            self.theListStore.set_value( anIter, COL_X, theFullPN == aFullPN )
             self.noHandle = False
             anIter=self.theListStore.iter_next( anIter )
 
@@ -430,27 +428,28 @@ class TracerWindow( OsogoPluginWindow ):
         """ creates logger for all traces on TracerWindow """
         self.logAllAction( None )
 
-    def setTraceVisible (self, aFullPNString, aBoolean):
+    def setTraceVisible (self, aFullPN, toDisplay):
         """ sets visible trace of identified by FullPNString 
-            aBoolean:
+            toDisplay:
             True - Display
             False - Don't display trace
         """
-        if aFullPNString not in self.thePlotInstance.getDataSeriesNames():
+        if aFullPN not in self.thePlotInstance.getDataSeriesNames():
             return
-        aSeries = self.thePlotInstance.getDataSeries( aFullPNString )
+        aSeries = self.thePlotInstance.getDataSeries( aFullPN )
         currentState = aSeries.isOn()
 
-        if currentState == aBoolean:
+        if currentState == toDisplay:
             return None
         anIter=self.theListStore.get_iter_first()
         while True:
             if anIter == None:
                 return None
-            aTitle = self.theListStore.get_value(anIter, COL_TXT )
-            if aTitle == aFullPNString:
-                aSeries = self.thePlotInstance.getDataSeries( aFullPNString )
-                if aBoolean:
+            aTitle = identifiers.FullPN(
+                self.theListStore.get_value(anIter, COL_TXT ) )
+            if aTitle == aFullPN:
+                aSeries = self.thePlotInstance.getDataSeries( aFullPN )
+                if toDisplay:
                     aSeries.switchOn()
                 else:
                     aSeries.switchOff()
@@ -514,16 +513,17 @@ class TracerWindow( OsogoPluginWindow ):
             selectedList = self.getSelected()
             allHasLogger = True
             xAxisSelected = False
-            xAxis = self.thePlotInstance.getXAxisFullPNString()
+            xAxis = self.thePlotInstance.getXAxisFullPN()
+            aLoggerList = self.theSession.getLoggedPNList()
             for aSelection in selectedList:
-                if not self.hasLogger( aSelection[0] ):
+                if not aSelection[0] in aLoggerList:
                     allHasLogger = False
                 if aSelection[0] == xAxis:
                     xAxisSelected = True
                 
 
             theMenu = gtk.Menu()
-            listCount = len( self.displayedFullPNStringList )
+            listCount = len( self.displayedFullPNList )
             if len( selectedList ) > 0 and listCount - len(selectedList )  > 0 and not xAxisSelected:
             
                 removeItem = gtk.MenuItem( "Remove" )
@@ -562,7 +562,7 @@ class TracerWindow( OsogoPluginWindow ):
         for anItem in fpnList:
             aFullPNString = anItem[0]
             aLoggerStub = self.theSession.createLogger(
-                util.createFullPN( aFullPNString ) )
+                identifiers.FullPN( aFullPNString ) )
             aLoggerStub.setLoggerPolicy( newLogPolicy )
 
     def __toggleColor( self, *args ):
@@ -615,8 +615,8 @@ class TracerWindow( OsogoPluginWindow ):
         if self.noHandle:
             return
         iter = model.get_iter( (int( path ), ) )
-        text = self.theListStore.get_value( iter, COL_TXT )
-        aSeries = self.thePlotInstance.getDataSeries( text )
+        aFullPN = identifiers.FullPN( self.theListStore.get_value( iter, COL_TXT ) )
+        aSeries = self.thePlotInstance.getDataSeries( aFullPN )
         if aSeries.isOn( ):
             aSeries.switchOff()
         else:
@@ -635,11 +635,12 @@ class TracerWindow( OsogoPluginWindow ):
             return
         iter = model.get_iter( ( int ( path ), ) )
         fixed = model.get_value( iter, COL_LOG )
-        text = self.theListStore.get_value( iter, COL_TXT )
 
         if fixed == False:
             if self.checkRun():
                 return
+            aFullPN = identifiers.FullPN(
+                self.theListStore.get_value( iter, COL_TXT ) )
             self.theSession.createLogger( util.createFullPN( text ) )
             self.refreshLoggers()
 
@@ -651,10 +652,10 @@ class TracerWindow( OsogoPluginWindow ):
             return
         iter = model.get_iter( ( int ( path ), ) )
         fixed = model.get_value( iter, COL_X )
-        text = self.theListStore.get_value( iter, COL_TXT )
-        
         if fixed == False:
-            self.setXAxis( text )
+            aFullPN = identifiers.FullPN( 
+                self.theListStore.get_value( iter, COL_TXT ) )
+            self.setXAxis( aFullPN )
         else:
             self.setXAxis( "Time" )
 
@@ -663,35 +664,26 @@ class TracerWindow( OsogoPluginWindow ):
         this signal handler is called when "Remove Trace" button is pressed
         """
         #identify selected FullPNs
-        fpnlist=[]      
-        selected_list=self.getSelected()
-        for aselected in selected_list:
-            #remove from fullpnlist
-            if len(self.displayedFullPNStringList)==1:
+        fpnlist = []
+        for aSelectedFullPN, anIter in self.getSelected():
+            # XXX: is the following check really necessary?
+            if len( self.displayedFullPNList ) == 1:
                 break
-                
-            FullPNList = self.theRawFullPNList[:]
-            for afullpn in FullPNList:
-                if aselected[0] == util.createFullPNString( afullpn):
-                    self.theRawFullPNList.remove(afullpn)
-                    break       
+            matchedList = []
+            if aSelectedFullPN in self.theRawFullPNList:
+                self.theRawFullPNList.remove( aSelectedFullPN )
             #remove from displaylist
-            self.displayedFullPNStringList.remove( aselected[0] )
-            fpnlist.append( aselected[0] )
-            self.theListStore.remove( aselected[1] )
-            #remove from plotinstance
-        
+            self.displayedFullPNList.remove( aSelectedFullPN )
+            fpnlist.append( aSelectedFullPN )
+            self.theListStore.remove( anIter )
         self.thePlotInstance.removeTrace( fpnlist )
-        #delete selected from list
-        #self.checkHistoryButton()
-        #self.checkRemoveButton()
 
     def logAllAction(self,obj):
         """ this signal handler is called when "Log All" button is pressed """
         if not self.checkRun():
             return
         #creates logger in simulator for all FullPNs 
-        self.createLogger( self.displayedFullPNStringList )      
+        self.createLogger( self.displayedFullPNSList )      
         self.refreshLoggers()
         
     def toggleStripAction(self, obj):
@@ -704,8 +696,9 @@ class TracerWindow( OsogoPluginWindow ):
             self.thePlotInstance.setStripMode( 'strip' )
         else:
             pass_flag = True
-            for fpn in self.displayedFullPNStringList:
-                if not self.hasLogger(fpn): 
+            aLoggerList = self.theSession.getLoggedPNList()
+            for aFullPN in self.displayedFullPNList:
+                if not aFullPN in aLoggerList:
                     pass_flag = False
                     break
             if pass_flag:

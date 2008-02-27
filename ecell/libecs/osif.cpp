@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -107,7 +107,7 @@
 
 #include "osif.h"
 
-#if defined( WIN32 )
+#if defined( WIN32 ) && !defined( __CYGWIN__ )
 #include <windows.h>
 #include "unistd.h"
 #include "win32_utils.h"
@@ -162,7 +162,7 @@ int        num_process_path;
 
 long osif_get_pid(void)
 {
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( __CYGWIN__ )
     return GetCurrentProcessId();
 #else
     return (long)getpid();
@@ -171,7 +171,7 @@ long osif_get_pid(void)
 
 off_t osif_disk_free(const char *__path)
 {
-#if defined(WIN32)
+#if defined( WIN32 ) && !defined( __CYGWIN__ )
     ULARGE_INTEGER free_bytes_available;
     ULARGE_INTEGER total_number_of_bytes;
     ULARGE_INTEGER total_number_of_free_bytes;
@@ -215,7 +215,7 @@ off_t osif_disk_free(const char *__path)
 
 int osif_mkdir( const char *__name )
 {
-#if defined( WIN32 )
+#if defined( WIN32 ) && !defined( __CYGWIN__ )
     return CreateDirectory( __name, NULL ) ? 0: -1;
 #else
     return mkdir( __name, 0755 );
@@ -225,7 +225,7 @@ int osif_mkdir( const char *__name )
 // return a negative number on error
 int osif_is_dir(const char *__name)
 {
-#if defined( WIN32 )
+#if defined( WIN32 ) && !defined( __CYGWIN__ )
     DWORD result = GetFileAttributes( __name );
     if ( INVALID_FILE_ATTRIBUTES == result )
     {
