@@ -451,19 +451,6 @@ CLASSPROPERTY_INFO( # NAME, TYPE, SETMETHOD, GETMETHOD, SAVEMETHOD, LOADMETHOD )
   NULLGET_SPECIALIZATION( String );
   NULLGET_SPECIALIZATION( Polymorph );
 
-
-#define DEFINE_TYPE_NAME(n) \
-  template struct PropertiedClass::TypeName<libecs::n>; \
-  template<> const char PropertiedClass::TypeName<libecs::n>::name[] = #n;
-
-  DEFINE_TYPE_NAME(Integer)
-  DEFINE_TYPE_NAME(String)
-  DEFINE_TYPE_NAME(Real)
-
-#undef DEFINE_TYPE_NAME
-
-
-
   /*@}*/
   
 } // namespace libecs
