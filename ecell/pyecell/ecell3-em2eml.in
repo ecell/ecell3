@@ -44,8 +44,8 @@ def main():
 
     try:
         opts, args = getopt.getopt( sys.argv[1:] , 'DEho:p:',
-                         ["help", "outfile=",
-                          "preprocess"])
+                         ['help', 'debug', 'patch', 'outfile=',
+                          'preprocess'])
     except:
         usage()
         sys.exit( -1 )
