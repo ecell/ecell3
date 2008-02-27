@@ -419,6 +419,8 @@ namespace libecs
 
     VariableReferenceVectorIterator findVariableReference( StringCref aName );
 
+    VariableReferenceVectorConstIterator findVariableReference( StringCref aName ) const;
+
     void updateVariableReferenceVector();
 
     //    static const Polymorph 

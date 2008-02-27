@@ -380,6 +380,23 @@ namespace libecs
     return theVariableReferenceVector.end();
   }
 
+  VariableReferenceVectorConstIterator 
+  Process::findVariableReference( StringCref aVariableReferenceName ) const
+  {
+    // well this is a linear search.. but this won't be used during simulation.
+    for( VariableReferenceVectorConstIterator 
+	   i( theVariableReferenceVector.begin() );
+	 i != theVariableReferenceVector.end(); ++i )
+      {
+	if( (*i).getName() == aVariableReferenceName )
+	  {
+	    return i;
+	  }
+      }
+
+    return theVariableReferenceVector.end();
+  }
+
   void Process::declareUnidirectional()
   {
     std::for_each( thePositiveVariableReferenceIterator,
