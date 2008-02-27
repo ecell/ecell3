@@ -19,8 +19,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)\$(ProjectName).build"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -86,7 +86,7 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -153,8 +153,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)\$(ProjectName).build"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -219,8 +219,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)\$(ProjectName).build"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -613,50 +613,318 @@
 				</Filter>
 			</Filter>
 		</Filter>
-		<File
-			RelativePath="..\..\ecell\pyecell\ecell\config.py.in"
+		<Filter
+			Name="Templates"
 			>
-			<FileConfiguration
-				Name="Debug|Win32"
+			<File
+				RelativePath="..\..\ecell\pyecell\ecell\config.py.in"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Generating setup.py..."
-					CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\.. $(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectDir)..\..\ecell\pyecell\ecell\config.py"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|x64"
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)config.py"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)config.py"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)config.py"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)config.py"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\ecell\bin\ecell3-em2eml.in"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Generating setup.py..."
-					CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\.. $(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectDir)..\..\ecell\pyecell\ecell\config.py"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-em2eml"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-em2eml"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-em2eml"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-em2eml"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\ecell\bin\ecell3-eml2em.in"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Generating setup.py..."
-					CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectDir)..\..\ecell\pyeell\ecell\config.py"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|x64"
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-eml2em"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-eml2em"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-eml2em"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-eml2em"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\ecell\pyecell\ecell3-eml2sbml.in"
 				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Generating setup.py..."
-					CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
-					Outputs="$(ProjectDir)..\..\ecell\pyeell\ecell\config.py"
-				/>
-			</FileConfiguration>
-		</File>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-eml2sbml"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-eml2sbml"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-eml2sbml"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-eml2sbml"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\ecell\pyecell\ecell3-sbml2eml.in"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-sbml2eml"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-sbml2eml"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-sbml2eml"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-sbml2eml"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\ecell\pyecell\ecell3-session-manager.in"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-session-manager"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-session-manager"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-session-manager"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-session-manager"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\ecell\pyecell\ecell3-session.in"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-session"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-session"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-session"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating $(InputFileName)..."
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						Outputs="$(InputDir)ecell3-session"
+					/>
+				</FileConfiguration>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\..\ecell\pyecell\setup.py"
 			>
@@ -666,7 +934,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecell&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=%INCLUDE%;$(INCLUDE)&#x0D;&#x0A;SET LIB=$(SolutionDir)$(ConfigurationName);%LIB%;$(LIB)&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecell\setup.py&quot; build -g -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
+					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecell&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB);%LIB%&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecell\setup.py&quot; build -g -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
 					Outputs="$(OutDir)\$(ProjectName).stamp"
 				/>
 			</FileConfiguration>
@@ -676,7 +944,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecell&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=%INCLUDE%;$(INCLUDE)&#x0D;&#x0A;SET LIB=$(SolutionDir)$(ConfigurationName);%LIB%;$(LIB)&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecell\setup.py&quot; build -g -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
+					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecell&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB);%LIB%&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecell\setup.py&quot; build -g -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
 					Outputs="$(OutDir)\$(ProjectName).stamp"
 				/>
 			</FileConfiguration>
@@ -686,7 +954,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecell&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=%INCLUDE%;$(INCLUDE)&#x0D;&#x0A;SET LIB=$(SolutionDir)$(ConfigurationName);%LIB%;$(LIB)&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecell\setup.py&quot; build -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
+					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecell&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB);%LIB%&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecell\setup.py&quot; build -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
 					Outputs="$(OutDir)\$(ProjectName).stamp"
 				/>
 			</FileConfiguration>
@@ -696,7 +964,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecell&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=%INCLUDE%;$(INCLUDE)&#x0D;&#x0A;SET LIB=$(SolutionDir)$(ConfigurationName);%LIB%;$(LIB)&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecell\setup.py&quot; build -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
+					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecell&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB);%LIB%&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecell\setup.py&quot; build -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
 					Outputs="$(OutDir)\$(ProjectName).stamp"
 				/>
 			</FileConfiguration>

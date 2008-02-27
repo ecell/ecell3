@@ -20,8 +20,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)\dm"
-			IntermediateDirectory="$(ConfigurationName)\$(ProjectName).build"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\dm"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
@@ -43,8 +43,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GSL_DLL;__STDC__=1"
+				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GSL_DLL;BOOST_ALL_NO_LIB;__STDC__=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -64,9 +64,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib libgsl_dll.lib python25_d.lib boost_python_debug.lib"
+				AdditionalDependencies="ecs.lib gsl.lib python25_d.lib boost_python-gd.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(LIB)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -100,7 +100,7 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\dm"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
@@ -123,8 +123,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GSL_DLL;__STDC__=1"
+				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GSL_DLL;BOOST_ALL_NO_LIB;__STDC__=1"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -144,9 +144,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib libgsl_dll.lib python25_d.lib boost_python_debug.lib"
+				AdditionalDependencies="ecs.lib gsl.lib python25_d.lib boost_python-gd.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(LIB)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64)"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -179,8 +179,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)\dm"
-			IntermediateDirectory="$(ConfigurationName)\$(ProjectName).build"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\dm"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
@@ -202,8 +202,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GSL_DLL;__STDC__=1"
+				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GSL_DLL;BOOST_ALL_NO_LIB;__STDC__=1"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -221,9 +221,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib libgsl_dll.lib python25.lib boost_python.lib"
+				AdditionalDependencies="ecs.lib gsl.lib python25.lib boost_python.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(LIB)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -257,8 +257,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)\dm"
-			IntermediateDirectory="$(ConfigurationName)\$(ProjectName).build"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\dm"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
@@ -281,8 +281,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GSL_DLL;__STDC__=1"
+				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GSL_DLL;BOOST_ALL_NO_LIB;__STDC__=1"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -300,9 +300,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib libgsl_dll.lib python25.lib boost_python.lib"
+				AdditionalDependencies="ecs.lib gsl.lib python25.lib boost_python.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(LIB)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

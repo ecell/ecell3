@@ -106,8 +106,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyecell", "pyecell.vcproj",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libltdl", "libltdl.vcproj", "{185E074A-571E-4DC9-980B-338C578D8C1D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "model-editor", "model-editor.vcproj", "{A0391112-24C6-4D0D-954D-3279CC483036}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "session-monitor", "session-monitor.vcproj", "{345350DE-5260-4D67-B2DD-9FBE2FD6EE1F}"
 EndProject
 Global

@@ -20,8 +20,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)\$(ProjectName).build"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
@@ -47,7 +47,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(ProjectDir)..\..\libltdl;$(ProjectDir)..\..\osdep\win32;$(ProjectDir)..\..\ecell;$(ProjectDir)..\..;$(INCLUDE)"
+				AdditionalIncludeDirectories="$(ProjectDir)..\..\libltdl;$(ProjectDir)..\..\osdep\win32;$(ProjectDir)..\..\ecell;$(ProjectDir)..\..;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;PYECS_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -68,10 +68,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib emc.lib boost_python_debug.lib"
+				AdditionalDependencies="ecs.lib emc.lib boost_python-gd.lib"
 				OutputFile="$(OutDir)\_ecs.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(LIB)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -104,7 +104,7 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
@@ -131,7 +131,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(ProjectDir)..\..\libltdl;$(ProjectDir)..\..\osdep\win32;$(ProjectDir)..\..\ecell;$(ProjectDir)..\..;$(INCLUDE)"
+				AdditionalIncludeDirectories="$(ProjectDir)..\..\libltdl;$(ProjectDir)..\..\osdep\win32;$(ProjectDir)..\..\ecell;$(ProjectDir)..\..;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;PYECS_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -152,10 +152,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib emc.lib boost_python_debug.lib"
+				AdditionalDependencies="ecs.lib emc.lib boost_python-gd.lib"
 				OutputFile="$(OutDir)\_ecs.dll"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(LIB)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="17"
@@ -187,8 +187,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)\$(ProjectName).build"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
@@ -214,7 +214,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(ProjectDir)..\..\libltdl;$(ProjectDir)..\..\osdep\win32;$(ProjectDir)..\..\ecell;$(ProjectDir)..\..;$(INCLUDE)"
+				AdditionalIncludeDirectories="$(ProjectDir)..\..\libltdl;$(ProjectDir)..\..\osdep\win32;$(ProjectDir)..\..\ecell;$(ProjectDir)..\..;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PYECS_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -236,7 +236,7 @@
 				AdditionalDependencies="ecs.lib emc.lib boost_python.lib"
 				OutputFile="$(OutDir)\_ecs.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(LIB)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -270,8 +270,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|x64"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)\$(ProjectName).build"
+			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
@@ -298,7 +298,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(ProjectDir)..\..\libltdl;$(ProjectDir)..\..\osdep\win32;$(ProjectDir)..\..\ecell;$(ProjectDir)..\..;$(INCLUDE)"
+				AdditionalIncludeDirectories="$(ProjectDir)..\..\libltdl;$(ProjectDir)..\..\osdep\win32;$(ProjectDir)..\..\ecell;$(ProjectDir)..\..;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;PYECS_EXPORTS"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -320,7 +320,7 @@
 				AdditionalDependencies="ecs.lib emc.lib boost_python.lib"
 				OutputFile="$(OutDir)\_ecs.dll"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)$(ConfigurationName);$(LIB)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -461,7 +461,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecs&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=%INCLUDE%;$(INCLUDE)&#x0D;&#x0A;SET LIB=$(SolutionDir)$(ConfigurationName);%LIB%;$(LIB)&#x0D;&#x0A;SET LIBDIR=\lib&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecs\setup.py&quot; build -g -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
+					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecs&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib\site-packages\numpy\core\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB);%LIB%&#x0D;&#x0A;SET LIBDIR=\lib&#x0D;&#x0A;SET BOOST_PYTHON_LIB_NAME=boost_python-gd&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecs\setup.py&quot; build -g -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;"
 					Outputs="$(OutDir)\$(ProjectName).stamp"
 				/>
 			</FileConfiguration>
@@ -471,7 +471,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecs&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=%INCLUDE%;$(INCLUDE)&#x0D;&#x0A;SET LIB=$(SolutionDir)$(ConfigurationName);%LIB%;$(LIB)&#x0D;&#x0A;SET LIBDIR=\lib&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecs\setup.py&quot; build -g -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
+					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecs&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib\site-packages\numpy\core\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64);%LIB%&#x0D;&#x0A;SET LIBDIR=\lib&#x0D;&#x0A;SET BOOST_PYTHON_LIB_NAME=boost_python-gd&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecs\setup.py&quot; build -g -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;"
 					Outputs="$(OutDir)\$(ProjectName).stamp"
 				/>
 			</FileConfiguration>
@@ -481,7 +481,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecs&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=%INCLUDE%;$(INCLUDE)&#x0D;&#x0A;SET LIB=$(SolutionDir)$(ConfigurationName);%LIB%;$(LIB)&#x0D;&#x0A;SET LIBDIR=\lib&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecs\setup.py&quot; build -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
+					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecs&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib\site-packages\numpy\core\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB);%LIB%&#x0D;&#x0A;SET LIBDIR=\lib&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecs\setup.py&quot; build -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;"
 					Outputs="$(OutDir)\$(ProjectName).stamp"
 				/>
 			</FileConfiguration>
@@ -491,7 +491,7 @@
 				<Tool
 					Name="VCCustomBuildTool"
 					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecs&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=%INCLUDE%;$(INCLUDE)&#x0D;&#x0A;SET LIB=$(SolutionDir)$(ConfigurationName);%LIB%;$(LIB)&#x0D;&#x0A;SET LIBDIR=\lib&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecs\setup.py&quot; build -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
+					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\pyecs&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib\site-packages\numpy\core\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64);%LIB%&#x0D;&#x0A;SET LIBDIR=\lib&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(SolutionDir)..\..\ecell\pyecs\setup.py&quot; build -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;"
 					Outputs="$(OutDir)\$(ProjectName).stamp"
 				/>
 			</FileConfiguration>
