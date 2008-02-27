@@ -45,6 +45,7 @@ import types
 
 from types import *
 from ecell.ecssupport import *
+from ecell.identifiers import *
 
 class Eml:
     def __init__( self, aFileObject = None ):
@@ -103,7 +104,6 @@ class Eml:
                 anElement.removeChild( aChildElement )
     
     def getStepperList( self ):
-
         aStepperNodeList = self.__getStepperNodeList()
 
         aStepperList = []
@@ -183,10 +183,9 @@ class Eml:
         anEntityElement.setAttribute( 'class', aClass )
 
         if aFullID.typeCode == SYSTEM:
-            if aTargetPath != '':  # check if the supersystem exists
-                dummy = self.__getSystemNode( aFullID.getSuperSystemPath() )
-
-            anID = convertSystemFullID2SystemID( aFullID )
+            superSystemPath = aFullID.getSuperSystemPath()
+            if superSystemPath != None:
+                dummy = self.__getSystemNode( superSystemPath )
             anEntityElement.setAttribute( 'id', aFullID.id )
             self.__theDocument.documentElement.appendChild( anEntityElement )
 
@@ -287,7 +286,7 @@ class Eml:
         return aRetval
 
     def getEntityProperty( self, aFullPN ):
-        assert isinstance( aFullPN, identifiers.FullPN )
+        assert isinstance( aFullPN, FullPN )
         anEntityPropertyNode = self.__getEntityPropertyNode(
             aFullPN.fullID, aFullPN.propertyName )
         return self.__createValueList( anEntityPropertyNode )
@@ -321,7 +320,7 @@ class Eml:
             if aSystemNode.nodeName == 'system':
 
                 aSystemPath = aSystemNode.getAttribute( 'id' )
-                aSystemFullID = identifiers.SystemPath( aSystemPath )
+                aSystemFullID = SystemPath( aSystemPath )
                 self.__addToCache( aSystemFullID, aSystemNode )
 
                 for aChildNode in aSystemNode.childNodes:
@@ -361,7 +360,7 @@ class Eml:
         else:
             for aSystemNode in self.__theEmlNode.childNodes:
                 if aSystemNode.nodeName == 'system':
-                    aCandidate = identifiers.SystemPath(
+                    aCandidate = SystemPath(
                         aSystemNode.getAttribute( 'id' ) )
                     if aSystemPath.isParentOf( aCandidate ):
                         aSystemList.append( aCandidate.toFullID().id )
@@ -390,7 +389,7 @@ class Eml:
         raise "Entity [%s] not found."%aFullID
                         
     def __getSystemNode( self, aSystemPath ):
-        aFullID = identifiers.SystemPath( aSystemPath )
+        aFullID = SystemPath( aSystemPath ).toFullID()
 
         # first look up the cache
         try:

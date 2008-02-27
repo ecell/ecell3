@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Eml to Sbml converter
+# Eml to SBML converter
 
 import sys
 import string
@@ -10,47 +10,35 @@ import getopt
 import time
 import sets
 
-import ecell.ecs
-import ecell.config
-from ecell.eml import *
-from ecell.convertEML2SBML import *
+import ecell.converter.eml2sbml as conv
 
-# --------
-#  Main
-# --------
+def usage():
+    aProgramName = os.path.basename( sys.argv[0] )
 
-if __name__ == '__main__':
-
-
-    def usage():
-        aProgramName = os.path.basename( sys.argv[0] )
-
-        print '''
-%(appname)s -- convert a eml file to a SBML file
-        
+    print '''
+%s -- convert eml to em
+    
 Usage:
-    %(appname)s [-h] [-f] [-o SBMLFILE] infile
-        
+    %s [-h] [-f] [-o outfile] infile
+
+    
 Options:
-    -h or --help             : Print this message.
-    -f or --force            : Forcefully overwrite the output file
-                               even if it already exists.
-    -o or --outfile=SBMLFILE : Specify the output file name. '-' means stdout.
-        
-''' % { 'appname': aProgramName }
+    -h or --help    :  Print this message.
+    -f or --force   :  Force overwrite even if outfile already exists.
+    -o or --outfile=:  Specify output file name.  '-' means stdout.
+    
+''' % ( aProgramName, aProgramName )
 
-    ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
-
+def main():
     # commandline processing
     try:
-        opts, args = getopt.getopt(
-            sys.argv[ 1: ], "hfo:",
-            [ "help", "force", "outfile=" ] )
+        opts, args = getopt.getopt( sys.argv[1:], "hfo:",
+                                    ["help","force", "outfile="] )
     except getopt.GetoptError:
         usage()
-        sys.exit( -1 )
+        sys.exit( 1 )
 
-    aSbmlFileName = None
+    aSBMLFileName = None
     aForceFlag = 0
 
     for anOption, anArg in opts:
@@ -62,59 +50,56 @@ Options:
             aForceFlag = 1            
 
         if anOption in ( "-o", "--outfile" ):
-            aSbmlFileName = anArg
+            aSBMLFileName = anArg
             
     if len( args ) == 0:
         sys.stderr.write( "No input file.\n" )
-        sys.exit( -1 )
+        sys.exit( 1 )
 
     anEmlFileName = args[0]
 
-    anEmlFile = open( anEmlFileName )
-    anEml = Eml( anEmlFile )
-    anEmlFile.close()
-    
     aBaseName = os.path.basename( anEmlFileName )
     aBaseName, anExt = os.path.splitext( aBaseName )
 
-    if aSbmlFileName == None:
+    if aSBMLFileName == None:
         if anExt == '.eml' or anExt == '.xml':
             anExt = '.xml'
         else:
             anExt += '.xml'
-        aSbmlFileName = aBaseName + anExt
 
-    if aSbmlFileName == '-':
-        aSbmlFile = sys.stdout
+        aSBMLFileName = aBaseName + anExt
+
+    if aSBMLFileName == '-':
+        aSBMLFile = sys.stdout
+
     else:
-        if os.path.isfile( aSbmlFileName ) and aForceFlag == 0:
+        if os.path.isfile( aSBMLFileName ) and aForceFlag == 0:
             sys.stderr.write( "Output file %s exists. Use -f to overwrite.\n"
-                              % aSbmlFileName )
+                              % aSBMLFileName )
             sys.exit( 1 )
-        aSbmlFile = open( aSbmlFileName, 'w' )
 
     aSBMLLevel = raw_input( "SBML Model Level? ( 1 or 2 ) : " )
 
-    if aSBMLLevel == '1' :
+    if aSBMLLevel == '1':
         aSBMLVersion = raw_input( "SBML Model Version? ( 1 or 2 ) : " )
-        if( aSBMLVersion != '1' and aSBMLVersion != '2'):            
-            raise IOError," Such SBML Version is not defined"
+        if aSBMLVersion != '1' and aSBMLVersion != '2':
+            raise ValueError," Such SBML Version is not defined"
     elif aSBMLLevel == '2':
         aSBMLVersion = 1
     else:
-        raise IOError," Such SBML Level is not defined"
+        raise ValueError," Such SBML Level is not defined"
 
 
-    # ------------------------------
-    #       eml2sbml main  
-    # ------------------------------
+    anEmlFile = open( anEmlFileName )
+    aSBMLFile = open( aSBMLFileName, 'w' )
 
-    aSbmlString = convertToSBMLModel(
-        anEml, aBaseName, aSBMLLevel, aSBMLVersion )
+    aSBMLString = conv.convert( anEmlFile.read(),
+                                basename = aBaseName,
+                                level = aSBMLLevel,
+                                version = aSBMLVersion )
+    aSBMLFile.write( aSBMLString )
     
-    if aSbmlString != '':
-        aSbmlFile.write( aSbmlString )
-    else:
-        raise IOError," failed to write the SBML file(.xml)"
-    
-    aSbmlFile.close()
+    aSBMLFile.close()
+
+if __name__ == '__main__':
+    main()

@@ -1,4 +1,4 @@
-#!/usr/bin/env pytho
+#!/usr/bin/env python
 
 import sys
 from distutils.core import setup, Extension
@@ -19,6 +19,14 @@ setup(
         'ecell.SessionManager',
         'ecell.model',
         'ecell.analysis'
+        ],
+    scripts = [
+        'ecell3-em2eml',
+        'ecell3-eml2em',
+        'ecell3-eml2sbml',
+        'ecell3-sbml2eml',
+        'ecell3-session',
+        'ecell3-session-manager',
         ],
     ext_modules = [
         Extension( 'ecell._tableio',

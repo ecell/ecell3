@@ -17,135 +17,123 @@ import os
 import string 
 import getopt
 import tempfile
+from StringIO import StringIO
 
-import ecell.ecs
-import ecell.config
-import ecell.emparser
+import ecell.converter.em2eml as conv
+import ecell.em.preprocessor as pp
 
 def usage():
     aProgramName = os.path.basename( sys.argv[0] )
     print '''
-%(appname)s -- convert a EM file to a EML file
+%s -- convert em to eml
 
-Usage:
-    %(appname)s [-h] [-o EMLFILE] [-p PATCHFILE] infile.em
-    By default this command automatically overwrite EMLFILE.
+Usage: %s [-h] [-o outfile] [-p emlfile] infile.em
+
+       By default this command automatically overwrite infile.eml.
 
 Options:
-    -h or --help            : Print this message.
-    -o or --outfile=EMLFILE : Specify the output file name. '-' means stdout.
-    -p or --patch=PATCHFILE : Read PATCHFILE, override parameters by the input
-                              and then produce EMLFILE.
-    -E or --preprocess      : Preprocessing only. Implies -o -.
-''' % { 'appname': aProgramName }
+        -h or --help       :  Print this message.
+        -o or --outfile=   :  Specify output file name.  '-' means stdout.
+        -p or --patch=     :  Patch source eml file
+        -E or --preprocess :  Preprocessing only. implies -o -.
+''' % ( aProgramName, aProgramName )
+    
+
 
 def main():
-    ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
-
     try:
-        opts, args = getopt.getopt( sys.argv[1:] , 'DEho:p:',
-                         ["help", "outfile=",
-                          "preprocess"])
+        opts , args = getopt.getopt( sys.argv[1:] , 'DEho:p:',
+                         ['help', 'debug', 'patch', 'outfile=',
+                          'preprocess'])
+        args[0]
     except:
         usage()
-        sys.exit( -1 )
+        sys.exit(1)
 
-    anEmlFileName = None
-    aForceFlag = 1 # Default Automatic overwrite mode
-    aPatchFlag = 0
-    debug = 0
-    preprocessing_only = 0
+    anOutputFileName = None
+    aSrcEmlFileName = None
+    aForceFlag = True # Default Automatic overwrite mode
+    aPatchFlag = False
+    debug = False
+    preprocessing_only = False
     for anOption, anArg in opts:
         if anOption in ( "-h", '--help' ):
             usage()
-            sys.exit( 0 )
-            
+            sys.exit(0)
         if anOption in ( "-D", '--debug' ):
-            debug = 1
-            
+            debug = True
         if anOption in ( "-o", '--outfile'):
-                anEmlFileName = anArg
-            
+            anOutputFileName = anArg
         if anOption in ( "-p", '--patch'):
-            aPatchFlag = 1
+            aPatchFlag = True
             aSrcEmlFileName = anArg
-            aSrcEmlFile = open( aSrcEmlFileName, 'r' )
-            aSrcEml = ecell.eml.Eml( aSrcEmlFile)
-
         if anOption in ( "-E", '--preprocess'):
-            preprocessing_only = 1
-            anEmlFileName = '-'            
-
+            preprocessing_only = True
+            anOutputFileName = '-'            
     if len( args ) == 0:
         sys.stderr.write( "No input file.\n" )
         sys.exit( 1 )
 
-    if args[ 0 ] == '-':
-        anEmlFileName = '-'
+    if args[0] == '-':
+        anOutputFileName = '-'
         anEmFileName = args[1]
     else:
         anEmFileName = args[0]
-
-    anEmFile = open( anEmFileName, 'r' )
+        anEmFile = open( anEmFileName, 'r' )
     aBaseName = os.path.basename( anEmFileName )
     aBaseName, anExt = os.path.splitext( aBaseName )
 
     # <infile> check mode
-    if anExt == '.eml':
-        sys.stderr.write( "input file not .em file.\n" )
+    if anExt != '.em':
+        sys.stderr.write( "input is not a .em file.\n" )
         sys.exit( 1 )
 
-    if anEmlFileName == None:
+    if anOutputFileName == None:
         if anExt == '.em':
             anExt = '.eml'
         else:
             anExt += '.eml'
 
-        anEmlFileName = aBaseName + anExt
+        anOutputFileName = aBaseName + anExt
 
-    if anEmlFileName == '-':
-        anEmlFile = sys.stdout
+    if anOutputFileName == '-':
+        anOutputFile = sys.stdout
 
-    aPreprocessor = ecell.emparser.Preprocessor( anEmFile, anEmFileName )
-    aTempFile = aPreprocessor.preprocess()
+    if preprocessing_only:
+        pp.preprocess( anEmFile, anOutputFile )
+        sys.exit(0)
 
-    aTempFile.seek( 0 )
+    out = StringIO()
+    pp.preprocess( anEmFile, out )
+    content = out.getvalue()
 
-    if preprocessing_only != 0:
-        anEmlFile.write( aTempFile.read() )
-        aTempFile.close()
-        anEmlFile.close()
-        sys.exit( 0 )
-
+    aSrcEml = None
     if aPatchFlag:
-        anEmlObject = ecell.emparser.patchEm2Eml( aSrcEml, aTempFile, debug )
-    else:
-        anEmlObject = ecell.emparser.convertEm2Eml( aTempFile, debug )
-        
-    aTempFile.close()
-    del aPreprocessor
+        aSrcEmlFile = open( aSrcEmlFileName, 'r' )
+        aSrcEml = ecell.eml.Eml( aSrcEmlFile )
 
+    anEmlObject = conv.convert( content )
+        
     aString = anEmlObject.asString()
     
-    if anEmlFileName == '-':
+    if anOutputFileName == '-':
         print aString
     else:
         # Default automatic overwrite mode
-        if os.path.isfile(anEmlFileName) and aForceFlag:
+        if os.path.isfile(anOutputFileName) and aForceFlag:
             pass
         
-        elif not os.path.isfile(anEmlFileName):
+        elif not os.path.isfile(anOutputFileName):
             pass
         else:
             sys.stderr.write( "The output file already exists. To overwrite, use -f or --force.\n" )
             sys.exit( 1 )
             
-        anEmlFile = open(anEmlFileName, 'w')
-        anEmlFile.write(aString)
-        anEmlFile.close()
+        anOutputFile = open(anOutputFileName, 'w')
+        anOutputFile.write(aString)
+        anOutputFile.close()
         
 
 
 if __name__ == '__main__':
     main()
-    sys.exit( 0 )

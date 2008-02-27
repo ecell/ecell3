@@ -70,7 +70,7 @@ class FullID( object ):
             self.id               = aSeq.id
         else:
             raise ValueError( 'Cannot construct FullID from a value ' \
-                              + 'typed %s', aSeq.__class__ )
+                              + 'typed %s' % aSeq.__class__ )
 
     def getTypeName( self ):
         return consts.ENTITYTYPE_STRING_LIST[ self.typeCode ]

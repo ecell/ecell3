@@ -9,7 +9,7 @@ import code
 import ecell.config
 import ecell.ecs
 import ecell.emc
-import ecell.Session
+from ecell.Session import Session
 
 class Prompt:
     def __init__( self, aSession ):
@@ -30,7 +30,7 @@ class Console:
 
     def __createScriptContext( self, parameters ):
         # theSession == self in the script
-        aContext = { 'theSession': self.session, 'self': self.session }
+        aContext = { 'self': self.session }
 
         # flatten class methods and object properties so that
         # 'self.' isn't needed for each method calls in the script
@@ -62,12 +62,8 @@ class Console:
         except:
             pass
         anInterpreter = code.InteractiveConsole( aContext )
-        self.thePrompt = Prompt( self.session )
-        anInterpreter.runsource( '''
-import sys
-sys.ps1 = theSession.thePrompt
-del sys
-        ''' )
+        aContext[ '__prompt__' ] = Prompt( self.session )
+        anInterpreter.runsource( 'import sys; sys.ps1 = __prompt__; del sys, __prompt__' )
         anInterpreter.interact( self.banner )
 
 #FIXME: commandline processing needed
@@ -215,7 +211,7 @@ def main():
                 
             
     aSimulator = ecell.emc.Simulator()
-    aSession = ecell.Session( aSimulator )
+    aSession = Session( aSimulator )
 
     aConsole = Console( aSession, 
         '''ecell3-session [ E-Cell SE Version %s, on Python Version %d.%d.%d ]

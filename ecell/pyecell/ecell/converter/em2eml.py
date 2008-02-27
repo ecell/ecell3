@@ -38,6 +38,7 @@ __all__ = (
 import ecell.eml
 import ecell.em.lexer as emlexer
 import ecell.em.parser as emparser
+from ecell.identifiers import *
 from ecell.util import *
 
 class EMLRenderer:
@@ -60,14 +61,13 @@ class EMLRenderer:
         return map( EMLRenderer.convertToList, anListNode )
     convertToList = staticmethod( convertToList )
 
-    def rendererEntityNode( self, aContainingSystemId, anAst ):
+    def renderEntityNode( self, aContainingSystemId, anAst ):
         assert isinstance( anAst, emparser.EntityNode )
         aKind = self.nodeTypeToDomainClassName( anAst )
         aClassName = anAst.identifier[ 0 ]
         aName = anAst.identifier[ 1 ]
-        aFullID = aKind + ':' + \
-            convertSystemFullID2SystemID( aContainingSystemId ) + \
-            ':' + aName
+        aFullID = FullID( aKind,  FullID( aContainingSystemId ).toSystemPath(),
+                aName )
         self.theEml.createEntity( aClassName, aFullID )
         if len( anAst.identifier ) == 3:
             self.theEml.setEntityInfo( aFullID, anAst.identifier[ 2 ] )
@@ -76,10 +76,9 @@ class EMLRenderer:
                 aFullID, aListElemNode.name,
                 self.convertToList( aListElemNode.values ) )
 
-    def rendererSystemNode( self, anAst ):
+    def renderSystemNode( self, anAst ):
         assert isinstance( anAst, emparser.SystemNode )
-        aName = anAst.identifier[ 0 ]
-        aFullID = convertSystemID2SystemFullID( anAst.identifier[ 1 ] )
+        aFullID = SystemPath( anAst.identifier[ 1 ] ).toFullID()
         self.theEml.createEntity( 'System', aFullID )
         if len( anAst.identifier ) == 3:
             self.theEml.setEntityInfo( aFullID, anAst.identifier[ 2 ] )
@@ -89,9 +88,9 @@ class EMLRenderer:
                     aFullID, aListElemNode.name,
                     self.convertToList( aListElemNode.values ) )
             elif isinstance( aListElemNode, emparser.EntityNode ):
-                self.rendererEntityNode( aFullID, aListElemNode )
+                self.renderEntityNode( aFullID, aListElemNode )
                 
-    def rendererStepperNode( self, anAst ):
+    def renderStepperNode( self, anAst ):
         assert isinstance( anAst, emparser.StepperNode )
         anID = anAst.identifier[ 1 ]
         self.theEml.createStepper( anAst.identifier[ 0 ], anID )
@@ -103,16 +102,16 @@ class EMLRenderer:
                     anID, aListElemNode.name,
                     self.convertToList( aListElemNode.values ) )
 
-    def renderer( self, anAst ):
+    def render( self, anAst ):
         for aStmt in anAst:
             if isinstance( aStmt, emparser.StepperNode ):
-                self.rendererStepperNode( aStmt )
+                self.renderStepperNode( aStmt )
             elif isinstance( aStmt, emparser.SystemNode ):
-                self.rendererSystemNode( aStmt )
+                self.renderSystemNode( aStmt )
             elif isinstance( aStmt, emparser.PropertySetterNode ):
                 aFullPN = createFullID( aStmt[ 0 ] )
                 aPropertyName = aFullPN[ 3 ]
-                aFullID = createFullIDString( rendererFullPNToFullID( aFullPN ) )
+                aFullID = createFullIDString( renderFullPNToFullID( aFullPN ) )
                 self.theEml.deleteEntityProperty( aFullID, aPropertyName )
                 self.theEml.setEntityProperty( aFullID, aPropertyName, aStmt[ 1 ] )
 
@@ -120,7 +119,7 @@ def convert( str, anEml = None ):
     if anEml == None:
         anEml = ecell.eml.Eml()
     anAst = emparser.createParser().parse( str, lexer = emlexer.createLexer() )
-    EMLRenderer( anEml ).renderer( anAst )
+    EMLRenderer( anEml ).render( anAst )
 
     return anEml
 

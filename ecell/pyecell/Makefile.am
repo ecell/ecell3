@@ -6,7 +6,7 @@ mostlyclean-local:
 	$(PYTHON) setup.py clean
 
 install-exec-local:
-	$(PYTHON) setup.py install -f --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )
+	$(PYTHON) setup.py install -f --prefix=$(PREFIX) --root $(DESTDIR)/
 
 EXTRA_DIST = \
 	ecell/DataFile.py \
@@ -72,9 +72,7 @@ EXTRA_DIST = \
 	ecell/analysis/emlsupport2.py \
 	ecell/analysis/sbmlsupport.py \
 	ecell/analysis/util.py \
-	setup.py.in
-
-bin_SCRIPTS = \
+	setup.py.in \
 	ecell3-session \
 	ecell3-session-manager \
 	ecell3-sbml2eml \
