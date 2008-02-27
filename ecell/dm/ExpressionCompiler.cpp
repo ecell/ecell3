@@ -340,10 +340,16 @@ void CompilerHelper::compile()
                          + String( theProcess.getID() ) );
     }
 
-    compileTree( info.trees.begin() );
-
-    // place RET at the tail.
-    appendInstruction( Instruction<RET>() );
+    theCode = new Code();
+    try {
+        compileTree( info.trees.begin() );
+        // place RET at the tail.
+        appendInstruction( Instruction<RET>() );
+    } catch (const libecs::Exception& e) {
+        delete theCode;
+        theCode = 0;
+        throw e;
+    }
 }
 
 
