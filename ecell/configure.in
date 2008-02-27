@@ -308,9 +308,9 @@ AC_CONFIG_FILES([
     toollauncher/misc/Makefile
 ])
 AC_CONFIG_FILES([bin/ecell3-dmc], [chmod +x bin/ecell3-dmc])
-AC_CONFIG_FILES([bin/ecell3-em2eml], [chmod +x bin/ecell3-em2eml])
-AC_CONFIG_FILES([bin/ecell3-eml2em], [chmod +x bin/ecell3-eml2em])
 AC_CONFIG_FILES([pyecs/ecell3-python], [chmod +x pyecs/ecell3-python])
+AC_CONFIG_FILES([pyecell/ecell3-em2eml], [chmod +x pyecell/ecell3-em2eml])
+AC_CONFIG_FILES([pyecell/ecell3-eml2em], [chmod +x pyecell/ecell3-eml2em])
 AC_CONFIG_FILES([pyecell/ecell3-eml2sbml], [chmod +x pyecell/ecell3-eml2sbml])
 AC_CONFIG_FILES([pyecell/ecell3-sbml2eml], [chmod +x pyecell/ecell3-sbml2eml])
 AC_CONFIG_FILES([pyecell/ecell3-session], [chmod +x pyecell/ecell3-session])

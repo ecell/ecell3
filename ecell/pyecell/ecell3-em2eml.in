@@ -24,8 +24,8 @@ import ecell.emparser
 
 def usage():
     aProgramName = os.path.basename( sys.argv[0] )
-    print '''
-%(appname)s -- convert a EM file to a EML file
+    print \
+    '''%(appname)s -- convert a EM file to a EML file
 
 Usage:
     %(appname)s [-h] [-o EMLFILE] [-p PATCHFILE] infile.em

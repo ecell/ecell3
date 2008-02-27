@@ -42,20 +42,8 @@ from ecell.ecssupport import *
 from ecell.DataFileManager import *
 from ecell.ECDDataFile import *
 
-#from ecell.FullID import *
-#from ecell.util import *
-#from ecell.ECS import *
-
-BANNERSTRING =\
-'''ecell3-session [ E-Cell SE Version %s, on Python Version %d.%d.%d ]
-Copyright (C) 1996-2008 Keio University.
-Copyright (C) 2005-2008 The Molecular Sciences Institute.
-More info: http://www.e-cell.org/software'''\
-% ( ecell.ecs.getLibECSVersion(), sys.version_info[0], sys.version_info[1], sys.version_info[2] )
-
-
 class Session:
-    'Session class'
+    '''Session class'''
 
     def __init__( self, aSimulator=None ):
         'constructor'
@@ -68,33 +56,6 @@ class Session:
             self.theSimulator = aSimulator
 
         self.theModelName = ''
-
-    #
-    # Session methods
-    #
-
-    def loadScript( self, ecs, parameters={} ):
-        ( ecsDir, ecsFile ) = os.path.split( ecs )
-        if ecsDir != '':
-            os.chdir( ecsDir )
-        aContext = self.__createScriptContext( parameters )
-
-        execfile( ecsFile, aContext )
-            
-    def interact( self, parameters={} ):
-        aContext = self.__createScriptContext( parameters )
-        try:
-            import readline # to provide convenient commandline editing :)
-        except:
-            pass
-        import code
-        anInterpreter = code.InteractiveConsole( aContext )
-
-        self._prompt = self._session_prompt( self )
-        anInterpreter.runsource( 'import sys; sys.ps1=theSession._prompt; del sys' )
-
-        anInterpreter.interact( BANNERSTRING )
-
 
     def loadModel( self, aModel ):
         # aModel : an EML instance, a file name (string) or a file object
@@ -185,61 +146,6 @@ class Session:
             raise TypeError, "The type of aModel must be string(file name) or file object "
 
     # end of saveModel
- 
-##     def importSBML( self, sbml ):
-
-##         #import
-##         try:
-##             from ecell.convertSBML2EML import *
-##         except ImportError:
-##             raise ImportError, "ImportError:can not import convertSBML2EML.\ncan not use importSBML in session."
-        
-##         #type check
-##         if type( sbml ) == str:        
-##             aSbmlFile = open( sbml )
-##             aSbmlString = aSbmlFile.read()
-##             aSbmlFile.close()
-
-##         elif type( sbml ) == file:
-##             aSbmlString = sbml.read()
-##             aSbmlFile.close()
-                                    
-##         else:
-##             raise TypeError, "The type of SBML must be string(file name) or file object "
-        
-##         anEml = convertSBML2EML( aSbmlString )
-##         self.loadModel( anEml )
-
-##     def exportSBML( self, filename ):
-
-##         #import
-##         try:
-##             from ecell.convertEML2SBML import *
-##         except ImportError:
-##             raise ImportError, "ImportError:can not import convertEML2SBML.\ncan not use exportSBML in session."
-        
-##         #type check
-##         if type( filename ) == str:
-##             aFileName = filename
-##         else:
-##             raise TypeError, "The type of SBML must be string(file name)"
-
-##         # creates ana seve an EML instance 
-##         anEml = eml.Eml()
-
-##         # calls save methods
-##         self.__saveAllStepper( anEml )
-##         self.__saveEntity( anEml, 'System::/' )
-##         self.__saveAllEntity( anEml )
-##         self.__saveProperty( anEml )
-
-##         # convert eml to sbml
-##         aSbmlString = convertToSBMLModel( anEml, filename, aLevel=2, aVersion=2 )
-
-##         # save sbml file
-##         aSbmlFIle = open( filename, "w" )
-##         aSbmlFIle.write( aSbmlString )
-##         aSbmlFile.close()
     
     def restoreMessageMethod( self ):
         self.theMessageMethod=self.__plainMessageMethod
@@ -728,21 +634,6 @@ class Session:
 
 
         return aList
-
-
-
- 
-    class _session_prompt:
-        def __init__( self, aSession ):
-            self.theSession = aSession
-
-        def __str__( self ):
-            if self.theSession.theModelName == '':
-                return 'ecell3-session>>> '
-            else:
-                return '<%s, t=%g>>> ' %\
-                       ( self.theSession.theModelName, \
-                         self.theSession.getCurrentTime() )
 
 if __name__ == "__main__":
     pass
