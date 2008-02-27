@@ -1,4 +1,4 @@
-#!/usr/bin/env /home/moriyoshi/opt/ecell3/bin/ecell3-python
+#!/usr/bin/env @prefix@/bin/ecell3-python
 
 """
 This program for converting SBML to EML.

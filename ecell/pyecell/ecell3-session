@@ -1,4 +1,4 @@
-#!/usr/bin/env /home/moriyoshi/opt/ecell3/bin/ecell3-python
+#!/usr/bin/env python
 
 import sys
 import string
@@ -22,50 +22,6 @@ class Prompt:
             return '<%s, t=%g>>> ' %\
                    ( self.theSession.theModelName, \
                      self.theSession.getCurrentTime() )
-
-
-#FIXME: commandline processing needed
-
-def usage():
-    aProgramName = os.path.basename( sys.argv[0] )
-    print '''
-%(appname)s -- invoke ecell3 python interactive mode or run ess file
-
-Usage:
-
-    %(appname)s [-f] [-f EMLFILE]          : Load EMLFILE and then
-                                             switch to intractive mode
-    %(appname)s [ESSFILE] [-e ESSFILE]     : Run an ess file
-    %(appname)s                            : Run in intractive mode
-    %(appname)s [-h]                       : Print this message
-
-Options:
-
-    -e or --exec=[.ess file]           :  load script (.ess) file
-    -f or --file=[.eml file]           :  load model (.eml) file
-    
-    Either -e or -f option can be specified at once. 
-
-    -DNAME=VALUE                       :  Set session parameter
-    --parameters="[python dictionary]" :  Set session parameters
-        
-    -h or --help              :  Print this message.
-
-    Example: 
-       %(appname)s -DNAME1=VALUE1 -DNAME2=VALUE2
-       %(appname)s --parameters="{NAME1:VALUE1,NAME2:VALUE2}"
-
-    Note that spaces are not allowed in names and values.
-
-Configurations:
-    If ECELL3_DM_PATH environment variable is set to a colon (%(pathsep)s)
-    separated directory path, it tries to find dynamic modules within the
-    locations referred to by it.
-
-    Example: 
-      ECELL3_DM_PATH=/home/user/dm%(pathsep)s/home/user/dm_other %(appname)s
-
-'''% { 'appname': aProgramName, 'pathsep': os.pathsep }
 
 class Console:
     def __init__( self, session, banner ):
@@ -113,6 +69,49 @@ sys.ps1 = theSession.thePrompt
 del sys
         ''' )
         anInterpreter.interact( self.banner )
+
+#FIXME: commandline processing needed
+
+def usage():
+    aProgramName = os.path.basename( sys.argv[0] )
+    print '''
+%(appname)s -- invoke ecell3 python interactive mode or run ess file
+
+Usage:
+
+    %(appname)s [-f] [-f EMLFILE]          : Load EMLFILE and then
+                                             switch to intractive mode
+    %(appname)s [ESSFILE] [-e ESSFILE]     : Run an ess file
+    %(appname)s                            : Run in intractive mode
+    %(appname)s [-h]                       : Print this message
+
+Options:
+
+    -e or --exec=[.ess file]           :  load script (.ess) file
+    -f or --file=[.eml file]           :  load model (.eml) file
+    
+    Either -e or -f option can be specified at once. 
+
+    -DNAME=VALUE                       :  Set session parameter
+    --parameters="[python dictionary]" :  Set session parameters
+        
+    -h or --help              :  Print this message.
+
+    Example: 
+       %(appname)s -DNAME1=VALUE1 -DNAME2=VALUE2
+       %(appname)s --parameters="{NAME1:VALUE1,NAME2:VALUE2}"
+
+    Note that spaces are not allowed in names and values.
+
+Configurations:
+    If ECELL3_DM_PATH environment variable is set to a colon (%(pathsep)s)
+    separated directory path, it tries to find dynamic modules within the
+    locations referred to by it.
+
+    Example: 
+      ECELL3_DM_PATH=/home/user/dm%(pathsep)s/home/user/dm_other %(appname)s
+
+'''% { 'appname': aProgramName, 'pathsep': os.pathsep }
 
 def main():
     ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )

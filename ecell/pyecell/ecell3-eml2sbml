@@ -1,4 +1,4 @@
-#!/usr/bin/env /home/moriyoshi/opt/ecell3/bin/ecell3-python
+#!/usr/bin/env python
 
 # Eml to Sbml converter
 

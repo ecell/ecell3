@@ -78,7 +78,9 @@ bin_SCRIPTS = \
 	ecell3-session \
 	ecell3-session-manager \
 	ecell3-sbml2eml \
-	ecell3-eml2sbml
+	ecell3-eml2sbml \
+	ecell3-em2eml \
+	ecell3-eml2em
 
 clean-local:
 	${RM} -rf build *.exe *.zip *.dll *.pyd
