@@ -1,4 +1,5 @@
 SUBDIRS = glade plugins
+PYTHON_ = env PYTHONPATH=$(srcdir)/../pyecell $(PYTHON)
 
 EXTRA_DIST = \
 	ecell/ui/__init__.py\
@@ -37,7 +38,7 @@ EXTRA_DIST = \
 
 EXTRA_DIST +=\
 	osogo.ini\
-	setup.py.in
+	setup.py
 
 EXTRA_DIST +=\
 	ecell3-session-monitor
@@ -46,22 +47,22 @@ all-local:
 	sysconfdir=$(sysconfdir) \
 	datarootdir=$(datarootdir) \
 	libdir=$(libdir) \
-	$(PYTHON) setup.py config
+	$(PYTHON_) setup.py config
 	sysconfdir=$(sysconfdir) \
 	datarootdir=$(datarootdir) \
 	libdir=$(libdir) \
-	$(PYTHON) setup.py build
+	$(PYTHON_) setup.py build
 
 mostlyclean-local:
 	sysconfdir=$(sysconfdir) \
 	datarootdir=$(datarootdir) \
 	libdir=$(libdir) \
-	$(PYTHON) setup.py clean
+	$(PYTHON_) setup.py clean
 
 install-exec-local:
 	DESTDIR=$(DESTDIR); \
 	sysconfdir=$(sysconfdir) \
 	datarootdir=$(datarootdir) \
 	libdir=$(libdir) \
-	$(PYTHON) setup.py install -f --prefix=$(PREFIX) $${DESTDIR:+--root }$${DESTDIR}
+	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) $${DESTDIR:+--root }$${DESTDIR}
 
