@@ -153,8 +153,8 @@ public:\
 */
 
 #define NEVER_GET_HERE\
-      THROW_EXCEPTION( UnexpectedError, \
-		       "never get here (" + String( __PRETTY_FUNCTION__ )\
+      THROW_EXCEPTION( libecs::UnexpectedError, \
+		       "never get here (" + libecs::String( __PRETTY_FUNCTION__ )\
 		       + ")." )
 
 
