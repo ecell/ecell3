@@ -34,6 +34,7 @@
 
 #include "libecs.hpp"
 
+namespace libecs {
 
 template < class CLASS, typename RET, typename ARG1 = void > 
 class MethodProxy;
@@ -156,6 +157,6 @@ private:
 };
 
 
-
+} // namespace libecs
 
 #endif /* __METHODPROXY_HPP */
