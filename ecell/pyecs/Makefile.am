@@ -9,8 +9,6 @@ ECELL_DIRNAME = @ECELL_DIRNAME@
 ECELL_INCLUDE_DIR = ${includedir}/${ECELL_DIRNAME}
 pkgpyexecdir = @pkgpyexecdir@
 
-bin_SCRIPTS = ecell3-python
-
 EXTRA_DIST = \
 	PyEcs.hpp PyEmc.hpp\
 	PyEcs.cpp PyEmc.cpp\
@@ -28,4 +26,4 @@ mostlyclean-local:
 	$(RM) -rf build
 
 install-exec-local:
-	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libdir=$(libdir) $(PYTHON) setup.py install -f --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )
+	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libdir=$(libdir) $(PYTHON) setup.py install -f --prefix=$(PREFIX) --root $(DESTDIR)/
