@@ -122,4 +122,4 @@ if os.environ.has_key( 'ECELL3_DM_PATH' ):
     dm_path = os.environ[ 'ECELL3_DM_PATH' ].split( os.pathsep )
 else:
     dm_path = []
-dm_path += [ os.path.join( lib_dir, 'dms' ) ]
+dm_path += [ os.path.join( lib_dir, 'modules' ) ]
