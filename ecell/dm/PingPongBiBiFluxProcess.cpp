@@ -29,11 +29,11 @@
 // E-Cell Project.
 //
 
-#include "libecs.hpp"
+#include "libecs/libecs.hpp"
 
 #include "ContinuousProcess.hpp"
 
-USE_LIBECS;
+using namespace libecs;
 
 LIBECS_DM_CLASS( PingPongBiBiFluxProcess, ContinuousProcess )
 {

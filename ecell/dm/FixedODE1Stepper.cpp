@@ -29,9 +29,32 @@
 // E-Cell Project.
 //
 
-#include "Variable.hpp"
+#include "libecs/Variable.hpp"
+#include "libecs/DifferentialStepper.hpp"
 
-#include "FixedODE1Stepper.hpp"
+using namespace libecs;
+
+
+LIBECS_DM_CLASS( FixedODE1Stepper, DifferentialStepper )
+{
+
+public:
+
+  LIBECS_DM_OBJECT( FixedODE1Stepper, Stepper )
+    {
+      INHERIT_PROPERTIES( DifferentialStepper );
+    }
+
+  FixedODE1Stepper( void );
+  
+  virtual ~FixedODE1Stepper( void );
+
+  virtual void step();
+
+protected:
+
+};
+
 
 LIBECS_DM_INIT( FixedODE1Stepper, Stepper );
 

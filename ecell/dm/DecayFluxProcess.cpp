@@ -29,13 +29,11 @@
 // the number of Substrate of DecayReactor must be one.
 //
 
-#include "libecs.hpp"
-#include "Util.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Util.hpp"
+#include "libecs/ContinuousProcess.hpp"
 
-#include "ContinuousProcess.hpp"
-
-
-USE_LIBECS;
+using namespace libecs;
 
 LIBECS_DM_CLASS( DecayFluxProcess, ContinuousProcess )
 {

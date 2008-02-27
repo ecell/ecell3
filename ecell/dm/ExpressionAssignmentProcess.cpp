@@ -31,10 +31,9 @@
 // E-Cell Project.
 //
 
-
 #include "ExpressionProcessBase.hpp"
 
-USE_LIBECS;
+using namespace libecs;
 
 LIBECS_DM_CLASS( ExpressionAssignmentProcess, ExpressionProcessBase )
 {
@@ -90,7 +89,7 @@ LIBECS_DM_CLASS( ExpressionAssignmentProcess, ExpressionProcessBase )
     { 
       theVariableReference.setValue
 	( theVariableReference.getCoefficient() * 
-	  theVirtualMachine.execute( theCompiledCode ) );
+	  theVirtualMachine.execute( *theCompiledCode ) );
     }
 
  private:

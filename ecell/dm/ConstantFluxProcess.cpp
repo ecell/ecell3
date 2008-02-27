@@ -24,11 +24,12 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-#include "libecs.hpp"
 
-#include "ContinuousProcess.hpp"
+#include "libecs/libecs.hpp"
 
-USE_LIBECS;
+#include "libecs/ContinuousProcess.hpp"
+
+using namespace libecs;
 
 LIBECS_DM_CLASS( ConstantFluxProcess, ContinuousProcess )
 {

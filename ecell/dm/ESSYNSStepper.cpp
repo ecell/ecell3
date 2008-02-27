@@ -29,12 +29,71 @@
 // E-Cell Project.
 //
 
-#include "Variable.hpp"
-#include "Process.hpp"
-#include "PropertyInterface.hpp"
-#include "ESSYNSStepper.hpp"
+#include "libecs/Variable.hpp"
+#include "libecs/Process.hpp"
+#include "libecs/PropertyInterface.hpp"
+#include "libecs/DifferentialStepper.hpp"
+#include "ESSYNSProcess.hpp"
 
 #include <gsl/gsl_sf.h>
+
+using namespace libecs;
+
+LIBECS_DM_CLASS( ESSYNSStepper, AdaptiveDifferentialStepper )
+{
+
+public:
+
+  LIBECS_DM_OBJECT( ESSYNSStepper, Stepper )
+    {
+      INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
+      PROPERTYSLOT_SET_GET( Integer, TaylorOrder );
+    }
+
+  GET_METHOD( Integer, TaylorOrder )
+    {
+      return theTaylorOrder;
+    }
+
+  SET_METHOD( Integer, TaylorOrder )
+    {
+      theTaylorOrder = value;
+    }
+
+  ESSYNSStepper()
+    :
+    theESSYNSProcessPtr( NULLPTR ),
+    theTaylorOrder( 1 )
+    {
+      ; 
+    }
+	    
+  virtual ~ESSYNSStepper()
+    {
+      ;
+    }
+
+  virtual void initialize();
+  virtual bool calculate();
+    
+  virtual GET_METHOD( Integer, Order )
+    {
+      return theTaylorOrder;
+    }
+
+  virtual GET_METHOD( Integer, Stage ) { return 1; }
+
+protected:
+
+  Integer theSystemSize;
+  Integer theTaylorOrder;
+  ESSYNSProcessPtr   theESSYNSProcessPtr;
+  std::vector<RealVector> theESSYNSMatrix;
+  std::vector<VariableVector::size_type> theIndexVector;
+
+  //  RealVector theK1;
+};
+
 
 LIBECS_DM_INIT( ESSYNSStepper, Stepper );
 

@@ -24,20 +24,21 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
+
 #include <gsl/gsl_sf.h>
 #include <vector>
 
-#include "libecs.hpp"
-#include "System.hpp"
-#include "Stepper.hpp"
-#include "Variable.hpp"
-#include "Process.hpp"
-#include "Util.hpp"
-#include "PropertyInterface.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/System.hpp"
+#include "libecs/Stepper.hpp"
+#include "libecs/Variable.hpp"
+#include "libecs/Process.hpp"
+#include "libecs/Util.hpp"
+#include "libecs/PropertyInterface.hpp"
 
 #include "ESSYNSProcess.hpp"
 
-USE_LIBECS;
+using namespace libecs;
 
 LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
 {

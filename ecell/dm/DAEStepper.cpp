@@ -29,8 +29,8 @@
 // E-Cell Project.
 //
 
-#include "Variable.hpp"
-#include "Process.hpp"
+#include "libecs/Variable.hpp"
+#include "libecs/Process.hpp"
 
 #define GSL_RANGE_CHECK_OFF
 
@@ -38,11 +38,146 @@
 #include <gsl/gsl_complex.h>
 #include <gsl/gsl_complex_math.h>
 
-#include "DAEStepper.hpp"
+#include "libecs/DifferentialStepper.hpp"
 
 #define SQRT6 2.4494897427831779
 
-LIBECS_DM_INIT( DAEStepper, Stepper );
+using namespace libecs;
+
+DECLARE_VECTOR( Integer, IntVector );
+
+LIBECS_DM_CLASS( DAEStepper, libecs::DifferentialStepper )
+{
+
+public:
+
+  LIBECS_DM_OBJECT( DAEStepper, Stepper )
+    {
+      INHERIT_PROPERTIES( DifferentialStepper );
+
+      PROPERTYSLOT_SET_GET( Integer, MaxIterationNumber );
+      PROPERTYSLOT_SET_GET( Real, Uround );
+
+      PROPERTYSLOT_SET_GET( Real, AbsoluteTolerance );
+      PROPERTYSLOT_SET_GET( Real, RelativeTolerance );
+
+      PROPERTYSLOT_SET_GET( Real, JacobianRecalculateTheta );
+    }
+
+  DAEStepper( void );
+  virtual ~DAEStepper( void );
+
+  SET_METHOD( Integer, MaxIterationNumber )
+    {
+      theMaxIterationNumber = value;
+    }
+
+  GET_METHOD( Integer, MaxIterationNumber )
+    {
+      return theMaxIterationNumber;
+    }
+
+  SIMPLE_SET_GET_METHOD( Real, Uround );
+
+  SET_METHOD( Real, AbsoluteTolerance )
+    {
+      theAbsoluteTolerance = value;
+
+      const Real aRatio( theAbsoluteTolerance / theRelativeTolerance );
+      rtoler = 0.1 * pow( theRelativeTolerance, 2.0 / 3.0 );
+      atoler = rtoler * aRatio;
+    }
+
+  GET_METHOD( Real, AbsoluteTolerance )
+    {
+      return theAbsoluteTolerance;
+    }
+
+  SET_METHOD( Real, RelativeTolerance )
+    {
+      theRelativeTolerance = value;
+
+      const Real aRatio( theAbsoluteTolerance / theRelativeTolerance );
+      rtoler = 0.1 * pow( theRelativeTolerance, 2.0 / 3.0 );
+      atoler = rtoler * aRatio;
+    }
+
+  GET_METHOD( Real, RelativeTolerance )
+    {
+      return theRelativeTolerance;
+    }
+
+  SET_METHOD( Real, JacobianRecalculateTheta )
+    {
+      theJacobianRecalculateTheta = value;
+    }
+
+  GET_METHOD( Real, JacobianRecalculateTheta )
+    {
+      return theJacobianRecalculateTheta;
+    }
+
+  virtual void initialize();
+  bool calculate();
+  virtual void step();
+
+  virtual void interrupt( TimeParam aTime );
+
+  void checkDependency();
+
+  Real estimateLocalError();
+
+  void calculateJacobian();
+
+  void setJacobianMatrix();
+  void decompJacobianMatrix();
+  void calculateRhs();
+  Real solve();
+
+  virtual GET_METHOD( Integer, Order ) { return 3; }
+  virtual GET_METHOD( Integer, Stage ) { return 5; }
+
+protected:
+
+  Real    alpha, beta, gamma;
+
+  VariableVector::size_type     theSystemSize;
+
+  // IntVector as std::vector<VariableVector::size_type>
+  IntVector  theContinuousVariableVector;
+  RealVector theDiscreteActivityBuffer;
+
+  std::vector<RealVector>    theJacobian;
+
+  gsl_matrix*        theJacobianMatrix1;
+  gsl_permutation*   thePermutation1;
+  gsl_vector*        theVelocityVector1;
+  gsl_vector*        theSolutionVector1;
+
+  gsl_matrix_complex*        theJacobianMatrix2;
+  gsl_permutation*           thePermutation2;
+  gsl_vector_complex*        theVelocityVector2;
+  gsl_vector_complex*        theSolutionVector2;
+
+  RealVector         theW;
+
+  UnsignedInteger     theMaxIterationNumber;
+  Real                theStoppingCriterion;
+  Real                eta, Uround;
+
+  Real    theAbsoluteTolerance, atoler;
+  Real    theRelativeTolerance, rtoler;
+
+  bool    theFirstStepFlag, theRejectedStepFlag;
+  Real    theAcceptedError, theAcceptedStepInterval, thePreviousStepInterval;
+
+  bool    theJacobianCalculateFlag;
+  Real    theJacobianRecalculateTheta;
+
+  bool    isInterrupted;
+
+};
+
 
 DAEStepper::DAEStepper()
   :
@@ -968,3 +1103,6 @@ void DAEStepper::interrupt( TimeParam aTime )
   isInterrupted = true;
   DifferentialStepper::interrupt( aTime );
 }
+
+
+LIBECS_DM_INIT( DAEStepper, Stepper );

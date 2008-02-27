@@ -24,30 +24,28 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-#include "libecs.hpp"
-#include "ContinuousProcess.hpp"
-#include "Util.hpp"
-#include "FullID.hpp"
-#include "PropertyInterface.hpp"
 
-#include "System.hpp"
-#include "Stepper.hpp"
-#include "Variable.hpp"
-#include "Interpolant.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/ContinuousProcess.hpp"
+#include "libecs/Util.hpp"
+#include "libecs/FullID.hpp"
+#include "libecs/PropertyInterface.hpp"
+#include "libecs/System.hpp"
+#include "libecs/Stepper.hpp"
+#include "libecs/Variable.hpp"
+#include "libecs/Interpolant.hpp"
 
-USE_LIBECS;
-
-LIBECS_DM_CLASS( QuasiDynamicFluxProcess, ContinuousProcess )
+LIBECS_DM_CLASS( QuasiDynamicFluxProcess, libecs::ContinuousProcess )
 {
 
  public:
 
   LIBECS_DM_OBJECT( QuasiDynamicFluxProcess, Process )
     {
-      INHERIT_PROPERTIES( ContinuousProcess );
-      PROPERTYSLOT_SET_GET( Integer, Irreversible );
-      PROPERTYSLOT_SET_GET( Real, Vmax );
-      PROPERTYSLOT_SET_GET( Polymorph, FluxDistributionList );
+      INHERIT_PROPERTIES( libecs::ContinuousProcess );
+      PROPERTYSLOT_SET_GET( libecs::Integer, Irreversible );
+      PROPERTYSLOT_SET_GET( libecs::Real, Vmax );
+      PROPERTYSLOT_SET_GET( libecs::Polymorph, FluxDistributionList );
     }
 
   QuasiDynamicFluxProcess()
@@ -63,43 +61,43 @@ LIBECS_DM_CLASS( QuasiDynamicFluxProcess, ContinuousProcess )
       ; // do nothing
     }
 
-  SIMPLE_SET_GET_METHOD( Integer, Irreversible );
-  SIMPLE_SET_GET_METHOD( Real, Vmax );
+  SIMPLE_SET_GET_METHOD( libecs::Integer, Irreversible );
+  SIMPLE_SET_GET_METHOD( libecs::Real, Vmax );
 
-  SET_METHOD( Polymorph, FluxDistributionList )
+  SET_METHOD( libecs::Polymorph, FluxDistributionList )
     {
-      const PolymorphVector aVector( value.asPolymorphVector() );
+      const libecs::PolymorphVector aVector( value.asPolymorphVector() );
       
       theFluxDistributionVector.clear();
-      for( PolymorphVectorConstIterator i( aVector.begin() );
+      for( libecs::PolymorphVectorConstIterator i( aVector.begin() );
 	   i != aVector.end(); ++i )
 	{
 	  theFluxDistributionVector.push_back( ( *( findVariableReference( (*i).asString() ) ) ) );
 	}      
     }
   
-  GET_METHOD( Polymorph, FluxDistributionList )
+  GET_METHOD( libecs::Polymorph, FluxDistributionList )
     {
-      PolymorphVector aVector;
-      for( VariableReferenceVectorConstIterator
+      libecs::PolymorphVector aVector;
+      for( libecs::VariableReferenceVectorConstIterator
 	     i( theFluxDistributionVector.begin() );
 	   i != theFluxDistributionVector.end() ; ++i )
 	{
-	  FullID aFullID( (*i).getVariable()->getFullID() );
+	  libecs::FullID aFullID( (*i).getVariable()->getFullID() );
 	  aVector.push_back( aFullID.getString() );
 	}
 
       return aVector;
     }
 
-  VariableReferenceVector getFluxDistributionVector()
+  libecs::VariableReferenceVector getFluxDistributionVector()
     {
       return theFluxDistributionVector;
     }
 
   virtual void initialize()
     {
-      Process::initialize();      
+      libecs::Process::initialize();      
       if( theFluxDistributionVector.empty() )
 	{
 	  theFluxDistributionVector = theVariableReferenceVector;
@@ -113,9 +111,9 @@ LIBECS_DM_CLASS( QuasiDynamicFluxProcess, ContinuousProcess )
   
  protected:
 
-  VariableReferenceVector theFluxDistributionVector;
-  Integer Irreversible;
-  Real Vmax;
+  libecs::VariableReferenceVector theFluxDistributionVector;
+  libecs::Integer Irreversible;
+  libecs::Real Vmax;
 
 };
 

@@ -29,15 +29,13 @@
 // E-Cell Project.
 //
 
-#include "libecs.hpp"
-#include "Util.hpp"
-#include "PropertyInterface.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Util.hpp"
+#include "libecs/PropertyInterface.hpp"
+#include "libecs/System.hpp"
+#include "libecs/ContinuousProcess.hpp"
 
-#include "System.hpp"
-
-#include "ContinuousProcess.hpp"
-
-USE_LIBECS;
+using namespace libecs;
 
 LIBECS_DM_CLASS( MassActionFluxProcess, ContinuousProcess )
 {

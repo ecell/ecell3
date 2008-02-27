@@ -29,10 +29,83 @@
 // E-Cell Project.
 //
 
-#include "Variable.hpp"
-#include "Process.hpp"
+#include <gsl/gsl_linalg.h>
 
-#include "FixedDAE1Stepper.hpp"
+#include "libecs/Variable.hpp"
+#include "libecs/Process.hpp"
+#include "libecs/DifferentialStepper.hpp"
+
+using namespace libecs;
+
+DECLARE_VECTOR( int, IntVector );
+
+LIBECS_DM_CLASS( FixedDAE1Stepper, DifferentialStepper )
+{
+
+public:
+
+  LIBECS_DM_OBJECT( FixedDAE1Stepper, Stepper )
+    {
+      INHERIT_PROPERTIES( DifferentialStepper );
+
+      PROPERTYSLOT_SET_GET( Real, PerturbationRate );
+      PROPERTYSLOT_SET_GET( Real, Tolerance );
+    }
+
+  FixedDAE1Stepper( void );
+  
+  virtual ~FixedDAE1Stepper( void );
+
+  SET_METHOD( Real, PerturbationRate )
+  {
+    thePerturbationRate = value;
+  }
+
+  GET_METHOD( Real, PerturbationRate )
+  {
+    return thePerturbationRate;
+  }
+
+  SET_METHOD( Real, Tolerance )
+  {
+    theTolerance = value;
+  }
+
+  GET_METHOD( Real, Tolerance )
+  {
+    return theTolerance;
+  }
+
+  virtual void initialize();
+
+  virtual void step();
+
+  void calculateVelocityVector();
+  void calculateJacobian();
+
+  void checkDependency();
+
+  const Real solve();
+
+protected:
+
+  UnsignedInteger     theSystemSize;
+  Real                thePerturbationRate;
+  Real                theTolerance;
+
+  // std::vector<ProcessVector>
+  std::vector<IntVector>       theDependentProcessVector;
+  std::vector<IntVector>       theDependentVariableVector;
+
+  gsl_matrix*         theJacobianMatrix;
+  gsl_vector*         theVelocityVector;
+  gsl_vector*         theSolutionVector;
+  gsl_permutation*    thePermutation;
+
+  IntVector       theContinuousVariableVector;
+  RealVector      theActivityBuffer;
+};
+
 
 LIBECS_DM_INIT( FixedDAE1Stepper, Stepper );
 

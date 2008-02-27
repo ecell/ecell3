@@ -29,12 +29,59 @@
 // E-Cell Project.
 //
 
-#include "Variable.hpp"
+#include "libecs/Variable.hpp"
+#include "libecs/Interpolant.hpp"
+#include "libecs/DifferentialStepper.hpp"
 
-#include "ODE45Stepper.hpp"
+using namespace libecs;
+
+LIBECS_DM_CLASS( ODE45Stepper, AdaptiveDifferentialStepper )
+{
+
+public:
+
+  LIBECS_DM_OBJECT( ODE45Stepper, Stepper )
+    {
+      INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
+
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, SpectralRadius );
+    }
+
+  ODE45Stepper();
+  virtual ~ODE45Stepper();
+
+  virtual void initialize();
+  virtual void step();
+  virtual bool calculate();
+
+  virtual void interrupt( TimeParam aTime );
+
+  virtual GET_METHOD( Integer, Order ) { return 4; }
+  virtual GET_METHOD( Integer, Stage ) { return 5; }
+
+  GET_METHOD( Real, SpectralRadius )
+  {
+    return theSpectralRadius;
+  }
+
+  SET_METHOD( Real, SpectralRadius )
+  {
+    theSpectralRadius = value;
+  }
+
+protected:
+
+  bool isInterrupted;
+  Real theSpectralRadius;
+
+  RealMatrix theRungeKuttaBuffer;
+
+  Integer count;
+
+};
+
 
 LIBECS_DM_INIT( ODE45Stepper, Stepper );
-
 
 ODE45Stepper::ODE45Stepper()
   :

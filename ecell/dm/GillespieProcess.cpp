@@ -28,4 +28,4 @@
 #include "GillespieProcess.hpp"
 
 
-LIBECS_DM_INIT( GillespieProcess, Process );
+LIBECS_DM_INIT( GillespieProcess, libecs::Process );

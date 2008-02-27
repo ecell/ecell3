@@ -29,20 +29,183 @@
 // E-Cell Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "Variable.hpp"
-#include "Process.hpp"
-
 #define GSL_RANGE_CHECK_OFF
 
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_complex.h>
 #include <gsl/gsl_complex_math.h>
 
-#include "ODEStepper.hpp"
-
-LIBECS_DM_INIT( ODEStepper, Stepper );
+#include "libecs/Variable.hpp"
+#include "libecs/Process.hpp"
+#include "libecs/DifferentialStepper.hpp"
 
 #define SQRT6 2.4494897427831779
+
+using namespace libecs;
+
+LIBECS_DM_CLASS( ODEStepper, AdaptiveDifferentialStepper )
+{
+
+public:
+
+  LIBECS_DM_OBJECT( ODEStepper, Stepper )
+    {
+      INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
+
+      PROPERTYSLOT_SET_GET( Integer, MaxIterationNumber );
+      PROPERTYSLOT_SET_GET( Real, Uround );
+      
+      PROPERTYSLOT( Real, Tolerance,
+		    &ODEStepper::initializeTolerance,
+		    &AdaptiveDifferentialStepper::getTolerance );
+
+      PROPERTYSLOT( Real, AbsoluteToleranceFactor,
+		    &ODEStepper::initializeAbsoluteToleranceFactor,
+		    &AdaptiveDifferentialStepper::getAbsoluteToleranceFactor );
+      
+
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Stiffness );
+      PROPERTYSLOT_SET_GET( Real, JacobianRecalculateTheta );
+
+      PROPERTYSLOT( Integer, isStiff,
+		    &ODEStepper::setIntegrationType,
+		    &ODEStepper::getIntegrationType );
+
+      PROPERTYSLOT_SET_GET( Integer, CheckIntervalCount );
+      PROPERTYSLOT_SET_GET( Integer, SwitchingCount );
+    }
+
+  ODEStepper( void );
+  virtual ~ODEStepper( void );
+
+  SET_METHOD( Integer, MaxIterationNumber )
+    {
+      theMaxIterationNumber = value;
+    }
+
+  GET_METHOD( Integer, MaxIterationNumber )
+    {
+      return theMaxIterationNumber;
+    }
+
+  SIMPLE_SET_GET_METHOD( Real, Uround );
+
+  SIMPLE_SET_GET_METHOD( Integer, CheckIntervalCount );
+  SIMPLE_SET_GET_METHOD( Integer, SwitchingCount );
+
+  void setIntegrationType( Integer value )
+    {
+      isStiff = static_cast<bool>( value );
+      initializeStepper();
+    }
+
+  const Integer getIntegrationType() const { return isStiff; }
+  
+  SET_METHOD( Real, JacobianRecalculateTheta )
+    {
+      theJacobianRecalculateTheta = value;
+    }
+
+  GET_METHOD( Real, JacobianRecalculateTheta )
+    {
+      return theJacobianRecalculateTheta;
+    }
+
+  GET_METHOD( Real, Stiffness )
+  {
+    return 3.3 / theSpectralRadius;
+  }
+
+  GET_METHOD( Real, SpectralRadius )
+  {
+    return theSpectralRadius;
+  }
+
+  SET_METHOD( Real, SpectralRadius )
+  {
+    theSpectralRadius = value;
+  }
+
+  virtual void initialize();
+  virtual void step();
+  virtual bool calculate();
+  virtual void interrupt( TimeParam aTime );
+
+  void initializeStepper();
+
+  void calculateJacobian();
+  Real calculateJacobianNorm();
+  void setJacobianMatrix();
+  void decompJacobianMatrix();
+  void calculateRhs();
+  Real solve();
+  Real estimateLocalError();
+
+  void initializeRadauIIA();
+  bool calculateRadauIIA();
+  void stepRadauIIA();
+
+  void initializeTolerance( RealParam value )
+  {
+    setTolerance( value ); // AdaptiveDifferentialStepper::
+    rtoler = 0.1 * pow( getTolerance(), 2.0 / 3.0 );
+    atoler = rtoler * getAbsoluteToleranceFactor();
+  }
+
+  void initializeAbsoluteToleranceFactor( RealParam value )
+  {
+    setAbsoluteToleranceFactor( value ); // AdaptiveDifferentialStepper::
+    atoler = rtoler * getAbsoluteToleranceFactor();
+  }
+
+  virtual GET_METHOD( Integer, Order )
+  {
+    if ( isStiff ) return 3;
+    else return 4;
+  }
+
+  virtual GET_METHOD( Integer, Stage )
+  {
+    return 4;
+  }
+
+protected:
+
+  Real    alpha, beta, gamma;
+
+  VariableVector::size_type     theSystemSize;
+
+  RealMatrix    theJacobian, theW;
+
+  gsl_matrix*        theJacobianMatrix1;
+  gsl_permutation*   thePermutation1;
+  gsl_vector*        theVelocityVector1;
+  gsl_vector*        theSolutionVector1;
+
+  gsl_matrix_complex*        theJacobianMatrix2;
+  gsl_permutation*           thePermutation2;
+  gsl_vector_complex*        theVelocityVector2;
+  gsl_vector_complex*        theSolutionVector2;
+
+  UnsignedInteger    theMaxIterationNumber;
+  Real               theStoppingCriterion;
+  Real               eta, Uround;
+
+  Real               rtoler, atoler;
+
+  Real    theAcceptedError, theAcceptedStepInterval, thePreviousStepInterval;
+
+  Real    theJacobianRecalculateTheta;
+  Real    theSpectralRadius;
+
+  UnsignedInteger    theStiffnessCounter;
+  Integer    CheckIntervalCount, SwitchingCount;
+
+  bool    theFirstStepFlag, theJacobianCalculateFlag, theRejectedStepFlag;
+  bool    isInterrupted, isStiff;
+};
+
+LIBECS_DM_INIT( ODEStepper, Stepper );
 
 ODEStepper::ODEStepper()
   :

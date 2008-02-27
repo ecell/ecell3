@@ -24,17 +24,18 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
+
 #ifndef __SSYSTEMPROCESS_HPP
 #define __SSYSTEMPROCESS_HPP
 
 #include <gsl/gsl_sf.h>
 #include <vector>
 
-#include "libecs.hpp"
+#include "libecs/libecs.hpp"
 
 #include "ESSYNSProcess.hpp"
 
-USE_LIBECS;
+using namespace libecs;
 
 DECLARE_VECTOR( Real, RealVector );
 

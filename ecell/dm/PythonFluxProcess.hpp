@@ -37,7 +37,6 @@
 
 #include "PythonProcessBase.hpp"
 
-USE_LIBECS;
 
 LIBECS_DM_CLASS( PythonFluxProcess, PythonProcessBase )
 {

@@ -29,13 +29,10 @@
 
 #include <vector>
 
-#include "libecs.hpp"
-#include "Process.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Process.hpp"
 
-USE_LIBECS;
-
-
-LIBECS_DM_CLASS( ESSYNSProcess, Process )
+LIBECS_DM_CLASS( ESSYNSProcess, libecs::Process )
 {
   
  public:
@@ -45,7 +42,7 @@ LIBECS_DM_CLASS( ESSYNSProcess, Process )
 
   LIBECS_DM_OBJECT_ABSTRACT( ESSYNSProcess )
     {
-      INHERIT_PROPERTIES( Process );  
+      INHERIT_PROPERTIES( libecs::Process );  
     }
   
   ESSYNSProcess()
@@ -70,7 +67,7 @@ LIBECS_DM_CLASS( ESSYNSProcess, Process )
     
   virtual const std::vector<RealVector>& getESSYNSMatrix() = 0;
 
-  virtual GET_METHOD( Integer, SystemSize ) = 0;
+  virtual GET_METHOD( libecs::Integer, SystemSize ) = 0;
     
  protected:
 

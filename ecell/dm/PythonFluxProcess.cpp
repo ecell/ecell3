@@ -32,14 +32,13 @@
 // E-Cell Project.
 //
 
-#include "FullID.hpp"
+#include "libecs/FullID.hpp"
+
 #include "PythonFluxProcess.hpp"
 
-USE_LIBECS;
-
+using namespace libecs;
 
 LIBECS_DM_INIT( PythonFluxProcess, Process );
-
   
 void PythonFluxProcess::fire()
 {

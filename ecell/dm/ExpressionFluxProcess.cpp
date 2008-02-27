@@ -31,10 +31,9 @@
 // E-Cell Project.
 //
 
-
 #include "ExpressionProcessBase.hpp"
 
-USE_LIBECS;
+using namespace libecs;
 
 LIBECS_DM_CLASS( ExpressionFluxProcess, ExpressionProcessBase )
 {
@@ -59,7 +58,7 @@ LIBECS_DM_CLASS( ExpressionFluxProcess, ExpressionProcessBase )
   
   virtual void fire()
     { 
-      setFlux( theVirtualMachine.execute( theCompiledCode ) );
+      setFlux( theVirtualMachine.execute( *theCompiledCode ) );
     }
 
   virtual const bool isContinuous() const

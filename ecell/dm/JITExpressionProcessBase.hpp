@@ -56,7 +56,6 @@
 //#endif /* defined( EXPRESSIONPROCESS_USE_JIT ) */
 
 
-USE_LIBECS;
 
 DECLARE_ASSOCVECTOR
 ( Real(*)(Real),

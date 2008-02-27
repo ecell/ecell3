@@ -31,10 +31,9 @@
 // E-Cell Project.
 //
 
-
 #include "ExpressionProcessBase.hpp"
 
-USE_LIBECS;
+using namespace libecs;
 
 LIBECS_DM_CLASS( ExpressionAlgebraicProcess, ExpressionProcessBase )
 {
@@ -60,7 +59,7 @@ LIBECS_DM_CLASS( ExpressionAlgebraicProcess, ExpressionProcessBase )
   
   virtual void fire()
     { 
-      setActivity( theVirtualMachine.execute( theCompiledCode ) );
+      setActivity( theVirtualMachine.execute( *theCompiledCode ) );
     }
 
 };
