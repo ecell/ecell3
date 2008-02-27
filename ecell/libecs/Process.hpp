@@ -52,7 +52,7 @@ namespace libecs
 
 
   DECLARE_ASSOCVECTOR( String, VariableReference, std::less< const String >, 
-		       VariableReferenceMap  );
+                       VariableReferenceMap  );
 
   DECLARE_VECTOR( VariableReference, VariableReferenceVector );
 
@@ -71,27 +71,27 @@ namespace libecs
 
     LIBECS_DM_OBJECT_ABSTRACT( Process )
       {
-	INHERIT_PROPERTIES( Entity );
+        INHERIT_PROPERTIES( Entity );
 
-	PROPERTYSLOT_LOAD_SAVE( Polymorph, VariableReferenceList,
-				&Process::setVariableReferenceList,
-				&Process::getVariableReferenceList,
-				&Process::setVariableReferenceList,
-				&Process::saveVariableReferenceList );
+        PROPERTYSLOT_LOAD_SAVE( Polymorph, VariableReferenceList,
+                                &Process::setVariableReferenceList,
+                                &Process::getVariableReferenceList,
+                                &Process::setVariableReferenceList,
+                                &Process::saveVariableReferenceList );
 
-	PROPERTYSLOT_SET_GET( Integer,       Priority );
-	PROPERTYSLOT_SET_GET( String,        StepperID );
+        PROPERTYSLOT_SET_GET( Integer,       Priority );
+        PROPERTYSLOT_SET_GET( String,        StepperID );
 
-	PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real,    Activity );
-	PROPERTYSLOT_GET_NO_LOAD_SAVE(     Real,    MolarActivity );
+        PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real,    Activity );
+        PROPERTYSLOT_GET_NO_LOAD_SAVE(     Real,    MolarActivity );
 
-	PROPERTYSLOT_GET_NO_LOAD_SAVE(     Integer, IsContinuous );
+        PROPERTYSLOT_GET_NO_LOAD_SAVE(     Integer, IsContinuous );
       }
 
     /** 
-	Sort Processes in reversed order of 'Priority' values.
-	(Largest one first, smallest one last)
-	
+        Sort Processes in reversed order of 'Priority' values.
+        (Largest one first, smallest one last)
+        
 
     */
     class PriorityCompare
@@ -99,17 +99,17 @@ namespace libecs
     public:
       bool operator()( ProcessPtr aLhs, ProcessPtr aRhs ) const
       {
-	return compare( aLhs->getPriority(), aRhs->getPriority() );
+        return compare( aLhs->getPriority(), aRhs->getPriority() );
       }
 
       bool operator()( ProcessPtr aLhs, IntegerParam aRhs ) const
       {
-	return compare( aLhs->getPriority(), aRhs );
+        return compare( aLhs->getPriority(), aRhs );
       }
 
       bool operator()( IntegerParam aLhs, ProcessPtr aRhs ) const
       {
-	return compare( aLhs, aRhs->getPriority() );
+        return compare( aLhs, aRhs->getPriority() );
       }
 
     private:
@@ -117,14 +117,14 @@ namespace libecs
       // if statement can be faster than returning an expression directly
       inline static bool compare( IntegerParam aLhs, IntegerParam aRhs )
       {
-	if( aLhs > aRhs )
-	  {
-	    return true;
-	  }
-	else
-	  {
-	    return false;
-	  }
+        if( aLhs > aRhs )
+          {
+            return true;
+          }
+        else
+          {
+            return false;
+          }
       }
 
 
@@ -281,9 +281,9 @@ namespace libecs
     */
 
     void registerVariableReference( StringCref aName, 
-				    VariablePtr aVariable, 
-				    IntegerParam aCoefficient, 
-				    const bool isAccessor = true );
+                                    VariablePtr aVariable, 
+                                    IntegerParam aCoefficient, 
+                                    const bool isAccessor = true );
 
     /**
        Get VariableReference by a tag name.
@@ -307,14 +307,14 @@ namespace libecs
     VariableReferenceVector::size_type getZeroVariableReferenceOffset() const
     {
       return theZeroVariableReferenceIterator - 
-	getVariableReferenceVector().begin();
+        getVariableReferenceVector().begin();
     }
 
     VariableReferenceVector::size_type 
     getPositiveVariableReferenceOffset() const
     {
       return thePositiveVariableReferenceIterator - 
-	getVariableReferenceVector().begin();
+        getVariableReferenceVector().begin();
     }
 
 
@@ -359,16 +359,16 @@ namespace libecs
 
       // Increase or decrease variables, skipping zero coefficients.
       std::for_each( theVariableReferenceVector.begin(),
-		     theZeroVariableReferenceIterator,
-		     boost::bind2nd
-		     ( boost::mem_fun_ref
-		       ( &VariableReference::addValue ), aValue ) );
+                     theZeroVariableReferenceIterator,
+                     boost::bind2nd
+                     ( boost::mem_fun_ref
+                       ( &VariableReference::addValue ), aValue ) );
 
       std::for_each( thePositiveVariableReferenceIterator,
-		     theVariableReferenceVector.end(),
-		     boost::bind2nd
-		     ( boost::mem_fun_ref
-		       ( &VariableReference::addValue ), aValue ) );
+                     theVariableReferenceVector.end(),
+                     boost::bind2nd
+                     ( boost::mem_fun_ref
+                       ( &VariableReference::addValue ), aValue ) );
     }
 
 
@@ -422,7 +422,7 @@ namespace libecs
 
     //    static const Polymorph 
     //      convertVariableReferenceToPolymorph( VariableReferenceCref 
-    //					   aVariableReference );
+    //                                           aVariableReference );
 
     //    static const VariableReference 
     //      convertPolymorphToVariableReference( PolymorphCref aPolymorph );
