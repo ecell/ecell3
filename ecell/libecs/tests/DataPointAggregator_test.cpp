@@ -28,9 +28,12 @@
 // written by Koichi Takahashi
 // modified by Moriyoshi Koizumi
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
+
+#define BOOST_TEST_MODULE DataPointAggregator
 
 #include <boost/mpl/list.hpp>
 #include <boost/test/unit_test.hpp>
@@ -41,8 +44,7 @@
 #include "DataPoint.hpp"
 #include <iostream>
 
-namespace libecs
-{
+namespace libecs  {
 
 template<typename CharT, typename Traits>
 inline std::basic_ostream<CharT, Traits>&
@@ -53,66 +55,37 @@ operator <<(std::basic_ostream<CharT, Traits>& strm, DataPoint const& dp)
     return strm;
 }
 
-class DataPointAggregatorTest
+BOOST_AUTO_TEST_CASE(testAggregate)
 {
-public:
-    void testAggregate()
-    {
-        DataPointAggregator dpa;
-        dpa.aggregate( DataPoint(  3, 4 ) );
-        BOOST_CHECK_EQUAL( dpa.getLastPoint(), DataPoint(  3, 4 ) );
-        BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
-        BOOST_CHECK_EQUAL( dpa.getData().getMax(), 4 );
-        BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 4 );
-        dpa.aggregate( DataPoint(  5, 6 ) );
-        BOOST_CHECK_EQUAL( dpa.getLastPoint(), DataPoint(  5, 6 ) );
-        BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
-        BOOST_CHECK_EQUAL( dpa.getData().getMax(), 6 );
-        BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 4 );
-        dpa.aggregate( DataPoint(  7, 8 ) );
-        BOOST_CHECK_EQUAL( dpa.getLastPoint(), DataPoint(  7, 8 ) );
-        BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
-        BOOST_CHECK_EQUAL( dpa.getData().getMax(), 8 );
-        BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 5 );
-        dpa.aggregate( DataPoint(  9, 6 ) );
-        BOOST_CHECK_EQUAL( dpa.getLastPoint(), DataPoint(  9, 6 ) );
-        BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
-        BOOST_CHECK_EQUAL( dpa.getData().getMax(), 8 );
-        BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 6 );
-        dpa.aggregate( DataPoint( 11, 4 ) );
-        BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
-        BOOST_CHECK_EQUAL( dpa.getData().getMax(), 8 );
-        BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 6 );
-        dpa.aggregate( DataPoint( 13, 6 ) );
-        BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
-        BOOST_CHECK_EQUAL( dpa.getData().getMax(), 8 );
-        BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 5.6 );
-    }
-};
-
-} // namespace libecs
-
-boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
-{
-#   define add_test(klass, method) \
-        suite->add(boost::unit_test::make_test_case<klass>( \
-            &klass::method, \
-            BOOST_PP_STRINGIZE(klass) "::" BOOST_PP_STRINGIZE(method), \
-            inst))
-    boost::unit_test::test_suite* suites =
-            BOOST_TEST_SUITE("DataPointAggregator testsuites");
-
-    {
-        boost::unit_test::test_suite* suite =
-                BOOST_TEST_SUITE( "DataPointAggregator" );
-        boost::shared_ptr<libecs::DataPointAggregatorTest>
-            inst( new libecs::DataPointAggregatorTest() );
-
-        add_test( libecs::DataPointAggregatorTest, testAggregate );
-
-        suites->add(suite);
-    }
-
-    return suites;
+    DataPointAggregator dpa;
+    dpa.aggregate( DataPoint(  3, 4 ) );
+    BOOST_CHECK_EQUAL( dpa.getLastPoint(), DataPoint(  3, 4 ) );
+    BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
+    BOOST_CHECK_EQUAL( dpa.getData().getMax(), 4 );
+    BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 4 );
+    dpa.aggregate( DataPoint(  5, 6 ) );
+    BOOST_CHECK_EQUAL( dpa.getLastPoint(), DataPoint(  5, 6 ) );
+    BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
+    BOOST_CHECK_EQUAL( dpa.getData().getMax(), 6 );
+    BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 4 );
+    dpa.aggregate( DataPoint(  7, 8 ) );
+    BOOST_CHECK_EQUAL( dpa.getLastPoint(), DataPoint(  7, 8 ) );
+    BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
+    BOOST_CHECK_EQUAL( dpa.getData().getMax(), 8 );
+    BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 5 );
+    dpa.aggregate( DataPoint(  9, 6 ) );
+    BOOST_CHECK_EQUAL( dpa.getLastPoint(), DataPoint(  9, 6 ) );
+    BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
+    BOOST_CHECK_EQUAL( dpa.getData().getMax(), 8 );
+    BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 6 );
+    dpa.aggregate( DataPoint( 11, 4 ) );
+    BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
+    BOOST_CHECK_EQUAL( dpa.getData().getMax(), 8 );
+    BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 6 );
+    dpa.aggregate( DataPoint( 13, 6 ) );
+    BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
+    BOOST_CHECK_EQUAL( dpa.getData().getMax(), 8 );
+    BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 5.6 );
 }
 
+} // namespace libecs
