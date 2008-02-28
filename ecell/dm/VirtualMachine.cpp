@@ -248,8 +248,8 @@ const Real VirtualMachine::execute( CodeCref aCode )
                 aStack.push_back( static_cast<Real>( ( anInstruction->getOperand() )() ) );
 
                 INCREMENT_PC( OBJECT_METHOD_INTEGER );
-            }
                 break;
+            }
 
         case RET:
             return aStack.peek< 0 >().theReal;
