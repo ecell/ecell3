@@ -28,9 +28,14 @@
 // written by Koichi Takahashi
 // modified by Moriyoshi Koizumi
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
+
+#define BOOST_TEST_MODULE DynamicPriorityQueue
+#define BOOST_TEST_ALTERNATIVE_INIT_API 1
+#define BOOST_TEST_NO_MAIN
 
 #include <boost/mpl/list.hpp>
 #include <boost/test/unit_test.hpp>
@@ -44,8 +49,7 @@
 
 #include <iostream>
 
-namespace libecs
-{
+namespace libecs {
 
 template<typename T>
 class DynamicPriorityQueueTest
@@ -348,16 +352,14 @@ public:
 
 } // namespace libecs
 
-boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
+bool my_init_unit_test()
 {
 #   define add_test(klass, method) \
-        suite->add(boost::unit_test::make_test_case<klass>( \
-            &klass::method, \
-            BOOST_PP_STRINGIZE(klass) "::" BOOST_PP_STRINGIZE(method), \
-            inst))
-    boost::unit_test::test_suite* suites =
-            BOOST_TEST_SUITE("DPQ testsuites");
-
+        suite->add(\
+            boost::unit_test::make_test_case<klass>( \
+                &klass::method, \
+                BOOST_PP_STRINGIZE(klass) "::" BOOST_PP_STRINGIZE(method), \
+                inst))
     {
         typedef libecs::DynamicPriorityQueueTest<int> IntegerDPQTest;
         boost::unit_test::test_suite* suite =
@@ -375,7 +377,7 @@ boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
         add_test( IntegerDPQTest, testSimpleSortingWithPops );
         add_test( IntegerDPQTest, testInterleavedSortingWithPops );
 
-        suites->add(suite);
+        boost::unit_test::framework::master_test_suite().add(suite);
     }
 
     {
@@ -395,8 +397,13 @@ boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
         add_test( DoubleDPQTest, testSimpleSortingWithPops );
         add_test( DoubleDPQTest, testInterleavedSortingWithPops );
 
-        suites->add(suite);
+        boost::unit_test::framework::master_test_suite().add(suite);
     }
 
-    return suites;
+    return true;
+}
+
+int main( int argc, char **argv )
+{
+    return ::boost::unit_test::unit_test_main( &my_init_unit_test, argc, argv );
 }

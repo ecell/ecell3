@@ -29,6 +29,8 @@
 // modified by Moriyoshi Koizumi
 //
 
+#define BOOST_TEST_MODULE "Util"
+
 #include <boost/mpl/list.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
@@ -40,43 +42,9 @@
 
 #include <iostream>
 
-namespace libecs
+BOOST_AUTO_TEST_CASE(test)
 {
-
-class UtilTest
-{
-public:
-    void test()
-    {
-        std::string str( "  \t  a bcde f\tghi\n\t jkl\n \tmnopq     \n   \t " );
-        eraseWhiteSpaces( str );
-        BOOST_CHECK_EQUAL(str, "abcdefghijklmnopq");
-    }
+    std::string str( "  \t  a bcde f\tghi\n\t jkl\n \tmnopq     \n   \t " );
+    libecs::eraseWhiteSpaces( str );
+    BOOST_CHECK_EQUAL(str, "abcdefghijklmnopq");
 };
-
-} // namespace libecs
-
-boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[])
-{
-#   define add_test(klass, method) \
-        suite->add(boost::unit_test::make_test_case<klass>( \
-            &klass::method, \
-            BOOST_PP_STRINGIZE(klass) "::" BOOST_PP_STRINGIZE(method), \
-            inst))
-    boost::unit_test::test_suite* suites =
-            BOOST_TEST_SUITE( "Util testsuites" );
-
-    {
-        boost::unit_test::test_suite* suite =
-                BOOST_TEST_SUITE( "Util" );
-        boost::shared_ptr<libecs::UtilTest>
-            inst( new libecs::UtilTest() );
-
-        add_test( libecs::UtilTest, test );
-        suites->add(suite);
-    }
-
-
-    return suites;
-}
-
