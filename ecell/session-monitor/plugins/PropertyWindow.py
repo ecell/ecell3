@@ -338,7 +338,7 @@ class PropertyWindow(OsogoPluginWindow):
                 anAttribute = aProperty[1]
 
                 # When the getable attribute is false, value is ''
-                if anAttribute[GETABLE] == FALSE:
+                if anAttribute[GETABLE] == False:
                     aValue = ''
                 else:
                     aValue = str( aProperty[0] )
