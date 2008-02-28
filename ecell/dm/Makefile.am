@@ -1,7 +1,8 @@
 ECELL_DIRNAME = @ECELL_DIRNAME@
 
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/.. -I$(top_srcdir)/../libltdl
-AM_LDFLAGS = -module -avoid-version
+AM_LDFLAGS = -module -avoid-version -no-undefined
+LIBS = -L$(abs_top_srcdir)/tmp/@libdir@ -lecs
 
 pkglibdir = $(libdir)/$(ECELL_DIRNAME)/modules
 pkglib_LTLIBRARIES =  \

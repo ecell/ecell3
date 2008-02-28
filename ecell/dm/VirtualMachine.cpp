@@ -39,15 +39,38 @@ namespace scripting
 {
 using namespace libecs;
 
-#define EXPRESSION_PROCESS_USE_JIT 0
-
 #define ENABLE_STACKOPS_FOLDING 1
 
-//#if defined( EXPRESSIONPROCESS_USE_JIT )
-//#include "JITExpressionProcessBase"
-//#else /* defined( EXPRESSIONPROCESS_USE_JIT ) */
-//#include "SVMExpressionProcessBase"
-//#endif /* defined( EXPRESSIONPROCESS_USE_JIT ) */
+template < Opcode OPCODE >
+class Opcode2Instruction
+{
+    typedef void type;
+};
+
+
+#define DEFINE_OPCODE2INSTRUCTION( CODE )\
+  template<> class\
+  Opcode2Instruction< CODE >\
+  {\
+  public:\
+    typedef Instruction< CODE > type;\
+  }
+
+      
+DEFINE_OPCODE2INSTRUCTION( PUSH_REAL );
+DEFINE_OPCODE2INSTRUCTION( NEG );
+DEFINE_OPCODE2INSTRUCTION( ADD );
+DEFINE_OPCODE2INSTRUCTION( SUB );
+DEFINE_OPCODE2INSTRUCTION( MUL );
+DEFINE_OPCODE2INSTRUCTION( DIV );
+DEFINE_OPCODE2INSTRUCTION( LOAD_REAL );
+DEFINE_OPCODE2INSTRUCTION( CALL_FUNC1 );
+DEFINE_OPCODE2INSTRUCTION( CALL_FUNC2 );
+DEFINE_OPCODE2INSTRUCTION( OBJECT_METHOD_INTEGER );
+DEFINE_OPCODE2INSTRUCTION( OBJECT_METHOD_REAL );
+DEFINE_OPCODE2INSTRUCTION( RET );
+
+#undef DEFINE_OPCODE2INSTRUCTION
 
 const Real VirtualMachine::execute( CodeCref aCode )
 {
@@ -71,12 +94,10 @@ const Real VirtualMachine::execute( CodeCref aCode )
     //  aStack[0].theReal = 0.0;
     StackElement* aStackPtr( aStack - 1 );
 
-    const unsigned char* aPC( &aCode[0] );
+    const unsigned char* aPC( aCode.data() );
 
     for (;;) {
-
         Real bypass;
-
         switch ( FETCH_OPCODE() ) {
 
 #define SIMPLE_ARITHMETIC( OPCODE, OP )\
