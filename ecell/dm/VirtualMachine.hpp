@@ -44,12 +44,6 @@ namespace scripting
 
 class VirtualMachine
 {
-    union StackElement
-    {
-        libecs::Real    theReal;
-        libecs::Integer theInteger;
-    };
-
 public:
   
     VirtualMachine()

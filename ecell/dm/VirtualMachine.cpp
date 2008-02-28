@@ -39,7 +39,15 @@ namespace scripting
 {
 using namespace libecs;
 
-#define ENABLE_STACKOPS_FOLDING 1
+union StackElement
+{
+    libecs::Real    theReal;
+    libecs::Integer theInteger;
+
+    StackElement(): theReal( 0 ) {}
+    StackElement(libecs::Real aReal ): theReal( aReal ) {}
+    StackElement(libecs::Integer aInteger ): theInteger( aInteger ) {}
+};
 
 template < Opcode OPCODE >
 class Opcode2Instruction
@@ -72,6 +80,60 @@ DEFINE_OPCODE2INSTRUCTION( RET );
 
 #undef DEFINE_OPCODE2INSTRUCTION
 
+template< typename Telem_, std::size_t maxdepth_ >
+class LightweightStack
+{
+public:
+    typedef std::size_t size_type;
+
+public:
+    LightweightStack()
+        : ptr_( elems_ )
+    {
+    }
+
+    void push_back(const Telem_& elem)
+    {
+        *(++ptr_) = elem;
+        last = elem;
+    }
+
+    Telem_& pop()
+    {
+        last = *(ptr_ - 1);
+        return *(ptr_--);
+    }
+
+    size_type size()
+    {
+        return ptr_ - elems_;
+    }
+
+    size_type capacity()
+    {
+        return maxdepth_;
+    }
+
+    template<size_type bkidx>
+    Telem_& peek()
+    {
+        if ( bkidx == 0 )
+            return last;
+        return *( ptr_ - bkidx );
+    }
+
+    void pop_back()
+    {
+        last = *(--ptr_);
+    }
+
+private:
+    Telem_ elems_[ maxdepth_ + 1 ];
+    Telem_* ptr_;
+    Telem_ last;
+};
+
+
 const Real VirtualMachine::execute( CodeCref aCode )
 {
 
@@ -86,219 +148,116 @@ const Real VirtualMachine::execute( CodeCref aCode )
 
 
 #define INCREMENT_PC( OPCODE )\
-    aPC += sizeof( Opcode2Instruction<OPCODE>::type );\
+    aPC += sizeof( Opcode2Instruction<OPCODE>::type )\
  
-    //    std::cout << #OPCODE << std::endl;
-
-    StackElement aStack[100];
-    //  aStack[0].theReal = 0.0;
-    StackElement* aStackPtr( aStack - 1 );
+    LightweightStack<StackElement, 100> aStack;
 
     const unsigned char* aPC( aCode.data() );
 
     for (;;) {
-        Real bypass;
         switch ( FETCH_OPCODE() ) {
 
-#define SIMPLE_ARITHMETIC( OPCODE, OP )\
-            ( aStackPtr - 1)->theReal OP##= aStackPtr->theReal;\
-            INCREMENT_PC( OPCODE );\
-            --aStackPtr
+#define SIMPLE_ARITHMETIC( OPCODE, OP ) \
+    aStack.peek< -1 >().theReal OP##= aStack.peek< 0 >().theReal, \
+    aStack.pop_back(), \
+    INCREMENT_PC(OPCODE)
 
-        case ADD: {
+        case ADD:
             SIMPLE_ARITHMETIC( ADD, + );
+            break;
 
-            continue;
-        }
-
-        case SUB: {
+        case SUB:
             SIMPLE_ARITHMETIC( SUB, - );
+            break;
 
-            continue;
-        }
-
-        case MUL: {
+        case MUL:
             SIMPLE_ARITHMETIC( MUL, * );
+            break;
 
-            continue;
-        }
-
-        case DIV: {
+        case DIV:
             SIMPLE_ARITHMETIC( DIV, / );
-
-            continue;
-        }
-
+            break;
 #undef SIMPLE_ARITHMETIC
 
-        case CALL_FUNC2: {
-            DECODE_INSTRUCTION( CALL_FUNC2 );
+        case CALL_FUNC2:
+            {
+                DECODE_INSTRUCTION( CALL_FUNC2 );
 
-            ( aStackPtr - 1 )->theReal
-            = ( anInstruction->getOperand() )( ( aStackPtr - 1 )->theReal,
-                                               aStackPtr->theReal );
-            --aStackPtr;
+                aStack.peek< -1 >().theReal = anInstruction->getOperand()(
+                       aStack.peek< -1 >().theReal,
+                       aStack.peek< 0 >().theReal );
+                aStack.pop_back();
 
-            INCREMENT_PC( CALL_FUNC2 );
-            continue;
-        }
+                INCREMENT_PC( CALL_FUNC2 );
+                break;
+            }
 
 
-        case CALL_FUNC1: {
-            DECODE_INSTRUCTION( CALL_FUNC1 );
+        case CALL_FUNC1:
+            {
+                DECODE_INSTRUCTION( CALL_FUNC1 );
 
-            aStackPtr->theReal
-            = ( anInstruction->getOperand() )( aStackPtr->theReal );
+                aStack.peek< 0 >().theReal = anInstruction->getOperand()(
+                    aStack.peek< 0 >().theReal );
 
-            INCREMENT_PC( CALL_FUNC1 );
-            continue;
-        }
+                INCREMENT_PC( CALL_FUNC1 );
+                break;
+            }
 
-        case NEG: {
-            aStackPtr->theReal = - aStackPtr->theReal;
+        case NEG:
+            {
+                aStack.peek< 0 >().theReal = -aStack.peek< 0 >().theReal;
+                INCREMENT_PC( NEG );
+                break;
+            }
 
-            INCREMENT_PC( NEG );
-            continue;
-        }
+        case PUSH_REAL:
+            {
+                DECODE_INSTRUCTION( PUSH_REAL );
 
-#if 0
-        case PUSH_INTEGER: {
-            DECODE_INSTRUCTION( PUSH_INTEGER );
+                aStack.push_back( StackElement( anInstruction->getOperand() ) );
 
-            ++aStackPtr;
-            aStackPtr->theInteger = anInstruction->getOperand();
+                INCREMENT_PC( PUSH_REAL );
+                break;
+            }
 
-            INCREMENT_PC( PUSH_INTEGER );
-            continue;
-        }
+        case LOAD_REAL:
+            {
+                DECODE_INSTRUCTION( LOAD_REAL );
 
-        case PUSH_POINTER: {
-            DECODE_INSTRUCTION( PUSH_POINTER );
+                aStack.push_back( StackElement( *( anInstruction->getOperand() ) ) );
 
-            ++aStackPtr;
-            aStackPtr->thePointer = anInstruction->getOperand();
+                INCREMENT_PC( LOAD_REAL );
+                break;
+            }
 
-            INCREMENT_PC( PUSH_POINTER );
-            continue;
-        }
+        case OBJECT_METHOD_REAL:
+            {
+                DECODE_INSTRUCTION( OBJECT_METHOD_REAL );
 
-#endif // 0
+                aStack.push_back( StackElement( anInstruction->getOperand()() ) );
 
-        case PUSH_REAL: {
-            DECODE_INSTRUCTION( PUSH_REAL );
+                INCREMENT_PC( OBJECT_METHOD_REAL );
+                break;
+            }
 
-            bypass = anInstruction->getOperand();
+        case OBJECT_METHOD_INTEGER:
+            {
+                DECODE_INSTRUCTION( OBJECT_METHOD_INTEGER );
 
-            INCREMENT_PC( PUSH_REAL );
-            goto bypass_real;
-        }
+                aStack.push_back( static_cast<Real>( ( anInstruction->getOperand() )() ) );
 
-        case LOAD_REAL: {
-            DECODE_INSTRUCTION( LOAD_REAL );
+                INCREMENT_PC( OBJECT_METHOD_INTEGER );
+            }
+                break;
 
-            bypass = *( anInstruction->getOperand() );
+        case RET:
+            return aStack.peek< 0 >().theReal;
 
-            INCREMENT_PC( LOAD_REAL );
-            goto bypass_real;
-        }
-
-        case OBJECT_METHOD_REAL: {
-            DECODE_INSTRUCTION( OBJECT_METHOD_REAL );
-
-            bypass = ( anInstruction->getOperand() )();
-
-            INCREMENT_PC( OBJECT_METHOD_REAL );
-            goto bypass_real;
-        }
-
-        case OBJECT_METHOD_INTEGER: {
-            DECODE_INSTRUCTION( OBJECT_METHOD_INTEGER );
-
-            bypass = static_cast<Real>( ( anInstruction->getOperand() )() );
-
-            INCREMENT_PC( OBJECT_METHOD_INTEGER );
-            goto bypass_real;
-        }
-
-        case RET: {
-            return aStackPtr->theReal;
-        }
-
-        default: {
+        default:
             THROW_EXCEPTION( UnexpectedError, "Invalid instruction." );
-        }
 
         }
-
-#if defined( ENABLE_STACKOPS_FOLDING )
-
-bypass_real:
-
-        // Fetch next opcode, and if it is the target of of the stackops folding,
-        // do it here.   If not (default case), start the next loop iteration.
-        switch ( FETCH_OPCODE() ) {
-        case ADD: {
-            aStackPtr->theReal += bypass;
-
-            INCREMENT_PC( ADD );
-            break;
-        }
-
-        case SUB: {
-            aStackPtr->theReal -= bypass;
-
-            INCREMENT_PC( SUB );
-            break;
-        }
-
-        case MUL: {
-            aStackPtr->theReal *= bypass;
-
-            INCREMENT_PC( MUL );
-            break;
-        }
-
-        case DIV: {
-            aStackPtr->theReal /= bypass;
-
-            INCREMENT_PC( DIV );
-            break;
-        }
-
-        case CALL_FUNC2: {
-            DECODE_INSTRUCTION( CALL_FUNC2 );
-
-            aStackPtr->theReal
-            = ( anInstruction->getOperand() )( aStackPtr->theReal, bypass );
-
-            INCREMENT_PC( CALL_FUNC2 );
-            break;
-        }
-
-        default: {
-            // no need to do invalid instruction check here because
-            // it will be done in the next cycle.
-
-            ++aStackPtr;
-            aStackPtr->theReal = bypass;
-
-            break;
-        }
-        }
-
-        continue;
-
-#else /* defined( ENABLE_STACKOPS_FOLDING ) */
-
-bypass_real:
-
-        ++aStackPtr;
-        aStackPtr->theReal = bypass;
-
-        continue;
-
-#endif /* defined( ENABLE_STACKOPS_FOLDING ) */
-
     }
 
 #undef DECODE_INSTRUCTION
