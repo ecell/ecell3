@@ -165,6 +165,8 @@ typedef int ssize_t;
 
 #define OPEN_WHEN_ACCESS
 
+namespace libecs {
+
 const unsigned int VVECTOR_READ_CACHE_SIZE = 2048;
 const unsigned int VVECTOR_WRITE_CACHE_SIZE = 2048;
 const unsigned int VVECTOR_READ_CACHE_INDEX_SIZE = 2;
@@ -528,5 +530,6 @@ template<class T> void vvector<T>::clear()
   unlinkfile();
 }
 
+} // namespace libecs
 
 #endif	/* __VVECTOR_H__ */

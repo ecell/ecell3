@@ -160,6 +160,7 @@
 #define O_LARGEFILE 0
 #endif /* O_LARGEFILE */
 
+namespace libecs {
 
 int vvectorbase::_serialNumber = 0;
 char const *vvectorbase::_defaultDirectory = NULL;
@@ -446,3 +447,5 @@ void vvectorbase::my_close_write()
 
   }
 }
+
+} // namespace libecs
