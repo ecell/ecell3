@@ -7,7 +7,6 @@ from distutils.core import setup, Extension
 include_dirs = [
     '@DMTOOL_INCLUDE_DIR@',
     '@NUMPY_INCLUDE_DIR@',
-    '@INCLTDL@'[2:],
     '@top_srcdir@',
     '@top_srcdir@/libecs',
     '@top_srcdir@/libemc',
