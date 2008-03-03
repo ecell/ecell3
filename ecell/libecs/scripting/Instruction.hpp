@@ -36,6 +36,7 @@
 #define __INSTRUCTION_HPP
 
 #include "libecs/libecs.hpp"
+#include "libecs/MethodProxy.hpp"
 
 namespace libecs { namespace scripting {
 
@@ -77,55 +78,6 @@ public:
         return true;
     }
 };
-
-
-template<typename CharT, typename Traits>
-inline std::basic_ostream<CharT, Traits>&
-operator <<(std::basic_ostream<CharT, Traits>& strm,
-        const RealFunc0& dp)
-{
-    strm << "(libecs::Real(*)())" << (void *)dp;
-}
-
-template<typename CharT, typename Traits>
-inline std::basic_ostream<CharT, Traits>&
-operator <<(std::basic_ostream<CharT, Traits>& strm,
-        const RealFunc1& dp)
-{
-    strm << "(libecs::Real(*)(libecs::Real))" << (void *)dp;
-}
-
-template<typename CharT, typename Traits>
-inline std::basic_ostream<CharT, Traits>&
-operator <<(std::basic_ostream<CharT, Traits>& strm,
-        const RealFunc2& dp)
-{
-    strm << "(libecs::Real(*)(libecs::Real, libecs::Real))" << (void *)dp;
-}
-
-template<typename CharT, typename Traits>
-inline std::basic_ostream<CharT, Traits>&
-operator <<(std::basic_ostream<CharT, Traits>& strm,
-        const RealObjectMethodProxy& dp)
-{
-    strm << "libecs::ObjectMethodProxy<libecs::Real>()";
-}
-
-template<typename CharT, typename Traits>
-inline std::basic_ostream<CharT, Traits>&
-operator <<(std::basic_ostream<CharT, Traits>& strm,
-        const IntegerObjectMethodProxy& dp)
-{
-    strm << "libecs::ObjectMethodProxy<libecs::Integer>()";
-}
-
-template<typename CharT, typename Traits>
-inline std::basic_ostream<CharT, Traits>&
-operator <<(std::basic_ostream<CharT, Traits>& strm,
-        const NoOperand& dp)
-{
-    strm << "NoOperand";
-}
 
 template <Opcode OPCODE>
 class Opcode2Operand
@@ -231,5 +183,63 @@ SPECIALIZE_OPCODE2OPERAND( OBJECT_METHOD_INTEGER,    IntegerObjectMethodProxy );
 #undef SPECIALIZE_OPCODE2OPERAND
 
 } } // namespace libecs::scripting
+
+namespace std {
+
+template<typename CharT, typename Traits>
+inline std::basic_ostream<CharT, Traits>&
+operator <<(std::basic_ostream<CharT, Traits>& strm,
+        const libecs::scripting::RealFunc0& dp)
+{
+    strm << "(libecs::Real(*)())" << (void *)dp;
+    return strm;
+}
+
+template<typename CharT, typename Traits>
+inline std::basic_ostream<CharT, Traits>&
+operator <<(std::basic_ostream<CharT, Traits>& strm,
+        const libecs::scripting::RealFunc1& dp)
+{
+    strm << "(libecs::Real(*)(libecs::Real))" << (void *)dp;
+    return strm;
+}
+
+template<typename CharT, typename Traits>
+inline std::basic_ostream<CharT, Traits>&
+operator <<(std::basic_ostream<CharT, Traits>& strm,
+        const libecs::scripting::RealFunc2& dp)
+{
+    strm << "(libecs::Real(*)(libecs::Real, libecs::Real))" << (void *)dp;
+    return strm;
+}
+
+template<typename CharT, typename Traits>
+inline std::basic_ostream<CharT, Traits>&
+operator <<(std::basic_ostream<CharT, Traits>& strm,
+        const libecs::scripting::RealObjectMethodProxy&)
+{
+    strm << "libecs::ObjectMethodProxy<libecs::Real>()";
+    return strm;
+}
+
+template<typename CharT, typename Traits>
+inline std::basic_ostream<CharT, Traits>&
+operator <<(std::basic_ostream<CharT, Traits>& strm,
+        const libecs::scripting::IntegerObjectMethodProxy&)
+{
+    strm << "libecs::ObjectMethodProxy<libecs::Integer>()";
+    return strm;
+}
+
+template<typename CharT, typename Traits>
+inline std::basic_ostream<CharT, Traits>&
+operator <<(std::basic_ostream<CharT, Traits>& strm,
+        const libecs::scripting::NoOperand& dp)
+{
+    strm << "NoOperand";
+    return strm;
+}
+
+} // namespace std
 
 #endif /* __INSTRUCTION_HPP */

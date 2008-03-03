@@ -60,6 +60,7 @@ LoggerBroker.cpp\
 Exceptions.cpp\
 PropertiedObjectMaker.cpp\
 scripting/ExpressionCompiler.cpp\
+scripting/Assembler.cpp\
 scripting/VirtualMachine.cpp
 
 libecsdir=${ECELL_INCLUDE_DIR}/libecs
@@ -111,6 +112,7 @@ PropertiedObjectMaker.hpp\
 PropertySlotProxyLoggerAdapter.hpp\
 scripting/ExpressionCompiler.hpp\
 scripting/VirtualMachine.hpp\
+scripting/Assembler.hpp\
 scripting/Instruction.hpp
 
 noinst_HEADERS=\

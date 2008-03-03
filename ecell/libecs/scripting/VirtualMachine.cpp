@@ -33,7 +33,8 @@
 //
 
 #include "libecs.hpp"
-#include "VirtualMachine.hpp"
+#include "Exceptions.hpp"
+#include "scripting/VirtualMachine.hpp"
 
 namespace libecs { namespace scripting {
 using namespace libecs;
@@ -89,6 +90,7 @@ public:
     LightweightStack()
         : ptr_( elems_ )
     {
+        elems_[ 0 ].theReal = 0x55aa55aa; // sentinel
     }
 
     void push_back(const Telem_& elem)
@@ -157,7 +159,7 @@ const Real VirtualMachine::execute( CodeCref aCode )
         switch ( FETCH_OPCODE() ) {
 
 #define SIMPLE_ARITHMETIC( OPCODE, OP ) \
-    aStack.peek< -1 >().theReal OP##= aStack.peek< 0 >().theReal, \
+    aStack.peek< 1 >().theReal OP##= aStack.peek< 0 >().theReal, \
     aStack.pop_back(), \
     INCREMENT_PC(OPCODE)
 
@@ -182,8 +184,8 @@ const Real VirtualMachine::execute( CodeCref aCode )
             {
                 DECODE_INSTRUCTION( CALL_FUNC2 );
 
-                aStack.peek< -1 >().theReal = anInstruction->getOperand()(
-                       aStack.peek< -1 >().theReal,
+                aStack.peek< 1 >().theReal = anInstruction->getOperand()(
+                       aStack.peek< 1 >().theReal,
                        aStack.peek< 0 >().theReal );
                 aStack.pop_back();
 

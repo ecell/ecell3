@@ -58,6 +58,11 @@ public:
     return theInvoker( const_cast<CLASS* const>( anObject ) ); 
   }
 
+  inline bool operator==( const MethodProxy& that ) const
+  {
+    return that.theInvoker == theInvoker;
+  }
+
   template < const RET (CLASS::*METHOD)() const >
   static MethodProxy create()
   {
@@ -88,6 +93,11 @@ private:
   inline static const RET invoke( CLASS* const anObject )
   {
     return ( anObject->*METHOD )();
+  }
+
+  inline bool operator==( const MethodProxy& that ) const
+  {
+    return that.theInvoker == theInvoker;
   }
 
 private:
@@ -123,6 +133,11 @@ public:
 #else  /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
     return ObjectMethodProxy( invoke<T,TMethod>, anObject );
 #endif /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
+  }
+
+  inline bool operator==( const ObjectMethodProxy& that ) const
+  {
+    return that.theInvoker == theInvoker;
   }
 
 private:

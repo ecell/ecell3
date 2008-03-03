@@ -32,4 +32,7 @@ Util_test_SOURCES = Util_test.cpp
 check_PROGRAMS+=ExpressionCompiler_test
 ExpressionCompiler_test_SOURCES = ExpressionCompiler_test.cpp
 
+check_PROGRAMS+=VirtualMachine_test
+VirtualMachine_test_SOURCES = VirtualMachine_test.cpp
+
 TESTS=$(check_PROGRAMS)

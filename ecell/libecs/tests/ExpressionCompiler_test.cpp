@@ -39,6 +39,8 @@
 #include <boost/type_traits.hpp>
 
 #include "scripting/ExpressionCompiler.hpp"
+#include "Variable.hpp"
+#include "VariableReference.hpp"
 
 #include <iostream>
 
@@ -290,4 +292,108 @@ BOOST_AUTO_TEST_CASE(testPropertyAccess)
         BOOST_CHECK_EQUAL(type, "NoSlot");
     }
 }
+
+BOOST_AUTO_TEST_CASE(testVariableReferenceResolver)
+{
+    class ErrorReporter: public scripting::ErrorReporter {
+    public:
+        ErrorReporter() {}
+
+        virtual void error( const String& type, const String& msg ) const {
+            throw type;
+        }
+    } anErrorReporter;
+
+    class PropertyAccess: public scripting::PropertyAccess {
+    public:
+        PropertyAccess()
+            : a(0), b(0), c(0)
+        {
+        }
+
+        virtual Real* get( const String& name ) {
+            if (name == "a") {
+                return &a;
+            } else if (name == "b") {
+                return &b;
+            } else if (name == "c") {
+                return &c;
+            }
+            return 0;
+        }
+    public:
+        Real a, b, c;
+    } aPropertyAccess;
+
+    class VariableReferenceResolver: public scripting::VariableReferenceResolver {
+    public:
+        virtual const VariableReference* get(
+                const String& name ) const
+        {
+            if (name == "A") {
+                return &a;
+            } else if (name == "B") {
+                return &b;
+            } else if (name == "C") {
+                return &c;
+            }
+            return 0;
+        }
+    public:
+        VariableReference a, b, c;
+    } aVarRefResolver;
+
+
+    class EntityResolver: public scripting::EntityResolver {
+    public:
+        virtual Entity* get( const String& name )
+        {
+            return 0;
+        }
+    } anEntityResolver;
+
+    scripting::ExpressionCompiler ec(
+        anErrorReporter, aPropertyAccess,
+        anEntityResolver, aVarRefResolver );
+
+    {
+        std::auto_ptr<const scripting::Code> code(
+             ec.compileExpression("1 + a") );
+
+        const unsigned char* pc = code->data();
+        const unsigned char* eoc = &*code->end();
+        CHECK_INSTRUCTION( pc, scripting::PUSH_REAL, 1 );
+        CHECK_INSTRUCTION( pc, scripting::LOAD_REAL, &aPropertyAccess.a );
+        CHECK_INSTRUCTION( pc, scripting::ADD, scripting::NoOperand() );
+        CHECK_INSTRUCTION( pc, scripting::RET, scripting::NoOperand() );
+        BOOST_CHECK_EQUAL(eoc, pc);
+    }
+
+    {
+        std::auto_ptr<const scripting::Code> code(
+             ec.compileExpression("1 + a + A.Value") );
+
+        const unsigned char* pc = code->data();
+        const unsigned char* eoc = &*code->end();
+        CHECK_INSTRUCTION( pc, scripting::PUSH_REAL, 1 );
+        CHECK_INSTRUCTION( pc, scripting::LOAD_REAL, &aPropertyAccess.a );
+        CHECK_INSTRUCTION( pc, scripting::ADD, scripting::NoOperand() );
+        CHECK_INSTRUCTION( pc, scripting::OBJECT_METHOD_REAL, (
+                scripting::RealObjectMethodProxy::create<
+                    VariableReference, &VariableReference::getValue >(
+                        &aVarRefResolver.a ) ) );
+        CHECK_INSTRUCTION( pc, scripting::ADD, scripting::NoOperand() );
+        CHECK_INSTRUCTION( pc, scripting::RET, scripting::NoOperand() );
+        BOOST_CHECK_EQUAL(eoc, pc);
+    }
+
+    try {
+        std::auto_ptr<const scripting::Code> code(
+             ec.compileExpression("1 + D.value") );
+        BOOST_FAIL("The preceeding expression unexpectedly succeeded");
+    } catch (const String& type) {
+        BOOST_CHECK_EQUAL(type, "NotFound");
+    }
+}
+
 

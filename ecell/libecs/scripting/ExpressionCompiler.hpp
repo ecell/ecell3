@@ -47,9 +47,7 @@
 #endif
 
 #include "libecs/libecs.hpp"
-#include "libecs/Process.hpp"
-#include "libecs/MethodProxy.hpp"
-
+#include "libecs/AssocVector.h"
 #include "libecs/scripting/Instruction.hpp"
 
 namespace libecs { namespace scripting {

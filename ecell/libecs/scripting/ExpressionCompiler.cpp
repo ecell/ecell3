@@ -32,9 +32,11 @@
 // E-Cell Project.
 //
 
-#include <iostream> // for debugging
 #include <boost/assert.hpp>
-#include "ExpressionCompiler.hpp"
+
+#include "Util.hpp"
+#include "scripting/ExpressionCompiler.hpp"
+#include "scripting/Assembler.hpp"
 
 namespace libecs { namespace scripting {
 
@@ -296,7 +298,6 @@ struct CompilerConfig
 
 template <class CLASS,typename RESULT>
 struct ObjectMethodOperand {
-    //typedef boost::mem_fn< RESULT, CLASS > MethodType;
     typedef RESULT (CLASS::* MethodPtr)( void ) const;
 
     const CLASS* theOperand1;
@@ -316,45 +317,23 @@ public:
 public:
     CompilerHelper(
         StringCref anExpression,
+        Assembler& anAssembler,
         ErrorReporter& anErrorReporter,
         PropertyAccess& aPropertyAccess,
         EntityResolver& anEntityResolver,
         VariableReferenceResolver& aVarRefResolver)
         : theExpression( anExpression ),
+          theAssembler( anAssembler ),
           theErrorReporter( anErrorReporter ),
           thePropertyAccess( aPropertyAccess ),
           theEntityResolver( anEntityResolver ),
-          theVarRefResolver( aVarRefResolver ),
-          theCode( 0 )
+          theVarRefResolver( aVarRefResolver )
     {
     }
 
     void compile();
 
-    Code* getResult()
-    {
-        return theCode;
-    }
-
 protected:
-    template < class Tinstr_ >
-    void appendInstruction( const Tinstr_& anInstruction )
-    {
-        Code::size_type aCodeSize( theCode->size() );
-        theCode->resize( aCodeSize + sizeof( Tinstr_ ) );
-        // XXX: hackish!!!
-        new (&(*theCode)[aCodeSize]) Tinstr_( anInstruction );
-    }
-
-    void
-    appendVariableReferenceMethodInstruction(
-            libecs::VariableReferencePtr aVariableReference,
-            libecs::StringCref aMethodName );
-
-    void
-    appendSystemMethodInstruction( libecs::SystemPtr aSystemPtr,
-                                   libecs::StringCref aMethodName );
-
     void compileTree( TreeIterator const& aTreeIterator );
 
     void compileSystemProperty(
@@ -367,7 +346,7 @@ private:
     EntityResolver& theEntityResolver;
     VariableReferenceResolver& theVarRefResolver;
     ErrorReporter& theErrorReporter;
-    Code* theCode;
+    Assembler& theAssembler;
     static configuration_type theConfig;
 };
 
@@ -395,80 +374,10 @@ void CompilerHelper<Tconfig_>::compile()
         return;
     }
 
-    theCode = new Code();
-    try {
-        compileTree( info.trees.begin() );
-        // place RET at the tail.
-        appendInstruction( Instruction<RET>() );
-    } catch (const libecs::Exception& e) {
-        delete theCode;
-        theCode = 0;
-        throw e;
-    }
+    compileTree( info.trees.begin() );
+    // place RET at the tail.
+    theAssembler.appendInstruction( Instruction<RET>() );
 }
-
-
-#define APPEND_OBJECT_METHOD_REAL( OBJECT, CLASSNAME, METHODNAME )\
- appendInstruction\
-   ( Instruction<OBJECT_METHOD_REAL>\
-     ( RealObjectMethodProxy::\
-       create< CLASSNAME, & CLASSNAME::METHODNAME >\
-       ( OBJECT ) ) ) // \
- 
-#define APPEND_OBJECT_METHOD_INTEGER( OBJECT, CLASSNAME, METHODNAME )\
- appendInstruction\
-   ( Instruction<OBJECT_METHOD_INTEGER>\
-     ( IntegerObjectMethodProxy::\
-       create< CLASSNAME, & CLASSNAME::METHODNAME >\
-       ( OBJECT ) ) ) // \
- 
-template<typename Tconfig_> void
-CompilerHelper<Tconfig_>::appendVariableReferenceMethodInstruction(
-        VariableReferencePtr aVariableReference, StringCref aMethodName )
-{
-
-    if ( aMethodName == "MolarConc" ) {
-        APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
-                                   getMolarConc );
-    } else if ( aMethodName == "NumberConc" ) {
-        APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
-                                   getNumberConc );
-    } else if ( aMethodName == "Value" ) {
-        APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
-                                   getValue );
-    } else if ( aMethodName == "Velocity" ) {
-        APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
-                                   getVelocity );
-    } else if ( aMethodName == "Coefficient" ) {
-        APPEND_OBJECT_METHOD_INTEGER( aVariableReference, VariableReference,
-                                      getCoefficient );
-    } else {
-        THROW_EXCEPTION(
-            NotFound, 
-            String( "No such VariableReference attribute: " )
-            + aMethodName );
-    }
-}
-
-template<typename Tconfig_> void
-CompilerHelper<Tconfig_>::appendSystemMethodInstruction(
-        SystemPtr aSystemPtr, StringCref aMethodName )
-{
-    if ( aMethodName == "Size" ) {
-        APPEND_OBJECT_METHOD_REAL( aSystemPtr, System, getSize );
-    } else if ( aMethodName == "SizeN_A" ) {
-        APPEND_OBJECT_METHOD_REAL( aSystemPtr, System, getSizeN_A );
-    } else {
-        THROW_EXCEPTION
-        ( NotFound,
-          "System attribute [" +
-          aMethodName + "] not found." );
-    }
-
-}
-
-#undef APPEND_OBJECT_METHOD_REAL
-#undef APPEND_OBJECT_METHOD_INTEGER
 
 /**
    This function is ExpressionCompiler subclass member function.
@@ -487,7 +396,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
 
             const Real aFloatValue = stringCast<Real>( aFloatString );
 
-            appendInstruction( Instruction<PUSH_REAL>( aFloatValue ) );
+            theAssembler.appendInstruction( Instruction<PUSH_REAL>( aFloatValue ) );
         }
         break;
 
@@ -500,7 +409,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
 
             const Real anIntegerValue = stringCast<Real>( anIntegerString );
 
-            appendInstruction( Instruction<PUSH_REAL>( anIntegerValue ) );
+            theAssembler.appendInstruction( Instruction<PUSH_REAL>( anIntegerValue ) );
         }
         break;
 
@@ -525,7 +434,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
                 const Real
                 anExponentValue = stringCast<Real>( anExponentString );
 
-                appendInstruction( Instruction<PUSH_REAL>
+                theAssembler.appendInstruction( Instruction<PUSH_REAL>
                   ( aBaseValue * pow( 10, anExponentValue ) ) );
             } else {
                 const String
@@ -535,7 +444,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
                 const Real
                 anExponentValue = stringCast<Real>( anExponentString1 );
 
-                appendInstruction(
+                theAssembler.appendInstruction(
                   Instruction<PUSH_REAL>
                   ( aBaseValue * pow( 10, -anExponentValue ) ) );
             }
@@ -575,7 +484,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
                     anArgumentValue = stringCast<Real>( anArgumentString );
 
                     if ( aFunctionMap1Iterator != theConfig.theFunctionMap1.end() ) {
-                        appendInstruction( Instruction<PUSH_REAL>
+                        theAssembler.appendInstruction( Instruction<PUSH_REAL>
                           ( (*aFunctionMap1Iterator->second)
                             ( anArgumentValue ) ) );
                     } else {
@@ -600,7 +509,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
                     compileTree( aChildTreeIterator );
 
                     if ( aFunctionMap1Iterator != theConfig.theFunctionMap1.end() ) {
-                        appendInstruction(
+                        theAssembler.appendInstruction(
                             Instruction<CALL_FUNC1>(
                                 aFunctionMap1Iterator->second ) );
                     } else {
@@ -633,7 +542,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
                     theConfig.theFunctionMap2.find( aFunctionString );
 
                 if ( aFunctionMap2Iterator != theConfig.theFunctionMap2.end() ) {
-                    appendInstruction(
+                    theAssembler.appendInstruction(
                         Instruction<CALL_FUNC2>(
                             aFunctionMap2Iterator->second ) );
                 } else {
@@ -729,7 +638,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
             }
 
             try {
-                appendVariableReferenceMethodInstruction(
+                theAssembler.appendVariableReferenceMethodInstruction(
                     const_cast<VariableReference*>( aVariableReferencePtr ),
                     aVariableReferenceMethodString );
             } catch ( const NotFound& e ) {
@@ -752,14 +661,14 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
                 ConstantMapIterator aConstantMapIterator(
                     theConfig.theConstantMap.find( anIdentifierString ) );
                 if ( aConstantMapIterator != theConfig.theConstantMap.end() ) {
-                    appendInstruction(
+                    theAssembler.appendInstruction(
                         Instruction<PUSH_REAL>( aConstantMapIterator->second ) );
                     break;
                 }
 
                 const Real* prop( thePropertyAccess[ anIdentifierString ]);
                 if (prop) {
-                    appendInstruction( Instruction<LOAD_REAL>(prop) );
+                    theAssembler.appendInstruction( Instruction<LOAD_REAL>(prop) );
                     break;
                 }
 
@@ -790,11 +699,11 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
                 const Real
                 value = stringCast<Real>( aValueString );
 
-                appendInstruction( Instruction<PUSH_REAL>( -value ) );
+                theAssembler.appendInstruction( Instruction<PUSH_REAL>( -value ) );
             } else {
                 compileTree( aChildTreeIterator );
 
-                appendInstruction( Instruction<NEG>() );
+                theAssembler.appendInstruction( Instruction<NEG>() );
             }
         }
         break;
@@ -827,7 +736,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
 
 
                 if ( aTreeIterator->value.begin()[ 0 ] == '^' ) {
-                    appendInstruction(
+                    theAssembler.appendInstruction(
                         Instruction<PUSH_REAL>(
                             pow( anArgumentValue1, anArgumentValue2 ) ) );
                 }
@@ -843,7 +752,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
 
                 if ( aTreeIterator->value.begin()[ 0 ] == '^' ) {
                     RealFunc2 aPowFunc( theConfig.theFunctionMap2.find( "pow" )->second );
-                    appendInstruction( Instruction<CALL_FUNC2>( aPowFunc ) );
+                    theAssembler.appendInstruction( Instruction<CALL_FUNC2>( aPowFunc ) );
                 }
                 theErrorReporter(
                     "UnexpectedError",
@@ -879,11 +788,11 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
 
 
                 if ( aTreeIterator->value.begin()[ 0 ] == '*' ) {
-                    appendInstruction(
+                    theAssembler.appendInstruction(
                         Instruction<PUSH_REAL>( aTerm1Value * aTerm2Value ) );
                 }
                 else if ( aTreeIterator->value.begin()[ 0 ] == '/' ) {
-                    appendInstruction(
+                    theAssembler.appendInstruction(
                         Instruction<PUSH_REAL>( aTerm1Value / aTerm2Value ) );
                 }
                 else {
@@ -899,10 +808,10 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
                 compileTree( aChildTreeIterator + 1 );
 
                 if ( aTreeIterator->value.begin()[ 0 ] == '*' ) {
-                    appendInstruction( Instruction<MUL>() );
+                    theAssembler.appendInstruction( Instruction<MUL>() );
                 }
                 else if ( aTreeIterator->value.begin()[ 0 ] == '/' ) {
-                    appendInstruction( Instruction<DIV>() );
+                    theAssembler.appendInstruction( Instruction<DIV>() );
                 }
                 else {
                     theErrorReporter(
@@ -939,11 +848,11 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
                 const Real aTerm2Value = stringCast<Real>( aTerm2String );
 
                 if (aTreeIterator->value.begin()[ 0 ] == '+') {
-                    appendInstruction(
+                    theAssembler.appendInstruction(
                         Instruction<PUSH_REAL>( aTerm1Value + aTerm2Value ) );
                 }
                 else if (aTreeIterator->value.begin()[ 0 ] == '-') {
-                    appendInstruction(
+                    theAssembler.appendInstruction(
                         Instruction<PUSH_REAL>( aTerm1Value - aTerm2Value ) );
                 }
                 else {
@@ -960,10 +869,10 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
 
 
                 if (aTreeIterator->value.begin()[0] == '+') {
-                    appendInstruction( Instruction<ADD>() );
+                    theAssembler.appendInstruction( Instruction<ADD>() );
                 }
                 else if (aTreeIterator->value.begin()[0] == '-') {
-                    appendInstruction( Instruction<SUB>() );
+                    theAssembler.appendInstruction( Instruction<SUB>() );
                 }
                 else {
                     theErrorReporter(
@@ -999,7 +908,7 @@ CompilerHelper<Tconfig_>::compileSystemProperty(
     BOOST_ASSERT( aTreeIterator->value.begin()[ 0 ] == '.' );
 
     if ( aChildString == "getSuperSystem" ) {
-        appendSystemMethodInstruction( aSystemPtr, aMethodName );
+        theAssembler.appendSystemMethodInstruction( aSystemPtr, aMethodName );
     } else if ( aChildString == "." ) {
         SystemPtr theSystemPtr( aSystemPtr->getSuperSystem() );
 
@@ -1017,11 +926,18 @@ CompilerHelper<Tconfig_>::compileSystemProperty(
 const Code*
 ExpressionCompiler::compileExpression( StringCref anExpression )
 {
+    Code* code = new Code();
+    Assembler anAssembler( code );
     CompilerHelper<CompilerConfig> helper(
-            anExpression, theErrorReporter, thePropertyAccess,
+            anExpression, anAssembler, theErrorReporter, thePropertyAccess,
             theEntityResolver, theVarRefResolver );
-    helper.compile();
-    return helper.getResult();
+    try {
+        helper.compile();
+    } catch (const std::exception& e ) {
+        delete code;
+        throw e;
+    }
+    return code;
 }
 
 } } // namespace libecs::scripting
