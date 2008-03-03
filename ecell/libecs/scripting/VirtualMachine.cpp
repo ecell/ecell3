@@ -32,11 +32,10 @@
 // E-Cell Project.
 //
 
-#include "libecs/libecs.hpp"
+#include "libecs.hpp"
 #include "VirtualMachine.hpp"
 
-namespace scripting
-{
+namespace libecs { namespace scripting {
 using namespace libecs;
 
 union StackElement
@@ -266,4 +265,4 @@ const Real VirtualMachine::execute( CodeCref aCode )
 
 }
 
-} // namespace scripting
+} } // namespace libecs::scripting

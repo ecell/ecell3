@@ -2,7 +2,7 @@ ECELL_DIRNAME = @ECELL_DIRNAME@
 
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/.. -I$(top_srcdir)/../libltdl
 AM_LDFLAGS = -module -avoid-version -no-undefined
-LIBS = -L$(abs_top_srcdir)/tmp/@libdir@ -lecs
+LIBS = $(top_srcdir)/libecs/libecs.la
 
 pkglibdir = $(libdir)/$(ECELL_DIRNAME)/modules
 pkglib_LTLIBRARIES =  \
@@ -52,31 +52,19 @@ ESSYNSStepper_la_DATA = ESSYNSStepper.desc
 
 ExpressionAlgebraicProcess_la_SOURCES = \
 	ExpressionAlgebraicProcess.cpp \
-	ExpressionProcessBase.hpp \
-	ExpressionCompiler.hpp \
-	ExpressionCompiler.cpp \
-	VirtualMachine.hpp \
-	VirtualMachine.cpp
+	ExpressionProcessBase.hpp
 ExpressionAlgebraicProcess_ladir = $(pkglibdir)
 ExpressionAlgebraicProcess_la_DATA = ExpressionAlgebraicProcess.desc
 
 ExpressionAssignmentProcess_la_SOURCES = \
 	ExpressionAssignmentProcess.cpp \
-	ExpressionProcessBase.hpp \
-	ExpressionCompiler.hpp \
-	ExpressionCompiler.cpp \
-	VirtualMachine.hpp \
-	VirtualMachine.cpp
+	ExpressionProcessBase.hpp
 #ExpressionAssignmentProcess_ladir = $(pkglibdir)
 #ExpressionAssignmentProcess_la_DATA = ExpressionAssignmentProcess.desc
 
 ExpressionFluxProcess_la_SOURCES =  \
 	ExpressionFluxProcess.cpp \
-	ExpressionProcessBase.hpp \
-	ExpressionCompiler.hpp \
-	ExpressionCompiler.cpp \
-	VirtualMachine.hpp \
-	VirtualMachine.cpp
+	ExpressionProcessBase.hpp
 ExpressionFluxProcess_ladir = $(pkglibdir)
 ExpressionFluxProcess_la_DATA = ExpressionFluxProcess.desc
 

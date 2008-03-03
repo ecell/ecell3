@@ -50,19 +50,55 @@
 #include "libecs/Process.hpp"
 #include "libecs/MethodProxy.hpp"
 
-#include "Instruction.hpp"
+#include "libecs/scripting/Instruction.hpp"
 
-namespace scripting
-{
-
-DECLARE_ASSOCVECTOR(
-    libecs::String,
-    libecs::Real,
-    std::less<const libecs::String>,
-    PropertyMap
-);
+namespace libecs { namespace scripting {
 
 DECLARE_VECTOR( unsigned char, Code );
+
+class PropertyAccess
+{
+public:
+    virtual Real* get(const libecs::String& name) = 0;
+
+    inline Real* operator[](const libecs::String& name)
+    {
+        return get(name);
+    }
+};
+
+class EntityResolver
+{
+public:
+    virtual libecs::Entity* get(const libecs::String& name) = 0;
+
+    inline libecs::Entity* operator[](const libecs::String& name)
+    {
+        return get(name);
+    }
+};
+
+class VariableReferenceResolver 
+{
+public:
+    virtual const libecs::VariableReference* get(const libecs::String& name) const = 0;
+
+    inline const libecs::VariableReference* operator[](const libecs::String& name) const
+    {
+        return get(name);
+    }
+};
+
+class ErrorReporter
+{
+public:
+    virtual void error(const String& type, const String& msg) const = 0;
+
+    inline const void operator()(const String& type, const String& msg)
+    {
+        error(type, msg);
+    }
+};
 
 class ExpressionCompiler
 {
@@ -72,11 +108,15 @@ public:
 
 public:
 
-    ExpressionCompiler( libecs::ProcessCref aProcess,
-                        PropertyMapRef aPropertyMap )
-            : theProcess( aProcess ), thePropertyMap( aPropertyMap )
+    ExpressionCompiler( ErrorReporter& anErrorReporter,
+                        PropertyAccess& aPropertyAccess,
+                        EntityResolver& anEntityResolver,
+                        VariableReferenceResolver& aVarRefResolver )
+            : theErrorReporter( anErrorReporter ),
+              thePropertyAccess( aPropertyAccess ),
+              theEntityResolver( anEntityResolver ),
+              theVarRefResolver( aVarRefResolver )
     {
-        populateMap();
     }
 
 
@@ -86,17 +126,13 @@ public:
 
     const Code* compileExpression( libecs::StringCref anExpression );
 
-protected:
-    void throw_exception( libecs::String type, libecs::String aString );
-
 private:
-    static void populateMap();
-
-private:
-    libecs::ProcessCref theProcess;
-    PropertyMapRef thePropertyMap;
+    ErrorReporter& theErrorReporter;
+    PropertyAccess& thePropertyAccess;
+    EntityResolver& theEntityResolver;
+    VariableReferenceResolver& theVarRefResolver;
 }; // ExpressionCompiler
 
-} // namespace scripting
+} } // libecs::namespace scripting
 
 #endif /* __EXPRESSIONCOMPILER_HPP */

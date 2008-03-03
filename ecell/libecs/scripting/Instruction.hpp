@@ -35,7 +35,9 @@
 #ifndef __INSTRUCTION_HPP
 #define __INSTRUCTION_HPP
 
-namespace scripting {
+#include "libecs/libecs.hpp"
+
+namespace libecs { namespace scripting {
 
 enum Opcode { // the order of items is optimized. don't change.
     NOP,
@@ -57,17 +59,73 @@ enum Opcode { // the order of items is optimized. don't change.
 };
 
 
-typedef libecs::SystemPtr(libecs::VariableReference::*VariableReferenceSystemMethodPtr)() const;
-typedef libecs::SystemPtr(libecs::Process::* ProcessMethodPtr)() const;
-typedef const libecs::Real(libecs::System::* SystemMethodPtr)() const;
+typedef libecs::SystemPtr( libecs::VariableReference::*VariableReferenceSystemMethodPtr )() const;
+typedef libecs::SystemPtr( libecs::Process::* ProcessMethodPtr )() const;
+typedef const libecs::Real( libecs::System::* SystemMethodPtr )() const;
 
-typedef libecs::Real(*RealFunc0)();
-typedef libecs::Real(*RealFunc1)( libecs::Real );
-typedef libecs::Real(*RealFunc2)( libecs::Real, libecs::Real );
+typedef libecs::Real( *RealFunc0 )();
+typedef libecs::Real( *RealFunc1 )( libecs::Real );
+typedef libecs::Real( *RealFunc2 )( libecs::Real, libecs::Real );
 typedef libecs::ObjectMethodProxy<libecs::Real> RealObjectMethodProxy;
 typedef libecs::ObjectMethodProxy<libecs::Integer> IntegerObjectMethodProxy;
 
-class NoOperand {}; // Null type.
+class NoOperand
+{
+public:
+    bool operator==(const NoOperand& that) const
+    {
+        return true;
+    }
+};
+
+
+template<typename CharT, typename Traits>
+inline std::basic_ostream<CharT, Traits>&
+operator <<(std::basic_ostream<CharT, Traits>& strm,
+        const RealFunc0& dp)
+{
+    strm << "(libecs::Real(*)())" << (void *)dp;
+}
+
+template<typename CharT, typename Traits>
+inline std::basic_ostream<CharT, Traits>&
+operator <<(std::basic_ostream<CharT, Traits>& strm,
+        const RealFunc1& dp)
+{
+    strm << "(libecs::Real(*)(libecs::Real))" << (void *)dp;
+}
+
+template<typename CharT, typename Traits>
+inline std::basic_ostream<CharT, Traits>&
+operator <<(std::basic_ostream<CharT, Traits>& strm,
+        const RealFunc2& dp)
+{
+    strm << "(libecs::Real(*)(libecs::Real, libecs::Real))" << (void *)dp;
+}
+
+template<typename CharT, typename Traits>
+inline std::basic_ostream<CharT, Traits>&
+operator <<(std::basic_ostream<CharT, Traits>& strm,
+        const RealObjectMethodProxy& dp)
+{
+    strm << "libecs::ObjectMethodProxy<libecs::Real>()";
+}
+
+template<typename CharT, typename Traits>
+inline std::basic_ostream<CharT, Traits>&
+operator <<(std::basic_ostream<CharT, Traits>& strm,
+        const IntegerObjectMethodProxy& dp)
+{
+    strm << "libecs::ObjectMethodProxy<libecs::Integer>()";
+}
+
+template<typename CharT, typename Traits>
+inline std::basic_ostream<CharT, Traits>&
+operator <<(std::basic_ostream<CharT, Traits>& strm,
+        const NoOperand& dp)
+{
+    strm << "NoOperand";
+}
 
 template <Opcode OPCODE>
 class Opcode2Operand
@@ -115,7 +173,7 @@ private:
     const operand_type theOperand;
 };
 
-template< Opcode Eop_>
+template< Opcode Eop_ >
 class InstructionBase< Eop_, NoOperand >: public InstructionHead
 {
 public:
@@ -128,11 +186,17 @@ public:
         ; // do nothing
     }
 
-    const operand_type& getOperand()
+    const operand_type& getOperand() const
     {
-        return NoOperand();
+        return singleton_;
     }
+
+private:
+    static NoOperand singleton_;
 };
+
+template< Opcode Eop_ >
+NoOperand InstructionBase< Eop_, NoOperand >::singleton_;
 
 template< Opcode Eop_ >
 class Instruction
@@ -158,12 +222,14 @@ public:
 
 
 SPECIALIZE_OPCODE2OPERAND( PUSH_REAL,                libecs::Real );
-SPECIALIZE_OPCODE2OPERAND( LOAD_REAL,                libecs::RealPtr const );
+SPECIALIZE_OPCODE2OPERAND( LOAD_REAL,                const libecs::Real* );
 SPECIALIZE_OPCODE2OPERAND( CALL_FUNC1,               RealFunc1 );
 SPECIALIZE_OPCODE2OPERAND( CALL_FUNC2,               RealFunc2 );
 SPECIALIZE_OPCODE2OPERAND( OBJECT_METHOD_REAL,       RealObjectMethodProxy );
 SPECIALIZE_OPCODE2OPERAND( OBJECT_METHOD_INTEGER,    IntegerObjectMethodProxy );
 
-} // namespace scripting
+#undef SPECIALIZE_OPCODE2OPERAND
+
+} } // namespace libecs::scripting
 
 #endif /* __INSTRUCTION_HPP */

@@ -29,4 +29,7 @@ VVector_test_CPPFLAGS=-DBOOST_TEST_DYN_LINK=1
 check_PROGRAMS+=Util_test
 Util_test_SOURCES = Util_test.cpp
 
+check_PROGRAMS+=ExpressionCompiler_test
+ExpressionCompiler_test_SOURCES = ExpressionCompiler_test.cpp
+
 TESTS=$(check_PROGRAMS)

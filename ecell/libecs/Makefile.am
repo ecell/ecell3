@@ -58,8 +58,9 @@ PhysicalLogger.cpp\
 VariableReference.cpp\
 LoggerBroker.cpp\
 Exceptions.cpp\
-PropertiedObjectMaker.cpp
-
+PropertiedObjectMaker.cpp\
+scripting/ExpressionCompiler.cpp\
+scripting/VirtualMachine.cpp
 
 libecsdir=${ECELL_INCLUDE_DIR}/libecs
 libecs_HEADERS=\
@@ -107,7 +108,10 @@ DynamicPriorityQueue.hpp\
 FluxProcess.hpp\
 MethodProxy.hpp\
 PropertiedObjectMaker.hpp\
-PropertySlotProxyLoggerAdapter.hpp
+PropertySlotProxyLoggerAdapter.hpp\
+scripting/ExpressionCompiler.hpp\
+scripting/VirtualMachine.hpp\
+scripting/Instruction.hpp
 
 noinst_HEADERS=\
 osif.h\

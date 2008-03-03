@@ -39,11 +39,116 @@
 #include <limits>
 
 #include "libecs/libecs.hpp"
-#include "ExpressionCompiler.hpp"
-#include "VirtualMachine.hpp"
+#include "libecs/AssocVector.h"
+#include "libecs/scripting/ExpressionCompiler.hpp"
+#include "libecs/scripting/VirtualMachine.hpp"
+
+DECLARE_ASSOCVECTOR(
+    libecs::String,
+    libecs::Real,
+    std::less<const libecs::String>,
+    PropertyMap
+);
 
 LIBECS_DM_CLASS( ExpressionProcessBase, libecs::Process )
 {
+private:
+    class PropertyAccess
+          : public libecs::scripting::PropertyAccess
+    {
+    public:
+        PropertyAccess( ExpressionProcessBase& outer )
+            : outer_( outer )
+        {
+        }
+
+        virtual libecs::Real* get( const libecs::String& name )
+        {
+            PropertyMapIterator pos = outer_.thePropertyMap.find( name );
+            return pos == outer_.thePropertyMap.end() ? 0: &(pos->second);
+        }
+
+    private:
+        ExpressionProcessBase& outer_;
+    };
+    friend class PropertyAccess;
+
+    class EntityResolver
+          : public libecs::scripting::EntityResolver
+    {
+    public:
+        EntityResolver( ExpressionProcessBase& outer )
+            : outer_( outer )
+        {
+        }
+
+        virtual libecs::Entity* get( const libecs::String& name )
+        {
+            if ( name == "self" )
+                return &outer_;
+            try {
+                return outer_.getVariableReference( name ).getVariable();
+            } catch ( const libecs::Exception& ) {
+                return 0;
+            }
+        }
+
+    private:
+        ExpressionProcessBase& outer_;
+    };
+    friend class EntityResolver;
+
+    class VariableReferenceResolver
+          : public libecs::scripting::VariableReferenceResolver
+    {
+    public:
+        VariableReferenceResolver( ExpressionProcessBase& outer )
+            : outer_( outer )
+        {
+        }
+
+        virtual const libecs::VariableReference* get(
+                const libecs::String& name) const
+        {
+            try {
+                return &outer_.getVariableReference( name );
+            } catch ( const libecs::Exception& ) {
+                return 0;
+            }
+        }
+
+    private:
+        ExpressionProcessBase& outer_;
+    };
+    friend class VariableReferenceResolver;
+
+    class ErrorReporter
+          : public libecs::scripting::ErrorReporter
+    {
+    public:
+        ErrorReporter( ExpressionProcessBase& outer )
+            : outer_( outer )
+        {
+        }
+        
+        virtual void error( const libecs::String& type,
+                const libecs::String& _msg ) const
+        {
+            libecs::String msg = _msg + " in "
+                    + outer_.getClassName() + " [" + outer_.getID() + "]";
+            if ( type == "NoSlot" )
+                THROW_EXCEPTION( libecs::NoSlot, msg );
+            else if ( type == "NotFound" )
+                THROW_EXCEPTION( libecs::NotFound, msg );
+            else
+                THROW_EXCEPTION( libecs::UnexpectedError, msg );
+        }
+
+    private:
+        ExpressionProcessBase& outer_;
+    };
+    friend class ErrorReporter;
+
 public:
 
     LIBECS_DM_OBJECT_ABSTRACT( ExpressionProcessBase )
@@ -84,15 +189,15 @@ public:
 
     const libecs::Polymorph defaultGetProperty( libecs::StringCref aPropertyName ) const
     {
-        scripting::PropertyMapConstIterator aPropertyMapIterator(
+        PropertyMapConstIterator aPropertyMapIterator(
             thePropertyMap.find( aPropertyName ) );
 
         if ( aPropertyMapIterator != thePropertyMap.end() ) {
             return aPropertyMapIterator->second;
         } else {
             THROW_EXCEPTION( libecs::NoSlot, getClassNameString() +
-                             " : Property [" + aPropertyName +
-                             "] is not defined " );
+                             " : property [" + aPropertyName +
+                             "] is not defined" );
         }
     }
 
@@ -100,7 +205,7 @@ public:
     {
         libecs::PolymorphVector aVector;
 
-        for ( scripting::PropertyMapConstIterator aPropertyMapIterator(
+        for ( PropertyMapConstIterator aPropertyMapIterator(
                 thePropertyMap.begin() );
                 aPropertyMapIterator != thePropertyMap.end();
                 ++aPropertyMapIterator ) {
@@ -127,7 +232,13 @@ public:
 
     void compileExpression()
     {
-        scripting::ExpressionCompiler theCompiler( *this, getPropertyMap() );
+        ErrorReporter anErrorReporter( *this );
+        PropertyAccess aPropertyAccess( *this );
+        EntityResolver anEntityResolver( *this );
+        VariableReferenceResolver aVarRefResolver( *this );
+        libecs::scripting::ExpressionCompiler theCompiler(
+                anErrorReporter, aPropertyAccess, anEntityResolver,
+                aVarRefResolver );
 
         delete theCompiledCode;
         // it is possible that compileExpression throws an expression and
@@ -137,7 +248,7 @@ public:
         theCompiledCode = theCompiler.compileExpression( theExpression );
     }
 
-    scripting::PropertyMapCref getPropertyMap() const
+    PropertyMapCref getPropertyMap() const
     {
         return thePropertyMap;
     }
@@ -154,7 +265,7 @@ public:
 
 protected:
 
-    scripting::PropertyMapRef getPropertyMap()
+    PropertyMapRef getPropertyMap()
     {
         return thePropertyMap;
     }
@@ -163,12 +274,12 @@ protected:
 protected:
     libecs::String    theExpression;
 
-    const scripting::Code* theCompiledCode;
-    scripting::VirtualMachine theVirtualMachine;
+    const libecs::scripting::Code* theCompiledCode;
+    libecs::scripting::VirtualMachine theVirtualMachine;
 
     bool theRecompileFlag;
 
-    scripting::PropertyMap thePropertyMap;
+    PropertyMap thePropertyMap;
 };
 
 

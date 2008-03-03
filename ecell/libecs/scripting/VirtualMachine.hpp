@@ -36,10 +36,9 @@
 #define __VIRTUALMACHNE_HPP
 
 #include "libecs/libecs.hpp"
+#include "libecs/scripting/ExpressionCompiler.hpp"
 
-#include "ExpressionCompiler.hpp"
-
-namespace scripting
+namespace libecs { namespace scripting
 {
 
 class VirtualMachine
@@ -56,6 +55,6 @@ public:
     const libecs::Real execute( CodeCref aCode );
 };
 
-} // namespace scripting
+} } // namespace libecs::scripting
 
 #endif /* __VIRTUALMACHNE_HPP */
