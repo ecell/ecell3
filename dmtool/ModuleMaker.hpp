@@ -383,32 +383,36 @@ SharedModuleMaker<T,DMAllocator>::loadModule( const std::string& aClassname )
       throw DMException( "Failed to find or load a DM [" + aClassname + 
 			 "]: " + lt_dlerror() );
     }
-  typename SharedModule::DMAllocator anAllocator(
-      *reinterpret_cast< DMAllocator* >(
-	lt_dlsym( handle, "CreateObject" ) ) );
-  if ( !anAllocator )
-    {
-      throw DMException( "[" + filename + "] is not a valid DM file: "
-			  + lt_dlerror() );  
-    }
-  InfoLoaderType anInfoLoader(
-      *reinterpret_cast< InfoLoaderType* >(
-	lt_dlsym( handle, "GetClassInfo" ) ) );
-  if ( !anInfoLoader )
-    {
-      throw DMException( "[" + filename + "] is not a valid DM file: "
-			  + lt_dlerror() );  
-    }
+  typename SharedModule::DMAllocator* anAllocatorPtr( 0 );
+  InfoLoaderType* anInfoLoaderPtr( 0 );
+  const char** typeStringPtr( 0 );
 
-  const char* typeString = *reinterpret_cast< const char ** >(
+  anAllocatorPtr = reinterpret_cast< DMAllocator* >(
+	lt_dlsym( handle, "CreateObject" ) );
+  if (!anAllocatorPtr)
+    goto fail_dlsym;
+
+  anInfoLoaderPtr = reinterpret_cast< InfoLoaderType* >(
+	lt_dlsym( handle, "GetClassInfo" ) );
+  if ( !anInfoLoaderPtr )
+    goto fail_dlsym;
+
+  typeStringPtr = reinterpret_cast< const char ** >(
       lt_dlsym( handle, "__DM_TYPE" ) );
-  if ( !typeString )
-    {
-      throw DMException( "[" + filename + "] is not a valid DM file: "
-			  + lt_dlerror() );  
-    }
-  addClass( new SharedModule( aClassname, anAllocator, anInfoLoader,
-                              typeString, filename, handle ) );
+  if ( !typeStringPtr )
+    goto fail_dlsym;
+
+  if ( !*anAllocatorPtr || !*anInfoLoaderPtr || !*typeStringPtr )
+  {
+    throw DMException( "[" + filename + "] is not a valid DM file." );
+  }
+
+  addClass( new SharedModule( aClassname, *anAllocatorPtr, *anInfoLoaderPtr,
+                              *typeStringPtr, filename, handle ) );
+  return;
+fail_dlsym:
+  throw DMException( "[" + filename + "] is not a valid DM file ("
+		     + lt_dlerror() + ")" );
 }
 
 #endif /* __MODULEMAKER_HPP */
