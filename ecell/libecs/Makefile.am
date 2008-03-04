@@ -4,23 +4,23 @@ libdir=@libdir@
 
 SHLEXT = @LTDL_SHLIB_EXT@
 
-SUBDIRS = . tests
+SUBDIRS = scripting . tests
 
 ECELL_DIRNAME=@ECELL_DIRNAME@
-ECELL_INCLUDE_DIR=${includedir}/${ECELL_DIRNAME}
+ECELL_INCLUDE_DIR=$(includedir)/$(ECELL_DIRNAME)
 
 GSL_LIBADD = -lgsl -lgslcblas
 DMTOOL_INCLUDE = -I@DMTOOL_INCLUDE_DIR@
 INCLTDL = @INCLTDL@
 LIBLTDL = @LIBLTDL@
 
-INCLUDES = -I${top_srcdir}  -I${top_srcdir}/.. ${DMTOOL_INCLUDE} ${INCLTDL}
+INCLUDES = -I$(top_srcdir) $(DMTOOL_INCLUDE) $(INCLTDL)
 lib_LTLIBRARIES = libecs.la
 
 AM_CXXFLAGS = @CXXFLAGS@
 
 libecs_la_LDFLAGS= -version-info 2:0:0 -no-undefined
-libecs_la_LIBADD=  -lstdc++ ${LIBLTDL} ${GSL_LIBADD}
+libecs_la_LIBADD=  -lstdc++ $(LIBLTDL) $(GSL_LIBADD) scripting/libecs-scripting.la
 libecs_la_SOURCES=\
 libecs.cpp\
 Util.cpp\
@@ -58,13 +58,10 @@ PhysicalLogger.cpp\
 VariableReference.cpp\
 LoggerBroker.cpp\
 Exceptions.cpp\
-PropertiedObjectMaker.cpp\
-scripting/ExpressionCompiler.cpp\
-scripting/Assembler.cpp\
-scripting/VirtualMachine.cpp
+PropertiedObjectMaker.cpp
 
-libecsdir=${ECELL_INCLUDE_DIR}/libecs
-libecs_HEADERS=\
+libecs_ladir=${ECELL_INCLUDE_DIR}/libecs
+libecs_la_HEADERS=\
 AssocVector.h\
 libecs.hpp\
 Defs.hpp\
@@ -109,11 +106,7 @@ DynamicPriorityQueue.hpp\
 FluxProcess.hpp\
 MethodProxy.hpp\
 PropertiedObjectMaker.hpp\
-PropertySlotProxyLoggerAdapter.hpp\
-scripting/ExpressionCompiler.hpp\
-scripting/VirtualMachine.hpp\
-scripting/Assembler.hpp\
-scripting/Instruction.hpp
+PropertySlotProxyLoggerAdapter.hpp
 
 noinst_HEADERS=\
 osif.h\
