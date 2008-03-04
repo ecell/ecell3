@@ -381,18 +381,7 @@ class GtkSessionFacade:
         return self.theMainWindow.getStatusBar()
 
     def fireEvent( self, aType, **options ):
-<<<<<<< .mine
         self.theBroadcaster.fire( type, **options )
-=======
-        def broadcaster():
-            event = GtkSessionEvent( aType, options )
-            if event.type in ( 'simulation_updated', 'simulation_started', \
-                               'simulation_stopped' ):
-                self.theDataGenerator.update()
-            for aManagedWindow in self.theManagedWindowSet:
-                aManagedWindow.handleSessionEvent( event )
-        gobject.idle_add( broadcaster )
->>>>>>> .r3007
 
     def updateUI( self ):
         # updates all entity list windows
@@ -519,7 +508,6 @@ class GtkSessionFacade:
         try:
             self.theRunningFlag = True
 
-<<<<<<< .mine
             def handleTimer():
                 if not self.theRunningFlag:
                     return False
@@ -527,25 +515,6 @@ class GtkSessionFacade:
                     'simulation_updated',
                     simulationTime = self.getCurrentTime() )
                 return True
-=======
-            def thread_proc(): 
-                self.fireEvent( 'simulation_started' )
-                if time:
-                    self.theSession.run( time )
-                    self.theRunningFlag = False
-                    self.message( "%15s:Stop" % self.getCurrentTime() )
-                else:
-                    aCounter = 0
-                    while self.theRunningFlag:
-                        self.theSession.step()
-                        aCounter += 1
-                        if ( aCounter > self.theUpdateInterval ):
-                            self.fireEvent( 'simulation_updated' )
-                            aCounter = 0
-
-                self.fireEvent( 'simulation_updated' )
-                self.fireEvent( 'simulation_stopped' )
->>>>>>> .r3007
 
             self.fireEvent(
                 'simulation_started',

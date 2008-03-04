@@ -95,11 +95,6 @@ private:
     return ( anObject->*METHOD )();
   }
 
-  inline bool operator==( const MethodProxy& that ) const
-  {
-    return that.theInvoker == theInvoker;
-  }
-
 private:
     
   Invoker   theInvoker;

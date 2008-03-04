@@ -843,11 +843,7 @@ class MainWindow( OsogoWindow ):
         else:
             self.theSession.step( self.getStepSize() )
 
-<<<<<<< .mine
     def doSetStepSizeOrSec( self, text ):
-=======
-    def doInputStepSizeOrSec( self ):
->>>>>>> .r3007
         # gets the inputerd characters from the GtkEntry. 
         aNewValue = string.strip( text )
         hasErrorOccurred = False

@@ -32,7 +32,7 @@
 #
 
 import warnings
-from ObjectStub import *
+from ecell.ObjectStub import ObjectStub
 
 """
 - provides an object-oriented appearance to the ecs.Simulator's Logger API

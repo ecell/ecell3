@@ -39,6 +39,7 @@
 #include <limits>
 
 #include "libecs/libecs.hpp"
+#include "libecs/Process.hpp"
 #include "libecs/AssocVector.h"
 #include "libecs/scripting/ExpressionCompiler.hpp"
 #include "libecs/scripting/VirtualMachine.hpp"

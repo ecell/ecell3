@@ -300,6 +300,7 @@ AC_CONFIG_FILES([
     pyecs/setup.py
     session-monitor/Makefile
     session-monitor/plugins/Makefile
+    session-monitor/glade/Makefile
 ])
 AC_CONFIG_FILES([bin/ecell3-dmc], [chmod +x bin/ecell3-dmc])
 AC_OUTPUT
