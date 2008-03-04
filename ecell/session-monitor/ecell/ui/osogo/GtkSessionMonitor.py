@@ -380,7 +380,7 @@ class GtkSessionFacade:
         assert self.theMainWindow != None
         return self.theMainWindow.getStatusBar()
 
-    def fireEvent( self, aType, **options ):
+    def fireEvent( self, type, **options ):
         self.theBroadcaster.fire( type, **options )
 
     def updateUI( self ):

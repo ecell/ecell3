@@ -62,15 +62,15 @@ class LoggerStub( ObjectStub ):
         if self.exists():
             return
         if self.theLoggingPolicy != None:
-            self.theSimulator.createLogger( self.theFullPNString, self.theLoggingPolicy )
+            self.theSimulator.createLogger( str( self.theFullPNString ), self.theLoggingPolicy )
         else:
-            self.theSimulator.createLogger( self.theFullPNString )
+            self.theSimulator.createLogger( str( self.theFullPNString ) )
 
     def delete( self ):
         """
         Deletes the logger created by create()
         """
-        self.theSimulator.deleteLogger( self.theFullPNString )
+        self.theSimulator.deleteLogger( str( self.theFullPNString ) )
 
     def exists( self ):
         """
@@ -79,7 +79,7 @@ class LoggerStub( ObjectStub ):
         """
         # When the FullPN of this instance exists in 
         # the FullPN list, returns TRUE
-        if self.theFullPNString in self.theSimulator.getLoggerList():
+        if str( self.theFullPNString ) in self.theSimulator.getLoggerList():
             return True
         else:
             return False
@@ -94,11 +94,11 @@ class LoggerStub( ObjectStub ):
         if anEndTime == None:
             anEndTime = self.getEndTime()
         if anInterval == None:
-            return self.theSimulator.getLoggerData( self.theFullPNString,
+            return self.theSimulator.getLoggerData( str( self.theFullPNString ),
                                                     aStartTime,
                                                     anEndTime )
         else:
-            return self.theSimulator.getLoggerData( self.theFullPNString,
+            return self.theSimulator.getLoggerData( str( self.theFullPNString ),
                                                     aStartTime,
                                                     anEndTime,
                                                     anInterval )
@@ -112,17 +112,18 @@ class LoggerStub( ObjectStub ):
         return self.getData( aStartTime, anEndTime, anInterval )
 
     def getStartTime( self ):
-        return self.theSimulator.getLoggerStartTime( self.theFullPNString )
+        return self.theSimulator.getLoggerStartTime( str( self.theFullPNString ) )
 
     def getEndTime( self ):
-        return self.theSimulator.getLoggerEndTime( self.theFullPNString )
+        return self.theSimulator.getLoggerEndTime( str( self.theFullPNString ) )
 
     def getSize( self ):
-        return self.theSimulator.getLoggerSize( self.theFullPNString )
+        return self.theSimulator.getLoggerSize( str( self.theFullPNString ) )
 
     def setMinimumInterval( self, anInterval ):
         warnings.warn( "Use setLoggerPolicy instead", DeprecationWarning )
-        return self.theSimulator.setLoggerMinimumInterval( self.theFullPNString, anInterval )
+        return self.theSimulator.setLoggerMinimumInterval(
+            str( self.theFullPNString, anInterval ) )
 
     def getMinimumInterval( self ):
         """
@@ -130,14 +131,15 @@ class LoggerStub( ObjectStub ):
         This method can throw exceptions.
         """
         warnings.warn( "Use getLoggerPolicy() instead", DeprecationWarning )
-        return self.theSimulator.getLoggerMinimumInterval( self.theFullPNString )
+        return self.theSimulator.getLoggerMinimumInterval(
+            str( self.theFullPNString ) )
 
     def getLoggerPolicy( self ):
         """
         Returns the logger policy
         This method can throw exceptions.
         """
-        return self.theSimulator.getLoggerPolicy( self.theFullPNString )
+        return self.theSimulator.getLoggerPolicy( str( self.theFullPNString ) )
 
     def setLoggerPolicy( self, aLoggingPolicy ):
         """
@@ -150,7 +152,8 @@ class LoggerStub( ObjectStub ):
         This method can throw exceptions.
         """
         if self.exists():
-            self.theSimulator.setLoggerPolicy( self.theFullPNString, aLoggingPolicy)
+            self.theSimulator.setLoggerPolicy(
+                str( self.theFullPNString ), aLoggingPolicy )
         else:
             self.theLoggingPolicy = aLoggingPolicy
 

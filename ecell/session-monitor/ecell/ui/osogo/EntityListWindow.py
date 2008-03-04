@@ -559,9 +559,8 @@ class EntityListWindow( SeparativePane ):
 
         systemListLength = len( systemList )
         for systemID in systemList:
-            newSystemFullID = systemPath.createSystem( systemID )
+            newSystemFullID = systemPath.createSystemFullID( systemID )
             self.constructSystemTree( iter, newSystemFullID )
-
             path = systemStore.get_path( iter )
             if systemListLength < 6 and len( path ) < 6:
                 self.systemTree.expand_row( path, True )
