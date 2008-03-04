@@ -69,7 +69,7 @@ class FullID( object ):
             self.systemPathString = aSeq.systemPathString
             self.id               = aSeq.id
         else:
-            raise ValueError( 'Cannot construct FullID from a value ' \
+            raise ValueError( 'Cannot construct a FullID from a value ' \
                               + 'typed %s' % aSeq.__class__ )
 
     def getTypeName( self ):
