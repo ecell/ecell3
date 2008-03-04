@@ -242,9 +242,10 @@ template < class Base, class DMAllocator >
 SharedDynamicModule<Base,DMAllocator>::~SharedDynamicModule()
 {
 
-  if( this->theHandle != NULL )
+  if( this->theHandle )
     {
       lt_dlclose( this->theHandle );
+      this->theHandle = 0;
     }
 }
 
