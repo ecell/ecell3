@@ -279,16 +279,16 @@ T* StaticModuleMaker<T,DMAllocator>::make( const std::string& aClassname )
 {
 
   DMAllocator anAllocator( getAllocator( aClassname ) );
-  if( anAllocator == NULL )
+  if( !anAllocator )
     {
       throw DMException( std::string( "unexpected error in " ) +
 			 __PRETTY_FUNCTION__ );
     }
 
-  T* anInstance( NULL );
+  T* anInstance( 0 );
   anInstance = anAllocator();
 
-  if( anInstance == NULL )
+  if( !anInstance )
     {
       throw DMException( "Can't instantiate [" + aClassname + "]." );
     }
@@ -340,7 +340,7 @@ template<class T,class DMAllocator>
 DMAllocator SharedModuleMaker<T,DMAllocator>::
 getAllocator( const std::string& aClassname ) 
 {
-  DMAllocator anAllocator( NULL );
+  DMAllocator anAllocator( 0 );
 
   try 
     {
@@ -355,7 +355,7 @@ getAllocator( const std::string& aClassname )
 	StaticModuleMaker<T,DMAllocator>::getAllocator( aClassname );
     }
 
-  if( anAllocator == NULL )
+  if( !anAllocator )
     {
       // getAllocator() returned NULL! why?
       throw DMException( std::string( "unexpected error in " ) 
@@ -375,10 +375,10 @@ SharedModuleMaker<T,DMAllocator>::loadModule( const std::string& aClassname )
       return;      
     }
     
-  SharedModule* aSharedModule( NULL );
+  SharedModule* aSharedModule( 0 );
   std::string filename( aClassname );
   lt_dlhandle handle( lt_dlopenext( filename.c_str() ) );
-  if ( handle == NULL ) 
+  if ( !handle ) 
     {
       throw DMException( "Failed to find or load a DM [" + aClassname + 
 			 "]: " + lt_dlerror() );
@@ -386,7 +386,7 @@ SharedModuleMaker<T,DMAllocator>::loadModule( const std::string& aClassname )
   typename SharedModule::DMAllocator anAllocator(
       *reinterpret_cast< DMAllocator* >(
 	lt_dlsym( handle, "CreateObject" ) ) );
-  if ( anAllocator == NULL )
+  if ( !anAllocator )
     {
       throw DMException( "[" + filename + "] is not a valid DM file: "
 			  + lt_dlerror() );  
@@ -394,7 +394,7 @@ SharedModuleMaker<T,DMAllocator>::loadModule( const std::string& aClassname )
   InfoLoaderType anInfoLoader(
       *reinterpret_cast< InfoLoaderType* >(
 	lt_dlsym( handle, "GetClassInfo" ) ) );
-  if ( anInfoLoader == NULL )
+  if ( !anInfoLoader )
     {
       throw DMException( "[" + filename + "] is not a valid DM file: "
 			  + lt_dlerror() );  
@@ -402,7 +402,7 @@ SharedModuleMaker<T,DMAllocator>::loadModule( const std::string& aClassname )
 
   const char* typeString = *reinterpret_cast< const char ** >(
       lt_dlsym( handle, "__DM_TYPE" ) );
-  if ( typeString == NULL )
+  if ( !typeString )
     {
       throw DMException( "[" + filename + "] is not a valid DM file: "
 			  + lt_dlerror() );  
