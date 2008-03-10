@@ -12,123 +12,94 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
 
-#ifndef __ENTITY_HPP
-#define __ENTITY_HPP
-
 #include "libecs.hpp"
 #include "EntityType.hpp"
 #include "PropertiedClass.hpp"
-#include "PropertyInterface.hpp"
+#include "FullID.hpp"
 
+#ifndef __LIBECS_ENTITY_DEFINED
+#define __LIBECS_ENTITY_DEFINED
 
-namespace libecs
-{
-
-  /** @addtogroup entities The Entities.
-      Entities.
-      
-      @ingroup libecs
-
-   
-      @{ 
-   */ 
-
-  /** @file */
-
-  DECLARE_VECTOR( EntityPtr, EntityVector );
-
+/**
+   @addtogroup entities The Entities.
+   Entities.
   
-  /**
-     Entity class is a base class for all components in the cell model.
+   @ingroup libecs
+   @{
+ */
+/** @file */
 
-  */
+namespace libecs {
+
+DECLARE_VECTOR( EntityPtr, EntityVector );
 
 
-  LIBECS_DM_CLASS( Entity, PropertiedClass )
-  {
+/**
+   Entity class is a base class for all components in the cell model.
 
-  public:
+*/
 
-    LIBECS_DM_OBJECT_ABSTRACT( Entity ) 
-      {
-	INHERIT_PROPERTIES( PropertiedClass );
 
-	PROPERTYSLOT_SET_GET( String, Name );
+LIBECS_DM_CLASS( Entity, PropertiedClass )
+{
+public:
+    LIBECS_DM_OBJECT_ABSTRACT( Entity )
+    {
+        INHERIT_PROPERTIES( PropertiedClass );
+        PROPERTYSLOT_SET_GET( String, Name );
+    }
 
-	//	PROPERTYSLOT_NO_LOAD_SAVE( String, FullID,
-	//				   NULLPTR, &Entity::getFullIDString );
-      }
-
-    Entity(); 
+    Entity();
     virtual ~Entity();
 
     /**
-       Get a System to which this Entity belongs.
-
-       @return a borrowed pointer to the super system.
-    */
-
-    SystemPtr getSuperSystem() const 
-    {
-      return theSuperSystem;
-    }
-
+       Called right before the simulation gets kicked off.
+     */
+    virtual void initialize();
 
     /**
-       Get a FullID of this Entity.
-
-       @return a FullID of this Entity.
+       Get the System where this Entity belongs.
+       @return the borrowed pointer to the super system.
     */
+    SystemPtr getEnclosingSystem() const
+    {
+        return theSuperSystem;
+    }
 
+    /**
+       Get the FullID of this Entity.
+       @return the FullID of this Entity.
+    */
     const FullID getFullID() const;
-
 
     /**
        Get EntityType of this Entity.
-
        This method is overridden in Variable, Process and System classes.
-
        @return EntityType of this Entity object.
        @see EntityType
     */
-
-    virtual const EntityType getEntityType() const
+    const EntityType& getEntityType() const
     {
-      return EntityType( EntityType::ENTITY );
+        return EntityType::fromPropertiedClassKind(
+                getPropertyInterface().getKind() );
     }
-
-
-
-
-    /**
-       Get a SystemPath of this Entity.
-
-       @note The SystemPath doesn't include ID of this Entity even if 
-       this Entity is a System.
-
-       @return a SystemPath of this Entity.
-    */
-
-    virtual const SystemPath getSystemPath() const;
-
-
     /// \name Properties
     //@{
 
@@ -140,7 +111,7 @@ namespace libecs
 
     SET_METHOD( String, ID )
     {
-      theID = value;
+        theID = value;
     }
 
     /**
@@ -151,7 +122,7 @@ namespace libecs
 
     GET_METHOD( String, ID )
     {
-      return theID;
+        return theID;
     }
 
     /**
@@ -162,7 +133,7 @@ namespace libecs
 
     SET_METHOD( String, Name )
     {
-      theName = value;
+        theName = value;
     }
 
     /**
@@ -172,63 +143,58 @@ namespace libecs
     */
 
     GET_METHOD( String, Name )
-    { 
-      return theName; 
+    {
+        return theName;
     }
-
-    /**
-       Get a FullID of this Entity as String.
-
-       @note Property name for this method is 'getFullID', not
-       'getFullIDString.'
-
-       @return a FullID string of this Entity.
-    */
-
-    const String getFullIDString() const;
-
     //@}
-
 
     /**
        @internal
-
-       Set a supersystem of this Entity.  
-
+       Set a supersystem of this Entity.
        Usually no need to set this manually because a System object does
        this when an Entity is added to the System.
-
        @param supersystem a pointer to a System to which this object belongs.
     */
-
-    void setSuperSystem( SystemPtr const supersystem ) 
-    { 
-      theSuperSystem = supersystem; 
+    void setSuperSystem( SystemPtr const supersystem )
+    {
+        theSuperSystem = supersystem;
     }
 
-  private:
+private:
+    Entity( const Entity& ); // no copy construction
+    Entity& operator=( Entity& ); // no assignment
 
-    // hide them
-    Entity( EntityRef );
-    EntityRef operator=( EntityRef );
-
-  private:
-
-    SystemPtr theSuperSystem;
-
-
+private:
+    System*   theSuperSystem;
     String    theID;
     String    theName;
-  };
+};
 
+} // namespace libecs
+#endif /* __LIBECS_ENTITY_DEFINED */
 
+#include "System.hpp"
 
-  /*@}*/
+#ifndef __LIBECS_ENTITY_MEMBER_DEFINED
+#define __LIBECS_ENTITY_MEMBER_DEFINED
+
+namespace libecs {
+
+const FullID Entity::getFullID() const
+{
+    return FullID(
+            getEntityType(),
+            getEnclosingSystem() ?
+                getEnclosingSystem()->getPath():
+                SystemPath(),
+            getID() );
+}
 
 } // namespace libecs
 
-#endif /*  __ENTITY_HPP */
+#endif /* __LIBECS_ENTITY_MEMBER_DEFINED */
 
+/** @} */
 /*
   Do not modify
   $Author$

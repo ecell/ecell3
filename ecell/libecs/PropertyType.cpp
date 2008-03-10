@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-//
+// 
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-//
+// 
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
@@ -32,30 +32,40 @@
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include "System.hpp"
-#include "FullID.hpp"
-#include "Entity.hpp"
+#include <assert.h>
+
+#include "PropertyType.hpp"
+
 
 namespace libecs {
 
-LIBECS_DM_INIT_STATIC( Entity, Entity );
+const PropertyType* PropertyType::last( 0 );
+const PropertyType PropertyType::      NONE( _NONE     , "None" );
+const PropertyType PropertyType::   INTEGER( _INTEGER  , "Integer" );
+const PropertyType PropertyType::      REAL( _REAL     , "Real" );
+const PropertyType PropertyType::    STRING( _STRING   , "String" );
+const PropertyType PropertyType:: POLYMORPH( _POLYMORPH, "Polymorph" );
 
-Entity::~Entity()
+const PropertyType& PropertyType::get( const String& name )
 {
-    ; // do nothing
+    for ( const PropertyType* item = last; item; item = item->prev )
+    {
+        if ( item->name == name )
+        {
+            return *item;
+        }
+    }
 }
 
-void Entity::initialize()
+const PropertyType& PropertyType::get( enum Code code )
 {
-    ; // do nothing
+    for ( const PropertyType* item = last; item; item = item->prev )
+    {
+        if ( item->code == code )
+        {
+            return *item;
+        }
+    }
 }
 
 } // namespace libecs
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

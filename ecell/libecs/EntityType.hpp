@@ -12,144 +12,107 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
 
-#ifndef __ENTITYTYPE_HPP 
-#define __ENTITYTYPE_HPP 
+#ifndef __ENTITYTYPE_HPP
+#define __ENTITYTYPE_HPP
 
 #include "libecs.hpp"
-
 
 namespace libecs
 {
 
-  /** @addtogroup identifier
-   *
-   *@{
-   */
+/** @addtogroup identifier
+ *
+ *@{
+ */
 
-  /** @file */
+/** @file */
 
+class PropertiedClassKind;
 
-  /**
+/**
+  A decorated enumeration type that lists the types of entities
+ */
+struct LIBECS_API EntityType
+{
+public:
+    enum Code {
+        _NONE      = 0,
+        _ENTITY    = 1,
+        _VARIABLE  = 2,
+        _PROCESS   = 3,
+        _SYSTEM    = 4
+    };
 
-  */
-
-  class LIBECS_API EntityType
-  {
-
-  public:
-    
-    enum Type
-      {
-	NONE      = 0,
-	ENTITY    = 1,
-	VARIABLE  = 2,
-	PROCESS   = 3,
-	SYSTEM    = 4
-      };
-
-    EntityType( StringCref typestring );
-
-    EntityType( const int number );
-
-    EntityType( const Type type )
-      :
-      theType( type )
+public:
+    bool operator<( const EntityType& rhs ) const
     {
-      ; // do nothing
+        return code < rhs.code;
     }
 
-    EntityType( EntityTypeCref primitivetype )
-      :
-      theType( primitivetype.getType() )
+    bool operator==( const EntityType& rhs ) const
     {
-      ; // do nothing
+        return code == rhs.code;
     }
 
-    EntityType()
-      :
-      theType( NONE )
+    bool operator!=( const EntityType& rhs ) const
     {
-      ; // do nothing
+        return code != rhs.code;
     }
 
-      
-    StringCref getString() const;
+    static const EntityType& get( const String& );
 
-    operator StringCref() const
+    static const EntityType& get( enum Code );
+
+    static const EntityType& fromPropertiedClassKind( const PropertiedClassKind& );
+
+    operator const String&() const
     {
-      return getString();
+        return name;
     }
 
-    const Type& getType() const
+    operator const char* const() const
     {
-      return theType;
+        return name.c_str();
+    }
+private:
+    EntityType( const Code _code, const String& _name )
+        : code( _code ), name( _name ), prev( last )
+    {
+        last = this;
     }
 
-    operator const Type&() const
-    {
-      return getType();
-    }
+public:
+    static const EntityType NONE;
+    static const EntityType ENTITY;
+    static const EntityType VARIABLE;
+    static const EntityType PROCESS;
+    static const EntityType SYSTEM;
 
-    //    operator const int&() const
-    //    {
-    //      return static_cast<const int&>( getType() ); 
-    //    }
+    enum Code code;
+    const String& name;
+private:
+    const EntityType* prev;
+    static const EntityType* last;
+};
 
-    bool operator<( EntityTypeCref rhs ) const
-    {
-      return theType < rhs.getType();
-    }
-
-    bool operator<( const Type rhs ) const
-    {
-      return theType < rhs;
-    }
-
-    bool operator==( EntityTypeCref rhs ) const
-    {
-      return theType == rhs.getType();
-    }
-
-    bool operator==( const Type rhs ) const
-    {
-      return theType == rhs;
-    }
-
-
-    static StringCref  EntityTypeStringOfNone();
-
-    static StringCref  EntityTypeStringOfEntity();
-
-    static StringCref  EntityTypeStringOfProcess();
-    
-    static StringCref  EntityTypeStringOfVariable();
-    
-    static StringCref  EntityTypeStringOfSystem();
-
-  private:
-
-    Type theType;
-
-  };
-
-  /*@}*/
+/*@}*/
 
 } // namespace libecs
 

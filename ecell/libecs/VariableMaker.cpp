@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
@@ -37,44 +37,42 @@
 
 namespace libecs
 {
-  VariableMaker::VariableMaker( PropertiedObjectMaker& maker )
-    : theBackend( maker )
-  {
+VariableMaker::VariableMaker( PropertiedObjectMaker& maker )
+        : theBackend( maker )
+{
     makeClassList();
-  }
+}
 
-  VariableMaker::~VariableMaker()
-  {
+VariableMaker::~VariableMaker()
+{
     ; // do nothing
-  }
+}
 
-  Variable* VariableMaker::make( const std::string& aClassName )
-  {
-    const PropertiedObjectMaker::SharedModule& mod(
-	theBackend.getModule( aClassName, false ) );
-    if ( mod.getTypeName() != "Variable" )
-      {
-	throw TypeError( "specified class is not a Variable" );
-      }
-    return reinterpret_cast< Variable* >( theBackend.make( aClassName ) );
-  }
+Variable* VariableMaker::make( const std::string& aClassName )
+{
+    const Module& mod( getModule( aClassName ) );
+    return mod.createInstance();
+}
 
-  const PropertiedObjectMaker::SharedModule& VariableMaker::getModule(
-      const std::string& aClassName, bool forceReload )
-  {
+const PropertiedObjectMaker::SharedModule& VariableMaker::getModule(
+    const std::string& aClassName )
+{
     const PropertiedObjectMaker::SharedModule& mod(
-	theBackend.getModule( aClassName, forceReload ) );
-    if ( mod.getTypeName() != "Variable" )
-      {
-	throw TypeError( "specified class is not a Variable" );
-      }
+        theBackend.getModule( aClassName ) );
+    const PropertyInterfaceBase* pif(
+        reinterpret_cast<PropertyInterfaceBase *>(
+            mod.getInfo( "PropertyInterface" )));
+    if ( pif->getDMType() != "Variable" )
+    {
+        throw TypeError( "specified class is not a Variable" );
+    }
     return mod;
-  }
+}
 
-  void VariableMaker::makeClassList()
-  {
+void VariableMaker::makeClassList()
+{
     theBackend.NewDynamicModule( PropertiedClass, Variable );
-  }
+}
 
 } // namespace libecs
 

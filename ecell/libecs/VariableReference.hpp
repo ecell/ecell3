@@ -60,19 +60,19 @@ public:
             ; // do nothing
         }
 
-        bool operator()( VariableReferenceCref aLhs,
-                         VariableReferenceCref aRhs ) const
+        bool operator()( const VariableReference& aLhs,
+                         const VariableReference& aRhs ) const
         {
             return compare( aLhs.getCoefficient(), aRhs.getCoefficient() );
         }
 
         bool operator()( IntegerParam aLhs,
-                         VariableReferenceCref aRhs ) const
+                         const VariableReference& aRhs ) const
         {
             return compare( aLhs, aRhs.getCoefficient() );
         }
 
-        bool operator()( VariableReferenceCref aLhs,
+        bool operator()( const VariableReference& aLhs,
                          IntegerParam aRhs ) const
         {
             return compare( aLhs.getCoefficient(), aRhs );
@@ -96,20 +96,20 @@ public:
             ; // do nothing
         }
 
-        bool operator()( VariableReferenceCref aLhs,
-                         VariableReferenceCref aRhs ) const
+        bool operator()( const VariableReference& aLhs,
+                         const VariableReference& aRhs ) const
         {
             return compare( aLhs.getName(), aRhs.getName() );
         }
 
-        bool operator()( StringCref aLhs,
-                         VariableReferenceCref aRhs ) const
+        bool operator()( const String& aLhs,
+                         const VariableReference& aRhs ) const
         {
             return compare( aLhs, aRhs.getName() );
         }
 
-        bool operator()( VariableReferenceCref aLhs,
-                         StringCref aRhs ) const
+        bool operator()( const VariableReference& aLhs,
+                         const String& aRhs ) const
         {
             return compare( aLhs.getName(), aRhs );
         }
@@ -117,7 +117,7 @@ public:
 
     private:
 
-        static const bool compare( StringCref aLhs, StringCref aRhs )
+        static const bool compare( const String& aLhs, const String& aRhs )
         {
             const bool anIsLhsEllipsis( VariableReference::
                                         isEllipsisNameString( aLhs ) );
@@ -148,8 +148,8 @@ public:
             ; // do nothing
         }
 
-        bool operator()( VariableReferenceCref aLhs,
-                         VariableReferenceCref aRhs ) const
+        bool operator()( const VariableReference& aLhs,
+                         const VariableReference& aRhs ) const
         {
             static CoefficientLess aCoefficientLess;
             if ( aCoefficientLess( aLhs, aRhs ) )
@@ -180,7 +180,7 @@ public:
         ; // do nothing
     }
 
-    VariableReference( StringCref aName,
+    VariableReference( const String& aName,
                        VariablePtr aVariablePtr,
                        IntegerParam aCoefficient,
                        const bool anIsAccessor = true )
@@ -195,7 +195,7 @@ public:
 
     ~VariableReference() {}
 
-    void setName( StringCref aName )
+    void setName( const String& aName )
     {
         theName = aName;
     }
@@ -298,11 +298,6 @@ public:
         theVariablePtr->setFixed( aValue );
     }
 
-    SystemPtr getSuperSystem() const
-    {
-        return theVariablePtr->getSuperSystem();
-    }
-
     const bool isEllipsisName() const
     {
         return isEllipsisNameString( theName );
@@ -315,7 +310,7 @@ public:
         return isDefaultNameString( theName );
     }
 
-    bool operator==( VariableReferenceCref rhs ) const
+    bool operator==( const VariableReference& rhs ) const
     {
         if ( theName        == rhs.theName &&
              theVariablePtr == rhs.theVariablePtr &&
@@ -331,8 +326,8 @@ public:
     }
 
 
-    static const bool isEllipsisNameString( StringCref aname );
-    static const bool isDefaultNameString( StringCref aname );
+    static const bool isEllipsisNameString( const String& aname );
+    static const bool isDefaultNameString( const String& aname );
 
 
 public:

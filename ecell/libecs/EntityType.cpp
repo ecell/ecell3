@@ -36,105 +36,56 @@
 
 #include "Exceptions.hpp"
 #include "EntityType.hpp"
+#include "PropertiedClassKind.hpp"
+
+namespace libecs {
+
+const EntityType* EntityType::last( 0 );
+const EntityType EntityType::    NONE( _NONE  ,   "None" );
+const EntityType EntityType::  ENTITY( _ENTITY,   "Entity" );
+const EntityType EntityType::VARIABLE( _VARIABLE, "Variable" );
+const EntityType EntityType:: PROCESS( _PROCESS,  "Process" );
+const EntityType EntityType::  SYSTEM( _SYSTEM,   "System" );
 
 
-namespace libecs
+const EntityType& EntityType::get( const String& name )
 {
+    for ( const EntityType* item = last; item; item = item->prev )
+    {
+        if ( item->name == name )
+        {
+            return *item;
+        }
+    }
+}
 
-  StringCref EntityType::EntityTypeStringOfNone()
-  {
-    const static String aString;
-    return aString;
-  }
+const EntityType& EntityType::get( enum Code code )
+{
+    for ( const EntityType* item = last; item; item = item->prev )
+    {
+        if ( item->code == code )
+        {
+            return *item;
+        }
+    }
+}
 
-  StringCref EntityType::EntityTypeStringOfEntity()
-  {
-    const static String aString( "Entity" );
-    return aString;
-  }
-
-  StringCref EntityType::EntityTypeStringOfProcess()
-  {
-    const static String aString( "Process" );
-    return aString;
-  }
-  
-  StringCref EntityType::EntityTypeStringOfVariable()
-  {
-    const static String aString( "Variable" );
-    return aString;
-  }
-  
-  StringCref EntityType::EntityTypeStringOfSystem()
-  { 
-    const static String aString( "System" );
-    return aString;
-  }
-
-
-
-  EntityType::EntityType( StringCref aTypeString )
-  {
-    // linear search may well work here;  n < 8.
-
-    if( aTypeString.empty() )
-      {
-	theType = NONE;
-      }
-    else if( aTypeString == EntityTypeStringOfVariable() )
-      {
-	theType = VARIABLE;
-      }
-    else if( aTypeString == EntityTypeStringOfProcess() )
-      {
-	theType = PROCESS;
-      }
-    else if( aTypeString == EntityTypeStringOfSystem() )
-      {
-	theType = SYSTEM;
-      }
-    else if( aTypeString == EntityTypeStringOfEntity() )
-      {
-	theType = ENTITY;
-      }
-    else
-      {
-	THROW_EXCEPTION( InvalidEntityType,
-			 "Can not convert the typestring [" + aTypeString
-			 + "] to EntityType." );
-      }
-  }
-
-  EntityType::EntityType( const int number )
-    :
-    theType( static_cast<const Type>( number ) )
-  {
-    if( number > 4 || number <= 0 )
-      {
-	THROW_EXCEPTION( InvalidEntityType,
-			 "Invalid EntityType number" );
-      }
-  }
-
-  StringCref EntityType::getString() const
-  {
-    switch( theType )
-      {
-      case NONE:
-	return EntityTypeStringOfNone();
-      case VARIABLE:
-	return EntityTypeStringOfVariable();
-      case PROCESS:
-	return EntityTypeStringOfProcess();
-      case SYSTEM:
-	return EntityTypeStringOfSystem();
-      case ENTITY:
-	return EntityTypeStringOfEntity();
-      default:
-	THROW_EXCEPTION( InvalidEntityType,
-			 "unexpected EntityType::Type." );
-      }
-  }
+const EntityType&
+EntityType::fromPropertiedClassKind( const PropertiedClassKind& pck )
+{
+    switch ( pck.code )
+    {
+    case PropertiedClassKind::_PROCESS:
+        return EntityType::PROCESS;
+    case PropertiedClassKind::_VARIABLE:
+        return EntityType::VARIABLE;
+    case PropertiedClassKind::_SYSTEM:
+        return EntityType::SYSTEM;
+    }
+    THROW_EXCEPTION( ValueError,
+        String( "no EntityType counterpart for " )
+        + static_cast< const String& >( pck ) );
+}
 
 } // namespace libecs
 

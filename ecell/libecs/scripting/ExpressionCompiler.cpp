@@ -597,7 +597,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
                 return;
             }
 
-            SystemPtr const aSystemPtr( anEntityPtr->getSuperSystem() );
+            SystemPtr const aSystemPtr( anEntityPtr->getEnclosingSystem() );
 
             const String aMethodName(
                 ( aChildTreeIterator+aChildTreeSize - 1 )->value.begin(),
@@ -910,7 +910,7 @@ CompilerHelper<Tconfig_>::compileSystemProperty(
     if ( aChildString == "getSuperSystem" ) {
         theAssembler.appendSystemMethodInstruction( aSystemPtr, aMethodName );
     } else if ( aChildString == "." ) {
-        SystemPtr theSystemPtr( aSystemPtr->getSuperSystem() );
+        SystemPtr theSystemPtr( aSystemPtr->getEnclosingSystem() );
 
         compileSystemProperty( aChildTreeIterator, theSystemPtr, aMethodName );
     } else {

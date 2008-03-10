@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 
 #ifndef __DYNAMICMODULE_HPP
@@ -30,6 +30,8 @@
 
 #include <exception>
 #include <string>
+#include <map>
+#include <vector>
 #include "ltdl.h"
 
 #if defined(WIN32) || defined(_WIN32)
@@ -37,95 +39,77 @@
 #endif /* _WIN32 */
 
 /// doc needed
-
-#define SimpleAllocator( BASE ) BASE* (*)()
-typedef const void*(*InfoLoaderType)();
-
 /**
    Exception class for dmtool.
 */
 
 class DMException : public std::exception
 {
-public: 
+public:
 
-  DMException( const std::string& message ) 
-    : 
-    theMessage( message )
-  {
-    ; // do nothing
-  }
+    DMException( const std::string& message )
+            :
+            theMessage( message )
+    {
+        ; // do nothing
+    }
 
-  ~DMException() throw()
-  {
-    ; // do nothing
-  }
+    ~DMException() throw()
+    {
+        ; // do nothing
+    }
 
-  /**
-     Get dynamically created exception message.
-   */
+    /**
+       Get dynamically created exception message.
+     */
 
-  const char* what() const throw()
-  { 
-    return theMessage.c_str();
-  }
+    const char* what() const throw()
+    {
+        return theMessage.c_str();
+    }
 
 private:
-  
-  const std::string theMessage;
+
+    const std::string theMessage;
 
 };
 
 /**
   Common base class of DynamicModule and SharedDynamicModule
 */
-  
-template <class Base,class _TAllocator = SimpleAllocator( Base )>
+
+template <typename T_>
 class DynamicModuleBase
 {
 public:
+    typedef DynamicModuleBase Module;
 
-  typedef _TAllocator DMAllocator;
+public:
 
-public:		
+    DynamicModuleBase( const std::string& moduleName )
+        : theModuleName( moduleName )
+    {
+        ; // do nothing
+    }
 
-  DynamicModuleBase( const std::string& moduleName,
-                     DMAllocator allocator,
-                     InfoLoaderType infoLoader,
-                     const std::string& typeName = "" );
-  virtual ~DynamicModuleBase(){}
-  
-  const std::string& getModuleName() const
-  {
-    return this->theModuleName;
-  }
+    virtual ~DynamicModuleBase()
+    {
+        ; // do nothing
+    }
 
-  virtual const std::string getFileName() const
-  {
-    return "";
-  }
+    const std::string& getModuleName() const
+    {
+        return theModuleName;
+    }
 
-  const DMAllocator& getAllocator() const
-  {
-    return this->theAllocator;
-  }
+    virtual const std::string& getFileName() const = 0;
 
-  const InfoLoaderType& getInfoLoader() const
-  {
-	return this->theInfoLoader;
-  }
+    virtual T_* createInstance() const = 0;
 
-  const std::string getTypeName() const
-  {
-    return this->theTypeName;
-  }
+    virtual const void* getInfo( const std::string& kind ) const = 0;
 
 protected:
-
-  const std::string theModuleName;
-  DMAllocator theAllocator;
-  InfoLoaderType theInfoLoader;
-  const std::string theTypeName;
+    const std::string theModuleName;
 };
 
 
@@ -133,17 +117,39 @@ protected:
    DynamicModule instantiates objects of a single class.
 */
 
-template <class Base,class Derived,class DMAllocator = SimpleAllocator( Base )>
-class DynamicModule
-  :
-  public DynamicModuleBase< Base, DMAllocator >
+template <typename T_>
+class DynamicModule: public DynamicModuleBase< T_ >
 {
+public:
+    typedef DynamicModuleBase< T_ > Module;
 
 public:
+    DynamicModule( const std::string& moduleName )
+        : DynamicModuleBase<T_>( moduleName )
+    {
+        ; // do nothing
+    }
 
-  DynamicModule( const std::string& moduleName,
-		 const std::string& typeName = "" );
-  virtual ~DynamicModule(){}
+    virtual ~DynamicModule()
+    {
+        // do nothing
+    }
+
+    virtual T_* createInstance() const
+    {
+        return new T_( *this );
+    }
+
+    virtual const void* getInfo( const std::string& kind ) const
+    {
+        return 0;
+    }
+
+    virtual const std::string& getFileName() const
+    {
+        static const std::string empty("");
+        return empty;
+    }
 };
 
 
@@ -157,28 +163,55 @@ public:
    The shared object must have followings:
      - T* CreateObject()       - which returns a new object.
    and
-     - void* GetClassInfo()    - which must be reinterpreted to PolymorphMap in libecs, sorry, 
-	 maybe later a pure string version should be implemented
+     - void* GetClassInfo()    - which must be reinterpreted to PolymorphMap in libecs, sorry,
+  maybe later a pure string version should be implemented
      - a full set of symbols needed to instantiate and use the class.
 */
 
-template <class Base,class DMAllocator = SimpleAllocator( Base )>
-class SharedDynamicModule : public DynamicModuleBase< Base >
+template <class T_>
+class SharedDynamicModule : public DynamicModuleBase< T_ >
 {
+public:
+    typedef DynamicModuleBase< T_ > Module;
+
+protected:
+    typedef T_* (*FactoryFunction)( const Module& );
+    typedef const void* (*GetInfoFunction)( const std::string& kind );
 
 public:
 
-  SharedDynamicModule( const std::string& classname, DMAllocator allocator,
-                       InfoLoaderType infoLoader, const std::string& typeName,
-                       const std::string& fileName, lt_dlhandle handle );
-  virtual ~SharedDynamicModule();
-  const std::string getFileName() const;
+    SharedDynamicModule( const std::string& classname,
+                         const std::string& fileName, lt_dlhandle handle );
+
+    virtual ~SharedDynamicModule()
+    {
+        if ( theHandle )
+        {
+            lt_dlclose( theHandle );
+            theHandle = 0;
+        }
+    }
+
+    virtual T_* createInstance() const
+    {
+        return theFactoryFunction( *this );
+    }
+
+    virtual const void* getInfo( const std::string& kind ) const
+    {
+        return theInfoRetriever( kind );
+    }
+
+    virtual const std::string& getFileName() const
+    {
+        return theFileName;
+    }
 
 private:
-
-  lt_dlhandle theHandle;
-  std::string theFileName;
-  std::string theTypeName;
+    lt_dlhandle theHandle;
+    std::string theFileName;
+    FactoryFunction theFactoryFunction;
+    GetInfoFunction theInfoRetriever;
 };
 
 /**
@@ -198,62 +231,43 @@ addClass( new DynamicModule< BASE, DERIVED, ALLOC >( #DERIVED ) )
 
 //////////////////////////// begin implementation
 
-template < class Base, class DMAllocator >
-DynamicModuleBase< Base, DMAllocator >::
-DynamicModuleBase( const std::string& moduleName,
-		   DMAllocator allocator, InfoLoaderType infoLoader,
-		   const std::string& typeName )
-  : 
-  theModuleName( moduleName ),
-  theAllocator( allocator ),
-  theInfoLoader( infoLoader ),
-  theTypeName( typeName )
+template < typename TBase_ >
+SharedDynamicModule< TBase_ >::SharedDynamicModule(
+    const std::string& classname, const std::string& fileName,
+    lt_dlhandle handle )
+    : DynamicModuleBase< TBase_ >( classname ),
+      theFileName( fileName ),
+      theHandle( handle ),
+      theFactoryFunction( 0 ),
+      theInfoRetriever( 0 )
 {
-  ; // do nothing
-}
+    FactoryFunction* anFactoryFunctionPtr( 0 );
+    GetInfoFunction* anGetInfoFunctionPtr( 0 );
+    const char** aTypeStringPtr( 0 );
 
-template < class Base, class Derived, class DMAllocator >
-DynamicModule< Base, Derived, DMAllocator >::
-DynamicModule( const std::string& moduleName, const std::string& typeName )
-  : 
-  DynamicModuleBase<Base,DMAllocator>( moduleName,
-				       reinterpret_cast< DMAllocator >(
-                         &Derived::createInstance ),
-				       &Derived::getClassInfoPtr,
-				       typeName )
-{
-  ; // do nothing
-}
+    anFactoryFunctionPtr = reinterpret_cast< FactoryFunction* >(
+                         lt_dlsym( handle, "CreateObject" ) );
+    if ( !anFactoryFunctionPtr )
+        goto fail_dlsym;
+    anGetInfoFunctionPtr = reinterpret_cast< GetInfoFunction* >(
+                              lt_dlsym( handle, "GetClassInfo" ) );
+    if ( !anGetInfoFunctionPtr )
+        goto fail_dlsym;
 
-template < class Base, class DMAllocator >
-SharedDynamicModule< Base, DMAllocator >::
-SharedDynamicModule( const std::string& classname, DMAllocator allocator,
-                     InfoLoaderType infoLoader, const std::string& typeName,
-                     const std::string& fileName, lt_dlhandle handle )
-  :
-  DynamicModuleBase<Base,DMAllocator>( classname, allocator, infoLoader,
-                                       typeName ), 
-  theFileName( fileName ),
-  theHandle( handle )
-{
-}
-
-template < class Base, class DMAllocator >
-SharedDynamicModule<Base,DMAllocator>::~SharedDynamicModule()
-{
-
-  if( this->theHandle != NULL )
+    if ( !*anFactoryFunctionPtr
+            || !*anGetInfoFunctionPtr
+            || !*aTypeStringPtr )
     {
-      lt_dlclose( this->theHandle );
+        throw DMException( "[" + fileName + "] is not a valid DM file." );
     }
-}
 
+    theFactoryFunction = *anFactoryFunctionPtr;
+    theInfoRetriever = *anGetInfoFunctionPtr;
+    return;
 
-
-template < class Base, class DMAllocator >
-const std::string SharedDynamicModule<Base,DMAllocator>::getFileName() const
-{
-  return this->theFileName;
+fail_dlsym:
+    throw DMException( "[" + fileName + "] is not a valid DM file: "
+                       + lt_dlerror() );
 }
 
 #endif /* __DYNAMICMODULE_HPP */

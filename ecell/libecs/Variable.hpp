@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
@@ -43,58 +43,56 @@
 namespace libecs
 {
 
-  /** @addtogroup entities
-   *@{
-   */
+/** @addtogroup entities
+ *@{
+ */
 
-  /** @file */
+/** @file */
 
 
-  /**
-     Variable class represents state variables in the simulation model, such as
-     amounts of molecular species in a compartment.
+/**
+   Variable class represents state variables in the simulation model, such as
+   amounts of molecular species in a compartment.
 
-  */
+*/
 
-  LIBECS_DM_CLASS( Variable, Entity )
-  {
+LIBECS_DM_CLASS( Variable, Entity )
+{
 
-  public:
+public:
 
     LIBECS_DM_BASECLASS( Variable );
 
     LIBECS_DM_OBJECT( Variable, Variable )
-      {
-	INHERIT_PROPERTIES( Entity );
-	
-	PROPERTYSLOT_LOAD_SAVE( Real, Value,
-				&Variable::setValue,
-				&Variable::getValue,
-				&Variable::loadValue,
-				&Variable::saveValue );
+    {
+        INHERIT_PROPERTIES( Entity );
+
+        PROPERTYSLOT_LOAD_SAVE( Real, Value,
+                                &Variable::setValue,
+                                &Variable::getValue,
+                                &Variable::loadValue,
+                                &Variable::saveValue );
 
 
-	PROPERTYSLOT_SET_GET( Real,  DiffusionCoeff );
+        PROPERTYSLOT_SET_GET( Integer,  Fixed );
 
-	PROPERTYSLOT_SET_GET( Integer,  Fixed );
+        PROPERTYSLOT_NO_LOAD_SAVE( Real, Velocity,
+                                   NOMETHOD,
+                                   &Variable::getVelocity );
 
-	PROPERTYSLOT_NO_LOAD_SAVE( Real, Velocity,
-				   NOMETHOD,
-				   &Variable::getVelocity );
+        PROPERTYSLOT_LOAD_SAVE( Real, MolarConc,
+                                &Variable::setMolarConc,
+                                &Variable::getMolarConc,
+                                &Variable::loadMolarConc,
+                                NOMETHOD );
+        // PROPERTYSLOT_NO_LOAD_SAVE( Real, MolarConc,
+        //       &Variable::setMolarConc,
+        //       &Variable::getMolarConc );
 
-	PROPERTYSLOT_LOAD_SAVE( Real, MolarConc,
-				&Variable::setMolarConc,
-				&Variable::getMolarConc,
-				&Variable::loadMolarConc,
-				NOMETHOD );
-	//	PROPERTYSLOT_NO_LOAD_SAVE( Real, MolarConc,
-	//				   &Variable::setMolarConc,
-	//				   &Variable::getMolarConc );
-
-	PROPERTYSLOT_NO_LOAD_SAVE( Real, NumberConc,
-				   &Variable::setNumberConc,
-				   &Variable::getNumberConc );
-      }
+        PROPERTYSLOT_NO_LOAD_SAVE( Real, NumberConc,
+                                   &Variable::setNumberConc,
+                                   &Variable::getNumberConc );
+    }
 
 
     Variable();
@@ -102,12 +100,12 @@ namespace libecs
 
     virtual const EntityType getEntityType() const
     {
-      return EntityType( EntityType::VARIABLE );
+        return EntityType( EntityType::VARIABLE );
     }
 
 
     /**
-       Initializes this variable. 
+       Initializes this variable.
     */
 
     virtual void initialize();
@@ -119,23 +117,23 @@ namespace libecs
 
     virtual const bool isIntegrationNeeded() const
     {
-      return ! theInterpolantVector.empty();
+        return ! theInterpolantVector.empty();
     }
 
-    /** 
-	Integrate.
+    /**
+    Integrate.
     */
 
     virtual void integrate( RealParam aTime )
     {
-      if( isFixed() == false ) 
-	{
-	  updateValue( aTime );
-	}
-      else 
-	{
-	  theLastTime = aTime;
-	}
+        if ( isFixed() == false )
+        {
+            updateValue( aTime );
+        }
+        else
+        {
+            lastUpdated = aTime;
+        }
     }
 
 
@@ -147,16 +145,16 @@ namespace libecs
     */
 
     void interIntegrate( RealParam aCurrentTime )
-      {
-	const Real anInterval( aCurrentTime - theLastTime );
-	
-	if ( anInterval > 0.0 )
-	  {
-	    Real aVelocitySum( calculateDifferenceSum( aCurrentTime,
-						       anInterval ) );
-	    loadValue( getValue() + aVelocitySum );
-	  }
-      }
+    {
+        const Real anInterval( aCurrentTime - lastUpdated );
+
+        if ( anInterval > 0.0 )
+        {
+            Real aVelocitySum( calculateDifferenceSum( aCurrentTime,
+                               anInterval ) );
+            loadValue( getValue() + aVelocitySum );
+        }
+    }
 
 
     /**
@@ -166,35 +164,35 @@ namespace libecs
     */
 
     virtual SET_METHOD( Real, Value )
-    { 
-      if ( !isFixed() ) 
-	{
-	  loadValue( value ); 
-	}
+    {
+        if ( !isFixed() )
+        {
+            value = value;
+        }
     }
 
 
-    // Currently this is non-virtual, but will be changed to a 
+    // Currently this is non-virtual, but will be changed to a
     // virtual function, perhaps in version 3.3.
     // virtual
     GET_METHOD( Real, Value )
-    { 
-      return saveValue();
+    {
+        return value;
     }
 
     void addValue( RealParam aValue )
     {
-      setValue( getValue() + aValue );
+        setValue( getValue() + aValue );
     }
 
-    void loadValue( RealParam aValue )
+    void loadValue( Param<Polymorph> aValue )
     {
-      theValue = aValue;
+        value = aValue.as<Real>();
     }
 
-    const Real saveValue() const
+    const Polymorph saveValue() const
     {
-      return theValue;
+        return Polymorph( value );
     }
 
     /**
@@ -203,14 +201,14 @@ namespace libecs
 
     GET_METHOD( Real, Velocity )
     {
-      Real aVelocitySum( 0.0 );
-      FOR_ALL( InterpolantVector, theInterpolantVector )
-	{
-	  InterpolantPtr const anInterpolantPtr( *i );
-	  aVelocitySum += anInterpolantPtr->getVelocity( theLastTime );
-	}
+        Real aVelocitySum( 0.0 );
+        FOR_ALL( InterpolantVector, theInterpolantVector )
+        {
+            InterpolantPtr const anInterpolantPtr( *i );
+            aVelocitySum += anInterpolantPtr->getVelocity( lastUpdated );
+        }
 
-      return aVelocitySum;
+        return aVelocitySum;
     }
 
     /**
@@ -221,7 +219,7 @@ namespace libecs
 
     void setFixed( const bool aValue )
     {
-      theFixed = aValue;
+        fixed = aValue;
     }
 
     /**
@@ -230,29 +228,19 @@ namespace libecs
 
     const bool isFixed() const
     {
-      return theFixed;
+        return fixed;
     }
 
 
-    // wrappers to expose is/setFixed as PropertySlots 
+    // wrappers to expose is/setFixed as PropertySlots
     SET_METHOD( Integer, Fixed )
-    { 
-      theFixed = value != 0;
+    {
+        fixed = value != 0;
     }
 
     GET_METHOD( Integer, Fixed )
-    { 
-      return theFixed;
-    }
-
-    SET_METHOD( Real, DiffusionCoeff )
-    { 
-      theDiffusionCoeff = value;
-    }
-
-    GET_METHOD( Real, DiffusionCoeff )
-    { 
-      return theDiffusionCoeff;
+    {
+        return fixed;
     }
 
     /**
@@ -263,8 +251,8 @@ namespace libecs
 
     GET_METHOD( Real, MolarConc )
     {
-      // N_A_R = 1.0 / N_A
-      return getNumberConc() * N_A_R;
+        // N_A_R = 1.0 / N_A
+        return getNumberConc() * N_A_R;
     }
 
     /**
@@ -275,7 +263,7 @@ namespace libecs
 
     SET_METHOD( Real, MolarConc )
     {
-      setNumberConc( value * N_A );
+        setNumberConc( value * N_A );
     }
 
     /**
@@ -288,7 +276,7 @@ namespace libecs
 
     LOAD_METHOD( Real, MolarConc )
     {
-      loadNumberConc( value * N_A );
+        loadNumberConc( value * N_A );
     }
 
     /**
@@ -301,11 +289,11 @@ namespace libecs
 
     GET_METHOD( Real, NumberConc )
     {
-      return getValue() / getSizeOfSuperSystem();
+        return getValue() / getSizeOfSuperSystem();
 
-      // This uses getSizeOfSuperSystem() private method instead of
-      // getSuperSystem()->getSize() because otherwise it is 
-      // impossible to inline this.
+        // This uses getSizeOfSuperSystem() private method instead of
+        // getSuperSystem()->getSize() because otherwise it is
+        // impossible to inline this.
     }
 
     /**
@@ -316,96 +304,71 @@ namespace libecs
 
     SET_METHOD( Real, NumberConc )
     {
-      setValue( value * getSizeOfSuperSystem() );
+        setValue( value * getSizeOfSuperSystem() );
 
-      // This uses getSizeOfSuperSystem() private method instead of
-      // getSuperSystem()->getSize() because otherwise it is 
-      // impossible to inline this.
+        // This uses getSizeOfSuperSystem() private method instead of
+        // getSuperSystem()->getSize() because otherwise it is
+        // impossible to inline this.
     }
 
-
-    /**
-       Load the number concentration of this Variable.
-
-       This method can be called before the SIZE Variable of 
-       the supersystem of this Variable is configured in
-       Model::initialize().
-
-       Thus this method gets the value of the SIZE Variable
-       without relying on the System::getSizeVariable() method
-       of the supersystem.
-
-       @see loadMolarConc()
-       @see System::getSizeVariable()
-       @see System::configureSizeVariable()
-       @see System::findSizeVariable()
-    */
-
-    LOAD_METHOD( Real, NumberConc );
-
     void registerInterpolant( InterpolantPtr const anInterpolant );
-    //    void removeInterpolant( InterpolantPtr const anInterpolant );
 
-
-  protected:
-
-    const Real calculateDifferenceSum( RealParam aCurrentTime, 
-				       RealParam anInterval ) const
+protected:
+    const Real calculateDifferenceSum( RealParam aCurrentTime,
+                                       RealParam anInterval ) const
     {
-      Real aVelocitySum( 0.0 );
-      FOR_ALL( InterpolantVector, theInterpolantVector )
-	{
-	  InterpolantPtr const anInterpolantPtr( *i );
-	  aVelocitySum += anInterpolantPtr->getDifference( aCurrentTime,
-							   anInterval );
-	}
+        Real aVelocitySum( 0.0 );
 
-      return aVelocitySum;
+        FOR_ALL ( InterpolantVector, theInterpolantVector )
+        {
+            aVelocitySum += (*i)->getDifference( aCurrentTime,
+                            anInterval );
+        }
+
+        return aVelocitySum;
     }
 
 
     void updateValue( RealParam aCurrentTime )
     {
-      const Real anInterval( aCurrentTime - theLastTime );
+        const Real anInterval( aCurrentTime - lastUpdated );
 
-      if( anInterval == 0.0 )
-	{
-	  return;
-	}
+        if ( anInterval == 0.0 )
+        {
+            return;
+        }
 
-      const Real aVelocitySum( calculateDifferenceSum( aCurrentTime, 
-						       anInterval ) );
-      loadValue( getValue() + aVelocitySum );
+        const Real aVelocitySum( calculateDifferenceSum( aCurrentTime,
+                                 anInterval ) );
+        setValue( getValue() + aVelocitySum );
 
-      theLastTime = aCurrentTime;
+        lastUpdated = aCurrentTime;
     }
 
 
 
     void clearInterpolantVector();
 
-  private:
+private:
 
     const Real getSizeOfSuperSystem() const
-      {
-	return getSuperSystem()->getSizeVariable()->getValue();
-      }
+    {
+        return getEnclosingSystem()->getSizeVariable()->getValue();
+    }
 
-  protected:
+protected:
 
-    Real theValue;
+    Real value;
 
-    Real theLastTime;
-
-    Real theDiffusionCoeff;
+    Real lastUpdated;
 
     InterpolantVector theInterpolantVector;
 
-    bool theFixed;
-  };
+    bool fixed;
+};
 
 
-  /*@}*/
+/*@}*/
 
 } // namespace libecs
 

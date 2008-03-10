@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Gabor Bereczki <gabor.bereczki@talk21.com>
@@ -36,143 +36,121 @@
 #include "Exceptions.hpp"
 #include "DataPoint.hpp"
 #include "DataPointVector.hpp"
+#include "LoggingPolicy.hpp"
+
+/**
+   @addtogroup logging
+   @{
+ */
+
+/** @file */
 
 template <typename T> class vvector;
 
-namespace libecs
+namespace libecs {
+
+class LIBECS_API PhysicalLogger
 {
-
-  /** @addtogroup logging
-   *@{
-   */
-
-  /** @file */
-
-
-  class LIBECS_API PhysicalLogger
-  {
-
-    //    DECLARE_TYPE( _DATAPOINT, DATAPOINT );
-    //    typedef vvector<DATAPOINT> Vector;
-
     typedef vvector<DataPoint> Vector;
-    
-  public:
 
-    DECLARE_TYPE( size_t, VectorIterator );
-    DECLARE_TYPE( size_t, size_type );
+public:
+    DECLARE_TYPE( ::std::size_t, size_type );
 
     PhysicalLogger();
     virtual ~PhysicalLogger();
-	
-    void push( DataPointCref aDataPoint );
 
-    void setEndPolicy( Integer anEndPolicy );
+    void push( const DataPoint& aDataPoint );
 
-    int getEndPolicy() const;
+    void setPolicy( const LoggingPolicy& pol );
 
-    /// set max storage size in Kbytes.
-    void setMaxSize( size_type aMaxSize );
-
-    size_type getMaxSize() const
-    {
-      return theMaxSize;
-    }
+    const LoggingPolicy& getEndPolicy() const;
 
     size_type lower_bound( const size_type start,
-			   const size_type end,
-			   const Real time ) const;
+                           const size_type end,
+                           const Real time ) const;
 
     size_type upper_bound( const size_type start,
-			   const size_type end,
-			   const Real time ) const;
+                           const size_type end,
+                           const Real time ) const;
 
     size_type lower_bound_linear( const size_type start,
-				  const size_type end,
-				  const Real time ) const;
+                                  const size_type end,
+                                  const Real time ) const;
 
     size_type upper_bound_linear( const size_type start,
-				  const size_type end,
-				  const Real time ) const;
+                                  const size_type end,
+                                  const Real time ) const;
 
     size_type lower_bound_linear_backwards( const size_type start,
-					    const size_type end,
-					    const Real time ) const;
+                                            const size_type end,
+                                            const Real time ) const;
 
     size_type lower_bound_linear_estimate( const size_type start,
-					   const size_type end,
-					   const Real time,
-					   const Real time_per_step ) const;
+                                           const size_type end,
+                                           const Real time,
+                                           const Real time_per_step ) const;
 
     size_type upper_bound_linear_estimate( const size_type start,
-					   const size_type end,
-					   const Real time,
-					   const Real time_per_step ) const;
-    
+                                           const size_type end,
+                                           const Real time,
+                                           const Real time_per_step ) const;
+
     DataPointVectorSharedPtr getVector( const size_type start,
-					const size_type end ) const;
+                                        const size_type end ) const;
 
     size_type size() const;
 
     bool empty() const;
 
-
-    LongDataPoint at( size_type index) const;
+    LongDataPoint at( size_type index ) const;
 
     size_type begin() const
     {
-      return 0;
-    }
-    
-    
-    size_type end() const
-    {
-      if ( size() > 0 )
-	{
-	  return size() - 1;
-	}
-      else
-	{
-	  return 0;
-	}
+        return 0;
     }
 
+    size_type end() const
+    {
+        if ( size() > 0 )
+        {
+            return size() - 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
 
     LongDataPoint front() const
     {
-      if ( empty() )
-	{
-	  return DataPoint();
-	}
-      
-      return at( begin() );
+        if ( empty() )
+        {
+            return DataPoint();
+        }
+
+        return at( begin() );
     }
-    
+
     LongDataPoint back() const
     {
-      if ( empty() )
-	{
-	  return DataPoint();
-	}
-      
-      return at( end() );
+        if ( empty() )
+        {
+            return DataPoint();
+        }
+
+        return at( end() );
     }
-  
+
     Real getAverageInterval() const;
 
-  private:
-
-    // this mutable can be removed if vvector supports const operations
+private:
     Vector         *theVector;
+    LoggingPolicy  thePolicy;
+};
 
-    size_type      theMaxSize;
-
-  };
-
-
-  //@}
 
 } // namespace libecs
 
+/** @} */
 
 #endif /* __PHYSICALLOGGER_HPP */

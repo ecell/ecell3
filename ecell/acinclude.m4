@@ -277,13 +277,41 @@ AC_DEFUN([ECELL_CHECK_PRETTY_FUNCTION], [
     ])
   ])
   if [[ $ac_cv_macro_pretty_function == yes ]]; then
-    AC_DEFINE(HAVE_PRETTY_FUNCTION, 1, dnl
+    AC_DEFINE(HAVE_PRETTY_FUNCTION_MACRO, 1, dnl
       [Define to 1 if __PRETTY_FUNCTION__ is supported.])
     AC_MSG_RESULT(yes)
+    ifelse([$1],[],[],[$1]) 
   else
     AC_MSG_RESULT(no)
+    ifelse([$2],[],[],[$2]) 
   fi
 ])
+
+AC_DEFUN([ECELL_CHECK_FUNCTION], [
+  AC_MSG_CHECKING(for __FUNCTION__)
+  AC_CACHE_VAL(ac_cv_macro_function, [
+    AC_TRY_CPP([
+  test()
+  {
+    const char* function = __FUNCTION__;
+  }
+    ], [
+      ac_cv_macro_function=yes
+    ], [
+      ac_cv_macro_function=no
+    ])
+  ])
+  if [[ $ac_cv_macro_function == yes ]]; then
+    AC_DEFINE(HAVE_FUNCTION_MACRO, 1, dnl
+      [Define to 1 if __FUNCTION__ is supported.])
+    AC_MSG_RESULT(yes)
+    ifelse([$1],[],[],[$1]) 
+  else
+    AC_MSG_RESULT(no)
+    ifelse([$2],[],[],[$2]) 
+  fi
+])
+
 
 
 AC_DEFUN([ECELL_CHECK_GSL], [

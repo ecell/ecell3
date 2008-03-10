@@ -62,11 +62,11 @@ namespace libecs
 
     DataPointRef asShort( DataPointVectorIterator aPosition );
 
-    DataPointCref asShort( DataPointVectorIterator aPosition ) const;
+    const DataPoint& asShort( DataPointVectorIterator aPosition ) const;
 
     LongDataPointRef asLong( DataPointVectorIterator aPosition );
 
-    LongDataPointCref asLong( DataPointVectorIterator aPosition ) const;
+    const LongDataPoint& asLong( DataPointVectorIterator aPosition ) const;
 
     DataPointVectorIterator getSize() const
     {

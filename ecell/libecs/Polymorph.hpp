@@ -72,12 +72,12 @@ namespace libecs
 
   protected:
   
-    PolymorphValue( PolymorphValueCref ) {}
+    PolymorphValue( const PolymorphValue& ) {}
     PolymorphValue() {}
 
   private:
 
-    PolymorphCref operator= ( PolymorphCref );
+    const Polymorph& operator= ( const Polymorph& );
 
   };
 
@@ -125,7 +125,7 @@ namespace libecs
       ; // do nothing
     }
 
-    ConcretePolymorphValue( PolymorphValueCref aValue )
+    ConcretePolymorphValue( const PolymorphValue& aValue )
       :
       theValue( aValue.as<T>() )
     {
@@ -218,7 +218,7 @@ namespace libecs
       ; // do nothing
     }
 
-    Polymorph( StringCref  aValue ) 
+    Polymorph( const String&  aValue ) 
       :
       theValue( new ConcretePolymorphValue<String>( aValue ) )
     {
@@ -239,14 +239,14 @@ namespace libecs
       ; // do nothing
     }
 
-    Polymorph( PolymorphVectorCref aValue )
+    Polymorph( const PolymorphVector& aValue )
       :
       theValue( new ConcretePolymorphValue<PolymorphVector>( aValue ) )
     {
       ; // do nothing
     }
 
-    Polymorph( PolymorphCref aValue )
+    Polymorph( const Polymorph& aValue )
       :
       theValue( aValue.createValueClone() )
     {
@@ -258,7 +258,7 @@ namespace libecs
       delete theValue;
     }
 
-    PolymorphCref operator=( PolymorphCref rhs )
+    const Polymorph& operator=( const Polymorph& rhs )
     {
       if( this != &rhs )
 	{
@@ -419,7 +419,7 @@ namespace libecs
   class ConvertTo< ToType, PolymorphVector >
   {
   public:
-    const ToType operator()( PolymorphVectorCref aValue )
+    const ToType operator()( const PolymorphVector& aValue )
     {
       checkSequenceSize( aValue, 1 );
       return static_cast<Polymorph>(aValue[0]).as<ToType>();
@@ -431,7 +431,7 @@ namespace libecs
   class ConvertTo< String, PolymorphVector >
   {
   public:
-    const String operator()( PolymorphVectorCref aValue )
+    const String operator()( const PolymorphVector& aValue )
     {
       checkSequenceSize( aValue, 1 );
       return static_cast<Polymorph>(aValue[0]).as<String>();

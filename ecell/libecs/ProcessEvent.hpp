@@ -86,13 +86,13 @@ namespace libecs
       setTime( aNewStepInterval + aTime );
     }
 
-    const bool isDependentOn( ProcessEventCref anEvent ) const
+    const bool isDependentOn( const ProcessEvent& anEvent ) const
     {
       return theProcess->isDependentOn( anEvent.getProcess() );
     }
 
 
-    const bool operator< ( ProcessEventCref rhs ) const
+    const bool operator< ( const ProcessEvent& rhs ) const
     {
       // return theTime < rhs.theTime;
 
@@ -112,7 +112,7 @@ namespace libecs
     }
 
 
-    const bool operator> ( ProcessEventCref rhs ) const
+    const bool operator> ( const ProcessEvent& rhs ) const
     {
       // return theTime < rhs.theTime;
 
@@ -132,19 +132,19 @@ namespace libecs
     }
 
 
-    const bool operator<= ( ProcessEventCref rhs ) const
+    const bool operator<= ( const ProcessEvent& rhs ) const
     {
       return !( *this > rhs );
     }
 
 
-    const bool operator>= ( ProcessEventCref rhs ) const
+    const bool operator>= ( const ProcessEvent& rhs ) const
     {
       return !( *this < rhs );
     }
 
 
-    const bool operator!= ( ProcessEventCref rhs ) const
+    const bool operator!= ( const ProcessEvent& rhs ) const
     {
       if( getTime() == rhs.getTime() && 
 	  getProcess() == rhs.getProcess() )

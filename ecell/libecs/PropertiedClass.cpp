@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
@@ -37,118 +37,195 @@
 
 #include "PropertyInterface.hpp"
 #include "Exceptions.hpp"
-
 #include "PropertiedClass.hpp"
 
 namespace libecs
 {
 
+PropertiedClass::~PropertiedClass()
+{
+    ; // do nothing
+}
 
-  ///////////////////////////// PropertiedClass
+void PropertiedClass::__libecs_init__()
+{
+    initialized = true;
+}
 
-  const Polymorph PropertiedClass::
-  defaultGetPropertyAttributes( StringCref aPropertyName ) const
-  {
-    THROW_EXCEPTION( NoSlot, 
-		     getClassName() + 
-		     String( ": No property slot [" )
-		     + aPropertyName + "].  Get property attributes failed." );
-  }
+const String& ProperitedClass::asString() const
+{
+    return getClassName();
+}
 
-  const Polymorph 
-  PropertiedClass::defaultGetPropertyList() const
-  {
+void PropertiedClass::initializePropertyInterface( ::libecs::PropertyInterface& thePropertyInterface )
+{
+}
+
+const PropertyInterface& PropertiedClass::getPropertyInterface() const
+{
+    return thePropertyInterface;
+}
+
+PropertySlot*
+PropertiedClass::getPropertySlot( const String& aPropertyName ) const
+{
+    return getPropertyInterface().getPropertySlot( aPropertyName );
+}
+
+void
+PropertiedClass::setProperty( const String& aPropertyName,
+                              const Polymorph& aValue )
+{
+    PropertySlot* slot( getPropertySlot( aPropertyName ) );
+    if ( slot )
+        slot.set( *this, aValue )
+        else
+            defaultSetProperty( aPropertyName, aValue );
+}
+
+const Polymorph
+PropertiedClass::getProperty( const String& aPropertyName ) const
+{
+    PropertySlot* slot( getPropertySlot( aPropertyName ) );
+    if ( slot )
+        return slot.get( *this );
+    else
+        return defaultGetProperty( aPropertyName );
+}
+
+void
+PropertiedClass::loadProperty( const String& aPropertyName,
+                               const Polymorph& aValue )
+{
+    PropertySlot* slot( getPropertySlot( aPropertyName ) );
+    if ( slot )
+        slot.load( *this, aValue );
+    else
+        slot.defaultSetProperty( aPropertyName, aValue );
+}
+
+Polymorph
+PropertiedClass::saveProperty( const String& aPropertyName ) const
+{
+    PropertySlot* slot( getPropertySlot( aPropertyName ) );
+    if ( slot )
+        return slot.save( *this );
+    else
+        return slot.defaultGetProperty( aPropertyName );
+}
+
+PropertySlotProxy
+PropertiedClass::createPropertySlotProxy( const String& name )
+{
+    const PropertySlot* aPropertySlot( getPropertySlot( name ) );
+    if ( !aPropertySlot ) {
+        THROW_EXCEPTION( NoSlot,
+                         getPropertyInterface().getClassName() +
+                         String( ": No such property slot: " )
+                         + aPropertyName
+                       );
+    }
+
+    return PropertySlotProxy( anObject, *aPropertySlot );
+}
+
+
+const Polymorph PropertiedClass::
+defaultGetPropertyAttributes( const String& aPropertyName ) const
+{
+    THROW_EXCEPTION( NoSlot,
+                     getPropertyInterface().getClassName() +
+                     String( ": No property slot [" )
+                     + aPropertyName + "].  Get property attributes failed." );
+}
+
+const Polymorph
+PropertiedClass::defaultGetPropertyList() const
+{
     PolymorphVector aVector;
 
     return aVector;
-  }
-  
-  void PropertiedClass::defaultSetProperty( StringCref aPropertyName, 
-					    PolymorphCref aValue )
-  {
+}
+
+void PropertiedClass::defaultSetProperty( const String& aPropertyName,
+        const Polymorph& aValue )
+{
     THROW_EXCEPTION( NoSlot,
-		     getClassName() + 
-		     String( ": No property slot [" )
-		     + aPropertyName + "].  Set property failed." );
-  }
+                     getPropertyInterface().getClassName() +
+                     String( ": No property slot [" )
+                     + aPropertyName + "].  Set property failed." );
+}
 
-  const Polymorph 
-  PropertiedClass::defaultGetProperty( StringCref aPropertyName ) const
-  {
-    THROW_EXCEPTION( NoSlot, 
-		     getClassName() + 
-		     String( ": No property slot [" )
-		     + aPropertyName + "].  Get property failed." );
-  }
-  
-  void PropertiedClass::registerLogger( LoggerPtr aLoggerPtr )
-  {
-    if( std::find( theLoggerVector.begin(), theLoggerVector.end(), aLoggerPtr )
-	== theLoggerVector.end() )
-      {
-   	theLoggerVector.push_back( aLoggerPtr );
-      }
-  }
+const Polymorph
+PropertiedClass::defaultGetProperty( const String& aPropertyName ) const
+{
+    THROW_EXCEPTION( NoSlot,
+                     getPropertyInterface().getClassName() +
+                     String( ": No property slot [" )
+                     + aPropertyName + "].  Get property failed." );
+}
 
-  void PropertiedClass::removeLogger( LoggerPtr aLoggerPtr )
-  {
-    LoggerVectorIterator i( find( theLoggerVector.begin(), 
-				  theLoggerVector.end(),
-				  aLoggerPtr ) );
-    
-    if( i != theLoggerVector.end() )
-      {
-	theLoggerVector.erase( i );
-      }
+void PropertiedClass::registerLogger( LoggerPtr aLoggerPtr )
+{
+    if ( std::find( theLoggerVector.begin(), theLoggerVector.end(), aLoggerPtr )
+            == theLoggerVector.end() )
+    {
+        theLoggerVector.push_back( aLoggerPtr );
+    }
+}
 
-  }
+void PropertiedClass::removeLogger( LoggerPtr aLoggerPtr )
+{
+    LoggerVectorIterator i( find( theLoggerVector.begin(),
+                                  theLoggerVector.end(),
+                                  aLoggerPtr ) );
+
+    if ( i != theLoggerVector.end() )
+    {
+        theLoggerVector.erase( i );
+    }
+
+}
+
+// @internal
+void PropertiedClass::nullLoad( Param<Polymorph>::type )
+{
+    THROW_EXCEPTION( IllegalOperation, "Not loadable." );
+}
+
+/// @internal
+const Polymorph PropertiedClass::nullSave() const
+{
+    THROW_EXCEPTION( IllegalOperation, "Not savable." );
+    return Polymorph();
+}
 
 
-  void PropertiedClass::throwNotSetable()
-  {
-    THROW_EXCEPTION( AttributeError, "Not setable." );
-  }
-
-  void PropertiedClass::throwNotGetable()
-  {
-    THROW_EXCEPTION( AttributeError, "Not getable." );
-  }
-
+PropertyInterface< PropertiedClass > PropertiedClass::thePropertyInterface(
+    "PropertiedClass",  "" );
 
 #define NULLSET_SPECIALIZATION_DEF( TYPE )\
-  template <> void PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )\
-  {\
-    throwNotSetable();\
-  } //
+template <> void PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )\
+{\
+    THROW_EXCEPTION( IllegalOperation, "Not settable." ); \
+}
 
-  NULLSET_SPECIALIZATION_DEF( Real );
-  NULLSET_SPECIALIZATION_DEF( Integer );
-  NULLSET_SPECIALIZATION_DEF( String );
-  NULLSET_SPECIALIZATION_DEF( Polymorph );
+NULLSET_SPECIALIZATION_DEF( Real );
+NULLSET_SPECIALIZATION_DEF( Integer );
+NULLSET_SPECIALIZATION_DEF( String );
+NULLSET_SPECIALIZATION_DEF( Polymorph );
 
 #define NULLGET_SPECIALIZATION_DEF( TYPE )\
-  template <> const TYPE PropertiedClass::nullGet<TYPE>() const\
-  {\
-    throwNotGetable();\
+template <> const TYPE PropertiedClass::nullGet<TYPE>() const\
+{\
+    THROW_EXCEPTION( IllegalOperation, "Not gettable." ); \
     return TYPE(); \
-  } //
+}
 
-  NULLGET_SPECIALIZATION_DEF( Real );
-  NULLGET_SPECIALIZATION_DEF( Integer );
-  NULLGET_SPECIALIZATION_DEF( String );
-  NULLGET_SPECIALIZATION_DEF( Polymorph );
-
-
-#define DEFINE_TYPE_NAME(n) \
-  template struct PropertiedClass::TypeName<libecs::n>; \
-  template<> const char PropertiedClass::TypeName<libecs::n>::name[] = #n;
-
-  DEFINE_TYPE_NAME(Integer)
-  DEFINE_TYPE_NAME(String)
-  DEFINE_TYPE_NAME(Real)
-  DEFINE_TYPE_NAME(Polymorph)
-
-#undef DEFINE_TYPE_NAME
+NULLGET_SPECIALIZATION_DEF( Real );
+NULLGET_SPECIALIZATION_DEF( Integer );
+NULLGET_SPECIALIZATION_DEF( String );
+NULLGET_SPECIALIZATION_DEF( Polymorph );
 
 } // namespace libecs
 

@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
@@ -44,33 +44,30 @@
 namespace libecs
 {
 
-  /** @addtogroup entities
-   *@{
-   */
+/** @addtogroup entities
+ *@{
+ */
 
-  /** @file */
+/** @file */
 
 
-  DECLARE_ASSOCVECTOR( String, VariableReference, std::less< const String >, 
-                       VariableReferenceMap  );
+DECLARE_ASSOCVECTOR( String, VariableReference, std::less< const String >,
+                     VariableReferenceMap  );
 
-  DECLARE_VECTOR( VariableReference, VariableReferenceVector );
+DECLARE_VECTOR( VariableReference, VariableReferenceVector );
 
-  /**
-     Process class is used to represent chemical and other phenonema which 
-     may or may not result in change in value of one or more Variables.
+/**
+   Process class is used to represent chemical and other phenonema which
+   may or may not result in change in value of one or more Variables.
 
-  */
-
-  LIBECS_DM_CLASS( Process, Entity )
-  {
-
-  public:
-
+*/
+LIBECS_DM_CLASS( Process, Entity )
+{
+public:
     LIBECS_DM_BASECLASS( Process );
 
     LIBECS_DM_OBJECT_ABSTRACT( Process )
-      {
+    {
         INHERIT_PROPERTIES( Entity );
 
         PROPERTYSLOT_LOAD_SAVE( Polymorph, VariableReferenceList,
@@ -86,84 +83,68 @@ namespace libecs
         PROPERTYSLOT_GET_NO_LOAD_SAVE(     Real,    MolarActivity );
 
         PROPERTYSLOT_GET_NO_LOAD_SAVE(     Integer, IsContinuous );
-      }
+    }
 
-    /** 
-        Sort Processes in reversed order of 'Priority' values.
-        (Largest one first, smallest one last)
-        
-
+    /**
+       Sort Processes in reversed order of 'Priority' values.
+       (Largest one first, smallest one last)
     */
     class PriorityCompare
     {
     public:
-      bool operator()( ProcessPtr aLhs, ProcessPtr aRhs ) const
-      {
-        return compare( aLhs->getPriority(), aRhs->getPriority() );
-      }
+        bool operator()( ProcessPtr aLhs, ProcessPtr aRhs ) const
+        {
+            return compare( aLhs->getPriority(), aRhs->getPriority() );
+        }
 
-      bool operator()( ProcessPtr aLhs, IntegerParam aRhs ) const
-      {
-        return compare( aLhs->getPriority(), aRhs );
-      }
+        bool operator()( ProcessPtr aLhs, IntegerParam aRhs ) const
+        {
+            return compare( aLhs->getPriority(), aRhs );
+        }
 
-      bool operator()( IntegerParam aLhs, ProcessPtr aRhs ) const
-      {
-        return compare( aLhs, aRhs->getPriority() );
-      }
+        bool operator()( IntegerParam aLhs, ProcessPtr aRhs ) const
+        {
+            return compare( aLhs, aRhs->getPriority() );
+        }
 
     private:
-
-      // if statement can be faster than returning an expression directly
-      inline static bool compare( IntegerParam aLhs, IntegerParam aRhs )
-      {
-        if( aLhs > aRhs )
-          {
-            return true;
-          }
-        else
-          {
-            return false;
-          }
-      }
-
-
+        // if statement can be faster than returning an expression directly
+        inline static bool compare( IntegerParam aLhs, IntegerParam aRhs )
+        {
+            return aLhs > aRhs;
+        }
     };
 
 
-  public:
-
+public:
     Process();
     virtual ~Process();
 
     virtual const EntityType getEntityType() const
     {
-      return EntityType( EntityType::PROCESS );
+        return EntityType( EntityType::PROCESS );
     }
 
-    virtual void initialize();
-    
     virtual void fire() = 0;
-    
+
     virtual GET_METHOD( Real, StepInterval )
     {
-      return INF;
+        return INF;
     }
 
-
     /**
-       This method returns true if this Process is compatible with 
+       This method returns true if this Process is compatible with
        continuous Steppers.
     */
 
     virtual const bool isContinuous() const
     {
-      return false;
+        return false;
     }
-    
+
     GET_METHOD( Integer, IsContinuous )
     {
-      return isContinuous();
+        return isContinuous();
     }
 
     /**
@@ -181,8 +162,8 @@ namespace libecs
     */
 
     SET_METHOD( Real, Activity )
-    { 
-      theActivity = value; 
+    {
+        theActivity = value;
     }
 
     /**
@@ -194,7 +175,7 @@ namespace libecs
 
     GET_METHOD( Real, Activity )
     {
-      return theActivity;
+        return theActivity;
     }
 
     SET_METHOD( Polymorph, VariableReferenceList );
@@ -204,7 +185,7 @@ namespace libecs
 
     GET_METHOD( Real, MolarActivity )
     {
-      return theActivity / ( getSuperSystem()->getSize() * N_A );
+        return theActivity / ( getEnclosingSystem()->getSize() * N_A );
     }
 
 
@@ -220,7 +201,7 @@ namespace libecs
 
     SET_METHOD( Integer, Priority )
     {
-      thePriority = value;
+        thePriority = value;
     }
 
     /**
@@ -229,7 +210,7 @@ namespace libecs
 
     GET_METHOD( Integer, Priority )
     {
-      return thePriority;
+        return thePriority;
     }
 
     /**
@@ -264,9 +245,9 @@ namespace libecs
        @param aValue a PolymorphVector specifying a VariableReference.
     */
 
-    void setVariableReference( PolymorphVectorCref aValue );
+    void setVariableReference( const PolymorphVector& aValue );
 
-    void removeVariableReference( StringCref aName );
+    void removeVariableReference( const String& aName );
 
 
     /**
@@ -275,14 +256,14 @@ namespace libecs
        VariableReferences are sorted by coefficients, preserving the relative
        order by the names.
 
-       @param aName name of the VariableReference. 
+       @param aName name of the VariableReference.
        @param aVariable a Pointer to the Variable.
        @param aCoefficient an Integer value of the coefficient.
     */
 
-    void registerVariableReference( StringCref aName, 
-                                    VariablePtr aVariable, 
-                                    IntegerParam aCoefficient, 
+    void registerVariableReference( const String& aName,
+                                    VariablePtr aVariable,
+                                    IntegerParam aCoefficient,
                                     const bool isAccessor = true );
 
     /**
@@ -293,58 +274,47 @@ namespace libecs
        @see VariableReference
     */
 
-    VariableReferenceCref getVariableReference(
-        StringCref aVariableReferenceName ) const;
+    const VariableReference& getVariableReference(
+        const String& aVariableReferenceName ) const;
 
     /**
        @return a const reference to the VariableReferenceVector
     */
 
-    VariableReferenceVectorCref getVariableReferenceVector() const
+    const VariableReferenceVector& getVariableReferenceVector() const
     {
-      return theVariableReferenceVector;
+        return theVariableReferenceVector;
     }
 
     VariableReferenceVector::size_type getZeroVariableReferenceOffset() const
     {
-      return theZeroVariableReferenceIterator - 
-        getVariableReferenceVector().begin();
+        return theZeroVariableReferenceIterator -
+               getVariableReferenceVector().begin();
     }
 
-    VariableReferenceVector::size_type 
+    VariableReferenceVector::size_type
     getPositiveVariableReferenceOffset() const
     {
-      return thePositiveVariableReferenceIterator - 
-        getVariableReferenceVector().begin();
+        return thePositiveVariableReferenceIterator -
+               getVariableReferenceVector().begin();
     }
-
-
-
 
     void setStepper( StepperPtr const aStepper );
 
     /**
        Returns a pointer to a Stepper object that this Process belongs.
-
        @return A pointer to a Stepper object that this Process, or
        NULLPTR if it is not set yet.
     */
-
-    StepperPtr getStepper() const
+    Stepper* getStepper() const
     {
-      return theStepper;
+        return theStepper;
     }
-
-    ModelPtr getModel() const
-    {
-      return getSuperSystem()->getModel();
-    }
-
 
     /**
        Add a value to each of VariableReferences.
 
-       For each VariableReference, the new value is: 
+       For each VariableReference, the new value is:
        old_value + ( aValue * theCoeffiencnt ).
 
        VariableReferences with zero coefficients are skipped for optimization.
@@ -353,23 +323,22 @@ namespace libecs
 
        @param aValue aReal value to be added.
     */
-
     void addValue( RealParam aValue )
     {
-      setActivity( aValue );
+        setActivity( aValue );
 
-      // Increase or decrease variables, skipping zero coefficients.
-      std::for_each( theVariableReferenceVector.begin(),
-                     theZeroVariableReferenceIterator,
-                     boost::bind2nd
-                     ( boost::mem_fun_ref
-                       ( &VariableReference::addValue ), aValue ) );
+        // Increase or decrease variables, skipping zero coefficients.
+        std::for_each( theVariableReferenceVector.begin(),
+                       theZeroVariableReferenceIterator,
+                       boost::bind2nd
+                       ( boost::mem_fun_ref
+                         ( &VariableReference::addValue ), aValue ) );
 
-      std::for_each( thePositiveVariableReferenceIterator,
-                     theVariableReferenceVector.end(),
-                     boost::bind2nd
-                     ( boost::mem_fun_ref
-                       ( &VariableReference::addValue ), aValue ) );
+        std::for_each( thePositiveVariableReferenceIterator,
+                       theVariableReferenceVector.end(),
+                       boost::bind2nd
+                       ( boost::mem_fun_ref
+                         ( &VariableReference::addValue ), aValue ) );
     }
 
 
@@ -385,13 +354,13 @@ namespace libecs
 
     void setFlux( RealParam aVelocity )
     {
-      setActivity( aVelocity );
+        setActivity( aVelocity );
     }
 
     /**
        Unset all the product species' isAccessor() bit.
 
-       Product species here means VariableReferences those have positive 
+       Product species here means VariableReferences those have positive
        non-zero coefficients.
 
        As a result these becomes write-only VariableReferences.
@@ -415,39 +384,39 @@ namespace libecs
     const bool isDependentOn( const ProcessCptr aProcessPtr ) const;
 
 
-  protected:
+protected:
 
-    VariableReferenceVectorIterator findVariableReference( StringCref aName );
+    VariableReferenceVectorIterator findVariableReference( const String& aName );
 
-    VariableReferenceVectorConstIterator findVariableReference( StringCref aName ) const;
+    VariableReferenceVectorConstIterator findVariableReference( const String& aName ) const;
 
     void updateVariableReferenceVector();
 
-    //    static const Polymorph 
-    //      convertVariableReferenceToPolymorph( VariableReferenceCref 
+    //    static const Polymorph
+    //      convertVariableReferenceToPolymorph( const VariableReference&
     //                                           aVariableReference );
 
-    //    static const VariableReference 
-    //      convertPolymorphToVariableReference( PolymorphCref aPolymorph );
+    //    static const VariableReference
+    //      convertPolymorphToVariableReference( const Polymorph& aPolymorph );
 
-  protected:
+protected:
 
     VariableReferenceVector theVariableReferenceVector;
 
     VariableReferenceVectorIterator theZeroVariableReferenceIterator;
     VariableReferenceVectorIterator thePositiveVariableReferenceIterator;
 
-  private:
+private:
 
     StepperPtr  theStepper;
 
     Real        theActivity;
     Integer     thePriority;
 
-  };
+};
 
 
-  /*@}*/
+/*@}*/
 
 } // namespace libecs
 

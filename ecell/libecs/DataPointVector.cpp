@@ -88,7 +88,7 @@ namespace libecs
     return theRawArray[ aPosition ];
   }
 
-  DataPointCref 
+  const DataPoint& 
   DataPointVector::asShort( DataPointVectorIterator aPosition ) const
   {
     assert (thePointSize == 2);
@@ -102,7 +102,7 @@ namespace libecs
   }
 
 
-  LongDataPointCref 
+  const LongDataPoint& 
   DataPointVector::asLong( DataPointVectorIterator aPosition ) const
   {
     assert (thePointSize == 5);

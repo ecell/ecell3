@@ -12,329 +12,249 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
 
-#ifndef __SYSTEM_HPP
-#define __SYSTEM_HPP
-
-#include "libecs.hpp"
-
+#ifndef __LIBECS_ENTITY_DEFINED
 #include "Entity.hpp"
+#endif
 
+#include <boost/shared_ptr.hpp>
+#include "Happening.hpp"
+
+/** @addtogroup entities
+ *@{
+ */
+
+/** @file */
+#ifndef __LIBECS_SYSTEM_DEFINED
+#define __LIBECS_SYSTEM_DEFINED
 namespace libecs
 {
 
-  /** @addtogroup entities
-   *@{
-   */
+LIBECS_DM_CLASS( System, Entity )
+{
+protected:
+    // Maps used for entry lists
+    DECLARE_UNORDERED_MAP(
+                const String, Variable*, DEFAULT_HASHER( String ),
+                VariableMap );
+    DECLARE_UNORDERED_MAP(
+                const String, Process*, DEFAULT_HASHER( String ),
+                ProcessMap );
+    DECLARE_UNORDERED_MAP(
+                const String, System*, DEFAULT_HASHER( String ),
+                SystemMap );
+    typedef ::std::map<LocalID, Entity*> EntityMap;
 
-  /** @file */
+    struct EntityEventObserver
+    {
+    public:
+        virtual ~EntityEventObserver();
+    };
 
+    typedef Happening<boost::shared_ptr<EntityEventObserver>, Entity*> EntityEvent;
 
-  // Maps used for entry lists
-  DECLARE_MAP( const String, VariablePtr, 
-	       std::less<const String>, VariableMap );
-  DECLARE_MAP( const String, ProcessPtr,   
-	       std::less<const String>, ProcessMap );
-  DECLARE_MAP( const String, SystemPtr,    
-	       std::less<const String>, SystemMap );
-
-
-  LIBECS_DM_CLASS( System, Entity )
-  {
-    
-  public:
+public:
+    typedef VariableMap::const_iterator VariableIterator;
+    typedef ProcessMap::const_iterator ProcessIterator;
+    typedef SystemMap::const_iterator SystemIterator;
+    typedef EntityMap::const_iterator EntityIterator;
 
     LIBECS_DM_BASECLASS( System );
 
     LIBECS_DM_OBJECT( System, System )
     {
-      INHERIT_PROPERTIES( Entity );
-      
-      //    PROPERTYSLOT_SET_GET( Real,      Dimension );
-      PROPERTYSLOT_SET_GET( String,    StepperID );
-      
-      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real,      Size );
+        INHERIT_PROPERTIES( Entity );
 
+        PROPERTYSLOT_SET_GET( String, StepperID );
+        PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Size );
     }
 
-    System();
     virtual ~System();
 
-    virtual const EntityType getEntityType() const
-    {
-      return EntityType( EntityType::SYSTEM );
-    }
-
+    /** @see Entity::initialize */
     virtual void initialize();
 
     /**
-       Get a pointer to a Stepper object that this System belongs.
-
-       @return A pointer to a Stepper object that this System belongs or
-       NULL pointer if it is not set.
+       Retrieves the pointer to a Stepper object assigned to this System.
+       @return the pointer to the assigned Stepper object. NULL if unassigned.
     */
-
-    StepperPtr getStepper() const 
-    { 
-      return theStepper; 
+    Stepper* getStepper() const
+    {
+        return theStepper;
     }
 
     /**
+       Assigns a Stepper object to this System.
+       @return the pointer to assign to the Stepper object.
+    */
+    void setStepper( Stepper* obj );
+
+    /**
        Set a StepperID.
-
        This provides a default Stepper to Processes holded by this System.
-
        @param anID Stepper ID.
     */
-
     SET_METHOD( String, StepperID );
-
 
     /**
        Get the default StepperID in this System.
-
        @return an ID of the Stepper as a String.
     */
-
     GET_METHOD( String, StepperID );
 
     /**
        Get the size of this System in [L] (liter).
-
        @return Size of this System.
-    */
-
+     */
     GET_METHOD( Real, Size );
 
     GET_METHOD( Real, SizeN_A )
     {
-      return getSize() * N_A;
+        return getSize() * N_A;
     }
 
-    template <class C>
-      const std::map<const String,C*,std::less<const String> >& getMap() const;
-    //    {
-    //      DEFAULT_SPECIALIZATION_INHIBITED();
-    //    }
-
-    VariableMapCref getVariableMap() const
-    {
-      return theVariableMap;
-    }
-
-    ProcessMapCref  getProcessMap() const
-    {
-      return theProcessMap;
-    }
-
-    SystemMapCref    getSystemMap() const
-    {
-      return theSystemMap;
-    }
-
+    template<typename T_>
+    typename UNORDERED_MAP( const String, T_*, DEFAULT_HASHER(String) )::const_iterator
+    getBelongings() const;
 
     /**
-       Find a Process with given id in this System.  
-       
-       This method throws NotFound exception if it is not found.
-
-       @return a borrowed pointer to a Process object in this System named @a id.
-    */
-
-    ProcessPtr getProcess( StringCref anID ) const;
-
+       Find a Process with given id in this System.
+       This method returns null if not found.
+       @return a borrowed pointer to a Process object
+     */
+    Process* getProcess( const String& id ) const;
 
     /**
-       Find a Variable with given id in this System. 
-       
-       This method throws NotFound exception if it is not found.
-
-       @return a borrowed pointer to a Variable object in this System named @a id.
-    */
-
-    VariablePtr getVariable( StringCref anID ) const;
+       Find a Variable with given id in this System.
+       This method returns null if not found.
+       @return a borrowed pointer to a Variable object
+     */
+    Variable* getVariable( const String& anID ) const;
 
     /**
-       Find a System pointed by the given SystemPath relative to
-       this System.
-       
-       If aSystemPath is empty, this method returns this System.
-
-       If aSystemPath is absolute ( starts with '/' ), this method
-       calls getSystem() of the Model object, and returns the result.
-
-       This method throws NotFound exception if it is not found.
-
-       @param aSystemPath A SystemPath object.
-       @return a borrowed pointer to a System object pointed by aSystemPath.
-    */
-
-    SystemPtr getSystem( SystemPathCref anID ) const;
-
+       Find an Entity with given id within this System.
+       This method returns null if not found.
+       @return a borrowed pointer to an Entity object
+     */
+    Entity* getEntity( const LocalID& localID ) const;
 
     /**
-       Find a System with a given id in this System. 
-       
-       This method throws NotFound exception if it is not found.
-
-       Unlike getSystem( SystemPath ) method, this method searches only
-       within this System.  In the other words this method doesn't 
-       conduct a recursive search.
-
-       @param anID An ID string of a System.
-
-       @return a borrowed pointer to a System object in this System
-       whose ID is anID.
+       Add a Entity object to this System.
+       This method takes over the ownership of the given pointer,
+       and deletes it if there is an error.
     */
-
-    SystemPtr getSystem( StringCref id ) const;
-
-
-    /**
-       Register a Process object in this System.
-
-       This method steals ownership of the given pointer, and deletes
-       it if there is an error.
-    */
-
-    void registerProcess( ProcessPtr aProcess );
-  
-
-    /**
-       Register a Variable object in this System.
-
-       This method steals ownership of the given pointer, and deletes
-       it if there is an error.
-    */
-
-    void registerVariable( VariablePtr aVariable );
-  
-
-    /**
-       Register a System object in this System.
-
-       This method steals ownership of the given pointer, and deletes
-       it if there is an error.
-    */
-
-    void registerSystem( SystemPtr aSystem );
+    void add( Entity* anEntity );
 
     /**
        Check if this is a root System.
-
-
        @return true if this is a Root System, false otherwise.
     */
-
     bool isRootSystem() const
     {
-      return ( getSuperSystem() == this );
+        return !getEnclosingSystem();
     }
 
     /**
-       @see Entity::getSystePath()
+       @see Entity::getSystemPath()
     */
-
-    virtual const SystemPath getSystemPath() const;
-
+    virtual const SystemPath getPath() const;
 
     /**
-       Get a Model object to which this System belongs.
-
+       Get a Model object associated with this system.
        @return a borrowed pointer to the Model.
     */
-
-    ModelPtr getModel() const
+    Model* getModel() const
     {
-      return theModel;
+        return theModel;
     }
 
-    void setModel( ModelPtr const aModel )
+    /**
+       Associates a Model object with this system
+     */
+    void setModel( Model* model )
     {
-      theModel = aModel;
+        if ( __libecs_ready )
+            THROW_EXCEPTION( Exception, "Object is already initialized" );
+        theModel = model;
     }
 
-    VariableCptr const getSizeVariable() const
+    Variable* getSizeVariable() const
     {
-      return theSizeVariable;
+        return theSizeVariable;
     }
 
+    void configureSizeVariable();
+
+protected:
     void notifyChangeOfEntityList();
 
     VariableCptr const findSizeVariable() const;
 
-    void configureSizeVariable();
-
-  public: // property slots
-
+public: // property slots
     GET_METHOD( Polymorph, SystemList );
     GET_METHOD( Polymorph, VariableList );
     GET_METHOD( Polymorph, ProcessList );
 
-  protected:
+protected:
+    void addProcess( Process* aProcess );
+    void addVariable( Variable* aVariable );
+    void addSystem( System* aSystem );
 
-    StepperPtr   theStepper;
+public:
+     EntityEvent entityAdded;
 
-  private:
-
-    ModelPtr     theModel;
-
+protected:
+    Stepper*     theStepper;
+    Model*       theModel;
     VariableMap  theVariableMap;
     ProcessMap   theProcessMap;
     SystemMap    theSystemMap;
-
-    VariableCptr  theSizeVariable;
-
+    EntityMap    theEntityMap;
+    Variable*    theSizeVariable;
     bool         theEntityListChanged;
+};
 
-  };
+template<>
+System::VariableIterator
+System::getBelongings<Variable>() const
+{
+    return theVariableMap.begin();
+}
 
+template<>
+System::ProcessIterator
+System::getBelongings<Process>() const
+{
+    return theProcessMap.begin();
+}
 
-
-  template <>
-  inline VariableMapCref System::getMap() const
-  {
-    return getVariableMap();
-  }
-
-  template <>
-  inline ProcessMapCref   System::getMap() const
-  {
-    return getProcessMap();
-  }
-
-  template <>
-  inline SystemMapCref    System::getMap() const
-  {
-    return getSystemMap();
-  }
-
-
-
-  /*@}*/
+template<>
+System::SystemIterator System::getBelongings<System>() const
+{
+    return theSystemMap.begin();
+}
 
 } // namespace libecs
 
+#endif /* __LIBECS_SYSTEM_DEFINED */
 
-#endif /* __SYSTEM_HPP */
-
-
+/*@}*/
 /*
   Do not modify
   $Author$

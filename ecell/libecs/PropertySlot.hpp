@@ -12,375 +12,348 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
 
-#ifndef __PROPERTYSLOT_HPP
-#define __PROPERTYSLOT_HPP
-
 #include <functional>
 
 #include "libecs.hpp"
-#include "PropertiedClass.hpp"
 #include "convertTo.hpp"
 #include "Polymorph.hpp"
+#include "PropertyType.hpp"
 
+/** @addtogroup property
+  
+@ingroup libecs
+@{
+*/
 
-namespace libecs
+/** @file */
+
+#ifndef __LIBECS_PROPERTYSLOT_DEFINED
+#define __LIBECS_PROPERTYSLOT_DEFINED
+namespace libecs {
+
+class PropertySlot
 {
-
-
-  /** @addtogroup property
-      
-  @ingroup libecs
-  @{
-  */
-
-  /** @file */
-
-
-
-  // convert std::map to a Polymorph which is a nested-list.
-  //  template< class MAP >
-
-  /**
-     Base class for PropertySlot classes.
-
-     @see PropertyInterface
-  */
-
-  class DM_IF PropertySlotBase
-  {
-
-  public:
-
-    PropertySlotBase()
+public:
+    PropertySlot( const String& name, const PropertyType& type )
+        : theName( name ), theType( type )
     {
-      ; // do nothing
-    }
-    
-    virtual ~PropertySlotBase();
-
-    virtual const bool isSetable() const = 0;
-    virtual const bool isGetable() const = 0;
-
-    virtual const bool isLoadable() const;
-    virtual const bool isSavable()  const;
-
-  };
-
-
-  template
-  < 
-    class T
-  >
-  class PropertySlot
-    :
-    public PropertySlotBase
-  {
-
-  public:
-
-    typedef void    ( T::* SetPolymorphMethodPtr )( PolymorphCref );
-    typedef const Polymorph ( T::* GetPolymorphMethodPtr )() const;
-
-    PropertySlot()
-    {
-      ; // do nothing
+        ; // do nothing
     }
 
     virtual ~PropertySlot()
     {
-      ; // do nothing
+        ; // do nothing
     }
 
-
-#define _PROPERTYSLOT_SETMETHOD( TYPE )\
-    virtual void set ## TYPE( T& anObject, Param<TYPE>::type value ) = 0;
-
-#define _PROPERTYSLOT_GETMETHOD( TYPE )\
-    virtual const TYPE get ## TYPE( const T& anObject ) const = 0;
-
-    _PROPERTYSLOT_SETMETHOD( Polymorph );
-    _PROPERTYSLOT_GETMETHOD( Polymorph );
-
-    _PROPERTYSLOT_SETMETHOD( Real );
-    _PROPERTYSLOT_GETMETHOD( Real );
-
-    _PROPERTYSLOT_SETMETHOD( Integer );
-    _PROPERTYSLOT_GETMETHOD( Integer );
-
-    _PROPERTYSLOT_SETMETHOD( String );
-    _PROPERTYSLOT_GETMETHOD( String );
-
-#undef _PROPERTYSLOT_SETMETHOD
-#undef _PROPERTYSLOT_GETMETHOD
-
-
-    DM_IF virtual void loadPolymorph( T& anObject, Param<Polymorph>::type aValue )
+public:
+    const String& getName() const 
     {
-      setPolymorph( anObject, aValue );
+        return theName;
     }
 
-    DM_IF virtual const Polymorph savePolymorph( const T& anObject ) const
+    const PropertyType& getType() const
     {
-      return getPolymorph( anObject );
+        return theType;
     }
 
-  };
-
-
-  template
-  < 
-    class T,
-    typename SlotType_
-  >
-  class ConcretePropertySlot
-    :
-    public PropertySlot<T>
-  {
-
-  public:
-
-    DECLARE_TYPE( SlotType_, SlotType );
-
-    typedef typename Param<SlotType>::type  SetType;
-    typedef const SlotType                  GetType;
-
-    typedef void    ( T::* SetMethodPtr )( SetType );
-    typedef GetType ( T::* GetMethodPtr )() const;
-
-    ConcretePropertySlot( const SetMethodPtr aSetMethodPtr,
-			  const GetMethodPtr aGetMethodPtr )
-      :
-      theSetMethodPtr( SetMethod( aSetMethodPtr ) ),
-      theGetMethodPtr( GetMethod( aGetMethodPtr ) )
+    virtual bool isSetable() const
     {
-      ; // do nothing
+        return true;
     }
 
-    DM_IF virtual ~ConcretePropertySlot()
+    virtual bool isGetable() const
     {
-      ; // do nothing
+        return true;
     }
 
-
-    DM_IF virtual const bool isSetable() const
+    virtual bool isLoadable() const
     {
-      return isSetableMethod( theSetMethodPtr );
+        return true;
     }
 
-    DM_IF virtual const bool isGetable() const
+    virtual bool isSavable() const
     {
-      return isGetableMethod( theGetMethodPtr );
-    }
-
-#define _PROPERTYSLOT_SETMETHOD( TYPE )\
-    virtual void set ## TYPE( T& anObject, Param<TYPE>::type aValue )\
-    {\
-      setImpl( anObject, aValue );\
-    }
-
-#define _PROPERTYSLOT_GETMETHOD( TYPE )\
-    virtual const TYPE get ## TYPE( const T& anObject ) const\
-    {\
-      return getImpl<TYPE>( anObject );\
-    }
-
-    _PROPERTYSLOT_SETMETHOD( Polymorph );
-    _PROPERTYSLOT_GETMETHOD( Polymorph );
-
-    _PROPERTYSLOT_SETMETHOD( Real );
-    _PROPERTYSLOT_GETMETHOD( Real );
-
-    _PROPERTYSLOT_SETMETHOD( Integer );
-    _PROPERTYSLOT_GETMETHOD( Integer );
-
-    _PROPERTYSLOT_SETMETHOD( String );
-    _PROPERTYSLOT_GETMETHOD( String );
-
-#undef _PROPERTYSLOT_SETMETHOD
-#undef _PROPERTYSLOT_GETMETHOD
-
-
-  protected:
-
-    inline void callSetMethod( T& anObject, SetType aValue )    
-    {
-      ( anObject.*theSetMethodPtr )( aValue );
-    }
-
-    inline GetType callGetMethod( const T& anObject ) const
-    {
-      return ( anObject.*theGetMethodPtr )();
+        return true;
     }
 
     template < typename Type >
-    inline void setImpl( T& anObject, Type aValue )
+    void set( PropertiedClass& anObject,
+            typename Param<Type>::type aValue ) const
     {
-      callSetMethod( anObject, convertTo<SlotType>( aValue ) );
     }
-    
+
     template < typename Type >
-    inline const Type getImpl( const T& anObject ) const
+    const Type get( const PropertiedClass& anObject ) const
     {
-      return convertTo<Type>( callGetMethod( anObject ) );
     }
 
-
-    static const bool isSetableMethod( const SetMethodPtr aSetMethodPtr )
+    virtual void load( PropertiedClass& anObject,
+        Param<Polymorph>::type aValue ) const
     {
-      const SetMethodPtr aNullMethodPtr( &PropertiedClass::nullSet<SlotType> );
-      return aSetMethodPtr != aNullMethodPtr;
+        setPolymorph( anObject, aValue );
     }
 
-    static const bool isGetableMethod( const GetMethodPtr aGetMethodPtr )
+    virtual const Polymorph save( const PropertiedClass& anObject ) const
     {
-      const GetMethodPtr
-	aNullMethodPtr( &PropertiedClass::nullGet<SlotType> );
-      return aGetMethodPtr != aNullMethodPtr;
+        return getPolymorph( anObject );
     }
 
+protected:
+    void setPolymorph(
+        PropertiedClass& anObject,
+        Param<Polymorph>::type aValue ) const;
 
-    static SetMethodPtr SetMethod( SetMethodPtr aSetMethodPtr )
-    {
-      if( aSetMethodPtr == NULLPTR )
-	{
-	  return &PropertiedClass::nullSet<SlotType>;
-	}
-      else
-	{
-	  return aSetMethodPtr;
-	}
-    }
+    const Polymorph getPolymorph(
+        const PropertiedClass& anObject ) const;
 
-    static GetMethodPtr GetMethod( GetMethodPtr aGetMethodPtr )
-    {
-      if( aGetMethodPtr == NULLPTR )
-	{
-	  return &PropertiedClass::nullGet<SlotType>;
-	}
-      else
-	{
-	  return aGetMethodPtr;
-	}
-    }
+    virtual void setInteger(
+        PropertiedClass& anObject,
+        Param<Integer>::type aValue ) const = 0;
+    virtual const Integer getInteger(
+        const PropertiedClass& anObject ) const = 0;
 
+    virtual void setReal(
+        PropertiedClass& anObject,
+        Param<Real>::type aValue ) const = 0;
+    virtual const Real getReal(
+        const PropertiedClass& anObject ) const = 0;
 
-  protected:
+    virtual void setString(
+        PropertiedClass& anObject,
+        Param<String>::type aValue ) const = 0;
+    virtual const String getString(
+        const PropertiedClass& anObject ) const = 0;
 
-    const SetMethodPtr theSetMethodPtr;
-    const GetMethodPtr theGetMethodPtr;
+protected:
+    const String theName;
+    const PropertyType& theType;
+};
 
-  };
-
-  template
-  < 
-    class T,
-    typename SlotType_
-  >
-  class LoadSaveConcretePropertySlot
-    :
-    public ConcretePropertySlot<T,SlotType_>
-  {
-
-  public:
-
-    DECLARE_TYPE( SlotType_, SlotType );
-
-    typedef ConcretePropertySlot<T,SlotType> ConcretePropertySlot;
-
-    typedef typename ConcretePropertySlot::SetType SetType;
-    typedef typename ConcretePropertySlot::GetType GetType;
-
-    typedef typename ConcretePropertySlot::SetMethodPtr SetMethodPtr;
-    typedef typename ConcretePropertySlot::GetMethodPtr GetMethodPtr;
-
-    DM_IF LoadSaveConcretePropertySlot( const SetMethodPtr aSetMethodPtr,
-				  const GetMethodPtr aGetMethodPtr,
-				  const SetMethodPtr aLoadMethodPtr,
-				  const GetMethodPtr aSaveMethodPtr )
-      :
-      ConcretePropertySlot( aSetMethodPtr, aGetMethodPtr ),
-      theLoadMethodPtr( SetMethod( aLoadMethodPtr ) ),
-      theSaveMethodPtr( GetMethod( aSaveMethodPtr ) )
-    {
-      ; // do nothing
-    }
-
-    DM_IF ~LoadSaveConcretePropertySlot()
-    {
-      ; // do nothing
-    }
-
-
-    DM_IF virtual const bool isLoadable() const
-    {
-      return isSetableMethod( theLoadMethodPtr );
-    }
-
-    DM_IF virtual const bool isSavable()  const
-    {
-      return isGetableMethod( theSaveMethodPtr );
-    }
-
-    DM_IF virtual void loadPolymorph( T& anObject, Param<Polymorph>::type aValue )
-    {
-      loadImpl( anObject, aValue );
-    }
-
-    DM_IF virtual const Polymorph savePolymorph( const T& anObject ) const
-    {
-      return saveImpl( anObject );
-    }
-
-
-  protected:
-
-    inline void callLoadMethod( T& anObject, SetType aValue )    
-    {
-      ( anObject.*theLoadMethodPtr )( aValue );
-    }
-
-    inline GetType callSaveMethod( const T& anObject ) const
-    {
-      return ( anObject.*theSaveMethodPtr )();
-    }
-
-    inline void loadImpl( T& anObject, PolymorphCref aValue )
-    {
-      callLoadMethod( anObject, convertTo<SlotType>( aValue ) );
-    }
-    
-    inline const Polymorph saveImpl( const T& anObject ) const
-    {
-      return convertTo<Polymorph>( callSaveMethod( anObject ) );
-    }
-
-  protected:
-
-    const SetMethodPtr theLoadMethodPtr;
-    const GetMethodPtr theSaveMethodPtr;
-
-  };
-
-  /*@}*/
-
+template<> inline void
+PropertySlot::set<Integer>( PropertiedClass& anObject,
+        Param<Integer>::type aValue ) const
+{
+    setInteger( anObject, aValue );
 }
 
+template<> inline const Integer
+PropertySlot::get<Integer>( const PropertiedClass& anObject ) const
+{
+    return getInteger( anObject );
+}
 
-#endif /* __PROPERTYSLOT_HPP */
+template<> inline void
+PropertySlot::set<Real>( PropertiedClass& anObject,
+        Param<Real>::type aValue ) const
+{
+    setReal( anObject, aValue );
+}
+
+template<> inline const Real
+PropertySlot::get<Real>( const PropertiedClass& anObject ) const
+{
+    return getReal( anObject );
+}
+
+template<> inline void
+PropertySlot::set<String>( PropertiedClass& anObject,
+        Param<String>::type aValue ) const
+{
+    setString( anObject, aValue );
+}
+
+template<> inline const String
+PropertySlot::get<String>( const PropertiedClass& anObject ) const
+{
+    return getString( anObject );
+}
+
+template<> inline void
+PropertySlot::set<Polymorph>( PropertiedClass& anObject,
+        Param<Polymorph>::type aValue ) const
+{
+    setPolymorph( anObject, aValue );
+}
+
+template<> inline const Polymorph
+PropertySlot::get<Polymorph>( const PropertiedClass& anObject ) const
+{
+    return getPolymorph( anObject );
+}
+
+} // namespace libecs
+#endif /* __LIBECS_PROPERTYSLOT_DEFINED */
+
+#ifndef __LIBECS_CONCRETEPROPERTYSLOT_DEFINED
+#define __LIBECS_CONCRETEPROPERTYSLOT_DEFINED
+namespace libecs {
+
+template< class T, typename SlotType_ >
+class ConcretePropertySlot: public PropertySlot
+{
+public:
+    DECLARE_TYPE( SlotType_, SlotType );
+
+    typedef void ( T::* SetMethod )( typename Param<SlotType>::type );
+    typedef const SlotType ( T::* GetMethod )() const;
+    typedef void ( T::* LoadMethod )( typename Param<Polymorph>::type );
+    typedef const Polymorph ( T::* SaveMethod )() const;
+
+    ConcretePropertySlot(
+        const String& name,
+        const SetMethod aSetMethodPtr,
+        const GetMethod aGetMethodPtr,
+        const LoadMethod aLoadMethodPtr = 0,
+        const SaveMethod aSaveMethodPtr = 0 )
+        : PropertySlot( name, Type2PropertyType< SlotType >::value ),
+          theSetMethodPtr( aSetMethodPtr ),
+          theGetMethodPtr(  aGetMethodPtr ),
+          theLoadMethodPtr( aLoadMethodPtr ),
+          theSaveMethodPtr( aSaveMethodPtr )
+    {
+        ; // do nothing
+    }
+
+    virtual ~ConcretePropertySlot()
+    {
+        ; // do nothing
+    }
+
+    virtual bool isSetable() const;
+
+    virtual bool isGetable() const;
+
+    virtual bool isLoadable() const;
+
+    virtual bool isSavable() const;
+
+protected:
+    virtual void load( PropertiedClass& anObject, const Polymorph& aValue ) const
+    {
+        if ( !theLoadMethodPtr )
+        {
+            ( dynamic_cast<T&>(anObject).*theSetMethodPtr )(
+                    convertTo< SlotType >( aValue ) );
+            return;
+        }
+
+        ( dynamic_cast<T&>(anObject).*theLoadMethodPtr )( aValue );
+    }
+
+    virtual const Polymorph save( const PropertiedClass& anObject ) const
+    {
+        if ( !theSaveMethodPtr )
+        {
+            return convertTo< Polymorph >(
+                ( dynamic_cast<const T&>(anObject).*theGetMethodPtr )() );
+        }
+        return ( dynamic_cast<const T&>(anObject).*theSaveMethodPtr )();
+    }
+
+    virtual void setInteger(
+        PropertiedClass& anObject,
+        Param<Integer>::type aValue ) const
+    {
+        ( dynamic_cast<T&>(anObject).*theSetMethodPtr )(
+                convertTo< SlotType >( aValue ) );
+    }
+
+    virtual const Integer getInteger(
+        const PropertiedClass& anObject ) const
+    {
+        return convertTo< Integer >(
+            ( dynamic_cast<const T&>(anObject).*theGetMethodPtr )() );
+    }
+
+    virtual void setReal(
+        PropertiedClass& anObject,
+        Param<Real>::type aValue ) const
+    {
+        ( dynamic_cast<T&>(anObject).*theSetMethodPtr )(
+                convertTo< SlotType >( aValue ) );
+    }
+
+    virtual const Real getReal(
+        const PropertiedClass& anObject ) const
+    {
+        return convertTo< Real >(
+            ( dynamic_cast<const T&>(anObject).*theGetMethodPtr )() );
+    }
+
+    virtual void setString(
+        PropertiedClass& anObject,
+        Param<String>::type aValue ) const
+    {
+        ( dynamic_cast<T&>(anObject).*theSetMethodPtr )(
+                convertTo< SlotType >( aValue ) );
+    }
+
+    virtual const String getString(
+        const PropertiedClass& anObject ) const
+    {
+        return convertTo< String >(
+            ( dynamic_cast<const T&>(anObject).*theGetMethodPtr )() );
+    }
+
+
+protected:
+    const SetMethod theSetMethodPtr;
+    const GetMethod theGetMethodPtr;
+    const LoadMethod theLoadMethodPtr;
+    const SaveMethod theSaveMethodPtr;
+};
+
+} // namespace libecs
+
+#include "PropertiedClass.hpp"
+
+namespace libecs {
+
+template< class T, typename SlotType_ >
+bool ConcretePropertySlot<T, SlotType_>::isSetable() const
+{
+    return theSetMethodPtr != static_cast< SetMethod >(
+            &PropertiedClass::template nullSet<SlotType> );
+}
+
+template< class T, typename SlotType_ >
+bool ConcretePropertySlot<T, SlotType_>::isGetable() const
+{
+    return theGetMethodPtr != static_cast< GetMethod >(
+            &PropertiedClass::template nullGet<SlotType> );
+}
+
+template< class T, typename SlotType_ >
+bool ConcretePropertySlot<T, SlotType_>::isLoadable() const
+{
+    return theLoadMethodPtr != reinterpret_cast< LoadMethod >(
+            &PropertiedClass::nullLoad );
+}
+
+template< class T, typename SlotType_ >
+bool ConcretePropertySlot<T, SlotType_>::isSavable() const
+{
+    return theSaveMethodPtr != reinterpret_cast< SaveMethod >(
+            &PropertiedClass::nullSave );
+}
+
+} // namespace libecs
+#endif /* __LIBECS_CONCRETEPROPERTYSLOT_DEFINED */
+/*@}*/

@@ -37,7 +37,7 @@ namespace libecs
 {
   
 
-  DataPointRef DataPoint::operator= ( LongDataPointCref aLongDataPoint )
+  DataPointRef DataPoint::operator= ( const LongDataPoint& aLongDataPoint )
   {
     setTime( aLongDataPoint.getTime() );
     setValue ( aLongDataPoint.getValue() );
@@ -55,7 +55,7 @@ namespace libecs
   }
   
 
-  DataPointAggregator::DataPointAggregator( LongDataPointCref aDataPoint )
+  DataPointAggregator::DataPointAggregator( const LongDataPoint& aDataPoint )
   {
     store( aDataPoint );
   }
@@ -67,7 +67,7 @@ namespace libecs
   }
   
   
-  void DataPointAggregator::store( LongDataPointCref aDataPoint )
+  void DataPointAggregator::store( const LongDataPoint& aDataPoint )
   {
     theAccumulator = aDataPoint;
     thePreviousPoint = aDataPoint;
@@ -76,7 +76,7 @@ namespace libecs
   
   
   bool DataPointAggregator::stockpile( LongDataPointRef aTarget, 
-				       LongDataPointCref aNewPoint )
+				       const LongDataPoint& aNewPoint )
   {
     //if target empty, simply store
     //return true
@@ -103,7 +103,7 @@ namespace libecs
   }
   
   
-  void DataPointAggregator::aggregate( LongDataPointCref aNewPoint )
+  void DataPointAggregator::aggregate( const LongDataPoint& aNewPoint )
   {
     // first try to put it into accumulator
     if ( ! stockpile( theAccumulator, aNewPoint ) )
@@ -124,7 +124,7 @@ namespace libecs
   }
   
   
-  LongDataPointCref DataPointAggregator::getData()
+  const LongDataPoint& DataPointAggregator::getData()
   {
     return theAccumulator;
   }
@@ -132,7 +132,7 @@ namespace libecs
   
   inline void
   DataPointAggregator::calculateMinMax( LongDataPointRef aTarget,
-                                        LongDataPointCref aNewPoint )
+                                        const LongDataPoint& aNewPoint )
   {
     // accu min
     
@@ -150,7 +150,7 @@ namespace libecs
   }
   
   
-  void DataPointAggregator::calculate( LongDataPointCref aNewPoint )
+  void DataPointAggregator::calculate( const LongDataPoint& aNewPoint )
   {
     // accu avg
     theAccumulator.setAvg

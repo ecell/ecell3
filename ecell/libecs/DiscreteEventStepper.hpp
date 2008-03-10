@@ -101,7 +101,7 @@ namespace libecs
 
     GET_METHOD( String, LastProcess );
 
-    ProcessVectorCref getProcessVector() const
+    const ProcessVector& getProcessVector() const
       {
 	return theProcessVector;
       }

@@ -28,23 +28,44 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
-// modified by Masayuki Okayama <smash@e-cell.org>,
-// E-Cell Project.
-//
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include "PropertySlotProxy.hpp"
+#include <assert.h>
+
+#include "PropertiedClassKind.hpp"
 
 
-namespace libecs
+namespace libecs {
+
+const PropertiedClassKind* PropertiedClassKind::last( 0 );
+const PropertiedClassKind PropertiedClassKind::      NONE( _NONE    , "None" );
+const PropertiedClassKind PropertiedClassKind::   STEPPER( _STEPPER , "Stepper" );
+const PropertiedClassKind PropertiedClassKind::  VARIABLE( _VARIABLE, "Variable" );
+const PropertiedClassKind PropertiedClassKind::   PROCESS( _PROCESS,  "Process" );
+const PropertiedClassKind PropertiedClassKind::    SYSTEM( _SYSTEM,   "System" );
+
+const PropertiedClassKind& PropertiedClassKind::get( const String& name )
 {
-  PropertySlotProxy::~PropertySlotProxy()
-  {
-    ; // do nothing
-  }
-
-
+    for ( const PropertiedClassKind* item = last; item; item = item->prev )
+    {
+        if ( item->name == name )
+        {
+            return *item;
+        }
+    }
 }
 
+const PropertiedClassKind& PropertiedClassKind::get( enum Code code )
+{
+    for ( const PropertiedClassKind* item = last; item; item = item->prev )
+    {
+        if ( item->code == code )
+        {
+            return *item;
+        }
+    }
+}
+
+} // namespace libecs

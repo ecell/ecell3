@@ -48,7 +48,7 @@
 using libecs::FullID;
 using libecs::EntityType;
 using libecs::SystemPath;
-using libecs::InvalidEntityType;
+using libecs::BadFormat;
 
 BOOST_AUTO_TEST_CASE(testConstruction)
 {
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(testFullID)
         BOOST_CHECK_EQUAL( aFullID.getID(), "S" ); 
         BOOST_CHECK( aFullID.isValid() );
     }
-    BOOST_CHECK_THROW( FullID( "UNKNOWN:/UNKNOWN:" ), InvalidEntityType );
+    BOOST_CHECK_THROW( FullID( "UNKNOWN:/UNKNOWN:" ), BadFormat );
     { 
         FullID aFullID( "Process::/" );
         BOOST_CHECK_EQUAL( aFullID.getString(), "Process::/" );

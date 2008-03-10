@@ -108,7 +108,7 @@ namespace libecs
         the original implementation based on the following two functions.
 	(2004/10/19)
 
-      const Real interpolate( const RealMatrixCref aTaylorSeries,
+      const Real interpolate( const const RealMatrix& aTaylorSeries,
 			      const Real anInterval,
 			      const Real aStepInterval )
       {
@@ -136,7 +136,7 @@ namespace libecs
 	    return 0.0;
 	  }
 
-	const RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
+	const const RealMatrix& aTaylorSeries( theStepper.getTaylorSeries() );
 	const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
 	const Real aStepInterval( theStepper.getTolerableStepInterval() );
 	
@@ -163,7 +163,7 @@ namespace libecs
         const Real aTimeInterval1( aTime - theStepper.getCurrentTime() );
         const Real aTimeInterval2( aTimeInterval1 - anInterval );
 
-        RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
+        const RealMatrix& aTaylorSeries( theStepper.getTaylorSeries() );
 	RealCptr aTaylorCoefficientPtr( aTaylorSeries.origin() + theIndex );
 
 	// calculate first order.
@@ -223,7 +223,7 @@ namespace libecs
 
         const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
 
-        RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
+        const RealMatrix& aTaylorSeries( theStepper.getTaylorSeries() );
 	RealCptr aTaylorCoefficientPtr( aTaylorSeries.origin() + theIndex );
 
 	// calculate first order.
@@ -335,7 +335,7 @@ namespace libecs
       return getStage(); 
     }
 
-    RealMatrixCref getTaylorSeries() const
+    const RealMatrix& getTaylorSeries() const
     {
       return theTaylorSeries;
     }

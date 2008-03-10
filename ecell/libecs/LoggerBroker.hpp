@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Masayuki Okayama <smash@e-cell.org>,
@@ -41,30 +41,30 @@
 
 namespace libecs
 {
-  // forward declaration
-  class Model;
+// forward declaration
+class Model;
 
-  /** @addtogroup logging
-   *@{
-   */
+/** @addtogroup logging
+ *@{
+ */
 
-  /** @file */
+/** @file */
 
-  /**
-     LoggerBroker creates and administrates Loggers in a model.
+/**
+   LoggerBroker creates and administrates Loggers in a model.
 
-     This class creates, holds in a map which associates FullPN with a Logger,
-     and responds to requests to Loggers.
+   This class creates, holds in a map which associates FullPN with a Logger,
+   and responds to requests to Loggers.
 
-     @see FullPN
-     @see Logger
+   @see FullPN
+   @see Logger
 
-  */
+*/
 
-  class LIBECS_API LoggerBroker
-  {
+class LIBECS_API LoggerBroker
+{
 
-  public:
+public:
 
     DECLARE_MAP( const FullPN, LoggerPtr, std::less<const FullPN>, LoggerMap );
 
@@ -74,12 +74,12 @@ namespace libecs
 
     void setModel( Model* model )
     {
-      theModel = model;
+        theModel = model;
     }
 
     Model* getModel()
     {
-      return theModel;
+        return theModel;
     }
 
     /**
@@ -88,7 +88,7 @@ namespace libecs
        This method first look for a Logger object which is logging
        the specified PropertySlot, and if it is found, returns the
        Logger.  If there is no Logger connected to the PropertySlot yet,
-       it creates and returns a new Logger.  
+       it creates and returns a new Logger.
 
        FIXME: doc for interval needed
 
@@ -98,9 +98,10 @@ namespace libecs
        
     */
 
-    LoggerPtr getLogger( FullPNCref aFullPN ) const;
+    Logger& getLogger( const FullPN& aFullPN ) const;
 
-    LoggerPtr createLogger( FullPNCref aFullPN, PolymorphVectorCref aParamList );
+    Logger& createLogger( const FullPN& aFullPN,
+                          const LoggingPolicy& aParamList );
 
     /**
        Flush the data in all the Loggers immediately.
@@ -108,47 +109,35 @@ namespace libecs
        Usually Loggers record data with logging intervals.  This method
        orders every Logger to write the data immediately ignoring the
        logging interval.
-    
+
     */
-
     void flush();
-
 
     /**
        Get a const reference to the LoggerMap.
 
-       Use this method for const operations such as LoggerMap::size() 
+       Use this method for const operations such as LoggerMap::size()
        and LoggerMap::begin().
 
        @return a const reference to the LoggerMap.
     */
-
-    LoggerMapCref getLoggerMap() const
+    const LoggerMap& getLoggerMap() const
     {
-      return theLoggerMap;
+        return theLoggerMap;
     }
 
-  private:
-    
-    Model* getModel() const
-    {
-      return theModel;
-    }
-
-
+private:
     // prevent copy
-    LoggerBroker( LoggerBrokerCref );
+    LoggerBroker( const LoggerBroker& );
     LoggerBrokerRef operator=( const LoggerBroker& );
 
-  private:
-
+private:
     LoggerMap     theLoggerMap;
     Model*        theModel;
+};
 
-  };
+//@}
 
-  //@}
-  
 } // namespace libecs
 
 #endif

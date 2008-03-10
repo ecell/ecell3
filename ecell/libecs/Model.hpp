@@ -113,7 +113,7 @@ namespace libecs
 
     void step()
     {
-      StepperEventCref aNextEvent( theScheduler.getTopEvent() );
+      const StepperEvent& aNextEvent( theScheduler.getTopEvent() );
       theCurrentTime = aNextEvent.getTime();
       theLastStepper = aNextEvent.getStepper();
 
@@ -154,21 +154,11 @@ namespace libecs
        in  the Model.
 
        @param aClassname
-       @param aClassType
-    */
-
-    PolymorphMap getClassInfo( StringCref aClassType, StringCref aClassname, Integer forceReload );
-
-    /**
-       Creates a new Entity object and register it in an appropriate System
-       in  the Model.
-
-       @param aClassname
        @param aFullID
        @param aName
     */
 
-    void createEntity( StringCref aClassname, FullIDCref aFullID );
+    Entity& createEntity( const String& aClassname, const FullID& aFullID );
 
 
     /**
@@ -178,7 +168,7 @@ namespace libecs
        @return A borrowed pointer to an Entity specified by the FullID.
     */
 
-    EntityPtr getEntity( FullIDCref aFullID ) const;
+    Entity& getEntity( const FullID& aFullID ) const;
 
     /**
        This method finds a System object pointed by the SystemPath.  
@@ -187,9 +177,7 @@ namespace libecs
        @param aSystemPath a SystemPath of the requested System.
        @return A borrowed pointer to a System.
     */
-
-
-    SystemPtr getSystem( SystemPathCref aSystemPath ) const;;
+    System& getSystem( const SystemPath& aSystemPath ) const;;
 
 
     /**
@@ -201,7 +189,7 @@ namespace libecs
 
     */
 
-    void createStepper( StringCref aClassname, StringCref anID );
+    void createStepper( const String& aClassname, const String& anID );
 
 
     /**
@@ -211,7 +199,7 @@ namespace libecs
        @return a borrowed pointer to the Stepper.
     */
 
-    StepperPtr getStepper( StringCref anID ) const;
+    StepperPtr getStepper( const String& anID ) const;
 
 
     /**
@@ -220,7 +208,7 @@ namespace libecs
        @return the const reference of the StepperMap.
     */
 
-    StepperMapCref getStepperMap() const
+    const StepperMap& getStepperMap() const
     {
       return theStepperMap;
     }
@@ -246,16 +234,15 @@ namespace libecs
        @return a borrowed pointer to the RootSystem.
     */
 
-    SystemPtr getRootSystem() const
+    System* getRootSystem() const
     {
-      return theRootSystemPtr;
+      return theRootSystem;
     }
 
-    SystemStepperPtr getSystemStepper()
+    SystemStepper* getSystemStepper()
     {
-      return &theSystemStepper;
+      return dynamic_cast<SystemStepper*>( theWorld.getStepper() );
     }
-
 
     /**
        Get the LoggerBroker.
@@ -268,7 +255,7 @@ namespace libecs
       return theLoggerBroker; 
     }
 
-    LoggerBrokerCref getLoggerBroker() const
+    const LoggerBroker& getLoggerBroker() const
     { 
       return theLoggerBroker; 
     }
@@ -309,28 +296,21 @@ namespace libecs
 
     static void initializeSystems( SystemPtr const aSystem );
 
-  private:
-
+private:
     Time                theCurrentTime;
     StepperPtr          theLastStepper;
-
     StepperEventScheduler theScheduler;
-
     LoggerBroker        theLoggerBroker;
-
-    System              *theRootSystemPtr;
- 
-    SystemStepper       theSystemStepper;
-
+    DynamicModule< PropertiedClass > theNullModule;
+    System              theWorld;
+    System*             theRootSystem;
     StepperMap          theStepperMap;
-
     PropertiedObjectMaker& thePropertiedObjectMaker;
     StepperMaker          theStepperMaker;
     SystemMaker           theSystemMaker;
     VariableMaker         theVariableMaker;
     ProcessMaker          theProcessMaker;
-
-  };
+};
 
   
   /*@}*/

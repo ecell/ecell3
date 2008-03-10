@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
@@ -35,350 +35,315 @@
 #include "libecs.hpp"
 #include "EntityType.hpp"
 
+namespace libecs {
 
-namespace libecs
+/** @addtogroup identifier The FullID, FullPN and SystemPath.
+ The FullID, FullPN and SystemPath.
+ 
+
+ @ingroup libecs
+ @{
+ */
+
+/** @file */
+
+
+/**
+ SystemPath
+ */
+class LIBECS_API SystemPath : protected StringList
 {
-
-  /** @addtogroup identifier The FullID, FullPN and SystemPath.
-   The FullID, FullPN and SystemPath.
-   
-
-   @ingroup libecs
-   @{ 
-   */ 
-  
-  /** @file */
-
-
-  /** 
-      SystemPath 
-  */
-
-  class LIBECS_API SystemPath : public StringList
-  {
-
-  public:
-
-    explicit SystemPath( StringCref systempathstring = "" )
+public:
+    SystemPath( const StringList& systempath )
+            : StringList( systempath )
     {
-      parse( systempathstring );
+        ; // do nothing
     }
 
-    SystemPath( SystemPathCref systempath )
-      :
-      StringList( static_cast<StringList>( systempath ) )
+    SystemPath()
+            : StringList()
     {
-      ; // do nothing
     }
 
     ~SystemPath() {}
 
-    const String getString() const;
+    const String asString() const;
 
     bool isAbsolute() const
     {
-      return ( ( ( ! empty() ) && ( front()[0] == DELIMITER ) ) || empty() );
+        return ( ( ( ! empty() ) && ( front()[0] == DELIMITER ) ) || empty() );
     }
-
-    bool isValid() const
-    {
-      // FIXME: check '..'s and '.'s etc..
-      return true;
-    }
-
-  protected:
 
     /**
-       Standardize a SystemPath. 
+       Normalize a SystemPath.
        Reduce '..'s and remove extra white spaces.
 
        @return reference to the systempath
     */
-    void standardize();
+    SystemPath normalize();
 
-  private:
+    LIBECS_API static SystemPath parse( const String& systempathstring );
 
-    //    SystemPath();
+    bool operator==(const SystemPath& rhs) const
+    {
+        return static_cast<const StringList&>(*this) == static_cast<const StringList&>(rhs);
+    }
 
+    bool operator!=(const SystemPath& rhs) const
+    {
+        return static_cast<const StringList&>(*this) != static_cast<const StringList&>(rhs);
+    }
 
-    void parse( StringCref systempathstring );
+    bool operator<(const SystemPath& rhs) const
+    {
+        return static_cast<const StringList&>(*this) < static_cast<const StringList&>(rhs);
+    }
 
-  public:
-
+public:
     static const char DELIMITER = '/';
+};
 
-  };
-
-
-  /**
-     FullID is an identifier of a unique Entiy in a cell model.
-     The FullID consists of a EntityType, a SystemPath and an ID string.
-
-     @see EntityType, SystemPath
-  */
-  class FullID
-  {
-
-  public:
-
-    FullID( const EntityType type,
-	    SystemPathCref systempath,
-	    StringCref id )
-      :
-      theEntityType( type ),
-      theSystemPath( systempath ),
-      theID( id )
+/**
+   LocalID is an identifier that is unique within a System.
+ */
+class LocalID
+{
+public:
+    LocalID( const EntityType& type,
+             const String& id )
+            :
+            theEntityType( type ),
+            theID( id )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
-    explicit FullID( const EntityType type,
-		     StringCref systempathstring,
-		     StringCref id )
-      :
-      theEntityType( type ),
-      theSystemPath( systempathstring ),
-      theID( id )
+    ~LocalID() {}
+
+    const EntityType  getEntityType() const
     {
-      ; // do nothing
+        return theEntityType;
     }
 
-    FullID( StringCref fullidstring )
+    const String& getID() const
     {
-      parse( fullidstring );
+        return theID;
     }
 
-    FullID( FullIDCref fullid )
-      :
-      theEntityType( fullid.getEntityType() ),
-      theSystemPath( fullid.getSystemPath() ),
-      theID( fullid.getID() )
+    bool operator<( const LocalID& rhs ) const
     {
-      ; // do nothing
+        // first look at the EntityType
+        if ( getEntityType() != rhs.getEntityType() )
+        {
+            return getEntityType() < rhs.getEntityType();
+        }
+
+        // finally compare the ID strings
+        return getID() < rhs.getID();
     }
 
+    bool operator==( const LocalID& rhs ) const
+    {
+        return getEntityType() == rhs.getEntityType() &&
+                getID() == rhs.getID();
+    }
+
+    bool operator!=( const LocalID& rhs ) const
+    {
+        return ! operator==( rhs );
+    }
+
+private:
+    LocalID();
+
+private:
+    const EntityType& theEntityType;
+    const String        theID;
+};
+
+/**
+   FullID is an identifier that specifies an unique Entity in a cell model.
+   The FullID consists of a EntityType, a SystemPath and an ID string.
+
+   @see EntityType, SystemPath
+*/
+class FullID
+{
+public:
+    FullID( const LocalID& localID,
+            const SystemPath& systempath )
+            :
+            theLocalID( localID ),
+            theSystemPath( systempath )
+    {
+        ; // do nothing
+    }
+
+    FullID( const EntityType& type,
+            const SystemPath& systempath,
+            const String& id )
+            :
+            theLocalID( type, id ),
+            theSystemPath( systempath )
+    {
+        ; // do nothing
+    }
 
     ~FullID() {}
-  
-    const EntityType  getEntityType() const 
-    { 
-      return theEntityType; 
-    }
 
-    SystemPathCref getSystemPath() const
-    { 
-      return theSystemPath; 
-    }
-
-    StringCref getID() const
-    { 
-      return theID;
-    }
-
-
-    void setEntityType( const EntityType type )
+    const EntityType getEntityType() const
     {
-      theEntityType = type;
+        return theLocalID.getEntityType();
     }
 
-    void setSystemPath( SystemPathCref systempath ) 
+    const SystemPath& getSystemPath() const
     {
-      theSystemPath = systempath;
+        return theSystemPath;
     }
 
-    void setID( StringCref id ) 
+    const String& getID() const
     {
-      theID = id;
+        return theLocalID.getEntityType();
     }
 
-    bool isValid() const;
-
-    LIBECS_API const String getString() const;
-
-    bool operator<( FullIDCref rhs ) const
+    const LocalID& getLocalID() const
     {
-      // first look at the EntityType
-      if( getEntityType() != rhs.getEntityType() )
-	{
-	  return getEntityType() < rhs.getEntityType();
-	}
-
-      // then compare the SystemPaths
-      // FIXME: should be faster is there is SystemPath::compare()
-      if( getSystemPath() != rhs.getSystemPath() )
-	{
-	  return getSystemPath() < rhs.getSystemPath();
-	}
-
-      // finally compare the ID strings
-      return getID() < rhs.getID();
+        return theLocalID;
     }
 
-    bool operator==( FullIDCref rhs ) const
+    LIBECS_API const String asString() const;
+
+    bool operator<( const FullID& rhs ) const
     {
-      // first look at the EntityType
-      if( getEntityType() != rhs.getEntityType() )
-	{
-	  return false;
-	}
+        if ( getSystemPath() != rhs.getSystemPath() )
+        {
+            return getSystemPath() < rhs.getSystemPath();
+        }
 
-      // then compare the SystemPaths
-      if( getSystemPath() != rhs.getSystemPath() )
-	{
-	  return false;
-	}
-
-      // finally compare the ID strings
-      return getID() == rhs.getID();
+        return getLocalID() < rhs.getLocalID();
     }
 
-    bool operator!=( FullIDCref rhs ) const
+    bool operator==( const FullID& rhs ) const
     {
-      return ! operator==( rhs );
+        return getSystemPath() == rhs.getSystemPath() &&
+                getLocalID() == rhs.getLocalID();
     }
 
-  protected:
+    bool operator!=( const FullID& rhs ) const
+    {
+        return ! operator==( rhs );
+    }
 
-    LIBECS_API void parse( StringCref fullidstring );
+    LIBECS_API static FullID parse( const String& fullidstring );
 
-  private:
-
+private:
     FullID();
 
-  public:
+public:
 
     static const char DELIMITER = ':';
 
-  private:
+private:
+    const LocalID       theLocalID;
+    const SystemPath    theSystemPath;
+};
 
-    EntityType theEntityType;
-    SystemPath    theSystemPath;
-    String        theID;
-
-  };
-
-  class FullPN
-  {
-
-  public:
-
-    FullPN( const EntityType type, 
-	    SystemPathCref systempath,
-	    StringCref id,
-	    StringCref propertyname )
-      :
-      theFullID( type, systempath, id ),
-      thePropertyName( propertyname )
+class FullPN
+{
+public:
+    FullPN( const EntityType& type,
+            const SystemPath& systempath,
+            const String& id,
+            const String& propertyname )
+            :
+            theFullID( type, systempath, id ),
+            thePropertyName( propertyname )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
-    FullPN( FullIDCref fullid, StringCref propertyname )
-      :
-      theFullID( fullid ),
-      thePropertyName( propertyname )
+    FullPN( const FullID& fullid, const String& propertyname )
+            :
+            theFullID( fullid ),
+            thePropertyName( propertyname )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
-    FullPN( FullPNCref fullpn )
-      :
-      theFullID( fullpn.getFullID() ),
-      thePropertyName( fullpn.getPropertyName() )
+    FullPN( const FullPN& fullpn )
+            :
+            theFullID( fullpn.getFullID() ),
+            thePropertyName( fullpn.getPropertyName() )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
-    LIBECS_API FullPN( StringCref fullpropertynamestring );
-
-    ~FullPN() 
+    ~FullPN()
     {
-      ; // do nothing
+        ; // do nothing
     }
 
-    FullIDCref getFullID() const
+    const FullID& getFullID() const
     {
-      return theFullID;
+        return theFullID;
     }
 
-    const EntityType  getEntityType() const 
-    { 
-      return getFullID().getEntityType(); 
-    }
-
-    SystemPathCref getSystemPath() const
-    { 
-      return getFullID().getSystemPath();
-    }
-
-    StringCref getID() const
-    { 
-      return getFullID().getID();
-    }
-
-    StringCref     getPropertyName()  const//const StringCref     getPropertyName()  const
+    const EntityType  getEntityType() const
     {
-      return thePropertyName;
+        return getFullID().getEntityType();
     }
 
-    void setEntityType( const EntityType type )
+    const SystemPath& getSystemPath() const
     {
-      theFullID.setEntityType( type );
+        return getFullID().getSystemPath();
     }
 
-    void setSystemPath( SystemPathCref systempath ) 
+    const String& getID() const
     {
-      theFullID.setSystemPath( systempath );
+        return getFullID().getID();
     }
 
-    void setID( StringCref id ) 
+    const String& getPropertyName() const
     {
-      theFullID.setID( id );
+        return thePropertyName;
     }
 
-    void setPropertyName( StringCref propertyname )
+    LIBECS_API static FullPN parse( const String& that );
+
+    LIBECS_API const String asString() const;
+
+    bool operator<( const FullPN& rhs ) const
     {
-      thePropertyName = propertyname;
+        if ( getFullID() != rhs.getFullID() )
+        {
+            return getFullID() < rhs.getFullID();
+        }
+
+        return getPropertyName() < rhs.getPropertyName();
     }
 
-    LIBECS_API const String getString() const;
-
-    bool isValid() const;
-
-    bool operator<( FullPNCref rhs ) const
+    bool operator==( const FullPN& rhs ) const
     {
-      if( getFullID() != rhs.getFullID() )
-	{
-	  return getFullID() < rhs.getFullID();
-	}
+        if ( getFullID() != rhs.getFullID() )
+        {
+            return false;
+        }
 
-      return getPropertyName() < rhs.getPropertyName();
+        // finally compare the ID strings
+        return getPropertyName() == rhs.getPropertyName();
     }
 
-    bool operator==( FullPNCref rhs ) const
+    bool operator!=( const FullPN& rhs ) const
     {
-      if( getFullID() != rhs.getFullID() )
-	{
-	  return false;
-	}
-
-      // finally compare the ID strings
-      return getPropertyName() == rhs.getPropertyName();
+        return ! operator==( rhs );
     }
 
-    bool operator!=( FullPNCref rhs ) const
-    {
-      return ! operator==( rhs );
-    }
-
-  private:
-
+private:
     FullID theFullID;
     String thePropertyName;
+};
 
-  };
-
-  /** @} */ // identifier module
+/** @} */ // identifier module
 
 } // namespace libecs
 

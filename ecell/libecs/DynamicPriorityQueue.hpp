@@ -32,25 +32,19 @@
 #ifndef __DYNAMICPRIORITYQUEUE_HPP
 #define __DYNAMICPRIORITYQUEUE_HPP
 
-#include "Defs.hpp"
-
 #include <functional>
 #include <vector>
 #include <algorithm>
 #include <stdexcept>
 
-#if defined( HAVE_UNORDERED_MAP )
-#include <unordered_map>
-#elif defined( HAVE_TR1_UNORDERED_MAP )
-#include <tr1/unordered_map>
-#else
-#include <map>
-#endif /* HAVE_UNORDERED_MAP */
+#ifndef ECELL_USE_UNORDERED_MAP
+#define ECELL_USE_UNORDERED_MAP
+#endif
 
+#include "libecs.hpp"
 
 namespace libecs
 {
-
 
 class PersistentIDPolicy
 {
@@ -62,33 +56,19 @@ public:
     typedef IDVector::size_type    Index;
     typedef IDVector::const_iterator IDIterator;
 
-#if defined( HAVE_UNORDERED_MAP ) || defined( HAVE_TR1_UNORDERED_MAP )
-
     class IDHasher
         : 
         public std::unary_function<ID, std::size_t>
     {
-
     public:
-
         std::size_t operator()( ID value ) const
         {
             return static_cast<std::size_t>( value ) ^
                 static_cast<std::size_t>( value >> ( sizeof( ID ) * 8 / 2 ) );
         }
-
     };
 
-#endif // HAVE_UNORDERED_MAP || HAVE_TR1_UNORDERED_MAP
-
-#if defined( HAVE_UNORDERED_MAP )
-    typedef std::unordered_map<const ID, Index, IDHasher> IndexMap;
-#elif defined( HAVE_TR1_UNORDERED_MAP )
-    typedef std::tr1::unordered_map<const ID, Index, IDHasher> IndexMap;
-#else 
-    typedef std::map<const ID, Index> IndexMap;
-#endif
-
+    DECLARE_UNORDERED_MAP( const ID, Index, IDHasher, IndexMap );
 
     PersistentIDPolicy()
         :

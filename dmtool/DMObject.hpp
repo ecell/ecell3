@@ -28,6 +28,7 @@
 #ifndef __DMOBJECT_HPP
 #define __DMOBJECT_HPP
 
+#include "DynamicModule.hpp"
 
 #ifdef WIN32
 #define DM_IF __declspec(dllexport)
@@ -35,35 +36,24 @@
 #define DM_IF
 #endif /* WIN32 */
 
-/// an allocator function template
-
-template< class Base, class Derived >
-Base* ObjectAllocator()
+template<typename T_>
+T_* FactoryFunction( const DynamicModuleBase< T_ >& mod )
 {
-  return new Derived;
+    return new T_( mod );
 }
 
-
-
-#define DM_INIT( CLASSNAME, TYPE )\
+/// an allocator function template
+#define DM_INIT( CLASSNAME )\
   extern "C"\
   {\
-    DM_IF TYPE::AllocatorFuncPtr CreateObject =\
-    &ObjectAllocator<TYPE,CLASSNAME>;\
+    DM_IF SharedDynamicModule< CLASSNAME >::FactoryFunction CreateInstance = &FactoryFunction<CLASSNAME>;\
+    DM_IF const void* (*GetClassInfo)( const std::string& ) = &CLASSNAME::getClassInfo;\
     DM_IF const char* __DM_CLASSNAME = #CLASSNAME;\
-    DM_IF const char* __DM_TYPE = #TYPE;\
-    DM_IF const void *(*GetClassInfo)() = &CLASSNAME::getClassInfoPtr;\
   } // 
 
 
-#define DM_OBJECT( CLASSNAME, TYPE )\
- static TYPE* createInstance() { return new CLASSNAME ; }\
- static const char *getTypeName() { return #TYPE; }
-
-
-#define DM_BASECLASS( CLASSNAME )\
-public:\
- typedef CLASSNAME * (* AllocatorFuncPtr )()
+#define DM_OBJECT( CLASSNAME )\
+ static CLASSNAME* createInstance( const DynamicModuleBase< CLASSNAME >& mod ) { return new CLASSNAME( mod ); }
 
 
 #endif /* __DMOBJECT_HPP */

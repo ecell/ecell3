@@ -51,14 +51,14 @@ namespace libecs
     delete theVector;
   }
 	
-  void PhysicalLogger::push( DataPointCref aDataPoint )
+  void PhysicalLogger::push( const DataPoint& aDataPoint )
   {
     theVector->push_back( aDataPoint );
   }
 
-  void PhysicalLogger::setEndPolicy( Integer anEndPolicy )
+  void PhysicalLogger::setPolicy( const LoggingPolicy& thePolicy )
   {
-    theVector->setEndPolicy ( anEndPolicy );
+    theVector->setEndPolicy ( thePolicyanEndPolicy );
   }
 
   int PhysicalLogger::getEndPolicy() const

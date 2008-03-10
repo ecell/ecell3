@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Masayuki Okayama <smash@e-cell.org>,
@@ -48,81 +48,64 @@
 namespace libecs
 {
 
-  LoggerBroker::LoggerBroker()
-    : theModel(0)
-  {
+LoggerBroker::LoggerBroker()
+        : theModel( 0 )
+{
     ; // do nothing
-  }
+}
 
-  LoggerBroker::~LoggerBroker()
-  {
+LoggerBroker::~LoggerBroker()
+{
     FOR_ALL_SECOND( LoggerMap, theLoggerMap, ~Logger );
-  }
+}
 
 
-  void LoggerBroker::flush()
-  {
+void LoggerBroker::flush()
+{
     FOR_ALL_SECOND( LoggerMap, theLoggerMap, flush );
-  }
+}
 
-  LoggerPtr 
-  LoggerBroker::getLogger( FullPNCref aFullPN ) const
-  {
+Logger&
+LoggerBroker::getLogger( const FullPN& aFullPN ) const
+{
     LoggerMapConstIterator aLoggerMapIterator( theLoggerMap.find( aFullPN ) );
 
-    if( aLoggerMapIterator == theLoggerMap.end() )
-      {
-	THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.getString() 
-			 + "] not found." );
-      }
+    if ( aLoggerMapIterator == theLoggerMap.end() )
+    {
+        THROW_EXCEPTION( NotFound,
+                         "no logger defined for " + aFullPN.asString() );
+    }
 
-    return aLoggerMapIterator->second;
-  }
+    return *aLoggerMapIterator->second;
+}
 
+Logger& LoggerBroker::createLogger(
+    const FullPN& aFullPN,
+    const LoggingPolicy& aLoggerPolicy )
+{
+    if ( theLoggerMap.find( aFullPN ) != theLoggerMap.end() )
+    {
+        THROW_EXCEPTION( AlreadyExist,
+                         "logger already defined for " + aFullPN.asString() );
+    }
 
-  LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,   PolymorphVectorCref aParamList ) 
-  {
-    if( theLoggerMap.find( aFullPN ) != theLoggerMap.end() )
-      {
-	THROW_EXCEPTION( AlreadyExist, "Logger [" + aFullPN.getString()
-			 + "] already exist." );
-      }
+    Entity& anEntity( theModel->getEntity( aFullPN.getFullID() ) );
 
-    EntityPtr anEntityPtr( theModel->getEntity( aFullPN.getFullID() ) );
+    LoggerAdapter* aLoggerAdapter(
+        new PropertySlotProxyLoggerAdapter(
+            anEntity.createPropertySlotProxy(
+                aFullPN.getPropertyName() ) ) );
 
-    const String aPropertyName( aFullPN.getPropertyName() );
-
-    PropertySlotProxyPtr 
-      aPropertySlotProxy( anEntityPtr->
-			  createPropertySlotProxy( aPropertyName ) );
-
-    LoggerAdapterPtr aLoggerAdapter
-      ( new PropertySlotProxyLoggerAdapter( aPropertySlotProxy ) );
-
-
-    LoggerPtr aNewLogger( new Logger( aLoggerAdapter) );
-
-    anEntityPtr->registerLogger( aNewLogger );
+    Logger* aNewLogger( new Logger( aLoggerAdapter ) );
+    anEntity.registerLogger( aNewLogger );
     theLoggerMap[aFullPN] = aNewLogger;
+
     // it should have at least one datapoint to work correctly.
     aNewLogger->log( theModel->getCurrentTime() );
     aNewLogger->flush();
+    aNewLogger->setPolicy( aLoggerPolicy );
 
-    // set logger policy
-    aNewLogger->setLoggerPolicy( aParamList );
-
-
-    return aNewLogger;
-  }
-
-  
+    return *aNewLogger;
+}
 
 } // namespace libecs
-
-
-
-
-
-
-
-

@@ -87,7 +87,7 @@ namespace libecs
   class ConvertTo< ToType, String >
   {
   public:
-    inline const ToType operator()( StringCref aValue )
+    inline const ToType operator()( const String& aValue )
     {
       // strategy:
       // (1) if ToType is arithmetic, use LexicalCaster.
