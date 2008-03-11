@@ -319,6 +319,7 @@ AC_CONFIG_FILES([
 ])
 AC_CONFIG_FILES([
   dm/Makefile
+  dm/MoleculizerProcess/Makefile
 ])
 AC_CONFIG_FILES([
   bin/Makefile
