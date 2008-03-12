@@ -47,7 +47,7 @@
 USE_LIBECS;
 
 /**************************************************************
-       MProcess
+       MoleculizerProcess
 **************************************************************/
 
 namespace mzr
@@ -55,27 +55,28 @@ namespace mzr
   class moleculizer;
 }
 
-LIBECS_DM_CLASS( MProcess, Process )
+LIBECS_DM_CLASS( MoleculizerProcess, Process )
 {
 
  public:
-  LIBECS_DM_OBJECT( MProcess, Process)
+  LIBECS_DM_OBJECT( MoleculizerProcess, Process)
     {
-
       INHERIT_PROPERTIES( Process );
 
-      // These are the important ones....  
+      // 0 = no debug, 1 = verbose output to stdout.  
+      PROPERTYSLOT_SET_GET( Integer, Debug);
+
+      PROPERTYSLOT_SET_GET( String, Model);
       PROPERTYSLOT_SET_GET( String, ModelFile);
-      // PROPERTYSLOT_SET_GET( String, Model);
-      
-      // This is the stepper that the newly created processes should be added to.
+
+            // This is the stepper that the newly created processes should be added to.
       PROPERTYSLOT_SET_GET( String, GillespieProcessStepperID);
 
       // PROPERTYSLOT_SET_GET( Integer, NetworkExpansionDepth);
     }
 
-  MProcess();
-  ~MProcess();
+  MoleculizerProcess();
+  ~MoleculizerProcess();
 
   virtual void initialize();
   virtual void fire();
@@ -132,7 +133,7 @@ LIBECS_DM_CLASS( MProcess, Process )
   class addProductsToRxn : public std::unary_function<std::pair<mzr::species*, int>, void>
   {
   public:
-    addProductsToRxn(ProcessPtr reactionPtr, SystemPtr containingSystemPtr, MProcess& aMoleculizerProcess)
+    addProductsToRxn(ProcessPtr reactionPtr, SystemPtr containingSystemPtr, MoleculizerProcess& aMoleculizerProcess)
       :
       rxnProcessPtr( reactionPtr ),
       parentSystemPtr( containingSystemPtr ),
@@ -145,7 +146,7 @@ LIBECS_DM_CLASS( MProcess, Process )
   private:
     ProcessPtr rxnProcessPtr;
     SystemPtr parentSystemPtr;
-    MProcess& parentProcess;
+    MoleculizerProcess& parentProcess;
     unsigned int productNdx;
 
   private:
