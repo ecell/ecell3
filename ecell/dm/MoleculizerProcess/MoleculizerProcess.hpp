@@ -65,14 +65,15 @@ LIBECS_DM_CLASS( MoleculizerProcess, Process )
 
       // 0 = no debug, 1 = verbose output to stdout.  
       PROPERTYSLOT_SET_GET( Integer, Debug);
+      PROPERTYSLOT_SET_GET( Integer, RateExtrapolation);
 
-      PROPERTYSLOT_SET_GET( String, Model);
+      PROPERTYSLOT_SET_GET( String, ModelDescription);
       PROPERTYSLOT_SET_GET( String, ModelFile);
 
-            // This is the stepper that the newly created processes should be added to.
+      // This is the stepper that the newly created processes should be added to.
       PROPERTYSLOT_SET_GET( String, GillespieProcessStepperID);
 
-      // PROPERTYSLOT_SET_GET( Integer, NetworkExpansionDepth);
+      PROPERTYSLOT_SET_GET( Integer, NetworkExpansionDepth);
     }
 
   MoleculizerProcess();
@@ -82,36 +83,83 @@ LIBECS_DM_CLASS( MoleculizerProcess, Process )
   virtual void fire();
 
 
-  SIMPLE_SET_GET_METHOD( String, ModelFile);
+  SIMPLE_SET_GET_METHOD( String, ModelDescription)
+    SIMPLE_SET_GET_METHOD( String, ModelFile);
   SIMPLE_SET_GET_METHOD( String, GillespieProcessStepperID );
+  SET_METHOD(Integer, Debug)
+    {
+      debugMode = (bool) value;
+    }
+
+  GET_METHOD(Integer, Debug)
+    {
+      if (debugMode) return 1;
+      else return 0;
+    }
+
+  GET_METHOD( Integer, NetworkExpansionDepth)
+    {
+      // Optimally this just sets the moleculizer object directly.
+      return NetworkExpansionDepth;
+    }
+
+  SET_METHOD( Integer, NetworkExpansionDepth)
+    {
+      // Set it in the moleculizer object as well.
+      NetworkExpansionDepth = value;
+
+      if (moleculizerObject)
+        {
+          moleculizerObject->setGenerateDepth( value );
+        }
+    }
+
+
+  GET_METHOD( Integer, RateExtrapolation)
+    {
+      return 1;
+    }
+
+  SET_METHOD( Integer, RateExtrapolation)
+    {
+      // Do nothing for now.
+    }
 
  private:
-  void updateSpeciesChanges();
+
+  void expandMoleculizerNetworkBySpecies();
   void createSpeciesAndReactions(bool initPopulationToZero = true);
-
-
-  typedef mzr::generatedDifference::newSpeciesEntry newSpeciesEntry;
-  typedef mzr::generatedDifference::newReactionEntry newReactionEntry;
-  typedef mzr::generatedDifference::key SpeciesKey;
-  typedef mzr::generatedDifference::key ReactionKey;
-
   void initializeMoleculizerObject();
-  void createNewSpecies(const newSpeciesEntry& newSpecies, bool initPopulationToZero);
-  void createNewReaction(const newReactionEntry& newRxn);
+  void createNewSpecies(const String& newSpecies, bool initPopulationToZero);
+  void createNewReaction(const mzr::mzrReaction* newRxn);
 
+
+
+
+  bool debugMode;
+  String ModelDescription;
   String ModelFile;
+  Integer NetworkExpansionDepth;
+  bool onceInitialized;
+  bool rateExtrapolation;
+             
+  
+
   String GillespieProcessStepperID;
   mzr::moleculizer* moleculizerObject;
   Integer rxnNdx;
+
   ModelPtr ptrModel;
-  SystemPath compartmentName;
+
+  SystemPath compartmentPath;
   SystemPtr compartmentPtr;
   RegisterClass* theRegisterClass;
 
  private:
-  class addSubstratesToRxn : public std::unary_function<std::pair<mzr::species*, int>, void>
+  class addSubstratesToRxn : public std::unary_function<std::pair<mzr::mzrSpecies*, int>, void>
   {
   public:
+    // Should this be a SystemPtr...?
     addSubstratesToRxn( ProcessPtr newRxnPtr, SystemPtr containingSystemPtr )
       :
       rxnProcessPtr( newRxnPtr ),
@@ -119,7 +167,7 @@ LIBECS_DM_CLASS( MoleculizerProcess, Process )
       substrateNdx( 0 )
     {}
 
-    void operator()(std::pair< mzr::species*, int> aSubstrate);
+    void operator()(std::pair< mzr::mzrSpecies*, int> aSubstrate);
 
   private:
     ProcessPtr rxnProcessPtr;
@@ -130,7 +178,7 @@ LIBECS_DM_CLASS( MoleculizerProcess, Process )
     static const String alphabet;
   };
 
-  class addProductsToRxn : public std::unary_function<std::pair<mzr::species*, int>, void>
+  class addProductsToRxn : public std::unary_function<std::pair<mzr::mzrSpecies*, int>, void>
   {
   public:
     addProductsToRxn(ProcessPtr reactionPtr, SystemPtr containingSystemPtr, MoleculizerProcess& aMoleculizerProcess)
@@ -141,7 +189,7 @@ LIBECS_DM_CLASS( MoleculizerProcess, Process )
       productNdx( 0 )
     {}
 
-    void operator()( std::pair<mzr::species*, int> aProduct);
+    void operator()( std::pair<mzr::mzrSpecies*, int> aProduct);
 
   private:
     ProcessPtr rxnProcessPtr;
@@ -154,12 +202,5 @@ LIBECS_DM_CLASS( MoleculizerProcess, Process )
   };
 
 };
-
-
-
-
-
-
-
 
 #endif

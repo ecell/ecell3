@@ -6,9 +6,9 @@
 
 #include "utl/dom.hh"
 
-
 #include "mzr/moleculizer.hh"
 #include "mzr/unitsMgr.hh"
+#include "mzr/mzrUnit.hh"
 
 #include "CallbackVariable.hpp"
 
@@ -17,13 +17,15 @@ LIBECS_DM_INIT( MoleculizerProcess, Process);
 
 MoleculizerProcess::MoleculizerProcess()
   :
-  moleculizerObject( NULL ),
-  debugModeFlag( false ),
-  Model( ""),
+  moleculizerObject( new mzr::moleculizer ),
+  debugMode( false ),
+  ModelDescription( ""),
   ModelFile( "" ),
   rxnNdx( 0 ),
   theRegisterClass(new RegisterClass),
-  onceInitialized( false )
+  onceInitialized( false ),
+  NetworkExpansionDepth( 1 ),
+  rateExtrapolation( true )
 {}
 
 MoleculizerProcess::~MoleculizerProcess()
@@ -32,122 +34,141 @@ MoleculizerProcess::~MoleculizerProcess()
   delete theRegisterClass;
 }
 
-
-
 void 
 MoleculizerProcess::initialize()
 {
-  if (!onceInitialized)
+  if ( !onceInitialized )
     {
-      ptrModel = this->getModel();
-      compartmentName = this->getFullID().getSystemPath();
-      compartmentPtr = this->getModel()->getSystem( compartmentName );
+      // Only do this the very first time this function is called.  
+      onceInitialized = true;
 
+      ptrModel = this->getModel();
+
+      compartmentPath = this->getFullID().getSystemPath();
+      compartmentPtr = this->getModel()->getSystem( compartmentPath );
+
+      // Create the moleculizer* and then add the species and reactions to the model.
       initializeMoleculizerObject();
       createSpeciesAndReactions(false);
-
-      onceInitialized = true;
     }
   
+  // This is the part that constantly reinitializes.
   Process::initialize();
 }
 
 
 void MoleculizerProcess::fire()
 {
-  updateSpeciesChanges();
+  expandMoleculizerNetworkBySpecies();
   createSpeciesAndReactions();
   getModel()->initialize();
 }
 
 void MoleculizerProcess::initializeMoleculizerObject()
 {
-  // This appears to be a non-sequiter at the moment.  The reason for this
-  // is to try to make this idempotent.  If initialize gets called multiple times
-  // we would otherwise have a memory leak.
-  delete moleculizerObject;
 
-  String fileName = getModelFile();
-  
-  xmlpp::DomParser parser;
+  // Set the volume for the libmoleculizer object. 
 
-  parser.set_validate( false );
-  parser.parse_file( this->getModelFile() );
-  
-  mzr::moleculizer* ptrMoleculizerObject = 
-    new mzr::moleculizer( parser.get_document() );
-  
-  this->moleculizerObject = ptrMoleculizerObject;
+  if (!compartmentPtr)
+    {
 
-  std::set<mzr::reaction*> aSet;
-  this->moleculizerObject->pUserUnits->theMzrUnit.getMolarFactor().updateVolume(1.0e-18, aSet);
+      throw UnexpectedError("MoleculizerProcess::initializeMoleculizerObject()",
+                            "CompartmentPtr should be set but isn't.");
+    }
+  
+  
+  Real theVolume = compartmentPtr->getSize();
+  fnd::sensitivityList<mzr::mzrReaction> aSet;  
+
+  moleculizerObject->pUserUnits->pMzrUnit->getMolarFactor().updateVolume(theVolume, aSet);
+  // moleculizerObject->pUserUnits->pMzrUnit->getMolarFactor().updateVolume(1e-18, aSet);
+
+
+  // We should also set the generation depth as well as the RateExtrapolation here.
+  moleculizerObject->setGenerateDepth( getNetworkExpansionDepth() );
+
+  // This actually does nothing at the moment.  libmoleculizer should be extended to fix this.
+  moleculizerObject->setRateExtrapolation( getRateExtrapolation() );
+  
+  if ( getModelDescription() != "" )
+    {
+      // Initialize Moleculizer with the model.
+      String model = getModelDescription();
+      moleculizerObject->attachString( model );
+    }
+  else if ( getModelFile() != "" )
+    {
+      // Initialize Moleculizer with the file
+      String fileName = getModelFile();
+      moleculizerObject->attachFileName( fileName );
+    }
+  else
+    {
+      // Throw a different, better error.
+      throw UnexpectedError("MoleculizerProcess::initializeMoleculizerObject()",
+                            "No model information has been set.");
+    }
 }
 
-void MoleculizerProcess::updateSpeciesChanges()
+void MoleculizerProcess::expandMoleculizerNetworkBySpecies()
 {
+  // In this function we iterate through theRegisterClass, which contains the ID's of all
+  // the species which have updated for the first time, and tell the moleculizer object 
+  // to expand the reaction network by way of these species.
 
   for(std::vector<std::string>::iterator i = (*theRegisterClass).theVect.begin();
       i != (*theRegisterClass).theVect.end();
       ++i)
     {
-      std::set<mzr::reaction*> affectedReactions;
-
-      mzr::species* theSpecies = moleculizerObject->theGeneratedDifferences.generatedSpeciesByName[ *i ];
-      theSpecies-> update(affectedReactions, 3);
+      moleculizerObject->incrementNetworkBySpeciesName( *i );
     }
-
+  
   theRegisterClass->clearAll();
 }
 
-void MoleculizerProcess::createSpeciesAndReactions(bool initPopulationToZero)
-{
-  mzr::generatedDifference& genDiff = moleculizerObject->theGeneratedDifferences;
+// void MoleculizerProcess::createSpeciesAndReactions(bool initPopulationToZero)
+// {
+//   mzr::generatedDifference& genDiff = moleculizerObject->theGeneratedDifferences;
   
-  for(std::list< mzr::generatedDifference::newSpeciesEntry>::const_iterator iter = genDiff.generatedSpeciesDiff.begin();
-      iter != genDiff.generatedSpeciesDiff.end();
-      ++iter)
-    {
-      this->createNewSpecies(*iter, initPopulationToZero);
-    }
+//   for(std::list< mzr::generatedDifference::newSpeciesEntry>::const_iterator iter = genDiff.generatedSpeciesDiff.begin();
+//       iter != genDiff.generatedSpeciesDiff.end();
+//       ++iter)
+//     {
+//       this->createNewSpecies(*iter, initPopulationToZero);
+//     }
 
-  //  getModel()->initialize();
+//   //  getModel()->initialize();
 
-  for(std::list< mzr::generatedDifference::newReactionEntry>::const_iterator iter = genDiff.generatedRxnsDiff.begin();
-      iter != genDiff.generatedRxnsDiff.end();
-      ++iter)
-    {
-      this->createNewReaction(*iter);
-    }
+//   for(std::list< mzr::generatedDifference::newReactionEntry>::const_iterator iter = genDiff.generatedRxnsDiff.begin();
+//       iter != genDiff.generatedRxnsDiff.end();
+//       ++iter)
+//     {
+//       this->createNewReaction(*iter);
+//     }
 
-  // getModel()->initialize();
+//   // getModel()->initialize();
 
-  genDiff.clearAll();
-  return;
-}
+//   genDiff.clearAll();
+//   return;
+//}
   
-void MoleculizerProcess::createNewSpecies(const newSpeciesEntry& newSpecies, bool initPopulationToZero)
+void MoleculizerProcess::createNewSpecies(const String& newSpecies, bool initPopulationToZero)
 {
-  const mzr::species* const ptrNewSpecies(newSpecies.first);
-  String newSpeciesName(newSpecies.second.second);
-  SpeciesKey newSpeciesKey = newSpecies.second.first;
-  Integer newSpeciesPopulation;
-
+  
   FullID newSpeciesFullID( EntityType("Variable"),
-                           this->compartmentName,
-                           newSpeciesName );
+                           this->compartmentPath,
+                           newSpecies );
 
-  if (initPopulationToZero) 
+  Integer newSpeciesPopulation(0);
+  if (!initPopulationToZero) 
     {
-      newSpeciesPopulation = 0;
-    }
-  else 
-    {
-      newSpeciesPopulation = newSpecies.first->getPop();
+      newSpeciesPopulation = moleculizerObject->getPopulation( newSpecies );
     }
   
   ptrModel->createEntity("CallbackVariable", newSpeciesFullID);
   EntityPtr newVariable = ptrModel->getEntity( newSpeciesFullID );
 
+  // I can totally understand where this comes from, but it's just a little obscene.
   CallbackVariable* newCallbackVariable = dynamic_cast<CallbackVariable*>(newVariable);
   newCallbackVariable->registerCallback( this->theRegisterClass );
   
@@ -155,15 +176,12 @@ void MoleculizerProcess::createNewSpecies(const newSpeciesEntry& newSpecies, boo
   return;
 }
 
-void MoleculizerProcess::createNewReaction(const newReactionEntry& newRxn)
+void MoleculizerProcess::createNewReaction(const mzr::mzrReaction* newRxn)
 {
-
-  const mzr::reaction* const ptrMzrGeneratedRxn( newRxn.first );
-  String newReactionName( newRxn.second.second );
-  ReactionKey newReactionKey = newRxn.second.first;
+  
 
   FullID newRxnFullID( EntityType("Process"),
-                       this->compartmentName,
+                       this->compartmentPath,
                        "Rxn_" + boost::lexical_cast<String>(this->rxnNdx++));
 
   ptrModel->createEntity("GillespieProcess", newRxnFullID);
@@ -172,11 +190,11 @@ void MoleculizerProcess::createNewReaction(const newReactionEntry& newRxn)
   ProcessPtr newRxnPtr = dynamic_cast<ProcessPtr>(newEntityPtr);
 
 
-  newRxnPtr->setProperty("k", ptrMzrGeneratedRxn->getRate() );
+  newRxnPtr->setProperty("k", newRxn->getRate() );
   newRxnPtr->setStepperID( this->GillespieProcessStepperID );
 
-  const std::map<mzr::species*, int>& rxnSubstrates( ptrMzrGeneratedRxn->getSubstrateMap() );
-  const std::map<mzr::species*, int>& rxnProducts( ptrMzrGeneratedRxn->getProductMap() );
+  const std::map<mzr::mzrSpecies*, int>& rxnSubstrates( newRxn->getReactants() );
+  const std::map<mzr::mzrSpecies*, int>& rxnProducts( newRxn->getProducts() );
 
   std::for_each( rxnSubstrates.begin(),
                  rxnSubstrates.end(),
@@ -191,10 +209,10 @@ void MoleculizerProcess::createNewReaction(const newReactionEntry& newRxn)
 
 
 void
-MoleculizerProcess::addSubstratesToRxn::operator()(std::pair<mzr::species*, int> aSubstrate)
+MoleculizerProcess::addSubstratesToRxn::operator()(std::pair<mzr::mzrSpecies*, int> aSubstrate)
 {
   // This should already exist...
-  String substrateName( aSubstrate.first->getCanonicalName() );
+  String substrateName( aSubstrate.first->getName() );
   SystemPath containingSystemPath = rxnProcessPtr->getFullID().getSystemPath();
 
   // We must check this ptr to make sure it's ok.
@@ -214,10 +232,10 @@ MoleculizerProcess::addSubstratesToRxn::operator()(std::pair<mzr::species*, int>
 }
 
 void
-MoleculizerProcess::addProductsToRxn::operator()(std::pair<mzr::species*, int> aProduct)
+MoleculizerProcess::addProductsToRxn::operator()(std::pair<mzr::mzrSpecies*, int> aProduct)
 {
 
-  String productName( aProduct.first->getCanonicalName() );
+  String productName( aProduct.first->getName() );
   SystemPath containingSystemPath = rxnProcessPtr->getFullID().getSystemPath();
 
   // We must check this ptr to make sure it's ok.
