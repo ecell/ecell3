@@ -41,6 +41,9 @@
 
 #include "mzr/moleculizer.hh"
 #include "RegisterClass.hpp"
+#include <iostream>
+using std::cout;
+using std::endl;
 
 #include <functional>
 

@@ -59,6 +59,11 @@ MoleculizerProcess::initialize()
 
 void MoleculizerProcess::fire()
 {
+  if (getDebug() )
+    {
+      cout << "Moleculizer::Process::fire()" << endl;
+    }
+
   expandMoleculizerNetworkBySpecies();
   createSpeciesAndReactions();
   getModel()->initialize();
@@ -66,6 +71,11 @@ void MoleculizerProcess::fire()
 
 void MoleculizerProcess::initializeMoleculizerObject()
 {
+
+  if (getDebug() )
+    {
+      cout << "MoleculizerProcess::initializeMoleculizerObject()" << endl;
+    }
 
   // Set the volume for the libmoleculizer object. 
 
@@ -98,9 +108,15 @@ void MoleculizerProcess::initializeMoleculizerObject()
     }
   else if ( getModelFile() != "" )
     {
+
+
       // Initialize Moleculizer with the file
       String fileName = getModelFile();
       moleculizerObject->attachFileName( fileName );
+      if (getDebug() )
+        {
+          cout << "Attaching Modelfile..." << endl;
+        }
     }
   else
     {
@@ -108,10 +124,22 @@ void MoleculizerProcess::initializeMoleculizerObject()
       throw UnexpectedError("MoleculizerProcess::initializeMoleculizerObject()",
                             "No model information has been set.");
     }
+
+  if (getDebug() )
+    {
+      cout << "Generated " << moleculizerObject->getNumberDeltaSpecies()  << "species." << endl;
+      cout << "Generated " << moleculizerObject->getNumberDeltaReactions()  << "reactions." << endl;
+    }
 }
 
 void MoleculizerProcess::expandMoleculizerNetworkBySpecies()
 {
+  if (getDebug() )
+    {
+      cout << "MoleculizerProcess::expandMoleculizerNetworkBySpecies()" << endl;
+    }
+
+
   // In this function we iterate through theRegisterClass, which contains the ID's of all
   // the species which have updated for the first time, and tell the moleculizer object 
   // to expand the reaction network by way of these species.
@@ -126,34 +154,44 @@ void MoleculizerProcess::expandMoleculizerNetworkBySpecies()
   theRegisterClass->clearAll();
 }
 
-// void MoleculizerProcess::createSpeciesAndReactions(bool initPopulationToZero)
-// {
-//   mzr::generatedDifference& genDiff = moleculizerObject->theGeneratedDifferences;
-  
-//   for(std::list< mzr::generatedDifference::newSpeciesEntry>::const_iterator iter = genDiff.generatedSpeciesDiff.begin();
-//       iter != genDiff.generatedSpeciesDiff.end();
-//       ++iter)
-//     {
-//       this->createNewSpecies(*iter, initPopulationToZero);
-//     }
+ void MoleculizerProcess::createSpeciesAndReactions(bool initPopulationToZero)
+ {
 
-//   //  getModel()->initialize();
+  if (getDebug() )
+    {
+      cout << "MoleculizerProcess::createSpeciesAndReactions()" << endl;
+    }
 
-//   for(std::list< mzr::generatedDifference::newReactionEntry>::const_iterator iter = genDiff.generatedRxnsDiff.begin();
-//       iter != genDiff.generatedRxnsDiff.end();
-//       ++iter)
-//     {
-//       this->createNewReaction(*iter);
-//     }
+   for(std::list<mzr::mzrSpecies*>::const_iterator iter = (*moleculizerObject).theDeltaSpeciesList.begin();
+       iter != (*moleculizerObject).theDeltaSpeciesList.end();
+       ++iter)
+     {
+       this->createNewSpecies( (*iter)->getName(), initPopulationToZero);
+     }
 
-//   // getModel()->initialize();
+   cout << "Reinitializing..." << endl;
+   getModel()->initialize();
 
-//   genDiff.clearAll();
-//   return;
-//}
+   for(std::list< mzr::mzrReaction*>::const_iterator iter = (*moleculizerObject).theDeltaReactionList.begin();
+       iter != (*moleculizerObject).theDeltaReactionList.end();
+       ++iter)
+     {
+       this->createNewReaction(*iter);
+     }
+   
+   cout << "Reinitializing..." << endl;
+   getModel()->initialize();
+   moleculizerObject->resetCurrentState();
+
+   return;
+}
   
 void MoleculizerProcess::createNewSpecies(const String& newSpecies, bool initPopulationToZero)
 {
+  if (getDebug() )
+    {
+      cout << "MoleculizerProcess::creatingNewSpecies() -- creating\n\t " << newSpecies << endl;
+    }
   
   FullID newSpeciesFullID( EntityType("Variable"),
                            this->compartmentPath,
@@ -179,6 +217,10 @@ void MoleculizerProcess::createNewSpecies(const String& newSpecies, bool initPop
 void MoleculizerProcess::createNewReaction(const mzr::mzrReaction* newRxn)
 {
   
+  if (getDebug() )
+    {
+      cout << "MoleculizerProcess::createNewReaction -- \n\t" << newRxn->getName() << endl;
+    }
 
   FullID newRxnFullID( EntityType("Process"),
                        this->compartmentPath,
