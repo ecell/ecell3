@@ -34,6 +34,7 @@
 
 #include "libecs.hpp"
 #include "Stepper.hpp"
+#include "EventBase.hpp"
 
 /** @file */
 namespace libecs {
@@ -41,43 +42,43 @@ namespace libecs {
 class StepperEvent: public EventBase
 {
 public:
-    StepperEvent( TimeParam aTime, StepperPtr aStepperPtr )
-        : EventBase( aTime ), theStepper( aStepperPtr )
+    StepperEvent( TimeParam aTime, Stepper* stepper )
+        : EventBase( aTime ), stepper_( stepper )
     {
         ; // do nothing
     }
 
     void fire()
     {
-        theStepper->integrate( getTime() );
-        theStepper->step();
-        theStepper->log();
+        stepper_->integrate( getTime() );
+        stepper_->step();
+        stepper_->log();
 
         reschedule();
     }
 
     void update( TimeParam aTime )
     {
-        theStepper->interrupt( aTime );
+        stepper_->interrupt( aTime );
 
         reschedule();
     }
 
     void reschedule()
     {
-        const Time aLocalTime( theStepper->getCurrentTime() );
-        const Time aNewStepInterval( theStepper->getStepInterval() );
+        const Time aLocalTime( stepper_->getCurrentTime() );
+        const Time aNewStepInterval( stepper_->getStepInterval() );
         setTime( aNewStepInterval + aLocalTime );
     }
 
     const bool isDependentOn( const StepperEvent& anEvent ) const
     {
-        return theStepper->isDependentOn( anEvent.getStepper() );
+        return stepper_->isDependentOn( anEvent.getStepper() );
     }
 
     const Stepper* getStepper() const
     {
-        return theStepper;
+        return stepper_;
     }
 
     // this method is basically used in initializing and rescheduling
@@ -93,7 +94,7 @@ public:
         {
             return true;
         }
-        if ( theStepper->getPriority() < rhs.getStepper()->getPriority() )
+        if ( stepper_->getPriority() < rhs.getStepper()->getPriority() )
         {
             return true;
         }
@@ -110,7 +111,7 @@ public:
         {
             return true;
         }
-        if ( theStepper->getPriority() > rhs.getStepper()->getPriority() )
+        if ( stepper_->getPriority() > rhs.getStepper()->getPriority() )
         {
             return true;
         }
@@ -139,7 +140,7 @@ public:
     }
 
 private:
-    StepperPtr theStepper;
+    Stepper* stepper_;
 };
 
 } // namespace libecs

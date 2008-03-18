@@ -29,7 +29,7 @@
 // 25/03/2002
 
 
-#ifndef __DATAPOINT_HPP)
+#ifndef __DATAPOINT_HPP
 #define __DATAPOINT_HPP
 
 #include "libecs.hpp"
@@ -71,11 +71,24 @@ public:
     };
 
 public:
-    DataPoint( Param<Time> time = 0.0, Param<Value> value = 0.0 )
-            : theTime ( aTime ), theValue( value )
+    DataPoint( Param<Time> _time = 0.0, Param<Value> _value = 0.0 )
+            : time ( _time ), value( _value )
     {
         ; //do nothing
     }
+
+    bool isValid() const
+    {
+        return time >= 0;
+    }
+
+    DataPoint& operator=( const DataPoint& aLongDataPoint )
+    {
+        setTime( aLongDataPoint.getTime() );
+        setValue ( aLongDataPoint.getValue() );
+        return *this;
+    }
+
 
     bool operator==( const DataPoint& that ) const
     {
@@ -85,7 +98,11 @@ public:
 public:
     Time time;
     Value value;
+    static DataPoint invalid;
 };
+
+template<typename Ttime_, typename Tval_>
+DataPoint<Ttime_, Tval_> DataPoint<Ttime_, Tval_>::invalid( -1.0, 0 );
 
 } // namespace libecs
 

@@ -50,8 +50,13 @@ void DiscreteTimeStepper::initialize()
 {
     Stepper::initialize();
 
-    if ( getDiscreteProcessOffset() != 0 && ! getProcessVector().empty() )
+    if ( getProcesses().empty() )
     {
+        THROW_EXCEPTION( InitializationFailed,
+                         "no process associated." );
+    }
+
+    if ( !getContinuousProcesses().empty() ) {
         THROW_EXCEPTION( InitializationFailed,
                          "not usable with continuous processes." );
     }

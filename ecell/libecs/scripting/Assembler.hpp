@@ -61,12 +61,12 @@ public:
 
     void
     appendVariableReferenceMethodInstruction(
-            libecs::VariableReferencePtr aVariableReference,
-            libecs::StringCref aMethodName );
+            libecs::VariableReference* aVariableReference,
+            const libecs::String& aMethodName );
 
     void
-    appendSystemMethodInstruction( libecs::SystemPtr aSystemPtr,
-                                   libecs::StringCref aMethodName );
+    appendSystemMethodInstruction( libecs::System* aSystemPtr,
+                                   const libecs::String& aMethodName );
 
 private:
     Code* theCode;

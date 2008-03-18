@@ -40,6 +40,7 @@ class LIBECS_API ModuleMaker;
 
 #include "dmtool/DMObject.hpp"
 #include "Exceptions.hpp"
+#include "Happening.hpp"
 
 //
 // Macros for DM class definition.
@@ -108,7 +109,7 @@ public:\
         return 0; \
     }\
 public:\
-  CLASSNAME( const Module& mod ): _LIBECS_BASE_CLASS_( reinterpret_cast< const _LIBECS_BASE_CLASS_::Module &>( mod ) ) {}
+  CLASSNAME( const Module& mod ): _LIBECS_BASE_CLASS_( reinterpret_cast< const _LIBECS_BASE_CLASS_::Module &>( mod ) ) { }
 //
 // Macros for property definitions
 //
@@ -215,11 +216,11 @@ public:\
 #define GET_METHOD( TYPE, NAME )\
   GET_SLOT( TYPE, get ## NAME )
 
-#define LOAD_METHOD( TYPE, NAME )\
-  SET_SLOT( TYPE, load ## NAME )
+#define LOAD_METHOD( NAME )\
+  SET_SLOT( ::libecs::Polymorph, load ## NAME )
 
-#define SAVE_METHOD( TYPE, NAME )\
-  GET_SLOT( TYPE, save ## NAME )
+#define SAVE_METHOD( NAME )\
+  GET_SLOT( ::libecs::Polymorph, save ## NAME )
 
 #define SET_METHOD_DEF( TYPE, NAME, CLASS )\
   SET_SLOT_DEF( TYPE, set ## NAME, CLASS )
@@ -227,11 +228,11 @@ public:\
 #define GET_METHOD_DEF( TYPE, NAME, CLASS )\
   GET_SLOT_DEF( TYPE, get ## NAME, CLASS )
 
-#define LOAD_METHOD_DEF( TYPE, NAME, CLASS )\
-  SET_SLOT_DEF( TYPE, load ## NAME, CLASS )
+#define LOAD_METHOD_DEF( NAME, CLASS )\
+  SET_SLOT_DEF( ::libecs::Polymorph, load ## NAME, CLASS )
 
-#define SAVE_METHOD_DEF( TYPE, NAME, CLASS )\
-  GET_SLOT_DEF( TYPE, save ## NAME, CLASS )
+#define SAVE_METHOD_DEF( NAME, CLASS )\
+  GET_SLOT_DEF( ::libecs::Polymorph, save ## NAME, CLASS )
 
 #define SIMPLE_GET_METHOD( TYPE, NAME )\
   GET_METHOD( TYPE, NAME )\
@@ -258,7 +259,10 @@ namespace libecs {
 
 /** @file */
 
+class PropertySlot;
+class PropertySlotProxy;
 class PropertyInterface;  
+class Polymorph;
 
 /**
    Common base class for classes with PropertySlots.
@@ -274,6 +278,12 @@ public:
     typedef PropertyInterface ConcretePropertyInterface;
     typedef DynamicModuleBase<PropertiedClass> Module;
 
+    struct PropertyChangeObserver
+    {
+    };
+
+    typedef Happening<boost::shared_ptr<PropertyChangeObserver>, PropertySlotProxy> PropertyChange;
+    DECLARE_UNORDERED_MAP( String, PropertyChange, DEFAULT_HASHER( String ), PropertyChangeNotifiers );
 public:
     LIBECS_DM_DEFINE_PROPERTIES();
 
@@ -330,23 +340,26 @@ public:
 
     virtual const PropertyInterface& getPropertyInterface() const;
 
-    void registerLogger( LoggerPtr aLogger );
+    const String& getClassName() const;
 
-    void removeLogger( LoggerPtr aLogger );
+    PropertySlotProxy createPropertySlotProxy( const String& aPropertyName );
 
-    const LoggerVector& getLoggerVector() const
+    void addPropertyChangeObserver( const String& name,
+            const PropertyChange::Subscription& sub )
     {
-        return theLoggerVector;
+        propertyChangeNotifiers_[ name ].add( sub );
     }
 
-    const String& getClassName() const;
+    void removePropertyChangeObserver( const String& name,
+            const PropertyChange::Subscription& sub )
+    {
+        propertyChangeNotifiers_[ name ].remove( sub );
+    }
 
     static void initializePropertyInterface( const PropertyInterface& )
     {
         ; // do nothing
     }
-
-    PropertySlotProxy createPropertySlotProxy( const String& aPropertyName );
 
 public:
     /// @internal
@@ -366,7 +379,7 @@ public:
 
     virtual const String& asString() const;
 
-    void throwException( const Exception& exc )
+    void throwException( const Exception& exc ) const
     {
         Exception modified(
             exc.getMethod(),
@@ -375,10 +388,15 @@ public:
         throw exc;
     }
 
+    operator const String&() const
+    {
+        return asString();
+    }
+
 protected:
     static ConcretePropertyInterface thePropertyInterface;
-    LoggerVector theLoggerVector;
     const Module& theModule;
+    PropertyChangeNotifiers propertyChangeNotifiers_;
     bool __libecs_ready;
 };
 

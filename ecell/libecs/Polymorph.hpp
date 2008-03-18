@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
@@ -36,27 +36,32 @@
 
 #include "dmtool/DMObject.hpp"
 #include "libecs.hpp"
-#include "convertTo.hpp"
+#include "Converters.hpp"
 #include "Util.hpp"
 
-namespace libecs
-{
-
-  /** @addtogroup polymorph The Polymorph.
+/**
+   @addtogroup polymorph The Polymorph.
    The Polymorph
 
    @ingroup libecs
-   @{ 
-   */ 
+ */
 
-  /** @file */
-  
-  DECLARE_CLASS( PolymorphValue );
+/** @{ */
 
-  class LIBECS_API PolymorphValue
-  {
+/** @file */
 
-  public:
+namespace libecs {
+
+using namespace converter;
+
+class Polymorph;
+
+typedef std::vector<Polymorph> PolymorphVector;
+
+
+class LIBECS_API PolymorphValue
+{
+public:
 
     virtual ~PolymorphValue();
 
@@ -68,232 +73,236 @@ namespace libecs
     template< typename T >
     const T as() const;
 
-    virtual PolymorphValuePtr createClone() const = 0;
+    virtual PolymorphValue* createClone() const = 0;
 
-  protected:
-  
+protected:
+
     PolymorphValue( const PolymorphValue& ) {}
     PolymorphValue() {}
 
-  private:
+private:
 
     const Polymorph& operator= ( const Polymorph& );
 
-  };
+};
 
 
-  template <>
-  inline const String PolymorphValue::as() const
-  {
+template <>
+inline const String PolymorphValue::as() const
+{
     return asString();
-  }
+}
 
-  template <>
-  inline const Real PolymorphValue::as() const
-  {
+template <>
+inline const Real PolymorphValue::as() const
+{
     return asReal();
-  }
+}
 
-  template <>
-  inline const Integer PolymorphValue::as() const
-  {
+template <>
+inline const Integer PolymorphValue::as() const
+{
     return asInteger();
-  }
+}
 
-  template <>
-  inline const PolymorphVector PolymorphValue::as() const
-  {
+template <>
+inline const PolymorphVector PolymorphValue::as() const
+{
     return asPolymorphVector();
-  }
+}
 
 
 
-  template< typename T >
-  class LIBECS_API ConcretePolymorphValue 
-    : 
-    public PolymorphValue
-  {
+template< typename T >
+class LIBECS_API ConcretePolymorphValue
+            :
+            public PolymorphValue
+{
 
     typedef typename libecs::Param<T>::type TParam;
 
-  public:
+public:
 
-    ConcretePolymorphValue( TParam aValue ) 
-      :
-      theValue( aValue )
+    ConcretePolymorphValue( TParam aValue )
+            :
+            theValue( aValue )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
     ConcretePolymorphValue( const PolymorphValue& aValue )
-      :
-      theValue( aValue.as<T>() )
+            :
+            theValue( aValue.as<T>() )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
     virtual ~ConcretePolymorphValue()
     {
-      ; // do nothing
-    }
-  
-    virtual const String asString() const 
-    { 
-      return convertTo<String>( theValue ); 
+        ; // do nothing
     }
 
-    virtual const Real   asReal()  const 
-    { 
-      return convertTo<Real>( theValue );
+    virtual const String asString() const
+    {
+        return convertTo<String>( theValue );
     }
 
-    virtual const Integer asInteger()   const 
-    { 
-      return convertTo<Integer>( theValue ); 
+    virtual const Real   asReal()  const
+    {
+        return convertTo<Real>( theValue );
+    }
+
+    virtual const Integer asInteger()   const
+    {
+        return convertTo<Integer>( theValue );
     }
 
     virtual const PolymorphVector asPolymorphVector() const
-    { 
-      return convertTo<PolymorphVector>( theValue ); 
-    }
-
-    virtual PolymorphValuePtr createClone() const
     {
-      return new ConcretePolymorphValue<T>( *this );
+        return convertTo<PolymorphVector>( theValue );
     }
 
-  private:
+    virtual PolymorphValue* createClone() const
+    {
+        return new ConcretePolymorphValue<T>( *this );
+    }
+
+private:
 
     T theValue;
 
-  };
+};
 
 
 
 
-  class LIBECS_API PolymorphNoneValue 
-    : 
-    public PolymorphValue
-  {
+class LIBECS_API PolymorphNoneValue
+            :
+            public PolymorphValue
+{
 
-  public: 
+public:
 
     PolymorphNoneValue() {}
 
     virtual ~PolymorphNoneValue();
 
     virtual const String  asString() const;
-    virtual const Real    asReal() const       { return 0.0; }
-    virtual const Integer asInteger() const    { return 0; }
+    virtual const Real    asReal() const       {
+        return 0.0;
+    }
+    virtual const Integer asInteger() const    {
+        return 0;
+    }
     virtual const PolymorphVector asPolymorphVector() const;
-  
-    virtual PolymorphValuePtr createClone() const
+
+    virtual PolymorphValue* createClone() const
     {
-      return new PolymorphNoneValue;
+        return new PolymorphNoneValue;
     }
 
-  };
+};
 
 
 
-  class LIBECS_API Polymorph
-  {
+class LIBECS_API Polymorph
+{
 
-  public:
+public:
 
     enum Type
-      {
-	NONE,
-	REAL, 
-	INTEGER,  
-	STRING,
-	POLYMORPH_VECTOR
-      };
+    {
+        NONE,
+        REAL,
+        INTEGER,
+        STRING,
+        POLYMORPH_VECTOR
+    };
 
-  
+
     Polymorph()
-      :
-      theValue( new PolymorphNoneValue )
+            :
+            theValue( new PolymorphNoneValue )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
-    Polymorph( const String&  aValue ) 
-      :
-      theValue( new ConcretePolymorphValue<String>( aValue ) )
+    Polymorph( const String&  aValue )
+            :
+            theValue( new ConcretePolymorphValue<String>( aValue ) )
     {
-      ; // do nothing
-    }
-  
-    Polymorph( RealParam aValue )      
-      :
-      theValue( new ConcretePolymorphValue<Real>( aValue ) )
-    {
-      ; // do nothing
+        ; // do nothing
     }
 
-    Polymorph( IntegerParam aValue )      
-      :
-      theValue( new ConcretePolymorphValue<Integer>( aValue ) )
+    Polymorph( RealParam aValue )
+            :
+            theValue( new ConcretePolymorphValue<Real>( aValue ) )
     {
-      ; // do nothing
+        ; // do nothing
+    }
+
+    Polymorph( IntegerParam aValue )
+            :
+            theValue( new ConcretePolymorphValue<Integer>( aValue ) )
+    {
+        ; // do nothing
     }
 
     Polymorph( const PolymorphVector& aValue )
-      :
-      theValue( new ConcretePolymorphValue<PolymorphVector>( aValue ) )
+            :
+            theValue( new ConcretePolymorphValue<PolymorphVector>( aValue ) )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
     Polymorph( const Polymorph& aValue )
-      :
-      theValue( aValue.createValueClone() )
+            :
+            theValue( aValue.createValueClone() )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
     ~Polymorph()
     {
-      delete theValue;
+        delete theValue;
     }
 
     const Polymorph& operator=( const Polymorph& rhs )
     {
-      if( this != &rhs )
-	{
-	  delete theValue;
-	  theValue = rhs.createValueClone();
-	}
-    
-      return *this;
+        if ( this != &rhs )
+        {
+            delete theValue;
+            theValue = rhs.createValueClone();
+        }
+
+        return *this;
     }
 
     const String asString() const
-    { 
-      return theValue->asString(); 
+    {
+        return theValue->asString();
     }
 
     const Real   asReal() const
-    { 
-      return theValue->asReal(); 
+    {
+        return theValue->asReal();
     }
-  
+
     const Integer asInteger() const
-    { 
-      return theValue->asInteger();
+    {
+        return theValue->asInteger();
     }
 
     const PolymorphVector asPolymorphVector() const
-    { 
-      return theValue->asPolymorphVector();
+    {
+        return theValue->asPolymorphVector();
     }
 
     template< typename T >
     const T as() const;
-      //    {
-      //      DefaultSpecializationInhibited();
-      //    }
+    //    {
+    //      DefaultSpecializationInhibited();
+    //    }
 
     const Type getType() const;
 
@@ -302,146 +311,184 @@ namespace libecs
 
     operator String() const
     {
-      return asString();
+        return asString();
     }
 
     operator Real() const
     {
-      return asReal();
+        return asReal();
     }
 
     operator Integer() const
     {
-      return asInteger();
+        return asInteger();
     }
 
     operator PolymorphVector() const
     {
-      return asPolymorphVector();
+        return asPolymorphVector();
     }
 
-  protected:
+protected:
 
-    PolymorphValuePtr createValueClone() const
+    PolymorphValue* createValueClone() const
     {
-      return theValue->createClone();
+        return theValue->createClone();
     }
 
-  protected:
+protected:
 
-    PolymorphValuePtr theValue;
+    PolymorphValue* theValue;
 
-  };
-
-
+};
 
 
-  template <>
-  inline const String Polymorph::as() const
-  {
+
+
+template <>
+inline const String Polymorph::as() const
+{
     return asString();
-  }
+}
 
-  template <>
-  inline const Real   Polymorph::as() const
-  {
+template <>
+inline const Real   Polymorph::as() const
+{
     return asReal();
-  }
+}
 
-  template <>
-  inline const Integer Polymorph::as() const
-  {
+template <>
+inline const Integer Polymorph::as() const
+{
     return asInteger();
-  }
+}
 
-  template <>
-  inline const PolymorphVector Polymorph::as() const
-  {
+template <>
+inline const PolymorphVector Polymorph::as() const
+{
     return asPolymorphVector();
-  }
+}
 
+LIBECS_API const Polymorph convertStringMapToPolymorph( std::map<const String&, const String&> const& aMap );
 
-
-  //
-  // nullValue() specialization for Polymorph. See Util.hpp
-  //
-
-  template<>
-  inline const Polymorph nullValue()
-  {
+/**
+   nullValue() specialization for Polymorph. See Util.hpp
+ */
+template<>
+inline const Polymorph nullValue()
+{
     return Polymorph();
-  }
+}
 
-
-
-
-  //
-  // convertTo template specializations for PolymorphVector.
-  //
-
-  // identity
-  template<>
-  class ConvertTo< PolymorphVector, PolymorphVector >
-  {
-  public:
-    const PolymorphVector operator()( const PolymorphVector& aValue )
+// convertTo template specializations for PolymorphVector.
+namespace converter { namespace detail {
+    template<>
+    struct ConvertTo< PolymorphVector, std::map< const String, const String > >
     {
-      return aValue;
-    }
-  };
+        typedef PolymorphVector ToType;
+        typedef std::map< const String, const String > FromType;
 
-  // to PolymorphVector
+        struct Converter
+        {
+            ToType operator()( const FromType& aMap )
+            {
+                PolymorphVector aVector;
+                aVector.reserve( aMap.size() );
 
-  template< typename FromType >
-  class ConvertTo< PolymorphVector, FromType >
-  {
-  public:
-    const PolymorphVector operator()( const FromType& aValue )
+                for ( FromType::const_iterator i( aMap.begin() );
+                        i != aMap.end();  ++i )
+                {
+                    PolymorphVector anInnerVector;
+                    anInnerVector.push_back( i->first );
+                    anInnerVector.push_back( i->second );
+
+                    aVector.push_back( anInnerVector );
+                }
+
+                return aVector;
+            }
+        };
+    };
+
+    template< typename Tfrom_ >
+    struct ConvertTo< PolymorphVector, Tfrom_ >
     {
-      return PolymorphVector( 1, aValue );
-    }
-  };
+        typedef PolymorphVector ToType;
+        typedef Tfrom_ FromType;
 
-  // Override the <T,String> case defined in convertTo.hpp.
-  template<>
-  class ConvertTo< PolymorphVector, String >
-  {
-  public:
-    const PolymorphVector operator()( const String& aValue )
+        struct Converter
+        {
+            const PolymorphVector operator()( const FromType& aValue )
+            {
+                return PolymorphVector( 1, aValue );
+            }
+        };
+    };
+
+    // Override the <T,String> case defined in convertTo.hpp.
+    template<>
+    struct ConvertTo< PolymorphVector, String >
     {
-      return PolymorphVector( 1, aValue );
-    }
-  };
+        typedef PolymorphVector ToType;
+        typedef String FromType;
 
+        struct Converter
+        {
+            const PolymorphVector operator()( const String& aValue )
+            {
+                return PolymorphVector( 1, aValue );
+            }
+        };
+    };
 
-  // from PolymorphVector 
-  template< typename ToType >
-  class ConvertTo< ToType, PolymorphVector >
-  {
-  public:
-    const ToType operator()( const PolymorphVector& aValue )
+    // from PolymorphVector
+    template<>
+    struct ConvertTo< PolymorphVector, PolymorphVector >
     {
-      checkSequenceSize( aValue, 1 );
-      return static_cast<Polymorph>(aValue[0]).as<ToType>();
-    }
-  };
+        typedef PolymorphVector ToType;
+        typedef PolymorphVector FromType;
 
-  // Override the <String,T> case defined in convertTo.hpp.
-  template<>
-  class ConvertTo< String, PolymorphVector >
-  {
-  public:
-    const String operator()( const PolymorphVector& aValue )
+        typedef StaticCaster< PolymorphVector, PolymorphVector > Converter;
+    };
+
+
+    // from PolymorphVector
+    template< typename Tto_ >
+    struct ConvertTo< Tto_, PolymorphVector >
     {
-      checkSequenceSize( aValue, 1 );
-      return static_cast<Polymorph>(aValue[0]).as<String>();
-    }
-  };
+        typedef Tto_ ToType;
+        typedef PolymorphVector FromType;
 
+        struct Converter
+        {
+            const ToType operator()( const PolymorphVector& aValue )
+            {
+                checkSequenceSize( aValue, 1 );
+                return static_cast<Polymorph>( aValue[0] ).as<ToType>();
+            }
+        };
+    };
 
-  // @} // polymorph
+    // Override the <String,T> case defined in convertTo.hpp.
+    template<>
+    struct ConvertTo< String, PolymorphVector >
+    {
+        typedef String ToType;
+        typedef PolymorphVector FromType;
+
+        struct Converter
+        {
+            const String operator()( const PolymorphVector& aValue )
+            {
+                checkSequenceSize( aValue, 1 );
+                return static_cast<Polymorph>( aValue[0] ).as<String>();
+            }
+        };
+    };
+} } // namespace converter::detail
 
 } // namespace libecs
 
+/** @} */
 
 #endif /* __POLYMORPH_HPP */

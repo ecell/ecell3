@@ -48,15 +48,9 @@
 
 namespace libecs {
 
-DECLARE_VECTOR( EntityPtr, EntityVector );
-
-
 /**
    Entity class is a base class for all components in the cell model.
-
 */
-
-
 LIBECS_DM_CLASS( Entity, PropertiedClass )
 {
 public:
@@ -78,7 +72,7 @@ public:
        Get the System where this Entity belongs.
        @return the borrowed pointer to the super system.
     */
-    SystemPtr getEnclosingSystem() const
+    System* getEnclosingSystem() const
     {
         return theSuperSystem;
     }
@@ -155,7 +149,7 @@ public:
        this when an Entity is added to the System.
        @param supersystem a pointer to a System to which this object belongs.
     */
-    void setSuperSystem( SystemPtr const supersystem )
+    void setSuperSystem( System* const supersystem )
     {
         theSuperSystem = supersystem;
     }

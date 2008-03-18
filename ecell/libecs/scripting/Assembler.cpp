@@ -52,8 +52,8 @@ namespace libecs { namespace scripting {
  
 void
 Assembler::appendVariableReferenceMethodInstruction(
-        libecs::VariableReferencePtr aVariableReference,
-        libecs::StringCref aMethodName )
+        libecs::VariableReference* aVariableReference,
+        const libecs::String& aMethodName )
 {
 
     if ( aMethodName == "MolarConc" ) {
@@ -82,7 +82,7 @@ Assembler::appendVariableReferenceMethodInstruction(
 
 void
 Assembler::appendSystemMethodInstruction(
-        libecs::SystemPtr aSystemPtr, libecs::StringCref aMethodName )
+        libecs::System* aSystemPtr, const libecs::String& aMethodName )
 {
     if ( aMethodName == "Size" ) {
         APPEND_OBJECT_METHOD_REAL( aSystemPtr, System, getSize );

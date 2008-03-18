@@ -46,6 +46,8 @@
 namespace libecs
 {
 
+class Model;
+
 LIBECS_DM_CLASS( System, Entity )
 {
 protected:
@@ -204,7 +206,7 @@ public:
 protected:
     void notifyChangeOfEntityList();
 
-    VariableCptr const findSizeVariable() const;
+    const Variable* const findSizeVariable() const;
 
 public: // property slots
     GET_METHOD( Polymorph, SystemList );

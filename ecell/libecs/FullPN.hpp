@@ -29,12 +29,11 @@
 // E-Cell Project.
 //
 
-#ifndef __FULLID_HPP
-#define __FULLID_HPP
+#ifndef __FULLPN_HPP
+#define __FULLPN_HPP
 
 #include "libecs.hpp"
-#include "LocalID.hpp"
-#include "SystemPath.hpp"
+#include "FullID.hpp"
 
 /** @addtogroup identifier The FullID, FullPN and SystemPath.
  The FullID, FullPN and SystemPath.
@@ -49,96 +48,98 @@
 
 namespace libecs {
 
-/**
-   FullID is an identifier that specifies an unique Entity in a cell model.
-   The FullID consists of a EntityType, a SystemPath and an ID string.
-
-   @see EntityType, SystemPath
-*/
-class FullID
+class FullPN
 {
 public:
-    FullID( const LocalID& localID,
-            const SystemPath& systempath )
-        : localID_( localID ), systemPath_( systempath )
-    {
-        ; // do nothing
-    }
-
-    FullID( const EntityType& type,
+    FullPN( const EntityType& type,
             const SystemPath& systempath,
-            const String& id )
-            :
-            localID_( type, id ),
-            systemPath_( systempath )
+            const String& id,
+            const String& propertyname )
+        : fullID_( type, systempath, id ),
+          propertyName_( propertyname )
     {
         ; // do nothing
     }
 
-    ~FullID() {}
-
-    const EntityType getEntityType() const
+    FullPN( const FullID& fullid, const String& propertyname )
+        : fullID_( fullid ),
+          propertyName_( propertyname )
     {
-        return localID_.getEntityType();
+        ; // do nothing
     }
 
-    const String& getID() const
+    FullPN( const FullPN& fullpn )
+        : fullID_( fullpn.getFullID() ),
+          propertyName_( fullpn.getPropertyName() )
     {
-        return localID_.getEntityType();
+        ; // do nothing
+    }
+
+    ~FullPN()
+    {
+        ; // do nothing
+    }
+
+    const FullID& getFullID() const
+    {
+        return fullID_;
+    }
+
+    const EntityType  getEntityType() const
+    {
+        return getFullID().getEntityType();
     }
 
     const SystemPath& getSystemPath() const
     {
-        return systemPath_;
+        return getFullID().getSystemPath();
     }
 
-    const LocalID& getLocalID() const
+    const String& getID() const
     {
-        return localID_;
+        return getFullID().getID();
     }
+
+    const String& getPropertyName() const
+    {
+        return propertyName_;
+    }
+
+    LIBECS_API static FullPN parse( const String& that );
 
     LIBECS_API const String asString() const;
 
-    bool operator<( const FullID& rhs ) const
+    bool operator<( const FullPN& rhs ) const
     {
-        if ( getSystemPath() != rhs.getSystemPath() )
+        if ( getFullID() != rhs.getFullID() )
         {
-            return getSystemPath() < rhs.getSystemPath();
+            return getFullID() < rhs.getFullID();
         }
 
-        return getLocalID() < rhs.getLocalID();
+        return getPropertyName() < rhs.getPropertyName();
     }
 
-    bool operator==( const FullID& rhs ) const
+    bool operator==( const FullPN& rhs ) const
     {
-        return getSystemPath() == rhs.getSystemPath() &&
-               getLocalID() == rhs.getLocalID();
+        return getFullID() == rhs.getFullID() &&
+               getPropertyName() == rhs.getPropertyName();
     }
 
-    bool operator!=( const FullID& rhs ) const
+    bool operator!=( const FullPN& rhs ) const
     {
         return ! operator==( rhs );
     }
 
-    LIBECS_API static FullID parse( const String& fullidstring );
-
 private:
-    FullID();
-
-public:
-
-    static const char DELIMITER = ':';
-
-private:
-    const LocalID       localID_;
-    const SystemPath    systemPath_;
+    FullID fullID_;
+    String propertyName_;
 };
 
 } // namespace libecs
 
 /** @} */ // identifier module
 
-#endif // __FULLID_HPP
+#endif // __FULLPN_HPP
 
 /*
   Do not modify

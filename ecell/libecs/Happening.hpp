@@ -78,12 +78,12 @@ public:
     {
     }
 
-    void add( Subscription sub )
+    void add( const Subscription& sub )
     {
         subscriptions.insert( sub );
     }
 
-    void remove( Subscription sub )
+    void remove( const Subscription& sub )
     {
         subscriptions.erase( sub );
     }
@@ -116,4 +116,4 @@ protected:
 
 }
 
-#endif // define __HAPPENING_HPP
+#endif /* __HAPPENING_HPP */

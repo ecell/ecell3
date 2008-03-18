@@ -35,7 +35,6 @@
 #include "libecs.hpp"
 #include "Exceptions.hpp"
 #include "DataPoint.hpp"
-#include "DataPointVector.hpp"
 #include "LoggingPolicy.hpp"
 
 /**
@@ -51,6 +50,7 @@ namespace libecs {
 
 class LIBECS_API PhysicalLogger
 {
+    typedef ::libecs::DataPoint<Time, Real> DataPoint;
     typedef vvector<DataPoint> Vector;
 
 public:
@@ -95,53 +95,9 @@ public:
                                            const Real time,
                                            const Real time_per_step ) const;
 
-    DataPointVectorSharedPtr getVector( const size_type start,
-                                        const size_type end ) const;
-
     size_type size() const;
 
     bool empty() const;
-
-    LongDataPoint at( size_type index ) const;
-
-    size_type begin() const
-    {
-        return 0;
-    }
-
-    size_type end() const
-    {
-        if ( size() > 0 )
-        {
-            return size() - 1;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-
-    LongDataPoint front() const
-    {
-        if ( empty() )
-        {
-            return DataPoint();
-        }
-
-        return at( begin() );
-    }
-
-    LongDataPoint back() const
-    {
-        if ( empty() )
-        {
-            return DataPoint();
-        }
-
-        return at( end() );
-    }
-
-    Real getAverageInterval() const;
 
 private:
     Vector         *theVector;

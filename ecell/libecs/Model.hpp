@@ -42,7 +42,6 @@
 #include "VariableMaker.hpp"
 #include "ProcessMaker.hpp"
 #include "SystemMaker.hpp"
-#include "LoggerBroker.hpp"
 #include "Stepper.hpp"
 #include "SystemStepper.hpp"
 
@@ -144,7 +143,7 @@ namespace libecs
     }
 
 
-    const StepperPtr getLastStepper() const
+    const Stepper* getLastStepper() const
     {
       return theLastStepper;
     }
@@ -244,39 +243,22 @@ namespace libecs
       return dynamic_cast<SystemStepper*>( theWorld.getStepper() );
     }
 
-    /**
-       Get the LoggerBroker.
-
-       @return a borrowed pointer to the LoggerBroker.
-    */
-
-    LoggerBrokerRef getLoggerBroker()
-    { 
-      return theLoggerBroker; 
-    }
-
-    const LoggerBroker& getLoggerBroker() const
-    { 
-      return theLoggerBroker; 
-    }
-
-
     StepperEventScheduler&   getScheduler() { return theScheduler; }
 
     /// @internal
-    StepperMakerRef     getStepperMaker()     { return theStepperMaker; }
+    StepperMaker&     getStepperMaker()     { return theStepperMaker; }
 
     /// @internal
 
-    ProcessMakerRef     getProcessMaker()     { return theProcessMaker; }
+    ProcessMaker&     getProcessMaker()     { return theProcessMaker; }
 
     /// @internal
 
-    VariableMakerRef    getVariableMaker()    { return theVariableMaker; }
+    VariableMaker&    getVariableMaker()    { return theVariableMaker; }
 
     /// @internal
 
-    SystemMakerRef      getSystemMaker()      { return theSystemMaker; }
+    SystemMaker&      getSystemMaker()      { return theSystemMaker; }
 
 
   private:
@@ -298,9 +280,8 @@ namespace libecs
 
 private:
     Time                theCurrentTime;
-    StepperPtr          theLastStepper;
+    const Stepper*      theLastStepper;
     StepperEventScheduler theScheduler;
-    LoggerBroker        theLoggerBroker;
     DynamicModule< PropertiedClass > theNullModule;
     System              theWorld;
     System*             theRootSystem;

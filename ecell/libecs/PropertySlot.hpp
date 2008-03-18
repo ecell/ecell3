@@ -32,9 +32,10 @@
 #include <functional>
 
 #include "libecs.hpp"
-#include "convertTo.hpp"
+#include "Converters.hpp"
 #include "Polymorph.hpp"
 #include "PropertyType.hpp"
+#include "PropertiedClass.hpp"
 
 /** @addtogroup property
   

@@ -36,8 +36,8 @@
 
 #include "FullID.hpp"
 #include "Model.hpp"
-#include "Logger.hpp"
-
+#include "LoggerManager.hpp"
+#include "PhysicalLogger.hpp"
 #include "DiscreteEventStepper.hpp"
 
 
@@ -51,20 +51,17 @@ LIBECS_DM_INIT_STATIC( DiscreteEventStepper, Stepper );
 DiscreteEventStepper::DiscreteEventStepper()
         :
         //    theTimeScale( 0.0 ),
-        theTolerance( 0.0 ),
-        theLastEventID( -1 )
+        tolerance_( 0.0 ),
+        lastEventID_( -1 )
 {
     ; // do nothing
 }
 
 GET_METHOD_DEF( String, LastProcess, DiscreteEventStepper )
 {
-    if ( theLastEventID != -1 )
+    if ( lastEventID_ != -1 )
     {
-        const ProcessCptr aLastProcess(
-            theScheduler.getEvent( theLastEventID ).getProcess() );
-
-        return aLastProcess->getFullID().asString();
+        return scheduler_.getEvent( lastEventID_ ).getProcess()->getFullID().asString();
     }
     else
     {
@@ -76,35 +73,30 @@ void DiscreteEventStepper::initialize()
 {
     Stepper::initialize();
 
-    if ( theProcessVector.empty() )
+    if ( processes_.empty() )
     {
         THROW_EXCEPTION( InitializationFailed,
                          "no process is associated" );
     }
 
-    const Real aCurrentTime( getCurrentTime() );
+    const Real currentTime( getCurrentTime() );
 
 
     // (1) (re)construct the scheduler's priority queue.
 
     // can this be done in registerProcess()?
 
-    theScheduler.clear();
-    for ( ProcessVectorConstIterator i( theProcessVector.begin() );
-            i != theProcessVector.end(); ++i )
+    // register a Process (as an event generator) to the priority queue.
+    scheduler_.clear();
+    for ( ProcessVector::const_iterator i( processes_.begin() );
+            i != processes_.end(); ++i )
     {
-        ProcessPtr aProcessPtr( *i );
-
-        // register a Process (as an event generator) to
-        // the priority queue.
-        theScheduler.addEvent( ProcessEvent( aProcessPtr->getStepInterval()
-                                             + aCurrentTime,
-                                             aProcessPtr ) );
+        scheduler_.addEvent(
+            ProcessEvent( (*i)->getStepInterval() + currentTime, *i ) );
     }
 
     // (2) (re)construct the event dependency array.
-
-    theScheduler.updateEventDependency();
+    scheduler_.updateEventDependency();
 
 
     // (3) Reschedule this Stepper.
@@ -114,38 +106,17 @@ void DiscreteEventStepper::initialize()
     // by the scheduler with the new stepinterval.
     // That means, this Stepper doesn't necessary step immediately
     // after initialize().
-    const ProcessEvent& aTopEvent( theScheduler.getTopEvent() );
-    const Real aNewTime( aTopEvent.getTime() );
-
-    loadStepInterval( aNewTime - aCurrentTime );
+    setStepInterval( scheduler_.getTopEvent().getTime() - currentTime );
 }
-
-
-
 
 void DiscreteEventStepper::step()
 {
-    theLastEventID = theScheduler.getTopID();
+    lastEventID_ = scheduler_.getTopID();
 
-    theScheduler.step();
-
+    scheduler_.step();
 
     // Set new StepInterval.
-    const ProcessEvent& aNewTopEvent( theScheduler.getTopEvent() );
-    const Real aNewStepInterval( aNewTopEvent.getTime() - getCurrentTime() );
-
-    // ProcessPtr const aNewTopProcess( aTopEvent.getProcess() );
-    // Calculate new timescale.
-    // To prevent 0.0 * INF -> NaN from happening, simply set zero
-    // if the tolerance is zero.
-    // ( DiscreteEventProcess::getTimeScale() can return INF. )
-
-    // temporarily disabled
-    //    theTimeScale = ( theTolerance == 0.0 ) ?
-    //      0.0 : theTolerance * aNewTopProcess->getTimeScale();
-
-    // FIXME: should be setStepInterval()
-    loadStepInterval( aNewStepInterval );
+    setStepInterval( scheduler_.getTopEvent().getTime() - getCurrentTime() );
 }
 
 
@@ -156,37 +127,28 @@ void DiscreteEventStepper::interrupt( TimeParam aTime )
     setCurrentTime( aTime );
 
     // update step intervals of all the Processes.
-    //    for( ProcessVector::const_iterator i( theProcessVector.begin() );
-    //  i != theProcessVector.end(); ++i )
-    theScheduler.updateAllEvents( getCurrentTime() );
+    scheduler_.updateAllEvents( getCurrentTime() );
 
-    const ProcessEvent& aTopEvent( theScheduler.getTopEvent() );
-    const Real aNewTime( aTopEvent.getTime() );
-
-    loadStepInterval( aNewTime - getCurrentTime() );
+    setStepInterval( scheduler_.getTopEvent().getTime() - getCurrentTime() );
 }
 
 void DiscreteEventStepper::log()
 {
-    if ( theLoggerVector.empty() )
-    {
-        return;
-    }
-
     // call Logger::log() of Loggers that are attached to
     // the last fired Process and Variables in its VariableReferenceVector.
+    const Process* lastProcess(
+            scheduler_.getEvent( lastEventID_ ).getProcess() );
+    loggerManager_->log( currentTime_, lastProcess );
 
-    const Real aCurrentTime( getCurrentTime() );
-
-    const ProcessEvent&
-    aLastEvent( theScheduler.getEvent( theLastEventID ) );
-    const ProcessCptr aLastProcess( aLastEvent.getProcess() );
-
-    const LoggerVector& aProcessLoggerVector( aLastProcess->getLoggerVector() );
-
-    FOR_ALL( LoggerVector, aProcessLoggerVector )
     {
-        ( *i )->log( aCurrentTime );
+        const Process::VarRefVectorCRange& varRefs(
+                lastProcess->getVariableReferences() );
+
+        for ( Process::VarRefVector::const_iterator i( varRefs.begin() );
+                i != varRefs.end(); ++i )
+        {
+            loggerManager_->log( currentTime_, (*i).getVariable() );
+        }
     }
 
     // Log all relevant processes.
@@ -196,41 +158,20 @@ void DiscreteEventStepper::log()
     //
     typedef ProcessEventScheduler::EventIDVector EventIDVector;
     const EventIDVector& anEventIDVector(
-        theScheduler.getDependencyVector( theLastEventID ) );
+        scheduler_.getDependencyVector( lastEventID_ ) );
 
     for ( EventIDVector::const_iterator i( anEventIDVector.begin() );
             i != anEventIDVector.end(); ++i )
     {
-        const ProcessEvent&
-        aDependentEvent( theScheduler.getEvent( *i ) );
-        ProcessPtr const aDependentProcess( aDependentEvent.getProcess() );
+        const Process* dependentProcess( scheduler_.getEvent( *i ).getProcess() );
+        loggerManager_->log( currentTime_, dependentProcess );
+        const Process::VarRefVectorCRange& varRefs(
+                dependentProcess->getVariableReferences() );
 
-
-        const LoggerVector& aDependentProcessLoggerVector( aDependentProcess->
-                getLoggerVector() );
-        for ( LoggerVectorConstIterator
-                j( aDependentProcessLoggerVector.begin() );
-                j != aDependentProcessLoggerVector.end(); ++j )
+        for ( Process::VarRefVector::const_iterator i( varRefs.begin() );
+                i != varRefs.end(); ++i )
         {
-            const LoggerPtr aLogger( *j );
-            aLogger->log( aCurrentTime );
-        }
-    }
-
-
-    const VariableReferenceVector&
-    aVariableReferenceVector( aLastProcess->getVariableReferenceVector() );
-
-    for ( VariableReferenceVectorConstIterator
-            j( aVariableReferenceVector.begin() );
-            j != aVariableReferenceVector.end(); ++j )
-    {
-        const VariableCptr aVariablePtr( ( *j ).getVariable() );
-        const LoggerVector& aLoggerVector( aVariablePtr->getLoggerVector() );
-
-        FOR_ALL( LoggerVector, aLoggerVector )
-        {
-            ( *i )->log( aCurrentTime );
+            loggerManager_->log( currentTime_, (*i).getVariable() );
         }
     }
 }

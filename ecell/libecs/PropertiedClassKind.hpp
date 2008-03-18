@@ -35,6 +35,11 @@
 
 namespace libecs {
 
+class Stepper;
+class Process;
+class Variable;
+class System;
+
 class PropertiedClassKind
 {
 public:

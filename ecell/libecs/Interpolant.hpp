@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
@@ -37,90 +37,79 @@
 namespace libecs
 {
 
-  class LIBECS_API Interpolant
-  {
-    friend class libecs::Stepper;
+class Stepper;
+class Variable;
 
+class LIBECS_API Interpolant
+{
+public:
 
-  public:
-
-    class VariablePtrCompare
+    class VariablePtrComparator
     {
     public:
-      bool operator()( InterpolantCptr const aLhs, 
-		       InterpolantCptr const aRhs ) const
-      {
-	return compare( aLhs->getVariable(), aRhs->getVariable() );
-      }
+        bool operator()( const Interpolant* const aLhs,
+                         const Interpolant* const aRhs ) const
+        {
+            return compare( aLhs->getVariable(), aRhs->getVariable() );
+        }
 
-      bool operator()( InterpolantCptr const aLhs,
-		       VariableCptr const aRhs ) const
-      {
-	return compare( aLhs->getVariable(), aRhs );
-      }
+        bool operator()( const Interpolant* const aLhs,
+                         const Variable* const aRhs ) const
+        {
+            return compare( aLhs->getVariable(), aRhs );
+        }
 
-      bool operator()( VariableCptr const aLhs, 
-		       InterpolantCptr const aRhs ) const
-      {
-	return compare( aLhs, aRhs->getVariable() );
-      }
+        bool operator()( const Variable* const aLhs,
+                         const Interpolant* const aRhs ) const
+        {
+            return compare( aLhs, aRhs->getVariable() );
+        }
 
     private:
-
-      // if statement can be faster than returning an expression directly
-      inline static bool compare( VariableCptr const aLhs, 
-				  VariableCptr const aRhs )
-      {
-	if( aLhs < aRhs )
-	  {
-	    return true;
-	  }
-	else
-	  {
-	    return false;
-	  }
-      }
-
-
+        // if statement can be faster than returning an expression directly
+        inline static bool compare( const Variable* const aLhs,
+                                    const Variable* const aRhs )
+        {
+            return aLhs < aRhs;
+        }
     };
 
 
-    Interpolant( VariablePtr const aVariable );
+    Interpolant() {}
 
-    virtual ~Interpolant();
-    
-    virtual 
+    virtual void setVariable( Variable *var )
+    {
+        theVariable = var;
+    }
+
+    virtual ~Interpolant() {}
+
+    virtual
     const Real getVelocity( RealParam aTime ) const
     {
-      return 0.0;
+        return 0.0;
     }
-    
-    virtual 
+
+    virtual
     const Real getDifference( RealParam aTime, RealParam anInterval ) const
     {
-      return 0.0;
+        return 0.0;
     }
-     
-   VariablePtr const getVariable() const
+
+    Variable* const getVariable() const
     {
-      return theVariable;
+        return theVariable;
     }
 
-  private:
+private:
+    Variable* theVariable;
 
-    VariablePtr const theVariable;
-    
-  };
-
-
-  DECLARE_VECTOR( InterpolantPtr, InterpolantVector );
+};
 
 }
 
 
-
 #endif /* __INTERPOLANT_HPP */
-
 
 
 /*

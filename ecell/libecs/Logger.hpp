@@ -35,14 +35,14 @@
 #define __LOGGER_HPP
 
 #include <vector>
+#include <cstddef>
 
 #include <boost/utility.hpp>
 
 #include "libecs.hpp"
-#include "LoggerAdapter.hpp"
-#include "PhysicalLogger.hpp"
-#include "DataPointVector.hpp"
 #include "LoggingPolicy.hpp"
+#include "DataPoint.hpp"
+
 /*
  // enumeration for logging policy
  enum Policy
@@ -66,23 +66,21 @@ MAX_SPACE
 namespace libecs
 {
 
+class PhysicalLogger;
+
 /**
  Logger module for logging and retrieving data runtime.
  */
-class LIBECS_API Logger: private boost::noncopyable
+class LIBECS_API Logger
 {
 public:
-    DECLARE_TYPE( PhysicalLogger::size_type, size_type );
+    typedef DataPoint< Time, Real > DataPoint;
+    typedef ::std::size_t Step;
 
 public:
-    /**
-       Constructor.
+    Logger( const LoggingPolicy& pol = LoggingPolicy() );
 
-       Takes up the ownership of the given LoggerAdapter.
-
-    */
-    Logger( LoggerAdapterPtr aLoggerAdapter );
-    ~Logger( void );
+    ~Logger();
 
     /**
       Sets logging policy
@@ -97,28 +95,7 @@ public:
     /**
       Log current value that theLoggerAdapter gives with aTime.
     */
-    void log( RealParam aTime );
-
-    /**
-       Returns contents of the whole logger.
-
-    */
-    DataPointVectorSharedPtr getData( void ) const;
-
-    /**
-       Returns a slice of the data from aStartTime to anEndTime.
-    */
-
-    DataPointVectorSharedPtr getData( RealParam aStartTime,
-            RealParam anEndTime ) const;
-
-    /**
-       Returns a summary of the data from aStartTime to anEndTime with
-       intervals anInterval between data elements.
-    */
-    DataPointVectorSharedPtr getData( RealParam aStartTime,
-            RealParam anEndTime,
-            RealParam anInterval ) const;
+    void log( const DataPoint& aTime );
 
     /**
        Returns time of the first element  in Logger.
@@ -133,44 +110,14 @@ public:
     /**
       Returns size of logger
     */
-    const size_type getSize() const
-    {
-        return thePhysicalLogger.size();
-    }
-
-    /**
-       This method does nothing as of version 3.1.103.
-    */
-    void flush()
-    {
-        ; // do nothing
-    }
-
-protected:
-    /**
-      @internal
-
-     */
-    DataPointVectorIterator binary_search( DataPointVectorIterator begin,
-                                           DataPointVectorIterator end,
-                                           RealParam t )
-    {
-        return thePhysicalLogger.lower_bound( thePhysicalLogger.begin(),
-                                              thePhysicalLogger.end(),
-                                              t );
-    }
-
-private:
-    /// no default constructor
-    Logger( void );
+    const Step getSize() const;
 
 private:
     /// Data members
-    PhysicalLogger              thePhysicalLogger;
-    LoggerAdapterPtr            theLoggerAdapter;
-    PhysicalLogger::size_type   theStepCounter;
-    Real                        theLastTime;
-    LoggingPolicy               thePolicy;
+    boost::scoped_ptr< PhysicalLogger > impl_;
+    Time            lastTime_;
+    Step            stepCount_;
+    LoggingPolicy   policy_;
 };
 
 } // namespace libecs

@@ -40,29 +40,31 @@
 #include "libecs.hpp"
 #include "Entity.hpp"
 #include "VariableReference.hpp"
+#include "PartitionedList.hpp"
 
-namespace libecs
-{
-
-/** @addtogroup entities
- *@{
+/**
+   @addtogroup entities
  */
 
 /** @file */
 
+/** @{ */
 
-DECLARE_ASSOCVECTOR( String, VariableReference, std::less< const String >,
-                     VariableReferenceMap  );
-
-DECLARE_VECTOR( VariableReference, VariableReferenceVector );
+namespace libecs {
 
 /**
    Process class is used to represent chemical and other phenonema which
    may or may not result in change in value of one or more Variables.
-
-*/
+ */
 LIBECS_DM_CLASS( Process, Entity )
 {
+public:
+    typedef std::vector< VariableReference > VarRefVector;
+    typedef PartitionedList< 3, VarRefVector > VarRefs;
+    typedef ::boost::iterator_range< VarRefVector::iterator >
+            VarRefVectorRange;
+    typedef ::boost::iterator_range< VarRefVector::const_iterator >
+            VarRefVectorCRange;
 public:
     LIBECS_DM_BASECLASS( Process );
 
@@ -120,11 +122,6 @@ public:
     Process();
     virtual ~Process();
 
-    virtual const EntityType getEntityType() const
-    {
-        return EntityType( EntityType::PROCESS );
-    }
-
     virtual void fire() = 0;
 
     virtual GET_METHOD( Real, StepInterval )
@@ -159,8 +156,7 @@ public:
 
        @param anActivity An activity value to be set.
        @see getActivity()
-    */
-
+     */
     SET_METHOD( Real, Activity )
     {
         theActivity = value;
@@ -171,8 +167,7 @@ public:
 
        @see setActivity()
        @return the activity value of this Process.
-    */
-
+     */
     GET_METHOD( Real, Activity )
     {
         return theActivity;
@@ -180,14 +175,12 @@ public:
 
     SET_METHOD( Polymorph, VariableReferenceList );
     GET_METHOD( Polymorph, VariableReferenceList );
-    SAVE_METHOD( Polymorph, VariableReferenceList );
-
+    SAVE_METHOD( VariableReferenceList );
 
     GET_METHOD( Real, MolarActivity )
     {
         return theActivity / ( getEnclosingSystem()->getSize() * N_A );
     }
-
 
     /**
        Set a priority value of this Process.
@@ -197,8 +190,7 @@ public:
 
        @param aValue the priority value as an Integer.
        @see Stepper
-    */
-
+     */
     SET_METHOD( Integer, Priority )
     {
         thePriority = value;
@@ -206,8 +198,7 @@ public:
 
     /**
        @see setPriority()
-    */
-
+     */
     GET_METHOD( Integer, Priority )
     {
         return thePriority;
@@ -217,19 +208,15 @@ public:
        Register the Stepper of this Process by an ID.
 
        @param anID Stepper ID.
-    */
-
+     */
     SET_METHOD( String, StepperID );
 
     /**
        Get an ID of the Stepper of this Process.
 
        @return StepperID as a String.
-    */
-
+     */
     GET_METHOD( String, StepperID );
-
-
 
     /**
        Create a new VariableReference.
@@ -251,9 +238,9 @@ public:
 
 
     /**
-       Register a new VariableReference to theVariableReferenceVector.
+       Register a new VariableReference to varRefs_.
 
-       VariableReferences are sorted by coefficients, preserving the relative
+       VarRefs are sorted by coefficients, preserving the relative
        order by the names.
 
        @param aName name of the VariableReference.
@@ -278,80 +265,95 @@ public:
         const String& aVariableReferenceName ) const;
 
     /**
-       @return a const reference to the VariableReferenceVector
+       @return a const reference to the VarRefVector
     */
-
-    const VariableReferenceVector& getVariableReferenceVector() const
+    VarRefVectorCRange getVariableReferences() const
     {
-        return theVariableReferenceVector;
+        return VarRefVectorCRange( varRefs_.begin(), varRefs_.end() );
     }
 
-    VariableReferenceVector::size_type getZeroVariableReferenceOffset() const
+    VarRefVectorRange
+    getNegativeVariableReferences()
     {
-        return theZeroVariableReferenceIterator -
-               getVariableReferenceVector().begin();
+        return varRefs_.partition_range( 0 );
     }
 
-    VariableReferenceVector::size_type
-    getPositiveVariableReferenceOffset() const
+    VarRefVectorCRange
+    getNegativeVariableReferences() const
     {
-        return thePositiveVariableReferenceIterator -
-               getVariableReferenceVector().begin();
+        return varRefs_.partition_range( 0 );
     }
 
-    void setStepper( StepperPtr const aStepper );
+    VarRefVectorRange getZeroVariableReferences()
+    {
+        return varRefs_.partition_range( 1 );
+    }
+
+    VarRefVectorCRange getZeroVariableReferences() const
+    {
+        return varRefs_.partition_range( 1 );
+    }
+
+    VarRefVectorRange
+    getPositiveVariableReferences()
+    {
+        return varRefs_.partition_range( 2 );
+    }
+
+    VarRefVectorCRange
+    getPositiveVariableReferences() const
+    {
+        return varRefs_.partition_range( 2 );
+    }
+
+    void setStepper( Stepper* const aStepper );
 
     /**
        Returns a pointer to a Stepper object that this Process belongs.
        @return A pointer to a Stepper object that this Process, or
        NULLPTR if it is not set yet.
-    */
+     */
     Stepper* getStepper() const
     {
         return theStepper;
     }
 
     /**
-       Add a value to each of VariableReferences.
+       Add a value to each of VarRefs.
 
        For each VariableReference, the new value is:
        old_value + ( aValue * theCoeffiencnt ).
 
-       VariableReferences with zero coefficients are skipped for optimization.
+       VarRefs with zero coefficients are skipped for optimization.
 
        This is a convenient method for use in subclasses.
 
        @param aValue aReal value to be added.
-    */
+     */
     void addValue( RealParam aValue )
     {
         setActivity( aValue );
 
         // Increase or decrease variables, skipping zero coefficients.
-        std::for_each( theVariableReferenceVector.begin(),
-                       theZeroVariableReferenceIterator,
-                       boost::bind2nd
-                       ( boost::mem_fun_ref
-                         ( &VariableReference::addValue ), aValue ) );
+        VarRefVectorCRange zeroVarRefs( getZeroVariableReferences() );
+        VarRefVectorCRange positiveVarRefs( getPositiveVariableReferences() );
+        std::for_each(
+                zeroVarRefs.begin(), zeroVarRefs.end(),
+                boost::bind2nd( boost::mem_fun_ref(
+                    &VariableReference::addValue ), aValue ) );
 
-        std::for_each( thePositiveVariableReferenceIterator,
-                       theVariableReferenceVector.end(),
-                       boost::bind2nd
-                       ( boost::mem_fun_ref
-                         ( &VariableReference::addValue ), aValue ) );
+        std::for_each(
+                positiveVarRefs.begin(), positiveVarRefs.end(),
+               boost::bind2nd( boost::mem_fun_ref(
+                    &VariableReference::addValue ), aValue ) );
     }
-
 
     /**
        Set velocity of each VariableReference according to stoichiometry.
-
-       VariableReferences with zero coefficients are skipped for optimization.
-
-       This is a convenient method for use in subclasses.
-
+       VarRefs with zero coefficients are skipped for optimization.
+       This is a convenience method for use in subclasses.
        @param aVelocity a base velocity to be added.
-    */
-
+     */
     void setFlux( RealParam aVelocity )
     {
         setActivity( aVelocity );
@@ -359,66 +361,42 @@ public:
 
     /**
        Unset all the product species' isAccessor() bit.
-
-       Product species here means VariableReferences those have positive
+       Product species here means VarRefs those have positive
        non-zero coefficients.
-
-       As a result these becomes write-only VariableReferences.
-
+       As a result these becomes write-only VarRefs.
        This method is typically called in initialize() of subclasses.
        This method should be called before getVariableReference().
 
        This is a convenient method.
-
-    */
-
+     */
     void declareUnidirectional();
-
 
     /**
        Check if this Process can affect on a given Process.
-       
+     */
+    const bool isDependentOn( const Process& aProcessPtr ) const;
 
-    */
+protected:
+    VarRefVector::iterator findVariableReference( const String& aName );
+    VarRefVector::const_iterator findVariableReference( const String& aName ) const;
 
-    const bool isDependentOn( const ProcessCptr aProcessPtr ) const;
-
+    void updateVarRefVector();
 
 protected:
 
-    VariableReferenceVectorIterator findVariableReference( const String& aName );
-
-    VariableReferenceVectorConstIterator findVariableReference( const String& aName ) const;
-
-    void updateVariableReferenceVector();
-
-    //    static const Polymorph
-    //      convertVariableReferenceToPolymorph( const VariableReference&
-    //                                           aVariableReference );
-
-    //    static const VariableReference
-    //      convertPolymorphToVariableReference( const Polymorph& aPolymorph );
-
-protected:
-
-    VariableReferenceVector theVariableReferenceVector;
-
-    VariableReferenceVectorIterator theZeroVariableReferenceIterator;
-    VariableReferenceVectorIterator thePositiveVariableReferenceIterator;
+    VarRefs varRefs_;
 
 private:
 
-    StepperPtr  theStepper;
+    Stepper*  theStepper;
 
     Real        theActivity;
     Integer     thePriority;
-
 };
 
-
-/*@}*/
-
 } // namespace libecs
+
+/** @}*/
 
 #endif /* __PROCESS_HPP */
 

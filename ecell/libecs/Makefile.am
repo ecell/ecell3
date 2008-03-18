@@ -19,12 +19,11 @@ lib_LTLIBRARIES = libecs.la
 
 AM_CXXFLAGS = @CXXFLAGS@
 
-libecs_la_LDFLAGS= -version-info 2:0:0 -no-undefined
-libecs_la_LIBADD=  -lstdc++ $(LIBLTDL) $(GSL_LIBADD) scripting/libecs-scripting.la
-libecs_la_SOURCES=\
+libecs_la_LDFLAGS = -version-info 2:0:0 -no-undefined
+libecs_la_LIBADD =  -lstdc++ $(LIBLTDL) $(GSL_LIBADD) scripting/libecs-scripting.la
+libecs_la_SOURCES = \
+AdaptiveDifferentialStepper.cpp\
 ContinuousProcess.cpp\
-DataPoint.cpp\
-DataPointVector.cpp\
 DifferentialStepper.cpp\
 DiscreteEventStepper.cpp\
 DiscreteTimeStepper.cpp\
@@ -32,10 +31,10 @@ Entity.cpp\
 EntityType.cpp\
 Exceptions.cpp\
 FullID.cpp\
-Interpolant.cpp\
+FullPN.cpp\
 Logger.cpp\
 LoggerAdapter.cpp\
-LoggerBroker.cpp\
+LoggerManager.cpp\
 Model.cpp\
 PassiveStepper.cpp\
 PhysicalLogger.cpp\
@@ -52,20 +51,27 @@ Stepper.cpp\
 StepperMaker.cpp\
 System.cpp\
 SystemMaker.cpp\
+SystemPath.cpp\
 SystemStepper.cpp\
 Util.cpp\
 VVector.cpp\
 Variable.cpp\
 VariableMaker.cpp\
 VariableReference.cpp\
+VariableValueInterpolant.cpp\
 libecs.cpp\
 BlockIO.cpp
 
 libecs_ladir=${ECELL_INCLUDE_DIR}/libecs
 libecs_la_HEADERS=\
+AdaptiveDifferentialStepper.hpp\
 AssocVector.h\
+CastUtils.hpp\
+Converters.hpp\
 ContinuousProcess.hpp\
 DataPoint.hpp\
+DataPointIntegrator.hpp\
+Downsampler.hpp\
 DataPointVector.hpp\
 Defs.hpp\
 DifferentialStepper.hpp\
@@ -74,15 +80,19 @@ DiscreteTimeStepper.hpp\
 DynamicPriorityQueue.hpp\
 Entity.hpp\
 EntityType.hpp\
+EventBase.hpp\
 EventScheduler.hpp\
 Exceptions.hpp\
 FluxProcess.hpp\
 FullID.hpp\
+FullPN.hpp\
 Happening.hpp\
 Interpolant.hpp\
+Integrator.hpp\
+LocalID.hpp\
 Logger.hpp\
 LoggerAdapter.hpp\
-LoggerBroker.hpp\
+LoggerManager.hpp\
 MethodProxy.hpp\
 Model.hpp\
 PassiveStepper.hpp\
@@ -99,11 +109,13 @@ PropertySlot.hpp\
 PropertySlotProxy.hpp\
 PropertySlotProxyLoggerAdapter.hpp\
 PropertyType.hpp\
+RealMath.hpp\
 Stepper.hpp\
 StepperEvent.hpp\
 StepperMaker.hpp\
 System.hpp\
 SystemMaker.hpp\
+StstemPath.hpp\
 SystemStepper.hpp\
 Util.hpp\
 Variable.hpp\

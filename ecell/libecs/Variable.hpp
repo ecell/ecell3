@@ -36,31 +36,27 @@
 
 #include "libecs.hpp"
 #include "Entity.hpp"
-#include "Interpolant.hpp"
 #include "System.hpp"
 
 
-namespace libecs
-{
-
-/** @addtogroup entities
- *@{
+/**
+   @addtogroup entities
  */
-
+/** @{ */
 /** @file */
 
+namespace libecs {
+
+class VariableValueIntegrator;
 
 /**
    Variable class represents state variables in the simulation model, such as
    amounts of molecular species in a compartment.
 
 */
-
 LIBECS_DM_CLASS( Variable, Entity )
 {
-
 public:
-
     LIBECS_DM_BASECLASS( Variable );
 
     LIBECS_DM_OBJECT( Variable, Variable )
@@ -73,8 +69,7 @@ public:
                                 &Variable::loadValue,
                                 &Variable::saveValue );
 
-
-        PROPERTYSLOT_SET_GET( Integer,  Fixed );
+        PROPERTYSLOT( Integer, Fixed, &Variable::setFixed, &Variable::isFixed );
 
         PROPERTYSLOT_NO_LOAD_SAVE( Real, Velocity,
                                    NOMETHOD,
@@ -85,99 +80,40 @@ public:
                                 &Variable::getMolarConc,
                                 &Variable::loadMolarConc,
                                 NOMETHOD );
-        // PROPERTYSLOT_NO_LOAD_SAVE( Real, MolarConc,
-        //       &Variable::setMolarConc,
-        //       &Variable::getMolarConc );
 
-        PROPERTYSLOT_NO_LOAD_SAVE( Real, NumberConc,
-                                   &Variable::setNumberConc,
-                                   &Variable::getNumberConc );
+        PROPERTYSLOT_LOAD_SAVE( Real, NumberConc,
+                                &Variable::setNumberConc,
+                                &Variable::getNumberConc,
+                                &Variable::loadNumberConc,
+                                NOMETHOD );
     }
 
 
     Variable();
     virtual ~Variable();
 
-    virtual const EntityType getEntityType() const
-    {
-        return EntityType( EntityType::VARIABLE );
-    }
-
-
     /**
-       Initializes this variable.
+       Initializes this variable right before the simulation starts.
     */
-
     virtual void initialize();
-
-
-    /**
-       Clear theVelocity by zero.
-    */
-
-    virtual const bool isIntegrationNeeded() const
-    {
-        return ! theInterpolantVector.empty();
-    }
-
-    /**
-    Integrate.
-    */
-
-    virtual void integrate( RealParam aTime )
-    {
-        if ( isFixed() == false )
-        {
-            updateValue( aTime );
-        }
-        else
-        {
-            lastUpdated = aTime;
-        }
-    }
-
-
-    /**
-
-    This method is used internally by DifferentialStepper.
-
-    @internal
-    */
-
-    void interIntegrate( RealParam aCurrentTime )
-    {
-        const Real anInterval( aCurrentTime - lastUpdated );
-
-        if ( anInterval > 0.0 )
-        {
-            Real aVelocitySum( calculateDifferenceSum( aCurrentTime,
-                               anInterval ) );
-            loadValue( getValue() + aVelocitySum );
-        }
-    }
-
 
     /**
        This simply sets the value of this Variable if getFixed() is false.
-
        @see getFixed()
     */
-
     virtual SET_METHOD( Real, Value )
     {
-        if ( !isFixed() )
+        if ( fixed_ )
         {
-            value = value;
+            THROW_EXCEPTION( IllegalOperation,
+                    "cannot modify constant variable" );
         }
+        value_ = value;
     }
 
-
-    // Currently this is non-virtual, but will be changed to a
-    // virtual function, perhaps in version 3.3.
-    // virtual
     GET_METHOD( Real, Value )
     {
-        return value;
+        return value_;
     }
 
     void addValue( RealParam aValue )
@@ -185,31 +121,20 @@ public:
         setValue( getValue() + aValue );
     }
 
-    void loadValue( Param<Polymorph> aValue )
+    LOAD_METHOD( Value )
     {
-        value = aValue.as<Real>();
+        value_ = value;
     }
 
-    const Polymorph saveValue() const
+    SAVE_METHOD( Value )
     {
-        return Polymorph( value );
+        return Polymorph( value_ );
     }
 
     /**
        @return current velocity value in (number of molecules)/(step)
     */
-
-    GET_METHOD( Real, Velocity )
-    {
-        Real aVelocitySum( 0.0 );
-        FOR_ALL( InterpolantVector, theInterpolantVector )
-        {
-            InterpolantPtr const anInterpolantPtr( *i );
-            aVelocitySum += anInterpolantPtr->getVelocity( lastUpdated );
-        }
-
-        return aVelocitySum;
-    }
+    GET_METHOD( Real, Velocity );
 
     /**
 
@@ -219,45 +144,32 @@ public:
 
     void setFixed( const bool aValue )
     {
-        fixed = aValue;
+        fixed_ = aValue;
     }
-
-    /**
-       @return true if the Variable is fixed or false if not.
-    */
-
-    const bool isFixed() const
-    {
-        return fixed;
-    }
-
 
     // wrappers to expose is/setFixed as PropertySlots
     SET_METHOD( Integer, Fixed )
     {
-        fixed = value != 0;
+        fixed_ = value != 0;
     }
 
-    GET_METHOD( Integer, Fixed )
+    Integer isFixed()
     {
-        return fixed;
+        return fixed_;
     }
 
     /**
        Returns the molar concentration of this Variable.
-
        @return Concentration in M [mol/L].
     */
 
     GET_METHOD( Real, MolarConc )
     {
-        // N_A_R = 1.0 / N_A
         return getNumberConc() * N_A_R;
     }
 
     /**
        Set the molar concentration of this Variable.
-
        @param value Concentration in M [mol/L].
     */
 
@@ -268,110 +180,75 @@ public:
 
     /**
        Load the molar concentration of this Variable.
-
        This method uses loadNumberConc() instead of setNumberConc().
-
        @see setNumberConc()
     */
-
-    LOAD_METHOD( Real, MolarConc )
+    LOAD_METHOD( MolarConc )
     {
-        loadNumberConc( value * N_A );
+        loadNumberConc( value.as<Real>() * N_A );
     }
 
     /**
        Returns the number concentration of this Variable.
-
        Unlike getMolarConc, this method just returns value / size.
-
        @return Concentration in [number/L].
     */
 
     GET_METHOD( Real, NumberConc )
     {
         return getValue() / getSizeOfSuperSystem();
-
-        // This uses getSizeOfSuperSystem() private method instead of
-        // getSuperSystem()->getSize() because otherwise it is
-        // impossible to inline this.
     }
 
     /**
        Set the number concentration of this Variable.
-
        @param value concentration in [number/L].
     */
-
     SET_METHOD( Real, NumberConc )
     {
         setValue( value * getSizeOfSuperSystem() );
-
-        // This uses getSizeOfSuperSystem() private method instead of
-        // getSuperSystem()->getSize() because otherwise it is
-        // impossible to inline this.
     }
 
-    void registerInterpolant( InterpolantPtr const anInterpolant );
+    SAVE_METHOD( NumberConc )
+    {
+        return Polymorph( getNumberConc() );
+    }
+
+    LOAD_METHOD( NumberConc )
+    {
+        setNumberConc( value.as<Real>() );
+    }
+
+    void setVariableValueIntegrator( VariableValueIntegrator* integrator )
+    {
+        integrator_ = integrator_;
+    }
+
+    VariableValueIntegrator* getVariableValueIntegrator()
+    {
+        return integrator_;
+    }
+
+    const VariableValueIntegrator* getVariableValueIntegrator() const
+    {
+        return integrator_;
+    }
 
 protected:
-    const Real calculateDifferenceSum( RealParam aCurrentTime,
-                                       RealParam anInterval ) const
-    {
-        Real aVelocitySum( 0.0 );
-
-        FOR_ALL ( InterpolantVector, theInterpolantVector )
-        {
-            aVelocitySum += (*i)->getDifference( aCurrentTime,
-                            anInterval );
-        }
-
-        return aVelocitySum;
-    }
-
-
-    void updateValue( RealParam aCurrentTime )
-    {
-        const Real anInterval( aCurrentTime - lastUpdated );
-
-        if ( anInterval == 0.0 )
-        {
-            return;
-        }
-
-        const Real aVelocitySum( calculateDifferenceSum( aCurrentTime,
-                                 anInterval ) );
-        setValue( getValue() + aVelocitySum );
-
-        lastUpdated = aCurrentTime;
-    }
-
-
-
-    void clearInterpolantVector();
-
-private:
-
     const Real getSizeOfSuperSystem() const
     {
         return getEnclosingSystem()->getSizeVariable()->getValue();
     }
 
 protected:
-
-    Real value;
-
-    Real lastUpdated;
-
-    InterpolantVector theInterpolantVector;
-
-    bool fixed;
+    Real value_;
+    VariableValueIntegrator* integrator_;
+    bool fixed_;
 };
 
 
-/*@}*/
-
 } // namespace libecs
 
+/** @} */
 
 #endif /* __VARIABLE_HPP */
 

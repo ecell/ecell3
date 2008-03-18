@@ -40,15 +40,19 @@
 #include <gsl/gsl_rng.h>
 #endif
 
+#include <boost/range/iterator_range.hpp>
+
 #include "libecs.hpp"
 
-#include "Util.hpp"
 #include "Polymorph.hpp"
+#include "Variable.hpp"
 #include "Interpolant.hpp"
 #include "PropertyInterface.hpp"
+#include "PartitionedList.hpp"
 
-/** @addtogroup stepper
- *@{
+/**
+   @addtogroup stepper
+   @{
  */
 
 /** @file */
@@ -57,9 +61,7 @@ namespace libecs
 {
 
 class Model;
-
-DECLARE_VECTOR( Real, RealVector );
-typedef VariableVector::size_type VariableIndex;
+class LoggerManager;
 
 /**
    Stepper class defines and governs a computation unit in a model.
@@ -67,16 +69,29 @@ typedef VariableVector::size_type VariableIndex;
 */
 LIBECS_DM_CLASS( Stepper, PropertiedClass )
 {
+public:
+    typedef std::vector<Variable*> VariableVector;
+    typedef PartitionedList< 3, VariableVector > Variables;
+    typedef boost::iterator_range<Variables::iterator> VariableVectorRange;
+    typedef boost::iterator_range<Variables::const_iterator> VariableVectorCRange;
+    typedef std::vector<Process*> ProcessVector;
+    typedef PartitionedList< 2, ProcessVector> Processes;
+    typedef boost::iterator_range<Processes::iterator> ProcessVectorRange;
+    typedef boost::iterator_range<Processes::const_iterator> ProcessVectorCRange;
+    typedef std::vector<System*> SystemSet;
+    typedef boost::iterator_range<SystemSet::iterator> SystemSetRange;
+    typedef boost::iterator_range<SystemSet::const_iterator> SystemSetCRange;
+
+    typedef std::vector<Real> RealVector;
 
 public:
-
     LIBECS_DM_BASECLASS( Stepper );
 
     LIBECS_DM_OBJECT_ABSTRACT( Stepper )
     {
         INHERIT_PROPERTIES( PropertiedClass );
 
-        PROPERTYSLOT_SET_GET( Integer,       Priority );
+        PROPERTYSLOT_SET_GET( Integer,   Priority );
         PROPERTYSLOT_SET_GET( Real,      StepInterval );
         PROPERTYSLOT_SET_GET( Real,      MaxStepInterval );
         PROPERTYSLOT_SET_GET( Real,      MinStepInterval );
@@ -89,47 +104,34 @@ public:
         PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, SystemList );
         PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, ReadVariableList );
         PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, WriteVariableList );
-
-
-        // setting rng type:  not yet supported
-        //PROPERTYSLOT_SET_GET( Polymorph, Rng,              Stepper );
     }
 
 
-    class PriorityCompare
+    class PriorityComparator
     {
     public:
-        bool operator()( StepperPtr aLhs, StepperPtr aRhs ) const
+        bool operator()( StepperPtr lhs, StepperPtr rhs ) const
         {
-            return compare( aLhs->getPriority(), aRhs->getPriority() );
+            return compare( lhs->getPriority(), rhs->getPriority() );
         }
 
-        bool operator()( StepperPtr aLhs, IntegerParam aRhs ) const
+        bool operator()( StepperPtr lhs, IntegerParam rhs ) const
         {
-            return compare( aLhs->getPriority(), aRhs );
+            return compare( lhs->getPriority(), rhs );
         }
 
-        bool operator()( IntegerParam aLhs, StepperPtr aRhs ) const
+        bool operator()( IntegerParam lhs, StepperPtr rhs ) const
         {
-            return compare( aLhs, aRhs->getPriority() );
+            return compare( lhs, rhs->getPriority() );
         }
 
     private:
 
         // if statement can be faster than returning an expression directly
-        inline static bool compare( IntegerParam aLhs, IntegerParam aRhs )
+        inline static bool compare( IntegerParam lhs, IntegerParam rhs )
         {
-            if ( aLhs > aRhs )
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return lhs > rhs;
         }
-
-
     };
 
 
@@ -148,12 +150,12 @@ public:
 
     GET_METHOD( Real, CurrentTime )
     {
-        return theCurrentTime;
+        return currentTime_;
     }
 
     SET_METHOD( Real, CurrentTime )
     {
-        theCurrentTime = value;
+        currentTime_ = value;
     }
 
     /**
@@ -190,7 +192,7 @@ public:
 
     GET_METHOD( Real, StepInterval )
     {
-        return theStepInterval;
+        return stepInterval_;
     }
 
     virtual GET_METHOD( Real, TimeScale )
@@ -200,33 +202,33 @@ public:
 
     SET_METHOD( String, ID )
     {
-        theID = value;
+        id_ = value;
     }
 
     GET_METHOD( String, ID )
     {
-        return theID;
+        return id_;
     }
 
 
     SET_METHOD( Real, MinStepInterval )
     {
-        theMinStepInterval = value;
+        minStepInterval_ = value;
     }
 
     GET_METHOD( Real, MinStepInterval )
     {
-        return theMinStepInterval;
+        return minStepInterval_;
     }
 
     SET_METHOD( Real, MaxStepInterval )
     {
-        theMaxStepInterval = value;
+        maxStepInterval_ = value;
     }
 
     GET_METHOD( Real, MaxStepInterval )
     {
-        return theMaxStepInterval;
+        return maxStepInterval_;
     }
 
 
@@ -262,72 +264,69 @@ public:
 
     /**
        Register a System to this Stepper.
-
        @param aSystemPtr a pointer to a System object to register
     */
 
-    void registerSystem( SystemPtr aSystemPtr );
+    void registerSystem( System* aSystemPtr );
 
     /**
        Remove a System from this Stepper.
-
        @note This method is not currently supported.  Calling this method
        causes undefined behavior.
-
        @param aSystemPtr a pointer to a System object
     */
 
-    void removeSystem( SystemPtr aSystemPtr );
+    void removeSystem( System* aSystemPtr );
 
     /**
        Register a Process to this Stepper.
-
        @param aProcessPtr a pointer to a Process object to register
     */
 
-    void registerProcess( ProcessPtr aProcessPtr );
+    virtual void registerProcess( Process* aProcessPtr );
 
     /**
        Remove a Process from this Stepper.
-
        @note This method is not currently supported.
-
        @param aProcessPtr a pointer to a Process object
     */
 
-    void removeProcess( ProcessPtr aProcessPtr );
+    void removeProcess( Process* aProcessPtr );
 
 
     void loadStepInterval( RealParam aStepInterval )
     {
-        theStepInterval = aStepInterval;
+        stepInterval_ = aStepInterval;
     }
 
-    void registerLogger( LoggerPtr );
-
-    ModelPtr getModel() const
+    Model* getModel() const
     {
-        return theModel;
+        return model_;
     }
 
-    /**
-       @internal
-
-    */
-
-    void setModel( ModelPtr const aModel )
+    void setModel( Model* const model )
     {
-        theModel = aModel;
+        model_ = model;
+    }
+
+    LoggerManager* getLoggerManager() const
+    {
+        return loggerManager_;
+    } 
+
+    void setLoggerManager( LoggerManager* manager )
+    {
+        loggerManager_ = manager;
     }
 
     void setSchedulerIndex( const int anIndex )
     {
-        theSchedulerIndex = anIndex;
+        schedulerIndex_ = anIndex;
     }
 
     const int getSchedulerIndex() const
     {
-        return theSchedulerIndex;
+        return schedulerIndex_;
     }
 
 
@@ -346,7 +345,7 @@ public:
 
     SET_METHOD( Integer, Priority )
     {
-        thePriority = value;
+        priority_ = value;
     }
 
     /**
@@ -355,20 +354,22 @@ public:
 
     GET_METHOD( Integer, Priority )
     {
-        return thePriority;
+        return priority_;
     }
 
-
-    const SystemVector& getSystemVector() const
+    const SystemSetCRange getSystems() const
     {
-        return theSystemVector;
+        return SystemSetCRange( systems_.begin(), systems_.end() );
+    }
+
+    SystemSetRange getSystems()
+    {
+        return SystemSetRange( systems_.begin(), systems_.end() );
     }
 
     /**
        Get the reference to the ProcessVector of this Stepper.
-
        The ProcessVector holds a set of pointers to this Stepper's Processes.
-
        The ProcessVector is partitioned in this way:
 
        |  Continuous Processes  |  Discrete Processes |
@@ -378,23 +379,35 @@ public:
 
        Each part of the ProcessVector is sorted by Priority properties
        of Processes.
-
     */
-
-    const ProcessVector& getProcessVector() const
+    ProcessVectorCRange getProcesses() const
     {
-        return theProcessVector;
+        return ProcessVectorCRange( processes_.begin(), processes_.end() );
     }
 
-    /**
-
-    @see getProcessVector()
-
-    */
-
-    const ProcessVector::size_type getDiscreteProcessOffset() const
+    ProcessVectorRange getProcesses()
     {
-        return theDiscreteProcessOffset;
+        return ProcessVectorRange( processes_.begin(), processes_.end() );
+    }
+
+    ProcessVectorCRange getContinuousProcesses() const
+    {
+        return processes_.partition_range( 0 );
+    }
+
+    ProcessVectorRange getContinuousProcesses()
+    {
+        return processes_.partition_range( 0 );
+    }
+
+    ProcessVectorCRange getDiscreteProcesses() const
+    {
+        return processes_.partition_range( 1 );
+    }
+
+    ProcessVectorRange getDiscreteProcesses()
+    {
+        return processes_.partition_range( 1 );
     }
 
     /**
@@ -410,42 +423,74 @@ public:
 
        Use getReadOnlyVariableOffset() method to get the index of the first
        Read-Only Variable in the VariableVector.
-       
-
     */
-
-    const VariableVector& getVariableVector() const
+    VariableVectorCRange getInvolvedVariables() const
     {
-        return theVariableVector;
+        return VariableVectorCRange( variables_.begin(), variables_.end() );
+    }
+
+    VariableVectorRange getInvolvedVariables()
+    {
+        return VariableVectorRange( variables_.begin(), variables_.end() );
     }
 
     /**
-       @see getVariableVector()
+       @see getVariables()
     */
-
-    const VariableVector::size_type getReadWriteVariableOffset() const
+    VariableVectorCRange getAffectedVariables() const
     {
-        return theReadWriteVariableOffset;
+        return VariableVectorCRange( variables_.begin( 0 ), variables_.end( 1 ) );
+    }
+
+    VariableVectorRange getAffectedVariables()
+    {
+        return VariableVectorRange( variables_.begin( 0 ), variables_.end( 1 ) );
     }
 
     /**
-       @see getVariableVector()
+       @see getVariables()
     */
-
-    const VariableVector::size_type getReadOnlyVariableOffset() const
+    VariableVectorCRange getReadVariables() const
     {
-        return theReadOnlyVariableOffset;
+        return VariableVectorCRange( variables_.begin( 1 ), variables_.end( 2 ) );
     }
 
+    VariableVectorRange getReadVariables()
+    {
+        return VariableVectorRange( variables_.begin( 1 ), variables_.end( 2 ) );
+    }
+
+    /**
+       @see getVariables()
+    */
+    VariableVectorCRange getReadWriteVariables() const
+    {
+        return VariableVectorCRange( variables_.begin( 1 ), variables_.end( 1 ) );
+    }
+
+    VariableVectorRange getReadWriteVariables()
+    {
+        return VariableVectorRange( variables_.begin( 1 ), variables_.end( 1 ) );
+    }
+
+
+    /**
+       @see getVariables()
+    */
+    VariableVectorCRange getReadOnlyVariables() const
+    {
+        return VariableVectorCRange( variables_.begin( 2 ), variables_.end( 2 ) );
+    }
+
+    VariableVectorRange getReadOnlyVariables()
+    {
+        return VariableVectorRange( variables_.begin( 2 ), variables_.end( 2 ) );
+    }
 
     const RealVector& getValueBuffer() const
     {
-        return theValueBuffer;
+        return valueBuffer_;
     }
-
-
-    const VariableIndex
-    getVariableIndex( VariableCptr const aVariable );
 
 
     virtual void interrupt( TimeParam aTime ) = 0;
@@ -461,8 +506,7 @@ public:
     Variable 'read' and 'write'.
     @see Process, VariableReference
     */
-
-    const bool isDependentOn( const StepperCptr aStepper );
+    bool isDependentOn( const StepperCptr aStepper ) const;
 
     /**
     This method updates theIntegratedVariableVector.
@@ -471,13 +515,9 @@ public:
     This method must be called after initialize().
     @internal
      */
-
     void updateIntegratedVariableVector();
 
-    virtual InterpolantPtr createInterpolant( VariablePtr aVariablePtr )
-    {
-        return new Interpolant( aVariablePtr );
-    }
+    virtual Interpolant* createInterpolant();
 
     const gsl_rng* getRng() const
     {
@@ -490,7 +530,6 @@ public:
     }
 
 protected:
-
     void clearVariables();
 
     void fireProcesses();
@@ -519,40 +558,46 @@ protected:
     */
     void createInterpolants();
 
-    /**
-       Scan all the relevant Entity objects to this Stepper and construct
-       the list of loggers.
+    void loadVariablesToBuffer();
 
-       The list, theLoggerVector, is used in log() method.
-    */
+    void saveBufferToVariables( bool onlyAffected = true );
 
-    void updateLoggerVector();
+    const Variables::size_type getVariableIndex( const Variable* const var ) const
+    { 
+        VariableVectorCRange range( getInvolvedVariables() );
+        Variables::const_iterator pos(
+                std::find( range.begin(), range.end(), var ) );
+        if ( pos == range.end() )
+        {
+            THROW_EXCEPTION( NotFound,
+                    String( "no such variable involved: " ) + var->asString() );
+        }
+
+        return pos - range.begin();
+    }
 
 protected:
-    SystemVector              theSystemVector;
-    LoggerVector              theLoggerVector;
-    VariableVector            theVariableVector;
-    VariableVector::size_type theReadWriteVariableOffset;
-    VariableVector::size_type theReadOnlyVariableOffset;
-    VariableVector            theIntegratedVariableVector;
-    ProcessVector             theProcessVector;
-    ProcessVector::size_type  theDiscreteProcessOffset;
-    RealVector theValueBuffer;
-    Model*              theModel;
+    SystemSet                    systems_;
+    Variables                    variables_;
+    VariableVector               variablesToIntegrate_;
+    Processes                    processes_;
+    RealVector                   valueBuffer_;
+    Model*                       model_;
+    LoggerManager*               loggerManager_;
     /** the index on the scheduler */
-    int                 theSchedulerIndex;
-    Integer             thePriority;
-    Real                theCurrentTime;
-    Real                theStepInterval;
-    Real                theMinStepInterval;
-    Real                theMaxStepInterval;
-    String              theID;
-    gsl_rng*   theRng;
+    int                 schedulerIndex_;
+    Integer             priority_;
+    Real                currentTime_;
+    Real                stepInterval_;
+    Real                minStepInterval_;
+    Real                maxStepInterval_;
+    String              id_;
+    gsl_rng*            theRng;
 };
 
 } // namespace libecs
 
-/* @} */
+/** @} */
 
 #endif /* __STEPPER_HPP */
 /*

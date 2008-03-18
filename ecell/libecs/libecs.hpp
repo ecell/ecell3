@@ -61,12 +61,14 @@ DECLARE_TYPE( unsigned long int, UnsignedInteger );
 DECLARE_TYPE( double, Real );
 DECLARE_TYPE( HIGHREAL_TYPE, HighReal );
 DECLARE_TYPE( Real, Time );
+DECLARE_TYPE( Real, TimeDifference );
 
 typedef Param<Integer>::type IntegerParam;
 typedef Param<UnsignedInteger>::type UnsignedIntegerParam;
 typedef Param<Real>::type RealParam;
 typedef Param<HighReal>::type HighRealParam;
 typedef Param<Time>::type TimeParam;
+typedef Param<TimeDifference>::type TimeDifferenceParam;
 
 const Real N_A( 6.0221367e+23 );
 const Real N_A_R( 1.0 / N_A );
@@ -147,82 +149,6 @@ LIBECS_API bool initialize();
 LIBECS_API void finalize();
 LIBECS_API void setDMSearchPath( const String& path );
 LIBECS_API const String getDMSearchPath();
-
-// Forward declarations.
-
-
-// string STL containers.
-typedef std::list<String> StringList;
-typedef std::vector<String> StringVector;
-typedef std::map<const String, String, std::less<const String> > StringMap;
-DECLARE_SHAREDPTR( StringList );
-DECLARE_SHAREDPTR( StringVector );
-
-
-// classes
-
-DECLARE_CLASS( System );
-DECLARE_CLASS( Entity );
-DECLARE_CLASS( EntityType );
-DECLARE_CLASS( SystemPath );
-DECLARE_CLASS( FullID );
-DECLARE_CLASS( FullPN );
-DECLARE_CLASS( VariableReference );
-DECLARE_CLASS( Process );
-DECLARE_CLASS( DiscreteEventProcess );
-DECLARE_CLASS( ProcessMaker );
-DECLARE_CLASS( Stepper );
-DECLARE_CLASS( SystemStepper );
-DECLARE_CLASS( Interpolant );
-DECLARE_CLASS( Model );
-DECLARE_CLASS( Scheduler );
-DECLARE_CLASS( StepperEvent );
-DECLARE_CLASS( StepperMaker );
-DECLARE_CLASS( Variable );
-DECLARE_CLASS( VariableMaker );
-DECLARE_CLASS( System );
-DECLARE_CLASS( SystemMaker );
-DECLARE_CLASS( PropertySlot );
-DECLARE_CLASS( PropertiedClass );
-DECLARE_CLASS( PropertySlotProxy );
-DECLARE_CLASS( Polymorph );
-DECLARE_CLASS( LoggerBroker );
-DECLARE_CLASS( Logger );
-DECLARE_CLASS( LoggerAdapter );
-DECLARE_CLASS( DataPoint );
-DECLARE_CLASS( LongDataPoint );
-DECLARE_CLASS( DataPointAggregator );
-DECLARE_CLASS( DataPointVector );
-
-
-// containers
-DECLARE_VECTOR( Polymorph,    PolymorphVector );
-DECLARE_VECTOR( VariablePtr,  VariableVector );
-DECLARE_VECTOR( ProcessPtr,   ProcessVector );
-DECLARE_VECTOR( SystemPtr,    SystemVector );
-DECLARE_VECTOR( StepperPtr,   StepperVector );
-DECLARE_VECTOR( LoggerPtr,    LoggerVector );
-//  DECLARE_VECTOR( PropertySlotPtr, PropertySlotVector );
-
-// exceptions
-
-DECLARE_CLASS( Exception );
-DECLARE_CLASS( UnexpectedError );
-DECLARE_CLASS( NotFound );
-DECLARE_CLASS( BadFormat );
-DECLARE_CLASS( CallbackFailed );
-DECLARE_CLASS( NoMethod );
-DECLARE_CLASS( NoSlot );
-DECLARE_CLASS( BadFormat );
-
-DECLARE_MAP ( const String, Polymorph, std::less<const String>,
-              PolymorphMap );
-
-
-// other reference counted pointer types
-
-DECLARE_SHAREDPTR( PolymorphVector );
-DECLARE_SHAREDPTR( DataPointVector );
 
 /** @} */
 

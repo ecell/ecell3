@@ -42,70 +42,43 @@
 #include "Model.hpp"
 #include "PropertySlot.hpp"
 #include "PropertySlotProxyLoggerAdapter.hpp"
-#include "LoggerBroker.hpp"
+#include "LoggerManager.hpp"
 
 
 namespace libecs
 {
 
-LoggerBroker::LoggerBroker()
-        : theModel( 0 )
+LoggerManager::LoggerManager( Model* model )
+    : model_( model )
 {
-    ; // do nothing
 }
 
-LoggerBroker::~LoggerBroker()
+LoggerManager::~LoggerManager()
 {
-    FOR_ALL_SECOND( LoggerMap, theLoggerMap, ~Logger );
 }
 
-
-void LoggerBroker::flush()
+void LoggerManager::add( const FullPN& fullPN, LoggerHandle logger )
 {
-    FOR_ALL_SECOND( LoggerMap, theLoggerMap, flush );
+    dispatchers_[ fullPN.getFullID() ][ fullPN.getPropertyName() ].add(
+            LoggingEventDispatcher::Subscription( logger, &Logger::log ) );
 }
 
-Logger&
-LoggerBroker::getLogger( const FullPN& aFullPN ) const
+void LoggerManager::remove( const FullPN& fullPN, LoggerHandler logger )
 {
-    LoggerMapConstIterator aLoggerMapIterator( theLoggerMap.find( aFullPN ) );
+    dispatchers_[ fullPN.getFullID() ][ fullPN.getPropertyName() ].remove(
+            LoggingEventDispatcher::Subscription( logger, &Logger::log ) );
+}
 
-    if ( aLoggerMapIterator == theLoggerMap.end() )
+void LoggerManager::log( Time currentTime, Entity* ent )
+{
+    FullID fullID( model_->getFullID( ent ) );
+    PNToDispatcherMap& pnToDispatcherMap( dispatchers_[ fullID ] );
+    for ( PNToDispatcherMap::const_iterator i( pnToDispatcherMap.begin() );
+            i != pnToDispatcherMap.end(); ++i )
     {
-        THROW_EXCEPTION( NotFound,
-                         "no logger defined for " + aFullPN.asString() );
+        ( i->second )(
+            Logger::DataPoint( currentTime, ent->getProperty( i->first ) ) );
     }
-
-    return *aLoggerMapIterator->second;
-}
-
-Logger& LoggerBroker::createLogger(
-    const FullPN& aFullPN,
-    const LoggingPolicy& aLoggerPolicy )
-{
-    if ( theLoggerMap.find( aFullPN ) != theLoggerMap.end() )
-    {
-        THROW_EXCEPTION( AlreadyExist,
-                         "logger already defined for " + aFullPN.asString() );
-    }
-
-    Entity& anEntity( theModel->getEntity( aFullPN.getFullID() ) );
-
-    LoggerAdapter* aLoggerAdapter(
-        new PropertySlotProxyLoggerAdapter(
-            anEntity.createPropertySlotProxy(
-                aFullPN.getPropertyName() ) ) );
-
-    Logger* aNewLogger( new Logger( aLoggerAdapter ) );
-    anEntity.registerLogger( aNewLogger );
-    theLoggerMap[aFullPN] = aNewLogger;
-
-    // it should have at least one datapoint to work correctly.
-    aNewLogger->log( theModel->getCurrentTime() );
-    aNewLogger->flush();
-    aNewLogger->setPolicy( aLoggerPolicy );
-
-    return *aNewLogger;
 }
 
 } // namespace libecs

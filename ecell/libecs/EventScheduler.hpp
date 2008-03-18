@@ -36,118 +36,19 @@
 #include "DynamicPriorityQueue.hpp"
 #include "AssocVector.h"
 
-namespace libecs
-{
-
-/** @addtogroup model The Model.
-
-    The model.
-
-    @ingroup libecs
-    @{
- */
-
-/** @file */
-
-DECLARE_CLASS( EventBase );
-
 
 /**
-   EventBase
+   @addtogroup model The Model.
 
-   A subclass must define three customization points;
+   The model.
 
-   void fire()
-   {
-     (1) do what this event is supposed to do.
-     (2) setTime( next scheduled time of this event );
-   }
+   @ingroup libecs
+ */
+/** @file */
+/** @{ */
 
-   void update( const Event& anEvent )
-   {
-     Given the last fired Event (anEvent) that this Event
-     depends on,
-
-     (1) recalculate scheduled time (if necessary).
-     (2) setTime( new scheduled time ).
-   }
-
-   const bool isDependentOn( const Event& anEvent )
-   {
-     Return true if this Event must be updated when the
-     given Event (anEvent) fired.  Otherwise return false;
-   }
-*/
-
-class LIBECS_API EventBase
+namespace libecs
 {
-public:
-    EventBase( TimeParam aTime )
-            :
-            theTime( aTime )
-    {
-        ; // do nothing
-    }
-
-    void setTime( TimeParam aTime )
-    {
-        theTime = aTime;
-    }
-
-    const Time getTime() const
-    {
-        return theTime;
-    }
-
-    bool operator<( const EventBase& rhs ) const
-    {
-        if ( getTime() < rhs.getTime() )
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    bool operator>( const EventBase& rhs ) const
-    {
-        if ( getTime() > rhs.getTime() )
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    bool operator>=( const EventBase& rhs ) const
-    {
-        return !operator<( rhs );
-    }
-
-    bool operator<=( const EventBase& rhs ) const
-    {
-        return !operator>( rhs );
-    }
-
-    bool operator==( const EventBase& rhs ) const
-    {
-        return getTime() == rhs.getTime();
-    }
-
-    bool operator!=( const EventBase& rhs ) const
-    {
-        return !operator==( rhs );
-    }
-
-private:
-    Time theTime;
-};
-
-
 /**
    Event scheduler.
 
@@ -336,27 +237,14 @@ updateEventDependency( const EventID i1 )
     std::sort( anEventIDVector.begin(), anEventIDVector.end() );
 }
 
-
-
-
-
-/*@}*/
-
 } // namespace libecs
 
-
-
+/** @} */
 
 #endif /* __EVENTSCHEDULER_HPP */
-
-
-
-
 /*
   Do not modify
   $Author$
   $Revision$
-  $Date$
   $Locker$
 */
-

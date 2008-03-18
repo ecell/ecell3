@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
@@ -35,154 +35,130 @@
 #include "libecs.hpp"
 #include "Process.hpp"
 
-#include "EventScheduler.hpp"
+#include "EventBase.hpp"
 
+/** @file */
 
 namespace libecs
 {
 
-  /** @file */
+DECLARE_CLASS( ProcessEvent );
 
-  DECLARE_CLASS( ProcessEvent );
-
-  class LIBECS_API ProcessEvent
-    :
-    public EventBase
-  {
-
-
-  public:
-
-    ProcessEvent( TimeParam aTime, ProcessPtr aProcessPtr )
-      :
-      EventBase( aTime ),
-      theProcess( aProcessPtr )
+class LIBECS_API ProcessEvent: public EventBase
+{
+public:
+    ProcessEvent( TimeParam aTime, Process* process )
+        : EventBase( aTime ), process_( process )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
-    const ProcessPtr getProcess() const
+    const Process* getProcess() const
     {
-      return theProcess;
+        return process_;
     }
 
 
     void fire()
     {
-      //FIXME: should be theProcess->fire();
-      theProcess->addValue( 1.0 );
+        //FIXME: should be process_->fire();
+        process_->addValue( 1.0 );
 
-      reschedule( getTime() );
+        reschedule( getTime() );
     }
 
     void update( TimeParam aTime )
     {
-      reschedule( aTime );
+        reschedule( aTime );
     }
 
     void reschedule( TimeParam aTime )
     {
-      const Time aNewStepInterval( theProcess->getStepInterval() );
-      setTime( aNewStepInterval + aTime );
+        const Time aNewStepInterval( process_->getStepInterval() );
+        setTime( aNewStepInterval + aTime );
     }
 
     const bool isDependentOn( const ProcessEvent& anEvent ) const
     {
-      return theProcess->isDependentOn( anEvent.getProcess() );
+        return process_->isDependentOn( *anEvent.getProcess() );
     }
 
 
     const bool operator< ( const ProcessEvent& rhs ) const
     {
-      // return theTime < rhs.theTime;
+        // return theTime < rhs.theTime;
 
-      if( getTime() > rhs.getTime() )
-	{
-	  return false;
-	}
-      if( getTime() < rhs.getTime() )
-	{
-	  return true;
-	}
-      if( theProcess->getPriority() < rhs.getProcess()->getPriority() )
-	{
-	  return true;
-	}
-      return false;
+        if ( getTime() > rhs.getTime() )
+        {
+            return false;
+        }
+        if ( getTime() < rhs.getTime() )
+        {
+            return true;
+        }
+        if ( process_->getPriority() < rhs.getProcess()->getPriority() )
+        {
+            return true;
+        }
+        return false;
     }
 
 
     const bool operator> ( const ProcessEvent& rhs ) const
     {
-      // return theTime < rhs.theTime;
+        // return theTime < rhs.theTime;
 
-      if( getTime() < rhs.getTime() )
-	{
-	  return false;
-	}
-      if( getTime() > rhs.getTime() )
-	{
-	  return true;
-	}
-      if( theProcess->getPriority() > rhs.getProcess()->getPriority() )
-	{
-	  return true;
-	}
-      return false;
+        if ( getTime() < rhs.getTime() )
+        {
+            return false;
+        }
+        if ( getTime() > rhs.getTime() )
+        {
+            return true;
+        }
+        if ( process_->getPriority() > rhs.getProcess()->getPriority() )
+        {
+            return true;
+        }
+        return false;
     }
 
 
     const bool operator<= ( const ProcessEvent& rhs ) const
     {
-      return !( *this > rhs );
+        return !( *this > rhs );
     }
 
 
     const bool operator>= ( const ProcessEvent& rhs ) const
     {
-      return !( *this < rhs );
+        return !( *this < rhs );
     }
 
 
     const bool operator!= ( const ProcessEvent& rhs ) const
     {
-      if( getTime() == rhs.getTime() && 
-	  getProcess() == rhs.getProcess() )
-	{
-	  return false;
-	}
-      else
-	{
-	  return true;
-	}
+        if ( getTime() == rhs.getTime() &&
+                getProcess() == rhs.getProcess() )
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
-
-    // dummy, because DynamicPriorityQueue requires this. better without.
-    ProcessEvent()
-    {
-      ; // do nothing
-    }
-
-
-  private:
-
-    ProcessPtr theProcess;
-
-  };
-
-  /*@}*/
+private:
+    Process* process_;
+};
 
 } // namespace libecs
 
-
+/** @} */
 
 
 #endif /* __PROCESSEVENT_HPP */
-
-
-
-
 /*
   Do not modify
   $Author$
@@ -190,4 +166,3 @@ namespace libecs
   $Date$
   $Locker$
 */
-

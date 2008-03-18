@@ -32,107 +32,10 @@
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <string>
-
-#include "Util.hpp"
 #include "Exceptions.hpp"
-
 #include "FullID.hpp"
 
-namespace libecs
-{
-
-///////////////////////  SystemPath
-
-SystemPath SystemPath::parse( const String& aString )
-{
-    if ( aString.empty() )
-    {
-        return SystemPath();
-    }
-
-    SystemPath retval;
-
-    String::size_type start( 0 ), end( 0 );
-
-    // absolute path ( start with '/' )
-    if ( aString[0] == DELIMITER )
-    {
-        //insert(end(), String( 1, DELIMITER ) );
-        retval.push_back( String( 1, DELIMITER ) );
-
-        if ( aString.size() == 1 )
-        {
-            return retval;
-        }
-
-        ++start;
-    }
-
-    for ( ;; )
-    {
-        end = aString.find_first_of( DELIMITER, start );
-        if ( end == String::npos )
-        {
-            retval.push_back( aString.substr( start ) );
-            break;
-        }
-        else
-        {
-            retval.push_back( aString.substr( start, end - start ) );
-        }
-        start = end + 1;
-    }
-
-    return retval;
-}
-
-const String SystemPath::asString() const
-{
-    StringList::const_iterator i = begin();
-    String aString;
-
-    if ( isAbsolute() )
-    {
-        if ( size() == 1 )
-        {
-            return "/";
-        }
-        else
-        {
-            ; // do nothing
-        }
-    }
-    else
-    {
-        // isAbsolute() == false implies that this can be empty
-        if ( empty() )
-        {
-            return aString;
-        }
-        else
-        {
-            aString = *i;
-        }
-    }
-
-    if ( i == end() ) {
-        return aString;
-    }
-
-    ++i;
-
-    while ( i != end() )
-    {
-        aString += '/';
-        aString += *i;
-        ++i;
-    }
-
-    return aString;
-}
-
-///////////////// FullID
+namespace libecs {
 
 FullID FullID::parse( const String& aString )
 {
@@ -179,39 +82,9 @@ FullID FullID::parse( const String& aString )
 
 const String FullID::asString() const
 {
-    return theLocalID.getEntityType() + FullID::DELIMITER
-           + theSystemPath.asString() + FullID::DELIMITER
-           + theLocalID.getID();
-}
-
-///////////////// FullPN
-
-FullPN FullPN::parse( const String& fullpropertynamestring )
-{
-    String::size_type aPosition( 0 );
-
-    for ( int i( 0 ) ; i < 3 ; ++i )
-    {
-        aPosition = fullpropertynamestring.
-                    find_first_of( FullID::DELIMITER, aPosition );
-        if ( aPosition == String::npos )
-        {
-            THROW_EXCEPTION( BadFormat,
-                             "not enough fields in FullPN string \"" +
-                             fullpropertynamestring + "\"" );
-        }
-        ++aPosition;
-    }
-
-    return FullPN(
-           FullID::parse(
-               fullpropertynamestring.substr( 0, aPosition - 1 ) ),
-           fullpropertynamestring.substr( aPosition ) );
-}
-
-const String FullPN::asString() const
-{
-    return theFullID.asString() + FullID::DELIMITER + thePropertyName;
+    return localID_.getEntityType() + FullID::DELIMITER
+           + systemPath_.asString() + FullID::DELIMITER
+           + localID_.getID();
 }
 
 } // namespace libecs

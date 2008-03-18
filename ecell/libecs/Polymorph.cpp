@@ -124,5 +124,4 @@ namespace libecs
     theValue = aPolymorphValuePtr;
   }
 
-
 } // namespace libecs
