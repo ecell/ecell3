@@ -37,7 +37,6 @@ LoggerAdapter.cpp\
 LoggerManager.cpp\
 Model.cpp\
 PassiveStepper.cpp\
-PhysicalLogger.cpp\
 Polymorph.cpp\
 Process.cpp\
 ProcessMaker.cpp\
@@ -96,7 +95,6 @@ LoggerManager.hpp\
 MethodProxy.hpp\
 Model.hpp\
 PassiveStepper.hpp\
-PhysicalLogger.hpp\
 Polymorph.hpp\
 Process.hpp\
 ProcessEvent.hpp\

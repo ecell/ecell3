@@ -32,6 +32,8 @@
 #ifndef __DATAPOINT_HPP
 #define __DATAPOINT_HPP
 
+#include <string.h>
+
 #include "libecs.hpp"
 #include "Polymorph.hpp"
 
@@ -55,21 +57,84 @@ public:
     class EarlinessOrdering
     {
     public:
-        bool operator()( const DataPoint& x, const DataPoint& y )
+        typedef DataPoint first_argument_type;
+        typedef DataPoint second_argument_type;
+        typedef bool result_type;
+
+    public:
+        bool operator()( const DataPoint& x, const DataPoint& y ) const
         {
-            return x.getTime() < y.getTime();
+            return x.time < y.time;
         }
     };
 
     class LatenessOrdering
     {
     public:
-        bool operator()( const DataPoint& x, const DataPoint& y )
+        typedef DataPoint first_argument_type;
+        typedef DataPoint second_argument_type;
+        typedef bool result_type;
+
+    public:
+        bool operator()( const DataPoint& x, const DataPoint& y ) const
         {
-            return x.getTime() > y.getTime();
+            return x.time > y.time;
         }
     };
 
+    class TimeEquality
+    {
+    public:
+        typedef DataPoint argument_type;
+        typedef bool result_type;
+
+    public:
+        TimeEquality( Time time ): time_( time ) {}
+        
+        bool operator()( const DataPoint& x ) const
+        {
+            return  x.time == time_;
+        }
+
+    private:
+        Time time_;
+    };
+
+    class Lateness
+    {
+    public:
+        typedef DataPoint argument_type;
+        typedef bool result_type;
+
+    public:
+        Lateness( Time time ): time_( time ) {}
+        
+        bool operator()( const DataPoint& x ) const
+        {
+            return  x.time > time_;
+        }
+
+    private:
+        Time time_;
+    };
+
+    class Earliness
+    {
+    public:
+        typedef DataPoint argument_type;
+        typedef bool result_type;
+
+    public:
+        Earliness( Time time ): time_( time ) {}
+        
+        bool operator()( const DataPoint& x ) const
+        {
+            return  x.time < time_;
+        }
+
+    private:
+        Time time_;
+    };
 public:
     DataPoint( Param<Time> _time = 0.0, Param<Value> _value = 0.0 )
             : time ( _time ), value( _value )
@@ -82,13 +147,11 @@ public:
         return time >= 0;
     }
 
-    DataPoint& operator=( const DataPoint& aLongDataPoint )
+    DataPoint& operator=( const DataPoint& that )
     {
-        setTime( aLongDataPoint.getTime() );
-        setValue ( aLongDataPoint.getValue() );
+        ::memmove(this, &that, sizeof(*this));
         return *this;
     }
-
 
     bool operator==( const DataPoint& that ) const
     {

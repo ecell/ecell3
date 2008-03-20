@@ -39,11 +39,10 @@
 //	and/or <http://www.e-cell.org/>.
 //END_V2_HEADER
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
-
-#include "ecell_config.h"
 
 #ifndef WIN32
 #include <unistd.h>
@@ -81,17 +80,18 @@
 
 #endif
 
-#include "VVector.h"
-
 #include <string.h>
 #include <stdlib.h>
+
+#include "Util.hpp"
+#include "VVector.hpp"
 
 namespace libecs
 {
 
 VVectorMaker& VVectorMaker::getInstance()
 {
-    static VVectorMaker v(libecs_get_temp_dir());
+    static VVectorMaker v(getTempDirectory());
 
     return v;
 }

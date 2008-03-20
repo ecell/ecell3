@@ -37,7 +37,6 @@
 #include "FullID.hpp"
 #include "Model.hpp"
 #include "LoggerManager.hpp"
-#include "PhysicalLogger.hpp"
 #include "DiscreteEventStepper.hpp"
 
 

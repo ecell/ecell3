@@ -33,53 +33,112 @@
 //
 // modified by Koichi Takahashi <shafi@e-cell.org>
 
+#include <functional>
+#include <algorithm>
+#include <boost/range/iterator_range.hpp>
 #include "libecs.hpp"
 #include "Polymorph.hpp"
-
 #include "Logger.hpp"
-#include "PhysicalLogger.hpp"
+#include "VVector.hpp"
 
 namespace libecs
 {
 
-Logger::Logger( const LoggingPolicy& pol )
-	: policy_( pol ), impl_( new PhysicalLogger() )
+class Logger::LoggerImpl
+{
+public:
+    typedef VVector<DataPoint> DataPointVector;
+    typedef boost::iterator_range<DataPointVector::iterator> DataPoints;
+    typedef boost::iterator_range<DataPointVector::const_iterator> ConstDataPoints;
+
+public:
+    LoggerImpl( const LoggingPolicy& pol = LoggingPolicy() );
+    virtual ~LoggerImpl();
+
+    void log( const Logger::DataPoint& aDataPoint );
+
+    void setPolicy( const LoggingPolicy& pol );
+
+    const LoggingPolicy& getPolicy() const;
+
+    Step getSize() const;
+
+    DataPoints getDataPoints( Logger::Step startIdx = 0, Logger::Step endIdx = static_cast<Logger::Step>( -1 ) );
+
+    ConstDataPoints getDataPoints( Logger::Step startIdx = 0, Logger::Step endIdx = static_cast<Logger::Step>( -1 ) ) const;
+
+    const Logger::DataPoint& get( Logger::Step step ) const;
+
+    Logger::DataPoint& get( Logger::Step step );
+
+    Logger::DataPoint& operator[]( Logger::Step step )
+    {
+        return get( step );
+    }
+
+    const Logger::DataPoint& operator[]( Logger::Step step ) const
+    {
+        return get( step );
+    }
+
+private:
+    Time             lastTime_;
+    Step             stepCount_;
+    DataPointVector* vec_;
+    LoggingPolicy    policy_;
+};
+
+Logger::LoggerImpl::LoggerImpl( const LoggingPolicy& pol )
+        : policy_( pol ),
+          vec_( VVectorMaker::getInstance().create<DataPoint>() ),
+          lastTime_( 0.0 ), stepCount_( 0 )
 {
 }
 
-Logger::~Logger()
+Logger::LoggerImpl::~LoggerImpl()
 {
+    delete vec_;
 }
 
-void Logger::setPolicy( const LoggingPolicy& pol )
+void Logger::LoggerImpl::setPolicy( const LoggingPolicy& policy )
 {
-    policy_ = pol;
-    impl_.setPolicy( pol );
+    policy_ = policy;
 }
 
-const LoggingPolicy& Logger::getPolicy()
+const LoggingPolicy& Logger::LoggerImpl::getPolicy() const
 {
     return policy_;
 }
-
-DataPointVectorSharedPtr Logger::getData() const
+    
+Logger::LoggerImpl::DataPoints
+Logger::LoggerImpl::getDataPoints( Logger::Step startIdx, Logger::Step endIdx )
 {
-    return impl_.getVector( impl_.begin(), impl_.end() );
+    return DataPoints( vec_->begin() + startIdx,
+            endIdx == static_cast<Logger::Step>( -1 ) ?
+                vec_->end(): vec_->begin() + endIdx );
 }
 
-DataPointVectorSharedPtr Logger::getData( RealParam aStartTime,
-        RealParam anEndTime ) const
+Logger::LoggerImpl::ConstDataPoints
+Logger::LoggerImpl::getDataPoints( Logger::Step startIdx, Logger::Step endIdx ) const
 {
-    PhysicalLogger::size_type
-        topIterator( impl_.upper_bound(
-            impl_.begin(), impl_.end(), anEndTime ) ),
-        bottomIterator( impl_.lower_bound(
-            impl_.begin(), topIterator, aStartTime ) );
-
-    return impl_.getVector( bottomIterator, topIterator );
+    return ConstDataPoints(
+            const_cast<const DataPointVector*>(vec_)->begin() + startIdx,
+            endIdx == static_cast<Logger::Step>( -1 ) ?
+                const_cast<const DataPointVector *>( vec_ )->end():
+                const_cast<const DataPointVector *>( vec_ )->begin() + endIdx );
 }
 
-void Logger::log( DataPoint dp )
+Logger::DataPoint& Logger::LoggerImpl::get( Logger::Step index )
+{
+    return vec_->at( index );
+}
+
+const Logger::DataPoint& Logger::LoggerImpl::get( Logger::Step index ) const
+{
+    return vec_->at( index );
+}
+
+void Logger::LoggerImpl::log( const DataPoint& dp )
 {
     ++stepCount_;
     if ( policy_.getMinimumInterval() == 0.0 )
@@ -91,124 +150,213 @@ void Logger::log( DataPoint dp )
     }
     else
     {
-        if ( ( aTime - lastTime_ ) < policy_.getMinimumInterval() )
+        if ( ( dp.time - lastTime_ ) < policy_.getMinimumInterval() )
         {
             return;
         }
     }
 
-    impl_.push( dp );
+    vec_->push_back( dp );
 
-    lastTime_ = aTime;
+    lastTime_ = dp.time;
     stepCount_ = 0;
 }
 
-const Real Logger::getStartTime( void ) const
+Logger::Step Logger::LoggerImpl::getSize() const
 {
-    return  impl_.front().getTime();
-
+    return vec_->size();
 }
 
-const Real Logger::getEndTime( void ) const
+Logger::iterator::reference
+Logger::iterator::operator*() const
 {
-    return impl_.back().getTime();
+    return impl_->get( idx_ );
 }
 
-Step Logger::getSize() const
+Logger::iterator::pointer
+Logger::iterator::operator->() const
 {
-	return impl_.size();
+    return &impl_->get( idx_ );
 }
 
-DataPointVectorSharedPtr Logger::getData( RealParam aStartTime,
-        RealParam anEndTime,
-        RealParam anInterval ) const
+Logger::iterator::reference
+Logger::iterator::operator[]( difference_type idx ) const
 {
-    // this case doesn't work well with below routine on x86-64.
-    // anyway a serious effort of code cleanup is necessary.
-    if ( aStartTime == anEndTime )
+    return impl_->get( idx_ + idx );
+}
+
+Logger::const_iterator::reference
+Logger::const_iterator::operator*() const
+{
+    return impl_->get( idx_ );
+}
+
+Logger::const_iterator::pointer
+Logger::const_iterator::operator->() const
+{
+    return &impl_->get( idx_ );
+}
+
+Logger::const_iterator::reference
+Logger::const_iterator::operator[]( difference_type idx ) const
+{
+    return impl_->get( idx_ + idx );
+}
+
+
+Logger::Logger( const LoggingPolicy& pol )
+        : impl_( new LoggerImpl() )
+{
+}
+
+Logger::~Logger()
+{
+}
+
+void Logger::setPolicy( const LoggingPolicy& pol )
+{
+    impl_->setPolicy( pol );
+}
+
+const LoggingPolicy& Logger::getPolicy() const
+{
+    return impl_->getPolicy();
+}
+
+void Logger::log( const DataPoint& dp )
+{
+    impl_->log( dp );
+}
+
+Logger::Step Logger::size() const
+{
+        return impl_->getSize();
+}
+
+Logger::iterator Logger::begin()
+{
+    return iterator( impl_, 0 );
+}
+
+Logger::const_iterator Logger::begin() const
+{
+    return const_iterator( impl_, 0 );
+}
+
+Logger::iterator Logger::end()
+{
+    return iterator( impl_, size() );
+}
+
+Logger::const_iterator Logger::end() const
+{
+    return const_iterator( impl_, size() );
+}
+
+Logger::iterator Logger::find( Time time )
+{
+    if ( size() == 0 )
     {
-        PhysicalLogger::size_type
-        anIterator( impl_.upper_bound
-                    ( impl_.begin(),
-                      impl_.end(),
-                      anEndTime ) );
-        LongDataPoint aLongDataPoint( impl_.at( anIterator ) );
-        DataPointVectorPtr aDataPointVector( new DataPointVector( 1, 5 ) );
-        aDataPointVector->asLong( 0 ) = aLongDataPoint;
-        return DataPointVectorSharedPtr( aDataPointVector );
+        THROW_EXCEPTION( IllegalOperation, "no data available" );
     }
 
-    // set up output vector
-    DataPointVectorIterator aPhysicalRange( static_cast<size_type>(
-            ( anEndTime - aStartTime ) / anInterval ) );
+    Time avgIntervalPerStep(
+            ( getEndTime() - getStartTime() ) / size() );
 
-    //this is a technical adjustment, because I realized that sometimes
-    //conversion from real is flawed: rounding error
-    Real anEstimatedRange( ( anEndTime - aStartTime ) / anInterval );
+    Step s( static_cast< Step >( time / avgIntervalPerStep ) );
 
-    if ( ( static_cast<Real>( aPhysicalRange ) ) + 0.9999
-            < anEstimatedRange )
+    if ( impl_->get( s ).time <= time )
     {
-        ++aPhysicalRange;
+        Logger::iterator i( std::find_if( begin() + s, end(),
+                std::not1( DataPoint::Earliness( time ) ) ) );
+        return i;
     }
-
-    Real aTimeGap( ( impl_.back().getTime()
-                     - impl_.front().getTime() ) /
-                   impl_.size() );
-
-    DataPointVectorPtr
-    aDataPointVector( new DataPointVector( aPhysicalRange, 5 ) );
-
-    // set up iterators
-    PhysicalLogger::size_type
-    anIterationEnd( impl_.
-                    upper_bound_linear_estimate
-                    ( impl_.begin(),
-                      impl_.end(),
-                      anEndTime,
-                      aTimeGap ) );
-
-    PhysicalLogger::size_type
-    anIterationStart( impl_.
-                      lower_bound_linear_estimate
-                      ( impl_.begin(),
-                        anIterationEnd,
-                        aStartTime,
-                        aTimeGap ) );
-
-    // start from vectorslice start to vectorslice end,
-    // scan through all datapoints
-    size_type aCounter( anIterationStart );
-
-    Real aTargetTime( aStartTime + anInterval );
-    LongDataPoint aLongDataPoint( impl_.at( aCounter ) );
-
-    DataPointAggregator anAggregator;
-    anAggregator.aggregate( aLongDataPoint );
-    for ( DataPointVectorIterator anElementCount( 0 );
-            anElementCount < aPhysicalRange; ++anElementCount )
+    else if ( impl_->get( s ).time > time )
     {
-        do
+        Logger::iterator i( std::find_if( begin() + s, begin(),
+                DataPoint::Earliness( time ) ) );
+        if ( i->time < time )
         {
-            if ( ( aCounter < anIterationEnd ) &&
-                    ( aLongDataPoint.getTime() < aTargetTime ) )
-            {
-                ++aCounter;
-                aLongDataPoint = impl_.at( aCounter );
-            }
+            ++i;
+        }
+        return i;
+    }
+    return begin() + s;
+}
 
-            anAggregator.aggregate( aLongDataPoint );
-        } while ( aLongDataPoint.getTime() < aTargetTime &&
-                aCounter < anIterationEnd );
-
-        aDataPointVector->asLong( anElementCount ) = anAggregator.getData();
-        anAggregator.beginNextPoint();
-
-        aTargetTime += anInterval;
+Logger::const_iterator Logger::find( Time time ) const
+{
+    if ( size() == 0 )
+    {
+        THROW_EXCEPTION( IllegalOperation, "no data available" );
     }
 
-    return DataPointVectorSharedPtr( aDataPointVector );
+    Time avgIntervalPerStep(
+            ( getEndTime() - getStartTime() ) / size() );
+
+    Step s( static_cast< Step >( time / avgIntervalPerStep ) );
+
+    if ( impl_->get( s ).time <= time )
+    {
+        Logger::const_iterator i( std::find_if( begin() + s, end(),
+                std::not1( DataPoint::Earliness( time ) ) ) );
+        return i;
+    }
+    else if ( impl_->get( s ).time > time )
+    {
+        Logger::const_iterator i( std::find_if( begin() + s, begin(),
+                DataPoint::Earliness( time ) ) );
+        if ( i->time < time )
+            ++i;
+        return i;
+    }
+    return begin() + s;
 }
+
+Logger::DataPoints Logger::getDataPoints(Step startIdx, Step endIdx )
+{
+    DataPoints::iterator startPos( begin() + startIdx );
+    DataPoints::iterator endPos(
+            endIdx == static_cast<Logger::Step>( -1 ) ?
+                end(): begin() + endIdx );
+    if ( startPos >= end() || startPos < begin())
+    {
+        THROW_EXCEPTION(OutOfRange, "start index out of range: " + startIdx );
+    }
+    if ( endPos >= end() || endPos < begin())
+    {
+        THROW_EXCEPTION(OutOfRange, "start index out of range: " + endIdx );
+    }
+    return DataPoints( startPos, endPos );
+}
+
+Logger::ConstDataPoints Logger::getDataPoints(Step startIdx, Step endIdx ) const
+{
+    ConstDataPoints::iterator startPos( begin() + startIdx );
+    ConstDataPoints::iterator endPos(
+            endIdx == static_cast<Logger::Step>( -1 ) ?
+                end(): begin() + endIdx );
+    if ( startPos > end() || startPos < begin())
+    {
+        THROW_EXCEPTION(OutOfRange, "start index out of range: " + startIdx );
+    }
+    if ( endPos > end() || endPos < begin())
+    {
+        THROW_EXCEPTION(OutOfRange, "start index out of range: " + endIdx );
+    }
+    return ConstDataPoints( startPos, endPos );
+}
+
+Logger::DataPoints Logger::getDataPoints( Time startTime, Time endTime )
+{
+    return DataPoints( find( startTime ), find( endTime ) );
+}
+
+Logger::ConstDataPoints Logger::getDataPoints( Time startTime, Time endTime ) const
+{
+    return ConstDataPoints( find( startTime ), find( endTime ) );
+}
+
 
 } // namespace libecs
 

@@ -29,8 +29,10 @@
 #ifndef __VVECTOR_H__
 #define	__VVECTOR_H__
 
+#include <boost/noncopyable.hpp>
 #include <boost/assert.hpp>
 #include <vector>
+#include "libecs.hpp"
 #include "Exceptions.hpp"
 #include "BlockIO.hpp"
 
@@ -38,129 +40,195 @@ namespace libecs
 {
 
 template<typename T, typename BlockIOT = FileIO> class VVector
+        : private boost::noncopyable
 {
     friend class VVectorMaker;
 
 public:
-    template<class Container>
-    class Iterator
+    template<typename Tcontainer_, typename Tself_>
+    class iterator_base
     {
-    public:
-        typedef typename Container::value_type value_type;
-        typedef typename Container::difference_type difference_type;
-        typedef typename Container::size_type size_type;
-
-    private:
-        Container& cntnr;
-        typename Container::size_type cidx;
+    protected:
+        typedef Tself_ Self;
 
     public:
-        Iterator(Container& _cntnr, difference_type _cidx)
-            :
-            cntnr(_cntnr), cidx(_cidx)
+        typedef Tcontainer_ Container;
+        typedef typename Tcontainer_::value_type value_type;
+        typedef typename Tcontainer_::difference_type difference_type;
+        typedef typename Tcontainer_::size_type size_type;
+        typedef ::std::bidirectional_iterator_tag iterator_category;
+        typedef typename Tcontainer_::pointer pointer;
+        typedef typename Tcontainer_::reference reference;
+
+    public:
+        iterator_base(Container& _cntnr, difference_type _cidx)
+            : cntnr(_cntnr), cidx(_cidx)
         {
         }
 
-        value_type const& operator[](size_type idx) const
+        Self operator+(difference_type diff) const
         {
-            return cntnr[idx];
-        }
-
-        value_type& operator[](size_type idx)
-        {
-            return cntnr[idx];
-        }
-
-        Iterator operator+(difference_type diff) const
-        {
-            iterator retval = *this;
+            Self retval = *this;
             retval.cidx += diff;
             return retval;
         }
 
-        Iterator operator-(difference_type diff) const
+        Self operator-(difference_type diff) const
         {
-            iterator retval = *this;
+            Self retval = *this;
             retval.cidx -= diff;
             return retval;
         }
 
 
-        Iterator operator+=(difference_type diff)
+        Self operator+=(difference_type diff)
         {
             cidx += diff;
             return *this;
         }
 
-        Iterator& operator-=(difference_type diff)
+        Self& operator-=(difference_type diff)
         {
             cidx -= diff;
             return *this;
         }
 
-        difference_type operator-(Iterator const& that) const
+        difference_type operator-(Self const& that) const
         {
             return this.cidx - that.cidx;
         }
 
-        Iterator& operator++()
+        Self& operator++()
         {
             ++cidx;
             return *this;
         }
 
-        Iterator operator++(int dummy)
+        Self operator++(int)
         {
-            iterator save = *this;
+            Self save = *this;
             cidx++;
             return save;
         }
 
-        Iterator& operator--()
+        Self& operator--()
         {
             --cidx;
             return *this;
         }
 
-        Iterator operator--(int dummy)
+        Self operator--(int)
         {
-            iterator save = *this;
+            Self save = *this;
             cidx--;
             return save;
         }
 
-        value_type& operator*()
-        {
-            return (*this)[cidx];
-        }
-
-        value_type const& operator*() const
-        {
-            return (*this)[cidx];
-        }
-
-        bool operator<(const Iterator& that) const
+        bool operator<(const Self& that) const
         {
             return cidx < that.cidx;
         }
 
-        bool operator>(const Iterator& that) const
+        bool operator>(const Self& that) const
         {
             return cidx > that.cidx;
         }
 
-        bool operator==(const Iterator& that) const
+        bool operator==(const Self& that) const
         {
             return cidx == that.cidx;
         }
+
+    protected:
+        const Container& cntnr;
+        typename Tcontainer_::size_type cidx;
     };
 
     typedef T value_type;
-    typedef size_t size_type;
-    typedef ptrdiff_t difference_type;
-    typedef Iterator<VVector> iterator;
-    typedef Iterator<const VVector> const_iterator;
+    typedef ::size_t size_type;
+    typedef ::ptrdiff_t difference_type;
+    typedef value_type* pointer;
+    typedef value_type& reference;
+    typedef value_type* const_pointer;
+    typedef value_type& const_reference;
     typedef BlockIOT storage_impl_type;
+
+    class iterator: public iterator_base<VVector, iterator>
+    {
+    protected:
+        typedef iterator_base<VVector, iterator> Base;
+
+    public:
+        typedef typename VVector::value_type value_type;
+        typedef typename VVector::difference_type difference_type;
+        typedef typename VVector::reference reference;
+        typedef typename VVector::pointer pointer;
+
+    public:
+        iterator(typename Base::Container& _cntnr, difference_type _cidx)
+            : Base( _cntnr, _cidx )
+        {
+        }
+
+        iterator( const Base& that )
+            : Base( that )
+        {
+        }
+
+        reference operator*() const
+        {
+            return (*this)[Base::cidx];
+        }
+
+        pointer operator->() const
+        {
+            return &(*this)[Base::cidx];
+        }
+
+        reference operator[](difference_type idx) const
+        {
+            return Base::cntnr[Base::cidx + idx];
+        }
+    };
+
+    class const_iterator: public iterator_base<const VVector, const_iterator>
+    {
+    protected:
+        typedef iterator_base<const VVector, const_iterator> Base;
+
+    public:
+        typedef typename VVector::value_type value_type;
+        typedef typename VVector::difference_type difference_type;
+        typedef typename VVector::const_reference reference;
+        typedef typename VVector::const_pointer pointer;
+
+    public:
+        const_iterator(const typename Base::Container& _cntnr,
+                difference_type _cidx)
+            : Base( _cntnr, _cidx )
+        {
+        }
+
+        const_iterator( const Base& that )
+            : Base( that )
+        {
+        }
+
+        reference operator*() const
+        {
+            return (*this)[Base::cidx];
+        }
+
+        pointer operator->() const
+        {
+            return &(*this)[Base::cidx];
+        }
+
+        reference operator[](difference_type idx) const
+        {
+            return Base::cntnr[Base::cidx + idx];
+        }
+    };
 
 private:
     struct Buffer
@@ -673,9 +741,9 @@ public:
 public:
     VVectorMaker(const String& baseDirectory);
 
-    template<typename T> VVector<T>* create( fildes_t fd,
+    template<typename T_> VVector<T_>* create( fildes_t fd,
                                              char* filename = 0 ) const;
-    template<typename T> VVector<T>* create() const;
+    template<typename T_> VVector<T_>* create() const;
 };
 
 inline VVectorMaker::VVectorMaker(const String& baseDirectory)
@@ -684,23 +752,23 @@ inline VVectorMaker::VVectorMaker(const String& baseDirectory)
     theBaseDirectory += "/XXXXXXXX";
 }
 
-template<typename T>
-inline VVector<T>*
+template<typename T_>
+VVector<T_>*
 VVectorMaker::create( fildes_t fd, char* filename ) const
 {
-    typedef typename VVector<T>::Header header_type;
+    typedef typename VVector<T_>::Header header_type;
 
     FileIO* fio = new FileIO( fd, filename, FileIO::READ | FileIO::WRITE );
     fio->resize( sizeof( header_type ) );
     header_type* hdr = static_cast< header_type* >( (void *)*fio );
-    hdr->elem_size = sizeof( T );
+    hdr->elem_size = sizeof( typename VVector<T_>::value_type );
     hdr->count = 0;
 
-    return new VVector<T>( fio );
+    return new VVector<T_>( fio );
 }
 
-template<typename T>
-inline VVector<T>* VVectorMaker::create() const
+template<typename T_>
+VVector<T_>* VVectorMaker::create() const
 {
     fildes_t fd;
     const String::size_type len = theBaseDirectory.length();
@@ -717,7 +785,7 @@ inline VVector<T>* VVectorMaker::create() const
 
     try
     {
-        return create<T>( fd, buf );
+        return create<T_>( fd, buf );
     }
     catch ( IOException& e )
     {

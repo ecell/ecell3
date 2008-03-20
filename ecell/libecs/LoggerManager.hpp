@@ -35,7 +35,7 @@
 
 #include <map>
 #include <boost/shared_ptr.hpp>
-
+#include <boost/noncopyable.hpp>
 #include "libecs.hpp"
 #include "Happening.hpp"
 #include "FullPN.hpp"

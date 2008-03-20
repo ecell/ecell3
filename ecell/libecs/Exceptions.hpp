@@ -50,11 +50,8 @@ namespace libecs
     throwException( CLASS( __PRETTY_FUNCTION__, MESSAGE ) )
 
 /// Base exception class
-class LIBECS_API Exception
-            :
-            public std::exception
+class LIBECS_API Exception: public std::exception
 {
-
 public:
     Exception( const String& method, const String& message = "" )
             :

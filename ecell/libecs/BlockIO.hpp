@@ -28,12 +28,11 @@
 #ifndef __BLOCKIO_H__
 #define __BLOCKIO_H__
 
-#ifdef HAVE_CONFIG_H
-#include "ecell_config.h"
-#endif /* HAVE_CONFIG_H */
-
-#include "osif.h"
+#include <stddef.h>
 #include "Exceptions.hpp"
+#include "libecs.hpp"
+
+typedef int fildes_t;
 
 namespace libecs
 {
@@ -69,6 +68,8 @@ public:
     virtual size_type size() = 0;
     virtual void dispose() = 0;
     virtual operator void*() = 0;
+
+    BlockIO* clone();
 };
 
 inline bool
@@ -81,6 +82,12 @@ inline bool
 BlockIO::unlock()
 {
   return unlock(0, size());
+}
+
+inline BlockIO*
+BlockIO::clone()
+{
+    return map( 0, size() );
 }
 
 class FileIO
@@ -179,7 +186,7 @@ public:
 
 inline ConcreteBlockIO::ConcreteBlockIO( FileIO* _super, offset_type _offset,
                                          size_type _size )
-    : super( _super ), offset( _offset ), ptr( 0 ), sz( _size )
+    : super( _super ), offset( _offset ), ptr( 0 ), sz( _size ), refcount( 1 )
 {
 }
 
@@ -230,7 +237,7 @@ inline void ConcreteBlockIO::dispose()
 inline VirtualBlockIO::VirtualBlockIO( BlockIO* _super,
                                        offset_type _offset,
                                        size_type _size)
-    : super(_super), offset(_offset), sz(_size), refcount(1)
+    : super( _super ), offset( _offset ), sz( _size ), refcount( 1 )
 {
 }
 
