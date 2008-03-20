@@ -38,6 +38,7 @@
 #include <cstddef>
 
 #include <boost/utility.hpp>
+#include <boost/range/iterator_range.hpp>
 
 #include "libecs.hpp"
 #include "LoggingPolicy.hpp"

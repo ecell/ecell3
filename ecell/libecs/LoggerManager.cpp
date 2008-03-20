@@ -57,19 +57,19 @@ LoggerManager::~LoggerManager()
 {
 }
 
-void LoggerManager::add( const FullPN& fullPN, LoggerHandle logger )
+void LoggerManager::add( const FullPN& fullPN, Handle logger )
 {
     dispatchers_[ fullPN.getFullID() ][ fullPN.getPropertyName() ].add(
             LoggingEventDispatcher::Subscription( logger, &Logger::log ) );
 }
 
-void LoggerManager::remove( const FullPN& fullPN, LoggerHandler logger )
+void LoggerManager::remove( const FullPN& fullPN, Handle logger )
 {
     dispatchers_[ fullPN.getFullID() ][ fullPN.getPropertyName() ].remove(
             LoggingEventDispatcher::Subscription( logger, &Logger::log ) );
 }
 
-void LoggerManager::log( Time currentTime, Entity* ent )
+void LoggerManager::log( Time currentTime, const Entity* ent ) const
 {
     FullID fullID( model_->getFullID( ent ) );
     PNToDispatcherMap& pnToDispatcherMap( dispatchers_[ fullID ] );

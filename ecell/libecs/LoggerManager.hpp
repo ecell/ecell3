@@ -65,10 +65,10 @@ class Model;
 class LIBECS_API LoggerManager: private boost::noncopyable
 {
 public:
-    typedef boost::shared_ptr< Logger > LoggerHandle;
+    typedef boost::shared_ptr< Logger > Handle;
 
 private:
-    typedef Happening< LoggerHandle, Logger::DataPoint > LoggingEventDispatcher;
+    typedef Happening< Handle, Logger::DataPoint > LoggingEventDispatcher;
     typedef std::map< const String, LoggingEventDispatcher > PNToDispatcherMap;
     typedef std::map< const FullID, PNToDispatcherMap > DispatcherMap;
 
@@ -77,10 +77,10 @@ public:
 
     ~LoggerManager();
 
-    void add( const FullPN& fullPN, LoggerHandle logger );
-    void remove( const FullPN& fullPN, LoggerHandle logger );
+    void add( const FullPN& fullPN, Handle logger );
+    void remove( const FullPN& fullPN, Handle logger );
 
-    void log( Time currentTime, const Entity* ent );
+    void log( Time currentTime, const Entity* ent ) const;
 
 private:
     DispatcherMap     dispatchers_;
