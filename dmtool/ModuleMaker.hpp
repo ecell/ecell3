@@ -385,7 +385,7 @@ SharedModuleMaker<T,DMAllocator>::loadModule( const std::string& aClassname )
     }
   typename SharedModule::DMAllocator* anAllocatorPtr( 0 );
   InfoLoaderType* anInfoLoaderPtr( 0 );
-  const char** typeStringPtr( 0 );
+  const char** typeStringPtr = 0;
 
   anAllocatorPtr = reinterpret_cast< DMAllocator* >(
 	lt_dlsym( handle, "CreateObject" ) );
