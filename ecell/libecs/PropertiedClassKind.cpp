@@ -35,7 +35,8 @@
 #include <assert.h>
 
 #include "PropertiedClassKind.hpp"
-
+#include "EntityType.hpp"
+#include "Exceptions.hpp"
 
 namespace libecs {
 
@@ -73,16 +74,16 @@ PropertiedClassKind::fromEntityType( const EntityType& et )
 {
     switch ( et.code )
     {
-    case Entity::_PROCESS:
+    case EntityType::_PROCESS:
         return PropertiedClassKind::PROCESS;
-    case Entity::_VARIABLE:
+    case EntityType::_VARIABLE:
         return PropertiedClassKind::VARIABLE;
-    case Entity::_SYSTEM:
+    case EntityType::_SYSTEM:
         return PropertiedClassKind::SYSTEM;
     }
     THROW_EXCEPTION( ValueError,
         String( "no PropertiedClassKind counterpart for " )
-        + static_cast< const String& >( pck ) );
+        + static_cast< const String& >( et ) );
 }
 
 } // namespace libecs

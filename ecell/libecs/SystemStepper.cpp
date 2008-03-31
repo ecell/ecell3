@@ -48,7 +48,7 @@ namespace libecs
 
   ////////////////////////// Stepper
 
-  SystemStepper::SystemStepper() 
+  void SystemStepper::startup()
   {
     setCurrentTime( INF );
     setMaxStepInterval( INF );

@@ -50,9 +50,7 @@ public:
     {
     }
 
-    ~PropertiedObjectMaker()
-    {
-    }
+    ~PropertiedObjectMaker();
 
     template<typename T_>
     T_* make( const String& className )

@@ -36,11 +36,11 @@
 /** @file */
 namespace libecs {
 
-virtual ~PropertySlotProxyLoggerAdapter::PropertySlotProxyLoggerAdapter()
+PropertySlotProxyLoggerAdapter::~PropertySlotProxyLoggerAdapter()
 {
 }
 
-virtual const Real PropertySlotProxyLoggerAdapter::getValue() const
+const Real PropertySlotProxyLoggerAdapter::getValue() const
 {
     return thePropertySlotProxy.get<Real>();
 }

@@ -188,7 +188,7 @@ void Model::addEntity( const FullID& fullID, Entity* ent )
     sys->add( fullID.getID(), ent );
 }
 
-System* Model::getSystem( const SystemPath& systemPath )
+System* Model::getSystem( const SystemPath& systemPath, bool throwIfNotFound )
 {
     if ( ! systemPath.isAbsolute() || systemPath.isEmpty() )
     {
@@ -204,18 +204,22 @@ System* Model::getSystem( const SystemPath& systemPath )
     EntityMap::const_iterator pos( systems_.find( fullID ) );
     if ( pos == systems_.end() )
     {
-        THROW_EXCEPTION( NotFound, String( "No such system: " ) + fullID );
+        if ( throwIfNotFound )
+        {
+            THROW_EXCEPTION( NotFound, String( "No such system: " ) + fullID );
+        }
+        return 0;
     }
 
     return reinterpret_cast<System*>( pos->second );
 }
 
-const System* Model::getSystem( const SystemPath& systemPath ) const
+const System* Model::getSystem( const SystemPath& systemPath, bool throwIfNotFound ) const
 {
-    return const_cast<Model*>(this)->getSystem( systemPath );
+    return const_cast<Model*>(this)->getSystem( systemPath, throwIfNotFound );
 }
 
-Entity* Model::getEntity( const FullID& fullID )
+Entity* Model::getEntity( const FullID& fullID, bool throwIfNotFound )
 {
     EntityMap::const_iterator pos;
 
@@ -224,21 +228,33 @@ Entity* Model::getEntity( const FullID& fullID )
         pos = systems_.find( fullID );
         if ( pos == systems_.end() )
         {
-            THROW_EXCEPTION( NotFound, "No such system: " + fullID );
+            if ( throwIfNotFound )
+            {
+                THROW_EXCEPTION( NotFound, "No such system: " + fullID );
+            }
+            return 0;
         }
         break;
     case EntityType::_PROCESS:
         pos = processes_.find( fullID );
         if ( pos == processes_.end() )
         {
-            THROW_EXCEPTION( NotFound, "No such process: " + fullID );
+            if ( throwIfNotFound )
+            {
+                THROW_EXCEPTION( NotFound, "No such process: " + fullID );
+            }
+            return 0;
         }
         break;
     case EntityType::_VARIABLE:
         pos = variables_.find( fullID );
         if ( pos == variables_.end() )
         {
-            THROW_EXCEPTION( NotFound, "No such variable: " + fullID );
+            if ( throwIfNotFound )
+            {
+                THROW_EXCEPTION( NotFound, "No such variable: " + fullID );
+            }
+            return 0;
         }
         break;
     }
@@ -246,9 +262,9 @@ Entity* Model::getEntity( const FullID& fullID )
     return pos->second;
 }
 
-const Entity* Model::getEntity( const FullID& fullID ) const
+const Entity* Model::getEntity( const FullID& fullID, bool throwIfNotFound ) const
 {
-    return const_cast< Model* >( this )->getEntity( fullID );
+    return const_cast< Model* >( this )->getEntity( fullID, throwIfNotFound );
 }
 
 Stepper* Model::getStepper( const String& anID )

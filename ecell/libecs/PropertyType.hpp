@@ -35,6 +35,8 @@
 
 namespace libecs {
 
+class Polymorph;
+
 class PropertyType
 {
 public:

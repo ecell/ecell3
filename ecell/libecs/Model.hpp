@@ -172,21 +172,21 @@ public:
        @param fullID a FullID of the requested Entity.
        @return A borrowed pointer to an Entity specified by the FullID.
     */
-    const Entity* getEntity( const FullID& fullID ) const;
+    const Entity* getEntity( const FullID& fullID, bool throwIfNotFound = true ) const;
 
     /**
        This method finds an Entity object pointed by the FullID.
        @param fullID a FullID of the requested Entity.
        @return A borrowed pointer to an Entity specified by the FullID.
     */
-    Entity* getEntity( const FullID& fullID );
+    Entity* getEntity( const FullID& fullID, bool throwIfNotFound = true );
 
     /**
        This method finds a System object pointed by the SystemPath.
        @param systemPath a SystemPath of the requested System.
        @return A borrowed pointer to a System.
     */
-    System* getSystem( const SystemPath& systemPath );
+    System* getSystem( const SystemPath& systemPath, bool throwIfNotFound = true );
 
 
     /**
@@ -194,7 +194,7 @@ public:
        @param systemPath a SystemPath of the requested System.
        @return A borrowed pointer to a System.
     */
-    const System* getSystem( const SystemPath& systemPath ) const;
+    const System* getSystem( const SystemPath& systemPath, bool throwIfNotFound = true ) const;
 
     /**
        Create a stepper with an ID and a classname.

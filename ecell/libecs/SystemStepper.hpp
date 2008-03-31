@@ -57,7 +57,6 @@ public:
 
 
 
-    SystemStepper();
     virtual ~SystemStepper();
 
     virtual GET_METHOD( Real, TimeScale )
@@ -65,6 +64,7 @@ public:
         return 0.0;
     }
 
+    virtual void startup();
 
     virtual void initialize();
 

@@ -227,6 +227,10 @@ public:
     GET_METHOD( Polymorph, ProcessList );
     GET_METHOD( Polymorph, SystemList );
 
+    virtual void startup();
+
+    virtual void initialize();
+
     void initializeProcesses();
 
     /**
@@ -495,8 +499,6 @@ protected:
     void fireProcesses();
 
     virtual void reset();
-
-    virtual void initialize();
 
     /**
        Update theProcessVector.

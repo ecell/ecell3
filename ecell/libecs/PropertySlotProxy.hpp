@@ -41,9 +41,13 @@
 
 /** @file */
 
+#include "PropertySlot.hpp"
+
 #ifndef __LIBECS_PROPERTYSLOTPROXYPROXY_DEFINED
 #define __LIBECS_PROPERTYSLOTPROXYPROXY_DEFINED
 namespace libecs {
+
+class PropertiedClass;
 
 class PropertySlotProxy
 {

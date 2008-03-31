@@ -34,7 +34,9 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <time.h>
+
 #include "SimulationContext.hpp"
+#include "Model.hpp"
 
 namespace libecs {
 
@@ -52,18 +54,18 @@ SimulationContext::~SimulationContext()
 void SimulationContext::setModel( Model* model )
 {
     model_ = model;
-    model.setSimulationContext( model );
+    model_->setSimulationContext( this );
 }
 
 void SimulationContext::setRngSeed( const String& value )
-    unsigned int seed( 0 );
 {
+    unsigned int seed( 0 );
     if ( value == "TIME" )
     {
         // Using just time() still gives the same seeds to Steppers
         // in multi-stepper model.  Stepper index is added to prevent this.
         seed = static_cast<UnsignedInteger>(
-                time( NULLPTR ) + getSchedulerIndex() );
+                time( NULLPTR ) + scheduler_.getSize() );
     }
     else if ( value == "DEFAULT" )
     {
@@ -85,12 +87,15 @@ void SimulationContext::startup()
     world_.setStepper( &systemStepper_ );
 }
 
-void ensureExistenceOfSizeVariable()
+void SimulationContext::ensureExistenceOfSizeVariable()
 {
-    FullID fullID( FullID.parse( "Variable:/:SIZE" ) );
+    FullID fullID( FullID::parse( "Variable:/:SIZE" ) );
 
-    if ( !getModel().contains( fullID ) ) {
-        createEntity<Variable>( "Variable", fullID )->setValue( 1.0 );
+    if ( !model_->getEntity( fullID, false ) )
+    {
+        Variable* var = model_->createEntity<Variable>( "Variable" );
+        model_->addEntity( fullID, var );
+        var->setValue( 1.0 );
     }
 }
 
@@ -105,33 +110,29 @@ void ensureExistenceOfSizeVariable()
        - fill theIntegratedVariableVector.
    @internal
  */
-void initializeSteppers()
+void SimulationContext::initializeSteppers()
 {
-    Model::StepperMapCRange steppers( model->getSteppers() );
-
     systemStepper_.initialize();
-    Model::StepperMapCRange steppers( model->getSteppers() );
-    for ( Model::StepperMapCRange::iterator i( steppers.begin() );
+    Model::SteppersCRange steppers( model_->getSteppers() );
+    for ( Model::SteppersCRange::iterator i( steppers.begin() );
             i != steppers.end(); ++i ) {
-        i->second->initialize();
+        (*i)->initialize();
     }
 }
 
-void postInitializeSteppers()
+void SimulationContext::postInitializeSteppers()
 {
-    Model::StepperMapCRange steppers( model->getSteppers() );
-
     systemStepper_.postInitialize();
     scheduler_.addEvent(
         StepperEvent(
             lastEvent_.getTime() + systemStepper_.getStepInterval(),
             &systemStepper_ ) );
 
-    Model::StepperMapCRange steppers( model->getSteppers() );
-    for ( Model::StepperMapCRange::iterator i( steppers.begin() );
+    Model::SteppersCRange steppers( model_->getSteppers() );
+    for ( Model::SteppersCRange::iterator i( steppers.begin() );
             i != steppers.end(); ++i ) {
-        i->second->postInitialize();
-        for ( Model::StepperMapCRange::iterator i( steppers.begin() );
+        (*i)->postInitialize();
+        for ( Model::SteppersCRange::iterator i( steppers.begin() );
                 i != steppers.end(); ++i ) {
             scheduler_.addEvent(
                     StepperEvent(
@@ -140,15 +141,15 @@ void postInitializeSteppers()
         }
     }
 
-    _scheduler.updateEventDependency();
+    scheduler_.updateEventDependency();
 }
 
-void initialize()
+void SimulationContext::initialize()
 {
-    world_->initialize();
+    world_.initialize();
     ensureExistenceOfSizeVariable();
-    intializeSteppers();
-    world_->postInitialize();
+    initializeSteppers();
+    world_.postInitialize();
     postInitializeSteppers();
 }
 
