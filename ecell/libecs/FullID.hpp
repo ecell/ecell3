@@ -84,7 +84,7 @@ public:
 
     const String& getID() const
     {
-        return localID_.getEntityType();
+        return localID_.getID();
     }
 
     const SystemPath& getSystemPath() const
@@ -122,17 +122,19 @@ public:
 
     LIBECS_API static FullID parse( const String& fullidstring );
 
-private:
-    FullID();
-
 public:
 
     static const char DELIMITER = ':';
 
 private:
-    const LocalID       localID_;
-    const SystemPath    systemPath_;
+    LocalID       localID_;
+    SystemPath    systemPath_;
 };
+
+String operator+( const String& lhs, const FullID& rhs )
+{
+    return lhs + rhs.asString();
+}
 
 } // namespace libecs
 

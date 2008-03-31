@@ -28,19 +28,19 @@
 // written by Gabor Bereczki <gabor.bereczki@talk21.com>
 // 25/03/2002
 
-#ifndef __DATAPOINTINTEGRATOR_HPP
-#define __DATAPOINTINTEGRATOR_HPP
+#ifndef __DATAPOINTAGGREGATOR_HPP
+#define __DATAPOINTAGGREGATOR_HPP
 
 namespace libecs {
 
 template<typename Tdp_>
-class DataPointIntegrator
+class DataPointAggregator
 {
 public:
     typedef Tdp_ DataPoint;
 
 public:
-    DataPointIntegrator()
+    DataPointAggregator()
         : accumulator_( DataPoint::invalid ),
           last_( DataPoint::invalid ),
           min_( DataPoint::invalid ),
@@ -48,7 +48,7 @@ public:
     {
     }
 
-    ~DataPointIntegrator() {}
+    ~DataPointAggregator() {}
 
     void put( const DataPoint& newPoint )
     {
@@ -112,4 +112,4 @@ private:
 
 } // namespace libecs
 
-#endif /* __DATAPOINTINTEGRATOR_HPP */
+#endif /* __DATAPOINTAGGREGATOR_HPP */

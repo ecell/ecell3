@@ -51,7 +51,8 @@
 namespace libecs
 {
 class Model;
-
+class PropertySlot;
+class Entity;
 /**
    LoggerManager creates and administrates Loggers in a model.
 
@@ -69,8 +70,9 @@ public:
 
 private:
     typedef Happening< Handle, Logger::DataPoint > LoggingEventDispatcher;
-    typedef std::map< const String, LoggingEventDispatcher > PNToDispatcherMap;
-    typedef std::map< const FullID, PNToDispatcherMap > DispatcherMap;
+    typedef std::pair< PropertySlot*, LoggingEventDispatcher > Entry;
+    typedef std::map< const String, Entry > PNToDispatcherMap;
+    typedef std::map< const Entity*, PNToDispatcherMap > DispatcherMap;
 
 public:
     LoggerManager( Model* model );
@@ -80,7 +82,7 @@ public:
     void add( const FullPN& fullPN, Handle logger );
     void remove( const FullPN& fullPN, Handle logger );
 
-    void log( Time currentTime, const Entity* ent ) const;
+    void log( TimeParam currentTime, const Entity* ent ) const;
 
 private:
     DispatcherMap     dispatchers_;

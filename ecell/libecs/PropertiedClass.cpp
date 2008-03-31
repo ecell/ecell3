@@ -47,9 +47,20 @@ PropertiedClass::~PropertiedClass()
     ; // do nothing
 }
 
-void PropertiedClass::__libecs_init__()
+void PropertiedClass::startup()
 {
-    initialized = true;
+}
+
+void PropertiedClass::initialize()
+{
+}
+
+void PropertiedClass::postInitialize()
+{
+}
+
+void PropertiedClass::interrupt( TimeParam )
+{
 }
 
 const String& ProperitedClass::asString() const

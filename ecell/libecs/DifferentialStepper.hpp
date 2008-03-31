@@ -133,6 +133,8 @@ public:
 
     void setVariableVelocity( boost::detail::multi_array::sub_array<Real, 1> aVelocityBuffer );
 
+    virtual void startup();
+
     virtual void initialize();
 
     virtual void reset();

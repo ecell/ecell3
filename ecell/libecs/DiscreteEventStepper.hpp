@@ -55,16 +55,12 @@ namespace libecs
 
 LIBECS_DM_CLASS( DiscreteEventStepper, Stepper )
 {
-
-protected:
-
+public:
     typedef EventScheduler<ProcessEvent> ProcessEventScheduler;
     typedef ProcessEventScheduler::EventID EventID;
 
 
-
 public:
-
     LIBECS_DM_OBJECT( DiscreteEventStepper, Stepper )
     {
         INHERIT_PROPERTIES( Stepper );
@@ -77,6 +73,7 @@ public:
     DiscreteEventStepper();
     virtual ~DiscreteEventStepper() {}
 
+    virtual void startup();
     virtual void initialize();
     virtual void step();
     virtual void interrupt( TimeParam aTime );

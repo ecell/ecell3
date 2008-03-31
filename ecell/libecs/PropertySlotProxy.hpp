@@ -48,36 +48,36 @@ namespace libecs {
 class PropertySlotProxy
 {
 public:
-    PropertySlotProxy( PropertiedClass& anObject,
-            const PropertySlot& aSlot )
-        : theObject( anObject ), thePropertySlot( aSlot )
+    PropertySlotProxy( PropertiedClass* anObject,
+            const PropertySlot* aSlot )
+        : obj_( anObject ), slot_( aSlot )
     {
         ; // do nothing
     }
 
     template < typename Type > void set( typename Param<Type>::type aValue )
     {
-        thePropertySlot.set<Type>( theObject, aValue );
+        slot_->set<Type>( *obj_, aValue );
     }
 
     template < typename Type > Type get() const
     {
-        return thePropertySlot.get<Type>( theObject );
+        return slot_->get<Type>( *obj_ );
     }
 
     void load( Param<Polymorph>::type aValue )
     {
-        thePropertySlot.load( theObject, aValue );
+        slot_->load( *obj_, aValue );
     }
 
     const Polymorph save() const
     {
-        return thePropertySlot.save( theObject );
+        return slot_->save( *obj_ );
     }
 
 protected:
-    PropertiedClass& theObject;
-    const PropertySlot& thePropertySlot;
+    PropertiedClass* obj_;
+    const PropertySlot* slot_;
 };
 
 } // namespace libecs

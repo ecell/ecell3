@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
@@ -33,47 +33,40 @@
 #define __DISCRETETIMESTEPPER_HPP
 
 #include "libecs.hpp"
-
 #include "Stepper.hpp"
 
+/**
+   @addtogroup stepper
+ */
 
+/** @{ */
+/** @file */
 
 namespace libecs
 {
 
-  /** @addtogroup stepper
-   *@{
-   */
+/**
+   DiscreteTimeStepper has a fixed step interval.
+  
+   This stepper ignores incoming interruptions, but dispatches
+   interruptions always when it steps.
 
-  /** @file */
+   Process objects in this Stepper isn't allowed to use
+   Variable::addVelocity() method, but Variable::setValue() method only.
 
+*/
+LIBECS_DM_CLASS( DiscreteTimeStepper, Stepper )
+{
 
-
-  /**
-     DiscreteTimeStepper has a fixed step interval.
-     
-     This stepper ignores incoming interruptions, but dispatches 
-     interruptions always when it steps.
-
-     Process objects in this Stepper isn't allowed to use 
-     Variable::addVelocity() method, but Variable::setValue() method only.
-
-  */
-
-  LIBECS_DM_CLASS( DiscreteTimeStepper, Stepper )
-  {
-
-  public:
+public:
 
     LIBECS_DM_OBJECT( DiscreteTimeStepper, Stepper )
-      {
-	INHERIT_PROPERTIES( Stepper );
-      }
+    {
+        INHERIT_PROPERTIES( Stepper );
+    }
 
 
-    DiscreteTimeStepper();
     virtual ~DiscreteTimeStepper() {}
-
 
     virtual void initialize();
 
@@ -89,7 +82,7 @@ namespace libecs
 
     virtual void interrupt( TimeParam )
     {
-      ; // do nothing -- ignore interruption
+        ; // do nothing -- ignore interruption
     }
 
 
@@ -101,19 +94,16 @@ namespace libecs
 
     virtual GET_METHOD( Real, TimeScale )
     {
-      return 0.0;
+        return 0.0;
     }
 
-  };
-
-
+};
 
 } // namespace libecs
 
+/** @} */
+
 #endif /* __DISCRETETIMESTEPPER_HPP */
-
-
-
 /*
   Do not modify
   $Author$

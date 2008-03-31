@@ -31,21 +31,20 @@
 #define __DOWNSAMPLER_HPP
 
 #include <cstddef>
-#include "DataPointIntegrator.hpp"
 
 namespace libecs {
 
-template<typename Tdpi_, typename Tint_>
+template<typename Tdpi_, typename Tagg_>
 class Downsampler
 {
 public:
-    typedef Tint_ Integrator;
+    typedef Tagg_ Integrator;
     typedef Tdpi_::value_type value_type;
     typedef ::std::size_t size_type;
 
-    struct IntegratedDataPoint: public value_type
+    struct AggregatedDataPoint: public value_type
     {
-        IntegratedDataPoint(
+        AggregatedDataPoint(
                 typename value_type::Time _time,
                 typename value_type::Value _value,
                 typename value_type::Value _min,
@@ -69,12 +68,12 @@ public:
         consumed_ = false;
     }
 
-    IntegratedDataPoint operator*() const
+    AggregatedDataPoint operator*() const
     {
         consume();
-        return IntegratedDataPoint(
-                int_.get().time, int_.get().value,
-                int_.getMin(), int_.getMax() );
+        return AggregatedDataPoint(
+                agg_.get().time, agg_.get().value,
+                agg_.getMin(), agg_.getMax() );
     }
 
 private:
@@ -85,7 +84,7 @@ private:
             for ( size_type i( 0 ); i < interval_; ++i ) {
                 if ( iter_ == end_ )
                     break;
-                int_.put( *iter_ );
+                agg_.put( *iter_ );
                 ++iter_;
             }
             consumed_ = true;
@@ -93,7 +92,7 @@ private:
     }
 
 private:
-    Tint_ int_;
+    Tagg_ agg_;
     Tdpi_ iter_;
     Tdpi_ begin_;
     Tdpi_ end_;

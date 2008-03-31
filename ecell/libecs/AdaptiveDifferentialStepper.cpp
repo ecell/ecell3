@@ -49,18 +49,18 @@ namespace libecs {
 
 LIBECS_DM_INIT_STATIC( AdaptiveDifferentialStepper, Stepper );
 
-AdaptiveDifferentialStepper::AdaptiveDifferentialStepper()
-    : theTolerance( 1.0e-6 ),
-      theAbsoluteToleranceFactor( 1.0 ),
-      theStateToleranceFactor( 1.0 ),
-      theDerivativeToleranceFactor( 1.0 ),
-      theEpsilonChecked( 0 ),
-      theAbsoluteEpsilon( 0.1 ),
-      theRelativeEpsilon( 0.1 ),
-      safety( 0.9 ),
-      theMaxErrorRatio( 1.0 )
+void AdaptiveDifferentialStepper::startup()
 {
-    // use more narrow range
+    _LIBECS_BASE_CLASS_::startup();
+    theTolerance =  1.0e-6;
+    theAbsoluteToleranceFactor = 1.0;
+    theStateToleranceFactor = 1.0;
+    theDerivativeToleranceFactor = 1.0;
+    theEpsilonChecked = 0,
+    theAbsoluteEpsilon = 0.1 ;
+    theRelativeEpsilon = 0.1 ;
+    safety = 0.9;
+    theMaxErrorRatio = 1.0;
     setMinStepInterval( 1e-100 );
     setMaxStepInterval( 1e+10 );
 }

@@ -32,97 +32,112 @@
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <utility>
+
+#include <boost/lambda/lambda.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/join.hpp>
+
 #include "Exceptions.hpp"
 #include "SystemPath.hpp"
 
 namespace libecs {
 
-SystemPath SystemPath::parse( const String& aString )
+const char SystemPath::DELIMITER[] = "/";
+const char SystemPath::CURRENT[] = ".";
+const char SystemPath::PARENT[] = "..";
+
+
+std::pair< const SystemPath, String > SystemPath::splitAtLast() const
 {
-    if ( aString.empty() )
+    if ( components_.empty() )
     {
-        return SystemPath();
+        THROW_EXCEPTION( BadFormat,
+                "getParent() called against an empty SystemPath" );
     }
-
-    SystemPath retval;
-
-    String::size_type start( 0 ), end( 0 );
-
-    // absolute path ( start with '/' )
-    if ( aString[0] == DELIMITER )
-    {
-        //insert(end(), String( 1, DELIMITER ) );
-        retval.push_back( String( 1, DELIMITER ) );
-
-        if ( aString.size() == 1 )
-        {
-            return retval;
-        }
-
-        ++start;
-    }
-
-    for ( ;; )
-    {
-        end = aString.find_first_of( DELIMITER, start );
-        if ( end == String::npos )
-        {
-            retval.push_back( aString.substr( start ) );
-            break;
-        }
-        else
-        {
-            retval.push_back( aString.substr( start, end - start ) );
-        }
-        start = end + 1;
-    }
-
-    return retval;
+    SystemPath parentPath( *this );
+    return std::make_pair( parentPath, parentPath.pop() );
 }
 
 const String SystemPath::asString() const
 {
-    StringList::const_iterator i = begin();
-    String aString;
+    return boost::algorithm::join( components_, DELIMITER );
+}
+
+SystemPath& SystemPath::append( const String& pathRepr )
+{
+    using namespace boost::lambda;
+
+    if ( pathRepr.empty() )
+    {
+        return *this;
+    }
+
+    StringList comps;
+    boost::algorithm::split( comps, pathRepr, _1 == DELIMITER[ 0 ] );
+
+    return append( comps );
+}
+
+SystemPath SystemPath::toAbsolute( const SystemPath& baseSystemPath ) const
+{
+    if ( !baseSystemPath.isAbsolute() )
+    {
+        THROW_EXCEPTION( ValueError,
+                String( "Base system path is expected to be absolute, " )
+                + baseSystemPath.asString() + " given." );
+    }
 
     if ( isAbsolute() )
     {
-        if ( size() == 1 )
-        {
-            return "/";
-        }
-        else
-        {
-            ; // do nothing
-        }
+        return *this;
     }
-    else
+
+    return baseSystemPath.cat( *this );
+}
+
+SystemPath SystemPath::toRelative( const SystemPath& baseSystemPath ) const
+{
+    if ( !baseSystemPath.isAbsolute() )
     {
-        // isAbsolute() == false implies that this can be empty
-        if ( empty() )
-        {
-            return aString;
-        }
-        else
-        {
-            aString = *i;
-        }
+        THROW_EXCEPTION( ValueError,
+                String( "Base system path is expected to be absolute, " )
+                + baseSystemPath.asString() + " given." );
     }
 
-    if ( i == end() ) {
-        return aString;
-    }
-
-    ++i;
-
-    while ( i != end() )
+    if ( !isAbsolute() )
     {
-        aString += '/';
-        aString += *i;
+        return *this;
+    }
+
+    SystemPath retval;
+    StringList::const_iterator i( baseSystemPath.components_.begin() ),
+                               j( components_.begin() );
+    while ( j != components_.end() )
+    {
+        if ( i == baseSystemPath.components_.end() ) {
+            retval.components_.clear();
+            break;
+        }
+       
+        if ( *i != *j )
+        {
+            retval.components_.push_back( (*i).empty() ? CURRENT: PARENT );
+            break;
+        }
+        ++i, ++j;
+    }
+
+    while ( i != baseSystemPath.components_.end() )
+    {
+        retval.components_.push_back( (*i).empty() ? CURRENT: PARENT );
         ++i;
     }
 
-    return aString;
+    ::std::copy( j, components_.end(),
+            ::std::back_inserter( retval.components_ ) );
+
+    return  retval;
 }
 
 } // namespace libecs

@@ -32,6 +32,7 @@
 #ifndef __LOCALID_HPP
 #define __LOCALID_HPP
 
+#include <string.h>
 #include "libecs.hpp"
 #include "EntityType.hpp"
 
@@ -56,9 +57,7 @@ class LocalID
 public:
     LocalID( const EntityType& type,
              const String& id )
-            :
-            entityType_( type ),
-            id_( id )
+        : entityType_( &type ), id_( id )
     {
         ; // do nothing
     }
@@ -67,7 +66,7 @@ public:
 
     const EntityType  getEntityType() const
     {
-        return entityType_;
+        return *entityType_;
     }
 
     const String& getID() const
@@ -99,11 +98,8 @@ public:
     }
 
 private:
-    LocalID();
-
-private:
-    const EntityType& entityType_;
-    const String      id_;
+    const EntityType* entityType_;
+    String id_;
 };
 
 /** @} */ // identifier module

@@ -36,49 +36,10 @@
 
 namespace libecs
 {
-PropertiedObjectMaker::PropertiedObjectMaker()
-        : theModuleMakerList()
-{
-}
 
 PropertiedObjectMaker::~PropertiedObjectMaker()
 {
     ; // do nothing
-}
-
-void
-PropertiedObjectMaker::addModuleMaker( ModuleMaker* maker )
-{
-    theModuleMakerList.add( maker );
-}
-
-void
-PropertiedObjectMaker::removeModuleMaker( ModuleMaker* maker )
-{
-    theModuleMakerList.remove( maker );
-}
-
-const Module&
-PropertiedObjectMaker::getModule( const String& name ) const
-{
-    for ( ModuleMakerList::const_iterator i( theModuleMakerList.begin() );
-            i != theModuleMakerList.end(); ++i )
-    {
-        try
-        {
-            const Module& retval( ( *i )->getModule( name, false ) );
-            return retval;
-        }
-        catch ( const DMException& e )
-        {
-            ; // do nothing
-        }
-    }
-    THROW_EXCEPTION( NotFound,
-                     "Class [ " + name + "] not found"
-                   );
-
-    return Module( name ); // never get here
 }
 
 } // namespace libecs

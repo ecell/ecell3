@@ -88,7 +88,7 @@ public:
         subscriptions.erase( sub );
     }
 
-    void operator()( const Tdesc_& desc )
+    void operator()( const Tdesc_& desc ) const
     {
         bool interrupted( false );
         for ( typename Subscriptions::const_iterator i( subscriptions.begin() );

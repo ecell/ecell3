@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
@@ -42,86 +42,86 @@
 namespace libecs
 {
 
-  PolymorphValue::~PolymorphValue()
-  {
+PolymorphValue::~PolymorphValue()
+{
     ; // do nothing
-  }
+}
 
-  PolymorphNoneValue::~PolymorphNoneValue()
-  {
+PolymorphNoneValue::~PolymorphNoneValue()
+{
     ; // do nothing
-  }
+}
 
-  const PolymorphVector PolymorphNoneValue::asPolymorphVector() const
-  { 
-    return PolymorphVector(); 
-  }
+const PolymorphVector PolymorphNoneValue::asPolymorphVector() const
+{
+    return PolymorphVector();
+}
 
-  const String PolymorphNoneValue::asString() const
-  { 
+const String PolymorphNoneValue::asString() const
+{
     return String();
-  }
+}
 
-  const Polymorph::Type Polymorph::getType() const
-  {
-    if( typeid( *theValue) == typeid( ConcretePolymorphValue<Real> ) )
-      {
-	return REAL;
-      }
-    else if( typeid( *theValue) == typeid( ConcretePolymorphValue<Integer> ) )
-      {
-	return INTEGER;
-      }
-    else if( typeid( *theValue) == typeid( ConcretePolymorphValue<String> ) )
-      {
-	return STRING;
-      }
-    else if( typeid( *theValue) == 
-	     typeid( ConcretePolymorphValue<PolymorphVector> ) )
-      {
-	return POLYMORPH_VECTOR;
-      }
-    else if( typeid( *theValue ) == typeid( PolymorphNoneValue ) )
-      {
-	return NONE;
-      }
+const Polymorph::Type Polymorph::getType() const
+{
+    if ( typeid( *value_ ) == typeid( ConcretePolymorphValue<Real> ) )
+    {
+        return REAL;
+    }
+    else if ( typeid( *value_ ) == typeid( ConcretePolymorphValue<Integer> ) )
+    {
+        return INTEGER;
+    }
+    else if ( typeid( *value_ ) == typeid( ConcretePolymorphValue<String> ) )
+    {
+        return STRING;
+    }
+    else if ( typeid( *value_ ) ==
+              typeid( ConcretePolymorphValue<PolymorphVector> ) )
+    {
+        return POLYMORPH_VECTOR;
+    }
+    else if ( typeid( *value_ ) == typeid( PolymorphNoneValue ) )
+    {
+        return NONE;
+    }
 
     NEVER_GET_HERE;
-  }
+}
 
 
-  void Polymorph::changeType( const Type aType )
-  {
-    PolymorphValuePtr aPolymorphValuePtr( NULLPTR );
+void Polymorph::changeType( const Type aType )
+{
+    PolymorphValue* pval( NULLPTR );
 
-    switch( aType )
-      {
-      case REAL:
-	aPolymorphValuePtr = 
-	  new ConcretePolymorphValue<Real>( theValue->asReal() );
-	break;
-      case INTEGER:
-	aPolymorphValuePtr = 
-	  new ConcretePolymorphValue<Integer>( theValue->asInteger() );
-	break;
-      case STRING:
-	aPolymorphValuePtr = 
-	  new ConcretePolymorphValue<String>( theValue->asString() );
-	break;
-      case POLYMORPH_VECTOR:
-	aPolymorphValuePtr = 
-	  new ConcretePolymorphValue<PolymorphVector>
-	  ( theValue->asPolymorphVector() );
-	break;
-      case NONE:
-	aPolymorphValuePtr = new PolymorphNoneValue();
-	break;
-      default:
-	NEVER_GET_HERE;
-      }
+    switch ( aType )
+    {
+    case REAL:
+        pval =
+            new ConcretePolymorphValue<Real>( value_->asReal() );
+        break;
+    case INTEGER:
+        pval =
+            new ConcretePolymorphValue<Integer>( value_->asInteger() );
+        break;
+    case STRING:
+        pval =
+            new ConcretePolymorphValue<String>( value_->asString() );
+        break;
+    case POLYMORPH_VECTOR:
+        pval =
+            new ConcretePolymorphValue<PolymorphVector>
+        ( value_->asPolymorphVector() );
+        break;
+    case NONE:
+        pval = new PolymorphNoneValue();
+        break;
+    default:
+        NEVER_GET_HERE;
+    }
 
-    delete theValue;
-    theValue = aPolymorphValuePtr;
-  }
+    delete value_;
+    value_ = pval;
+}
 
 } // namespace libecs

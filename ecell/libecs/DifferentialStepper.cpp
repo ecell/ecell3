@@ -43,7 +43,7 @@
 #include "VariableValueIntegrator.hpp"
 #include "Process.hpp"
 #include "Model.hpp"
-
+#include "SimulationContext.hpp"
 #include "DifferentialStepper.hpp"
 
 #include <boost/array.hpp>
@@ -181,13 +181,12 @@ DifferentialStepper::Interpolant::getVelocity( TimeParam aTime ) const
 }
 
 
-DifferentialStepper::DifferentialStepper()
-        :
-        theNextStepInterval( 0.001 ),
-        theTolerableStepInterval( 0.001 ),
-        theStateFlag( true )
+void DifferentialStepper::startup()
 {
-    ; // do nothing
+    _LIBECS_BASE_CLASS_::startup();
+    theNextStepInterval =  0.001;
+    theTolerableStepInterval = 0.001 ;
+    theStateFlag = true;
 }
 
 DifferentialStepper::~DifferentialStepper()
@@ -203,8 +202,6 @@ libecs::Interpolant* DifferentialStepper::createInterpolant()
 void DifferentialStepper::initialize()
 {
     Stepper::initialize();
-
-    createInterpolants();
 
     theTaylorSeries.resize(
         boost::extents[ getStage() ][ getAffectedVariables().size() ]
@@ -330,7 +327,7 @@ void DifferentialStepper::interIntegrate()
 void DifferentialStepper::interrupt( TimeParam callerCurrentTime )
 {
     const TimeDifference callerTimeScale(
-            getModel()->getLastStepper()->getTimeScale() );
+            model_->getSimulationContext()->getLastEvent().getStepper()->getTimeScale() );
     const TimeDifference stepInterval( getStepInterval() );
 
     // If the step size of this is less than caller's timescale,

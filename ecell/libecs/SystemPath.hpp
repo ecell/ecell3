@@ -33,6 +33,7 @@
 #define SYSTEMPATH_HPP
 
 #include <vector>
+#include <algorithm>
 #include "libecs.hpp"
 
 /** @addtogroup identifier The FullID, FullPN and SystemPath.
@@ -51,58 +52,159 @@ namespace libecs {
 /**
  SystemPath
  */
-class LIBECS_API SystemPath : protected std::vector<String>
+class LIBECS_API SystemPath
 {
-public:
-    typedef std::vector<String> Base;
-public:
-    SystemPath( const Base& systempath )
-            : Base( systempath )
-    {
-        ; // do nothing
-    }
+protected:
+    typedef ::std::vector< String > StringList;
 
-    SystemPath(): Base()
+public:
+    SystemPath() {}
+
+    template< typename Trange_ >
+    SystemPath( const Trange_& components )
     {
+        ::std::copy( components.begin(), components.end(),
+                ::std::back_inserter( components_) );
     }
 
     ~SystemPath() {}
 
     const String asString() const;
 
-    bool isAbsolute() const
+    bool isEmpty() const
     {
-        return ( ( ( ! empty() ) && ( front()[0] == DELIMITER ) ) || empty() );
+        return components_.empty();
     }
 
-    /**
-       Normalize a SystemPath.
-       Reduce '..'s and remove extra white spaces.
+    bool isRoot() const
+    {
+        return components_.size() == 2 &&
+                components_[ 0 ].empty() && components_[ 1 ].empty();
+    }
 
-       @return reference to the systempath
-    */
-    SystemPath normalize();
+    bool isAbsolute() const
+    {
+        return ( !components_.empty() && components_[ 0 ].empty() );
+    }
 
-    LIBECS_API static SystemPath parse( const String& systempathstring );
+    std::pair< const SystemPath, String> splitAtLast() const;
+
+    String pop()
+    {
+        String retval( components_.back() );
+        components_.pop_back();
+        return retval; 
+    }
+
+    template< typename Tcomps_ > 
+    SystemPath& append( const Tcomps_& comps )
+    {
+        typename Tcomps_::const_iterator i( comps.begin() ), end( comps.end() );
+
+        if ( i == end )
+        {
+            return *this;
+        }
+
+        // is the specified path absolute and the original is not empty?
+        if ( (*i).empty() && !components_.empty() )
+        {
+            ++i;
+        }
+
+        while ( i != end )
+        {
+            components_.push_back( *i );
+        }
+
+        return *this;
+    }
+
+    SystemPath& append( const SystemPath& that )
+    {
+        return append( that.components_ );
+    }
+
+    SystemPath& append( const String& pathRepr );
+
+    SystemPath cat( const String& pathRepr ) const
+    {
+        return SystemPath( *this ).append( pathRepr );
+    }
+
+    SystemPath cat( const SystemPath& pathRepr ) const
+    {
+        return cat( pathRepr.components_ );
+    }
+
+    SystemPath toAbsolute( const SystemPath& baseSystemPath ) const;
+
+    SystemPath toRelative( const SystemPath& baseSystemPath ) const;
+
+    static SystemPath parse( const String& pathRepr )
+    {
+        return SystemPath().append( pathRepr );
+    }
+
+    SystemPath operator+( const String& rhs ) const
+    {
+        return cat( rhs );
+    }
+
+    SystemPath operator+( const SystemPath& rhs ) const
+    {
+        return cat( rhs );
+    }
+
+    SystemPath operator+=( const String& rhs )
+    {
+        return append( rhs );
+    }
+
+    SystemPath operator+=( const SystemPath& rhs )
+    {
+        return append( rhs );
+    }
+
+    SystemPath& operator=( const SystemPath& rhs )
+    {
+        components_ = rhs.components_;
+        return *this;
+    }
+
+    void swap( SystemPath& rhs )
+    {
+        components_.swap( rhs.components_ );
+    }
 
     bool operator==(const SystemPath& rhs) const
     {
-        return static_cast<const Base&>(*this) == static_cast<const Base&>(rhs);
+        return components_ == rhs.components_;
     }
 
     bool operator!=(const SystemPath& rhs) const
     {
-        return static_cast<const Base&>(*this) != static_cast<const Base&>(rhs);
+        return components_ != rhs.components_;
     }
 
     bool operator<(const SystemPath& rhs) const
     {
-        return static_cast<const Base&>(*this) < static_cast<const Base&>(rhs);
+        return components_ < rhs.components_;
     }
 
 public:
-    static const char DELIMITER = '/';
+    static const char DELIMITER[];
+    static const char CURRENT[];
+    static const char PARENT[];
+
+protected:
+    std::vector<String> components_;
 };
+
+String operator+( const String& lhs, const SystemPath& rhs )
+{
+    return lhs + rhs.asString();
+}
 
 } // namespace libecs
 

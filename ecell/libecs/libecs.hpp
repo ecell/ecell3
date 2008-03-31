@@ -132,6 +132,7 @@ inline Td safe_int_cast( const Ts& v )
 
 /** @file */
 
+class PropertiedObjectMaker;
 
 LIBECS_API extern int const MAJOR_VERSION;
 LIBECS_API extern int const MINOR_VERSION;
@@ -149,6 +150,7 @@ LIBECS_API bool initialize();
 LIBECS_API void finalize();
 LIBECS_API void setDMSearchPath( const String& path );
 LIBECS_API const String getDMSearchPath();
+LIBECS_API const PropertiedObjectMaker& getPropertiedObjectMaker();
 
 /** @} */
 

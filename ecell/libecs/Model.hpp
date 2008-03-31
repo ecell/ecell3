@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
@@ -32,164 +32,184 @@
 #ifndef __MODEL_HPP
 #define __MODEL_HPP
 
+#include <map>
+#include <boost/iterator/transform_iterator.hpp>
+#include <boost/range/iterator_range.hpp>
 #include "AssocVector.h"
 
 #include "libecs.hpp"
+#include "FullID.hpp"
+#include "CastUtils.hpp"
+#include "PropertiedClass.hpp"
+#include "System.hpp"
 
-#include "EventScheduler.hpp"
-#include "StepperEvent.hpp"
-#include "StepperMaker.hpp"
-#include "VariableMaker.hpp"
-#include "ProcessMaker.hpp"
-#include "SystemMaker.hpp"
-#include "Stepper.hpp"
-#include "SystemStepper.hpp"
+
+/** @addtogroup model The Model.
+
+    The model.
+
+    @ingroup libecs
+ */
+/** @{ */
+/** @file */
+
 
 namespace libecs
 {
+class SimulationContext;
+class Entity;
+class Stepper;
+class Variable;
+class Process;
+class PropertiedObjectMaker;
 
-  /** @addtogroup model The Model.
+/**
+   Model class represents a simulation model.
 
-      The model.
+   Model has a list of Steppers and a pointer to the root system.
 
-      @ingroup libecs
-      @{ 
-   */ 
+*/
+LIBECS_DM_CLASS( Model, PropertiedClass )
+{
+public:
+    typedef ::Loki::AssocVector< String, Stepper* > StepperMap;
+    typedef ::boost::transform_iterator<
+            select2nd<StepperMap::value_type>,
+                StepperMap::iterator> StepperIterator;
+    typedef ::boost::transform_iterator<
+            select2nd<StepperMap::value_type>,
+                StepperMap::const_iterator> StepperCIterator;
+    typedef ::boost::iterator_range<StepperIterator> SteppersRange;
+    typedef ::boost::iterator_range<StepperCIterator> SteppersCRange;
 
-  /** @file */
+    typedef ::Loki::AssocVector< FullID, Entity* > EntityMap;
+    typedef ::boost::iterator_range<EntityMap::iterator>       EntityMapRange;
+    typedef ::boost::iterator_range<EntityMap::const_iterator> EntityMapCRange;
 
+    typedef ::boost::transform_iterator<
+            unary_compose<ReinterpretCaster<Process*, Entity*>,
+                select2nd<EntityMap::value_type> >,
+                EntityMap::iterator>
+                    ProcessIterator;
+    typedef ::boost::transform_iterator<
+            unary_compose<ReinterpretCaster<Process*, Entity*>,
+                select2nd<EntityMap::value_type> >,
+                EntityMap::const_iterator > ProcessCIterator;
+    typedef ::boost::iterator_range<ProcessIterator> ProcessesRange;
+    typedef ::boost::iterator_range<ProcessCIterator> ProcessesCRange;
+    
+    typedef ::boost::transform_iterator<
+            unary_compose<ReinterpretCaster<System*, Entity*>,
+                select2nd<EntityMap::value_type> >,
+                EntityMap::iterator > SystemIterator;
+    typedef ::boost::transform_iterator<
+            unary_compose<ReinterpretCaster<System*, Entity*>,
+                select2nd<EntityMap::value_type> >,
+                EntityMap::const_iterator> SystemCIterator;
+    typedef ::boost::iterator_range<SystemIterator> SystemsRange;
+    typedef ::boost::iterator_range<SystemCIterator> SystemsCRange;
+    
+    
+    typedef ::boost::transform_iterator<
+            unary_compose<ReinterpretCaster<Variable*, Entity*>,
+                select2nd<EntityMap::value_type> >, EntityMap::iterator>
+                    VariableIterator;
+    typedef ::boost::transform_iterator<
+            unary_compose<ReinterpretCaster<Variable*, Entity*>,
+                select2nd<EntityMap::value_type> >, EntityMap::const_iterator>
+                    VariableCIterator;
+    typedef ::boost::iterator_range<VariableIterator> VariablesRange;
+    typedef ::boost::iterator_range<VariableCIterator> VariablesCRange;
 
-  DECLARE_ASSOCVECTOR( String, StepperPtr, std::less< const String >,
-		       StepperMap ); 
-
-
-  /**
-     Model class represents a simulation model.
-
-     Model has a list of Steppers and a pointer to the root system.
-
-  */
-
-  class LIBECS_API Model
-  {
-
-  protected:
-
-    typedef EventScheduler<StepperEvent> StepperEventScheduler;
-    typedef StepperEventScheduler::EventIndex EventIndex;
-
-  public:
-
-    Model( PropertiedObjectMaker& maker );
-    ~Model();
-
-    /**
-       Initialize the whole model.
-
-       This method must be called before running the model, and when
-       structure of the model is changed.
-
-       Procedure of the initialization is as follows:
-
-       1. Initialize Systems recursively starting from theRootSystem.
-          ( System::initialize() )
-       2. Check if all the Systems have a Stepper each.
-       3. Initialize Steppers. ( Stepper::initialize() )
-       4. Construct Stepper interdependency graph 
-          ( Stepper::updateDependentStepperVector() )
-
-
-       @throw InitializationFailed
-    */
-
-    void initialize();
-
-    /**
-       Conduct a step of the simulation.
-
-       @see Scheduler
-    */
-
-    void step()
+private:
+    class EntityEventObserver: public System::EntityEventObserver
     {
-      const StepperEvent& aNextEvent( theScheduler.getTopEvent() );
-      theCurrentTime = aNextEvent.getTime();
-      theLastStepper = aNextEvent.getStepper();
+    public:
+        EntityEventObserver() {}
 
-      theScheduler.step();
-    }
+        void setModel( Model* model )
+        {
+            model_ = model;
+        }
 
+        void entityAdded( Descriptor desc );
 
-    /**
-       Get the next event to occur on the scheduler.
+        void entityRemoved( Descriptor desc );
 
-     */
+    private:
+        Model* model_;
+    };
+    friend class EntityEventObserver;
 
-    const StepperEvent& getTopEvent() const
-    {
-      return theScheduler.getTopEvent();
-    }
+public:
+    virtual ~Model();
 
+    virtual void startup();
 
-    /**
-       Returns the current time.
+    virtual void initialize();
 
-       @return time elasped since start of the simulation.
-    */
+    virtual void postInitialize();
 
-    const Real getCurrentTime() const
-    {
-      return theCurrentTime;
-    }
-
-
-    const Stepper* getLastStepper() const
-    {
-      return theLastStepper;
-    }
+    virtual void interrupt( TimeParam time );
 
     /**
        Creates a new Entity object and register it in an appropriate System
        in  the Model.
-
-       @param aClassname
-       @param aFullID
+       @param className
+       @param fullID
        @param aName
     */
+    template<typename T_>
+    T_* createEntity( const String& className );
 
-    Entity& createEntity( const String& aClassname, const FullID& aFullID );
-
+    /**
+       Adds an entity to the model
+     */
+    void addEntity( const FullID& fullID, Entity* entity );
 
     /**
        This method finds an Entity object pointed by the FullID.
-
-       @param aFullID a FullID of the requested Entity.
+       @param fullID a FullID of the requested Entity.
        @return A borrowed pointer to an Entity specified by the FullID.
     */
-
-    Entity& getEntity( const FullID& aFullID ) const;
+    const Entity* getEntity( const FullID& fullID ) const;
 
     /**
-       This method finds a System object pointed by the SystemPath.  
+       This method finds an Entity object pointed by the FullID.
+       @param fullID a FullID of the requested Entity.
+       @return A borrowed pointer to an Entity specified by the FullID.
+    */
+    Entity* getEntity( const FullID& fullID );
 
-
-       @param aSystemPath a SystemPath of the requested System.
+    /**
+       This method finds a System object pointed by the SystemPath.
+       @param systemPath a SystemPath of the requested System.
        @return A borrowed pointer to a System.
     */
-    System& getSystem( const SystemPath& aSystemPath ) const;;
+    System* getSystem( const SystemPath& systemPath );
 
 
     /**
-       Create a stepper with an ID and a classname. 
+       This method finds a System object pointed by the SystemPath.
+       @param systemPath a SystemPath of the requested System.
+       @return A borrowed pointer to a System.
+    */
+    const System* getSystem( const SystemPath& systemPath ) const;
 
-       @param aClassname  a classname of the Stepper to create.  
+    /**
+       Create a stepper with an ID and a classname.
 
-       @param anID        a Stepper ID string of the Stepper to create.  
+       @param className  a classname of the Stepper to create.
+
+       @param anID        a Stepper ID string of the Stepper to create.
 
     */
+    Stepper* createStepper( const String& className );
 
-    void createStepper( const String& aClassname, const String& anID );
-
+    /**
+       Adds a stepper to the model
+     */
+    void addStepper( const String& id, Stepper* );
 
     /**
        Get a stepper by an ID.
@@ -197,115 +217,188 @@ namespace libecs
        @param anID a Stepper ID string of the Stepper to get.
        @return a borrowed pointer to the Stepper.
     */
+    Stepper* getStepper( const String& anID );
 
-    StepperPtr getStepper( const String& anID ) const;
+    /**
+       Get a stepper by an ID.
 
+       @param anID a Stepper ID string of the Stepper to get.
+       @return a borrowed pointer to the Stepper.
+    */
+    const Stepper* getStepper( const String& anID ) const;
 
     /**
        Get the StepperMap of this Model.
 
        @return the const reference of the StepperMap.
     */
-
-    const StepperMap& getStepperMap() const
+    SteppersCRange getSteppers() const
     {
-      return theStepperMap;
+        return SteppersCRange(
+            StepperCIterator(
+                steppers_.begin(),
+                select2nd<StepperMap::value_type>()),
+            StepperCIterator(
+                steppers_.end(),
+                select2nd<StepperMap::value_type>()));
     }
 
+    /**
+       Get the StepperMap of this Model.
 
-
+       @return the const reference of the StepperMap.
+    */
+    SteppersRange getSteppers()
+    {
+        return SteppersRange(
+            StepperIterator(
+                steppers_.begin(),
+                select2nd<StepperMap::value_type>()),
+            StepperIterator(
+                steppers_.end(),
+                select2nd<StepperMap::value_type>()));
+    }
 
     /**
-       Flush the data in all Loggers immediately.
+       Get the SystemMap of this Model.
 
-       Usually Loggers record data with logging intervals.  This method
-       orders every Logger to write the data immediately ignoring the
-       logging interval.
-
+       @return the const reference of the SystemMap.
     */
+    SystemsCRange getSystems() const
+    {
+        return SystemsCRange(
+                SystemCIterator(systems_.begin(),
+                    compose1(ReinterpretCaster<System*, Entity*>(),
+                            select2nd<EntityMap::value_type>())),
+                SystemCIterator(systems_.end(),
+                    compose1(ReinterpretCaster<System*, Entity*>(),
+                            select2nd<EntityMap::value_type>())));
+    }
 
-    void flushLoggers();
+    /**
+       Get the EntityMap of this Model.
 
+       @return the const reference of the EntityMap.
+    */
+    SystemsRange getSystems()
+    {
+        return SystemsRange(
+                SystemIterator(systems_.begin(),
+                    compose1(ReinterpretCaster<System*, Entity*>(),
+                            select2nd<EntityMap::value_type>())),
+                SystemIterator(systems_.end(),
+                    compose1(ReinterpretCaster<System*, Entity*>(),
+                            select2nd<EntityMap::value_type>())));
+    }
+
+    /**
+       Get the ProcessMap of this Model.
+
+       @return the const reference of the ProcessMap.
+    */
+    ProcessesCRange getProcesss() const
+    {
+        return ProcessesCRange(
+                ProcessCIterator(processes_.begin(),
+                    compose1(ReinterpretCaster<Process*, Entity*>(),
+                            select2nd<EntityMap::value_type>())),
+                ProcessCIterator(processes_.end(),
+                    compose1(ReinterpretCaster<Process*, Entity*>(),
+                            select2nd<EntityMap::value_type>())));
+    }
+
+    /**
+       Get the ProcessMap of this Model.
+
+       @return the const reference of the ProcessMap.
+    */
+    ProcessesRange getProcesss()
+    {
+        return ProcessesRange(
+                ProcessIterator(processes_.begin(),
+                    compose1(ReinterpretCaster<Process*, Entity*>(),
+                            select2nd<EntityMap::value_type>())),
+                ProcessIterator(processes_.end(),
+                    compose1(ReinterpretCaster<Process*, Entity*>(),
+                            select2nd<EntityMap::value_type>())));
+    }
+
+    /**
+       Get the VariableMap of this Model.
+
+       @return the const reference of the VariableMap.
+    */
+    VariablesCRange getVariables() const
+    {
+        return VariablesCRange(
+                VariableCIterator(variables_.begin(),
+                    compose1(ReinterpretCaster<Variable*, Entity*>(),
+                            select2nd<EntityMap::value_type>())),
+                VariableCIterator(variables_.end(),
+                    compose1(ReinterpretCaster<Variable*, Entity*>(),
+                            select2nd<EntityMap::value_type>())));
+    }
+
+    /**
+       Get the VariableMap of this Model.
+
+       @return the const reference of the VariableMap.
+    */
+    VariablesRange getVariables()
+    {
+        return VariablesRange(
+                VariableIterator(variables_.begin(),
+                    compose1(ReinterpretCaster<Variable*, Entity*>(),
+                            select2nd<EntityMap::value_type>())),
+                VariableIterator(variables_.end(),
+                    compose1(ReinterpretCaster<Variable*, Entity*>(),
+                            select2nd<EntityMap::value_type>())));
+    }
+
+    FullID getFullIDOf( const Entity* ent ) const;
 
     /**
        Get the RootSystem.
 
        @return a borrowed pointer to the RootSystem.
     */
-
     System* getRootSystem() const
     {
-      return theRootSystem;
+        return rootSystem_;
     }
 
-    SystemStepper* getSystemStepper()
+    const SimulationContext* getSimulationContext() const
     {
-      return dynamic_cast<SystemStepper*>( theWorld.getStepper() );
+        return simulationContext_;
     }
 
-    StepperEventScheduler&   getScheduler() { return theScheduler; }
+    SimulationContext* getSimulationContext()
+    {
+        return simulationContext_;
+    }
 
-    /// @internal
-    StepperMaker&     getStepperMaker()     { return theStepperMaker; }
-
-    /// @internal
-
-    ProcessMaker&     getProcessMaker()     { return theProcessMaker; }
-
-    /// @internal
-
-    VariableMaker&    getVariableMaker()    { return theVariableMaker; }
-
-    /// @internal
-
-    SystemMaker&      getSystemMaker()      { return theSystemMaker; }
-
-
-  private:
-
-    /**
-       This method checks recursively if all systems have Steppers
-       connected.
-
-       @param aSystem a root node to start recursive search.
-       
-       @throw InitializationFailed if the check is failed.
-    */
-
-    void checkStepper( SystemCptr const aSystem ) const;
-
-    void checkSizeVariable( SystemCptr const aSystem );
-
-    static void initializeSystems( SystemPtr const aSystem );
+    void setSimulationContext( SimulationContext* ctx )
+    {
+        simulationContext_ = ctx;
+    }
 
 private:
-    Time                theCurrentTime;
-    const Stepper*      theLastStepper;
-    StepperEventScheduler theScheduler;
-    DynamicModule< PropertiedClass > theNullModule;
-    System              theWorld;
-    System*             theRootSystem;
-    StepperMap          theStepperMap;
-    PropertiedObjectMaker& thePropertiedObjectMaker;
-    StepperMaker          theStepperMaker;
-    SystemMaker           theSystemMaker;
-    VariableMaker         theVariableMaker;
-    ProcessMaker          theProcessMaker;
+    SimulationContext*     simulationContext_;
+    System*                rootSystem_;
+    StepperMap             steppers_;
+    EntityMap              systems_;
+    EntityMap              processes_;
+    EntityMap              variables_;
+    PropertiedObjectMaker* propertiedObjectMaker_;
+    EntityEventObserver    observer_;
 };
-
-  
-  /*@}*/
 
 } // namespace libecs
 
-
+/** @}*/
 
 
 #endif /* __STEPPERLEADER_HPP */
-
-
-
-
 /*
   Do not modify
   $Author$
@@ -313,4 +406,3 @@ private:
   $Date$
   $Locker$
 */
-

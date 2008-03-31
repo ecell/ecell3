@@ -36,6 +36,14 @@
 #include "win32_utils.h"
 #endif /* WIN32 */
 
+#ifdef DLL_EXPORT
+#undef DLL_EXPORT
+#include <gsl/gsl_rng.h>
+#define DLL_EXPORT
+#else
+#include <gsl/gsl_rng.h>
+#endif
+
 #include "dmtool/ModuleMaker.hpp"
 
 #include "libecs.hpp"
@@ -49,6 +57,13 @@ int const MICRO_VERSION( ECELL_MICRO_VERSION );
 char const* const VERSION_STRING( ECELL_VERSION_STRING );
 
 static volatile bool isInitialized = false;
+
+static PropertiedObjectMaker propertiedObjectMaker;
+
+const PropertiedObjectMaker& getPropertiedObjectMaker() const
+{
+    return propertiedObjectMaker;
+}
 
 bool initialize()
 {
@@ -69,6 +84,13 @@ bool initialize()
         return false;
     }
 #endif
+
+    gsl_rng_env_setup();
+
+
+    PropertiedObjectMaker.addModuleMaker(
+        new SharedModuleMaker<
+
     return true;
 }
 

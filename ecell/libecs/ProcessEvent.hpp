@@ -80,7 +80,7 @@ public:
 
     const bool isDependentOn( const ProcessEvent& anEvent ) const
     {
-        return process_->isDependentOn( *anEvent.getProcess() );
+        return process_->isDependentOn( anEvent.getProcess() );
     }
 
 

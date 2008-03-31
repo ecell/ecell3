@@ -29,13 +29,13 @@
 // E-Cell Project.
 //
 
-#include "libecs.hpp"
-#include "EntityType.hpp"
-#include "PropertiedClass.hpp"
-#include "FullID.hpp"
-
 #ifndef __LIBECS_ENTITY_DEFINED
 #define __LIBECS_ENTITY_DEFINED
+
+#include "libecs.hpp"
+#include "PropertiedClass.hpp"
+#include "EntityType.hpp"
+#include "FullID.hpp"
 
 /**
    @addtogroup entities The Entities.
@@ -48,11 +48,14 @@
 
 namespace libecs {
 
+class System;
+
 /**
    Entity class is a base class for all components in the cell model.
 */
 LIBECS_DM_CLASS( Entity, PropertiedClass )
 {
+    friend class System;
 public:
     LIBECS_DM_OBJECT_ABSTRACT( Entity )
     {
@@ -62,6 +65,11 @@ public:
 
     Entity();
     virtual ~Entity();
+
+    /**
+       Called when the simulation model is being initialized
+     */
+    virtual void startup();
 
     /**
        Called right before the simulation gets kicked off.
@@ -74,7 +82,7 @@ public:
     */
     System* getEnclosingSystem() const
     {
-        return theSuperSystem;
+        return enclosingSystem_;
     }
 
     /**
@@ -105,7 +113,7 @@ public:
 
     SET_METHOD( String, ID )
     {
-        theID = value;
+        id_ = value;
     }
 
     /**
@@ -116,7 +124,7 @@ public:
 
     GET_METHOD( String, ID )
     {
-        return theID;
+        return id_;
     }
 
     /**
@@ -127,7 +135,7 @@ public:
 
     SET_METHOD( String, Name )
     {
-        theName = value;
+        name_ = value;
     }
 
     /**
@@ -138,7 +146,7 @@ public:
 
     GET_METHOD( String, Name )
     {
-        return theName;
+        return name_;
     }
     //@}
 
@@ -149,22 +157,25 @@ public:
        this when an Entity is added to the System.
        @param supersystem a pointer to a System to which this object belongs.
     */
-    void setSuperSystem( System* const supersystem )
+    void setEnclosingSystem( System* val )
     {
-        theSuperSystem = supersystem;
+        enclosingSystem_ = val;
     }
 
-private:
-    Entity( const Entity& ); // no copy construction
-    Entity& operator=( Entity& ); // no assignment
-
-private:
-    System*   theSuperSystem;
-    String    theID;
-    String    theName;
+protected:
+    void __setID( const String& id )
+    {
+        id_ = id;
+    }
+   
+protected:
+    System*   enclosingSystem_;
+    String    id_;
+    String    name_;
 };
 
 } // namespace libecs
+
 #endif /* __LIBECS_ENTITY_DEFINED */
 
 #include "System.hpp"

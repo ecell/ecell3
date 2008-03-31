@@ -125,14 +125,14 @@ public:
 
     ConcretePolymorphValue( TParam aValue )
             :
-            theValue( aValue )
+            value_( aValue )
     {
         ; // do nothing
     }
 
     ConcretePolymorphValue( const PolymorphValue& aValue )
             :
-            theValue( aValue.as<T>() )
+            value_( aValue.as<T>() )
     {
         ; // do nothing
     }
@@ -144,22 +144,22 @@ public:
 
     virtual const String asString() const
     {
-        return convertTo<String>( theValue );
+        return convertTo<String>( value_ );
     }
 
     virtual const Real   asReal()  const
     {
-        return convertTo<Real>( theValue );
+        return convertTo<Real>( value_ );
     }
 
     virtual const Integer asInteger()   const
     {
-        return convertTo<Integer>( theValue );
+        return convertTo<Integer>( value_ );
     }
 
     virtual const PolymorphVector asPolymorphVector() const
     {
-        return convertTo<PolymorphVector>( theValue );
+        return convertTo<PolymorphVector>( value_ );
     }
 
     virtual PolymorphValue* createClone() const
@@ -169,7 +169,7 @@ public:
 
 private:
 
-    T theValue;
+    T value_;
 
 };
 
@@ -222,57 +222,57 @@ public:
 
     Polymorph()
             :
-            theValue( new PolymorphNoneValue )
+            value_( new PolymorphNoneValue )
     {
         ; // do nothing
     }
 
     Polymorph( const String&  aValue )
             :
-            theValue( new ConcretePolymorphValue<String>( aValue ) )
+            value_( new ConcretePolymorphValue<String>( aValue ) )
     {
         ; // do nothing
     }
 
     Polymorph( RealParam aValue )
             :
-            theValue( new ConcretePolymorphValue<Real>( aValue ) )
+            value_( new ConcretePolymorphValue<Real>( aValue ) )
     {
         ; // do nothing
     }
 
     Polymorph( IntegerParam aValue )
             :
-            theValue( new ConcretePolymorphValue<Integer>( aValue ) )
+            value_( new ConcretePolymorphValue<Integer>( aValue ) )
     {
         ; // do nothing
     }
 
     Polymorph( const PolymorphVector& aValue )
             :
-            theValue( new ConcretePolymorphValue<PolymorphVector>( aValue ) )
+            value_( new ConcretePolymorphValue<PolymorphVector>( aValue ) )
     {
         ; // do nothing
     }
 
     Polymorph( const Polymorph& aValue )
             :
-            theValue( aValue.createValueClone() )
+            value_( aValue.createValueClone() )
     {
         ; // do nothing
     }
 
     ~Polymorph()
     {
-        delete theValue;
+        delete value_;
     }
 
     const Polymorph& operator=( const Polymorph& rhs )
     {
         if ( this != &rhs )
         {
-            delete theValue;
-            theValue = rhs.createValueClone();
+            delete value_;
+            value_ = rhs.createValueClone();
         }
 
         return *this;
@@ -280,22 +280,22 @@ public:
 
     const String asString() const
     {
-        return theValue->asString();
+        return value_->asString();
     }
 
     const Real   asReal() const
     {
-        return theValue->asReal();
+        return value_->asReal();
     }
 
     const Integer asInteger() const
     {
-        return theValue->asInteger();
+        return value_->asInteger();
     }
 
     const PolymorphVector asPolymorphVector() const
     {
-        return theValue->asPolymorphVector();
+        return value_->asPolymorphVector();
     }
 
     template< typename T >
@@ -333,12 +333,12 @@ protected:
 
     PolymorphValue* createValueClone() const
     {
-        return theValue->createClone();
+        return value_->createClone();
     }
 
 protected:
 
-    PolymorphValue* theValue;
+    PolymorphValue* value_;
 
 };
 

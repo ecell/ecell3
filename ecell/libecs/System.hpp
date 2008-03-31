@@ -63,13 +63,24 @@ protected:
                 SystemMap );
     typedef ::std::map<LocalID, Entity*> EntityMap;
 
-    struct EntityEventObserver
+public:
+    struct EntityEventDescriptor
     {
-    public:
-        virtual ~EntityEventObserver();
+        EntityEventDescriptor( System* _system, Entity* _entity,
+                const LocalID& _id )
+            : system( _system ), entity( _entity ), id( _id ) {} 
+
+        System* system;
+        Entity* entity;
+        LocalID id;
     };
 
-    typedef Happening<boost::shared_ptr<EntityEventObserver>, Entity*> EntityEvent;
+    struct EntityEventObserver
+    {
+        typedef EntityEventDescriptor Descriptor;
+    };
+
+    typedef Happening<boost::shared_ptr<EntityEventObserver>, EntityEventDescriptor> EntityEvent;
 
 public:
     typedef VariableMap::const_iterator VariableIterator;
@@ -89,8 +100,11 @@ public:
 
     virtual ~System();
 
-    /** @see Entity::initialize */
+    virtual void startup();
+
     virtual void initialize();
+
+    virtual void postInitialize();
 
     /**
        Retrieves the pointer to a Stepper object assigned to this System.
@@ -98,7 +112,7 @@ public:
     */
     Stepper* getStepper() const
     {
-        return theStepper;
+        return stepper_;
     }
 
     /**
@@ -147,7 +161,21 @@ public:
        This method returns null if not found.
        @return a borrowed pointer to a Variable object
      */
-    Variable* getVariable( const String& anID ) const;
+    Variable* getVariable( const String& id ) const;
+
+    /**
+       Find a System with given id in this System.
+       This method returns null if not found.
+       @return a borrowed pointer to a Variable object
+     */
+    System* getSystem( const String& id ) const;
+
+    /**
+       Find a System with given system path in this System.
+       This method returns null if not found.
+       @return a borrowed pointer to a Variable object
+     */
+    System* getSystem( const SystemPath& path ) const;
 
     /**
        Find an Entity with given id within this System.
@@ -161,7 +189,7 @@ public:
        This method takes over the ownership of the given pointer,
        and deletes it if there is an error.
     */
-    void add( Entity* anEntity );
+    void add( const String& id, Entity* anEntity );
 
     /**
        Check if this is a root System.
@@ -177,28 +205,9 @@ public:
     */
     virtual const SystemPath getPath() const;
 
-    /**
-       Get a Model object associated with this system.
-       @return a borrowed pointer to the Model.
-    */
-    Model* getModel() const
-    {
-        return theModel;
-    }
-
-    /**
-       Associates a Model object with this system
-     */
-    void setModel( Model* model )
-    {
-        if ( __libecs_ready )
-            THROW_EXCEPTION( Exception, "Object is already initialized" );
-        theModel = model;
-    }
-
     Variable* getSizeVariable() const
     {
-        return theSizeVariable;
+        return sizeVariable_;
     }
 
     void configureSizeVariable();
@@ -214,42 +223,42 @@ public: // property slots
     GET_METHOD( Polymorph, ProcessList );
 
 protected:
-    void addProcess( Process* aProcess );
-    void addVariable( Variable* aVariable );
-    void addSystem( System* aSystem );
+    void addProcess( const String& id, Process* aProcess );
+    void addVariable( const String& id, Variable* aVariable );
+    void addSystem( const String& id, System* aSystem );
 
 public:
-     EntityEvent entityAdded;
+    EntityEvent  entityAdded;
+    EntityEvent  entityRemoved;
 
 protected:
-    Stepper*     theStepper;
-    Model*       theModel;
-    VariableMap  theVariableMap;
-    ProcessMap   theProcessMap;
-    SystemMap    theSystemMap;
-    EntityMap    theEntityMap;
-    Variable*    theSizeVariable;
-    bool         theEntityListChanged;
+    Stepper*     stepper_;
+    VariableMap  variables_;
+    ProcessMap   processes_;
+    SystemMap    systems_;
+    EntityMap    entities_;
+    Variable*    sizeVariable_;
+    bool         entityListChanged_;
 };
 
 template<>
 System::VariableIterator
 System::getBelongings<Variable>() const
 {
-    return theVariableMap.begin();
+    return variables_.begin();
 }
 
 template<>
 System::ProcessIterator
 System::getBelongings<Process>() const
 {
-    return theProcessMap.begin();
+    return processes_.begin();
 }
 
 template<>
 System::SystemIterator System::getBelongings<System>() const
 {
-    return theSystemMap.begin();
+    return systems_.begin();
 }
 
 } // namespace libecs

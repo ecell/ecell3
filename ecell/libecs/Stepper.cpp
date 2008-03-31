@@ -56,34 +56,21 @@ LIBECS_DM_INIT_STATIC( Stepper, Stepper );
 
 ////////////////////////// Stepper
 
-Stepper::Stepper()
-        :
-        theReadWriteVariableOffset( 0 ),
-        theReadOnlyVariableOffset( 0 ),
-        model_( NULLPTR ),
-        schedulerIndex_( -1 ),
-        priority_( 0 ),
-        currentTime_( 0.0 ),
-        stepInterval_( 0.001 ),
-        minStepInterval_( 0.0 ),
-        maxStepInterval_( std::numeric_limits<Real>::infinity() )
+void Stepper::startup()
 {
-    gsl_rng_env_setup();
+    _LIBECS_BASE_CLASS_::startup();
 
-    theRng = gsl_rng_alloc( gsl_rng_default );
-
-    setRngSeed( "TIME" );
+    schedulerIndex_ = -1;
+    priority_ = 0;
+    currentTime_ =  0.0;
+    stepInterval_ =  0.001;
+    minStepInterval_ = 0.0;
+    maxStepInterval_ =  std::numeric_limits<Real>::infinity();
 }
-
-Stepper::~Stepper()
-{
-    gsl_rng_free( theRng );
-}
-
 
 void Stepper::initialize()
 {
-    _LIBECES_BASE_CLASS_::initialize();
+    _LIBECS_BASE_CLASS_::initialize();
 
     // Update theVariableVector.  This also calls updateInterpolantVector.
     updateVariableVector();
@@ -176,24 +163,9 @@ void Stepper::updateVariableVector()
 }
 
 
-void Stepper::updateIntegratedVariableVector()
-{
-    using boost::lambda;
-
-    variablesToIntegrate_.clear();
-    VariableVectorRange affecteds( getAffectedVariables() );
-    for_each( affectes().begin(), affected().end(),
-            if_then( _1->isIntegrationNeeded(),
-                variablesToIntegrate_.push_back( _1 ) ) );
-
-    // optimization: sort by memory address.
-    std::sort( variablesToIntegrate_.begin(),
-               variablesToIntegrate_.end() );
-}
-
 Interpolant* createInterpolant()
 {
-    return new Interpolant();
+    return 0;
 }
 
 void Stepper::createInterpolants()
@@ -212,6 +184,21 @@ void Stepper::createInterpolants()
 
         integrator->addInterpolant( createInterpolant() );
     }
+}
+
+void Stepper::postInitialize()
+{
+    using boost::lambda;
+
+    variablesToIntegrate_.clear();
+    VariableVectorRange affecteds( getAffectedVariables() );
+    for_each( affectes().begin(), affected().end(),
+            if_then( _1->isIntegrationNeeded(),
+                variablesToIntegrate_.push_back( _1 ) ) );
+
+    // optimization: sort by memory address.
+    std::sort( variablesToIntegrate_.begin(),
+               variablesToIntegrate_.end() );
 }
 
 bool Stepper::isDependentOn( const Stepper& aStepper ) const
@@ -386,15 +373,6 @@ void Stepper::clearVariables()
 
 }
 
-void Stepper::initializeProcesses()
-{
-    FOR_ALL( ProcessVector, theProcessVector )
-    {
-        ( *i )->initialize();
-    }
-}
-
-
 void Stepper::fireProcesses()
 {
     std::for_each( processes_.begin(), processes_.end(),
@@ -433,35 +411,6 @@ void Stepper::saveBufferToVariables( bool onlyAffected )
         (*i)->setValue( valueBuffer[ i - variables_.begin() ] );
     }
 }
-
-SET_METHOD_DEF( String, RngSeed, Stepper )
-{
-    UnsignedInteger aSeed( 0 );
-
-    if ( value == "TIME" )
-    {
-        // Using just time() still gives the same seeds to Steppers
-        // in multi-stepper model.  Stepper index is added to prevent this.
-        aSeed = static_cast<UnsignedInteger>( time( NULLPTR )
-                                              + getSchedulerIndex() );
-    }
-    else if ( value == "DEFAULT" )
-    {
-        aSeed = gsl_rng_default_seed;
-    }
-    else
-    {
-        aSeed = stringCast<UnsignedInteger>( value );
-    }
-
-    gsl_rng_set( getRng(), aSeed );
-}
-
-GET_METHOD_DEF( String, RngType, Stepper )
-{
-    return gsl_rng_name( getRng() );
-}
-
 
 } // namespace libecs
 

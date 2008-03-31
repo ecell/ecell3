@@ -32,9 +32,7 @@
 #ifndef ___PROPERTIEDOBJECTMAKER_H___
 #define ___PROPERTIEDOBJECTMAKER_H___
 
-#include "PropertiedClass.hpp"
-#include "dmtool/ModuleMaker.hpp"
-
+#include "ModuleManager.hpp"
 
 namespace libecs
 {
@@ -47,19 +45,50 @@ namespace libecs
 class LIBECS_API PropertiedObjectMaker
 {
 public:
-    typedef StaticModuleMaker< PropertiedClass > ModuleMaker;
-    typedef ModuleMaker::Module Module;
-    typedef std::vector<ModuleMaker*> ModuleMakerList;
+    PropertiedObjectMaker( ModuleManager* moduleManager )
+        : moduleManager_( moduleManager )
+    {
+    }
 
-public:
-    PropertiedObjectMaker();
-    virtual ~PropertiedObjectMaker();
-    void addModuleMaker(ModuleMaker*);
-    void removeModuleMaker(ModuleMaker*);
-    const Module& getModule( const String& ) const;
+    ~PropertiedObjectMaker()
+    {
+    }
+
+    template<typename T_>
+    T_* make( const String& className )
+    {
+        // should not use dynamic_cast<> because quering RTTI to the
+        // dynamicall added class is not well defined in the C++ spec.
+        return reinterpret_cast< T_* >(
+                make( Type2PropertiedClassKind< T_ >::value, className ) );
+    }
+
+    PropertiedClass* make( const PropertiedClassKind& kind,
+            const String& className  )
+    {
+        const ModuleManager::Module& mod(
+                moduleManager_->getModule( className ) );
+        const PropertyInterface* info(
+                reinterpret_cast< const PropertyInterface *>(
+                    mod.getInfo( "Interface" ) ) );
+        if ( info == NULL )
+        {
+            THROW_EXCEPTION( UnexpectedError,
+                    String( "Querying interface failed on Module " )
+                    + className );
+        }
+        if ( info->getKind() != kind )
+        {
+            THROW_EXCEPTION( UnexpectedError,
+                    String( "Requested module " )
+                    + className + " is not a " + kind.name );
+        }
+
+        return mod.createInstance();
+    }
 
 private:
-    ModuleMakerList theModuleMakerList;
+    ModuleManager* moduleManager_;
 };
 
 #define NewPropertiedObjectModule(CLASS) NewDynamicModule(PropertiedObject,CLASS)

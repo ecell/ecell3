@@ -39,6 +39,7 @@ class Stepper;
 class Process;
 class Variable;
 class System;
+class EntityType;
 
 class PropertiedClassKind
 {
@@ -55,6 +56,8 @@ public:
     static const PropertiedClassKind& get( const String& );
 
     static const PropertiedClassKind& get( enum Code );
+
+    static const PropertiedClassKind& fromEntityType( const EntityType& );
 
     operator const String&() const
     {

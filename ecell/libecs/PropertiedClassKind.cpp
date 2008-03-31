@@ -68,4 +68,21 @@ const PropertiedClassKind& PropertiedClassKind::get( enum Code code )
     }
 }
 
+const PropertiedClassKind&
+PropertiedClassKind::fromEntityType( const EntityType& et )
+{
+    switch ( et.code )
+    {
+    case Entity::_PROCESS:
+        return PropertiedClassKind::PROCESS;
+    case Entity::_VARIABLE:
+        return PropertiedClassKind::VARIABLE;
+    case Entity::_SYSTEM:
+        return PropertiedClassKind::SYSTEM;
+    }
+    THROW_EXCEPTION( ValueError,
+        String( "no PropertiedClassKind counterpart for " )
+        + static_cast< const String& >( pck ) );
+}
+
 } // namespace libecs

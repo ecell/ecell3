@@ -32,6 +32,7 @@
 #ifndef __CASTUTILS_HPP
 #define __CASTUTILS_HPP
 
+#include <functional>
 #include <boost/version.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/type_traits.hpp>
@@ -101,11 +102,12 @@ __STRINGCAST_SPECIALIZATION_DECL( UnsignedInteger, String );
 #undef __STRINGCAST_SPECIALIZATION_DECL
 
 template< class NEW, class GIVEN >
-class StaticCaster
-            :
-            std::unary_function< GIVEN, NEW >
+struct StaticCaster
+       : std::unary_function< GIVEN, NEW >
 {
-public:
+    typedef GIVEN argument_type;
+    typedef NEW result_type;
+
     inline NEW operator()( const GIVEN& aValue )
     {
         BOOST_STATIC_ASSERT( ( boost::is_convertible<GIVEN,NEW>::value ) );
@@ -114,11 +116,12 @@ public:
 };
 
 template< class NEW, class GIVEN >
-class DynamicCaster
-            :
-            std::unary_function< GIVEN, NEW >
+struct DynamicCaster
+        : std::unary_function< GIVEN, NEW >
 {
-public:
+    typedef GIVEN argument_type;
+    typedef NEW result_type;
+
     NEW operator()( const GIVEN& aPtr )
     {
         NEW aNew( dynamic_cast<NEW>( aPtr ) );
@@ -134,11 +137,25 @@ public:
 };
 
 template< class NEW, class GIVEN >
-class LexicalCaster
-            :
-            std::unary_function< GIVEN, NEW >
+struct ReinterpretCaster
+        : std::unary_function< GIVEN, NEW >
 {
-public:
+    typedef GIVEN argument_type;
+    typedef NEW result_type;
+
+    NEW operator()( const GIVEN& aPtr )
+    {
+        return reinterpret_cast<NEW>( aPtr );
+    }
+};
+
+template< class NEW, class GIVEN >
+struct LexicalCaster
+        : std::unary_function< GIVEN, NEW >
+{
+    typedef GIVEN argument_type;
+    typedef NEW result_type;
+
     const NEW operator()( const GIVEN& aValue )
     {
         return stringCast<NEW>( aValue );
@@ -146,9 +163,11 @@ public:
 };
 
 template< class NEW, class GIVEN >
-class NumericCaster: std::unary_function< GIVEN, NEW >
+struct NumericCaster: std::unary_function< GIVEN, NEW >
 {
-public:
+    typedef GIVEN argument_type;
+    typedef NEW result_type;
+
     inline NEW operator()( GIVEN aValue )
     {
         return boost::numeric_cast<NEW>( aValue );

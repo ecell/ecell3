@@ -45,6 +45,11 @@ Entity::~Entity()
     ; // do nothing
 }
 
+void Entity::startup()
+{
+    ; // do nothing
+}
+
 void Entity::initialize()
 {
     ; // do nothing

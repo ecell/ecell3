@@ -65,9 +65,9 @@ public:
 
 public:
 
-    AdaptiveDifferentialStepper();
-
     virtual ~AdaptiveDifferentialStepper();
+
+    virtual void startup();
 
     /**
        Adaptive stepsize control.

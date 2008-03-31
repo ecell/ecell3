@@ -24,41 +24,49 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 //
 //END_HEADER
+//
+// written by Koichi Takahashi <shafi@e-cell.org>,
+// E-Cell Project.
+//
 
-#ifndef __CONTINUOUSPROCESS_HPP
-#define __CONTINUOUSPROCESS_HPP
+#ifndef ___MODULEMANAGER_H___
+#define ___MODULEMANAGER_H___
 
-#include "libecs.hpp"
-#include "Process.hpp"
+#include <set>
+#include "PropertiedClass.hpp"
+#include "dmtool/ModuleMaker.hpp"
+
 
 namespace libecs
 {
 
-LIBECS_DM_CLASS( ContinuousProcess, Process )
+/* *defgroup libecs_module The Libecs Module
+ * This is the libecs module
+ * @{
+ */
+
+class LIBECS_API ModuleManager
 {
+public:
+    typedef StaticModuleMaker< PropertiedClass > ModuleMaker;
+    typedef ModuleMaker::Module Module;
+    typedef std::set<ModuleMaker*> ModuleMakerSet;
 
 public:
+    ModuleManager();
+    virtual ~ModuleManager();
+    void addModuleMaker(ModuleMaker*);
+    void removeModuleMaker(ModuleMaker*);
+    const Module& getModule( const String& ) const;
 
-    LIBECS_DM_OBJECT_ABSTRACT( ContinuousProcess )
-    {
-        INHERIT_PROPERTIES( Process );
-    }
-
-
-    virtual ~ContinuousProcess()
-    {
-        ;
-    }
-
-    virtual const bool isContinuous() const
-    {
-        return true;
-    }
-
-protected:
-
+private:
+    ModuleMakerSet moduleMakers_;
 };
 
-} // libecs
+#define NewPropertiedObjectModule(CLASS) NewDynamicModule(PropertiedObject,CLASS)
 
-#endif /* __ CONTINUOUSPROCESS_HPP */
+/** @} */ //end of libecs_module
+
+} // namespace libecs
+
+#endif /* ___MODULEMANAGER_H___ */

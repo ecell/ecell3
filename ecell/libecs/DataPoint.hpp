@@ -136,7 +136,7 @@ public:
         Time time_;
     };
 public:
-    DataPoint( Param<Time> _time = 0.0, Param<Value> _value = 0.0 )
+    DataPoint( const Time _time = 0.0, const Value _value = 0.0 )
             : time ( _time ), value( _value )
     {
         ; //do nothing

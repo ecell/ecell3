@@ -38,6 +38,7 @@
 class LIBECS_API ModuleMaker;
 #endif /* WIN32 */
 
+#include <boost/noncopyable.hpp>
 #include "dmtool/DMObject.hpp"
 #include "Exceptions.hpp"
 #include "Happening.hpp"
@@ -73,11 +74,11 @@ class DM_IF CLASSNAME: public BASE
   // This macro does two things:
   // (1) template specialization of PropertyInterface for CLASSNAME
   //     is necessary here to instantiate thePropertySlotMap static variable.
-  // (2) thePropertyInterface static variable must also be instantiated.
+  // (2) propertyInterface_ static variable must also be instantiated.
 
 #define LIBECS_DM_INIT_STATIC( CLASSNAME, DMTYPE )\
   libecs::ConcretePropertyInterface<CLASSNAME> \
-      CLASSNAME::thePropertyInterface( \
+      CLASSNAME::propertyInterface_( \
           #CLASSNAME, \
           ::libecs::Type2PropertiedClassKind< ::libecs::DMTYPE >::value )
 
@@ -96,20 +97,24 @@ class DM_IF CLASSNAME: public BASE
   ///@internal
 #define LIBECS_DM_EXPOSE_PROPERTYINTERFACE( CLASSNAME )\
 private:\
-    static ::libecs:: ConcretePropertyInterface<CLASSNAME> thePropertyInterface;\
+    static ::libecs:: ConcretePropertyInterface<CLASSNAME> propertyInterface_;\
 public:\
     virtual const ::libecs::PropertyInterface& getPropertyInterface() const { \
-       return thePropertyInterface; \
+       return propertyInterface_; \
     } \
     static const void* getClassInfo( const std::string& kind )\
     {\
-        if ( kind == "PropertyInterface" ) { \
-            return &thePropertyInterface; \
+        if ( kind == "Interface" ) { \
+            return &propertyInterface_; \
+        } else if ( kind == "BaseInterface" ) { \
+            return _LIBECS_BASE_CLASS_::getClassInfo( "Interface "); \
         } \
         return 0; \
     }\
 public:\
-  CLASSNAME( const Module& mod ): _LIBECS_BASE_CLASS_( reinterpret_cast< const _LIBECS_BASE_CLASS_::Module &>( mod ) ) { }
+    CLASSNAME( const Module* mod = 0 ) \
+        : _LIBECS_BASE_CLASS_(\
+            reinterpret_cast< const _LIBECS_BASE_CLASS_::Module* >( mod ) ) { }
 //
 // Macros for property definitions
 //
@@ -132,12 +137,12 @@ public:\
  */
 
 #define CLASS_INFO( FIELDNAME, FIELDVALUE) \
-    thePropertyInterface.setInfoField( \
+    propertyInterface_.setInfoField( \
         ::libecs::String( FIELDNAME ), ::libecs::String( FIELDVALUE ) )
 
 #define PROPERTYSLOT_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD,\
 				LOADMETHOD, SAVEMETHOD )\
-  thePropertyInterface.registerPropertySlot( \
+  propertyInterface_.registerPropertySlot( \
          new ::libecs::ConcretePropertySlot<_LIBECS_CLASS_,TYPE>( \
             ::libecs::String( #NAME ), \
             ( ::libecs::ConcretePropertySlot<_LIBECS_CLASS_, TYPE>::SetMethod ) SETMETHOD, \
@@ -191,7 +196,7 @@ public:\
 
 ///@internal
 #define LIBECS_DM_DEFINE_PROPERTIES()\
-  static void initializePropertyInterface( ::libecs::PropertyInterface& thePropertyInterface )
+  static void initializePropertyInterface( ::libecs::PropertyInterface& propertyInterface_ )
 
 // 
 // Macros for property method declaration / definitions.
@@ -255,14 +260,15 @@ public:\
  *@{
  */
 
-namespace libecs {
-
 /** @file */
+
+namespace libecs {
 
 class PropertySlot;
 class PropertySlotProxy;
 class PropertyInterface;  
 class Polymorph;
+class Model;
 
 /**
    Common base class for classes with PropertySlots.
@@ -271,31 +277,42 @@ class Polymorph;
 
 */
 
-class LIBECS_API PropertiedClass
+class LIBECS_API PropertiedClass: private boost::noncopyable
 {
 public:
     typedef void _LIBECS_BASE_CLASS_;
     typedef PropertyInterface ConcretePropertyInterface;
     typedef DynamicModuleBase<PropertiedClass> Module;
 
-    struct PropertyChangeObserver
-    {
-    };
-
-    typedef Happening<boost::shared_ptr<PropertyChangeObserver>, PropertySlotProxy> PropertyChange;
-    DECLARE_UNORDERED_MAP( String, PropertyChange, DEFAULT_HASHER( String ), PropertyChangeNotifiers );
 public:
     LIBECS_DM_DEFINE_PROPERTIES();
 
-    PropertiedClass( const Module& mod )
-        : theModule( mod ), __libecs_ready( false )
+    PropertiedClass( const Module* mod )
+        : module_( mod )
     {
       ; // do nothing
     }
 
     virtual ~PropertiedClass();
 
-    virtual void __libecs_init__();
+    void setModel( Model* val )
+    {
+        model_ = val;
+    }
+
+    Model* getModel()
+    {
+        return model_;
+    }
+
+    virtual void startup();
+
+    virtual void initialize();
+
+    virtual void postInitialize();
+
+    virtual void interrupt( TimeParam time );
+
 
     PropertySlot* getPropertySlot( const String& aPropertyName ) const;
 
@@ -344,21 +361,19 @@ public:
 
     PropertySlotProxy createPropertySlotProxy( const String& aPropertyName );
 
-    void addPropertyChangeObserver( const String& name,
-            const PropertyChange::Subscription& sub )
-    {
-        propertyChangeNotifiers_[ name ].add( sub );
-    }
-
-    void removePropertyChangeObserver( const String& name,
-            const PropertyChange::Subscription& sub )
-    {
-        propertyChangeNotifiers_[ name ].remove( sub );
-    }
-
     static void initializePropertyInterface( const PropertyInterface& )
     {
         ; // do nothing
+    }
+
+    static const void* getClassInfo( const std::string& kind )\
+    {
+        if ( kind == "Interface" ) {
+            return &propertyInterface_;
+        } else if ( kind == "BaseInterface" ) {
+            return 0;
+        }
+        return 0;
     }
 
 public:
@@ -394,30 +409,28 @@ public:
     }
 
 protected:
-    static ConcretePropertyInterface thePropertyInterface;
-    const Module& theModule;
-    PropertyChangeNotifiers propertyChangeNotifiers_;
-    bool __libecs_ready;
+    static ConcretePropertyInterface propertyInterface_;
+    const Module* module_;
+    Model* model_;
 };
 
 // these specializations of nullSet/nullGet are here to avoid spreading
 // inline copies of them around.  This reduces sizes of DM .so files a bit.
 
 #define NULLSET_SPECIALIZATION( TYPE )\
-  template <> LIBECS_API void libecs::PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )
-
-  NULLSET_SPECIALIZATION( Real );
-  NULLSET_SPECIALIZATION( Integer );
-  NULLSET_SPECIALIZATION( String );
-  NULLSET_SPECIALIZATION( Polymorph );
+    template <> LIBECS_API void libecs::PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )
+NULLSET_SPECIALIZATION( Real );
+NULLSET_SPECIALIZATION( Integer );
+NULLSET_SPECIALIZATION( String );
+NULLSET_SPECIALIZATION( Polymorph );
 
 #define NULLGET_SPECIALIZATION( TYPE )\
-  template <> LIBECS_API const TYPE libecs::PropertiedClass::nullGet<TYPE>() const
+    template <> LIBECS_API const TYPE libecs::PropertiedClass::nullGet<TYPE>() const
 
-  NULLGET_SPECIALIZATION( Real );
-  NULLGET_SPECIALIZATION( Integer );
-  NULLGET_SPECIALIZATION( String );
-  NULLGET_SPECIALIZATION( Polymorph );
+NULLGET_SPECIALIZATION( Real );
+NULLGET_SPECIALIZATION( Integer );
+NULLGET_SPECIALIZATION( String );
+NULLGET_SPECIALIZATION( Polymorph );
   
 } // namespace libecs
 

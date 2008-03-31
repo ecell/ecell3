@@ -47,13 +47,10 @@ LIBECS_DM_INIT_STATIC( DiscreteEventStepper, Stepper );
 
 //////////////////// DiscreteEventStepper
 
-DiscreteEventStepper::DiscreteEventStepper()
-        :
-        //    theTimeScale( 0.0 ),
-        tolerance_( 0.0 ),
-        lastEventID_( -1 )
+void DiscreteEventStepper::startup()
 {
-    ; // do nothing
+    tolerance_ = 0.0;
+    lastEventID_ = -1;
 }
 
 GET_METHOD_DEF( String, LastProcess, DiscreteEventStepper )

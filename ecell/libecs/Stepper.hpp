@@ -32,14 +32,6 @@
 #ifndef __STEPPER_HPP
 #define __STEPPER_HPP
 
-#ifdef DLL_EXPORT
-#undef DLL_EXPORT
-#include <gsl/gsl_rng.h>
-#define DLL_EXPORT
-#else
-#include <gsl/gsl_rng.h>
-#endif
-
 #include <boost/range/iterator_range.hpp>
 
 #include "libecs.hpp"
@@ -49,6 +41,7 @@
 #include "Interpolant.hpp"
 #include "PropertyInterface.hpp"
 #include "PartitionedList.hpp"
+#include "PropertiedClass.hpp"
 
 /**
    @addtogroup stepper
@@ -61,6 +54,7 @@ namespace libecs
 {
 
 class Model;
+class SimulationContext;
 class LoggerManager;
 
 /**
@@ -69,6 +63,8 @@ class LoggerManager;
 */
 LIBECS_DM_CLASS( Stepper, PropertiedClass )
 {
+    friend class Model;
+
 public:
     typedef std::vector<Variable*> VariableVector;
     typedef PartitionedList< 3, VariableVector > Variables;
@@ -85,8 +81,6 @@ public:
     typedef std::vector<Real> RealVector;
 
 public:
-    LIBECS_DM_BASECLASS( Stepper );
-
     LIBECS_DM_OBJECT_ABSTRACT( Stepper )
     {
         INHERIT_PROPERTIES( PropertiedClass );
@@ -95,7 +89,6 @@ public:
         PROPERTYSLOT_SET_GET( Real,      StepInterval );
         PROPERTYSLOT_SET_GET( Real,      MaxStepInterval );
         PROPERTYSLOT_SET_GET( Real,      MinStepInterval );
-        PROPERTYSLOT_SET    ( String,    RngSeed );
 
 
         // these properties are not loaded/saved.
@@ -134,8 +127,6 @@ public:
         }
     };
 
-
-    Stepper();
     virtual ~Stepper();
 
 
@@ -210,7 +201,6 @@ public:
         return id_;
     }
 
-
     SET_METHOD( Real, MinStepInterval )
     {
         minStepInterval_ = value;
@@ -236,10 +226,6 @@ public:
     GET_METHOD( Polymorph, ReadVariableList );
     GET_METHOD( Polymorph, ProcessList );
     GET_METHOD( Polymorph, SystemList );
-
-    SET_METHOD( String, RngSeed );
-
-    GET_METHOD( String, RngType );
 
     void initializeProcesses();
 
@@ -297,16 +283,6 @@ public:
     void loadStepInterval( RealParam aStepInterval )
     {
         stepInterval_ = aStepInterval;
-    }
-
-    Model* getModel() const
-    {
-        return model_;
-    }
-
-    void setModel( Model* const model )
-    {
-        model_ = model;
     }
 
     LoggerManager* getLoggerManager() const
@@ -493,8 +469,6 @@ public:
     }
 
 
-    virtual void interrupt( TimeParam aTime ) = 0;
-
     /**
     Definition of the Stepper dependency:
     Stepper A depends on Stepper B
@@ -508,21 +482,7 @@ public:
     */
     bool isDependentOn( const StepperCptr aStepper ) const;
 
-    /**
-    This method updates theIntegratedVariableVector.
-    theIntegratedVariableVector holds the Variables those
-    isIntegrationNeeded() method return true.
-    This method must be called after initialize().
-    @internal
-     */
-    void updateIntegratedVariableVector();
-
     virtual Interpolant* createInterpolant();
-
-    const gsl_rng* getRng() const
-    {
-        return theRng;
-    }
 
     bool operator<( const Stepper& rhs )
     {
@@ -547,6 +507,14 @@ protected:
        Update theVariableVector.
     */
     void updateVariableVector();
+
+    /**
+      This method updates theIntegratedVariableVector.
+      theIntegratedVariableVector holds the Variables those
+      isIntegrationNeeded() method return true.
+      @internal
+     */
+    void updateIntegratedVariableVector();
 
     /**
        Create Interpolant objects and distribute the objects to
@@ -577,13 +545,19 @@ protected:
     }
 
 protected:
+    void __setID( const String& id )
+    {
+        id_ = id;
+    }
+
+protected:
     SystemSet                    systems_;
     Variables                    variables_;
     VariableVector               variablesToIntegrate_;
     Processes                    processes_;
     RealVector                   valueBuffer_;
-    Model*                       model_;
     LoggerManager*               loggerManager_;
+
     /** the index on the scheduler */
     int                 schedulerIndex_;
     Integer             priority_;
@@ -592,7 +566,6 @@ protected:
     Real                minStepInterval_;
     Real                maxStepInterval_;
     String              id_;
-    gsl_rng*            theRng;
 };
 
 } // namespace libecs

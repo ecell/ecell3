@@ -41,11 +41,6 @@ LIBECS_DM_INIT_STATIC( DiscreteTimeStepper, Stepper );
 
 //////////////////// DiscreteTimeStepper
 
-DiscreteTimeStepper::DiscreteTimeStepper()
-{
-    ; // do nothing
-}
-
 void DiscreteTimeStepper::initialize()
 {
     Stepper::initialize();

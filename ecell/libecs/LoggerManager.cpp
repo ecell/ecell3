@@ -59,25 +59,33 @@ LoggerManager::~LoggerManager()
 
 void LoggerManager::add( const FullPN& fullPN, Handle logger )
 {
-    dispatchers_[ fullPN.getFullID() ][ fullPN.getPropertyName() ].add(
+    Entity* target( model_->getEntity( fullPN.getFullID() ) );
+    Entry& ent( dispatchers_[ target ][ fullPN.getPropertyName() ] );
+    ent.first = target->getPropertySlot( fullPN.getPropertyName() );
+    ent.second.add(
             LoggingEventDispatcher::Subscription( logger, &Logger::log ) );
 }
 
 void LoggerManager::remove( const FullPN& fullPN, Handle logger )
 {
-    dispatchers_[ fullPN.getFullID() ][ fullPN.getPropertyName() ].remove(
+    Entity* target( model_->getEntity( fullPN.getFullID() ) );
+    dispatchers_[ target ][ fullPN.getPropertyName() ]
+        .second.remove(
             LoggingEventDispatcher::Subscription( logger, &Logger::log ) );
 }
 
-void LoggerManager::log( Time currentTime, const Entity* ent ) const
+void LoggerManager::log( TimeParam currentTime, const Entity* ent ) const
 {
-    FullID fullID( model_->getFullID( ent ) );
-    PNToDispatcherMap& pnToDispatcherMap( dispatchers_[ fullID ] );
+    const DispatcherMap::const_iterator pos( dispatchers_.find( ent ) );
+    BOOST_ASSERT( pos != dispatchers_.end() );
+    const PNToDispatcherMap& pnToDispatcherMap( pos->second );
     for ( PNToDispatcherMap::const_iterator i( pnToDispatcherMap.begin() );
             i != pnToDispatcherMap.end(); ++i )
     {
-        ( i->second )(
-            Logger::DataPoint( currentTime, ent->getProperty( i->first ) ) );
+        ( i->second.second )(
+            Logger::DataPoint( currentTime,
+                i->second.first->get<Real>(
+                    static_cast<const PropertiedClass&>( *ent ) ) ) ); 
     }
 }
 

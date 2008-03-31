@@ -59,7 +59,7 @@ namespace libecs {
 LIBECS_DM_CLASS( Process, Entity )
 {
 public:
-    typedef std::vector< VariableReference > VarRefVector;
+    typedef ::std::vector< VariableReference > VarRefVector;
     typedef PartitionedList< 3, VarRefVector > VarRefs;
     typedef ::boost::iterator_range< VarRefVector::iterator >
             VarRefVectorRange;
@@ -73,9 +73,9 @@ public:
         INHERIT_PROPERTIES( Entity );
 
         PROPERTYSLOT_LOAD_SAVE( Polymorph, VariableReferenceList,
-                                &Process::setVariableReferenceList,
-                                &Process::getVariableReferenceList,
-                                &Process::setVariableReferenceList,
+                                &Process::loadVariableReferenceList,
+                                &Process::saveVariableReferenceList,
+                                &Process::loadVariableReferenceList,
                                 &Process::saveVariableReferenceList );
 
         PROPERTYSLOT_SET_GET( Integer,       Priority );
@@ -119,8 +119,9 @@ public:
 
 
 public:
-    Process();
     virtual ~Process();
+
+    virtual void startup();
 
     virtual void fire() = 0;
 
@@ -159,7 +160,7 @@ public:
      */
     SET_METHOD( Real, Activity )
     {
-        theActivity = value;
+        activity_ = value;
     }
 
     /**
@@ -170,16 +171,15 @@ public:
      */
     GET_METHOD( Real, Activity )
     {
-        return theActivity;
+        return activity_;
     }
 
-    SET_METHOD( Polymorph, VariableReferenceList );
-    GET_METHOD( Polymorph, VariableReferenceList );
+    LOAD_METHOD( VariableReferenceList );
     SAVE_METHOD( VariableReferenceList );
 
     GET_METHOD( Real, MolarActivity )
     {
-        return theActivity / ( getEnclosingSystem()->getSize() * N_A );
+        return activity_ / ( getEnclosingSystem()->getSize() * N_A );
     }
 
     /**
@@ -193,7 +193,7 @@ public:
      */
     SET_METHOD( Integer, Priority )
     {
-        thePriority = value;
+        priority_ = value;
     }
 
     /**
@@ -201,7 +201,7 @@ public:
      */
     GET_METHOD( Integer, Priority )
     {
-        return thePriority;
+        return priority_;
     }
 
     /**
@@ -217,22 +217,6 @@ public:
        @return StepperID as a String.
      */
     GET_METHOD( String, StepperID );
-
-    /**
-       Create a new VariableReference.
-
-       This method gets a Polymorph which contains
-       ( name, [ fullid, [ [ coefficient ] , accessor_flag ] ] ).
-
-       If only the name is given, the VariableReference with the name
-       is removed from this Process.
-
-       Default values of coefficient and accessor_flag are 0 and true (1).
-       
-       @param aValue a PolymorphVector specifying a VariableReference.
-    */
-
-    void setVariableReference( const PolymorphVector& aValue );
 
     void removeVariableReference( const String& aName );
 
@@ -315,7 +299,7 @@ public:
      */
     Stepper* getStepper() const
     {
-        return theStepper;
+        return stepper_;
     }
 
     /**
@@ -374,7 +358,7 @@ public:
     /**
        Check if this Process can affect on a given Process.
      */
-    const bool isDependentOn( const Process& aProcessPtr ) const;
+    const bool isDependentOn( const Process* proc ) const;
 
 protected:
     VarRefVector::iterator findVariableReference( const String& aName );
@@ -383,15 +367,10 @@ protected:
     void updateVarRefVector();
 
 protected:
-
-    VarRefs varRefs_;
-
-private:
-
-    Stepper*  theStepper;
-
-    Real        theActivity;
-    Integer     thePriority;
+    VarRefs     varRefs_;
+    Stepper*    stepper_;
+    Real        activity_;
+    Integer     priority_;
 };
 
 } // namespace libecs
