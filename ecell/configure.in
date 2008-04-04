@@ -309,6 +309,14 @@ AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(mkdir select strdup strerror strtod uname modf modfl)
 AC_CHECK_FUNCS(strdup strstr)
 
+AM_CHECK_PYMOD([em], [usage], [], [
+    AC_MSG_ERROR([``empy'' python module is not installed.])
+])
+
+AM_CHECK_PYMOD([ply], [], [], [
+    AC_MSG_ERROR([``ply'' python module is not installed.])
+])
+
 AC_CONFIG_FILES([
     Makefile
     bin/Makefile
