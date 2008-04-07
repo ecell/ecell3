@@ -1,4 +1,4 @@
-#!/usr/bin/env @prefix@/bin/ecell3-python
+#!/usr/bin/env python
 #
 # ecell3-dmc  - a program to compile and/or docify dynamic module in 
 #               E-Cell Simulation Environment Version 3
@@ -57,18 +57,19 @@ def main():
     # -------------------------------------
     # initialize file names
     # -------------------------------------
-    prefix = os.environ['ECELL3_PREFIX']
-    ecell3dir = os.environ['ECELL_DIRNAME']
-    BOOST_LIBRARIES = os.environ['BOOST_LIBRARIES']
+    prefix = "@prefix@"
+    ecell3dir = "@ECELL_DIRNAME@"
+    BOOST_LIBRARIES = "-lboost_python"
     exec_prefix = prefix
     BINDIR = exec_prefix + os.sep + 'bin'
     STDLIBDIR = '-L\"' + exec_prefix + os.sep + 'lib\"'
     ECELL_INCLUDE = prefix + os.sep + 'include' + os.sep + ecell3dir
     LIBECS_INCLUDE = ECELL_INCLUDE + os.sep + 'libecs'
+    PYTHON_INCLUDES = "@PYTHON_INCLUDES@"
     STDINCLUDE = [ '\"-I' + prefix + os.sep + 'include\"',
                    '\"-I' + ECELL_INCLUDE + '\"',
                    '\"-I' + LIBECS_INCLUDE + '\"',
-                   os.environ['PYTHON_INCLUDES'] ]
+                   PYTHON_INCLUDES ]
     DMCOMPILE = os.path.abspath( BINDIR + os.sep + 'dmcompile' )
     SRC = None
 
