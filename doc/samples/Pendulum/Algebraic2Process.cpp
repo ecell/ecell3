@@ -2,7 +2,7 @@
 #include "libecs.hpp"
 #include "Process.hpp"
 
-USE_LIBECS;
+using namespace libecs;
 
 LIBECS_DM_CLASS( Algebraic2Process, Process )
 {

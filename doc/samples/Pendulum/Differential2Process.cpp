@@ -2,7 +2,7 @@
 #include "libecs.hpp"
 #include "ContinuousProcess.hpp"
 
-USE_LIBECS;
+using namespace libecs;
 
 LIBECS_DM_CLASS( Differential2Process, ContinuousProcess )
 {

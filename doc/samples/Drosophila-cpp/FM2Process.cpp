@@ -2,7 +2,7 @@
 #include "ContinuousProcess.hpp"
 
 
-USE_LIBECS;
+using namespace libecs;
 
 LIBECS_DM_CLASS( FM2Process, ContinuousProcess )
 {

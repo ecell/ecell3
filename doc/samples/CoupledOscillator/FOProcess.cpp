@@ -10,7 +10,7 @@
 
 #include "Process.hpp"
 
-USE_LIBECS;
+using namespace libecs;
 
 LIBECS_DM_CLASS( FOProcess, Process )
 {
