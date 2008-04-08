@@ -58,6 +58,14 @@ protected:
     typedef ::std::vector< String > StringList;
 
 public:
+    typedef StringList::iterator iterator;
+    typedef StringList::const_iterator const_iterator;
+    typedef StringList::value_type value_type;
+    typedef StringList::pointer pointer;
+    typedef StringList::reference reference;
+
+
+public:
     SystemPath() {}
 
     template< typename Trange_ >
@@ -140,6 +148,26 @@ public:
     SystemPath toAbsolute( const SystemPath& baseSystemPath ) const;
 
     SystemPath toRelative( const SystemPath& baseSystemPath ) const;
+
+    const_iterator begin() const
+    {
+        return components_.begin();
+    }
+
+    const_iterator end() const
+    {
+        return components_.end();
+    }
+
+    iterator begin()
+    {
+        return components_.begin();
+    }
+
+    iterator end()
+    {
+        return components_.end();
+    }
 
     static SystemPath parse( const String& pathRepr )
     {

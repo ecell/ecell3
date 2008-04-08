@@ -31,10 +31,13 @@
 
 #ifndef __LIBECS_ENTITY_DEFINED
 #include "Entity.hpp"
-#endif
+#endif /* __LIBECS_ENTITY_DEFINED */
 
 #include <boost/shared_ptr.hpp>
+#include <boost/range/iterator_range.hpp>
+
 #include "Happening.hpp"
+#include "RangeConcatenator.hpp"
 
 /** @addtogroup entities
  *@{
@@ -53,15 +56,18 @@ LIBECS_DM_CLASS( System, Entity )
 protected:
     // Maps used for entry lists
     DECLARE_UNORDERED_MAP(
-                const String, Variable*, DEFAULT_HASHER( String ),
+                LocalID, Variable*, LocalID::Hasher,
                 VariableMap );
     DECLARE_UNORDERED_MAP(
-                const String, Process*, DEFAULT_HASHER( String ),
+                LocalID, Process*, LocalID::Hasher,
                 ProcessMap );
     DECLARE_UNORDERED_MAP(
-                const String, System*, DEFAULT_HASHER( String ),
+                LocalID, System*, LocalID::Hasher,
                 SystemMap );
-    typedef ::std::map<LocalID, Entity*> EntityMap;
+
+    typedef RangeConcatenator< ::boost::mpl::vector<
+            VariableMap, ProcessMap, SystemMap >,
+            ::std::pair< const LocalID, Entity* > > EntityMap;
 
 public:
     struct EntityEventDescriptor
@@ -82,12 +88,18 @@ public:
 
     typedef Happening<boost::shared_ptr<EntityEventObserver>, EntityEventDescriptor> EntityEvent;
 
-public:
-    typedef VariableMap::const_iterator VariableIterator;
-    typedef ProcessMap::const_iterator ProcessIterator;
-    typedef SystemMap::const_iterator SystemIterator;
-    typedef EntityMap::const_iterator EntityIterator;
+    typedef ::boost::iterator_range< VariableMap::iterator > VariablesRange;
+    typedef ::boost::iterator_range< VariableMap::const_iterator > VariablesCRange;
+    typedef ::boost::iterator_range< ProcessMap::iterator > ProcessesRange;
+    typedef ::boost::iterator_range< ProcessMap::const_iterator > ProcessesCRange;
 
+    typedef ::boost::iterator_range< SystemMap::iterator > SystemsRange;
+    typedef ::boost::iterator_range< SystemMap::const_iterator > SystemsCRange;
+
+    typedef ::boost::iterator_range< EntityMap::iterator > EntitiesRange;
+    typedef ::boost::iterator_range< EntityMap::const_iterator > EntitiesCRange;
+
+public:
     LIBECS_DM_BASECLASS( System );
 
     LIBECS_DM_OBJECT( System, System )
@@ -146,8 +158,13 @@ public:
     }
 
     template<typename T_>
-    typename UNORDERED_MAP( const String, T_*, DEFAULT_HASHER(String) )::const_iterator
-    getBelongings() const;
+    ::boost::iterator_range< typename UNORDERED_MAP( LocalID, T_*, DEFAULT_HASHER(String) )::const_iterator > getBelongings() const;
+
+    EntitiesCRange getBelongings() const;
+
+    template<typename T_>
+    ::boost::iterator_range< typename UNORDERED_MAP( LocalID, T_*, DEFAULT_HASHER(String) )::iterator > getBelongings();
+    EntitiesRange getBelongings();
 
     /**
        Find a Process with given id in this System.
@@ -203,7 +220,7 @@ public:
     /**
        @see Entity::getSystemPath()
     */
-    virtual const SystemPath getPath() const;
+    const SystemPath getPath() const;
 
     Variable* getSizeVariable() const
     {
@@ -215,7 +232,7 @@ public:
 protected:
     void notifyChangeOfEntityList();
 
-    const Variable* const findSizeVariable() const;
+    Variable* const findSizeVariable() const;
 
 public: // property slots
     GET_METHOD( Polymorph, SystemList );
@@ -236,29 +253,77 @@ protected:
     VariableMap  variables_;
     ProcessMap   processes_;
     SystemMap    systems_;
-    EntityMap    entities_;
+    mutable EntityMap*   entities_;
     Variable*    sizeVariable_;
     bool         entityListChanged_;
 };
 
 template<>
-System::VariableIterator
+System::VariablesCRange
 System::getBelongings<Variable>() const
 {
-    return variables_.begin();
+    return VariablesCRange( variables_.begin(), variables_.end() );
 }
 
 template<>
-System::ProcessIterator
+System::ProcessesCRange
 System::getBelongings<Process>() const
 {
-    return processes_.begin();
+    return ProcessesCRange( processes_.begin(), processes_.end() );
 }
 
 template<>
-System::SystemIterator System::getBelongings<System>() const
+System::SystemsCRange
+System::getBelongings<System>() const
 {
-    return systems_.begin();
+    return SystemsCRange( systems_.begin(), systems_.end() );
+}
+
+System::EntitiesCRange
+System::getBelongings() const
+{
+    if ( !entities_ )
+    {
+        entities_ = new EntityMap( EntityMap::range_list_type(
+                const_cast<VariableMap&>(variables_),
+                const_cast<ProcessMap&>(processes_),
+                const_cast<SystemMap&>(systems_) ) );
+    }
+
+    return EntitiesCRange( entities_->begin(), entities_->end() );
+}
+
+template<>
+System::VariablesRange
+System::getBelongings<Variable>()
+{
+    return VariablesRange( variables_.begin(), variables_.end() );
+}
+
+template<>
+System::ProcessesRange
+System::getBelongings<Process>()
+{
+    return ProcessesRange( processes_.begin(), processes_.end() );
+}
+
+template<>
+System::SystemsRange
+System::getBelongings<System>()
+{
+    return SystemsRange( systems_.begin(), systems_.end() );
+}
+
+System::EntitiesRange
+System::getBelongings()
+{
+    if ( !entities_ )
+    {
+        entities_ = new EntityMap( EntityMap::range_list_type(
+                variables_, processes_, systems_ ) );
+    }
+
+    return EntitiesRange( entities_->begin(), entities_->end() );
 }
 
 } // namespace libecs

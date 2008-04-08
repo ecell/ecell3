@@ -178,10 +178,13 @@ protected:
 
 #endif /* __LIBECS_ENTITY_DEFINED */
 
-#include "System.hpp"
-
 #ifndef __LIBECS_ENTITY_MEMBER_DEFINED
 #define __LIBECS_ENTITY_MEMBER_DEFINED
+
+#include "System.hpp"
+#include "Util.hpp"
+#include <utility>
+#include <functional>
 
 namespace libecs {
 
@@ -194,6 +197,27 @@ const FullID Entity::getFullID() const
                 SystemPath(),
             getID() );
 }
+
+template<typename Tpair_>
+struct EntityMapFilter
+    : public ::std::unary_function<
+        Tpair_, ::std::pair< const typename Tpair_::first_type,
+            typename ConstifyTheOtherIfConst<
+                typename Tpair_::second_type, Entity* >::type > >
+{
+    typedef Tpair_ argument_type;
+    typedef ::std::pair< const typename Tpair_::second_type,
+            typename ConstifyTheOtherIfConst<
+                typename Tpair_::second_type, Entity* >::type > result_type; 
+
+    result_type operator()( const argument_type& arg ) const
+    {
+        return result_type(
+            arg.first,
+            reinterpret_cast< typename result_type::second_type* >(
+                    arg.second ) );
+    }
+}; 
 
 } // namespace libecs
 

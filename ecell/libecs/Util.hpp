@@ -51,39 +51,6 @@
 /** @file */
 
 
-/**
-   Form a 'for' loop over a STL sequence.
-
-   Use this like:
-
-   FOR_ALL( std::vector<int>, anIntVector )
-   {
-     int anInt( *i ); // the iterator is 'i'.
-     ...
-   }
-
-   @arg SEQCLASS the classname of the STL sequence.
-   @arg SEQ the STL sequence.
-*/
-#define FOR_ALL( SEQCLASS, SEQ )\
-  for( SEQCLASS ::const_iterator i( (SEQ) .begin() ) ;\
-      i != (SEQ) .end() ; ++i )
-
-/**
-   For each 'second' member of element in a sequence, call a given method.
-
-   @note This will be deprecated.  Use select2nd instead.
-
-   @arg SEQCLASS the classname of the STL sequence.
-   @arg SEQ the STL sequence.
-   @arg METHOD the name of the method.
-  
-   @see FOR_ALL
-*/
-#define FOR_ALL_SECOND( SEQCLASS, SEQ, METHOD )\
-  FOR_ALL( SEQCLASS, SEQ )\
-    { (*i).second-> METHOD (); }
-
 namespace libecs {
 
 template< class T >
@@ -233,6 +200,18 @@ struct empty_unary_function: public std::unary_function< T_, T_ >
     {
         return v;
     }
+};
+
+template<typename T1, typename T2>
+struct ConstifyTheOtherIfConst
+{
+    typedef T2 type;
+};
+
+template<typename T1, typename T2>
+struct ConstifyTheOtherIfConst<const T1, T2>
+{
+    typedef const T2 type;
 };
 
 

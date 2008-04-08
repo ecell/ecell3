@@ -33,6 +33,7 @@
 #define __LOCALID_HPP
 
 #include <string.h>
+#include <cstddef>
 #include "libecs.hpp"
 #include "EntityType.hpp"
 
@@ -54,6 +55,20 @@ namespace libecs {
  */
 class LocalID
 {
+public:
+    struct Hasher
+    {
+        ::std::size_t operator()( const LocalID& v ) const
+        {
+            ::std::size_t hv( stringHasher_( v.getID() ) );
+            return ( hv << v.getEntityType().code )
+                    | ( hv >> ( sizeof(hv) * 8 - v.getEntityType().code ) );
+        }
+
+    private:
+        DEFAULT_HASHER( String ) stringHasher_;
+    };
+
 public:
     LocalID( const EntityType& type,
              const String& id )
@@ -102,9 +117,9 @@ private:
     String id_;
 };
 
-/** @} */ // identifier module
-
 } // namespace libecs
+
+/** @} */ // identifier module
 
 #endif // __LOCALID_HPP
 

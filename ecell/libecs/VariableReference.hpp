@@ -239,7 +239,7 @@ public:
         }
     }
 
-    void setIsAccessor( const bool anIsAccessor )
+    void setAccessor( const bool anIsAccessor )
     {
         theIsAccessor = anIsAccessor;
     }

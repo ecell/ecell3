@@ -238,9 +238,9 @@ void DifferentialStepper::initializeVariableReferenceList()
                 i < continuousProcesses.size(); ++i )
     {
         Process* const aProcess( continuousProcesses[ i ] );
-        const Process::VarRefVectorCRange negVarRefs(
+        const Process::VarRefsCRange negVarRefs(
                 aProcess->getNegativeVariableReferences() );
-        const Process::VarRefVectorCRange posiVarRefs(
+        const Process::VarRefsCRange posiVarRefs(
                 aProcess->getPositiveVariableReferences() );
         VarRefs& varRefs( varRefsOfProcesses_[ i ] );
 

@@ -61,10 +61,10 @@ LIBECS_DM_CLASS( Process, Entity )
 public:
     typedef ::std::vector< VariableReference > VarRefVector;
     typedef PartitionedList< 3, VarRefVector > VarRefs;
-    typedef ::boost::iterator_range< VarRefVector::iterator >
-            VarRefVectorRange;
-    typedef ::boost::iterator_range< VarRefVector::const_iterator >
-            VarRefVectorCRange;
+    typedef ::boost::iterator_range< VarRefs::iterator >
+            VarRefsRange;
+    typedef ::boost::iterator_range< VarRefs::const_iterator >
+            VarRefsCRange;
 public:
     LIBECS_DM_BASECLASS( Process );
 
@@ -249,43 +249,48 @@ public:
         const String& aVariableReferenceName ) const;
 
     /**
-       @return a const reference to the VarRefVector
+       @return a const reference to the VarRefs
     */
-    VarRefVectorCRange getVariableReferences() const
+    VarRefsCRange getVariableReferences() const
     {
-        return VarRefVectorCRange( varRefs_.begin(), varRefs_.end() );
+        return VarRefsCRange( varRefs_.begin(), varRefs_.end() );
     }
 
-    VarRefVectorRange
-    getNegativeVariableReferences()
+    VarRefsRange getVariableReferences()
     {
-        return varRefs_.partition_range( 0 );
+        return VarRefsRange( varRefs_.begin(), varRefs_.end() );
     }
 
-    VarRefVectorCRange
+    VarRefsCRange
     getNegativeVariableReferences() const
     {
         return varRefs_.partition_range( 0 );
     }
 
-    VarRefVectorRange getZeroVariableReferences()
+    VarRefsRange
+    getNegativeVariableReferences()
+    {
+        return varRefs_.partition_range( 0 );
+    }
+
+    VarRefsCRange getZeroVariableReferences() const
     {
         return varRefs_.partition_range( 1 );
     }
 
-    VarRefVectorCRange getZeroVariableReferences() const
+    VarRefsRange getZeroVariableReferences()
     {
         return varRefs_.partition_range( 1 );
     }
 
-    VarRefVectorRange
-    getPositiveVariableReferences()
+    VarRefsCRange
+    getPositiveVariableReferences() const
     {
         return varRefs_.partition_range( 2 );
     }
 
-    VarRefVectorCRange
-    getPositiveVariableReferences() const
+    VarRefsRange
+    getPositiveVariableReferences()
     {
         return varRefs_.partition_range( 2 );
     }
@@ -319,8 +324,8 @@ public:
         setActivity( aValue );
 
         // Increase or decrease variables, skipping zero coefficients.
-        VarRefVectorCRange zeroVarRefs( getZeroVariableReferences() );
-        VarRefVectorCRange positiveVarRefs( getPositiveVariableReferences() );
+        VarRefsCRange zeroVarRefs( getZeroVariableReferences() );
+        VarRefsCRange positiveVarRefs( getPositiveVariableReferences() );
         std::for_each(
                 zeroVarRefs.begin(), zeroVarRefs.end(),
                 boost::bind2nd( boost::mem_fun_ref(
@@ -361,10 +366,10 @@ public:
     const bool isDependentOn( const Process* proc ) const;
 
 protected:
-    VarRefVector::iterator findVariableReference( const String& aName );
-    VarRefVector::const_iterator findVariableReference( const String& aName ) const;
+    VarRefs::iterator findVariableReference( const String& aName );
+    VarRefs::const_iterator findVariableReference( const String& aName ) const;
 
-    void updateVarRefVector();
+    void updateVarRefs();
 
 protected:
     VarRefs     varRefs_;

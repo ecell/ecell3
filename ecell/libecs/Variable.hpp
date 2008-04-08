@@ -88,8 +88,6 @@ public:
                                 NOMETHOD );
     }
 
-
-    Variable();
     virtual ~Variable();
 
     /**
@@ -228,7 +226,7 @@ public:
         return integrator_;
     }
 
-    const VariableValueIntegrator* getVariableValueIntegrator() const
+    bool isIntegrationNeeded() const
     {
         return integrator_;
     }

@@ -38,6 +38,7 @@
 #include "Stepper.hpp"
 #include "SystemStepper.hpp"
 #include "System.hpp"
+#include "Process.hpp"
 #include "SimulationContext.hpp"
 #include "Model.hpp"
 #include "PropertiedObjectMaker.hpp"
@@ -51,13 +52,16 @@ void Model::EntityEventObserver::entityAdded( Descriptor desc )
 
     switch ( fullID.getEntityType().code ) {
     case EntityType::_SYSTEM:
-        model_->systems_.insert( std::make_pair( fullID, desc.entity ) );
+        model_->systems_.insert( std::make_pair( fullID,
+                reinterpret_cast< System* >( desc.entity ) ) );
         break;
     case EntityType::_PROCESS:
-        model_->processes_.insert( std::make_pair( fullID, desc.entity ) );
+        model_->processes_.insert( std::make_pair( fullID,
+                reinterpret_cast< Process* >( desc.entity ) ) );
         break;
     case EntityType::_VARIABLE:
-        model_->variables_.insert( std::make_pair( fullID, desc.entity ) );
+        model_->variables_.insert( std::make_pair( fullID,
+                reinterpret_cast< Variable* >( desc.entity ) ) );
         break;
     }
 }
@@ -81,17 +85,19 @@ void Model::EntityEventObserver::entityRemoved( Descriptor desc )
 
 Model::~Model()
 {
+    delete entities_;
+
     std::for_each( systems_.begin(), systems_.end(),
-            compose1( deleter< EntityMap::mapped_type >(),
-                    select2nd< EntityMap::value_type >() ) );
+            compose1( deleter< SystemMap::mapped_type >(),
+                    select2nd< SystemMap::value_type >() ) );
 
     std::for_each( variables_.begin(), variables_.end(),
-            compose1( deleter< EntityMap::mapped_type >(),
-                    select2nd< EntityMap::value_type >() ) );
+            compose1( deleter< VariableMap::mapped_type >(),
+                    select2nd< VariableMap::value_type >() ) );
 
     std::for_each( processes_.begin(), processes_.end(),
-            compose1( deleter< EntityMap::mapped_type >(),
-                    select2nd< EntityMap::value_type >() ) );
+            compose1( deleter< ProcessMap::mapped_type >(),
+                    select2nd< ProcessMap::value_type >() ) );
 
     std::for_each( steppers_.begin(), steppers_.end(),
             compose1( deleter< StepperMap::mapped_type >(),
@@ -115,16 +121,15 @@ FullID Model::getFullIDOf( const Entity* ent ) const
     switch (ent->getEntityType().code) {
     case EntityType::_SYSTEM:
         {
-            EntityMap::const_iterator pos(
-                    std::lower_bound( systems_.begin(), systems_.end(),
-                        const_cast< Entity* >( ent ),
-                        compose_2u_to_b(
-                            std::less< EntityMap::mapped_type >(),
-                            select2nd< EntityMap::value_type >(),
-                            empty_unary_function<
-                                EntityMap::mapped_type >()
-                        )
-                    ) );
+            SystemMap::const_iterator pos(
+                    std::find_if( systems_.begin(), systems_.end(),
+                        std::bind2nd(
+                            compose_2u_to_b(
+                                std::equal_to< const SystemMap::mapped_type >(),
+                                select2nd< SystemMap::value_type >(),
+                                empty_unary_function<
+                                    const SystemMap::mapped_type >() ),
+                            reinterpret_cast< const System *>( ent ) ) ) );
             if ( pos != systems_.end() )
             {
                 return pos->first;
@@ -133,16 +138,15 @@ FullID Model::getFullIDOf( const Entity* ent ) const
         break;
     case EntityType::_PROCESS:
         {
-            EntityMap::const_iterator pos(
-                    std::lower_bound(processes_.begin(), processes_.end(),
-                        const_cast< Entity* >( ent ),
-                        compose_2u_to_b(
-                            std::less< EntityMap::mapped_type >(),
-                            select2nd< EntityMap::value_type >(),
-                            empty_unary_function<
-                                EntityMap::mapped_type >()
-                        )
-                    ) );
+            ProcessMap::const_iterator pos(
+                    std::find_if( processes_.begin(), processes_.end(),
+                        std::bind2nd(
+                            compose_2u_to_b(
+                                std::equal_to< const ProcessMap::mapped_type >(),
+                                select2nd< ProcessMap::value_type >(),
+                                empty_unary_function<
+                                    const ProcessMap::mapped_type >() ),
+                            reinterpret_cast< const Process *>( ent ) ) ) );
             if ( pos != processes_.end() )
             {
                 THROW_EXCEPTION(
@@ -152,17 +156,15 @@ FullID Model::getFullIDOf( const Entity* ent ) const
         break;
     case EntityType::_VARIABLE:
         {
-            EntityMap::const_iterator pos(
-                    std::lower_bound(variables_.begin(), variables_.end(),
-                        const_cast< Entity* >( ent ),
-                        compose_2u_to_b(
-                            std::less< EntityMap::mapped_type >(),
-                            select2nd< EntityMap::value_type >(),
-                            empty_unary_function<
-                                EntityMap::mapped_type >()
-                        )
-                    ) );
-
+            VariableMap::const_iterator pos(
+                    std::find_if( variables_.begin(), variables_.end(),
+                        std::bind2nd(
+                            compose_2u_to_b(
+                                std::equal_to< const VariableMap::mapped_type >(),
+                                select2nd< VariableMap::value_type >(),
+                                empty_unary_function<
+                                    const VariableMap::mapped_type >() ),
+                            reinterpret_cast< const Variable *>( ent ) ) ) );
             if ( pos != variables_.end() )
             {
                 return pos->first;
@@ -201,7 +203,7 @@ System* Model::getSystem( const SystemPath& systemPath, bool throwIfNotFound )
     LocalID localID( EntityType::SYSTEM, p.second);
     FullID fullID( localID, p.first );
 
-    EntityMap::const_iterator pos( systems_.find( fullID ) );
+    SystemMap::const_iterator pos( systems_.find( fullID ) );
     if ( pos == systems_.end() )
     {
         if ( throwIfNotFound )
@@ -221,45 +223,42 @@ const System* Model::getSystem( const SystemPath& systemPath, bool throwIfNotFou
 
 Entity* Model::getEntity( const FullID& fullID, bool throwIfNotFound )
 {
-    EntityMap::const_iterator pos;
-
     switch ( fullID.getEntityType().code ) {
-    case EntityType::_SYSTEM:
-        pos = systems_.find( fullID );
-        if ( pos == systems_.end() )
+    case EntityType::_SYSTEM: 
         {
-            if ( throwIfNotFound )
+            SystemMap::iterator pos( systems_.find( fullID ) );
+            if ( pos != systems_.end() )
             {
-                THROW_EXCEPTION( NotFound, "No such system: " + fullID );
+                return pos->second;
             }
-            return 0;
         }
         break;
     case EntityType::_PROCESS:
-        pos = processes_.find( fullID );
-        if ( pos == processes_.end() )
         {
-            if ( throwIfNotFound )
+            ProcessMap::iterator pos( processes_.find( fullID ) );
+            if ( pos != processes_.end() )
             {
-                THROW_EXCEPTION( NotFound, "No such process: " + fullID );
+                return pos->second;
             }
-            return 0;
         }
         break;
     case EntityType::_VARIABLE:
-        pos = variables_.find( fullID );
-        if ( pos == variables_.end() )
         {
-            if ( throwIfNotFound )
+            VariableMap::iterator pos( variables_.find( fullID ) );
+            if ( pos != variables_.end() )
             {
-                THROW_EXCEPTION( NotFound, "No such variable: " + fullID );
+                return pos->second;
             }
-            return 0;
         }
         break;
     }
 
-    return pos->second;
+    if ( throwIfNotFound )
+    {
+        THROW_EXCEPTION( NotFound, "No such entity: " + fullID );
+    }
+
+    return 0;
 }
 
 const Entity* Model::getEntity( const FullID& fullID, bool throwIfNotFound ) const

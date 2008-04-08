@@ -56,50 +56,56 @@ LIBECS_DM_INIT_STATIC( System, System );
 
 GET_METHOD_DEF( Polymorph, SystemList, System )
 {
-    PolymorphVector aVector;
-    aVector.reserve( getSystemMap().size() );
+    SystemsCRange items( getBelongings< System >() );
+    PolymorphVector retval;
 
-    for ( SystemMapConstIterator i = getSystemMap().begin() ;
-            i != getSystemMap().end() ; ++i )
+    retval.reserve( items.size() );
+
+    for ( SystemsCRange::iterator i( items.begin() );
+            i != items.end(); ++i )
     {
-        aVector.push_back( i->second->getID() );
+        retval.push_back( (*i).first.getID() );
     }
 
-    return aVector;
+    return retval;
 }
 
 GET_METHOD_DEF( Polymorph, VariableList, System )
 {
-    PolymorphVector aVector;
-    aVector.reserve( getVariableMap().size() );
+    VariablesCRange items( getBelongings< Variable >() );
+    PolymorphVector retval;
 
-    for ( VariableMapConstIterator i( getVariableMap().begin() );
-            i != getVariableMap().end() ; ++i )
+    retval.reserve( items.size() );
+
+    for ( VariablesCRange::iterator i( items.begin() );
+            i != items.end(); ++i )
     {
-        aVector.push_back( i->second->getID() );
+        retval.push_back( (*i).first.getID() );
     }
 
-    return aVector;
+    return retval;
 }
 
 GET_METHOD_DEF( Polymorph, ProcessList, System )
 {
-    PolymorphVector aVector;
-    aVector.reserve( getProcessMap().size() );
+    ProcessesCRange items( getBelongings< Process >() );
+    PolymorphVector retval;
 
-    for ( ProcessMap::const_iterator i( getProcessMap().begin() );
-            i != getProcessMap().end() ; ++i )
+    retval.reserve( items.size() );
+
+    for ( ProcessesCRange::iterator i( items.begin() );
+            i != items.end(); ++i )
     {
-        aVector.push_back( i->second->getID() );
+        retval.push_back( (*i).first.getID() );
     }
 
-    return aVector;
+    return retval;
 }
 
 SET_METHOD_DEF( String, StepperID, System )
 {
     stepper_ = getModel()->getStepper( value );
-    stepper_->addSystem( this );
+    stepper_->registerSystem( this );
 }
 
 GET_METHOD_DEF( String, StepperID, System )
@@ -120,10 +126,12 @@ System::~System()
     {
         stepper_->removeSystem( this );
     }
+    
+    delete entities_;
 }
 
 
-VariableCptr const System::findSizeVariable() const
+Variable* const System::findSizeVariable() const
 {
     try
     {
@@ -150,7 +158,7 @@ void System::configureSizeVariable()
 void System::initialize()
 {
     // first initialize enclosed systems
-    for ( SystemIterator i( systems_.begin() ); i != variables_.end() ; ++i )
+    for ( SystemMap::iterator i( systems_.begin() ); i != systems_.end() ; ++i )
     {
         i->second->initialize();
     }
@@ -161,7 +169,7 @@ void System::initialize()
                          "No stepper is associated" );
     }
 
-    for ( VariableIterator i( variables_.begin() );
+    for ( VariableMap::iterator i( variables_.begin() );
             i != variables_.end() ; ++i )
     {
         i->second->initialize();
@@ -171,7 +179,7 @@ void System::initialize()
     // Set Process::stepper_.
     // Process::initialize() is called in Stepper::initialize()
     //
-    for ( ProcessIterator i( processes_.begin() );
+    for ( ProcessMap::iterator i( processes_.begin() );
             i != processes_.end() ; ++i )
     {
         i->second->setStepper( getStepper() );
@@ -186,7 +194,8 @@ void System::postInitialize()
 
 Process* System::getProcess( const String& id ) const
 {
-    ProcessMap::const_iterator i( processes_.find( id ) );
+    ProcessMap::const_iterator i( processes_.find(
+            LocalID( EntityType::PROCESS, id ) ) );
     if ( i == processes_.end() )
     {
         return NULLPTR;
@@ -196,7 +205,8 @@ Process* System::getProcess( const String& id ) const
 
 Variable* System::getVariable( const String& id ) const
 {
-    VariableMap::const_iterator i( variables_.find( id ) );
+    VariableMap::const_iterator i( variables_.find(
+            LocalID( EntityType::VARIABLE, id ) ) );
     if ( i == variables_.end() )
     {
         return NULLPTR;
@@ -204,10 +214,11 @@ Variable* System::getVariable( const String& id ) const
     return i->second;
 }
 
-Variable* System::getVariable( const String& id ) const
+System* System::getSystem( const String& id ) const
 {
-    SystemMap::const_iterator i( systems_.find( id ) );
-    if ( i == variables_.end() )
+    SystemMap::const_iterator i( systems_.find(
+            LocalID( EntityType::SYSTEM, id ) ) );
+    if ( i == systems_.end() )
     {
         return NULLPTR;
     }
@@ -216,43 +227,25 @@ Variable* System::getVariable( const String& id ) const
 
 System* System::getSystem( const SystemPath& sysPath ) const
 {
-    if ( sysPath.empty() )
+    if ( sysPath.isEmpty() )
     {
         return const_cast<System*>( this );
     }
 
     if ( sysPath.isAbsolute() )
     {
-        return getModel()->getSystem( sysPath );
+        return model_->getSystem( sysPath );
     }
 
-    System* const aNextSystem( getSystem( sysPath.front() ) );
+    System* retval( const_cast< System* >( this ) );
 
-    SystemPath sysPathCopy( sysPath );
-    sysPathCopy.pop_front();
-
-    return aNextSystem->getSystem( sysPathCopy );
-}
-
-
-System* System::getSystem( const SystemPath& sysPath ) const
-{
-    if ( sysPath.empty() )
+    for ( SystemPath::const_iterator i( sysPath.begin() ); i != sysPath.end();
+            ++i )
     {
-        return const_cast<System*>( this );
+        retval = retval->getSystem( *i );
     }
 
-    if ( sysPath.isAbsolute() )
-    {
-        return getModel()->getSystem( sysPath );
-    }
-
-    System* const aNextSystem( getSystem( sysPath.front() ) );
-
-    SystemPath sysPathCopy( sysPath );
-    sysPathCopy.pop_front();
-
-    return aNextSystem->getSystem( sysPathCopy );
+    return retval;
 }
 
 void System::notifyChangeOfEntityList()
@@ -260,30 +253,31 @@ void System::notifyChangeOfEntityList()
     //    getStepper()->getMasterStepper()->setEntityListChanged();
 }
 
-const SystemPath System::getSystemPath() const
+const SystemPath System::getPath() const
 {
     SystemPath retval( model_->getFullIDOf( this ).getSystemPath() );
-    return retval.
+    return retval;
 }
 
-void System::add( Entity* ent )
+void System::add( const String& id, Entity* ent )
 {
-    switch ( ent->getEntityType()->code ) {
+    switch ( ent->getEntityType().code ) {
     case EntityType::_PROCESS:
-        addProcess( reinterpret_cast<Process*>( ent ) );
+        addProcess( id, reinterpret_cast<Process*>( ent ) );
         break;
     case EntityType::_VARIABLE:
-        addVariable( reinterpret_cast<Variable*>( ent ) );
+        addVariable( id, reinterpret_cast<Variable*>( ent ) );
         break;
     case EntityType::_SYSTEM:
-        addSystem( reinterpret_cast<System*>( ent ) );
+        addSystem( id, reinterpret_cast<System*>( ent ) );
         break;
     }
 }
 
 void System::addProcess( const String& id, Process* proc )
 {
-    if ( getProcessMap().find( id ) != getProcessMap().end() )
+    LocalID localID( EntityType::PROCESS, id );
+    if ( processes_.find( localID ) != processes_.end() )
     {
         delete proc;
 
@@ -292,16 +286,16 @@ void System::addProcess( const String& id, Process* proc )
     }
 
     proc->__setID( id );
-    processes_[ id ] = proc;
+    processes_[ localID ] = proc;
     proc->setEnclosingSystem( this );
 
-    entityAdded( EntityEventDescriptor( this, proc,
-            LocalID( EntityType::PROCESS, id ) ) );
+    entityAdded( EntityEventDescriptor( this, proc, localID ) );
 }
 
 void System::addVariable( const String& id, Variable* var )
 {
-    if ( getVariableMap().find( id ) != getVariableMap().end() )
+    LocalID localID( EntityType::VARIABLE, id );
+    if ( variables_.find( localID ) != variables_.end() )
     {
         delete var;
 
@@ -310,16 +304,16 @@ void System::addVariable( const String& id, Variable* var )
     }
 
     var->__setID( id );
-    variables_[ id ] = var;
+    variables_[ localID ] = var;
     var->setEnclosingSystem( this );
 
-    entityAdded( EntityEventDescriptor( this, proc,
-            LocalID( EntityType::VARIABLE, id ) ) );
+    entityAdded( EntityEventDescriptor( this, var, localID ) );
 }
 
 void System::addSystem( const String& id, System* sys )
 {
-    if ( getSystemMap().find( id ) != getSystemMap().end() )
+    LocalID localID( EntityType::SYSTEM, id );
+    if ( systems_.find( localID ) != systems_.end() )
     {
         delete sys;
 
@@ -328,11 +322,10 @@ void System::addSystem( const String& id, System* sys )
     }
 
     sys->__setID( id );
-    systems_[ id ] = sys;
+    systems_[ localID ] = sys;
     sys->setEnclosingSystem( this );
 
-    entityAdded( EntityEventDescriptor( this, proc,
-            LocalID( EntityType::SYSTEM, id ) ) );
+    entityAdded( EntityEventDescriptor( this, sys, localID ) );
 }
 
 void System::setStepper( Stepper* obj )

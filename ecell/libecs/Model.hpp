@@ -42,7 +42,7 @@
 #include "CastUtils.hpp"
 #include "PropertiedClass.hpp"
 #include "System.hpp"
-
+#include "RangeConcatenator.hpp"
 
 /** @addtogroup model The Model.
 
@@ -74,52 +74,31 @@ LIBECS_DM_CLASS( Model, PropertiedClass )
 public:
     typedef ::Loki::AssocVector< String, Stepper* > StepperMap;
     typedef ::boost::transform_iterator<
-            select2nd<StepperMap::value_type>,
-                StepperMap::iterator> StepperIterator;
+            select2nd< StepperMap::value_type >,
+                StepperMap::iterator > StepperIterator;
     typedef ::boost::transform_iterator<
-            select2nd<StepperMap::value_type>,
+            select2nd< StepperMap::value_type >,
                 StepperMap::const_iterator> StepperCIterator;
-    typedef ::boost::iterator_range<StepperIterator> SteppersRange;
-    typedef ::boost::iterator_range<StepperCIterator> SteppersCRange;
+    typedef ::boost::iterator_range< StepperIterator > SteppersRange;
+    typedef ::boost::iterator_range< StepperCIterator > SteppersCRange;
 
-    typedef ::Loki::AssocVector< FullID, Entity* > EntityMap;
-    typedef ::boost::iterator_range<EntityMap::iterator>       EntityMapRange;
-    typedef ::boost::iterator_range<EntityMap::const_iterator> EntityMapCRange;
+    typedef ::Loki::AssocVector< FullID, Process* > ProcessMap;
+    typedef ::boost::iterator_range< ProcessMap::iterator >       ProcessMapRange;
+    typedef ::boost::iterator_range< ProcessMap::const_iterator > ProcessMapCRange;
 
-    typedef ::boost::transform_iterator<
-            unary_compose<ReinterpretCaster<Process*, Entity*>,
-                select2nd<EntityMap::value_type> >,
-                EntityMap::iterator>
-                    ProcessIterator;
-    typedef ::boost::transform_iterator<
-            unary_compose<ReinterpretCaster<Process*, Entity*>,
-                select2nd<EntityMap::value_type> >,
-                EntityMap::const_iterator > ProcessCIterator;
-    typedef ::boost::iterator_range<ProcessIterator> ProcessesRange;
-    typedef ::boost::iterator_range<ProcessCIterator> ProcessesCRange;
-    
-    typedef ::boost::transform_iterator<
-            unary_compose<ReinterpretCaster<System*, Entity*>,
-                select2nd<EntityMap::value_type> >,
-                EntityMap::iterator > SystemIterator;
-    typedef ::boost::transform_iterator<
-            unary_compose<ReinterpretCaster<System*, Entity*>,
-                select2nd<EntityMap::value_type> >,
-                EntityMap::const_iterator> SystemCIterator;
-    typedef ::boost::iterator_range<SystemIterator> SystemsRange;
-    typedef ::boost::iterator_range<SystemCIterator> SystemsCRange;
-    
-    
-    typedef ::boost::transform_iterator<
-            unary_compose<ReinterpretCaster<Variable*, Entity*>,
-                select2nd<EntityMap::value_type> >, EntityMap::iterator>
-                    VariableIterator;
-    typedef ::boost::transform_iterator<
-            unary_compose<ReinterpretCaster<Variable*, Entity*>,
-                select2nd<EntityMap::value_type> >, EntityMap::const_iterator>
-                    VariableCIterator;
-    typedef ::boost::iterator_range<VariableIterator> VariablesRange;
-    typedef ::boost::iterator_range<VariableCIterator> VariablesCRange;
+    typedef ::Loki::AssocVector< FullID, System* > SystemMap;
+    typedef ::boost::iterator_range< SystemMap::iterator >       SystemMapRange;
+    typedef ::boost::iterator_range< SystemMap::const_iterator > SystemMapCRange;
+
+    typedef ::Loki::AssocVector< FullID, Variable* > VariableMap;
+    typedef ::boost::iterator_range< VariableMap::iterator >       VariableMapRange;
+    typedef ::boost::iterator_range< VariableMap::const_iterator > VariableMapCRange;
+
+    typedef RangeConcatenator< ::boost::mpl::vector<
+            VariableMap, ProcessMap, SystemMap >,
+            ::std::pair< const LocalID, Entity* > > EntityMap;
+    typedef ::boost::iterator_range< EntityMap::iterator >       EntityMapRange;
+    typedef ::boost::iterator_range< EntityMap::const_iterator > EntityMapCRange;
 
 private:
     class EntityEventObserver: public System::EntityEventObserver
@@ -264,15 +243,9 @@ public:
 
        @return the const reference of the SystemMap.
     */
-    SystemsCRange getSystems() const
+    SystemMapCRange getSystemMap() const
     {
-        return SystemsCRange(
-                SystemCIterator(systems_.begin(),
-                    compose1(ReinterpretCaster<System*, Entity*>(),
-                            select2nd<EntityMap::value_type>())),
-                SystemCIterator(systems_.end(),
-                    compose1(ReinterpretCaster<System*, Entity*>(),
-                            select2nd<EntityMap::value_type>())));
+        return SystemMapCRange( systems_.begin(), systems_.end());
     }
 
     /**
@@ -280,15 +253,9 @@ public:
 
        @return the const reference of the EntityMap.
     */
-    SystemsRange getSystems()
+    SystemMapRange getSystemMap()
     {
-        return SystemsRange(
-                SystemIterator(systems_.begin(),
-                    compose1(ReinterpretCaster<System*, Entity*>(),
-                            select2nd<EntityMap::value_type>())),
-                SystemIterator(systems_.end(),
-                    compose1(ReinterpretCaster<System*, Entity*>(),
-                            select2nd<EntityMap::value_type>())));
+        return SystemMapRange( systems_.begin(), systems_.end());
     }
 
     /**
@@ -296,15 +263,9 @@ public:
 
        @return the const reference of the ProcessMap.
     */
-    ProcessesCRange getProcesss() const
+    ProcessMapCRange getProcessMap() const
     {
-        return ProcessesCRange(
-                ProcessCIterator(processes_.begin(),
-                    compose1(ReinterpretCaster<Process*, Entity*>(),
-                            select2nd<EntityMap::value_type>())),
-                ProcessCIterator(processes_.end(),
-                    compose1(ReinterpretCaster<Process*, Entity*>(),
-                            select2nd<EntityMap::value_type>())));
+        return ProcessMapCRange( processes_.begin(), processes_.end());
     }
 
     /**
@@ -312,15 +273,9 @@ public:
 
        @return the const reference of the ProcessMap.
     */
-    ProcessesRange getProcesss()
+    ProcessMapRange getProcessMap()
     {
-        return ProcessesRange(
-                ProcessIterator(processes_.begin(),
-                    compose1(ReinterpretCaster<Process*, Entity*>(),
-                            select2nd<EntityMap::value_type>())),
-                ProcessIterator(processes_.end(),
-                    compose1(ReinterpretCaster<Process*, Entity*>(),
-                            select2nd<EntityMap::value_type>())));
+        return ProcessMapRange( processes_.begin(), processes_.end());
     }
 
     /**
@@ -328,15 +283,9 @@ public:
 
        @return the const reference of the VariableMap.
     */
-    VariablesCRange getVariables() const
+    VariableMapCRange getVariables() const
     {
-        return VariablesCRange(
-                VariableCIterator(variables_.begin(),
-                    compose1(ReinterpretCaster<Variable*, Entity*>(),
-                            select2nd<EntityMap::value_type>())),
-                VariableCIterator(variables_.end(),
-                    compose1(ReinterpretCaster<Variable*, Entity*>(),
-                            select2nd<EntityMap::value_type>())));
+        return VariableMapCRange( variables_.begin(), variables_.end());
     }
 
     /**
@@ -344,15 +293,41 @@ public:
 
        @return the const reference of the VariableMap.
     */
-    VariablesRange getVariables()
+    VariableMapRange getVariables()
     {
-        return VariablesRange(
-                VariableIterator(variables_.begin(),
-                    compose1(ReinterpretCaster<Variable*, Entity*>(),
-                            select2nd<EntityMap::value_type>())),
-                VariableIterator(variables_.end(),
-                    compose1(ReinterpretCaster<Variable*, Entity*>(),
-                            select2nd<EntityMap::value_type>())));
+        return VariableMapRange( variables_.begin(), variables_.end());
+    }
+
+    /**
+       Get the VariableMap of this Model.
+
+       @return the const reference of the VariableMap.
+    */
+    EntityMapCRange getEntities() const
+    {
+        if ( !entities_ )
+        {
+            entities_ = new EntityMap( EntityMap::range_list_type(
+                    const_cast<VariableMap&>(variables_),
+                    const_cast<ProcessMap&>(processes_),
+                    const_cast<SystemMap&>(systems_) ) );
+        }
+        return EntityMapCRange( entities_->begin(), entities_->end() );
+    }
+
+    /**
+       Get the VariableMap of this Model.
+
+       @return the const reference of the VariableMap.
+    */
+    EntityMapRange getEntities()
+    {
+        if ( !entities_ )
+        {
+            entities_ = new EntityMap( EntityMap::range_list_type(
+                    variables_, processes_, systems_ ) );
+        }
+        return EntityMapRange( entities_->begin(), entities_->end() );
     }
 
     FullID getFullIDOf( const Entity* ent ) const;
@@ -386,9 +361,10 @@ private:
     SimulationContext*     simulationContext_;
     System*                rootSystem_;
     StepperMap             steppers_;
-    EntityMap              systems_;
-    EntityMap              processes_;
-    EntityMap              variables_;
+    SystemMap              systems_;
+    ProcessMap             processes_;
+    VariableMap            variables_;
+    mutable EntityMap*     entities_;
     PropertiedObjectMaker* propertiedObjectMaker_;
     EntityEventObserver    observer_;
 };

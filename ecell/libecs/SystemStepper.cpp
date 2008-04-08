@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-// 
+//
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-// 
+//
 //END_HEADER
 //
 // written by Koichi Takahashi <shafi@e-cell.org>,
@@ -33,6 +33,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <limits>
+#include <boost/foreach.hpp>
 
 #include "Model.hpp"
 #include "System.hpp"
@@ -40,63 +41,64 @@
 
 #include "SystemStepper.hpp"
 
+#include "VariableValueIntegrator.hpp"
 
 namespace libecs
 {
 
-  LIBECS_DM_INIT_STATIC( SystemStepper, Stepper );
+LIBECS_DM_INIT_STATIC( SystemStepper, Stepper );
 
-  ////////////////////////// Stepper
+////////////////////////// Stepper
 
-  void SystemStepper::startup()
-  {
+void SystemStepper::startup()
+{
     setCurrentTime( INF );
     setMaxStepInterval( INF );
     setStepInterval( INF );
-    setPriority( (std::numeric_limits<Integer>::max)() ); 
-  }
+    setPriority( ( std::numeric_limits<Integer>::max )() );
+}
 
 
-  SystemStepper::~SystemStepper()
-  {
+SystemStepper::~SystemStepper()
+{
     ; // do nothing
-  }
+}
 
-  void SystemStepper::step()
-  {
+void SystemStepper::step()
+{
     setStepInterval( INF );
-  }
+}
 
-  void SystemStepper::integrate( RealParam aTime )
-  {
+void SystemStepper::integrate( RealParam aTime )
+{
     integrateVariablesRecursively( getModel()->getRootSystem(), aTime );
     setCurrentTime( aTime );
-  }
+}
 
-  void SystemStepper::integrateVariablesRecursively( SystemPtr const aSystem,
-						     RealParam aTime )
-  {
-    FOR_ALL( VariableMap, aSystem->getVariableMap() )
-      {
-	VariablePtr const aVariable( i->second );
-	
-	if( aVariable->isIntegrationNeeded() )
-	  {
-	    aVariable->integrate( aTime );
-	  }
-      }
+void SystemStepper::integrateVariablesRecursively( SystemPtr const aSystem,
+        RealParam aTime )
+{
+    BOOST_FOREACH( const System::VariablesCRange::value_type& i, aSystem->getBelongings<Variable>() )
+    {
+        VariablePtr const aVariable( i.second );
 
-    FOR_ALL( SystemMap, aSystem->getSystemMap() )
-      {
-	SystemPtr const aSubSystem( i->second );
-	integrateVariablesRecursively( aSubSystem, aTime );
-      }
-  }
+        if ( aVariable->isIntegrationNeeded() )
+        {
+            aVariable->getVariableValueIntegrator()->integrate( aTime );
+        }
+    }
 
-  void SystemStepper::initialize()
-  {
+    BOOST_FOREACH( const System::SystemsCRange::value_type& i, aSystem->getBelongings<System>() )
+    {
+        SystemPtr const aSubSystem( i.second );
+        integrateVariablesRecursively( aSubSystem, aTime );
+    }
+}
+
+void SystemStepper::initialize()
+{
     ; // do nothing
-  }
+}
 
 
 } // namespace libecs

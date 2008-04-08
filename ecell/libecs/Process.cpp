@@ -315,16 +315,16 @@ Process::findVariableReference( const String& varRefName ) const
 
 void Process::declareUnidirectional()
 {
-    VarRefVectorRange positiveRefs( getPositiveVariableReferences() );
+    VarRefsRange positiveRefs( getPositiveVariableReferences() );
 
     std::for_each( positiveRefs.begin(), positiveRefs.end(),
            boost::bind2nd( boost::mem_fun_ref(
-                    &VariableReference::setIsAccessor ), false ) );
+                    &VariableReference::setAccessor ), false ) );
 }
 
 const bool Process::isDependentOn( const Process* proc ) const
 {
-    VarRefVectorCRange aVarRefs( proc->getVariableReferences() );
+    VarRefsCRange aVarRefs( proc->getVariableReferences() );
 
     for ( VarRefs::const_iterator i( varRefs_.begin() );
             i != varRefs_.end() ; ++i )

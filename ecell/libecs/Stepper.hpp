@@ -103,17 +103,17 @@ public:
     class PriorityComparator
     {
     public:
-        bool operator()( StepperPtr lhs, StepperPtr rhs ) const
+        bool operator()( Stepper* lhs, Stepper* rhs ) const
         {
             return compare( lhs->getPriority(), rhs->getPriority() );
         }
 
-        bool operator()( StepperPtr lhs, IntegerParam rhs ) const
+        bool operator()( Stepper* lhs, IntegerParam rhs ) const
         {
             return compare( lhs->getPriority(), rhs );
         }
 
-        bool operator()( IntegerParam lhs, StepperPtr rhs ) const
+        bool operator()( IntegerParam lhs, Stepper* rhs ) const
         {
             return compare( lhs, rhs->getPriority() );
         }
@@ -230,6 +230,8 @@ public:
     virtual void startup();
 
     virtual void initialize();
+
+    virtual void postInitialize();
 
     void initializeProcesses();
 
@@ -484,7 +486,7 @@ public:
     Variable 'read' and 'write'.
     @see Process, VariableReference
     */
-    bool isDependentOn( const StepperCptr aStepper ) const;
+    bool isDependentOn( const Stepper* aStepper ) const;
 
     virtual Interpolant* createInterpolant();
 
@@ -494,8 +496,6 @@ public:
     }
 
 protected:
-    void clearVariables();
-
     void fireProcesses();
 
     virtual void reset();

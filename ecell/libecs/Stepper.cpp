@@ -36,14 +36,17 @@
 #include <algorithm>
 #include <limits>
 #include <boost/lambda/lambda.hpp>
+#include <boost/lambda/if.hpp>
+#include <boost/lambda/bind.hpp>
 
 #include "Util.hpp"
 #include "Variable.hpp"
+#include "VariableValueIntegrator.hpp"
 #include "Interpolant.hpp"
 #include "Process.hpp"
 #include "Model.hpp"
 #include "FullID.hpp"
-#include "Logger.hpp"
+#include "LoggerManager.hpp"
 #include "SystemStepper.hpp"
 
 #include "Stepper.hpp"
@@ -54,7 +57,21 @@ namespace libecs
 
 LIBECS_DM_INIT_STATIC( Stepper, Stepper );
 
-////////////////////////// Stepper
+struct FullIDExtracter: public std::unary_function< const Entity*, FullID >
+{
+    typedef const Entity* argument_type;
+    typedef FullID result_type;
+
+    FullIDExtracter( const Model* model )
+        : model_( model ) {}
+
+    FullID operator()( const Entity* ent )
+    {
+        return model_->getFullIDOf( ent );
+    }
+
+    const Model* model_;
+};
 
 void Stepper::startup()
 {
@@ -88,27 +105,26 @@ void Stepper::updateVariableVector()
     VarRefMap::size_type numOfAccessors;
     VarRefMap::size_type numOfAffectedVars;
 
-    for ( ProcessVector::const_iterator i( theProcess.begin() );
-            i != theProcess.end() ; ++i )
+    for ( ProcessVectorCRange::const_iterator i( processes_.begin() );
+            i != processes_.end() ; ++i )
     {
-        const VariableReferenceVector& varRefVector(
-                (*i)->getVariableReferenceVector() );
+        Process::VarRefsCRange varRefs( (*i)->getVariableReferences() );
 
         // for all the VariableReferences
-        for ( VariableReferenceVector::const_iterator j( varRefVector.begin() );
-                j != varRefVector.end(); ++j )
+        for ( Process::VarRefsCRange::iterator j( varRefs.begin() );
+                j != varRefs.end(); ++j )
         {
             const VariableReference& varRef( *j );
             const Variable* var( j->getVariable() );
-            VarRefMap::const_iterator pos( varRefMap->find( var ) );
+            VarRefMap::iterator pos( varRefMap.find( var ) );
 
             if ( pos == varRefMap.end() )
             {
                 varRefMap[ var ] = varRef;
-                if ( varRef->isMutator() )
+                if ( varRef.isMutator() )
                 {
                     numOfAffectedVars++;
-                    if ( varRef->isAccessor() )
+                    if ( varRef.isAccessor() )
                     {
                         numOfAccessors++;
                     }
@@ -117,12 +133,12 @@ void Stepper::updateVariableVector()
             }
             else
             {
-                if ( !pos->second.isMutator() && varRef->isMutator() )
+                if ( !pos->second.isMutator() && varRef.isMutator() )
                 {
                     pos->second.setCoefficient( 1 );
                     numOfAffectedVars++;
 
-                    if ( !pos->second.isAccessor() && varRef->isAccessor() )
+                    if ( !pos->second.isAccessor() && varRef.isAccessor() )
                     {
                         pos->second.setAccessor( true );
                         numOfAccessors++;
@@ -138,7 +154,7 @@ void Stepper::updateVariableVector()
     variables_.partition( 1, numOfAffectedVars );
 
     for ( VarRefMap::const_iterator i( varRefMap.begin() );
-            i < varRefMap.end(); ++i )
+            i != varRefMap.end(); ++i )
     {
         if ( i->second.isMutator() )
         {
@@ -175,11 +191,11 @@ void Stepper::createInterpolants()
     for ( VariableVector::const_iterator i( affecteds.begin() );
             i != affecteds.end(); ++i )
     {
-        Integrator* integrator( (*i)->getIntegrator() );
+        VariableValueIntegrator* integrator( (*i)->getVariableValueIntegrator() );
         if ( !integrator )
         {
-            integrator = new Integrator( *i );
-            (*i)->setIntegrator( integrator );
+            integrator = new VariableValueIntegrator( *i );
+            (*i)->setVariableValueIntegrator( integrator );
         }
 
         integrator->addInterpolant( createInterpolant() );
@@ -188,29 +204,24 @@ void Stepper::createInterpolants()
 
 void Stepper::postInitialize()
 {
-    using boost::lambda;
+    using namespace boost::lambda;
 
     variablesToIntegrate_.clear();
     VariableVectorRange affecteds( getAffectedVariables() );
-    for_each( affectes().begin(), affected().end(),
-            if_then( _1->isIntegrationNeeded(),
-                variablesToIntegrate_.push_back( _1 ) ) );
+
+    std::for_each( affecteds.begin(), affecteds.end(),
+            if_then( bind( &Variable::isIntegrationNeeded, _1 ),
+                bind( &VariableVector::push_back,
+                    &variablesToIntegrate_, _1 ) ) );
 
     // optimization: sort by memory address.
     std::sort( variablesToIntegrate_.begin(),
                variablesToIntegrate_.end() );
 }
 
-bool Stepper::isDependentOn( const Stepper& aStepper ) const
+bool Stepper::isDependentOn( const Stepper* aStepper ) const
 {
-    // Every Stepper depends on the SystemStepper.
-    // FIXME: UGLY -- reimplement SystemStepper in a different way
-    if ( typeid( *aStepper ) == typeid( SystemStepper ) )
-    {
-        return true;
-    }
-
-    const VariableVectorCRange affecteds( aStepper->getVariables() );
+    const VariableVectorCRange affecteds( aStepper->getInvolvedVariables() );
     const VariableVectorCRange readers( getReadVariables() );
 
     // if at least one Variable in this::readlist appears in
@@ -236,7 +247,7 @@ GET_METHOD_DEF( Polymorph, SystemList, Stepper )
     PolymorphVector aVector;
     aVector.reserve( systems_.size() );
 
-    for ( SystemVector::const_iterator i( systems_.begin() );
+    for ( SystemSet::const_iterator i( systems_.begin() );
             i != systems_.end() ; ++i )
     {
         aVector.push_back( (*i)->getFullID().asString() );
@@ -252,12 +263,13 @@ void Stepper::registerSystem( System* sys )
 
 void Stepper::removeSystem( System* sys )
 {
-    SystemSet::iterator i( systems_.find( sys ) );
+    SystemSet::iterator i( 
+            std::find( systems_.begin(), systems_.end(), sys ) );
 
     if ( i == systems_.end() )
     {
         THROW_EXCEPTION( NotFound,
-                         "system not associated: " + *sys );
+                         String( "system not associated: " ) + sys->asString() );
     }
 
     systems_.erase( i );
@@ -277,19 +289,16 @@ void Stepper::registerProcess( Process* proc )
 
 void Stepper::removeProcess( Process* proc )
 {
-    Processes::const_iterator pos(
-            std::find(
-                theProcessVector.begin(),
-                theProcessVector.end(),
-                proc ) );
+    Processes::iterator pos(
+            std::find( processes_.begin(), processes_.end(), proc ) );
 
-    if ( pos == theProcessVector.end() )
+    if ( pos == processes_.end() )
     {
         THROW_EXCEPTION( NotFound,
-                proc + " not found in this stepper. Can't remove." );
+                proc->asString() + " not found in this stepper. Can't remove." );
     }
 
-    theProcessVector.erase( i );
+    processes_.erase( pos );
     Processes::partition_index_type part( proc->isContinuous() ? 0: 1 );
     std::stable_sort( processes_.begin( part ), processes_.end( part ),
                       Process::PriorityCompare() );
@@ -310,7 +319,7 @@ void Stepper::log()
         loggerManager_->log( currentTime_, (*i) );
     }
 
-    for ( SystemVector::const_iterator i( systems_.begin() );
+    for ( SystemSet::const_iterator i( systems_.begin() );
             i < systems_.end(); ++i )
     {
         loggerManager_->log( currentTime_, (*i) );
@@ -319,58 +328,47 @@ void Stepper::log()
 
 GET_METHOD_DEF( Polymorph, WriteVariableList, Stepper )
 {
-    PolymorphVector aVector;
-    aVector.reserve( theVariableVector.size() );
+    PolymorphVector retval;
+    VariableVectorCRange vars( getAffectedVariables() );
+    retval.reserve( vars.size() );
 
-    for ( VariableVector::size_type c( 0 );
-            c != theReadOnlyVariableOffset; ++c )
+    for ( VariableVectorCRange::iterator i( vars.begin() );
+            i != vars.end(); ++i )
     {
-        aVector.push_back( theVariableVector[c]->getFullID().getString() );
+        retval.push_back( model_->getFullIDOf( *i ).asString() );
     }
 
-    return aVector;
+    return retval;
 }
-
 
 GET_METHOD_DEF( Polymorph, ReadVariableList, Stepper )
 {
-    PolymorphVector aVector;
-    aVector.reserve( theVariableVector.size() );
+    PolymorphVector retval;
+    VariableVectorCRange vars( getReadVariables() );
+    retval.reserve( vars.size() );
 
-    for ( VariableVector::size_type c( theReadWriteVariableOffset );
-            c != theVariableVector.size(); ++c )
+    for ( VariableVectorCRange::iterator i( vars.begin() );
+            i != vars.end(); ++i )
     {
-        aVector.push_back( theVariableVector[c]->getFullID().getString() );
+        retval.push_back( model_->getFullIDOf( *i ).asString() );
     }
 
-    return aVector;
+    return retval;
 }
 
 GET_METHOD_DEF( Polymorph, ProcessList, Stepper )
 {
-    PolymorphVector aVector;
-    aVector.reserve( theProcessVector.size() );
+    PolymorphVector retval;
+    ProcessVectorCRange vars( getProcesses() );
+    retval.reserve( vars.size() );
 
-    for ( ProcessVector::const_iterator i( theProcessVector.begin() );
-            i != theProcessVector.end() ; ++i )
+    for ( ProcessVectorCRange::iterator i( vars.begin() );
+            i != vars.end(); ++i )
     {
-        aVector.push_back( ( *i )->getFullID().getString() );
+        retval.push_back( model_->getFullIDOf( *i ).asString() );
     }
 
-    return aVector;
-}
-
-void Stepper::clearVariables()
-{
-    const VariableVector::size_type aSize( theVariableVector.size() );
-    for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
-    {
-        VariablePtr const aVariable( theVariableVector[ c ] );
-
-        // save original value values
-        theValueBuffer[ c ] = aVariable->getValue();
-    }
-
+    return retval;
 }
 
 void Stepper::fireProcesses()
@@ -381,9 +379,11 @@ void Stepper::fireProcesses()
 
 void Stepper::integrate( RealParam aTime )
 {
+    using namespace boost::lambda;
+
     std::for_each( variablesToIntegrate_.begin(), variablesToIntegrate_.end(),
-            std::bind_2nd( boost::mem_fun1( &Variable::integrate ), aTime ) );
-    setCurrentTime( aTime );
+            bind( &VariableValueIntegrator::integrate,
+                bind( &Variable::getVariableValueIntegrator, _1 ), aTime ) );
 }
 
 void Stepper::reset()
@@ -403,12 +403,12 @@ void Stepper::loadVariablesToBuffer()
 void Stepper::saveBufferToVariables( bool onlyAffected )
 {
     VariableVectorRange range(
-        only_affected ? getAffectedVariables():
+        onlyAffected ? getAffectedVariables():
                 getInvolvedVariables() );
 
     for ( VariableVector::iterator i( range.begin() ); i < range.end(); ++i )
     {
-        (*i)->setValue( valueBuffer[ i - variables_.begin() ] );
+        (*i)->setValue( valueBuffer_[ i - variables_.begin() ] );
     }
 }
 

@@ -137,10 +137,10 @@ void DiscreteEventStepper::log()
     loggerManager_->log( currentTime_, lastProcess );
 
     {
-        const Process::VarRefVectorCRange& varRefs(
+        const Process::VarRefsCRange& varRefs(
                 lastProcess->getVariableReferences() );
 
-        for ( Process::VarRefVector::const_iterator i( varRefs.begin() );
+        for ( Process::VarRefs::const_iterator i( varRefs.begin() );
                 i != varRefs.end(); ++i )
         {
             loggerManager_->log( currentTime_, (*i).getVariable() );
@@ -161,10 +161,10 @@ void DiscreteEventStepper::log()
     {
         const Process* dependentProcess( scheduler_.getEvent( *i ).getProcess() );
         loggerManager_->log( currentTime_, dependentProcess );
-        const Process::VarRefVectorCRange& varRefs(
+        const Process::VarRefsCRange& varRefs(
                 dependentProcess->getVariableReferences() );
 
-        for ( Process::VarRefVector::const_iterator i( varRefs.begin() );
+        for ( Process::VarRefs::const_iterator i( varRefs.begin() );
                 i != varRefs.end(); ++i )
         {
             loggerManager_->log( currentTime_, (*i).getVariable() );

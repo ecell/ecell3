@@ -82,7 +82,7 @@ void AdaptiveDifferentialStepper::step()
 {
     theStateFlag = false;
 
-    clearVariables();
+    loadVariablesToBuffer();
 
     setStepInterval( getNextStepInterval() );
     //    setTolerableInterval( 0.0 );
