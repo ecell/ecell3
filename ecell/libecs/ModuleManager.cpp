@@ -47,7 +47,7 @@ ModuleManager::~ModuleManager()
 }
 
 void
-ModuleManager::addModuleMaker( ModuleMaker* maker )
+ModuleManager::addModuleMaker( boost::shared_ptr< ModuleMaker > maker )
 {
     moduleMakers_.insert( maker );
 }
@@ -55,7 +55,7 @@ ModuleManager::addModuleMaker( ModuleMaker* maker )
 void
 ModuleManager::removeModuleMaker( ModuleMaker* maker )
 {
-    moduleMakers_.erase( maker );
+    moduleMakers_.erase( boost::shared_ptr< ModuleMaker >( maker ) );
 }
 
 const ModuleManager::Module&

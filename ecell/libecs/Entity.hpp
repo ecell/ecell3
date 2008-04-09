@@ -188,7 +188,7 @@ protected:
 
 namespace libecs {
 
-const FullID Entity::getFullID() const
+inline const FullID Entity::getFullID() const
 {
     return FullID(
             getEntityType(),

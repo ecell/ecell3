@@ -35,7 +35,7 @@
 #include <boost/mpl/lambda.hpp>
 #include <boost/mpl/assert.hpp>
 
-#define BOOST_PP_ITERATION_PARAMS_1 (3, (1, 10, "RangeConcatenator.hpp"))
+#define BOOST_PP_ITERATION_PARAMS_1 (3, (1, 10, "libecs/RangeConcatenator.hpp"))
 
 namespace libecs
 {

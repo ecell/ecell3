@@ -68,4 +68,17 @@ const PropertyType& PropertyType::get( enum Code code )
     }
 }
 
+template<>
+const PropertyType& Type2PropertyType<Integer>::value( PropertyType::INTEGER );
+
+template<>
+const PropertyType& Type2PropertyType<Real>::value( PropertyType::REAL );
+
+template<>
+const PropertyType& Type2PropertyType<String>::value( PropertyType::STRING );
+
+template<>
+const PropertyType& Type2PropertyType<Polymorph>::value( PropertyType::POLYMORPH );
+
+
 } // namespace libecs

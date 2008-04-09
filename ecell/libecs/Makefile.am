@@ -67,7 +67,6 @@ ContinuousProcess.hpp\
 DataPoint.hpp\
 DataPointAggregator.hpp\
 Downsampler.hpp\
-DataPointVector.hpp\
 Defs.hpp\
 DifferentialStepper.hpp\
 DiscreteEventStepper.hpp\
@@ -83,7 +82,6 @@ FullID.hpp\
 FullPN.hpp\
 Happening.hpp\
 Interpolant.hpp\
-Integrator.hpp\
 LocalID.hpp\
 Logger.hpp\
 LoggerAdapter.hpp\
@@ -108,13 +106,12 @@ RangeConcatenator.hpp\
 Stepper.hpp\
 StepperEvent.hpp\
 System.hpp\
-StstemPath.hpp\
+SystemPath.hpp\
 SystemStepper.hpp\
 Util.hpp\
 Variable.hpp\
 VariableReference.hpp\
 VariableValueIntegrator.hpp\
-convertTo.hpp\
 libecs.hpp
 
 noinst_HEADERS=\

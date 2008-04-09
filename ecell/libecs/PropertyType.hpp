@@ -81,22 +81,6 @@ struct Type2PropertyType
     static const PropertyType& value;
 };
 
-
-template<typename T>
-const PropertyType& Type2PropertyType<T>::value( PropertyType::NONE );
-
-template<>
-const PropertyType& Type2PropertyType<Integer>::value( PropertyType::INTEGER );
-
-template<>
-const PropertyType& Type2PropertyType<Real>::value( PropertyType::REAL );
-
-template<>
-const PropertyType& Type2PropertyType<String>::value( PropertyType::STRING );
-
-template<>
-const PropertyType& Type2PropertyType<Polymorph>::value( PropertyType::POLYMORPH );
-
 } // namespace libesc
 
 #endif /* __PROPERTYTYPE_HPP_ */

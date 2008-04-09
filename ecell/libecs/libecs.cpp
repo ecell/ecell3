@@ -44,9 +44,17 @@
 #include <gsl/gsl_rng.h>
 #endif
 
-#include "dmtool/ModuleMaker.hpp"
+#include <boost/shared_ptr.hpp>
 
 #include "libecs.hpp"
+#include "PropertiedObjectMaker.hpp"
+#include "ModuleManager.hpp"
+#include "StaticDynamicModule.hpp"
+#include "System.hpp"
+#include "Variable.hpp"
+#include "DiscreteEventStepper.hpp"
+#include "DiscreteTimeStepper.hpp"
+#include "PassiveStepper.hpp"
 
 namespace libecs
 {
@@ -58,9 +66,11 @@ char const* const VERSION_STRING( ECELL_VERSION_STRING );
 
 static volatile bool isInitialized = false;
 
-static PropertiedObjectMaker propertiedObjectMaker;
+static ModuleManager moduleManager;
 
-const PropertiedObjectMaker& getPropertiedObjectMaker() const
+static PropertiedObjectMaker propertiedObjectMaker( &moduleManager );
+
+const PropertiedObjectMaker& getPropertiedObjectMaker()
 {
     return propertiedObjectMaker;
 }
@@ -87,9 +97,38 @@ bool initialize()
 
     gsl_rng_env_setup();
 
+    moduleManager.addModuleMaker(
+            boost::shared_ptr< ModuleManager::ModuleMaker >(
+                reinterpret_cast< ModuleManager::ModuleMaker* >(
+                        new SharedModuleMaker< PropertiedClass >() ) ) );
 
-    PropertiedObjectMaker.addModuleMaker(
-        new SharedModuleMaker<
+    StaticModuleMaker< PropertiedClass >* builtinModuleMaker = 
+            reinterpret_cast< StaticModuleMaker< PropertiedClass >* >(
+                new StaticModuleMaker< PropertiedClass >() );
+
+    builtinModuleMaker->addClass(
+            reinterpret_cast< StaticDynamicModule< PropertiedClass >* >(
+                new StaticDynamicModule< System >() ) );
+
+    builtinModuleMaker->addClass(
+            reinterpret_cast< StaticDynamicModule< PropertiedClass >* >(
+                new StaticDynamicModule< Variable >() ) );
+
+    builtinModuleMaker->addClass(
+            reinterpret_cast< StaticDynamicModule< PropertiedClass >* >(
+                new StaticDynamicModule< DiscreteEventStepper >() ) );
+
+    builtinModuleMaker->addClass(
+            reinterpret_cast< StaticDynamicModule< PropertiedClass >* >(
+                new StaticDynamicModule< DiscreteTimeStepper >() ) );
+
+    builtinModuleMaker->addClass(
+            reinterpret_cast< StaticDynamicModule< PropertiedClass >* >(
+                new StaticDynamicModule< PassiveStepper >() ) );
+
+    moduleManager.addModuleMaker(
+            boost::shared_ptr< ModuleManager::ModuleMaker >(
+                builtinModuleMaker ) );
 
     return true;
 }

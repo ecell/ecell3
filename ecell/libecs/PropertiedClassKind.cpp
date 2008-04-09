@@ -86,4 +86,21 @@ PropertiedClassKind::fromEntityType( const EntityType& et )
         + static_cast< const String& >( et ) );
 }
 
+template<>
+const PropertiedClassKind& Type2PropertiedClassKind<Stepper>::value(
+        PropertiedClassKind::STEPPER );
+
+template<>
+const PropertiedClassKind& Type2PropertiedClassKind<Variable>::value(
+        PropertiedClassKind::VARIABLE );
+
+template<>
+const PropertiedClassKind& Type2PropertiedClassKind<Process>::value(
+        PropertiedClassKind::PROCESS );
+
+template<>
+const PropertiedClassKind& Type2PropertiedClassKind<System>::value(
+        PropertiedClassKind::SYSTEM );
+
+
 } // namespace libecs

@@ -33,9 +33,9 @@
 #define ___MODULEMANAGER_H___
 
 #include <set>
+#include <boost/shared_ptr.hpp>
 #include "PropertiedClass.hpp"
 #include "dmtool/ModuleMaker.hpp"
-
 
 namespace libecs
 {
@@ -50,20 +50,20 @@ class LIBECS_API ModuleManager
 public:
     typedef StaticModuleMaker< PropertiedClass > ModuleMaker;
     typedef ModuleMaker::Module Module;
-    typedef std::set<ModuleMaker*> ModuleMakerSet;
+    typedef std::set< boost::shared_ptr< ModuleMaker > > ModuleMakerSet;
 
 public:
     ModuleManager();
     virtual ~ModuleManager();
-    void addModuleMaker(ModuleMaker*);
-    void removeModuleMaker(ModuleMaker*);
+    void addModuleMaker( boost::shared_ptr< ModuleMaker > );
+    void removeModuleMaker( ModuleMaker* );
     const Module& getModule( const String& ) const;
 
 private:
     ModuleMakerSet moduleMakers_;
 };
 
-#define NewPropertiedObjectModule(CLASS) NewDynamicModule(PropertiedObject,CLASS)
+//#define NewPropertiedObjectModule(CLASS) NewDynamicModule(PropertiedObject,CLASS)
 
 /** @} */ //end of libecs_module
 

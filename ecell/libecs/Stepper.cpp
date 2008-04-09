@@ -94,7 +94,7 @@ void Stepper::initialize()
 
     createInterpolants();
 
-    initializeValueBuffer();
+    prepareValueBuffer();
 }
 
 void Stepper::updateVariableVector()

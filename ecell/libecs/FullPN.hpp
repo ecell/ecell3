@@ -135,7 +135,7 @@ private:
     String propertyName_;
 };
 
-String operator+( const String& lhs, const FullPN& rhs )
+inline String operator+( const String& lhs, const FullPN& rhs )
 {
     return lhs + rhs.asString();
 }

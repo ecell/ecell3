@@ -259,27 +259,27 @@ protected:
 };
 
 template<>
-System::VariablesCRange
+inline System::VariablesCRange
 System::getBelongings<Variable>() const
 {
     return VariablesCRange( variables_.begin(), variables_.end() );
 }
 
 template<>
-System::ProcessesCRange
+inline System::ProcessesCRange
 System::getBelongings<Process>() const
 {
     return ProcessesCRange( processes_.begin(), processes_.end() );
 }
 
 template<>
-System::SystemsCRange
+inline System::SystemsCRange
 System::getBelongings<System>() const
 {
     return SystemsCRange( systems_.begin(), systems_.end() );
 }
 
-System::EntitiesCRange
+inline System::EntitiesCRange
 System::getBelongings() const
 {
     if ( !entities_ )
@@ -294,27 +294,27 @@ System::getBelongings() const
 }
 
 template<>
-System::VariablesRange
+inline System::VariablesRange
 System::getBelongings<Variable>()
 {
     return VariablesRange( variables_.begin(), variables_.end() );
 }
 
 template<>
-System::ProcessesRange
+inline System::ProcessesRange
 System::getBelongings<Process>()
 {
     return ProcessesRange( processes_.begin(), processes_.end() );
 }
 
 template<>
-System::SystemsRange
+inline System::SystemsRange
 System::getBelongings<System>()
 {
     return SystemsRange( systems_.begin(), systems_.end() );
 }
 
-System::EntitiesRange
+inline System::EntitiesRange
 System::getBelongings()
 {
     if ( !entities_ )

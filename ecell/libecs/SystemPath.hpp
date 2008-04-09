@@ -229,7 +229,7 @@ protected:
     std::vector<String> components_;
 };
 
-String operator+( const String& lhs, const SystemPath& rhs )
+inline String operator+( const String& lhs, const SystemPath& rhs )
 {
     return lhs + rhs.asString();
 }

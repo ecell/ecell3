@@ -131,7 +131,7 @@ private:
     SystemPath    systemPath_;
 };
 
-String operator+( const String& lhs, const FullID& rhs )
+inline String operator+( const String& lhs, const FullID& rhs )
 {
     return lhs + rhs.asString();
 }

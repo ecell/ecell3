@@ -101,22 +101,6 @@ template<typename T>
 const PropertiedClassKind& Type2PropertiedClassKind<T>::value(
         PropertiedClassKind::NONE );
 
-template<>
-const PropertiedClassKind& Type2PropertiedClassKind<Stepper>::value(
-        PropertiedClassKind::STEPPER );
-
-template<>
-const PropertiedClassKind& Type2PropertiedClassKind<Variable>::value(
-        PropertiedClassKind::VARIABLE );
-
-template<>
-const PropertiedClassKind& Type2PropertiedClassKind<Process>::value(
-        PropertiedClassKind::PROCESS );
-
-template<>
-const PropertiedClassKind& Type2PropertiedClassKind<System>::value(
-        PropertiedClassKind::SYSTEM );
-
 } // namespace libesc
 
 #endif /* __PROPERTIEDCLASSKIND_HPP_ */
