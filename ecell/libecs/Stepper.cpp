@@ -92,9 +92,9 @@ void Stepper::initialize()
     // Update theVariableVector.  This also calls updateInterpolantVector.
     updateVariableVector();
 
-    // size of the value buffer == the number of *all* variables.
-    // (not just read or write variables)
-    valueBuffer_.resize( variables_.size() );
+    createInterpolants();
+
+    initializeValueBuffer();
 }
 
 void Stepper::updateVariableVector()
@@ -391,6 +391,13 @@ void Stepper::reset()
     saveBufferToVariables();
 }
 
+void Stepper::prepareValueBuffer()
+{
+    // size of the value buffer == the number of *all* variables.
+    // (not just read or write variables)
+    valueBuffer_.resize( variables_.size() );
+}
+
 void Stepper::loadVariablesToBuffer()
 {
     for ( RealVector::size_type i( 0 ); i < valueBuffer_.size(); ++i )
@@ -398,7 +405,6 @@ void Stepper::loadVariablesToBuffer()
         valueBuffer_[ i ] = variables_[ i ]->getValue();
     }
 }
-
 
 void Stepper::saveBufferToVariables( bool onlyAffected )
 {

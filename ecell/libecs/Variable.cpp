@@ -39,7 +39,7 @@
 #include "EntityType.hpp"
 
 #include "Variable.hpp"
-
+#include "VariableValueIntegrator.hpp"
 
 namespace libecs
 {
@@ -51,7 +51,6 @@ Variable::~Variable()
     delete integrator_;
 }
 
-
 void Variable::initialize()
 {
     delete integrator_;
@@ -62,19 +61,6 @@ GET_METHOD_DEF( Real, Velocity, Variable )
 {
     return integrator_ ? integrator_->calculateVelocitySum(
             integrator_->getLastUpdateTime() ): 0.0;
-}
-
-LOAD_METHOD_DEF( Real, NumberConc, Variable )
-{
-    // Find the SIZE Variable by own.
-    // Here, it assumes that System::findSizeVariable() of the supersystem
-    // of this Variable works correctly even at this stage of the model
-    // loading.  In other words, properties of Entities of the model should be
-    // loaded in the order from the root (/) to leaves, AND Value property
-    // of the found SIZE Variable is already set.
-    VariableCptr const aSizeVariable( getSuperSystem()->findSizeVariable() );
-
-    setValue( value * aSizeVariable->getValue() );
 }
 
 } // namespace libecs

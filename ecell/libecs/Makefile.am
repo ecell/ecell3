@@ -54,7 +54,6 @@ Util.cpp\
 VVector.cpp\
 Variable.cpp\
 VariableReference.cpp\
-VariableValueInterpolant.cpp\
 libecs.cpp\
 BlockIO.cpp
 
@@ -105,6 +104,7 @@ PropertySlotProxy.hpp\
 PropertySlotProxyLoggerAdapter.hpp\
 PropertyType.hpp\
 RealMath.hpp\
+RangeConcatenator.hpp\
 Stepper.hpp\
 StepperEvent.hpp\
 System.hpp\
@@ -113,6 +113,7 @@ SystemStepper.hpp\
 Util.hpp\
 Variable.hpp\
 VariableReference.hpp\
+VariableValueIntegrator.hpp\
 convertTo.hpp\
 libecs.hpp
 

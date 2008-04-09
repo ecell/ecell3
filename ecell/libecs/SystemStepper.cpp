@@ -75,12 +75,12 @@ void SystemStepper::integrate( RealParam aTime )
     setCurrentTime( aTime );
 }
 
-void SystemStepper::integrateVariablesRecursively( SystemPtr const aSystem,
+void SystemStepper::integrateVariablesRecursively( System* const aSystem,
         RealParam aTime )
 {
     BOOST_FOREACH( const System::VariablesCRange::value_type& i, aSystem->getBelongings<Variable>() )
     {
-        VariablePtr const aVariable( i.second );
+        Variable* const aVariable( i.second );
 
         if ( aVariable->isIntegrationNeeded() )
         {
@@ -90,7 +90,7 @@ void SystemStepper::integrateVariablesRecursively( SystemPtr const aSystem,
 
     BOOST_FOREACH( const System::SystemsCRange::value_type& i, aSystem->getBelongings<System>() )
     {
-        SystemPtr const aSubSystem( i.second );
+        System* const aSubSystem( i.second );
         integrateVariablesRecursively( aSubSystem, aTime );
     }
 }
@@ -100,9 +100,7 @@ void SystemStepper::initialize()
     ; // do nothing
 }
 
-
 } // namespace libecs
-
 
 /*
   Do not modify
@@ -111,4 +109,3 @@ void SystemStepper::initialize()
   $Date$
   $Locker$
 */
-

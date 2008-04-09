@@ -310,14 +310,14 @@ void DifferentialStepper::interIntegrate()
 
     // save buffer only to read-only variables.
     for ( VariableVector::iterator i( readOnlyVariables.begin() );
-            i < readOnlyVariables.end(); ++i )
+            i != readOnlyVariables.end(); ++i )
     {
         (*i)->setValue( valueBuffer_[ i - variables_.begin() ] );
     }
 
     VariableVectorRange const readVariables( getReadVariables() );
     for ( VariableVector::iterator i( readVariables.begin() );
-            i < readVariables.end(); ++i )
+            i != readVariables.end(); ++i )
     {
         BOOST_ASSERT( (*i)->getVariableValueIntegrator() );
         (*i)->getVariableValueIntegrator()->integrate( currentTime );

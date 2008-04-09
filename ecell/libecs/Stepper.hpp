@@ -528,6 +528,8 @@ protected:
     */
     void createInterpolants();
 
+    void prepareValueBuffer();
+
     void loadVariablesToBuffer();
 
     void saveBufferToVariables( bool onlyAffected = true );
