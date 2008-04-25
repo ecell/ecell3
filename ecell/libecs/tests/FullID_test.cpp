@@ -196,36 +196,3 @@ BOOST_AUTO_TEST_CASE(testFullIDAssignment)
     BOOST_CHECK_EQUAL( aFullID.getEntityType(), EntityType::VARIABLE );
     BOOST_CHECK_EQUAL( aFullID.getID(), "TEST" );
 }
-/*
-void test()
-{
-     FullID aFullID( "       \t  \n  Variable:/A/B:S   \t   \n" );
-
-     FullID aFullID2( aFullID
-     std::cout << aFullID2.getString() << std::endl;
-
-     FullID aFullID3( "Process:/:R"
-     std::cout << aFullID3.getString() << std::endl;
-     aFullID3 = aFullID2;
-     std::cout << aFullID3.getString() << std::endl;
-
-     std::cout << "\n::::::::::" << std::endl;
-     //      FullPN aFullPN( 1,aFullID.getSystemPath(),"/", "PNAME"
-
-     FullPN aFullPN( "       \t  \n  Variable:/A/B:S:PNAME   \t   \n"
-     std::cout << aFullPN.getString() << std::endl;
-     std::cout << aFullPN.getEntityType() << std::endl;
-     std::cout << aFullPN.getSystemPath().getString() << std::endl;
-     std::cout << aFullPN.getID() << std::endl;
-     std::cout << aFullPN.getPropertyName() << std::endl;
-     std::cout << aFullPN.isValid() << std::endl;
-
-     FullPN aFullPN2( aFullPN
-     std::cout << aFullPN2.getString() << std::endl;
-
-     FullPN aFullPN3( "Process:/:R:P"
-     std::cout << aFullPN3.getString() << std::endl;
-     aFullPN3 = aFullPN2;
-     std::cout << aFullPN3.getString() << std::endl;
-}
-*/
