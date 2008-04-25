@@ -94,6 +94,35 @@ public:
         BOOST_CHECK( dpq.checkConsistency() );
     }
 
+    void testClearManyItems()
+    {
+        DPQ dpq;
+        typedef typename DPQ::Index Index;
+
+        for( int i( 0 ); i < 70000; ++i )
+        {
+            dpq.push( i );
+        }
+
+        BOOST_CHECK( dpq.checkConsistency() );
+
+        dpq.clear();
+
+        BOOST_CHECK( dpq.isEmpty() );
+        BOOST_CHECK( dpq.checkConsistency() );
+
+        dpq.push( 2 );
+        dpq.push( 20 );
+        dpq.push( 30 );
+
+        BOOST_CHECK_EQUAL( Index( 3 ), dpq.getSize() );
+
+        dpq.clear();
+
+        BOOST_CHECK( dpq.isEmpty() );
+        BOOST_CHECK( dpq.checkConsistency() );
+    }
+
     void testPush()
     {
         DPQ dpq;
@@ -368,6 +397,7 @@ bool my_init_unit_test()
 
         add_test( IntegerDPQTest, testConstruction );
         add_test( IntegerDPQTest, testClear );
+        add_test( IntegerDPQTest, testClearManyItems );
         add_test( IntegerDPQTest, testPush );
         add_test( IntegerDPQTest, testDuplicatedItems );
         add_test( IntegerDPQTest, testSimpleSorting );

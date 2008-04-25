@@ -577,6 +577,11 @@ template < typename Item, class IDPolicy >
 void DynamicPriorityQueue< Item, IDPolicy >::moveUpPos( const Index position, 
                                                         const Index start )
 {
+    if ( position == 0 )
+    {
+        return;
+    }
+
     const Index index( this->heap[ position ] );
     const Item& item( this->itemVector[ index ] );
 
