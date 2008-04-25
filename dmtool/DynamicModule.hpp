@@ -137,7 +137,7 @@ public:
 
     virtual T_* createInstance() const
     {
-        return new T_( *this );
+        return new T_( this );
     }
 
     virtual const void* getInfo( const std::string& kind ) const
@@ -175,7 +175,7 @@ public:
     typedef DynamicModuleBase< T_ > Module;
 
 protected:
-    typedef T_* (*FactoryFunction)( const Module& );
+    typedef T_* (*FactoryFunction)( const Module* );
     typedef const void* (*GetInfoFunction)( const std::string& kind );
 
 public:
@@ -194,7 +194,7 @@ public:
 
     virtual T_* createInstance() const
     {
-        return theFactoryFunction( *this );
+        return theFactoryFunction( this );
     }
 
     virtual const void* getInfo( const std::string& kind ) const

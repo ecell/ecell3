@@ -53,7 +53,7 @@ T_* FactoryFunction( const DynamicModuleBase< T_ >& mod )
 
 
 #define DM_OBJECT( CLASSNAME )\
- static CLASSNAME* createInstance( const DynamicModuleBase< CLASSNAME >& mod ) { return new CLASSNAME( mod ); }
+ static CLASSNAME* createInstance( const DynamicModuleBase< CLASSNAME >* mod ) { return new CLASSNAME( mod ); }
 
 
 #endif /* __DMOBJECT_HPP */

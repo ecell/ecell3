@@ -325,12 +325,9 @@ AC_CONFIG_FILES([
     libecs/Makefile
     libecs/scripting/Makefile
     libecs/tests/Makefile
-    libemc/Makefile
     pyecell/Makefile
     pyecell/setup.py
     pyecell/ecell/config.py
-    pyecs/Makefile
-    pyecs/setup.py
     session-monitor/Makefile
     session-monitor/plugins/Makefile
     session-monitor/glade/Makefile

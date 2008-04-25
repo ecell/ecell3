@@ -125,8 +125,8 @@ protected:
 protected:
     PropertySlotMap thePropertySlotMap;
     InfoMap theInfoMap;
-    const PropertiedClassKind& theKind;
     const String theClassName;
+    const PropertiedClassKind& theKind;
 };
 
 } // namespace libecs

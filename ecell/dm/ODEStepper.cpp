@@ -350,7 +350,7 @@ void ODEStepper::calculateJacobian()
       const Real aValue( aVariable1->getValue() );
       
       aPerturbation = sqrt( Uround * std::max( 1e-5, fabs( aValue ) ) );
-      aVariable1->loadValue( theValueBuffer[ i ] + aPerturbation );
+      aVariable1->loadValue( valueBuffer_[ i ] + aPerturbation );
 
       fireProcesses();
       setVariableVelocity( theW[ 4 ] );
@@ -478,7 +478,7 @@ void ODEStepper::calculateRhs()
 		    - theW[ 1 ][ c ] * 0.14125529502095420843
 		    - theW[ 2 ][ c ] * 0.030029194105147424492 );
 
-      theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + z );
+      theVariableVector[ c ]->loadValue( valueBuffer_[ c ] + z );
     }
   
   // ========= 1 ===========
@@ -500,7 +500,7 @@ void ODEStepper::calculateRhs()
 		    + theW[ 1 ][ c ] * 0.20412935229379993199
 		    + theW[ 2 ][ c ] * 0.38294211275726193779 );
 
-      theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + z );
+      theVariableVector[ c ]->loadValue( valueBuffer_[ c ] + z );
     }
   
   // ========= 2 ===========
@@ -520,7 +520,7 @@ void ODEStepper::calculateRhs()
       
       const Real z( theW[ 0 ][ c ] * 0.96604818261509293619 + theW[ 1 ][ c ] );
 
-      theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + z );
+      theVariableVector[ c ]->loadValue( valueBuffer_[ c ] + z );
     }
   
   // ========= 3 ===========
@@ -564,7 +564,7 @@ Real ODEStepper::solve()
 
   for ( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
-      Real aTolerance2( rtoler * fabs( theValueBuffer[ c ] ) + atoler );
+      Real aTolerance2( rtoler * fabs( valueBuffer_[ c ] ) + atoler );
       aTolerance2 = aTolerance2 * aTolerance2;
 
       deltaW = gsl_vector_get( theSolutionVector1, c );
@@ -790,11 +790,11 @@ Real ODEStepper::estimateLocalError()
   Real aDifference;
   for ( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
-      const Real aTolerance( rtoler * fabs( theValueBuffer[ c ] ) + atoler );
+      const Real aTolerance( rtoler * fabs( valueBuffer_[ c ] ) + atoler );
       aDifference = gsl_vector_get( theSolutionVector1, c );
 
       // for the case ( anError >= 1.0 )
-      theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + aDifference );
+      theVariableVector[ c ]->loadValue( valueBuffer_[ c ] + aDifference );
       
       aDifference /= aTolerance;
       anError += aDifference * aDifference;
@@ -824,7 +824,7 @@ Real ODEStepper::estimateLocalError()
       anError = 0.0;
       for ( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
 	{
-	  const Real aTolerance( rtoler * fabs( theValueBuffer[ c ] )
+	  const Real aTolerance( rtoler * fabs( valueBuffer_[ c ] )
 				 + atoler );
 	  
 	  Real aDifference( gsl_vector_get( theSolutionVector1, c ) );
@@ -890,7 +890,7 @@ void ODEStepper::stepRadauIIA()
       theW[ 3 ][ c ] = theW[ 2 ][ c ];
       theW[ 3 ][ c ] /= aStepInterval;
       
-      theVariableVector[ c ]->loadValue( theValueBuffer[ c ] );
+      theVariableVector[ c ]->loadValue( valueBuffer_[ c ] );
     }
 
   for ( VariableVector::size_type c( 0 ); c < theSystemSize; c++ )
@@ -944,7 +944,7 @@ bool ODEStepper::calculate()
 	
 	  aVariable->loadValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
 				* aStepInterval
-				+ theValueBuffer[ c ] );
+				+ valueBuffer_[ c ] );
 	}
     }
   else
@@ -958,7 +958,7 @@ bool ODEStepper::calculate()
 
 	  aVariable->loadValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
 				* aStepInterval
-				+ theValueBuffer[ c ] );
+				+ valueBuffer_[ c ] );
 	}	
     }
 
@@ -976,7 +976,7 @@ bool ODEStepper::calculate()
 	->loadValue( ( theTaylorSeries[ 0 ][ c ] * ( 3.0 / 40.0 ) 
 		       + theW[ 0 ][ c ] * ( 9.0 / 40.0 ) )
 		     * aStepInterval
-		     + theValueBuffer[ c ] );
+		     + valueBuffer_[ c ] );
     }
 
   // ========= 3 ===========
@@ -994,7 +994,7 @@ bool ODEStepper::calculate()
 		       - theW[ 0 ][ c ] * ( 56.0 / 15.0 )
 		       + theW[ 1 ][ c ] * ( 32.0 / 9.0 ) )
 		     * aStepInterval
-		     + theValueBuffer[ c ] );
+		     + valueBuffer_[ c ] );
     }
 
   // ========= 4 ===========
@@ -1013,7 +1013,7 @@ bool ODEStepper::calculate()
 		       + theW[ 1 ][ c ] * ( 64448.0 / 6561.0 )
 		       - theW[ 2 ][ c ] * ( 212.0 / 729.0 ) )
 		     * aStepInterval
-		     + theValueBuffer[ c ] );
+		     + valueBuffer_[ c ] );
     }
 
   // ========= 5 ===========
@@ -1035,7 +1035,7 @@ bool ODEStepper::calculate()
 	- theW[ 3 ][ c ] * ( 5103.0 / 18656.0 );
 
       aVariable->loadValue( theTaylorSeries[ 1 ][ c ] * aStepInterval
-			    + theValueBuffer[ c ] );
+			    + valueBuffer_[ c ] );
     }
 
   // ========= 6 ===========
@@ -1065,7 +1065,7 @@ bool ODEStepper::calculate()
 	+= ( theTaylorSeries[ 2 ][ c ] - theTaylorSeries[ 1 ][ c ] ) * ( theTaylorSeries[ 2 ][ c ] - theTaylorSeries[ 1 ][ c ] );
 
       aVariable->loadValue( theTaylorSeries[ 2 ][ c ] * aStepInterval
-			    + theValueBuffer[ c ] );
+			    + valueBuffer_[ c ] );
     }
 
   // ========= 7 ===========
@@ -1103,7 +1103,7 @@ bool ODEStepper::calculate()
 	+ theW[ 5 ][ c ] * ( 11237099.0 / 235043384.0 );
 
       const Real aTolerance( eps_rel * 
-			     ( a_y * fabs( theValueBuffer[ c ] ) 
+			     ( a_y * fabs( valueBuffer_[ c ] ) 
 			       + a_dydt * fabs( theTaylorSeries[ 2 ][ c ] ) * aStepInterval )
 			     + eps_abs );
 

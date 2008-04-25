@@ -1,12 +1,15 @@
+CPPFLAGS+=@INCLTDL@
+
 all-local:
-	$(PYTHON) setup.py config
-	$(PYTHON) setup.py build
+	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libdir="$(libdir)" $(PYTHON) setup.py config
+	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libdir="$(libdir)" $(PYTHON) setup.py build
 
 mostlyclean-local:
-	$(PYTHON) setup.py clean
+	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libdir="$(libdir)" $(PYTHON) setup.py clean
+	$(RM) -rf build
 
 install-exec-local:
-	$(PYTHON) setup.py install -f --prefix=$(PREFIX) --root $(DESTDIR)/
+	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libdir="$(libdir)" $(PYTHON) setup.py install -f --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )
 
 EXTRA_DIST = \
 	ecell/DataFile.py \
@@ -46,6 +49,7 @@ EXTRA_DIST = \
 	ecell/util.py \
 	ecell/yacc.py \
 	ecell/_tableio.c \
+	ecell/_ecs.cpp \
 	ecell/README.TableIO \
 	ecell/SessionManager/Globus2SessionProxy.py \
 	ecell/SessionManager/Globus2SystemProxy.py \

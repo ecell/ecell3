@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = libecs libemc pyecs pyecell bin dm
+SUBDIRS = libecs pyecell bin dm
 if ENABLE_GUI
 SUBDIRS += session-monitor
 endif
