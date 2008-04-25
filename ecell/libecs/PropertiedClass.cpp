@@ -35,9 +35,9 @@
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include "PropertyInterface.hpp"
 #include "Exceptions.hpp"
 #include "PropertiedClass.hpp"
+#include "PropertySlotProxy.hpp"
 
 namespace libecs
 {
@@ -63,7 +63,7 @@ void PropertiedClass::interrupt( TimeParam )
 {
 }
 
-const String& ProperitedClass::asString() const
+const String& PropertiedClass::asString() const
 {
     return getClassName();
 }
@@ -74,80 +74,67 @@ void PropertiedClass::initializePropertyInterface( ::libecs::PropertyInterface& 
 
 const PropertyInterface& PropertiedClass::getPropertyInterface() const
 {
-    return thePropertyInterface;
+    return propertyInterface_;
 }
 
-PropertySlot*
-PropertiedClass::getPropertySlot( const String& aPropertyName ) const
+const PropertySlot*
+PropertiedClass::getPropertySlot( const String& propertyName ) const
 {
-    return getPropertyInterface().getPropertySlot( aPropertyName );
+    return getPropertyInterface().getPropertySlot( propertyName );
 }
 
 void
-PropertiedClass::setProperty( const String& aPropertyName,
-                              const Polymorph& aValue )
-{
-    PropertySlot* slot( getPropertySlot( aPropertyName ) );
-    if ( slot )
-        slot.set( *this, aValue )
-        else
-            defaultSetProperty( aPropertyName, aValue );
-}
-
-const Polymorph
-PropertiedClass::getProperty( const String& aPropertyName ) const
-{
-    PropertySlot* slot( getPropertySlot( aPropertyName ) );
-    if ( slot )
-        return slot.get( *this );
-    else
-        return defaultGetProperty( aPropertyName );
-}
-
-void
-PropertiedClass::loadProperty( const String& aPropertyName,
+PropertiedClass::loadProperty( const String& propertyName,
                                const Polymorph& aValue )
 {
-    PropertySlot* slot( getPropertySlot( aPropertyName ) );
+    const PropertySlot* slot( getPropertySlot( propertyName ) );
     if ( slot )
-        slot.load( *this, aValue );
+    {
+        slot->load( *this, aValue );
+    }
     else
-        slot.defaultSetProperty( aPropertyName, aValue );
+    {
+        defaultSetProperty( propertyName, aValue );
+    }
 }
 
 Polymorph
-PropertiedClass::saveProperty( const String& aPropertyName ) const
+PropertiedClass::saveProperty( const String& propertyName ) const
 {
-    PropertySlot* slot( getPropertySlot( aPropertyName ) );
+    const PropertySlot* slot( getPropertySlot( propertyName ) );
     if ( slot )
-        return slot.save( *this );
+    {
+        return slot->save( *this );
+    }
     else
-        return slot.defaultGetProperty( aPropertyName );
+    {
+        return defaultGetProperty( propertyName );
+    }
 }
 
 PropertySlotProxy
-PropertiedClass::createPropertySlotProxy( const String& name )
+PropertiedClass::createPropertySlotProxy( const String& propertyName )
 {
-    const PropertySlot* aPropertySlot( getPropertySlot( name ) );
+    const PropertySlot* aPropertySlot( getPropertySlot( propertyName ) );
     if ( !aPropertySlot ) {
         THROW_EXCEPTION( NoSlot,
                          getPropertyInterface().getClassName() +
                          String( ": No such property slot: " )
-                         + aPropertyName
+                         + propertyName
                        );
     }
 
-    return PropertySlotProxy( anObject, *aPropertySlot );
+    return PropertySlotProxy( this, aPropertySlot );
 }
 
 
 const Polymorph PropertiedClass::
-defaultGetPropertyAttributes( const String& aPropertyName ) const
+defaultGetPropertyAttributes( const String& propertyName ) const
 {
     THROW_EXCEPTION( NoSlot,
                      getPropertyInterface().getClassName() +
                      String( ": No property slot [" )
-                     + aPropertyName + "].  Get property attributes failed." );
+                     + propertyName + "].  Get property attributes failed." );
 }
 
 const Polymorph
@@ -158,44 +145,22 @@ PropertiedClass::defaultGetPropertyList() const
     return aVector;
 }
 
-void PropertiedClass::defaultSetProperty( const String& aPropertyName,
+void PropertiedClass::defaultSetProperty( const String& propertyName,
         const Polymorph& aValue )
 {
     THROW_EXCEPTION( NoSlot,
                      getPropertyInterface().getClassName() +
                      String( ": No property slot [" )
-                     + aPropertyName + "].  Set property failed." );
+                     + propertyName + "].  Set property failed." );
 }
 
 const Polymorph
-PropertiedClass::defaultGetProperty( const String& aPropertyName ) const
+PropertiedClass::defaultGetProperty( const String& propertyName ) const
 {
     THROW_EXCEPTION( NoSlot,
                      getPropertyInterface().getClassName() +
                      String( ": No property slot [" )
-                     + aPropertyName + "].  Get property failed." );
-}
-
-void PropertiedClass::registerLogger( LoggerPtr aLoggerPtr )
-{
-    if ( std::find( theLoggerVector.begin(), theLoggerVector.end(), aLoggerPtr )
-            == theLoggerVector.end() )
-    {
-        theLoggerVector.push_back( aLoggerPtr );
-    }
-}
-
-void PropertiedClass::removeLogger( LoggerPtr aLoggerPtr )
-{
-    LoggerVectorIterator i( find( theLoggerVector.begin(),
-                                  theLoggerVector.end(),
-                                  aLoggerPtr ) );
-
-    if ( i != theLoggerVector.end() )
-    {
-        theLoggerVector.erase( i );
-    }
-
+                     + propertyName + "].  Get property failed." );
 }
 
 // @internal
@@ -212,8 +177,9 @@ const Polymorph PropertiedClass::nullSave() const
 }
 
 
-PropertyInterface< PropertiedClass > PropertiedClass::thePropertyInterface(
-    "PropertiedClass",  "" );
+ConcretePropertyInterface< PropertiedClass >
+PropertiedClass::propertyInterface_(
+    "PropertiedClass", PropertiedClassKind::NONE );
 
 #define NULLSET_SPECIALIZATION_DEF( TYPE )\
 template <> void PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )\

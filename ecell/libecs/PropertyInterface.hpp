@@ -28,23 +28,25 @@
 // E-Cell Project.
 //
 
-#ifndef __PROPERTYINTERFACE_HPP
-#define __PROPERTYINTERFACE_HPP
-
-#include <boost/assert.hpp>
-
-#include "libecs.hpp"
-#include "AssocVector.h"
-#include "PropertySlot.hpp"
-#include "PropertiedClassKind.hpp"
-
 /**
    @addtogroup property The Inter-object Communication.
    The Interobject Communication.
    @{
  */
 /** @file */
+
+#ifndef __LIBECS_PROPERTYINTERFACE_DEFINED
+#define __LIBECS_PROPERTYINTERFACE_DEFINED
+
+#include <boost/assert.hpp>
+#include "libecs.hpp"
+#include "PropertiedClassKind.hpp"
+#include "Polymorph.hpp"
+
 namespace libecs {
+
+class PropertySlot;
+class PropertiedClass;
 
 class LIBECS_API PropertyInterface
 {
@@ -53,14 +55,7 @@ public:
     DECLARE_UNORDERED_MAP( String, Polymorph, DEFAULT_HASHER( String ), InfoMap );
 
 public:
-    ~PropertyInterface()
-    {
-        for( PropertySlotMap::const_iterator i( thePropertySlotMap.begin() );
-                i != thePropertySlotMap.end() ; ++i )
-        {
-            delete i->second;
-        }
-    }
+    ~PropertyInterface();
 
     const String& getClassName() const
     {
@@ -100,19 +95,7 @@ public:
     }
 
 
-    void
-    registerPropertySlot( PropertySlot* aPropertySlotPtr )
-    {
-        const String& aName( aPropertySlotPtr->getName() );
-        if ( findPropertySlot( aName ) != thePropertySlotMap.end() )
-        {
-            // it already exists. take the latter one.
-            delete thePropertySlotMap[ aName ];
-            thePropertySlotMap.erase( aName );
-        }
-
-        thePropertySlotMap[ aName ] = aPropertySlotPtr;
-    }
+    void registerPropertySlot( PropertySlot* aPropertySlotPtr );
 
 protected:
 
@@ -146,19 +129,50 @@ protected:
     const String theClassName;
 };
 
+} // namespace libecs
 
-template < class T >
-class ConcretePropertyInterface: public T::_LIBECS_BASE_CLASS_::ConcretePropertyInterface
+#endif /* __LIBECS_PROPERTYINTERFACE_DEFINED */
+
+#ifndef __LIBECS_CONCRETEPROPERTYINTERFACE_DEFINED
+#define __LIBECS_CONCRETEPROPERTYINTERFACE_DEFINED
+
+#include <boost/assert.hpp>
+#include "libecs.hpp"
+#include "PropertiedClassKind.hpp"
+#include "Polymorph.hpp"
+#include "PropertiedClass.hpp"
+
+namespace libecs {
+
+template< typename T_ >
+class ConcretePropertyInterface;
+
+template< typename T_ >
+struct SuperPropertyInterfaceOf
+{
+    typedef ConcretePropertyInterface< typename T_::_LIBECS_BASE_CLASS_ > type;
+};
+
+template<>
+struct SuperPropertyInterfaceOf< PropertiedClass >
+{
+    typedef PropertyInterface type;
+};
+
+template< typename T >
+class ConcretePropertyInterface: public SuperPropertyInterfaceOf< T >::type
 {
 public:
     typedef T Owner;
+    typedef typename SuperPropertyInterfaceOf< T >::type Base;
 
     ConcretePropertyInterface(
             const String& className,
             const PropertiedClassKind& kind )
-        : PropertyInterface( className, kind )
+        : Base( className, kind )
     {
-        T::initializePropertyInterface( *const_cast< ConcretePropertyInterface* >( this ) );
+        T::initializePropertyInterface(
+                *const_cast< ConcretePropertyInterface* >( this ) );
     }
 
     ~ConcretePropertyInterface()
@@ -167,11 +181,42 @@ public:
 };
 
 } // namespace libecs
+#endif /* __LIBECS_CONCRETEPROPERTYINTERFACE_DEFINED */
+
+#ifndef __LIBECS_PROPERTYINTERFACE_MEMBER_DEFINED
+#define __LIBECS_PROPERTYINTERFACE_MEMBER_DEFINED
+
+#include "PropertySlot.hpp"
+
+namespace libecs {
+
+inline PropertyInterface::~PropertyInterface()
+{
+    for( PropertySlotMap::const_iterator i( thePropertySlotMap.begin() );
+            i != thePropertySlotMap.end() ; ++i )
+    {
+        delete i->second;
+    }
+}
+
+inline void PropertyInterface::registerPropertySlot( PropertySlot* aPropertySlotPtr )
+{
+    const String& aName( aPropertySlotPtr->getName() );
+    if ( findPropertySlot( aName ) != thePropertySlotMap.end() )
+    {
+        // it already exists. take the latter one.
+        delete thePropertySlotMap[ aName ];
+        thePropertySlotMap.erase( aName );
+    }
+
+    thePropertySlotMap[ aName ] = aPropertySlotPtr;
+}
+
+} // namespace libecs
+
+#endif /* __LIBECS_PROPERTYINTERFACE_MEMBER_DEFINED */
 
 /*@}*/
-
-
-#endif /* __PROPERTYINTERFACE_HPP */
 
 /*
   Do not modify

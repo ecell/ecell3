@@ -70,7 +70,7 @@ public:
 
 private:
     typedef Happening< Handle, Logger::DataPoint > LoggingEventDispatcher;
-    typedef std::pair< PropertySlot*, LoggingEventDispatcher > Entry;
+    typedef std::pair< const PropertySlot*, LoggingEventDispatcher > Entry;
     typedef std::map< const String, Entry > PNToDispatcherMap;
     typedef std::map< const Entity*, PNToDispatcherMap > DispatcherMap;
 

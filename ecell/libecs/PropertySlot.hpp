@@ -29,14 +29,6 @@
 // E-Cell Project.
 //
 
-#include <functional>
-
-#include "libecs.hpp"
-#include "Converters.hpp"
-#include "Polymorph.hpp"
-#include "PropertyType.hpp"
-#include "PropertiedClass.hpp"
-
 /** @addtogroup property
   
 @ingroup libecs
@@ -47,7 +39,17 @@
 
 #ifndef __LIBECS_PROPERTYSLOT_DEFINED
 #define __LIBECS_PROPERTYSLOT_DEFINED
+
+#include <functional>
+
+#include "libecs.hpp"
+#include "Converters.hpp"
+#include "Polymorph.hpp"
+#include "PropertyType.hpp"
+
 namespace libecs {
+
+class PropertiedClass;
 
 class PropertySlot
 {

@@ -526,9 +526,9 @@ movePos( const Index pos )
 
     const Index size( getSize() );
 
-    const Index succ( 2 * pos + 1 );
-    if( succ < size )
+    if( pos < size / 2 )
     {
+        const Index succ( 2 * pos + 1 );
         if( this->comp( this->itemVector[ this->heap[ succ ] ], item ) ||
             ( succ + 1 < size && 
               this->comp( this->itemVector[ this->heap[ succ + 1 ] ], 
@@ -539,17 +539,14 @@ movePos( const Index pos )
         }
     }
 
-    if( pos <= 0 )
+    if( pos > 0 )
     {
-        return;
-    }
-
-    const Index pred( ( pos - 1 ) / 2 );
-    if( pred >= 0  && 
-        this->comp( item, this->itemVector[ this->heap[ pred ] ] ) )
-    {
-        moveUpPos( pos );
-        return;
+        const Index pred( ( pos - 1 ) / 2 );
+        if( this->comp( item, this->itemVector[ this->heap[ pred ] ] ) )
+        {
+            moveUpPos( pos );
+            return;
+        }
     }
 }
 
@@ -638,35 +635,32 @@ DynamicPriorityQueue< Item, IDPolicy >::push( const Item& item )
 template < typename Item, class IDPolicy >
 void DynamicPriorityQueue< Item, IDPolicy >::popByIndex( const Index index )
 {
-    // first, pop the item from the itemVector.
+    // 1. pop the item from the itemVector.
     this->itemVector[ index ] = this->itemVector.back();
     this->itemVector.pop_back();
 
 
-    // update index<->ID mapping.
+    // 2.update index<->ID mapping.
     this->pol.pop( index );
 
-    //
-    // update the positionVector and the heap.
-    //
-    const Index removedPos( this->positionVector[ index ] );
+    // 3. swap positionVector[ end ] and positionVector[ index ]
     const Index movedPos( this->positionVector.back() );
-    
-    // 1. swap positionVector[ end ] and positionVector[ index ]
+    const Index removedPos( this->positionVector[ index ] );
+
     this->positionVector[ index ] = movedPos;
     this->heap[ movedPos ] = index;
-
-    // 2. swap heap[ end ] and heap[ removed ].
     this->positionVector[ this->heap.back() ] = removedPos;
     this->heap[ removedPos ] = this->heap.back();
 
-    // 3. discard the last.
+    // 4. discard the last item
     this->positionVector.pop_back();
     this->heap.pop_back();
 
-    movePos( removedPos );
-
-//    assert( checkConsistency() );
+    // the heap needs to be rebuilt unless the removed item is the last.
+    if ( removedPos < this->heap.size() )
+    {
+        movePos( removedPos );
+    }
 }
 
 

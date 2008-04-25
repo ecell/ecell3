@@ -97,7 +97,7 @@ class DM_IF CLASSNAME: public BASE
   ///@internal
 #define LIBECS_DM_EXPOSE_PROPERTYINTERFACE( CLASSNAME )\
 private:\
-    static ::libecs:: ConcretePropertyInterface<CLASSNAME> propertyInterface_;\
+    static ::libecs::ConcretePropertyInterface<CLASSNAME> propertyInterface_;\
 public:\
     virtual const ::libecs::PropertyInterface& getPropertyInterface() const { \
        return propertyInterface_; \
@@ -267,6 +267,7 @@ namespace libecs {
 class PropertySlot;
 class PropertySlotProxy;
 class PropertyInterface;  
+template< typename T_ > class ConcretePropertyInterface;  
 class Polymorph;
 class Model;
 
@@ -281,7 +282,6 @@ class LIBECS_API PropertiedClass: private boost::noncopyable
 {
 public:
     typedef void _LIBECS_BASE_CLASS_;
-    typedef PropertyInterface ConcretePropertyInterface;
     typedef DynamicModuleBase<PropertiedClass> Module;
 
 public:
@@ -314,7 +314,7 @@ public:
     virtual void interrupt( TimeParam time );
 
 
-    PropertySlot* getPropertySlot( const String& aPropertyName ) const;
+    const PropertySlot* getPropertySlot( const String& aPropertyName ) const;
 
     /**
        Set a value of a property slot.
@@ -326,7 +326,9 @@ public:
        @param aValue the value to set as a Polymorph.
        @throw NoSlot
     */
-    void setProperty( const String& aPropertyName, const Polymorph& aValue );
+    template< typename T_ >
+    void setProperty( const String& aPropertyName,
+                      typename Param< T_ >::type aValue );
 
     /**
        Get a property value from this object via a PropertySlot.
@@ -338,7 +340,8 @@ public:
        @return the value as a Polymorph.
        @throw NoSlot
     */
-    const Polymorph getProperty( const String& aPropertyName ) const;
+    template< typename T_ >
+    const T_ getProperty( const String& aPropertyName ) const;
 
     void loadProperty( const String& aPropertyName, const Polymorph& aValue );
 
@@ -409,7 +412,7 @@ public:
     }
 
 protected:
-    static ConcretePropertyInterface propertyInterface_;
+    static ConcretePropertyInterface< PropertiedClass > propertyInterface_;
     const Module* module_;
     Model* model_;
 };
@@ -434,9 +437,42 @@ NULLGET_SPECIALIZATION( Polymorph );
   
 } // namespace libecs
 
-/*@}*/
-
 #include "PropertyInterface.hpp"
+
+namespace libecs {
+
+template< typename T_ >
+void PropertiedClass::setProperty( const String& aPropertyName,
+                  typename Param< T_ >::type aValue )
+{
+    const PropertySlot* slot( getPropertySlot( aPropertyName ) );
+    if ( slot )
+    {
+        slot->set( *this, aValue );
+    }
+    else
+    {
+        defaultSetProperty( aPropertyName, Polymorph( aValue ) );
+    }
+}
+
+template< typename T_ >
+const T_ PropertiedClass::getProperty( const String& aPropertyName ) const
+{
+    const PropertySlot* slot( getPropertySlot( aPropertyName ) );
+    if ( slot )
+    {
+        return slot->get< T_ >( *this );
+    }
+    else
+    {
+        return defaultGetProperty( aPropertyName );
+    }
+}
+
+} // namespace libecs
+
+/*@}*/
 
 #endif /* __PROPERTIEDCLASS_HPP */
 
