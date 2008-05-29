@@ -186,7 +186,7 @@ class Eml:
             superSystemPath = aFullID.getSuperSystemPath()
             if superSystemPath != None:
                 dummy = self.__getSystemNode( superSystemPath )
-            anEntityElement.setAttribute( 'id', aFullID.id )
+            anEntityElement.setAttribute( 'id', str( aFullID.toSystemPath() ) )
             self.__theDocument.documentElement.appendChild( anEntityElement )
 
         elif aFullID.typeCode == VARIABLE or aFullID.typeCode == PROCESS:
