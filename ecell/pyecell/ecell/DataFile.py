@@ -40,119 +40,119 @@ import string
 # ------------------------------------------------------------------
 class DataFile:
 
-	# ------------------------------------------------------------------
-	# Constructor
-	#
-	# return  -> None
-	# ------------------------------------------------------------------
-	def __init__(self):
+    # ------------------------------------------------------------------
+    # Constructor
+    #
+    # return  -> None
+    # ------------------------------------------------------------------
+    def __init__(self):
 
-		self.theFileName = ''
+        self.theFileName = ''
 
-	# end of __init__
-
-
-	# ------------------------------------------------------------------
-	# setFileName
-	#
-	# aFileName(string)  : a file name 
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def setFileName(self, aFileName):
-
-		if( type(aFileName) != type('') ):
-			raise TypeError("Error : aFileName is not list matrix.")
-
-		if( len(aFileName) == 0 ):
-			print 'Warning: %s, the length of filename is 0' %__name__
-
-		self.theFileName = aFileName
-
-	# end of setFileName
+    # end of __init__
 
 
-	# ------------------------------------------------------------------
-	# getFileName
-	#
-	# return -> the file name (string)
-	# ------------------------------------------------------------------
-	def getFileName(self):
+    # ------------------------------------------------------------------
+    # setFileName
+    #
+    # aFileName(string)  : a file name 
+    #
+    # return -> None
+    # ------------------------------------------------------------------
+    def setFileName(self, aFileName):
 
-		return self.theFileName
+        if( type(aFileName) != type('') ):
+            raise TypeError("Error : aFileName is not list matrix.")
 
-	# end of theFileName
+        if( len(aFileName) == 0 ):
+            print 'Warning: %s, the length of filename is 0' %__name__
 
+        self.theFileName = aFileName
 
-	# ------------------------------------------------------------------
-	# save ( abstract )
-	#
-	# If this method doesn't be implemented in sub class, 
-	# then throws NotImplementedError
-	# ------------------------------------------------------------------
-	def save(self):
-
-		import inspect
-		caller = inspect.getouterframes(inspect.currentframe())[0][3]
-		raise NotImplementedError(caller + 'must be implemented in subclass')
-
-	# end of save
+    # end of setFileName
 
 
-	# ------------------------------------------------------------------
-	# load
-	#
-	# If this method doesn't be implemented in sub class, 
-	# then throws NotImplementedError
-	# ------------------------------------------------------------------
-	def load(self):
+    # ------------------------------------------------------------------
+    # getFileName
+    #
+    # return -> the file name (string)
+    # ------------------------------------------------------------------
+    def getFileName(self):
 
-		import inspect
-		caller = inspect.getouterframes(inspect.currentframe())[0][3]
-		raise NotImplementedError(caller + 'must be implemented in subclass')
+        return self.theFileName
 
-	# end of load
+    # end of theFileName
+
+
+    # ------------------------------------------------------------------
+    # save ( abstract )
+    #
+    # If this method doesn't be implemented in sub class, 
+    # then throws NotImplementedError
+    # ------------------------------------------------------------------
+    def save(self):
+
+        import inspect
+        caller = inspect.getouterframes(inspect.currentframe())[0][3]
+        raise NotImplementedError(caller + 'must be implemented in subclass')
+
+    # end of save
+
+
+    # ------------------------------------------------------------------
+    # load
+    #
+    # If this method doesn't be implemented in sub class, 
+    # then throws NotImplementedError
+    # ------------------------------------------------------------------
+    def load(self):
+
+        import inspect
+        caller = inspect.getouterframes(inspect.currentframe())[0][3]
+        raise NotImplementedError(caller + 'must be implemented in subclass')
+
+    # end of load
 
 
 # end of DataFile
 
 if __name__ == "__main__":
 
-	class SubClass1(DataFile):
-		def setData(self, aData):
-			print "setData"
-		def theData(self):
-			print "theData"
-		def save(self):
-			print "save"
-		def load(self):
-			print "load"
+    class SubClass1(DataFile):
+        def setData(self, aData):
+            print "setData"
+        def theData(self):
+            print "theData"
+        def save(self):
+            print "save"
+        def load(self):
+            print "load"
 
-	class SubClass2(DataFile):
-		def setData(self, aData):
-			print "setData"
-		def theData(self):
-			print "theData"
-		def save(self):
-			print "save"
-		def load(self):
-			print "load"
+    class SubClass2(DataFile):
+        def setData(self, aData):
+            print "setData"
+        def theData(self):
+            print "theData"
+        def save(self):
+            print "save"
+        def load(self):
+            print "load"
 
-	def main():
-		sub = SubClass1()
-		sub.setData('hoge')
-		sub.theData()
-		sub.save()
-		sub.load()
+    def main():
+        sub = SubClass1()
+        sub.setData('hoge')
+        sub.theData()
+        sub.save()
+        sub.load()
 
-		sub = SubClass2()
-		sub.setData('hoge')
-		sub.theData()
-		sub.save()
-		sub.load()
+        sub = SubClass2()
+        sub.setData('hoge')
+        sub.theData()
+        sub.save()
+        sub.load()
 
-		file = open('hoge','w')
-		file.close()
+        file = open('hoge','w')
+        file.close()
 
-	main()
+    main()
 

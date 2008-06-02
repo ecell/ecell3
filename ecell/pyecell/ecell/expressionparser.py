@@ -212,7 +212,7 @@ def p_expression_system_function(t):
     else:
         raise TypeError, str( t[1] ) + " doesn't have " + str( t[3] )
 
-    		
+            
 def p_expression_function(t):
     'Function : NAME LPAREN arguments RPAREN'
 
@@ -297,11 +297,11 @@ def p_expression_variablereference(t):
 
 
 def p_empty(t):
-	'''
-	empty :
-	'''
+    '''
+    empty :
+    '''
 #        print "Empty"
-        t[0] = ''
+    t[0] = ''
 
 def p_error(t):
     print "Syntax error at '%s'" % t.value

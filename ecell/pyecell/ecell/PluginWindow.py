@@ -44,75 +44,75 @@ from ecell.ecssupport import *
 
 
 class PluginWindow( Window ):
-	"""has some plugin functions
-	"""
+    """has some plugin functions
+    """
 
-	# ==============================================================
-	def __init__( self, aDirname, aPluginManager, aRoot=None ):
-		"""Constructor
-		aDirname        -- a directory name (str:absolute path/relative path)
-		aPluginManager  -- a reference to PluginManager (an instance of PluginManager)
-		aRoot           -- a root property (str)
-		"""
+    # ==============================================================
+    def __init__( self, aDirname, aPluginManager, aRoot=None ):
+        """Constructor
+        aDirname        -- a directory name (str:absolute path/relative path)
+        aPluginManager  -- a reference to PluginManager (an instance of PluginManager)
+        aRoot           -- a root property (str)
+        """
 
-		# creates glade file name (str)
-		aGladeFile = os.path.join( aDirname , self.__class__.__name__ + ".glade" )
+        # creates glade file name (str)
+        aGladeFile = os.path.join( aDirname , self.__class__.__name__ + ".glade" )
 
-		# calls superclass's constructor
-		Window.__init__( self, aGladeFile, aRoot )
+        # calls superclass's constructor
+        Window.__init__( self, aGladeFile, aRoot )
 
-		self.thePluginManager = aPluginManager  # PluginManager
+        self.thePluginManager = aPluginManager  # PluginManager
 
-	# ==============================================================
-	def openWindow( self ):
-		"""openWindow
-		Returns None
-		"""
+    # ==============================================================
+    def openWindow( self ):
+        """openWindow
+        Returns None
+        """
 
-		# calls superclass's method
-		Window.openWindow( self )
-
-
-	# ==============================================================
-	def update( self ):
-		"""(Abstract method)
-		update this window
-		Returns None
-		"""
-
-		import inspect
-		caller = inspect.getouterframes(inspect.currentframe())[0][3]
-		raise NotImplementedError(caller + 'must be implemented in subclass')
+        # calls superclass's method
+        Window.openWindow( self )
 
 
-	# ==============================================================
-	def exit( self, *arg ):
-		"""remove this window from PluginManager
-		Returns None
-		"""
+    # ==============================================================
+    def update( self ):
+        """(Abstract method)
+        update this window
+        Returns None
+        """
 
-		self.thePluginManager.removeInstance( self )
-	
-	def close( self ):
-		""" closes pluginwindow """
-		self.exit( None )	
+        import inspect
+        caller = inspect.getouterframes(inspect.currentframe())[0][3]
+        raise NotImplementedError(caller + 'must be implemented in subclass')
 
-	def getParent( self ):
-	   if self.theParent == None:
-	       return self
-	   return self.theParent
-	   
-#		if self.theRoot == None:
-			#return self[self.__class__.__name__]
-		#else:
-		#	return self.__getParent( self.theRoot )
 
-	#def __getParent( self, *obj ):
+    # ==============================================================
+    def exit( self, *arg ):
+        """remove this window from PluginManager
+        Returns None
+        """
 
-	#	if self.theRoot == None:
-	#		return self[self.__class__.__name__]
-	#	else:
-	#		return self.__getParent( self.theRoot )
+        self.thePluginManager.removeInstance( self )
+    
+    def close( self ):
+        """ closes pluginwindow """
+        self.exit( None )	
+
+    def getParent( self ):
+       if self.theParent == None:
+           return self
+       return self.theParent
+       
+#        if self.theRoot == None:
+            #return self[self.__class__.__name__]
+        #else:
+        #	return self.__getParent( self.theRoot )
+
+    #def __getParent( self, *obj ):
+
+    #	if self.theRoot == None:
+    #        return self[self.__class__.__name__]
+    #	else:
+    #        return self.__getParent( self.theRoot )
 
 
 # end of PluginWindow

@@ -85,14 +85,14 @@ class Session:
         # When the type doesn't match
         else:
             raise TypeError, " The type of aModel must be EML instance, string(file name) or file object "
-	
-	    # change directory to file's home directory
+    
+        # change directory to file's home directory
         if type( aModel ) != type( eml.Eml ) and\
                type( aModel ) != type( eml.Eml() ):
             dirname = os.path.dirname( aModel )
             if dirname != "":
                 os.chdir( dirname )
-	
+    
         # calls load methods
         self.__loadStepper( anEml )
         self.__loadEntity( anEml )
@@ -128,7 +128,7 @@ class Session:
 -->
 <eml>
 ''' % ( time.asctime( time.localtime() ) , self.getCurrentTime() )
-       	    aString = anEml.asString()
+            aString = anEml.asString()
             aBuffer = string.join( string.split( aString, '<eml>\n' ), aCurrentInfo )
             aFileObject = open( aModel, 'w' )
             aFileObject.write( aBuffer )
@@ -136,7 +136,7 @@ class Session:
 
         # if the type is file object
         elif type( aModel ) == file:
-       	    aString = anEml.asString()
+            aString = anEml.asString()
             aFileObject = aModel
             aFileObject.write( aString )
             aFileObject.close()
@@ -353,7 +353,7 @@ class Session:
 
         # end of try(1)
 
-	# end of saveData
+    # end of saveData
 
     def plainMessageMethod( self, aMessage ):
         self.__plainMessageMethod( aMessage )

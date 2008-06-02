@@ -104,7 +104,7 @@ def getVariableReferenceId( aVariableReference, aCurrentSystem ):
 
     if( aSpeciesReferencePath.count( '__' ) == 0 ):
 
-	aSystem = aSpeciesReferencePath
+        aSystem = aSpeciesReferencePath
 
     else:
         aLastUnderBar = string.rindex( aSpeciesReferencePath, '__' )
@@ -356,7 +356,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
             aProcessClass = anEml.getEntityClass( aFullIDString )
             aVariableReferenceList =\
             anEml.getEntityProperty( aFullIDString + ':VariableReferenceList' )
-	    aDelayFlag = False
+            aDelayFlag = False
 
             [ anExpression, aDelayFlag ] =\
             convertExpression(
@@ -476,7 +476,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 #                    setExpressionAnnotation( aKineticLaw, anExpression )
 
 
-		    aDelayFlag = False
+                    aDelayFlag = False
                     [ anExpression, aDelayFlag ] =\
                       convertExpression( anExpression,
                                          aVariableReferenceList,
@@ -693,7 +693,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
             # set ID ROOT System and Other System
             if( aFullID[2] == '' ):
-     	        aCompartmentID = 'default' # Root system
+                     aCompartmentID = 'default' # Root system
             else:
                 if( ( aFullID[2] in ID_Namespace ) == False ):
                     aCompartmentID = aFullID[2]

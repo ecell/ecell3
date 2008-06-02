@@ -42,181 +42,181 @@ from ObjectStub import *
 class StepperStub( ObjectStub ):
 
 
-	# ---------------------------------------------------------------
-	# Constructor
-	#
-	# aSimulator : a reference to a Simulator
-	# anID       : an ID of the Stepper
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-	def __init__( self, aSimulator, anID ):
+    # ---------------------------------------------------------------
+    # Constructor
+    #
+    # aSimulator : a reference to a Simulator
+    # anID       : an ID of the Stepper
+    #
+    # return -> None
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+    def __init__( self, aSimulator, anID ):
 
-		ObjectStub.__init__( self, aSimulator )
+        ObjectStub.__init__( self, aSimulator )
 
-		self.theID = anID
+        self.theID = anID
 
-	# end of __init__
+    # end of __init__
 
-	def getName( self ):
-		return self.theFullIDString
+    def getName( self ):
+        return self.theFullIDString
 
-	# ---------------------------------------------------------------
-	# create
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
+    # ---------------------------------------------------------------
+    # create
+    #
+    # return -> None
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
 
-	def create( self, aClassname ):
+    def create( self, aClassname ):
 
-		self.theSimulator.createStepper( aClassname, self.theID )
+        self.theSimulator.createStepper( aClassname, self.theID )
 
-	# end of create
+    # end of create
 
-	# ---------------------------------------------------------------
-	# delete
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
+    # ---------------------------------------------------------------
+    # delete
+    #
+    # return -> None
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
 
-	def delete( self ):
+    def delete( self ):
 
-		self.theSimulator.deleteStepper( self.theID )
+        self.theSimulator.deleteStepper( self.theID )
 
-	# end of delete
-
-
-	# ---------------------------------------------------------------
-	# exists
-	#
-	# return -> exist:TRUE / not exist:FALSE
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def exists( self ):
-
-		if self.theID in self.theSimulator.getStepperList():
-			return TRUE
-		else:
-			return FALSE
-
-	# end of exists
+    # end of delete
 
 
-	# ---------------------------------------------------------------
-	# getClassname
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-	def getClassname( self ):
+    # ---------------------------------------------------------------
+    # exists
+    #
+    # return -> exist:TRUE / not exist:FALSE
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
 
-		return self.theSimulator.getStepperClassName( self.theID )
+    def exists( self ):
 
-	# end of setClassname
+        if self.theID in self.theSimulator.getStepperList():
+            return TRUE
+        else:
+            return FALSE
 
-	# ---------------------------------------------------------------
-	# getPropertyList
-	#
-	# return -> a list of property names
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def getPropertyList( self ):
-
-		return self.theSimulator.getStepperPropertyList( self.theID )
-
-	# end of getPropertyList
+    # end of exists
 
 
-	# ---------------------------------------------------------------
-	# setStepperProperty
-	#
-	# aPropertyName : a property name
-	# aValue        : a value to set
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
+    # ---------------------------------------------------------------
+    # getClassname
+    #
+    # return -> None
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+    def getClassname( self ):
 
-	def setProperty( self, aPropertyName, aValue ):
+        return self.theSimulator.getStepperClassName( self.theID )
 
-		return self.theSimulator.setStepperProperty( self.theID, 
-		                                             aPropertyName, 
-		                                             aValue )
+    # end of setClassname
 
-	# end of setProperty
+    # ---------------------------------------------------------------
+    # getPropertyList
+    #
+    # return -> a list of property names
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
 
+    def getPropertyList( self ):
 
-	# ---------------------------------------------------------------
-	# __setitem__ ( = setStepperty )
-	#
-	# aPropertyName : a property name
-	# aValue        : a value to set
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
+        return self.theSimulator.getStepperPropertyList( self.theID )
 
-	def __setitem__( self, aPropertyName, aValue ):
-
-		return self.setProperty( aPropertyName, aValue )
-
-	# end of setProperty
+    # end of getPropertyList
 
 
-	# ---------------------------------------------------------------
-	# getStepperProperty
-	#
-	# aPropertyName : a property name
-	#
-	# return -> the property
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
+    # ---------------------------------------------------------------
+    # setStepperProperty
+    #
+    # aPropertyName : a property name
+    # aValue        : a value to set
+    #
+    # return -> None
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
 
-	def getProperty( self, aPropertyName ):
+    def setProperty( self, aPropertyName, aValue ):
 
-		return self.theSimulator.getStepperProperty( self.theID, 
-		                                             aPropertyName )
+        return self.theSimulator.setStepperProperty( self.theID, 
+                                                     aPropertyName, 
+                                                     aValue )
 
-	# end of getProperty
-
-
-	# ---------------------------------------------------------------
-	# __getitem__ ( = getStepperProperty )
-	#
-	# aPropertyName : a property name
-	#
-	# return -> the property
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def __getitem__( self, aPropertyName ):
-
-		return self.getProperty( aPropertyName )
-
-	# end of getProperty
+    # end of setProperty
 
 
-	# ---------------------------------------------------------------
-	# getPropertyAttributes
-	#
-	# aPropertyName : name of the property to get
-	#
-	# return -> boolean 2-tuple ( setable, getable )
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-	def getPropertyAttributes( self, aPropertyName ):
-	
-		return self.theSimulator.\
-		       getStepperPropertyAttributes( self.theID,\
-						     aPropertyName )
+    # ---------------------------------------------------------------
+    # __setitem__ ( = setStepperty )
+    #
+    # aPropertyName : a property name
+    # aValue        : a value to set
+    #
+    # return -> None
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+
+    def __setitem__( self, aPropertyName, aValue ):
+
+        return self.setProperty( aPropertyName, aValue )
+
+    # end of setProperty
 
 
-	# end of getProperty
+    # ---------------------------------------------------------------
+    # getStepperProperty
+    #
+    # aPropertyName : a property name
+    #
+    # return -> the property
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+
+    def getProperty( self, aPropertyName ):
+
+        return self.theSimulator.getStepperProperty( self.theID, 
+                                                     aPropertyName )
+
+    # end of getProperty
+
+
+    # ---------------------------------------------------------------
+    # __getitem__ ( = getStepperProperty )
+    #
+    # aPropertyName : a property name
+    #
+    # return -> the property
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+
+    def __getitem__( self, aPropertyName ):
+
+        return self.getProperty( aPropertyName )
+
+    # end of getProperty
+
+
+    # ---------------------------------------------------------------
+    # getPropertyAttributes
+    #
+    # aPropertyName : name of the property to get
+    #
+    # return -> boolean 2-tuple ( setable, getable )
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+    def getPropertyAttributes( self, aPropertyName ):
+    
+        return self.theSimulator.\
+               getStepperPropertyAttributes( self.theID,\
+                             aPropertyName )
+
+
+    # end of getProperty
 
 
 # end of LoggerStub

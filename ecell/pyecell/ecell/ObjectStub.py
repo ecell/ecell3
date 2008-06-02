@@ -42,69 +42,69 @@ from ecs_constants import *
 class ObjectStub:
 
 
-	# ---------------------------------------------------------------
-	# Constructor (must be called in constructor of subclass)
-	#
-	# aSimulator    : a reference to a Simulator 
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-	def __init__( self, aSimulator ):
-	
-		self.theSimulator = aSimulator
+    # ---------------------------------------------------------------
+    # Constructor (must be called in constructor of subclass)
+    #
+    # aSimulator    : a reference to a Simulator 
+    #
+    # return -> None
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+    def __init__( self, aSimulator ):
+    
+        self.theSimulator = aSimulator
 
-	# end of __init__
-
-
-	def getName( self ):
-		
-		import inspect
-		caller = inspect.getouterframes(inspect.currentframe())[0][3]
-		raise NotImplementedError(caller + ' must be implemented in subclass')
-
-	# ---------------------------------------------------------------
-	# exists (abstract method)
-	#
-	# return -> exist:TRUE / not exist:FALSE
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def exists( self ):
-
-		import inspect
-		caller = inspect.getouterframes(inspect.currentframe())[0][3]
-		raise NotImplementedError(caller + ' must be implemented in subclass')
-
-	# end of exists
+    # end of __init__
 
 
-	# ---------------------------------------------------------------
-	# setSimulator
-	#
-	# aSimulator    : the reference to Simulator to set
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-	def setSimulator( self, aSimulator ):
-	
-		self.theSimulator = aSimulator
+    def getName( self ):
+        
+        import inspect
+        caller = inspect.getouterframes(inspect.currentframe())[0][3]
+        raise NotImplementedError(caller + ' must be implemented in subclass')
 
-	# end of setSimulator
+    # ---------------------------------------------------------------
+    # exists (abstract method)
+    #
+    # return -> exist:TRUE / not exist:FALSE
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+
+    def exists( self ):
+
+        import inspect
+        caller = inspect.getouterframes(inspect.currentframe())[0][3]
+        raise NotImplementedError(caller + ' must be implemented in subclass')
+
+    # end of exists
 
 
-	# ---------------------------------------------------------------
-	# getSimulator
-	#
-	# return -> the reference to Simulator
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-	def getSimulator( self ):
-	
-		return self.theSimulator
+    # ---------------------------------------------------------------
+    # setSimulator
+    #
+    # aSimulator    : the reference to Simulator to set
+    #
+    # return -> None
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+    def setSimulator( self, aSimulator ):
+    
+        self.theSimulator = aSimulator
 
-	# end of getSimulator
+    # end of setSimulator
+
+
+    # ---------------------------------------------------------------
+    # getSimulator
+    #
+    # return -> the reference to Simulator
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+    def getSimulator( self ):
+    
+        return self.theSimulator
+
+    # end of getSimulator
 
 
 # end of EntityStub

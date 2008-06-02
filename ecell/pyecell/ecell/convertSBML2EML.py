@@ -178,7 +178,7 @@ def convertSBML2EML( aSBMLString ):
 
         ### setName ###
         
-	if( theModel.Level == 2 ):
+        if( theModel.Level == 2 ):
 
             if ( aSpecies[1] != '' ):
                 anEml.setEntityProperty( aSystemFullID, 'Name', aSpecies[1:2] )

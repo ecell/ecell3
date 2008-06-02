@@ -43,173 +43,173 @@ from ObjectStub import *
 class EntityStub( ObjectStub ):
 
 
-	# ---------------------------------------------------------------
-	# Constructor
-	#
-	# aSimulator    : a reference to a Simulator 
-	# aFullIDString : a FullID of the Entity as a String.
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-	def __init__( self, aSimulator, aFullIDString ):
-	
-		ObjectStub.__init__( self, aSimulator )
-		self.theFullIDString = aFullIDString
+    # ---------------------------------------------------------------
+    # Constructor
+    #
+    # aSimulator    : a reference to a Simulator 
+    # aFullIDString : a FullID of the Entity as a String.
+    #
+    # return -> None
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+    def __init__( self, aSimulator, aFullIDString ):
+    
+        ObjectStub.__init__( self, aSimulator )
+        self.theFullIDString = aFullIDString
 
-	# end of __init__
+    # end of __init__
 
-	def getName( self ):
-		return self.theFullIDString
+    def getName( self ):
+        return self.theFullIDString
 
-	
-	# ---------------------------------------------------------------
-	# create
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
+    
+    # ---------------------------------------------------------------
+    # create
+    #
+    # return -> None
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
 
-	def create( self, aClassname ):
+    def create( self, aClassname ):
 
-		self.theSimulator.createEntity( aClassname,
-		                                self.theFullIDString ) 
+        self.theSimulator.createEntity( aClassname,
+                                        self.theFullIDString ) 
 
-	# end of createEntity
+    # end of createEntity
 
-	# ---------------------------------------------------------------
-	# delete
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
+    # ---------------------------------------------------------------
+    # delete
+    #
+    # return -> None
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
 
-	def delete( self ):
+    def delete( self ):
 
-		self.theSimulator.deleteEntity( self.theFullIDString ) 
+        self.theSimulator.deleteEntity( self.theFullIDString ) 
 
-	# end of createEntity
-
-
-	# ---------------------------------------------------------------
-	# getClassname
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-	def getClassname( self ):
-
-		return self.theSimulator.\
-		       getEntityClassName( self.theFullIDString )
-
-	# end of setClassname
+    # end of createEntity
 
 
-	# ---------------------------------------------------------------
-	# getPropertyList
-	#
-	# return -> a list of property names
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
+    # ---------------------------------------------------------------
+    # getClassname
+    #
+    # return -> None
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+    def getClassname( self ):
 
-	def getPropertyList( self ):
+        return self.theSimulator.\
+               getEntityClassName( self.theFullIDString )
 
-		return self.theSimulator.\
-		       getEntityPropertyList( self.theFullIDString )
-
-	# end of getPropertyList
-
-
-	# ---------------------------------------------------------------
-	# exists
-	#
-	# return -> exist:TRUE / not exist:FALSE
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-
-	def exists( self ):
-
-		return self.theSimulator.isEntityExist( self.theFullIDString )
-
-	# end of exists
-
-	# ---------------------------------------------------------------
-	# setProperty
-	#
-	# aPropertyName : name of the property to set
-	# aValue        : the value to set
-	#
-	# return -> None
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-	def setProperty( self, aPropertyName, aValue ):
-
-		aFullPN = self.theFullIDString + ':' + aPropertyName	
-
-		self.theSimulator.setEntityProperty( aFullPN, aValue )
-
-	# end of setProperty
+    # end of setClassname
 
 
-	# ---------------------------------------------------------------
-	# __setitem__ ( = setProperty )
-	#
-	# see setProperty().
-	#
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-	def __setitem__( self, aPropertyName, aValue ):
-	
-		self.setProperty( aPropertyName, aValue )
+    # ---------------------------------------------------------------
+    # getPropertyList
+    #
+    # return -> a list of property names
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
 
-	# end of setProperty
+    def getPropertyList( self ):
 
+        return self.theSimulator.\
+               getEntityPropertyList( self.theFullIDString )
 
-	# ---------------------------------------------------------------
-	# getProperty
-	#
-	# aPropertyName : name of the property to get
-	#
-	# return -> the property value
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-	def getProperty( self, aPropertyName ):
-
-		aFullPN = self.theFullIDString + ':' + aPropertyName
-		return self.theSimulator.getEntityProperty( aFullPN )
-
-	# end of getProperty
+    # end of getPropertyList
 
 
-	# ---------------------------------------------------------------
-	# __getitem__ ( = getProperty )
-	#
-	# see getProperty().
-	#
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-	def __getitem__( self, aPropertyName ):
-	
-		return self.getProperty( aPropertyName )
+    # ---------------------------------------------------------------
+    # exists
+    #
+    # return -> exist:TRUE / not exist:FALSE
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
 
-	# end of getProperty
+    def exists( self ):
+
+        return self.theSimulator.isEntityExist( self.theFullIDString )
+
+    # end of exists
+
+    # ---------------------------------------------------------------
+    # setProperty
+    #
+    # aPropertyName : name of the property to set
+    # aValue        : the value to set
+    #
+    # return -> None
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+    def setProperty( self, aPropertyName, aValue ):
+
+        aFullPN = self.theFullIDString + ':' + aPropertyName	
+
+        self.theSimulator.setEntityProperty( aFullPN, aValue )
+
+    # end of setProperty
 
 
-	# ---------------------------------------------------------------
-	# getPropertyAttributes
-	#
-	# aPropertyName : name of the property to get
-	#
-	# return -> boolean 2-tuple ( setable, getable )
-	# This method can throw exceptions.
-	# ---------------------------------------------------------------
-	def getPropertyAttributes( self, aPropertyName ):
-	
-		aFullPN = self.theFullIDString + ':' + aPropertyName
-		return self.theSimulator.getEntityPropertyAttributes( aFullPN )
+    # ---------------------------------------------------------------
+    # __setitem__ ( = setProperty )
+    #
+    # see setProperty().
+    #
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+    def __setitem__( self, aPropertyName, aValue ):
+    
+        self.setProperty( aPropertyName, aValue )
+
+    # end of setProperty
 
 
-	# end of getProperty
+    # ---------------------------------------------------------------
+    # getProperty
+    #
+    # aPropertyName : name of the property to get
+    #
+    # return -> the property value
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+    def getProperty( self, aPropertyName ):
+
+        aFullPN = self.theFullIDString + ':' + aPropertyName
+        return self.theSimulator.getEntityProperty( aFullPN )
+
+    # end of getProperty
+
+
+    # ---------------------------------------------------------------
+    # __getitem__ ( = getProperty )
+    #
+    # see getProperty().
+    #
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+    def __getitem__( self, aPropertyName ):
+    
+        return self.getProperty( aPropertyName )
+
+    # end of getProperty
+
+
+    # ---------------------------------------------------------------
+    # getPropertyAttributes
+    #
+    # aPropertyName : name of the property to get
+    #
+    # return -> boolean 2-tuple ( setable, getable )
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
+    def getPropertyAttributes( self, aPropertyName ):
+    
+        aFullPN = self.theFullIDString + ':' + aPropertyName
+        return self.theSimulator.getEntityPropertyAttributes( aFullPN )
+
+
+    # end of getProperty
 
 # end of EntityStub
 

@@ -40,103 +40,103 @@ from string import *
 # ------------------------------------------------------------------
 class DataFileManager:
 
-	# ------------------------------------------------------------------
-	# Constructor
-	#
-	# return  -> None
-	# ------------------------------------------------------------------
-	def __init__(self):
+    # ------------------------------------------------------------------
+    # Constructor
+    #
+    # return  -> None
+    # ------------------------------------------------------------------
+    def __init__(self):
 
-		self.theFileMap = {}
-		self.theRootDirectory = '.'
+        self.theFileMap = {}
+        self.theRootDirectory = '.'
 
-	# end of __init__
-
-
-	# ------------------------------------------------------------------
-	# getFileMap()
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def getFileMap(self):
-
-		return self.theFileMap
-
-	# end of getFileMap
+    # end of __init__
 
 
-	# ------------------------------------------------------------------
-	# setRootDirectory()
-	#
-	# aRootDirectory : directory to save files
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def setRootDirectory( self, aRootDirectory ):
+    # ------------------------------------------------------------------
+    # getFileMap()
+    #
+    # return -> None
+    # ------------------------------------------------------------------
+    def getFileMap(self):
 
-		self.theRootDirectory = aRootDirectory
+        return self.theFileMap
 
-	# end of setRootDirectory
+    # end of getFileMap
 
 
-	# ------------------------------------------------------------------
-	# getRootDirectory()
-	#
-	# return -> aRootDirectory(string) 
-	# ------------------------------------------------------------------
-	def getRootDirectory( self ):
+    # ------------------------------------------------------------------
+    # setRootDirectory()
+    #
+    # aRootDirectory : directory to save files
+    #
+    # return -> None
+    # ------------------------------------------------------------------
+    def setRootDirectory( self, aRootDirectory ):
 
-		return self.theRootDirectory 
+        self.theRootDirectory = aRootDirectory
 
-	# end of getRootDirectory
-
-
-	# ------------------------------------------------------------------
-	# saveAll()
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def saveAll(self):
-
-		for aKey in self.theFileMap.keys():
-			aFileName = self.theFileMap[aKey].getFileName()
-			aFileName = split(aFileName,'/')[-1]
-			aFileName = self.theRootDirectory + '/' + aFileName
-			self.theFileMap[aKey].save(aFileName)
-
-	# end of saveAll()
+    # end of setRootDirectory
 
 
-	# ------------------------------------------------------------------
-	# loadAll()
-	#
-	# return -> None
-	# ------------------------------------------------------------------
-	def loadAll(self):
+    # ------------------------------------------------------------------
+    # getRootDirectory()
+    #
+    # return -> aRootDirectory(string) 
+    # ------------------------------------------------------------------
+    def getRootDirectory( self ):
 
-		for aKey in self.theFileMap.keys():
-			self.theFileMap[aKey].load()
+        return self.theRootDirectory 
 
-	# end of loadAll()
+    # end of getRootDirectory
+
+
+    # ------------------------------------------------------------------
+    # saveAll()
+    #
+    # return -> None
+    # ------------------------------------------------------------------
+    def saveAll(self):
+
+        for aKey in self.theFileMap.keys():
+            aFileName = self.theFileMap[aKey].getFileName()
+            aFileName = split(aFileName,'/')[-1]
+            aFileName = self.theRootDirectory + '/' + aFileName
+            self.theFileMap[aKey].save(aFileName)
+
+    # end of saveAll()
+
+
+    # ------------------------------------------------------------------
+    # loadAll()
+    #
+    # return -> None
+    # ------------------------------------------------------------------
+    def loadAll(self):
+
+        for aKey in self.theFileMap.keys():
+            self.theFileMap[aKey].load()
+
+    # end of loadAll()
 
 
 # end of DataFile
 
 if __name__ == "__main__":
 
-	from ECDDataFile import *
+    from ECDDataFile import *
 
-	def main():
+    def main():
 
-		ecdFile = ECDDataFile()
-		ecdFile.setFileName('hoge')
+        ecdFile = ECDDataFile()
+        ecdFile.setFileName('hoge')
 
-		dm = DataFileManager()
-		dm.getFileMap()['file'] = ecdFile 
-		dm.loadAll()
+        dm = DataFileManager()
+        dm.getFileMap()['file'] = ecdFile 
+        dm.loadAll()
 
-		dm.getFileMap()['file'].setFileName('hoge1')
-		dm.saveAll()
+        dm.getFileMap()['file'].setFileName('hoge1')
+        dm.saveAll()
 
-	main()
+    main()
 
