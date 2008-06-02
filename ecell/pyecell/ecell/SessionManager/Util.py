@@ -33,115 +33,113 @@ import string
 import os
 import time
 import popen2
+import threading
+import urlparse
 
 import ecell.eml
 import ecell.emc
 import ecell.ecs
 
-
-# constants
-
-try:
-	ECELL3_SESSION = os.path.abspath( os.popen('which ecell3-session').readline()[:-1] )
-except IOError:
-	ECELL3_SESSION = 'ecell3-session'
-
-DEFAULT_STDOUT = 'stdout'
-DEFAULT_STDERR = 'stderr'
-
-BANNERSTRING =\
-'''ecell3-session-manager [ E-Cell SE Version %s, on Python Version %d.%d.%d ]
-Copyright (C) 2001-2008 Keio University.
-Copyright (C) 2005-2008 The Molecular Sciences Institute.'''\
-% ( ecell.ecs.getLibECSVersion(), sys.version_info[0], sys.version_info[1], sys.version_info[2] )
-
-
-SYSTEM_PROXY = 'SystemProxy'
-SESSION_PROXY = 'SessionProxy'
-
-DEFAULT_TMP_DIRECTORY = 'tmp'
-DEFAULT_ENVIRONMENT = 'Local'
-
-
-# job status
-QUEUED 		= 0
-RUN		= 1
-FINISHED 	= 2
-ERROR		= 3
-
-STATUS = { 0:'QUEUED',
-           1:'RUN',
-           2:'FINISHED',
-           3:'ERROR',
-          }
-
+__all__ = (
+    'createScriptContext',
+    'getCurrentShell',
+    'lookupExecutableInPath',
+    'checkCommandExistence',
+    'pollForOutputs',
+    'raiseExceptionOnError',
+    'urlmerge'
+    )
 
 def createScriptContext( anInstance, parameters ):
-	'''create script context
-	'''
+    '''create script context
+    '''
 
-	# theSession == self in the script
-	aContext = { 'theSession': anInstance,'self': anInstance }
+    # theSession == self in the script
+    aContext = { 'theSession': anInstance,'self': anInstance }
 
-	# flatten class methods and object properties so that
-	# 'self.' isn't needed for each method calls in the script
-	aKeyList = list ( anInstance.__dict__.keys() +\
+    # flatten class methods and object properties so that
+    # 'self.' isn't needed for each method calls in the script
+    aKeyList = list ( anInstance.__dict__.keys() +\
                           anInstance.__class__.__dict__.keys() )
-	aDict = {}
-	for aKey in aKeyList:
-		aDict[ aKey ] = getattr( anInstance, aKey )
+    aDict = {}
+    for aKey in aKeyList:
+        aDict[ aKey ] = getattr( anInstance, aKey )
 
-		aContext.update( aDict )
-		aContext.update( parameters )
+        aContext.update( aDict )
+        aContext.update( parameters )
 
-		return aContext
+        return aContext
 
 def getCurrentShell():
-	'''return the current shell
-	Note: os.env('SHELL') returns not current shell but login shell.
-	'''
+    '''return the current shell
+    Note: os.env('SHELL') returns not current shell but login shell.
+    '''
 
-	aShellName = string.split( os.popen('ps -p %s'%os.getppid()).readlines()[1] )[3]
-	aCurrentShell = os.popen('which %s' %aShellName).read()[:-1]
+    aShellName = string.split( os.popen('ps -p %s'%os.getppid()).readlines()[1] )[3]
+    aCurrentShell = os.popen('which %s' %aShellName).read()[:-1]
 
-	return aCurrentShell
+    return aCurrentShell
 
-
-def getEnvString():
-	'''return the env string as below
-	VARIABLE1=VALUE1,VARIABLE2=VALUE2,VARIABLE3=VALUE3, ...
-	'''
-
-	aString = "ECELL3_PREFIX=%s" %os.getenv('ECELL3_PREFIX')
-	aString += ",LTDL_LIBRARY_PATH=%s" %os.getenv('LTDL_LIBRARY_PATH')
-	aString += ",LD_LIBRARY_PATH=%s" %os.getenv('LD_LIBRARY_PATH')
-	aString += ",PYTHONPATH=%s" %os.getenv('PYTHONPATH')
-	aString += ",PATH=%s" %os.getenv('PATH')
-
-	return aString
-
+def lookupExecutableInPath( binName, pathList = None ):
+    if pathList == None:
+        pathList = os.environ.get('PATH', '').split( os.pathsep )
+    for path in pathList:
+        file = os.path.join( path, binName )
+        try:
+            if not os.access( file, os.X_OK | os.R_OK ):
+                continue
+        except:
+            continue
+        return file
+    return None
 
 def checkCommandExistence(command):
-	'''constructor
-	command(str) -- a command name to be checked.
-	Return True(exists)/False(does not exist)
-	'''
+    '''constructor
+    command(str) -- a command name to be checked.
+    Return True(exists)/False(does not exist)
+    '''
+    return lookupExecutableInPath( command ) != None
 
-	# Check the argument.
-	if type(command) != str:
-		raise TypeError("type of command is %s. But command must be str." %type(command))
+def pollForOutputs( proc ):
+    proc.tochild.close()
+    msgs = { 'fromchild': '', 'childerr': '' }
+    def msg_fetch( msgs, key ):
+        try:
+            msgs[ key ]  += getattr( proc, key ).read()
+        except:
+            pass
 
-	if len(command) == 0:
-		raise Exception("The length of command must be > 0.")
+    threads = []
+    try:
+        for key in msgs.iterkeys():
+            t = threading.Thread( target = msg_fetch, args = ( msgs, key, ) )
+            threads.append( t )
+            t.start()
+    finally:
+        for t in threads:
+            t.join()
+    return ( os.WEXITSTATUS( proc.wait() ), msgs[ 'fromchild' ], msgs[ 'childerr' ] )
 
-	# Check the existence of command
-	aCheckProcess = popen2.Popen3("which %s" %command)
-	aCheckProcess.wait()
-	if aCheckProcess.poll() == 0:
-		return True
-	else:
-		return False
+def raiseExceptionOnError( exc, tup ):
+    if tup[ 0 ] != 0:
+        if len( tup[ 2 ] ):
+            errmsg = tup[ 2 ]
+        else:
+            errmsg = tup[ 1 ]
+        raise exc, "%s (return code: %d)" % ( errmsg, tup[ 0 ] )
+    return tup[ 1 ]
 
-# end of def checkCommandExistence(command):
-
+def urlmerge( base, url ):
+    if isinstance( base, str ) or isinstance( base, unicode ):
+        base = urlparse.urlsplit( base )
+    if isinstance( url, str ) or isinstance( url, unicode ):
+        url = urlparse.urlsplit( url )
+    builtUrl = [ '', '', '', '', '' ]
+    for k  in xrange( 0, 5 ):
+        v = url[ k ]
+        if v != '':
+            builtUrl[ k ] = v
+        else:
+            builtUrl[ k ] = base[ k ]
+    return builtUrl
 
