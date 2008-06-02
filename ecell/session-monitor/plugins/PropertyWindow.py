@@ -495,7 +495,7 @@ class PropertyWindow(OsogoPluginWindow):
         aGetable = self.theListStore.get_value( anIter, GETABLE_COL )
 
         # checks the type of inputted value 
-        if aGetable == TRUE:
+        if aGetable == True:
             aPreValue = self.theListStore.get_value( anIter, aColumn )
             try:
                 # when type is integer
@@ -515,7 +515,7 @@ class PropertyWindow(OsogoPluginWindow):
                     self.theStatusBarWidget.push(1,anErrorMessage)
                 showPopupMessage( OK_MODE, anErrorMessage, 'Error' )
                 return None
-        aFullPNString = util.createFullPNString(self.theSelectedFullPN)
+        aFullPNString = str( self.theSelectedFullPN )
 
         try:
             self.setValue( self.theSelectedFullPN, aValue )
