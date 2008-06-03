@@ -55,7 +55,7 @@ class Console:
         aContext = self.__createScriptContext( parameters )
         execfile( ecsFile, aContext )
 
-    def interact( self, parameters={} ):
+    def interact( self, parameters = {} ):
         aContext = self.__createScriptContext( parameters )
         try:
             import readline # to provide convenient commandline editing :)
