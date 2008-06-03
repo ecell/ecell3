@@ -497,6 +497,35 @@ class AbstractSystemProxy:
         '''
         return self.__theStderror
 
+    def getStdout( self, jobid ):
+        '''return the stdout of the job
+
+        jobid(int) -- job id
+        
+        Return str : the stdout
+        '''
+        return self.__jobDict[ jobid ].getStdout()
+
+    def getStderr( self, jobid ):
+        '''return the stderr of the job
+
+        jobid(int) -- job id
+        
+        Return str : the stderr
+        '''
+        return self.__jobDict[ jobid ].getStderr()
+
+    def getJobDirectory( self, jobid ):
+        '''Return the job directory name
+
+        jobid(int) -- job id
+
+        Return str : the path of the job directory
+        '''
+
+        # return the path of the job directory
+        return self.__jobDict[ jobid ].getJobDirectory()
+
     def setRetryMaxCount( self, count ):
         '''Set retry max count.
         When count < 0, count is set as 0
@@ -507,9 +536,13 @@ class AbstractSystemProxy:
         if count < 0:
             count = 0
         self.__theRetryMaxCount = count
+    setRetryLimit = setRetryMaxCount # for backwards compatibility
 
     def getRetryMaxCount( self ):
         return self.__theRetryMaxCount
+
+        self.__theSystemProxy.setRetryMaxCount(retrylimit )
+    getRetryLimit = getRetryMaxCount # for backwards compatibility
 
     def getOwner( self ):
         return self.__theOwner
@@ -541,11 +574,39 @@ class AbstractSystemProxy:
         self.__theSessionProxyCountByStatus[ oldStatus ] -= 1
         self.__theSessionProxyCountByStatus[ job.getStatus() ] += 1
 
-class SessionManager:
+class SessionManager( object ):
     '''SessionManager class
     Provide API to execute multiple jobs concurrently.
     You can access AbstractSessionProxy directory to control each job.
     '''
+    __delegated__ = (
+        'setRetryLimit',
+        'getRetryLimit',
+        'setRetryMaxCount',
+        'getRetryMaxCount',
+        'getSessionProxy',
+        'getSessionProxies',
+        'setStdoutFileName',
+        'getStdoutFileName',
+        'setStderrFileName',
+        'getStderrFileName',
+        'getJobDirectory',
+        'getStdout',
+        'getStderr',
+        'setRetryMaxCount',
+        'setOptionList',
+        'getOptionList',
+        'setOwner',
+        'getOwner',
+        )
+
+    def __metaclass__( name, base, dict ):
+        for mtd in dict[ '__delegated__']:
+            def def_fun( mtd ):
+                return lambda self, *args, **kwargs: \
+                    getattr( self.__theSystemProxy, mtd )( *args, **kwargs )
+            dict[ mtd ] = def_fun( mtd )
+        return type( name, base, dict )
 
     def __del__( self ):
         '''When SessionManager exits, this method is called.
@@ -728,16 +789,6 @@ class SessionManager:
 
         # return delete flag of tmp directory
         return self.__theTmpRemovable 
-
-    def setRetryLimit( self, retrylimit ):
-        '''Set a limit of retry number
-
-        retrylimit(int) -- a retry of retry number
-        Return None
-        '''
-        
-        # call a class method of AbstractSessionProxy.
-        self.__theSystemProxy.setRetryMaxCount(retrylimit )
 
     def registerSessionProxy( self, scriptfile, interpreter, arguments = None,
                      extrafilelist = [], timeout = 0 ):
@@ -1117,121 +1168,8 @@ class SessionManager:
         for job in self.getRunningSessionProxyList():
             job.stop()
 
-    def getSessionProxy( self, jobid ):
-        '''Return an instance of AbstractSessionProxy or dict of jobids.
-        and instances of AbstractSessionProxy.
-
-        jobid(int) -- job id
-                      When jobid<=0, return dict of AbstractSessionProxy
-
-        Return AbstractSessionProxy or dict of AbstractSessionProxy
-        A key of the dict of AbstractSessionProxy is jobid(int).
-        and a value of it is an instance of AbstractSessionProxy.
-        '''
-        return self.__theSystemProxy.getSessionProxy( jobid )
-
-    def getSessionProxies( self ):
-         return self.__theSystemProxy.getSessionProxies()
-
-    def setStdoutFileName( self, stdout ):
-        '''Set the standard output file.
-
-        stdout(str of file) -- the file name or file object 
-                               default is 'stdout'
-
-        Return None
-        '''
-
-        # set standard output
-        self.__theSystemProxy.setStdoutFileName( stdout )
-
-    def getStdoutFileName( self ):
-        '''Return the standard output file.
-
-        stdout(str of file) -- the file name or file object.
-        Return str or file : standard output
-        '''
-
-        # return standard output
-        return self.__theSystemProxy.getStdoutFileName()
-
-    def setStderrFileName( self, stderror ):
-        '''Set the standard error file.
-
-        stderr(str of file) -- the file name or file object
-                               default is 'stderr'
-        Return None
-        '''
-        self.__theSystemProxy.setStderrFileName( stderror )
-
-    def getStderrFileName( self ):
-        '''Return the standard error file.
-
-        stderror(str of file) -- the file name or file object
-        Return str or file : standard error 
-        '''
-
-        # return standard error 
-        return self.__theSystemProxy.getStderrFileName()
-
-    def getJobDirectory( self, jobid ):
-        '''Return the job directory name
-
-        jobid(int) -- job id
-
-        Return str : the path of the job directory
-        '''
-
-        # return the path of the job directory
-        return self.__jobDict[jobid].getJobDirectory()
-
-    def getStdout( self, jobid ):
-        '''return the stdout of the job
-
-        jobid(int) -- job id
-        
-        Return str : the stdout
-        '''
-        return self.__jobDict[jobid].getStdout()
-
-    def getStderr( self, jobid ):
-        '''return the stderr of the job
-
-        jobid(int) -- job id
-        
-        Return str : the stderr
-        '''
-        return self.__jobDict[jobid].getStderr()
-
-    def setRetryMaxCount( self, limit ):
-        self.__theSystemProxy.setRetryMaxCount(limit)
-
     def getSystemProxy( self ):
         return self.__theSystemProxy
-
-    def setOptionList( self, optionlist ):
-        '''Set a list of options for the execution command.
-
-        optionlist(list of str) -- a list of options
-        
-        Return None
-        '''
-
-        self.__theSystemProxy.setOptionList( optionlist )
-
-    def getOptionList( self ):
-        '''Get the option list of the execution command.
-
-        Return a list of options
-        '''
-
-        return self.__theSystemProxy.getOptionList()
-
-    def setOwner( self, owner ):
-        self.__theSystemProxy.setOwner( self, owner )
-
-    def getOwner( self ):
-        return self.__theSystemProxy.getOwner()
 
     def restoreMessageMethod( self ):
         self.__theMessageMethod = self.__plainMessageMethod
