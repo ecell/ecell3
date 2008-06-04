@@ -287,28 +287,23 @@ class AbstractSessionProxy:
         else:
             pass
 
+    def getStdoutFilePath( self ):
+        return os.path.join( self.getJobDirectory(),
+                self.getStdoutFileName() )
+
+    def getStderrFilePath( self ):
+        return os.path.join( self.getJobDirectory(),
+                self.getStderrFileName() )
+
     def getStdout( self ):
         '''Return stdout(str)
         '''
-
-        try:
-            return open(
-                os.path.join(
-                    self.getJobDirectory(),
-                    self.getStdoutFileName() ), 'rb').read()
-        except:
-            return None
+        return open( self.getStdoutFilePath(), 'rb' ).read()
 
     def getStderr( self ):
         '''Return stderr(str)
         '''
-        try:
-            return open(
-                os.path.join(
-                    self.getJobDirectory(),
-                    self.getStderrFileName( ) ),'rb').read()
-        except:
-            return None
+        return open( self.getStderrFilePath(), 'rb' ).read()
 
     def setOptionList( self, optionlist ):
         '''Set an option list.
@@ -365,7 +360,7 @@ class AbstractSystemProxy:
         self.__theStderror = DEFAULT_STDERR
         self.__autoRetry = True
         self.__theRetryMaxCount = 0
-        self.__theOwner = None
+        self.__theOwner = getCurrentUserName()
 
     def getLocalHost( self ):
         return self.__theLocalHost
@@ -1096,7 +1091,7 @@ class SessionManager( object ):
             try:
                 abortionEvent.set()
             finally:
-                mutex.releaes()
+                mutex.release()
         def poller():
             while not self.isFinished() and not abortionEvent.isSet():
                 # updates status of all AbstractSessionProxy

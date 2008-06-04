@@ -29,11 +29,11 @@
 # Programmed by Masahiro Sugimoto <msugi@sfc.keio.ac.jp>
 
 import sys
-import string
 import os
 import time
 import popen2
 import threading
+import signal
 import urlparse
 
 import ecell.eml
@@ -47,7 +47,8 @@ __all__ = (
     'checkCommandExistence',
     'pollForOutputs',
     'raiseExceptionOnError',
-    'urlmerge'
+    'urlmerge',
+    'getCurrentUserName'
     )
 
 def createScriptContext( anInstance, parameters ):
@@ -75,7 +76,7 @@ def getCurrentShell():
     Note: os.env('SHELL') returns not current shell but login shell.
     '''
 
-    aShellName = string.split( os.popen('ps -p %s'%os.getppid()).readlines()[1] )[3]
+    aShellName = os.popen('ps -p %s'%os.getppid()).readlines()[1].split()[3]
     aCurrentShell = os.popen('which %s' %aShellName).read()[:-1]
 
     return aCurrentShell
@@ -100,25 +101,50 @@ def checkCommandExistence(command):
     '''
     return lookupExecutableInPath( command ) != None
 
-def pollForOutputs( proc ):
+def pollForOutputs( proc, timeout = 2.0 ):
+    if sys.platform.startswith( 'win' ):
+        def msg_fetch( msgs, key ):
+            try:
+                msgs[ key ] += getattr( proc, key ).read()
+            except:
+                pass
+    else:
+        from select import select
+        import fcntl
+        def msg_fetch( msgs, key ):
+            try:
+                fd = getattr( proc, key ).fileno()
+                fcntl.fcntl(fd, fcntl.F_SETFL,
+                        fcntl.fcntl( fd, fcntl.F_GETFL ) | os.O_NONBLOCK )
+                while True:
+                    ifd, ofd, efd = select( [ fd ], [], [], 1 )
+                    if len( ifd ) == 0:
+                        break
+                    buf = os.read( fd, 1024 )
+                    if len( buf ) == 0:
+                        break
+                    msgs[ key ] += buf
+            except:
+                pass
+
     proc.tochild.close()
     msgs = { 'fromchild': '', 'childerr': '' }
-    def msg_fetch( msgs, key ):
-        try:
-            msgs[ key ]  += getattr( proc, key ).read()
-        except:
-            pass
 
     threads = []
+
+    timer = threading.Timer( timeout, lambda: os.kill( proc.pid, signal.SIGKILL ) )
+    timer.start()
     try:
         for key in msgs.iterkeys():
-            t = threading.Thread( target = msg_fetch, args = ( msgs, key, ) )
-            threads.append( t )
-            t.start()
+            thr = threading.Thread( target = msg_fetch, args = ( msgs, key, ) )
+            threads.append( thr )
+            thr.start()
     finally:
-        for t in threads:
-            t.join()
-    return ( os.WEXITSTATUS( proc.wait() ), msgs[ 'fromchild' ], msgs[ 'childerr' ] )
+        for thr in threads:
+            thr.join()
+    retval = ( os.WEXITSTATUS( proc.wait() ), msgs[ 'fromchild' ], msgs[ 'childerr' ] )
+    timer.cancel()
+    return retval
 
 def raiseExceptionOnError( exc, tup ):
     if tup[ 0 ] != 0:
@@ -143,3 +169,14 @@ def urlmerge( base, url ):
             builtUrl[ k ] = base[ k ]
     return builtUrl
 
+def getCurrentUserName():
+    retval = None
+    try:
+        retval = getattr( os, 'getlogin' )()
+    except:
+        try:
+            import win32api
+            retval = win32api.GetUserName()
+        except:
+            pass
+    return retval

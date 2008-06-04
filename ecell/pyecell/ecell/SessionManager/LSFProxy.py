@@ -29,7 +29,6 @@
 
 # imports standard modules
 import sys
-import string
 import os
 import time
 import signal
@@ -175,13 +174,15 @@ class SystemProxy( AbstractSystemProxy ):
         return self.__jobsByLSFJobID[ jobID ]
 
     def _updateStatus( self ):
-        stdout, stdin = popen2.popen2(
-            ( BJOBS, '-u', self.getOwner(), '-a' ) )
-        stdin.close()
-        header = stdout.readline()
-        header = header.split()
+        out = raiseExceptionOnError(
+            RuntimeError,
+            pollForOutputs(
+                popen2.Popen3( ( BJOBS, '-u', self.getOwner(), '-a' ), True )
+                )
+            ).split( "\n" )
+        header = out[ 0 ].split()
         header = dict( zip( header, xrange( 0, header.length ) ) )
-        for row in sys.stdin:
+        for row in out[ 1: ]:
             row = line.rstrip().split()
             jobID = row[ header[ 'JOBID' ] ]
             status = row[ header[ 'STAT' ] ]
@@ -196,31 +197,4 @@ class SystemProxy( AbstractSystemProxy ):
             del self.__jobsByLSFJobID[ self.getLSFJobID() ]
         except:
             pass
-
-    def __populateQueueList( self ):
-        # Get queue list.
-        if self.__theQueueList != None:
-            return
-
-        stdout, stdin = popen2.popen2( ( BHOST, "-q" ) )
-        stdin.close()
-
-        stdout.readline()
-        stdout.readline()
-
-        hostname = None
-        queueList = {}
-        for line in stdout:
-            m = re.match( r'^([^ ]*) *([^ ]*)' )
-            if m != None:
-                if m.groups( 0 ) != '':
-                    if hostname != None:
-                        queueList[ hostname ] = queuesInHost
-                    hostname = m.groups( 0 )
-                    queuesInHost = []
-                else:
-                    queuesInHost.append( m.groups( 1 ) )
-        queueList[ hostname ] = queuesInHost
-        stdout.close()
-        self.__theQueueList = queueList
 

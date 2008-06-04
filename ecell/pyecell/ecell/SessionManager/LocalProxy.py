@@ -31,7 +31,6 @@
 import os
 import popen2
 import signal
-import string
 import sys
 import time
 

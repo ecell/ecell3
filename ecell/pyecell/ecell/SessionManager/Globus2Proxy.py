@@ -30,7 +30,6 @@
 
 # imports standard modules
 import sys
-import string
 import os
 import time
 import signal

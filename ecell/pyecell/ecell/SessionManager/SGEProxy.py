@@ -32,7 +32,6 @@ import os
 import popen2
 import re
 import signal
-import string
 import sys
 import time
 from itertools import ifilter
@@ -189,16 +188,16 @@ class SystemProxy( AbstractSystemProxy ):
         aStatusDict = {}
 
         # reads the result of qstat
-        stdout, stdin = popen2.popen2( ( QSTAT, '-u', self.getOwner() ) )
-        stdin.close()
-
-        # skip the headers
-        stdout.readline()
-        stdout.readline()
+        out = raiseExceptionOnError(
+            RuntimeError,
+            pollForOutputs(
+                popen2.Popen3( ( QSTAT, '-u', self.getOwner() ), True )
+                )
+            ).split( "\n" )
 
         # When there are running jobs, gets SGE job id and status
-        for aLine in stdout:
-            comps = string.split( aLine )
+        for aLine in out[ 2: -1 ]:
+            comps = aLine.split()
             aStatusDict[ comps[ 0 ] ] = comps[ 4 ]
 
         # checks ths status of each SessionProxy
@@ -212,18 +211,16 @@ class SystemProxy( AbstractSystemProxy ):
                 # considered to be finished
                 if not aStatusDict.has_key( aSGEJobID ):
                     # read standard error file
-                    aStderrFile = os.path.join(
-                            job.getJobDirectory(),
-                            job.getStderrFileName() )
+                    aStderrFile = job.getStderrFilePath()
                     # When something is written in standard error,
                     if os.path.exists( aStderrFile ) and \
                        os.stat( aStderrFile )[ 6 ] > 0:
-                        job.setStatus(ERROR)
+                        job.setStatus( ERROR )
                     else:
-                        job.setStatus(FINISHED)
+                        job.setStatus( FINISHED )
                 else:
                     # When job is running,
-                    if string.find(aStatusDict[aSGEJobID],'E') != -1:
+                    if aStatusDict[ aSGEJobID ].find( 'E' ) != -1:
                         # When character 'E' is included in the status,
                         job.stop()
                     else:
