@@ -101,7 +101,7 @@ def checkCommandExistence(command):
     '''
     return lookupExecutableInPath( command ) != None
 
-def pollForOutputs( proc, timeout = 2.0 ):
+def pollForOutputs( proc, timeout = 15.0 ):
     if sys.platform.startswith( 'win' ):
         def msg_fetch( msgs, key ):
             try:
@@ -117,7 +117,7 @@ def pollForOutputs( proc, timeout = 2.0 ):
                 fcntl.fcntl(fd, fcntl.F_SETFL,
                         fcntl.fcntl( fd, fcntl.F_GETFL ) | os.O_NONBLOCK )
                 while True:
-                    ifd, ofd, efd = select( [ fd ], [], [], 1 )
+                    ifd, ofd, efd = select( [ fd ], [], [], timeout )
                     if len( ifd ) == 0:
                         break
                     buf = os.read( fd, 1024 )
