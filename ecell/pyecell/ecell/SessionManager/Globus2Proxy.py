@@ -117,9 +117,6 @@ class SessionProxy( AbstractSessionProxy ):
                 '-stdin', '-s', self.getScriptFileName() ),
                 self.getEnvironmentVariables(),
                 self.getJobDirectory() )
-        except:
-            self.setStatus( ERROR )
-            return False
         finally:
             os.chdir( aCwd )
         return True
