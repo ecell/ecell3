@@ -6,6 +6,10 @@ DOC_dvi = users-manual.dvi
 _htmldir = $(htmldir)/$(DOC_html)
 _html_DATA = $(DOC_html)/*
 
+psdir  = $(docdir)
+pdfdir = $(docdir)
+dvidir = $(docdir)
+
 if BUILD_USERS_MANUAL_html
 $(DOC_html)/*: users-manual.xml
 	$(DB2HTML) -o $(DOC_html) $<
