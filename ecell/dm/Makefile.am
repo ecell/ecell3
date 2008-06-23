@@ -138,7 +138,7 @@ PythonProcess$(LTDL_SHLIB_EXT) : PythonProcess.cpp
 # This install customization is needed because DLL's cannot be loaded by
 # LoadLibrary() without executable flags set to them under Windows NT.
 install-data-local:
-	test -z "$(dmsodir)" || $(MKDIR_P) "$(DESTDIR)$(dmsodir)"
+	test -z "$(dmsodir)" || $(mkdir_p) "$(DESTDIR)$(dmsodir)"
 	@for p in $(SOS); do \
 		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 		f=$(am__strip_dir) \
