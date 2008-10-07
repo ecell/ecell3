@@ -28,6 +28,7 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -35,35 +36,60 @@
 #include "Exceptions.hpp"
 #include "FullPN.hpp"
 
+#include <algorithm>
+#include <functional>
+#include <boost/range/iterator_range.hpp>
+#include <boost/algorithm/string/finder.hpp>
+#include <boost/algorithm/string/split.hpp>
+
 namespace libecs
 {
 
-FullPN FullPN::parse( const String& fullpropertynamestring )
+FullPN FullPN::parse( const String& fullPNRepr )
 {
-    String::size_type aPosition( 0 );
+    typedef boost::iterator_range< String::const_iterator > StringRange;
+    StringRange trimmedFullIDRepr(
+            std::find_if( fullPNRepr.begin(), fullPNRepr.end(),
+                !boost::is_space() ),
+            std::find_if( fullPNRepr.rbegin(), fullPNRepr.rend(),
+                !boost::is_space() ).base() );
 
-    for ( int i( 0 ) ; i < 3 ; ++i )
+    // empty FullID string is invalid
+    if ( trimmedFullIDRepr.begin() >= trimmedFullIDRepr.end() )
     {
-        aPosition = fullpropertynamestring.
-                    find_first_of( FullID::DELIMITER, aPosition );
-        if ( aPosition == String::npos )
-        {
-            THROW_EXCEPTION( BadFormat,
-                             "not enough fields in FullPN string \"" +
-                             fullpropertynamestring + "\"" );
-        }
-        ++aPosition;
+        THROW_EXCEPTION( BadFormat, "empty FullID string." );
     }
 
-    return FullPN(
-           FullID::parse(
-               fullpropertynamestring.substr( 0, aPosition - 1 ) ),
-           fullpropertynamestring.substr( aPosition ) );
+    std::vector< StringRange > i;
+    boost::iter_split( i, trimmedFullIDRepr, boost::token_finder(
+            std::bind2nd( std::equal_to< char >(), ID_DELIMITER ) ) );
+    if ( i.size() != 4 )
+    {
+        THROW_EXCEPTION( BadFormat,
+                         "not enough fields in FullPN string \"" +
+                         fullPNRepr + "\"" );
+    }
+
+    try
+    {
+        const EntityType& entityType( EntityType::get( i[ 0 ] ) );
+        SystemPath systemPath( SystemPath::parse( i[ 1 ] ) );
+        return FullPN(
+            FullID(
+                entityType,
+                systemPath,
+                String( i[ 2 ].begin(), i[ 2 ].end() ) ),
+            String( i[ 3 ].begin(), i[ 3 ].end() ) );
+    }
+    catch ( const Exception& e )
+    {
+        THROW_EXCEPTION( BadFormat, e.what() );
+    }
 }
 
 const String FullPN::asString() const
 {
-    return fullID_.asString() + FullID::DELIMITER + propertyName_;
+    return fullID_.asString() + ID_DELIMITER + propertyName_;
 }
 
 } // namespace libecs

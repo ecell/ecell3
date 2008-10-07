@@ -119,12 +119,12 @@ public:
     }
 
 protected:
-    void setPolymorph(
+    virtual void setPolymorph(
         PropertiedClass& anObject,
-        Param<Polymorph>::type aValue ) const;
+        Param<Polymorph>::type aValue ) const = 0;
 
-    const Polymorph getPolymorph(
-        const PropertiedClass& anObject ) const;
+    virtual const Polymorph getPolymorph(
+        const PropertiedClass& anObject ) const = 0;
 
     virtual void setInteger(
         PropertiedClass& anObject,
@@ -252,12 +252,12 @@ protected:
     {
         if ( !theLoadMethodPtr )
         {
-            ( dynamic_cast<T&>(anObject).*theSetMethodPtr )(
+            ( dynamic_cast< T& >( anObject ).*theSetMethodPtr )(
                     convertTo< SlotType >( aValue ) );
             return;
         }
 
-        ( dynamic_cast<T&>(anObject).*theLoadMethodPtr )( aValue );
+        ( dynamic_cast< T& >( anObject ).*theLoadMethodPtr )( aValue );
     }
 
     virtual const Polymorph save( const PropertiedClass& anObject ) const
@@ -265,16 +265,31 @@ protected:
         if ( !theSaveMethodPtr )
         {
             return convertTo< Polymorph >(
-                ( dynamic_cast<const T&>(anObject).*theGetMethodPtr )() );
+                ( dynamic_cast<const T&>( anObject ).*theGetMethodPtr )() );
         }
-        return ( dynamic_cast<const T&>(anObject).*theSaveMethodPtr )();
+        return ( dynamic_cast<const T&>( anObject ).*theSaveMethodPtr )();
+    }
+
+    virtual void setPolymorph(
+        PropertiedClass& anObject,
+        Param<Polymorph>::type aValue ) const
+    {
+        ( dynamic_cast< T& >( anObject ).*theSetMethodPtr )(
+                convertTo< SlotType >( aValue ) );
+    }
+
+    virtual const Polymorph getPolymorph(
+        const PropertiedClass& anObject ) const
+    {
+        return convertTo< Polymorph >(
+            ( dynamic_cast<const T&>( anObject ).*theGetMethodPtr )() );
     }
 
     virtual void setInteger(
         PropertiedClass& anObject,
         Param<Integer>::type aValue ) const
     {
-        ( dynamic_cast<T&>(anObject).*theSetMethodPtr )(
+        ( dynamic_cast< T& >( anObject ).*theSetMethodPtr )(
                 convertTo< SlotType >( aValue ) );
     }
 
@@ -282,14 +297,14 @@ protected:
         const PropertiedClass& anObject ) const
     {
         return convertTo< Integer >(
-            ( dynamic_cast<const T&>(anObject).*theGetMethodPtr )() );
+            ( dynamic_cast<const T&>( anObject ).*theGetMethodPtr )() );
     }
 
     virtual void setReal(
         PropertiedClass& anObject,
         Param<Real>::type aValue ) const
     {
-        ( dynamic_cast<T&>(anObject).*theSetMethodPtr )(
+        ( dynamic_cast< T& >( anObject ).*theSetMethodPtr )(
                 convertTo< SlotType >( aValue ) );
     }
 
@@ -297,14 +312,14 @@ protected:
         const PropertiedClass& anObject ) const
     {
         return convertTo< Real >(
-            ( dynamic_cast<const T&>(anObject).*theGetMethodPtr )() );
+            ( dynamic_cast<const T&>( anObject ).*theGetMethodPtr )() );
     }
 
     virtual void setString(
         PropertiedClass& anObject,
         Param<String>::type aValue ) const
     {
-        ( dynamic_cast<T&>(anObject).*theSetMethodPtr )(
+        ( dynamic_cast< T& >( anObject ).*theSetMethodPtr )(
                 convertTo< SlotType >( aValue ) );
     }
 
@@ -312,7 +327,7 @@ protected:
         const PropertiedClass& anObject ) const
     {
         return convertTo< String >(
-            ( dynamic_cast<const T&>(anObject).*theGetMethodPtr )() );
+            ( dynamic_cast<const T&>( anObject ).*theGetMethodPtr )() );
     }
 
 

@@ -33,6 +33,11 @@
 #define __ENTITYTYPE_HPP
 
 #include "libecs.hpp"
+#include "Exceptions.hpp"
+
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
 
 namespace libecs
 {
@@ -76,7 +81,22 @@ public:
         return code != rhs.code;
     }
 
-    static const EntityType& get( const String& );
+    template<typename TcharRange_>
+    static const EntityType& get( const TcharRange_& name )
+    {
+        for ( const EntityType* item = last; item; item = item->prev )
+        {
+            if ( boost::equals( item->name, name ) )
+            {
+                return *item;
+            }
+        }
+
+        THROW_EXCEPTION( ValueError,
+            String( "no EntityType named " )
+            + String( boost::begin( name ), boost::end( name ) ) );
+    }
+
 
     static const EntityType& get( enum Code );
 
@@ -106,7 +126,7 @@ public:
     static const EntityType SYSTEM;
 
     enum Code code;
-    const String& name;
+    const String name;
 private:
     const EntityType* prev;
     static const EntityType* last;

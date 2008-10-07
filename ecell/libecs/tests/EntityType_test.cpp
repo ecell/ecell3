@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2007 Keio University
+//       Copyright (C) 2005-2007 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -12,65 +12,42 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-//
+// 
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-//
+// 
 //END_HEADER
 //
-// written by Koichi Takahashi <shafi@e-cell.org>,
-// E-Cell Project.
+// written by Moriyoshi Koizumi
 //
-
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include "Util.hpp"
-#include "System.hpp"
-#include "FullID.hpp"
-#include "Model.hpp"
+#define BOOST_TEST_MODULE "EntityType"
+
+#include <boost/mpl/list.hpp>
+#include <boost/test/unit_test.hpp>
+#include <boost/test/unit_test_suite.hpp>
+#include <boost/test/test_case_template.hpp>
+#include <boost/preprocessor/stringize.hpp>
+
 #include "EntityType.hpp"
+#include "Exceptions.hpp"
 
-#include "Variable.hpp"
-#include "VariableValueIntegrator.hpp"
+using libecs::EntityType;
 
-namespace libecs
+BOOST_AUTO_TEST_CASE(testGetByString)
 {
-
-LIBECS_DM_INIT_STATIC( Variable, Variable );
-
-Variable::~Variable()
-{
-    delete integrator_;
+    BOOST_CHECK_EQUAL( EntityType::VARIABLE, EntityType::get("Variable") );
+    BOOST_CHECK_EQUAL( EntityType::SYSTEM, EntityType::get("System") );
+    BOOST_CHECK_EQUAL( EntityType::PROCESS, EntityType::get("Process") );
+    BOOST_CHECK_EQUAL( EntityType::NONE, EntityType::get("None") );
 }
-
-void Variable::initialize()
-{
-    delete integrator_;
-    integrator_ = 0;
-}
-
-GET_METHOD_DEF( Real, Velocity, Variable )
-{
-    return integrator_ ? integrator_->calculateVelocitySum(
-            integrator_->getLastUpdateTime() ): 0.0;
-}
-
-} // namespace libecs
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

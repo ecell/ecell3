@@ -28,6 +28,7 @@
 // written by Masayuki Okayama <smash@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -63,7 +64,7 @@ void LoggerManager::add( const FullPN& fullPN, Handle logger )
     Entry& ent( dispatchers_[ target ][ fullPN.getPropertyName() ] );
     ent.first = target->getPropertySlot( fullPN.getPropertyName() );
     ent.second.add(
-            LoggingEventDispatcher::Subscription( logger, &Logger::log ) );
+            LoggingEventDispatcher::Subscription( logger, &Logger::push_back ) );
 }
 
 void LoggerManager::remove( const FullPN& fullPN, Handle logger )
@@ -71,7 +72,7 @@ void LoggerManager::remove( const FullPN& fullPN, Handle logger )
     Entity* target( model_->getEntity( fullPN.getFullID() ) );
     dispatchers_[ target ][ fullPN.getPropertyName() ]
         .second.remove(
-            LoggingEventDispatcher::Subscription( logger, &Logger::log ) );
+            LoggingEventDispatcher::Subscription( logger, &Logger::push_back ) );
 }
 
 void LoggerManager::log( TimeParam currentTime, const Entity* ent ) const

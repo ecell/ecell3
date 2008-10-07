@@ -122,10 +122,6 @@ public:
 
     LIBECS_API static FullID parse( const String& fullidstring );
 
-public:
-
-    static const char DELIMITER = ':';
-
 private:
     LocalID       localID_;
     SystemPath    systemPath_;

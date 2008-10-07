@@ -48,8 +48,8 @@ public:
                 typename value_type::Time _time,
                 typename value_type::Value _value,
                 typename value_type::Value _min,
-                typename value_type::Value _max )
-            : value_type( _time, _value ), min( _min ), max( _max ) {} 
+                typename value_type::Value _max)
+            : value_type( _time, _value ), min( _min ), max( _max ) {}
 
         value_type::Value min;
         value_type::Value max;
@@ -73,7 +73,7 @@ public:
         consume();
         return AggregatedDataPoint(
                 agg_.get().time, agg_.get().value,
-                agg_.getMin(), agg_.getMax() );
+                agg_.getMin(), agg_.getMax());
     }
 
 private:

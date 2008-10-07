@@ -61,14 +61,14 @@ public:
             accumulator_.value = 
                 ( accumulator_.value * (
                         last_.time - accumulator_.time )
-                  + ( newPoint.value + last_.value ) / (
+                  + ( ( newPoint.value + last_.value ) * 
                         ( newPoint.time - last_.time ) ) / 2
                 ) / ( newPoint.time - accumulator_.time );
         }
 
         if ( !min_.isValid() || min_.value > newPoint.value )
         {
-            min_ = newPonit;
+            min_ = newPoint;
         }
 
         if ( !max_.isValid() || max_.value < newPoint.value )
@@ -99,7 +99,7 @@ public:
         accumulator_ = last_;
     }
 
-    DataPoint& last() const
+    const DataPoint& last() const
     {
         return last_;
     }

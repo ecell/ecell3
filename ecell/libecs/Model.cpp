@@ -28,6 +28,7 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -175,15 +176,6 @@ FullID Model::getFullIDOf( const Entity* ent ) const
     THROW_EXCEPTION( NotFound, "No such entity" );
 }
 
-template<typename T_>
-T_* Model::createEntity( const String& className )
-{
-    T_* ent( propertiedObjectMaker_->make<T_>( className ) );
-    ent->setModel( this );
-    ent->startup();
-    return ent;
-}
-
 void Model::addEntity( const FullID& fullID, Entity* ent )
 {
     System* sys( getSystem( fullID.getSystemPath() ) );
@@ -301,6 +293,13 @@ void Model::initialize()
 {
 }
 
+void Model::postInitialize()
+{
+}
+
+void Model::interrupt( TimeParam time )
+{
+}
 
 } // namespace libecs
 

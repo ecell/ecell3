@@ -371,6 +371,21 @@ private:
 
 } // namespace libecs
 
+#include "PropertiedObjectMaker.hpp"
+
+namespace libecs {
+
+template<typename T_>
+inline T_* Model::createEntity( const String& className )
+{
+    T_* ent( propertiedObjectMaker_->make<T_>( className ) );
+    ent->setModel( this );
+    ent->startup();
+    return ent;
+}
+
+} // namespace libecs
+
 /** @}*/
 
 

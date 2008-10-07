@@ -214,7 +214,7 @@ void DifferentialStepper::registerProcess( Process* proc )
 {
     if ( !proc->isContinuous() )
     {
-        THROW_EXCEPTION( ValueError, proc->getClassName()
+        THROW_EXCEPTION( ValueError, proc->getPropertyInterface().getClassName()
                 + " is not a continuous process" );
     }
 

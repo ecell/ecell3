@@ -29,9 +29,13 @@
 // E-Cell Project.
 //
 
-#include <string.h>
+#include <cstring>
+#include <cstddef>
 #include <boost/cast.hpp>
 #include <boost/python.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/type_traits/is_const.hpp>
+#include <boost/type_traits/add_const.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <numpy/arrayobject.h>
 
@@ -169,6 +173,17 @@ public:
 
 using namespace libecs;
 
+template< typename T_, typename Tvtype_, std::size_t offset >
+Tvtype_& memberRef( T_* x)
+{
+    return *reinterpret_cast< Tvtype_* >(
+        reinterpret_cast<
+            typename boost::mpl::if_<
+                typename boost::is_const< Tvtype_ >,
+                typename boost::add_const< unsigned char >::type*,
+                unsigned char*>::type >( x ) + offset );
+}
+
 
 // exception translators
 void translateException( const std::exception& anException )
@@ -186,18 +201,6 @@ static PyObject* getLibECSVersionInfo()
     PyTuple_SetItem( aPyTuple, 2, PyInt_FromLong( libecs::getMicroVersion() ) );
 
     return aPyTuple;
-}
-
-static const std::string EntityTypeString( int typecode )
-{
-    return EntityType::get( static_cast< enum EntityType::Code >( typecode ) );
-};
-
-template<typename _T, _T _code>
-static const int& ConstantFixer()
-{
-    static const int val = static_cast<int>( _code );
-    return val;
 }
 
 // module initializer / finalizer
@@ -241,108 +244,60 @@ BOOST_PYTHON_MODULE( _ecs )
     register_exception_translator<Exception>     ( &translateException );
     register_exception_translator<std::exception>( &translateException );
 
-
-
     class_<VariableReference>( "VariableReference", no_init )
+        // properties
+        .add_property( "coefficient",
+                       &VariableReference::getCoefficient )   // read-only
+        .add_property( "name",
+                       &VariableReference::getName ) // read-only
+        .add_property( "isAccessor",
+                       &VariableReference::isAccessor )       // read-only
+        ;
 
-    // properties
-    .add_property( "Coefficient",
-                   &VariableReference::getCoefficient )   // read-only
-    .add_property( "MolarConc",
-                   &VariableReference::getMolarConc ) // read-only
-    .add_property( "Name",
-                   &VariableReference::getName ) // read-only
-    .add_property( "NumberConc",
-                   &VariableReference::getNumberConc ) // read-only
-    .add_property( "IsFixed",
-                   &VariableReference::isFixed )      // read-only
-    .add_property( "IsAccessor",
-                   &VariableReference::isAccessor )       // read-only
-    .add_property( "Value",
-                   &VariableReference::getValue,
-                   &VariableReference::setValue )
-    .add_property( "Velocity",
-                   &VariableReference::getVelocity )
-
-    // methods
-    .def( "addValue",    &VariableReference::addValue )
-    .def( "getEnclosingSystem",  // this should be a property, but not supported
-          &VariableReference::getEnclosingSystem,
-          python::return_value_policy<python::reference_existing_object>() )
-    ;
-
-    class_<Process, bases<>, Process, boost::noncopyable>
-    ( "Process", no_init )
-
-    // properties
-    .add_property( "Activity",
-                   &Process::getActivity,
-                   &Process::setActivity )
-    .add_property( "Priority",
-                   &Process::getPriority )
-    .add_property( "StepperID",
-                   &Process::getStepperID )
-
-    // methods
-    .def( "addValue",    &Process::addValue )
-    .def( "getPositiveVariableReferenceOffset",
-          &Process::getPositiveVariableReferenceOffset )
-    .def( "getSuperSystem",   // this can be a property, but not supported
-          &Process::getSuperSystem,
-          python::return_value_policy<python::reference_existing_object>() )
-    .def( "getVariableReference",       // this should be a property
-          &Process::getVariableReference,
-          python::return_internal_reference<>() )
-    .def( "getVariableReferenceVector",       // this should be a property
-          &Process::getVariableReferenceVector,
-          python::return_value_policy<python::reference_existing_object>() )
-    .def( "getZeroVariableReferenceOffset",
-          &Process::getZeroVariableReferenceOffset )
-    .def( "setFlux",     &Process::setFlux )
-    ;
+    class_<Process, bases<>, Process, boost::noncopyable>( "Process", no_init )
+        // properties
+        .add_property( "activity",
+                       &Process::getActivity,
+                       &Process::setActivity )
+        .add_property( "priority",
+                       &Process::getPriority )
+        .add_property( "stepperID",
+                       &Process::getStepperID )
+        .add_property( "enclosingSystem",
+                       make_function(
+                           &Process::getEnclosingSystem,
+                           return_value_policy<
+                               python::reference_existing_object>() ) )
+        // methods
+        .def( "addValue",    &Process::addValue )
+        .def( "setFlux",     &Process::setFlux )
+        ;
 
 
     class_<System, bases<>, System, boost::noncopyable>( "System", no_init )
+        // properties
+        .add_property( "size",
+                       &System::getSize )
+        .add_property( "sizeN_A",
+                       &System::getSizeN_A )
+        .add_property( "stepperID",
+                       &System::getStepperID )
+         // this should be a property, but not supported
+        .add_property( "enclosingSystem",
+                       make_function(
+                           &System::getEnclosingSystem,
+                           return_value_policy<reference_existing_object>() ) )
+        ;
 
-    // properties
-    .add_property( "Size",
-                   &System::getSize )
-    .add_property( "SizeN_A",
-                   &System::getSizeN_A )
-    .add_property( "StepperID",
-                   &System::getStepperID )
-    // methods
-    .def( "getSuperSystem",   // this should be a property, but not supported
-          &System::getSuperSystem,
-          python::return_value_policy<python::reference_existing_object>() )
-    ;
-
-
-
-    class_<VariableReferenceVector>( "VariableReferenceVector" )
-    //, bases<>, VariableReferenceVector>
-
-    .def( vector_indexing_suite<VariableReferenceVector>() )
-    ;
-
-
-    class_<EntityType>( "EntityType" )
-
-    // properties
-    .def_readonly( "NONE",
-                   ConstantFixer< EntityType::Type, EntityType::NONE     >() )
-    .def_readonly( "ENTITY",
-                   ConstantFixer< EntityType::Type, EntityType::ENTITY   >() )
-    .def_readonly( "VARIABLE",
-                   ConstantFixer< EntityType::Type, EntityType::VARIABLE >() )
-    .def_readonly( "PROCESS",
-                   ConstantFixer< EntityType::Type, EntityType::PROCESS  >() )
-    .def_readonly( "SYSTEM",
-                   ConstantFixer< EntityType::Type, EntityType::SYSTEM   >() )
-
-    // methods
-    .def( "getString", &EntityTypeString )
-    .staticmethod( "getString" )
-    ;
+    class_<EntityType>( "EntityType", no_init )
+        .add_property( "code", make_getter( &EntityType::code ) )
+        .add_property( "name", make_getter( &EntityType::name ) )
+        // properties
+        .def_readonly( "NONE",      &EntityType::NONE )
+        .def_readonly( "ENTITY",    &EntityType::ENTITY )
+        .def_readonly( "VARIABLE",  &EntityType::VARIABLE )
+        .def_readonly( "PROCESS",   &EntityType::PROCESS )
+        .def_readonly( "SYSTEM",    &EntityType::SYSTEM )
+        ;
 }
 

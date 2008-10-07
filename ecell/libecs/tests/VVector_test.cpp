@@ -33,70 +33,79 @@
 #endif
 
 #define BOOST_TEST_MODULE "VVector"
-#define BOOST_TEST_ALTERNATIVE_INIT_API 1
-#define BOOST_TEST_NO_MAIN
 
+#include <cmath>
+#include <algorithm>
 #include <boost/mpl/list.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/unit_test_suite.hpp>
 #include <boost/test/test_case_template.hpp>
 #include <boost/preprocessor/stringize.hpp>
+#include <boost/mpl/list.hpp>
 
-#include "VVector.h"
+#include "VVector.hpp"
 
-#include <iostream>
+typedef boost::mpl::list7<char, short, int, long, float, double, long double> scalar_types;
 
-namespace libecs
+using libecs::VVector;
+using libecs::VVectorMaker;
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(testPushBack, T_, scalar_types)
 {
+    VVector< T_ > *a = VVectorMaker::getInstance().create<T_>();
+    typedef typename VVector< T_ >::size_type size_type;
+    size_type lim = static_cast< size_type >( std::min(
+        std::pow( 2., (int)sizeof( T_ ) * 8 ) - 1,
+        65536. ) );
 
-template<typename T>
-class VVectorTest
-{
-    typedef vvector<T> Vector;
-
-    Vector* create()
+    for ( size_type i = 0; i < lim; ++i )
     {
-        return new Vector();
+        a->push_back( i );
     }
 
-public:
-    void test()
+    BOOST_CHECK_EQUAL( lim, a->size() );
+
+    for ( size_type i = 0; i < lim; ++i )
     {
-        Vector* v = create();
-
-        for (int i = 0; i < 1024; i++)
-        {
-            v->push_back( i );
-        }
-
-        delete v;
-    }
-};
-
-} // namespace libecs
-
-bool my_init_unit_test()
-{
-#   define add_test(klass, method) \
-        suite->add(boost::unit_test::make_test_case<klass>( \
-            &klass::method, \
-            BOOST_PP_STRINGIZE(klass) "::" BOOST_PP_STRINGIZE(method), \
-            inst))
-
-    {
-        typedef libecs::VVectorTest<int> IntVVectorTest;
-        boost::unit_test::test_suite* suite =
-                BOOST_TEST_SUITE( "VVectorTest<int>" );
-        boost::shared_ptr<IntVVectorTest> inst( new IntVVectorTest() );
-
-        add_test( IntVVectorTest, test );
-        boost::unit_test::framework::master_test_suite().add(suite);
+        a->push_back( i );
     }
 
-    return true;
+    BOOST_CHECK_EQUAL( lim * 2, a->size() );
+
+    delete a;
 }
 
-int main( int argc, char **argv )
+BOOST_AUTO_TEST_CASE_TEMPLATE(testPushBackAndRef, T_, scalar_types)
 {
-    return ::boost::unit_test::unit_test_main( &my_init_unit_test, argc, argv );
+    VVector< T_ > *a = VVectorMaker::getInstance().create<T_>();
+    typedef typename VVector< T_ >::size_type size_type;
+    size_type lim = static_cast< size_type >( std::min(
+        std::pow( 2., (int)sizeof( T_ ) * 8 ) - 1,
+        65536. ) );
+
+    for ( size_type i = 0; i < lim; ++i )
+    {
+        a->push_back( i );
+    }
+
+    BOOST_CHECK_EQUAL( lim, a->size() );
+
+    for ( size_type i = 0; i < lim; ++i )
+    {
+        BOOST_CHECK_EQUAL( static_cast< T_ >( i ), ( *a )[ i ] );
+    }
+
+    for ( size_type i = 0; i < lim; ++i )
+    {
+        a->push_back( i );
+    }
+
+    BOOST_CHECK_EQUAL( lim * 2, a->size() );
+
+    for ( size_type i = 0; i < lim * 2; ++i )
+    {
+        BOOST_CHECK_EQUAL( static_cast< T_ >( i % lim ), ( *a )[ i ] );
+    }
+
+    delete a;
 }

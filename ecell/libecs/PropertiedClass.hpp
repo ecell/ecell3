@@ -360,8 +360,6 @@ public:
 
     virtual const PropertyInterface& getPropertyInterface() const;
 
-    const String& getClassName() const;
-
     PropertySlotProxy createPropertySlotProxy( const String& aPropertyName );
 
     static void initializePropertyInterface( const PropertyInterface& )

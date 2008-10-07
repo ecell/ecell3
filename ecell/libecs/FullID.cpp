@@ -28,62 +28,71 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
+
+#include <algorithm>
+#include <functional>
+#include <boost/range/iterator_range.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/finder.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 #include "Exceptions.hpp"
 #include "FullID.hpp"
 
 namespace libecs {
 
-FullID FullID::parse( const String& aString )
+FullID FullID::parse( const String& fullIDRepr )
 {
+    typedef boost::iterator_range< String::const_iterator > StringRange;
+    StringRange trimmedFullIDRepr(
+            std::find_if( fullIDRepr.begin(), fullIDRepr.end(),
+                !boost::is_space() ),
+            std::find_if( fullIDRepr.rbegin(), fullIDRepr.rend(),
+                !boost::is_space() ).base() );
+
     // empty FullID string is invalid
-    if ( aString.empty() )
+    if ( trimmedFullIDRepr.begin() >= trimmedFullIDRepr.end() )
     {
         THROW_EXCEPTION( BadFormat, "empty FullID string." );
     }
 
-    // ignore leading white spaces
-    String::size_type aFieldStart( 0 );
-    String::size_type aFieldEnd( aString.find_first_of( DELIMITER,
-                                 aFieldStart ) );
-    if ( aFieldEnd == String::npos )
+    std::vector< StringRange > i;
+    boost::iter_split( i, trimmedFullIDRepr, boost::token_finder(
+            std::bind2nd( std::equal_to< char >(), ID_DELIMITER ) ) );
+    if ( i.size() < 3 )
     {
         THROW_EXCEPTION( BadFormat,
-                         "no ':' in the FullID string \"" + aString + "\"" );
+                         "Too few ':' in the FullID string \""
+                         + fullIDRepr + "\"" );
     }
-
-    const EntityType& entityType( EntityType::get(
-                                      aString.substr( aFieldStart, aFieldEnd - aFieldStart ) ) );
-
-    aFieldStart = aFieldEnd + 1;
-    aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
-    if ( aFieldEnd == String::npos )
+    else if ( i.size() > 3 )
     {
         THROW_EXCEPTION( BadFormat,
-                         "only one ':' in the FullID string \""
-                         + aString + "\"" );
+                         "Too many ':' in the FullID string \""
+                         + fullIDRepr + "\"" );
     }
 
-    SystemPath systemPath( SystemPath::parse(
-                               aString.substr( aFieldStart, aFieldEnd - aFieldStart ) ) );
-
-    aFieldStart = aFieldEnd + 1;
-
-    // drop trailing string after extra ':'(if this is  FullPN),
-    // or go to the end
-    aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
-
-    return FullID( entityType, systemPath,
-                   aString.substr( aFieldStart, aFieldEnd - aFieldStart ) );
+    try
+    {
+        const EntityType& entityType( EntityType::get( i[ 0 ] ) );
+        SystemPath systemPath( SystemPath::parse( i[ 1 ] ) );
+        return FullID( entityType, systemPath, String( i[ 2 ].begin(), i[ 2 ].end() ) );
+    }
+    catch ( const Exception& e )
+    {
+        THROW_EXCEPTION( BadFormat, e.what() );
+    }
 }
 
 const String FullID::asString() const
 {
-    return localID_.getEntityType() + FullID::DELIMITER
-           + systemPath_.asString() + FullID::DELIMITER
+    return static_cast< const String& >( localID_.getEntityType() )
+           + ID_DELIMITER
+           + systemPath_.asString() + ID_DELIMITER
            + localID_.getID();
 }
 

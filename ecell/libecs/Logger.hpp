@@ -258,22 +258,22 @@ public:
     /**
       Log current value that theLoggerAdapter gives with aTime.
     */
-    void log( const DataPoint& dp );
+    void push_back( const DataPoint& dp );
 
     /**
        Returns time of the first element  in Logger.
     */
-    const Time getStartTime() const;
+    const DataPoint& front() const;
 
     /**
        Returns time of the last element in Logger
     */
-    const Time getEndTime() const;
+    const DataPoint& back() const;
 
     const TimeDifference getAverageInterval() const
     {
         return size() == 0.0 ? 0.0:
-            ( getEndTime() - getStartTime() ) / size();
+            ( back().time - front().time ) / size();
     }
 
     /**

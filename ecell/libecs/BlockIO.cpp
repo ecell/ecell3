@@ -39,6 +39,7 @@
 //	and/or <http://www.e-cell.org/>.
 //END_V2_HEADER
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -109,7 +110,7 @@ BlockIO::~BlockIO()
 FileIO::~FileIO()
 {
     if (ptr) {
-        munmap(ptr, safe_int_cast<size_t>(size()));
+        munmap(ptr, mapped_sz);
     }    
 
     if (hdl >= 0) {
@@ -156,7 +157,7 @@ FileIO* FileIO::create(const char* path, access_flag_type access)
     }
     catch (std::exception& e)
     {
-        delete _path;
+        delete[] _path;
         close(hdl);
         throw e;
     }
@@ -226,7 +227,7 @@ bool FileIO::unlock(offset_type offset, size_type size)
     return true;
 }
 
-BlockIO* FileIO::map(offset_type offset, size_type size)
+BlockIO* FileIO::map( offset_type offset, size_type size )
 {
     BOOST_ASSERT(size >= 0);
     size_type sz = this->size();
@@ -239,13 +240,10 @@ BlockIO* FileIO::map(offset_type offset, size_type size)
 
     refcount++;
 
-    if (!ptr || offset >= mapped_sz)
-        return new ConcreteBlockIO(this, offset, size);
-    else
-        return new VirtualBlockIO(this, offset, size);
+    return new ConcreteBlockIO(this, offset, size);
 }
 
-BlockIO::size_type FileIO::size()
+BlockIO::size_type FileIO::size() const
 {
     struct stat sb;
 
@@ -258,19 +256,13 @@ BlockIO::size_type FileIO::size()
     return sb.st_size;
 }
 
-void FileIO::resize(offset_type size)
+void FileIO::resize( offset_type size )
 {
     if (ftruncate(hdl, size)) {
         throw IOException(
                 "FileIO::set_size",
                 "File to resize file");
     }
-}
-
-void FileIO::dispose()
-{
-    if (--refcount > 0)
-        return;
 }
 
 FileIO::operator void*()

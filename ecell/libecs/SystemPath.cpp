@@ -28,14 +28,14 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <algorithm>
 #include <utility>
 
-#include <boost/lambda/lambda.hpp>
-#include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/join.hpp>
 
 #include "Exceptions.hpp"
@@ -62,21 +62,6 @@ std::pair< const SystemPath, String > SystemPath::splitAtLast() const
 const String SystemPath::asString() const
 {
     return boost::algorithm::join( components_, DELIMITER );
-}
-
-SystemPath& SystemPath::append( const String& pathRepr )
-{
-    using namespace boost::lambda;
-
-    if ( pathRepr.empty() )
-    {
-        return *this;
-    }
-
-    StringList comps;
-    boost::algorithm::split( comps, pathRepr, _1 == DELIMITER[ 0 ] );
-
-    return append( comps );
 }
 
 SystemPath SystemPath::toAbsolute( const SystemPath& baseSystemPath ) const
@@ -138,6 +123,46 @@ SystemPath SystemPath::toRelative( const SystemPath& baseSystemPath ) const
             ::std::back_inserter( retval.components_ ) );
 
     return  retval;
+}
+
+const SystemPath& SystemPath::toCanonical() const
+{
+    if ( canonicalized_ )
+    {
+        return *canonicalized_;
+    }
+
+    SystemPath* retval = new SystemPath();
+
+    StringList& components( retval->components_ );
+    for ( StringList::const_iterator i( components_.begin() );
+            i < components_.end(); ++i) {
+        if ( *i == CURRENT )
+        {
+            continue;
+        }
+        else if ( *i == PARENT )
+        {
+            if ( components.size() > 0 &&
+                    ( !components.front().empty() || components.size() > 1 ) )
+            {
+                components.pop_back(); 
+            }
+        }
+        else
+        {
+            components.push_back( *i );
+        }
+    }
+
+    if ( components.size() == 1 && components.front().empty() )
+    {
+        components.push_back( "" );
+    }
+
+    canonicalized_ = retval;
+
+    return *retval;
 }
 
 } // namespace libecs

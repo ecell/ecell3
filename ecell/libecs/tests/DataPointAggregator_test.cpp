@@ -42,50 +42,53 @@
 #include <boost/preprocessor/stringize.hpp>
 
 #include "DataPoint.hpp"
+#include "DataPointAggregator.hpp"
 #include <iostream>
 
 namespace libecs  {
 
+typedef DataPoint<Time, Real> DP;
+
 template<typename CharT, typename Traits>
 inline std::basic_ostream<CharT, Traits>&
-operator <<(std::basic_ostream<CharT, Traits>& strm, DataPoint const& dp)
+operator <<(std::basic_ostream<CharT, Traits>& strm, DP const& dp)
 {
     std::string buf;
-    strm << dp.getTime() << ":" << dp.getValue();
+    strm << dp.time << ":" << dp.value;
     return strm;
 }
 
 BOOST_AUTO_TEST_CASE(testAggregate)
 {
-    DataPointAggregator dpa;
-    dpa.aggregate( DataPoint(  3, 4 ) );
-    BOOST_CHECK_EQUAL( dpa.getLastPoint(), DataPoint(  3, 4 ) );
-    BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
-    BOOST_CHECK_EQUAL( dpa.getData().getMax(), 4 );
-    BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 4 );
-    dpa.aggregate( DataPoint(  5, 6 ) );
-    BOOST_CHECK_EQUAL( dpa.getLastPoint(), DataPoint(  5, 6 ) );
-    BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
-    BOOST_CHECK_EQUAL( dpa.getData().getMax(), 6 );
-    BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 4 );
-    dpa.aggregate( DataPoint(  7, 8 ) );
-    BOOST_CHECK_EQUAL( dpa.getLastPoint(), DataPoint(  7, 8 ) );
-    BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
-    BOOST_CHECK_EQUAL( dpa.getData().getMax(), 8 );
-    BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 5 );
-    dpa.aggregate( DataPoint(  9, 6 ) );
-    BOOST_CHECK_EQUAL( dpa.getLastPoint(), DataPoint(  9, 6 ) );
-    BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
-    BOOST_CHECK_EQUAL( dpa.getData().getMax(), 8 );
-    BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 6 );
-    dpa.aggregate( DataPoint( 11, 4 ) );
-    BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
-    BOOST_CHECK_EQUAL( dpa.getData().getMax(), 8 );
-    BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 6 );
-    dpa.aggregate( DataPoint( 13, 6 ) );
-    BOOST_CHECK_EQUAL( dpa.getData().getMin(), 4 );
-    BOOST_CHECK_EQUAL( dpa.getData().getMax(), 8 );
-    BOOST_CHECK_EQUAL( dpa.getData().getAvg(), 5.6 );
+    DataPointAggregator<DP > dpa;
+    dpa.put( DP(  3, 4 ) );
+    BOOST_CHECK_EQUAL( DP(  3,  4 ), dpa.last()    );
+    BOOST_CHECK_EQUAL( DP(  3,  4 ), dpa.getMin()  );
+    BOOST_CHECK_EQUAL( DP(  3,  4 ), dpa.getMax()  );
+    BOOST_CHECK_EQUAL( DP(  3,  4 ), dpa.get()     );
+    dpa.put( DP(  5, 6 ) );
+    BOOST_CHECK_EQUAL( DP(  5,  6 ), dpa.last()    );
+    BOOST_CHECK_EQUAL( DP(  3,  4 ), dpa.getMin()  );
+    BOOST_CHECK_EQUAL( DP(  5,  6 ), dpa.getMax()  );
+    BOOST_CHECK_EQUAL( DP(  3,  5 ), dpa.get()     );
+    dpa.put( DP(  7, 8 ) );
+    BOOST_CHECK_EQUAL( DP(  7,  8 ), dpa.last()    );
+    BOOST_CHECK_EQUAL( DP(  3,  4 ), dpa.getMin()  );
+    BOOST_CHECK_EQUAL( DP(  7,  8 ), dpa.getMax()  );
+    BOOST_CHECK_EQUAL( DP(  3,  6 ), dpa.get()     );
+    dpa.put( DP(  9, 6 ) );
+    BOOST_CHECK_EQUAL( DP(  9,  6 ),      dpa.last()   );
+    BOOST_CHECK_EQUAL( DP(  3,  4 ),      dpa.getMin() );
+    BOOST_CHECK_EQUAL( DP(  7,  8 ),      dpa.getMax() );
+    BOOST_CHECK_EQUAL( DP(  3, 38. / 6 ), dpa.get()    );
+    dpa.put( DP( 11, 4 ) );
+    BOOST_CHECK_EQUAL( DP(  3,  4 ), dpa.getMin() );
+    BOOST_CHECK_EQUAL( DP(  7,  8 ), dpa.getMax() );
+    BOOST_CHECK_EQUAL( DP(  3,  6 ), dpa.get() );
+    dpa.put( DP( 13, 6 ) );
+    BOOST_CHECK_EQUAL( DP(  3,  4 ), dpa.getMin() );
+    BOOST_CHECK_EQUAL( DP(  7,  8 ), dpa.getMax() );
+    BOOST_CHECK_EQUAL( DP(  3,  5.8 ), dpa.get() );
 }
 
 } // namespace libecs

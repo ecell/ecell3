@@ -73,6 +73,8 @@ typedef Param<TimeDifference>::type TimeDifferenceParam;
 const Real N_A( 6.0221367e+23 );
 const Real N_A_R( 1.0 / N_A );
 
+const char ID_DELIMITER = ':';
+
 #if defined( FP_FAST_FMA )
 inline const Real FMA( const Real a, const Real b, const Real c )
 {

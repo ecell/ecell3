@@ -52,6 +52,8 @@ namespace libecs {
 
 /**
    LocalID is an identifier that is unique within a System.
+   This class needs to be default-constructible as per the requirement
+   of AssocVector.
  */
 class LocalID
 {
@@ -79,7 +81,7 @@ public:
 
     ~LocalID() {}
 
-    const EntityType  getEntityType() const
+    const EntityType getEntityType() const
     {
         return *entityType_;
     }

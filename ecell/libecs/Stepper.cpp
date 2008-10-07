@@ -28,6 +28,7 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -72,6 +73,10 @@ struct FullIDExtracter: public std::unary_function< const Entity*, FullID >
 
     const Model* model_;
 };
+
+Stepper::~Stepper()
+{
+}
 
 void Stepper::startup()
 {
@@ -179,7 +184,7 @@ void Stepper::updateVariableVector()
 }
 
 
-Interpolant* createInterpolant()
+Interpolant* Stepper::createInterpolant()
 {
     return 0;
 }

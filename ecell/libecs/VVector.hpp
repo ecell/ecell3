@@ -462,6 +462,7 @@ inline VVector<T, BlockIOT>::~VVector()
     }
 
     hdr.dispose();
+    fio->dispose();
 }
 
 template<typename T, typename BlockIOT>
@@ -520,9 +521,10 @@ VVector<T, BlockIOT>::get_buffer( size_type offset, size_type count )
     if ( required_size >= last_size )
     {
         last_size = fio->size();
-        if ( required_size >= last_size )
+        if ( required_size > last_size )
         {
-            fio->resize(required_size);
+            fio->resize( required_size );
+            last_size = required_size;
         }
     }
 

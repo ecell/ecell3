@@ -28,6 +28,7 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -46,29 +47,6 @@ const EntityType EntityType::  ENTITY( _ENTITY,   "Entity" );
 const EntityType EntityType::VARIABLE( _VARIABLE, "Variable" );
 const EntityType EntityType:: PROCESS( _PROCESS,  "Process" );
 const EntityType EntityType::  SYSTEM( _SYSTEM,   "System" );
-
-
-const EntityType& EntityType::get( const String& name )
-{
-    for ( const EntityType* item = last; item; item = item->prev )
-    {
-        if ( item->name == name )
-        {
-            return *item;
-        }
-    }
-}
-
-const EntityType& EntityType::get( enum Code code )
-{
-    for ( const EntityType* item = last; item; item = item->prev )
-    {
-        if ( item->code == code )
-        {
-            return *item;
-        }
-    }
-}
 
 const EntityType&
 EntityType::fromPropertiedClassKind( const PropertiedClassKind& pck )

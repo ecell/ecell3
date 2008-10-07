@@ -47,7 +47,7 @@ namespace libecs
 
 /// A macro to throw an exception, with method name
 #define THROW_EXCEPTION( CLASS, MESSAGE )\
-    throwException( CLASS( __PRETTY_FUNCTION__, MESSAGE ) )
+    throw CLASS( __PRETTY_FUNCTION__, MESSAGE )
 
 /// Base exception class
 class LIBECS_API Exception: public std::exception
@@ -142,10 +142,6 @@ DEFINE_EXCEPTION( Interruption,           Exception );
          "never get here (" + libecs::String( __PRETTY_FUNCTION__ )\
          + ")." )
 
-inline void throwException( const Exception& exc )
-{
-    throw exc;
-}
 } // namespace libecs
 
 /** @} */ //end of exception module

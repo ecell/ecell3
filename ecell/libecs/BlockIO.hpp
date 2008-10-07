@@ -50,10 +50,15 @@ public:
         LCK_READ_WRITE
     };
 
+public:
     static const access_flag_type READ  = 0x0001;
     static const access_flag_type WRITE = 0x0002;
 
 protected:
+    int refcount;
+
+protected:
+    BlockIO();
 
 public:
     virtual ~BlockIO();
@@ -65,12 +70,16 @@ public:
     bool unlock();
     virtual bool unlock( offset_type offset, size_type size ) = 0;
     virtual BlockIO* map( offset_type offset, size_type size ) = 0;
-    virtual size_type size() = 0;
-    virtual void dispose() = 0;
+    virtual size_type size() const = 0;
+    void dispose();
     virtual operator void*() = 0;
 
     BlockIO* clone();
 };
+
+inline BlockIO::BlockIO(): refcount( 1 )
+{
+}
 
 inline bool
 BlockIO::lock()
@@ -90,14 +99,24 @@ BlockIO::clone()
     return map( 0, size() );
 }
 
+inline void BlockIO::dispose()
+{
+    if (--refcount > 0)
+        return;
+
+    delete this;
+}
+
+class ConcreteBlockIO;
+
 class FileIO
       : public BlockIO
 {
-public:
+    friend class ConcreteBlockIO;
+protected:
     const char* path;
     fildes_t hdl;
     void* ptr;
-    unsigned int refcount;
     access_flag_type access;
     size_type mapped_sz;
 
@@ -113,13 +132,12 @@ public:
                        enum lock_type type = LCK_DEFAULT );
     virtual bool unlock( offset_type offset, size_type size );
     virtual BlockIO* map( offset_type offset, size_type size );
-    virtual size_type size();
-    virtual void dispose();
+    virtual size_type size() const;
     virtual operator void*();
 };
 
 inline FileIO::FileIO(fildes_t _hdl, char *_path, access_flag_type _access)
-: hdl(_hdl), path(_path), ptr(0), mapped_sz(0), access(_access), refcount(1)
+: hdl(_hdl), path(_path), ptr(0), mapped_sz(0), access(_access)
 {
 }
 
@@ -137,7 +155,6 @@ class ConcreteBlockIO
       : public BlockIO
 {
 protected:
-    unsigned int refcount;
     FileIO* super;
     void* ptr;
     offset_type offset;
@@ -155,8 +172,7 @@ public:
                        enum lock_type type = LCK_DEFAULT );
     virtual bool unlock( offset_type offset, size_type size );
     virtual BlockIO* map( offset_type offset, size_type size );
-    virtual size_type size();
-    virtual void dispose();
+    virtual size_type size() const;
     virtual operator void*();
 };
 
@@ -167,7 +183,6 @@ protected:
     BlockIO* super;
     offset_type offset;
     size_type sz;
-    unsigned int refcount;
 
 public:
     VirtualBlockIO(BlockIO* super, offset_type offset, size_type size);
@@ -178,15 +193,14 @@ public:
                        enum lock_type type = LCK_DEFAULT );
     virtual bool unlock( offset_type offset, size_type size );
     virtual BlockIO* map( offset_type offset, size_type size );
-    virtual size_type size();
-    virtual void dispose();
+    virtual size_type size() const;
     virtual operator void*();
 };
 
 
 inline ConcreteBlockIO::ConcreteBlockIO( FileIO* _super, offset_type _offset,
                                          size_type _size )
-    : super( _super ), offset( _offset ), ptr( 0 ), sz( _size ), refcount( 1 )
+    : super( _super ), offset( _offset ), ptr( 0 ), sz( _size )
 {
 }
 
@@ -215,29 +229,29 @@ inline bool ConcreteBlockIO::unlock(offset_type offset, size_type size)
 
 inline BlockIO* ConcreteBlockIO::map(offset_type offset, size_type size)
 {
-    BlockIO* retval = super->map(
+    BlockIO* retval;
+    if ( safe_add< size_type >( offset, size ) <= size )
+    {
+        refcount++;
+        retval = new VirtualBlockIO( this, offset, size );
+    }
+    else
+    {
+        retval = super->map(
             safe_add< off_t >( offset, this->offset ), size );
-    refcount++;
+    }
     return retval;
 }
 
-inline BlockIO::size_type ConcreteBlockIO::size()
+inline BlockIO::size_type ConcreteBlockIO::size() const
 {
     return sz;
-}
-
-inline void ConcreteBlockIO::dispose()
-{
-    if (--refcount == 0)
-    {
-        delete this;
-    }
 }
 
 inline VirtualBlockIO::VirtualBlockIO( BlockIO* _super,
                                        offset_type _offset,
                                        size_type _size)
-    : super( _super ), offset( _offset ), sz( _size ), refcount( 1 )
+    : super( _super ), offset( _offset ), sz( _size )
 {
 }
 
@@ -265,7 +279,7 @@ VirtualBlockIO::getAccess()
     return super->getAccess();
 }
 
-inline BlockIO::size_type VirtualBlockIO::size()
+inline BlockIO::size_type VirtualBlockIO::size() const
 {
     return sz;
 }
@@ -299,14 +313,6 @@ inline bool VirtualBlockIO::unlock(offset_type offset, size_type size)
     }
 
     return super->unlock(safe_add<offset_type>(this->offset, offset), size);
-}
-
-inline void VirtualBlockIO::dispose()
-{
-    if (--refcount == 0)
-    {
-        delete this;
-    }
 }
 
 inline VirtualBlockIO::operator void*()

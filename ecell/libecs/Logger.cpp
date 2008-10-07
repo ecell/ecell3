@@ -33,6 +33,10 @@
 //
 // modified by Koichi Takahashi <shafi@e-cell.org>
 
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
+
 #include <functional>
 #include <algorithm>
 #include <boost/range/iterator_range.hpp>
@@ -48,24 +52,18 @@ class Logger::LoggerImpl
 {
 public:
     typedef VVector<DataPoint> DataPointVector;
-    typedef boost::iterator_range<DataPointVector::iterator> DataPoints;
-    typedef boost::iterator_range<DataPointVector::const_iterator> ConstDataPoints;
 
 public:
     LoggerImpl( const LoggingPolicy& pol = LoggingPolicy() );
     virtual ~LoggerImpl();
 
-    void log( const Logger::DataPoint& aDataPoint );
+    void push_back( const Logger::DataPoint& aDataPoint );
 
     void setPolicy( const LoggingPolicy& pol );
 
     const LoggingPolicy& getPolicy() const;
 
-    Step getSize() const;
-
-    DataPoints getDataPoints( Logger::Step startIdx = 0, Logger::Step endIdx = static_cast<Logger::Step>( -1 ) );
-
-    ConstDataPoints getDataPoints( Logger::Step startIdx = 0, Logger::Step endIdx = static_cast<Logger::Step>( -1 ) ) const;
+    Step size() const;
 
     const Logger::DataPoint& get( Logger::Step step ) const;
 
@@ -110,24 +108,6 @@ const LoggingPolicy& Logger::LoggerImpl::getPolicy() const
     return policy_;
 }
     
-Logger::LoggerImpl::DataPoints
-Logger::LoggerImpl::getDataPoints( Logger::Step startIdx, Logger::Step endIdx )
-{
-    return DataPoints( vec_->begin() + startIdx,
-            endIdx == static_cast<Logger::Step>( -1 ) ?
-                vec_->end(): vec_->begin() + endIdx );
-}
-
-Logger::LoggerImpl::ConstDataPoints
-Logger::LoggerImpl::getDataPoints( Logger::Step startIdx, Logger::Step endIdx ) const
-{
-    return ConstDataPoints(
-            const_cast<const DataPointVector*>(vec_)->begin() + startIdx,
-            endIdx == static_cast<Logger::Step>( -1 ) ?
-                const_cast<const DataPointVector *>( vec_ )->end():
-                const_cast<const DataPointVector *>( vec_ )->begin() + endIdx );
-}
-
 Logger::DataPoint& Logger::LoggerImpl::get( Logger::Step index )
 {
     return vec_->at( index );
@@ -138,7 +118,7 @@ const Logger::DataPoint& Logger::LoggerImpl::get( Logger::Step index ) const
     return vec_->at( index );
 }
 
-void Logger::LoggerImpl::log( const DataPoint& dp )
+void Logger::LoggerImpl::push_back( const DataPoint& dp )
 {
     ++stepCount_;
     if ( policy_.getMinimumInterval() == 0.0 )
@@ -162,7 +142,7 @@ void Logger::LoggerImpl::log( const DataPoint& dp )
     stepCount_ = 0;
 }
 
-Logger::Step Logger::LoggerImpl::getSize() const
+Logger::Step Logger::LoggerImpl::size() const
 {
     return vec_->size();
 }
@@ -223,14 +203,34 @@ const LoggingPolicy& Logger::getPolicy() const
     return impl_->getPolicy();
 }
 
-void Logger::log( const DataPoint& dp )
+void Logger::push_back( const DataPoint& dp )
 {
-    impl_->log( dp );
+    impl_->push_back( dp );
 }
 
 Logger::Step Logger::size() const
 {
-        return impl_->getSize();
+        return impl_->size();
+}
+
+const Logger::DataPoint& Logger::front() const
+{
+    if ( size() == 0 )
+    {
+        THROW_EXCEPTION( IllegalOperation, "no data available" );
+    }
+
+    return impl_->get(0);
+}
+
+const Logger::DataPoint& Logger::back() const
+{
+    if ( size() == 0 )
+    {
+        THROW_EXCEPTION( IllegalOperation, "no data available" );
+    }
+
+    return impl_->get(impl_->size() - 1);
 }
 
 Logger::iterator Logger::begin()
@@ -261,7 +261,7 @@ Logger::iterator Logger::find( Time time )
     }
 
     Time avgIntervalPerStep(
-            ( getEndTime() - getStartTime() ) / size() );
+            ( back().time - front().time ) / size() );
 
     Step s( static_cast< Step >( time / avgIntervalPerStep ) );
 
@@ -292,7 +292,7 @@ Logger::const_iterator Logger::find( Time time ) const
     }
 
     Time avgIntervalPerStep(
-            ( getEndTime() - getStartTime() ) / size() );
+            ( back().time - front().time ) / size() );
 
     Step s( static_cast< Step >( time / avgIntervalPerStep ) );
 

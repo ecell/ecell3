@@ -31,6 +31,7 @@
 // modified by Masayuki Okayama <smash@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -65,7 +66,7 @@ void PropertiedClass::interrupt( TimeParam )
 
 const String& PropertiedClass::asString() const
 {
-    return getClassName();
+    return getPropertyInterface().getClassName();
 }
 
 void PropertiedClass::initializePropertyInterface( ::libecs::PropertyInterface& thePropertyInterface )
