@@ -148,7 +148,7 @@ void FixedDAE1Stepper::initialize()
       if ( aSize != theSystemSize )
 	{
 	  THROW_EXCEPTION( InitializationFailed,
-			   "definitions are requred, are given." );
+			   "definitions are required, are given." );
 	}
 
       // allocate a matrix and set all elements to zero
