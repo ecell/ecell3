@@ -108,8 +108,8 @@ BuildHelper.prototype = {
         var scr = '';
         scr += '@ECHO OFF\n';
         scr += 'SET PWD=%~dp0\n';
-        scr += 'SET ECELL_HOME=%PWD%\\..\n';
-        scr += 'SET PYTHONPATH=%PYTHONHOME%;%ECELL_HOME%\\lib\\site-packages\n';
+        scr += 'IF "%ECELL_HOME%" == "" SET ECELL_HOME=%PWD%\\..\n';
+        scr += 'SET PYTHONPATH=%PYTHONPATH%;%ECELL_HOME%\\lib\\site-packages\n';
         scr += 'SET PATH=%PWD%;%PATH%\n';
         if (use_launcher > 0) {
             scr += 'START "' + FileSystemObject.GetFileName(path) + '" ';

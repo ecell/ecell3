@@ -66,24 +66,19 @@ var tasks = {
 
     installPyECell: function() {
         var pyECellDir = this.projectDir + 'ecell\\pyecell\\';
-        var binDir = this.projectDir + 'ecell\\bin\\';
         var destDir = this.distBinDir;
-        var binDirScripts = [
-            'ecell3-em2eml',
-            'ecell3-eml2em'
-        ];
         var pyECellDirScripts = [
+            'ecell3-em2eml',
+            'ecell3-eml2em',
             'ecell3-session',
             'ecell3-session-manager',
             'ecell3-eml2sbml',
             'ecell3-sbml2eml'
         ];
         BuildHelper.copyMultiple(
-            binDir, destDir, binDirScripts); 
-        BuildHelper.copyMultiple(
             pyECellDir, destDir, pyECellDirScripts);
         var self = this;
-        binDirScripts.concat(pyECellDirScripts).apply(function(fname) {
+        pyECellDirScripts.apply(function(fname) {
                 self.makePythonLauncher(destDir + '\\' + fname);
             });
         BuildHelper.chdir(pyECellDir);
