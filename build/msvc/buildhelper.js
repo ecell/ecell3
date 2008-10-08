@@ -516,7 +516,7 @@ BuildHelper.BourneShellNotationReader.prototype = {
                         val = m[2].substring(1, m[2].length - 1);
                         break;
                     default:
-                        val = m[2];
+                        val = this.expand(m[2]);
                         break;
                     }
                     this.env[m[1]] = val;
