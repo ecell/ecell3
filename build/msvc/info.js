@@ -3,10 +3,11 @@ buildInfo.env = (function() {
     WScript.Echo(buildInfo.projectDir + '\\ecell_version.sh');
     sh.eval(FileSystemObject.GetFile(
             buildInfo.projectDir + '\\ecell_version.sh'));
+    
     return sh.env.mix({
         top_srcdir: buildInfo.projectDir + '\\ecell',
-        ECELL_VERSION_STRING: BuildHelper.replacePlaceholders(
-            '"@ECELL_MAJOR_VERSION@.@ECELL_MINOR_VERSION@.@ECELL_MICRO_VERSION@"', sh.env),
+        ECELL_VERSION_STRING: '"' + sh.env.ECELL_VERSION_NUMBER + '"',
+        VERSION: sh.env.ECELL_VERSION_NUMBER,
         INCLTDL: '/I' + buildInfo.projectDir + '\\libltdl',
         DMTOOL_INCLUDE_DIR: buildInfo.projectDir,
         NUMPY_INCLUDE_DIR: buildInfo.pythonHome + '\\lib\\site-packages\\numpy\\core\\include'
