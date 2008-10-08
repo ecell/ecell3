@@ -10,6 +10,6 @@ inlining, template instantiation, or subclassing done by the compiler
 and linker. Derivative works resulted from any other activities are covered
 by the GPL.
 
-Please note that This package contains several third-party softwares
+Please note that this package contains several third-party softwares
 that are licensed under the terms different from the GPL. See README for
 details of these softwares.
