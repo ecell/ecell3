@@ -38,6 +38,7 @@
 
 from gui_config import *
 import sys
+import traceback
 import MainWindow  
 from ecell.Session import *
 from ecell.ModelWalker import *
