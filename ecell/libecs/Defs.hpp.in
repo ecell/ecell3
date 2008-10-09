@@ -536,4 +536,3 @@ typedef const mytype & mytype ## Cref;
 
 
 
-

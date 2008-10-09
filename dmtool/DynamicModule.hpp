@@ -266,4 +266,3 @@ const std::string SharedDynamicModule<Base,DMAllocator>::getFileName() const
   $Date$
   $Locker$
 */
-
