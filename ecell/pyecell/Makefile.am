@@ -47,17 +47,15 @@ EXTRA_DIST = \
 	ecell/yacc.py \
 	ecell/_tableio.c \
 	ecell/README.TableIO \
-	ecell/SessionManager/Globus2SessionProxy.py \
-	ecell/SessionManager/Globus2SystemProxy.py \
-	ecell/SessionManager/LocalSessionProxy.py \
-	ecell/SessionManager/LocalSystemProxy.py \
-	ecell/SessionManager/SGESessionProxy.py \
-	ecell/SessionManager/SGESystemProxy.py \
-	ecell/SessionManager/SessionManager.py \
-	ecell/SessionManager/SessionProxy.py \
-	ecell/SessionManager/SystemProxy.py \
-	ecell/SessionManager/Util.py \
 	ecell/SessionManager/__init__.py \
+	ecell/SessionManager/Globus4Proxy.py \
+	ecell/SessionManager/LocalProxy.py \
+	ecell/SessionManager/SessionManager.py \
+	ecell/SessionManager/Constants.py \
+	ecell/SessionManager/LSFProxy.py \
+	ecell/SessionManager/Util.py \
+	ecell/SessionManager/Globus2Proxy.py \
+	ecell/SessionManager/SGEProxy.py \
 	ecell/analysis/ControlCoefficient.py \
 	ecell/analysis/Elasticity.py \
 	ecell/analysis/Jacobian.py \
