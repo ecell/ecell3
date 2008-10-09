@@ -44,7 +44,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..;..\..\libltdl"
-				PreprocessorDefinitions="WIN32;_DEBUG;_DEBUG_LEVEL=2;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H"
+				PreprocessorDefinitions="WIN32;_DEBUG;_DEBUG_LEVEL=2;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H;_WIN32_WINNT=0x500"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -107,7 +107,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..;..\..\libltdl"
-				PreprocessorDefinitions="WIN32;_DEBUG;_DEBUG_LEVEL=2;_LIB;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H"
+				PreprocessorDefinitions="WIN32;_DEBUG;_DEBUG_LEVEL=2;_LIB;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H;_WIN32_WINNT=0x500"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -169,7 +169,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..;..\..\libltdl"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H;_WIN32_WINNT=0x500"
 				RuntimeLibrary="2"
 			/>
 			<Tool
@@ -229,7 +229,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..;..\..\libltdl"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE=1;HAVE_CONFIG_H;_WIN32_WINNT=0x500"
 				RuntimeLibrary="2"
 			/>
 			<Tool
