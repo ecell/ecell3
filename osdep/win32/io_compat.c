@@ -777,7 +777,9 @@ int libecs_win32_io_open(const char *pathname, int flags, ...)
     if (INVALID_HANDLE_VALUE == hdl)
         err = GetLastError();
 
+#if defined(_WINNT_)
 out:
+#endif
     if (real_pathname)
         libecs_win32_free(real_pathname);
 
