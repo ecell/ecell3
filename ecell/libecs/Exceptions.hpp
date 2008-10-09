@@ -74,19 +74,17 @@ if( ! ( EXPRESSION ) )\
     Exception( StringCref method, StringCref message = "" )
       : 
       theMethod( method ), 
-      theMessage( message ) 
+      theMessage( message ),
+      theWhatMsg()
     {
       ; // do nothing
     }
 
     virtual ~Exception() throw();
 
-    virtual const String message() const;
+    virtual const String& message() const;
 
-    virtual const char* what() const throw()
-    {
-      return message().c_str();
-    }
+    virtual const char* what() const throw();
 
     virtual const char* const getClassName() const
     {
@@ -94,9 +92,9 @@ if( ! ( EXPRESSION ) )\
     }
 
   protected:
-
     const String theMethod;
     const String theMessage;
+    mutable String theWhatMsg;
   };
 
   /**

@@ -42,15 +42,21 @@ namespace libecs
     ; // do nothing
   }
 
-  const String Exception::message() const
+  const String& Exception::message() const
   {
-#ifdef DEBUG
-    return theMethod + ":\n" + 
-      String( getClassName() ) + ": " + theMessage + "\n";
-#else
-    return String( getClassName() ) + ": " + theMessage + "\n";
-#endif /* DEBUG */
+    return theMessage;
   }
 
-
+  const char* Exception::what() const throw()
+  {
+    if (theWhatMsg.empty())
+    {
+#ifdef DEBUG
+      theWhatMsg = theMethod + ":\n" + String( getClassName() ) + ": " + theMessage + "\n";
+#else
+      theWhatMsg = String( getClassName() ) + ": " + theMessage + "\n";
+#endif /* DEBUG */
+    }
+    return theWhatMsg.c_str();
+  }
 } // namespace libecs
