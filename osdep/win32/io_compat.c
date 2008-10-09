@@ -1131,14 +1131,29 @@ off_t libecs_win32_io_seek(int fd, off_t offset, int whence)
 
         return _offset.QuadPart;
 #else
-        LONG new_offset;
-        if (!SetFilePointer(hdl, (LONG)offset, &new_offset,
-                libecs_win32_io_get_whence_code(whence))) {
-            __libecs_errno = libecs_win32_translate_errno(GetLastError());
+        LONG offset_l, new_offset_h, new_offset_l;
+        DWORD win32_error;
+
+        if (offset >= ((off_t)1 << (8 * sizeof(LONG)))) {
+            __libecs_errno = _EINVAL;
+            return -1;
+        } else if (offset < ((off_t)-1 << (8 * sizeof(LONG) - 1))) {
+            new_offset_h = -1;
+            offset_l = (DWORD)offset;
+        } else {
+            new_offset_h = 0;
+            offset_l = (DWORD)offset;
+        }
+
+        new_offset_l = SetFilePointer(hdl, offset_l, &new_offset_h,
+                libecs_win32_io_get_whence_code(whence));
+        win32_error = GetLastError();
+        if (win32_error) {
+            __libecs_errno = libecs_win32_translate_errno(win32_error);
             return -1;
         }
 
-        return new_offset;
+        return (off_t)((DWORD)new_offset_l) | ((off_t)new_offset_h << (8 * sizeof(LONG)));
 #endif
     }
 }
