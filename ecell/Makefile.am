@@ -1,9 +1,6 @@
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = libecs pyecell bin dm
-if ENABLE_GUI
-SUBDIRS += session-monitor
-endif
+SUBDIRS = libecs pyecell bin dm frontend
 
 ECELL_DIRNAME=@ECELL_DIRNAME@
 

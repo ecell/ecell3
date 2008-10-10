@@ -328,9 +328,10 @@ AC_CONFIG_FILES([
     pyecell/Makefile
     pyecell/setup.py
     pyecell/ecell/config.py
-    session-monitor/Makefile
-    session-monitor/plugins/Makefile
-    session-monitor/glade/Makefile
+    frontend/Makefile
+    frontend/session-monitor/Makefile
+    frontend/session-monitor/plugins/Makefile
+    frontend/session-monitor/glade/Makefile
 ])
 AC_CONFIG_FILES([bin/ecell3-dmc], [chmod +x bin/ecell3-dmc])
 AC_OUTPUT

@@ -684,7 +684,7 @@ class GtkSessionFacade:
             util.createFullPNString( aFullPN ) )
 
     def setEntityProperty( self, aFullPN, aValue ):
-        aFullPNString = util.createFullPNString( aFullPN )
+        aFullPNString = str( aFullPN )
         anAttribute = self.theSession.theSimulator.getEntityPropertyAttributes(
             aFullPNString )
 

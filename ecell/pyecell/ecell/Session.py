@@ -26,7 +26,6 @@
 # 
 #END_HEADER
 
-import string
 import eml
 import sys
 import os
@@ -137,7 +136,7 @@ class Session:
 <eml>
 ''' % ( time.asctime( time.localtime() ) , self.getCurrentTime() )
             aString = anEml.asString()
-            aBuffer = string.join( string.split( aString, '<eml>\n' ), aCurrentInfo )
+            aBuffer = aCurrentInfo.join( aString.split( '<eml>\n' ) )
             aFileObject = open( aModel, 'w' )
             aFileObject.write( aBuffer )
             aFileObject.close()

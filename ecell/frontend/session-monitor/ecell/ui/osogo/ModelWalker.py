@@ -64,7 +64,7 @@ class ModelWalker:
             self.theTreeWalker.moveTo( self.theActualID )
         else:
             self.theTreeWalker.moveTo(
-                self.theActualPath.getSuperSystemPath().toFullID() )
+                self.theActualID.getSuperSystemPath().toFullID() )
         self.__getEntityLists()
         
     def reset( self ):
@@ -79,7 +79,7 @@ class ModelWalker:
         gives None if reaches end of tree """
         previousID = identifiers.FullID( self.theActualID )
         self.__moveToNextEntity()
-        if createFullIDString( self.theActualID ) == 'System::/':
+        if self.theActualID == identifiers.FullID( 'System::/' ):
             self.moveTo( previousID)
             return None
         return self.getCurrentFullID()
@@ -181,7 +181,7 @@ class TreeWalker:
         newID = getNextInList( self.theChildren, None )           
         if newID != None:
 
-            self.theActualID = [ SYSTEM, convertFullIDToSystemPath( self.theActualID ), newID ]
+            self.theActualID = identifiers.FullID( SYSTEM, convertFullIDToSystemPath( self.theActualID ), newID )
             self.__getLists()
             return self.theActualID
 
@@ -232,7 +232,8 @@ class TreeWalker:
         # go down
         newID = getNextInList( self.theChildren, None )           
         if newID != None:
-            self.theActualID = [ SYSTEM, convertFullIDToSystemPath( self.theActualID ), newID ]
+            ## self.theActualID = [ SYSTEM, convertFullIDToSystemPath( self.theActualID ), newID ]
+            self.theActualID = identifiers.FullID( SYSTEM, convertFullIDToSystemPath( self.theActualID ), newID )
             self.__getLists()
 
             #get last forwards
@@ -266,5 +267,5 @@ class TreeWalker:
         self.theChildren = list(
             self.theSession.getEntityList(
                 ENTITYTYPE_STRING_LIST[ SYSTEM ],
-                self.theActualID.getSuperSystemPath() ) )
+                convertFullIDToSystemPath( self.theActualID ) ) )
 

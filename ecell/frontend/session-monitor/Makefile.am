@@ -1,5 +1,6 @@
 SUBDIRS = glade plugins
-PYTHON_ = env PYTHONPATH=$(srcdir)/../pyecell $(PYTHON)
+
+PYTHON_ = env PYTHONPATH=$(top_srcdir)/pyecell sysconfdir=$(sysconfdir) datarootdir=$(datarootdir) libdir=$(libdir) $(PYTHON)
 
 EXTRA_DIST = \
 	ecell/ui/__init__.py\
@@ -44,25 +45,11 @@ EXTRA_DIST +=\
 	ecell3-session-monitor
 
 all-local:
-	sysconfdir=$(sysconfdir) \
-	datarootdir=$(datarootdir) \
-	libdir=$(libdir) \
 	$(PYTHON_) setup.py config
-	sysconfdir=$(sysconfdir) \
-	datarootdir=$(datarootdir) \
-	libdir=$(libdir) \
 	$(PYTHON_) setup.py build
 
 mostlyclean-local:
-	sysconfdir=$(sysconfdir) \
-	datarootdir=$(datarootdir) \
-	libdir=$(libdir) \
 	$(PYTHON_) setup.py clean
 
 install-exec-local:
-	DESTDIR=$(DESTDIR); \
-	sysconfdir=$(sysconfdir) \
-	datarootdir=$(datarootdir) \
-	libdir=$(libdir) \
-	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) $${DESTDIR:+--root }$${DESTDIR}
-
+	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )
