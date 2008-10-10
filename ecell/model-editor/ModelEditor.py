@@ -25,8 +25,14 @@
 # 
 #END_HEADER
 
+import os
+import os.path
+import gtk
+import traceback
+import sys
+import time
 
-from ecell.gui_config import *  
+from config import *  
 
 import ConfigParser
 
@@ -35,19 +41,12 @@ import tempfile
 from Clipboard import *
 from ShapePluginManager import *
 from Constants import *
-import os
-import os.path
-import gtk
 from ConfirmWindow import *  
 from Command import *
 from CommandQueue import * 
 from EntityCommand import *
 from StepperCommand import *
-import string
-import traceback
-import sys
 from ModelStore import *
-import time
 import AutosaveWindow
 
 from MEMainWindow import *
@@ -71,9 +70,6 @@ from GraphicalUtils import *
 from LayoutBufferFactory import *
 
 from Error import *
-
-import time
-
 
 RECENTFILELIST_FILENAME = '.modeleditor' + os.sep + '.recentlist'
 RECENTFILELIST_DIRNAME = '.modeleditor'
@@ -296,8 +292,7 @@ class ModelEditor:
             
             self.printMessage( "Error loading file %s"%aFileName, ME_ERROR )
             
-            anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
-                    sys.exc_traceback), '\n' )
+            anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value, sys.exc_traceback ) )
             
             self.printMessage( anErrorMessage, ME_PLAINMESSAGE )
             return False
@@ -307,8 +302,7 @@ class ModelEditor:
         except:
             #display message dialog
             self.printMessage( "Error loading layout information from file %s"%aFileName, ME_ERROR )
-            anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
-                    sys.exc_traceback), '\n' )
+            anErrorMessage = '\n'.join( traceback.format_exception(sys.exc_type,sys.exc_value, sys.exc_traceback ) )
             self.printMessage( anErrorMessage, ME_PLAINMESSAGE )
             return False
         return True
@@ -331,8 +325,7 @@ class ModelEditor:
             self.theRuntimeObject.getSession().saveModel( aFileName )
         except:
             self.printMessage( "Error saving file %s"%aFileName, ME_ERROR )
-            anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
-                    sys.exc_traceback), '\n' )
+            anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value, sys.exc_traceback ) )
             self.printMessage( anErrorMessage, ME_PLAINMESSAGE )
             self.theMainWindow.resetCursor()
             return False
@@ -367,8 +360,7 @@ class ModelEditor:
         except:
             #display message dialog
             self.printMessage( "Error saving file %s"%aFileName, ME_ERROR )
-            anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
-                    sys.exc_traceback), '\n' )
+            anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value, sys.exc_traceback ) )
             self.printMessage( anErrorMessage, ME_PLAINMESSAGE )
             self.theMainWindow.resetCursor()
             return False
@@ -699,15 +691,8 @@ class ModelEditor:
         for aLayoutName in self.theLayoutManager.getLayoutNameList():
             self.__saveLayout( aLayoutName, aLayoutEml )
 
-        #aCurrentInfo = '''<!-- created by ecell ModelEditor
-# date: %s
-#
-#-->
-#<leml>
-#''' % time.asctime( time.localtime() )
         aString = aLayoutEml.asString()
         aLayoutEml.destroy()
-#       aBuffer = string.join( string.split(aString, '<leml>\n'), aCurrentInfo)
         aBuffer = aString
         try:
             aFileObject = open( fileName, 'w' )
@@ -716,8 +701,7 @@ class ModelEditor:
         except:
             #display message dialog
             self.printMessage( "Error saving file %s"%fileName, ME_ERROR )
-            anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value, \
-                    sys.exc_traceback), '\n' )
+            anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value, sys.exc_traceback ) )
             self.printMessage( anErrorMessage, ME_PLAINMESSAGE )
             return False
         return True
@@ -1808,8 +1792,8 @@ class ModelEditor:
         # catch exceptions
         except:
             self.message(' error while executing ini file [%s]' %aFileName)
-            anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
-            self.message(anErrorMessage)
+            anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback ) )
+            self.message( anErrorMessage )
             
  
          

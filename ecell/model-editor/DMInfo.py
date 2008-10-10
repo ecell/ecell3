@@ -26,14 +26,16 @@
 #END_HEADER
 
 
-import ecell._emc
-from Config import *
 import os
 import os.path
+import sys
+
+import ecell.emc
+
+from Config import *
 from Constants import *
 from Utils import *
-import sys
-import string
+
 MASTERLIST_TYPE = 0
 MASTERLIST_BUILTIN = 1
 MASTERLIST_INFOLIST = 2
@@ -42,15 +44,15 @@ MASTERLIST_FLAGS = 4
 
 
 DM_TRANSLATIONLIST={ "Real":DM_PROPERTY_FLOAT,
-                        "Integer":DM_PROPERTY_INTEGER,
-                        "String":DM_PROPERTY_STRING,
-                        "Polymorph":DM_PROPERTY_NESTEDLIST}
+                     "Integer":DM_PROPERTY_INTEGER,
+                     "String":DM_PROPERTY_STRING,
+                     "Polymorph":DM_PROPERTY_NESTEDLIST }
 
 
 DM_DEFAULTVALUES = { DM_PROPERTY_FLOAT : 0.0,
-                        DM_PROPERTY_INTEGER: 0,
-                        DM_PROPERTY_STRING:"",
-                        DM_PROPERTY_NESTEDLIST: [] }
+                     DM_PROPERTY_INTEGER: 0,
+                     DM_PROPERTY_STRING:"",
+                     DM_PROPERTY_NESTEDLIST: [] }
 
 INFO_TYPE = 0
 INFO_SETTABLE = 1
@@ -106,7 +108,7 @@ for i in range( 0, len( typeList ) ):\n\
 class DMInfo:
     # FIRST INITIATE HARDCODED CLASSES SUCH AS VARIABLE, SYSTEM, COMPARTMENT SYSTMEM FROM HERE
     def __init__(self ):
-        self.theSimulator = ecell._emc.Simulator()
+        self.theSimulator = ecell.emc.Simulator()
         self.__dummiesList = {}
         self.__createDummies()
         if os.name != "nt":

@@ -30,18 +30,16 @@
 #'Programming: Gabor Bereczki' at
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
+
+import os
+import os.path
 import gtk
 
 from ModelEditor import *
 from ListWindow import *
-import os
-import os.path
-import string
-
 from StepperEditor import *
 from StepperList import *
 from Constants import *
-
 
 class StepperTab(ListWindow):
 

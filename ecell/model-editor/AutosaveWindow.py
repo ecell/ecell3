@@ -38,6 +38,7 @@ from ModelEditor import *
 from Window import *
 from ConfirmWindow import *
 from ViewComponent import *
+
 OK_MODE = 0
 OKCANCEL_MODE = 1
 

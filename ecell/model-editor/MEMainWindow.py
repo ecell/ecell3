@@ -30,21 +30,20 @@
 #'Programming: Gabor Bereczki' at
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
-from gtk import *
-import gtk.gdk
-from ListWindow import *
+
 import os
 import os.path
-import string
+from gtk import *
+import gtk.gdk
+import webbrowser
+
+from ListWindow import *
 from Constants import *
 from LayoutCommand import *
 from PathwayEditor import * 
 from ConfirmWindow import *
 from Runtime import *
 import ModelEditor
-import webbrowser
-
-
         
 class MEMainWindow( ListWindow ):
 
@@ -303,7 +302,7 @@ class MEMainWindow( ListWindow ):
             
             # If first string is not '\n', add it.
             if len(aMessage)>0:
-                if string.find(aMessage[0],'\n') != 0:
+                if aMessage[0].find('\n') != 0:
                     aMessage[0] = '\n' + aMessage[0]
 
             for aLine in aMessage:
@@ -311,7 +310,7 @@ class MEMainWindow( ListWindow ):
                 
         else: 
             aString = str( aMessage )
-            if string.find(aString,'\n') != 0:
+            if aString.find('\n') != 0:
                 aString = '\n' + aString
         self.theMessageBuffer.insert(  iter, aString , len(aString) )
 

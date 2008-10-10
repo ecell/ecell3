@@ -14,9 +14,7 @@ EXTRA_DIST = \
 	ecell/ECDDataFile.py \
 	ecell/EntityStub.py \
 	ecell/FullID.py \
-	ecell/GtkSessionMonitor.py \
 	ecell/LoggerStub.py \
-	ecell/ModelWalker.py \
 	ecell/ObjectStub.py \
 	ecell/Plugin.py \
 	ecell/PluginWindow.py \
@@ -40,7 +38,6 @@ EXTRA_DIST = \
 	ecell/expressionlextab.py \
 	ecell/expressionparser.py \
 	ecell/expressionparsetab.py \
-	ecell/gui_config.py \
 	ecell/lex.py \
 	ecell/lextab.py \
 	ecell/util.py \

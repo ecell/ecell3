@@ -33,7 +33,6 @@ from ecell.ecssupport import *
 
 from xml.dom import minidom
 
-import string
 import types
 from Constants import *
 from types import *
@@ -47,7 +46,7 @@ class LayoutEml:
         if aFileObject is None:
             aStringData = '<?xml version="1.0" ?><leml></leml>'
         else:
-            aStringData = string.join( map( string.strip, aFileObject.readlines() ), '' )
+            aStringData = ''.join( map( str.strip, aFileObject.readlines() ) )
 
         # minidom.parseString() is much faster than minidom.parse().. why?
         self.__theDocument = minidom.parseString( aStringData )
@@ -303,7 +302,7 @@ class LayoutEml:
 
         else:       # scaler value
 
-            aNormalizedValue =  string.replace( aValue, '\n', '#x0A' )
+            aNormalizedValue =  aValue.replace( '\n', '#x0A' )
             aValueData = self.__theDocument.createTextNode( aNormalizedValue )
             aValueNode.appendChild( aValueData )
 
@@ -320,7 +319,7 @@ class LayoutEml:
 
         if aNodeType == aValueNode.TEXT_NODE:
 
-            aValue = string.replace( str( aNode.nodeValue ), '#x0A', '\n')
+            aValue = str( aNode.nodeValue ).replace( '#x0A', '\n' )
             try:
                 aValue = int (aValue )
             except:
@@ -367,7 +366,7 @@ class Eml:
         if aFileObject is None:
             aStringData = '<?xml version="1.0" ?><eml></eml>'
         else:
-            aStringData = string.join( map( string.strip, aFileObject.readlines() ), '' )
+            aStringData = ''.join( map( str.strip, aFileObject.readlines() ) )
 
 
         # minidom.parseString() is much faster than minidom.parse().. why?
@@ -722,7 +721,7 @@ class Eml:
                 self.__addToCache( aSystemFullID, aSystemNode )
 
                 for aChildNode in aSystemNode.childNodes:
-                    aType = string.capwords( aChildNode.nodeName )
+                    aType = aChildNode.nodeName.capitalize()
 
                     if  aType in ( 'Variable', 'Process' ):
 
@@ -747,7 +746,7 @@ class Eml:
 
         if aNodeType == aValueNode.TEXT_NODE:
 
-            aValue = string.replace( str( aNode.nodeValue ), '#x0A', '\n')
+            aValue = str( aNode.nodeValue ).replace( '#x0A', '\n' )
             return aValue
 
         elif aNodeType == aValueNode.ELEMENT_NODE:
@@ -810,8 +809,7 @@ class Eml:
         aSystemNode = self.__getSystemNode( aSystemPath )
 
         for aChildNode in aSystemNode.childNodes:
-                        
-            if string.capwords( aChildNode.nodeName ) == aType and\
+            if aChildNode.nodeName.capitalize() == aType and\
                    aChildNode.getAttribute( 'id' ) == anID:
 
                 self.__addToCache( aFullID, aChildNode )
@@ -897,7 +895,7 @@ class Eml:
 
         else:        # scaler value
 
-            aNormalizedValue =  string.replace( aValue, '\n', '#x0A' )
+            aNormalizedValue =  aValue.replace( '\n', '#x0A' )
 
             aValueData = self.__theDocument.createTextNode( aNormalizedValue )
             aValueNode.appendChild( aValueData )

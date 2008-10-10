@@ -31,15 +31,16 @@
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 
-from Config import *
-from Utils import *
+import os
+import os.path
 import gtk
 import gtk.gdk
 import gtk.glade
 import gobject
 
-import os
-import os.path
+from Config import *
+from Utils import *
+
 from ModelStore import *
 from ModelEditor import *
 from ViewComponent import *
@@ -48,7 +49,7 @@ from EntityCommand import *
 from AutoLayout import *
 from PropertyList import *
 
-import ecell.GtkSessionMonitor
+import GtkSessionMonitor
 
 #from Layout import *
 
@@ -101,7 +102,6 @@ class EntityList(ViewComponent):
                             'on_Delete_clicked' : self.__delete_clicked
                             })                           
                     
-
     def getMenuItems(self):
         aMenu = ViewComponent.getMenuItems(self)
         aFlags = self.getADCPFlags(self.theType)
@@ -125,19 +125,14 @@ class EntityList(ViewComponent):
                 self.__selectRows( [ aNameList[0] ], False, True )
                 return
 
-
-
     def getDisplayedType( self ):
         return self.theType
-
 
     def getPasteableTypes( self ):
         return self.theSelectionTypeList
 
-
     def getParentWindow( self ):
         return self.theParentWindow
-
 
     def close( self ):
         # dereference Liststore and other member gtk objects
@@ -148,8 +143,6 @@ class EntityList(ViewComponent):
         # call superclass close
         ViewComponent.close( self )
 
-
-
     def getDisplayedSysID ( self ):
         """
         returns displayed syspath
@@ -157,11 +150,9 @@ class EntityList(ViewComponent):
                
         return self.theDisplayedSysID
 
-
     def setDisplayedSysID ( self, anID ):
         self.theDisplayedSysID = anID
         self.update()
-
 
     def update( self ):
         """
@@ -175,16 +166,12 @@ class EntityList(ViewComponent):
         # restore selection
         self.restoreSelection()
 
-
-
     def getSelectedIDs( self ):
         """
         returns list of selected IDs
         """
         self.__getSelection()
         return copyValue( self.theSelection )
-
-
 
     def changeSelection( self, anEntityIDList, userSelect = False ):
         """
@@ -208,7 +195,6 @@ class EntityList(ViewComponent):
 
             self.__selectRows( aNameList )
 
-
     def getADCPFlags( self, aType ):
         
         self.theFlags[ ME_DELETE_FLAG ] = len( self.theSelection) > 0
@@ -218,13 +204,11 @@ class EntityList(ViewComponent):
             self.theFlags[ ME_PASTE_FLAG ] = len( self.theSelection) > 0
         return self.theFlags
 
-
     def restoreSelection( self ):
 
         # call changeselection with stored selection
 
         self.changeSelection( self.theSelection )
-
 
     def selectByUser( self ):
         self.userSelecting = True
@@ -247,7 +231,6 @@ class EntityList(ViewComponent):
         self.theParentWindow.update() 
         self.userSelecting = False
 
-                
     def generateLayout(self):
         if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
             return
@@ -257,7 +240,6 @@ class EntityList(ViewComponent):
         self.theAutoLayout = AutoLayout(self.theModelEditor,layoutName,self.theSelection, True)
         self.theModelEditor.theMainWindow.resetCursor()
         
-
     def copy( self ):
 
         # create command
@@ -265,7 +247,6 @@ class EntityList(ViewComponent):
 
         # execute
         self.theModelEditor.doCommandList( [ aCommand ] )
-
 
     def cut ( self ):
         if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
@@ -275,8 +256,6 @@ class EntityList(ViewComponent):
 
         # execute
         self.theParentWindow.theModelEditor.doCommandList( [ aCommand ] )
-
-
 
     def paste ( self ):
         if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
@@ -296,7 +275,6 @@ class EntityList(ViewComponent):
             for anItem in newList:
                 self.theSelection.append( ':'.join( [ self.theType, pastePath, anItem ] ) )
         self.theModelEditor.doCommandList( aCommandList )
-
 
     def add_new ( self ):
         if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
@@ -329,8 +307,6 @@ class EntityList(ViewComponent):
         self.__selectRows( [ newName ], True )
         self.noActivate = False
 
-    
-    
     def delete ( self ):
         if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
             return
@@ -339,7 +315,6 @@ class EntityList(ViewComponent):
         
         self.theSelection = []
         self.theModelEditor.doCommandList ( [ aCommand ] )
-
 
     def rename ( self, newName, anIter ):
         if not self.theModelEditor.theRuntimeObject.checkState( ME_DESIGN_MODE ):
@@ -375,7 +350,6 @@ class EntityList(ViewComponent):
         else:
             self.theListStore.set_value( anIter, 0, oldName )
 
-############################added by lilan#####################################
     def AppendTracertoBoard( self ):   
              
         fullIds= self.getSelectedIDs()
@@ -414,7 +388,6 @@ class EntityList(ViewComponent):
             return True
         return False
     
-
     def __cursor_changed( self, *args ):
         # when row is seleclickedcted in list
 
@@ -424,21 +397,16 @@ class EntityList(ViewComponent):
         self.theParentWindow.setLastActiveComponent( self )
         self.selectByUser()
 
-
-
     def __add_clicked( self, *args ):
         self.add_new()
-
 
     def __delete_clicked( self, *args ):
         self.delete()
 
-    
     def __unselectRows( self ):
     
          self.theListSelection.unselect_all()
 
-        
     def __buildList( self ):
         """
         clear and build list
@@ -454,7 +422,6 @@ class EntityList(ViewComponent):
         self.__addRows( aNameList )
         self.noActivate = False
 
-    
     def __addRows( self, aNameList ):
         """
         in: list of string aNameList
@@ -463,9 +430,6 @@ class EntityList(ViewComponent):
             anIter = self.theListStore.append(  )
             self.theListStore.set_value ( anIter, 0 , aName )
             self.theListStore.set_value ( anIter, 1 , True )
-
-
-
 
     def __deleteRows( self, aNameList ):
         """
@@ -479,7 +443,6 @@ class EntityList(ViewComponent):
                 self.theListStore.remove( anIter )
             anIter = self.theListStore.iter_next( anIter )
 
-
     def __getSelection( self ):
         """
         returns namelist
@@ -490,8 +453,6 @@ class EntityList(ViewComponent):
             anIter = self.theListStore.get_iter ( aPath )
             aNameList.append ( self.theListStore.get_value( anIter, 0 ) )
         return aNameList    
-
-
 
     def __selectRows( self, aNameList, forEdit = False, doSelect = False ):
         """
@@ -526,14 +487,11 @@ class EntityList(ViewComponent):
                     self.theListSelection.select_iter( anIter )
                 anIter = self.theListStore.iter_next(anIter)
 
-
     def __getIter( self, aName ):
         """
         in: str aName
         """
         pass
-
-
 
     def __getSelectedRows( self ):
         """
@@ -544,7 +502,6 @@ class EntityList(ViewComponent):
         #self.__thePathList returns index of the items on the entityList        
         return self.__thePathList
 
-
     def __foreachCallBack( self, *args ):
         """
         args[0] TreModel
@@ -553,7 +510,6 @@ class EntityList(ViewComponent):
         """
 
         self.__thePathList.append( args[1] )
-
 
     def __cellEdited( self, *args ):
         """

@@ -31,15 +31,12 @@
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
 
-
+import os
+import os.path
 import gtk
 
 from ModelEditor import *
 from ListWindow import *
-import os
-import os.path
-import string
-
 
 #class LayoutManagerWindow( ListWindow ):
 class LinePropertyEditor( ListWindow ):

@@ -29,7 +29,6 @@ from LayoutCommand import *
 from EntityCommand import *
 from Utils import *
 from PackingStrategy import *
-import string
 
 
 class CommandMultiplexer:
@@ -847,7 +846,7 @@ class CommandMultiplexer:
                     anewName = '/'.join(aNewFullIDList[1:])
                 aNewSystemFullID = anOldSystemFullID.split(':')
                 aNewSystemFullID[1]=anewName    
-                aNewSystemFullID = string.join(aNewSystemFullID,':')    
+                aNewSystemFullID = ':'.join(aNewSystemFullID)
                 returnCmdList.extend( self.__checkBrokenConnections(anOldSystemFullID, aNewSystemFullID ) )
                     
         return returnCmdList

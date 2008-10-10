@@ -30,7 +30,6 @@
 
 
 import tempfile
-from ecell.gui_config import *
 from ModelEditor import *
 from ConfirmWindow import *
 
@@ -238,7 +237,7 @@ gtk.main()\n\
             #self.theSession.theSimulator.initialize()
         except:
             self.message(' Error while trying to parse model into simulator \n')
-            anErrorMessage = string.join( traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+            anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback ) )
             self.message(anErrorMessage)
             self.theModelEditor.theMainWindow.resetCursor()
             dialog = ConfirmWindow(0,"Sorry, error in parsing model, see message window for details." )

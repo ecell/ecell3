@@ -48,6 +48,7 @@ sessionmonitor_PYTHON= \
 	DataGenerator.py \
 	EntityListWindow.py \
 	FullPNQueue.py \
+	GtkSessionMonitor.py \
 	InterfaceWindow.py \
 	LoggerFactory.py \
 	LoggerWindow.py \
@@ -63,11 +64,12 @@ sessionmonitor_PYTHON= \
 	StepperWindow.py \
 	VariableReferenceEditor.py \
 	ViewWindow.py \
+	gui_config.py \
 	config.py \
 	main.py \
 	opengui.py
 
-bin_SCRIPTS = ecell3-session-monitor gecell
+bin_SCRIPTS = ecell3-session-monitor
 
 EXTRA_DIST = $(sessionmonitor_DATA) $(bin_SCRIPTS)
 

@@ -36,15 +36,19 @@
 # at E-Cell Project, Lab. for Bioinformatics, Keio University.
 #
 
-from gui_config import *
+import os
+import os.path
 import sys
 import traceback
-import MainWindow  
-from ecell.Session import *
-from ecell.ModelWalker import *
 import gtk
 import gobject 
 
+from ecell.Session import *
+from config import *
+
+from ModelWalker import *
+
+import MainWindow  
 import EntityListWindow
 import LoggerWindow
 import InterfaceWindow 
@@ -53,12 +57,6 @@ import BoardWindow
 import ConfigParser
 import LoggingPolicy
 import OsogoPluginManager
-
-import os
-import os.path
-
-SESSIONMONITORPATH = os.environ['SESSIONMONITORPATH']
-
 
 class GtkSessionMonitor(Session):
 #

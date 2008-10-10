@@ -24,8 +24,8 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # 
 #END_HEADER
-from ecell.ecssupport import *
 
+from ecell.ecssupport import *
         
 def getNextInList(  aList, actualID ):
     if actualID == None:
@@ -37,7 +37,6 @@ def getNextInList(  aList, actualID ):
         return None
     else:
         return aList[idx + 1]
-
         
 def getPreviousInList(  aList, actualID ):
     if actualID == None:
@@ -49,8 +48,6 @@ def getPreviousInList(  aList, actualID ):
         return None
     else:
         return aList[idx - 1]
-    
-
 
 class ModelWalker:
     def __init__( self, aModel  ):
@@ -174,9 +171,6 @@ class ModelWalker:
             systemPath = self.theActualID[SYSTEMPATH]
         self.theProcessList = list( self.theModel.getEntityList( ENTITYTYPE_STRING_LIST[PROCESS], systemPath ) )
         self.theVariableList = list( self.theModel.getEntityList( ENTITYTYPE_STRING_LIST[VARIABLE], systemPath ) )
-
-
-
 
 class TreeWalker:
     def __init__( self, aModel ):

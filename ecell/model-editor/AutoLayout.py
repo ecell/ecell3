@@ -24,16 +24,18 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # 
 #END_HEADER
+
+import os
+import re
+import numpy as nu
+import math
+
 from ModelEditor import *
 from Utils import *
 from Constants import *
 from LayoutCommand import *
 from ConfirmWindow import *
-import string
-import os
-import re
-import numpy as nu
-import math
+
 POINTS_PER_INCH = 36
 FACTOR = 1.5
 

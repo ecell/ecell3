@@ -30,13 +30,14 @@
 #'Programming: Gabor Bereczki' at
 # E-CELL Project, Lab. for Bioinformatics, Keio University.
 #
-import gtk
-import gtk.gdk
-import ModelEditor
-from ListWindow import *
+
 import os
 import os.path
-import string
+import gtk
+import gtk.gdk
+
+import ModelEditor
+from ListWindow import *
 from Constants import *
 from PathwayCanvas import *
 from LayoutCommand import *

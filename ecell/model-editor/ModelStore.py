@@ -25,17 +25,12 @@
 # 
 #END_HEADER
 
-import string
 from Constants import *
 from Utils import *
 from ModelEditor import *
 from Error import *
 
-
 class ModelStore:
-
-
-    
     def __init__( self, aDMInfo ):
         """make ModelStore"""
         #self.theModelEditor = self.theParentWindow.theModelEditor
@@ -47,11 +42,6 @@ class ModelStore:
         self.__theEntity[MS_SYSTEM_ROOT] = [ DM_SYSTEM_CLASS, None, None, [],  [], [], 'RootSystem' ]
         self.__theEntity[MS_SYSTEM_ROOT][MS_ENTITY_PROPERTYLIST] = self.__createPropertyList( DM_SYSTEM_CLASS )
         
-
-    ##---------------------------------------------
-    ## Methods for Stepper
-    ##---------------------------------------------
-
     def createStepper( self, aClass, anID ):
         """create a stepper"""
         if anID in self.__theStepper.keys():
@@ -88,27 +78,21 @@ class ModelStore:
 
         del self.__theStepper[anID]
 
-
     def getStepperList( self):
 
         return self.__theStepper.keys()
-
 
     def getStepperClassName( self, aStepperID ):
         # check if Stepper exists
         if aStepperID not in self.__theStepper.keys():
             raise Exception("Stepper %s does not exist!"%aStepperID )
         return self.__theStepper[aStepperID][MS_STEPPER_CLASS]
-    
-
 
     def getStepperPropertyList( self, aStepperID ):
         # check if Stepper exists
         if aStepperID not in self.__theStepper.keys():
             raise Exception("Stepper %s does not exist!"%aStepperID )
         return copyValue ( self.__theStepper[aStepperID][MS_STEPPER_PROPERTYLIST].keys() )
-
-
 
     def createStepperProperty( self, aStepperID, aPropertyName, aValue, aType = DM_PROPERTY_STRING, anAttribute = [1,1,1,1,1,1] ):
         """create a Stepper property"""
@@ -132,8 +116,6 @@ class ModelStore:
         # create property
         self.__theStepper[aStepperID][MS_STEPPER_PROPERTYLIST][aPropertyName] = [convertValue, copyValue(anAttribute), aType]
 
-
-
     def __getStepperProperty( self, aStepperID, aPropertyName ):
         # check if Stepper exists
         if aStepperID not in self.__theStepper.keys():
@@ -143,8 +125,6 @@ class ModelStore:
 
         return self.__theStepper[aStepperID][MS_STEPPER_PROPERTYLIST][aPropertyName]
 
-    
-
     def loadStepperProperty( self, aStepperID, aPropertyName, aValue, aType = DM_PROPERTY_STRING, anAttribute = [1,1,1,1,1,1] ):
         if aStepperID not in self.__theStepper.keys():
             raise Exception("Stepper %s does not exist!"%aStepperID )
@@ -152,7 +132,6 @@ class ModelStore:
             self.createStepperProperty( aStepperID, aPropertyName, aValue, aType, anAttribute )
         else:
             self.setStepperProperty( aStepperID, aPropertyName, aValue )
-
 
     def saveStepperProperty( self, aStepperID, aPropertyName ):
 
@@ -164,7 +143,6 @@ class ModelStore:
         else:
             raise Exception("Property %s not gettable"%aPropertyName )
 
-################################################
     def setStepperProperty( self, aStepperID, aPropertyName, aValue ):
         """set a Stepper property"""
         aProperty = self.__getStepperProperty( aStepperID, aPropertyName )
@@ -181,8 +159,6 @@ class ModelStore:
         else:
             raise Exception("Property %s of stepper %s is not settable!"%(aPropertyName, aStepperID) )
 
-
-
     def getStepperProperty( self, aStepperID, aPropertyName ):
         """get a Stepper property"""
 
@@ -194,9 +170,6 @@ class ModelStore:
         else:
             raise Exception("Property %s not gettable"%aPropertyName )
 
-
-
-
     def deleteStepperProperty( self, aStepperID, aPropertyName ):
         """delete a Stepper property"""
 
@@ -207,21 +180,16 @@ class ModelStore:
             del self.__theStepper[aStepperID][MS_STEPPER_PROPERTYLIST][aPropertyName]
         else:
             raise Exception("Property %s of stepper %s is not deleteable!"%(aPropertyName, aStepperID) )
-
-
-
+    
     def getStepperPropertyAttributes( self, aStepperID, aPropertyName ):
         """ get a Stepper property attribute"""
         return self.__getStepperProperty( aStepperID, aPropertyName )[MS_PROPERTY_FLAGS]
-
-
 
     def getStepperPropertyType( self, aStepperID, aPropertyName ):
         """ candidates are:
         DM_PROPERTY_STRING,  DM_PROPERTY_MULTILINE, etc.
         """
         return self.__getStepperProperty( aStepperID, aPropertyName )[MS_PROPERTY_TYPE]
-
 
     def setStepperInfo( self, aStepperID, anInfoStrings ):
         # check if Stepper exists
@@ -230,54 +198,38 @@ class ModelStore:
 
         self.__theStepper[aStepperID][MS_STEPPER_INFO] = str( anInfoStrings )
 
-
-
     def getStepperInfo( self, aStepperID ):
         # check if Stepper exists
         if aStepperID not in self.__theStepper.keys():
             raise Exception("Stepper %s does not exist!"%aStepperID )
         return self.__theStepper[aStepperID][MS_STEPPER_INFO]
 
-    
-
-        
-    ##---------------------------------------------
-    ## Methods for Entity
-    ##---------------------------------------------
-
     def __getEntityType( self, aFullID ):
 
-        aFullIDParts = string.split( aFullID, ':' )
+        aFullIDParts = aFullID.split( ':' )
         return aFullIDParts[0]
-
-
 
     def __getEntityPath( self, aFullID ):
 
-        theEntityPath = string.split( aFullID, ':' )
+        theEntityPath = aFullID.split( ':' )
         return theEntityPath[1]
-
-
 
     def __getFullID( self, aFullPNString ):
         """get FullID from FullPN"""
 
-        aFullPNStringParts = string.split( aFullPNString, ':')
-        aFullID = string.join( aFullPNStringParts[:3], ':')
+        aFullPNStringParts = aFullPNString.split( ':' )
+        aFullID = ':'.join( aFullPNStringParts[:3] )
         return aFullID
-
-
 
     def __getPropertyName( self, aFullPNString ):
         """get property name from FullPN"""
-        aFullPNStringParts = string.split( aFullPNString, ':')
+        aFullPNStringParts = aFullPNString.split( ':')
         return aFullPNStringParts[3]
-
 
     def __getPropertyFlag( self, aFullPNString ):
         """get property flag from FullPN"""
 
-        aFullPNStringParts = string.split( aFullPNString, ':')
+        aFullPNStringParts = aFullPNString.split( ':' )
         return aFullPNStringParts[3]
 
     def __getEntity( self, aFullID ):
@@ -286,7 +238,6 @@ class ModelStore:
             return None
         else:
             return self.__theEntity[ aFullID ]
-
 
     def __createPropertyList( self, aClass ):
         aPropertyList = {}
@@ -312,8 +263,6 @@ class ModelStore:
         
         return aPropertyList 
 
-
-
     def __getEntityProperty( self, anEntity, aPropertyName ):
         # check if Entity exists
         if anEntity not in self.__theEntity.keys():
@@ -322,19 +271,11 @@ class ModelStore:
             raise Exception("Property %s of entity %s does not exist!"%(aPropertyName,anEntity))
         return self.__theEntity[anEntity][MS_ENTITY_PROPERTYLIST][aPropertyName]
 
-
-##################################################################################################################
     def createEntity( self, aClass, aFullID ):
         if aFullID in self.__theEntity.keys():
             raise Exception("Entity %s already exists!"%aFullID )
 
         anEntityType = self.__getEntityType( aFullID )
-
-#        if aClass not in self.__theDM.getClassList( anEntityType ):
-            #self.__theNotExistClass.append(aClass)
-            #raise Exception("There is no .desc file for %s!"%aClass)
-#            raise ClassNotExistError(aClass)
-            
 
         aParentFullID = convertSysPathToSysID( self.__getEntityPath( aFullID ) )
         aParentSystem = self.__getEntity( aParentFullID )
@@ -351,25 +292,9 @@ class ModelStore:
 
         if anEntityType == ME_SYSTEM_TYPE:
             pass
-#            aStepperIdValue = self.getEntityProperty(aFullPN)
-#            if not aStepperIdValue == '': #None here
-#                aFullPN = createFullPN( aFullID, 'StepperID')
-#                self.setEntityProperty( aFullPN, [aStepperIdValue])
-#            else:
-#                pass
-                
         elif anEntityType == ME_PROCESS_TYPE:
             pass
-#            aStepperIdValue = self.getEntityProperty(aFullPN)
-#            if not aStepperIdValue == None:
-#                aFullPN = createFullPN( aFullID, 'StepperID')
-#                self.setEntityProperty( aFullPN, [aStepperIdValue])
-#            else:
-#                pass
-                #MY PIECE
         else:
-            #aParentSystem[MS_ENTITY_CHILD_VARIABLELIST].append( self.__theEntity[aFullID] )
-            # find process referencing this variable
             for aProcessID in self.__theEntity.keys():
                 if getFullIDType( aProcessID ) != ME_PROCESS_TYPE:
                     continue
@@ -677,20 +602,6 @@ class ModelStore:
             if len( aVarref ) <3:
                 aVarref.append( 0 )
 
-
-#    def changeChangeableFlag( self, aProperty ):
-#        anOldProperty=aProperty
-#        aPropertyFlag= anOldProperty[MS_PROPERTY_FLAGS]
-#        #conver to tuple
-#        settable = aPropertyFlag[MS_SETTABLE_FLAG]
-#        gettable = aPropertyFlag[MS_GETTABLE_FLAG]
-#        deleteable =aPropertyFlag[MS_DELETEABLE_FLAG]
-#        loadable = aPropertyFlag[MS_LOADABLE_FLAG]
-#        saveable = aPropertyFlag[MS_SAVEABLE_FLAG]
-#        changeable=True
-#        aNewPropertyFlag=(gettable,settable,loadable,saveable,deleteable,changeable)
-#        return aNewPropertyFlag
-
     def loadEntityProperty( self, aFullPN, aValue, aType = DM_PROPERTY_STRING, anAttribute = [1,1,1,1,1,1] ):
         aFullID = self.__getFullID( aFullPN )
         aPropertyName = self.__getPropertyName( aFullPN )
@@ -702,13 +613,9 @@ class ModelStore:
             self.setEntityProperty( aFullPN, aValue )
         else:
             self.createEntityProperty( aFullID, aPropertyName, aValue[0], aType, anAttribute )
-        
 
     def saveEntityProperty( self, aFullPN ):
         return self.getEntityProperty( aFullPN )
-
-
-
 
     def getEntityProperty( self, aFullPN ):
         """get an entity property"""
@@ -718,8 +625,6 @@ class ModelStore:
         if not aProperty[MS_PROPERTY_FLAGS][MS_GETTABLE_FLAG]:
             raise Exception( "Property %s is not gettable!"%aFullPN )
         return copyValue( aProperty[MS_PROPERTY_VALUE] )
-
-
         
     def deleteEntityProperty( self, aFullID, aPropertyName ):
         """delete an entity property"""
@@ -742,9 +647,6 @@ class ModelStore:
                 self.__deregisterProcessFromVariable( aFullID, convertValue )
         anEntity = self.__getEntity( aFullID )
         del anEntity[MS_ENTITY_PROPERTYLIST][aPropertyName]
-    
-
-
 
     def getEntityPropertyAttributes( self, aFullPN ):
         """get an entity property attribute"""
@@ -753,13 +655,11 @@ class ModelStore:
         aProperty = self.__getEntityProperty( aFullID, aPropertyName )
         return copyValue( aProperty[MS_PROPERTY_FLAGS] )
 
-
     def setEntityInfo( self, aFullID, InfoStrings ):
         anEntity = self.__getEntity( aFullID )
         if anEntity == None:
             raise Exception( "Entity %s does not exist!"%anEntity )
         anEntity[MS_ENTITY_INFO] = copyValue( InfoStrings )
-
 
     def getEntityInfo( self, aFullID ):
         anEntity = self.__getEntity( aFullID )
@@ -781,7 +681,6 @@ class ModelStore:
         aPropertyName = self.__getPropertyName( aFullPN )
         aProperty = self.__getEntityProperty( aFullID, aPropertyName )
         return aProperty[MS_PROPERTY_TYPE]
-
 
     # this is illegal for Model API, but needed for revokable operations
     def setChangedFlag( self, aType, anID, aPropertyName, chgdFlag ):
