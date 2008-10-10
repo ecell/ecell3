@@ -13,8 +13,8 @@ plugins = glob(
     os.path.join( os.path.dirname( __file__ ), 'plugins', '*' ) )
 
 setup(
-    name = 'ecell.ui.osogo',
-    version = "3.1.105",
+    name = 'ecell.session-monitor',
+    version = config.version,
     description = 'E-Cell Osogo -- Session Monitor',
     author = 'E-Cell project',
     author_email = 'info@e-cell.org',
