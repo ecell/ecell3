@@ -26,6 +26,18 @@
 # 
 #END_HEADER
 
+import sys
+import os
+import string 
+import getopt
+import tempfile
+
+import ecell.eml
+from ecell.ecssupport import *
+
+import lex
+import yacc
+
 """
 A program for converting .em file to EML.
 This program is part of E-Cell Simulation Environment Version 3.
@@ -38,17 +50,6 @@ __copyright__ = 'Copyright (C) 2002-2003 Keio University'
 __license__ = 'GPL'
 
 
-import sys
-import os
-import string 
-import getopt
-import tempfile
-
-import ecell.eml
-from ecell.ecssupport import *
-
-import lex
-import yacc
 
 # Reserved words
 reserved = (

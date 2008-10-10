@@ -24,6 +24,11 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # 
 #END_HEADER
+
+from xml.dom import minidom
+from types import *
+from ecssupport import *
+
 """
 This is emllib for EML
 """
@@ -32,36 +37,14 @@ __email__      = 'suzuki@sfc.keio.ac.jp'
 __startDate__  = '020316'
 __lastUpdate__ = '020911'
 
-__Memo__ = '\
-'
-
-__Todo__ = '''
-'''
-
-
-
-#------------------- window line ---------------------------------------------#
-
-from xml.dom import minidom
-
-import string
-import types
-
-from types import *
-
-from ecssupport import *
-
-#---------------------------------------------------------"""
 class Eml:
-
-    
     def __init__( self, aFileObject=None ):
         """read EML file and make domtree"""
 
         if aFileObject is None:
             aStringData = '<?xml version="1.0" ?><eml></eml>'
         else:
-            aStringData = string.join(  map( string.strip, aFileObject.readlines()), '' )
+            aStringData = ''.join( map( str.strip, aFileObject.readlines() ) )
 
 
         # minidom.parseString() is much faster than minidom.parse().. why?
@@ -399,7 +382,6 @@ class Eml:
         self.__entityNodeCache = {}
 
     def __reconstructCache( self ):
-
         self.__clearCache()
 
         for aSystemNode in self.__theEmlNode.childNodes:
@@ -410,7 +392,7 @@ class Eml:
                 self.__addToCache( aSystemFullID, aSystemNode )
 
                 for aChildNode in aSystemNode.childNodes:
-                    aType = string.capwords( aChildNode.nodeName )
+                    aType = aChildNode.nodeName.capitalize()
 
                     if  aType in ( 'Variable', 'Process' ):
 
@@ -423,19 +405,14 @@ class Eml:
     ##-------------------------------------------
 
     def __createValueList( self, aValueNode ):
-
         aNode = aValueNode.firstChild
         aNodeType = aNode.nodeType
 
         if aNodeType == aValueNode.TEXT_NODE:
-
-            aValue = string.replace( str( aNode.nodeValue ), '#x0A', '\n')
+            aValue = str( aNode.nodeValue ).replace( '#x0A', '\n' )
             return aValue
-
         elif aNodeType == aValueNode.ELEMENT_NODE:
-
             return map( self.__createValueList, aValueNode.childNodes )
-
         else:
             raise "unexpected error."
 
@@ -491,7 +468,7 @@ class Eml:
 
         for aChildNode in aSystemNode.childNodes:
                         
-            if string.capwords( aChildNode.nodeName ) == aType and\
+            if aChildNode.nodeName.capitalize() == aType and\
                    aChildNode.getAttribute( 'id' ) == anID:
 
                 self.__addToCache( aFullID, aChildNode )
@@ -568,14 +545,14 @@ class Eml:
 
         aValueNode = self.__createElement( 'value' )
 
-        if type( aValue ) in ( types.TupleType, types.ListType ):    # vector value
+        if type( aValue ) in ( TupleType, ListType ):    # vector value
 
             map( aValueNode.appendChild,\
                  map( self.__createValueNode, aValue ) )
 
         else:        # scaler value
 
-            aNormalizedValue =  string.replace( aValue, '\n', '#x0A' )
+            aNormalizedValue =  aValue.replace( '\n', '#x0A' )
 
             aValueData = self.__theDocument.createTextNode( aNormalizedValue )
             aValueNode.appendChild( aValueData )

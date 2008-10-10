@@ -28,7 +28,6 @@ import libsbml
 from SbmlFunctions import *
 
 import sys
-import string
 
 ''' Compartment List '''
 
@@ -869,7 +868,7 @@ class SBML_Reaction( SBML_Model ):
                 for aVariableReference in self.VariableReferenceList:
                     if( aVariableReference[1].split(':')[2] == 'SIZE' ):
                         aCurrentPath = ( aVariableReference[1].split(':')[1] )
-                        aLastSlash = string.rindex( aCurrentPath, '/' )
+                        aLastSlash = aCurrentPath.rindex( '/' )
                         variableName = aCurrentPath[aLastSlash+1:]
                         return aVariableReference[ 0 ]
                         ## return variableName

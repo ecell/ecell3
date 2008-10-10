@@ -28,7 +28,6 @@
 # Eml to Sbml converter
 
 import sys
-import string
 import os
 import types
 import getopt
@@ -45,7 +44,7 @@ import numpy
 
 def getCurrentCompartment( aSystemPath ):
 
-    aLastSlash = string.rindex( aSystemPath, '/' )
+    aLastSlash = aSystemPath.rindex( '/' )
     return aSystemPath[aLastSlash+1:]
 
 
@@ -89,16 +88,16 @@ def convertToMoleUnit( aValue ):
 
 def getVariableReferenceId( aVariableReference, aCurrentSystem ):
 
-    aFirstColon = string.index( aVariableReference, ':' )
-    aLastColon = string.rindex( aVariableReference, ':' )
+    aFirstColon = aVariableReference.index( ':' )
+    aLastColon = aVariableReference.rindex( ':' )
 
     # set Species Id to Reactant object
     if ( aVariableReference[aFirstColon+1:aLastColon] == '.' ):
-        aSpeciesReferencePath = string.replace( aCurrentSystem[1:], '/', '__' )
+        aSpeciesReferencePath = aCurrentSystem[1:].replace( '/', '__' )
         
     else:
-        aSpeciesReferencePath = string.replace\
-        ( aVariableReference[aFirstColon+2:aLastColon], '/', '__' )
+        aSpeciesReferencePath = \
+            aVariableReference[aFirstColon+2:aLastColon].replace( '/', '__' )
 
     aVariableID = aVariableReference[aLastColon+1:]
 
@@ -107,7 +106,7 @@ def getVariableReferenceId( aVariableReference, aCurrentSystem ):
         aSystem = aSpeciesReferencePath
 
     else:
-        aLastUnderBar = string.rindex( aSpeciesReferencePath, '__' )
+        aLastUnderBar = aSpeciesReferencePath.rindex( '__' )
         aSystem = aSpeciesReferencePath[aLastUnderBar+2:]
 
 
@@ -261,8 +260,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                     aSpeciesID = aFullID[2]
                 else:
                     if ( aFullID[1][1:] != '' ):
-                        aSpeciesID = string.replace\
-                                     ( aFullID[1][1:], '/', '__' )\
+                        aSpeciesID = aFullID[1][1:].replace( '/', '__' )\
                                      + '__' + aFullID[2]
                     else:
                         aSpeciesID = 'default__' + aFullID[2]
@@ -342,8 +340,8 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
         aPropertyNameList = anEml.getEntityPropertyList( aFullIDString )
 
-        aFirstColon = string.index( aFullIDString, ':' )
-        aLastColon = string.rindex( aFullIDString, ':' )
+        aFirstColon = aFullIDString.index( ':' )
+        aLastColon = aFullIDString.rindex( ':' )
 
         
         # ------------------
@@ -491,14 +489,13 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                             if( int( float( aVariableReference[2]) ) != 0 ):
  
                                 aFirstColon =\
-                                string.index( aVariableReference[1], ':' )
+                                aVariableReference[1].index( ':' )
                                 aLastColon =\
-                                string.rindex( aVariableReference[1], ':' )
+                                aVariableReference[1].rindex( ':' )
 
                                 if( aVariableReference[1][aFirstColon+1:aLastColon] == '.' ):
 
-                                    aLastSlash =\
-                                    string.rindex( aFullID[1], '/' )
+                                    aLastSlash = aFullID[1].rindex( '/' )
 
                                     CompartmentOfReaction=\
                                     aFullID[1][aLastSlash+1:]
@@ -506,7 +503,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
 
                                 else: 
                                     aLastSlash =\
-                                    string.rindex( aVariableReference[1], '/' )
+                                    aVariableReference[1].rindex( '/' )
 
                                     CompartmentOfReaction=\
                                     aVariableReference[1][aLastSlash+1:aLastColon]
@@ -701,8 +698,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                     if( aFullID[1][1:] == '' ):
                         aCompartmentID = 'default__' + aFullID[2]
                     else:
-                        aCompartmentID = string.replace\
-                                         ( aFullID[1][1:], '/', '__' )\
+                        aCompartmentID = aFullID[1][1:].replace( '/', '__' )\
                                          + '__' + aFullID[2]
 
             ID_Namespace.add( aCompartmentID )
@@ -757,7 +753,7 @@ def createEntity( anEml, aSBMLModel, aFullID, anOptional='' ):
                     aCompartment.setOutside( "default" )
                     
             else:
-                aLastSlash = string.rindex( aFullID[1], '/' )
+                aLastSlash = aFullID[1].rindex( '/' )
 
                 aCompartment.setOutside(
                     getCurrentCompartment( aFullID[1][:aLastSlash] ) )
@@ -771,7 +767,7 @@ def createModel( anEml, aSBMLModel, aSystemPath='/' ):
     if aSystemPath == '':
         aFullID = ( SYSTEM, '', '/' )
     else:
-        aLastSlash = string.rindex( aSystemPath, '/' )
+        aLastSlash = aSystemPath.rindex( '/' )
         aPath = aSystemPath[:aLastSlash+1]
         anID = aSystemPath[aLastSlash+1:]
 

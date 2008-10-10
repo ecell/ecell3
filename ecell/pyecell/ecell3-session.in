@@ -9,7 +9,7 @@ import os
 import ecell.config
 import ecell.ecs
 import ecell.emc
-import ecell.Session
+from ecell.Session import Session
 
 class Prompt:
     def __init__( self, aSession ):
@@ -211,7 +211,7 @@ def main():
                 
             
     aSimulator = ecell.emc.Simulator()
-    aSession = ecell.Session( aSimulator )
+    aSession = Session( aSimulator )
 
     aConsole = Console( aSession, 
         '''ecell3-session [ E-Cell SE Version %s, on Python Version %d.%d.%d ]

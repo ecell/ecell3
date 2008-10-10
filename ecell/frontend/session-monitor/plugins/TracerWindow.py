@@ -25,20 +25,20 @@
 # 
 #END_HEADER
 
-import gtk
-import numpy as nu
-import gtk.gdk
-import re
-import string
-import operator
-from Plot import *
-from ecell.ecssupport import *
-#LoggerMinimumInterval=1
-
-from OsogoPluginWindow import *
-from ConfirmWindow import *
 import os
 import os.path
+import re
+import operator
+import numpy as nu
+import gtk
+import gtk.gdk
+
+from ecell.ecssupport import *
+
+import ecell.ui.osogo.config as config
+from ecell.ui.osogo.Plot import *
+from ecell.ui.osogo.OsogoPluginWindow import *
+from ecell.ui.osogo.ConfirmWindow import *
 
 COL_LOG = 2
 COL_PIX = 1
@@ -49,9 +49,6 @@ COL_X = 3
 
 
 class TracerWindow( OsogoPluginWindow ):
-
-
-
     def __init__( self, dirname, data, pluginmanager, root=None ):
         #initializa variables:
         #initiates OsogoPluginWindow
@@ -131,8 +128,8 @@ class TracerWindow( OsogoPluginWindow ):
         self.theListWindow.connect( "button-press-event", self.buttonPressedOnList)
 
         self.setIconList(
-        os.environ['SESSIONMONITORPATH'] + os.sep + "ecell.png",
-        os.environ['SESSIONMONITORPATH'] + os.sep + "ecell32.png")
+            os.path.join( config.GLADEFILE_PATH, "ecell.png" ),
+            os.path.join( config.GLADEFILE_PATH, "ecell32.png" ) )
         #addtrace to plot
         self.addTraceToPlot( self.theFullPNList() )
         #sets stripinterval, disable history buttons

@@ -26,11 +26,14 @@
 # 
 #END_HEADER
 
-from OsogoPluginWindow import *
-from ecell.ecssupport import *
-import operator
-import ConfirmWindow
 import os
+import operator
+
+from ecell.ecssupport import *
+
+import ecell.ui.osogo.ConfirmWindow
+import ecell.ui.osogo.config as config
+from ecell.ui.osogo.OsogoPluginWindow import *
 
 # ------------------------------------------------------
 # DigitalWindow -> OsogoPluginWindow
@@ -89,8 +92,8 @@ class DigitalWindow( OsogoPluginWindow ):
 			self["increase_button"].set_sensitive( FALSE )
 			self["decrease_button"].set_sensitive( FALSE )
                 self.setIconList(
-			os.environ['SESSIONMONITORPATH'] + os.sep + "ecell.png",
-			os.environ['SESSIONMONITORPATH'] + os.sep + "ecell32.png")
+			os.path.join( config.GLADEFILE_PATH, "ecell.png" ),
+			os.path.join( config.GLADEFILE_PATH, "ecell32.png" ) )
 		self.update()
 
 	# ------------------------------------------------------
@@ -133,7 +136,7 @@ class DigitalWindow( OsogoPluginWindow ):
 	def inputValue( self, *arg ):
 
 		# gets text from text field.
-		aText = string.split(self['value_frame'].get_text())
+		aText = self['value_frame'].get_text().split()
 		if type(aText) == type([]):
 			if len(aText) > 0:
 				aText = aText[0]
@@ -148,7 +151,7 @@ class DigitalWindow( OsogoPluginWindow ):
 			# Only when the value is numeric, 
 			# the value will be set to value_frame.
 			try:
-				aValue = string.atof( aText )
+				aValue = float( aText )
 				self.setValue( self.theFullPN(), aValue )
 			except:
 				ConfirmWindow.ConfirmWindow(0,'Input numerical value.')

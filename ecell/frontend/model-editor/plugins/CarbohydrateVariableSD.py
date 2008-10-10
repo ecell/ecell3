@@ -25,9 +25,10 @@
 # 
 #END_HEADER
 
-from Constants import *
 import numpy as nu
-from ShapeDescriptor import *
+
+from ecell.ui.model_editor.Constants import *
+from ecell.ui.model_editor.ShapeDescriptor import *
 
 SHAPE_PLUGIN_TYPE='Variable' #Shape Plugin Constants
 SHAPE_PLUGIN_NAME='Carbohydrate'

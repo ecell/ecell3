@@ -31,8 +31,6 @@
 # E-Cell Project, Lab. for Bioinformatics, Keio University.
 #
 
-import string
-
 # ------------------------------------------------------------------
 # DataFile (This is abstract class)
 #   - manages one file object

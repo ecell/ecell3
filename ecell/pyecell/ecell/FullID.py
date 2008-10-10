@@ -28,7 +28,6 @@
 
 from ecs_constants import *
 
-import string
 import types
 
 class FullID( tuple ):
@@ -62,7 +61,7 @@ class FullID( tuple ):
         aSystemPathString = self.getSystemPathString()
         return aTypeString + ':' + \
                aSystemPathString + ':' + \
-               string.join( self[ 2 : ] , ':' )
+               ':'.join( self[ 2 : ] )
 
     def convertToSystemPath( self ):
         if self[ TYPE ] == SYSTEM:
@@ -94,7 +93,7 @@ class SystemPath( tuple ):
         return self.getFullID().getFullPN( aPropertyName )
 
     def getString( self ):
-        return '/' + string.join( self[ 1 : ] , '/' )
+        return '/' + '/'.join( self[ 1 : ] )
 
     def isAbsolute( self ):
         if self[0] == '/':
@@ -131,8 +130,6 @@ class SystemPath( tuple ):
         aList = self.solveParentReference( aNewList )
         return aList
         
-
-# instantiation #
 def createFullID( aValue ):
     aList = convertToFullIDList( aValue )
     if not aList:
@@ -163,7 +160,6 @@ def createSystemPath( aValue ):
 
     return SystemPath( aList )
 
-# utils #
 def convertToList( aValue ):
     if isinstance( aValue , list ):
         return aValue
@@ -179,7 +175,7 @@ def convertToFullIDList( aValue ):
 
     else:
         if isinstance( aValue , str ):
-            aList = string.split( aValue, ':' )
+            aList = aValue.split( ':' )
             try:
                 aList[ 0 ] = ENTITYTYPE_DICT[ aList[ 0 ] ]
             except IndexError:
@@ -197,14 +193,14 @@ def convertToSystemPathList( aValue ):
 
     else:
         if isinstance( aValue , str ):
-            aList = string.split( aValue, '/' )
+            aList = aValue.split( '/' )
             if aValue == '':
                 return []
 
             if aList[ 0 ] == '':
                 del( aList[ 0 ])
 
-            if string.lstrip( aValue )[ 0 ] == '/':
+            if aValue.lstrip()[ 0 ] == '/':
                 aList[ 0 : 0 ] = ['/']
 
             return aList

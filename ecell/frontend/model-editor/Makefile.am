@@ -1,94 +1,100 @@
-SUBDIRS = glade doc plugins
+SUBDIRS = glade plugins
 
-ECELL_LIB_DIR = $(libdir)/$(ECELL_DIRNAME)
-modeleditordir = $(ECELL_LIB_DIR)/model-editor
+ECELL_STAGING_HOME=$(abs_top_builddir)/tmp
+PYECELL_STAGING_HOME=$(ECELL_STAGING_HOME)/pyecell
 
-modeleditor_PYTHON = \
-	ShapePluginManager.py \
-	AboutModelEditor.py \
-	AutoLayout.py \
-	AutosaveWindow.py \
-	Buffer.py \
-	BufferFactory.py \
-	ClassEditor.py \
-	ClassList.py \
-	ClassEditorWindow.py \
-	ClassPropertyList.py \
-	Clipboard.py \
-	Command.py \
-	CommandQueue.py \
-	ComplexShape.py \
-	ComplexLine.py \
-	ConfirmWindow.py \
-	ConnectionObject.py \
-	ConnectionObjectEditorWindow.py \
-	Constants.py \
-	DMInfo.py \
-	EditorObject.py \
-	EntityCommand.py \
-	EntityEditor.py \
-	EntityList.py \
-	EntityListTab.py \
-	Error.py \
-	FullIDBrowserWindow.py \
-	Layout.py \
-	LayoutBuffer.py \
-	LayoutBufferFactory.py \
-	LayoutCommand.py \
-	LayoutEml.py \
-	LayoutManager.py \
-	LayoutXML.py \
-	LinePropertyEditor.py \
-	LineDescriptor.py \
-	ListWindow.py \
-	MEMainWindow.py \
-	ModelEditor.py \
-	ModelStore.py \
-	MultiLineEditor.py \
-	NestedListEditor.py \
-	ObjectEditorWindow.py \
-	PathwayEditor.py \
-	PopupMenu.py \
-	ProcessObject.py \
-	PropertyEditor.py \
-	PropertyList.py \
-	ResizeableText.py \
-	Runtime.py \
-	ShapePropertyComponent.py \
-	StepperChooser.py \
-	StepperCommand.py \
-	StepperEditor.py \
-	StepperList.py \
-	StepperTab.py \
-	SystemObject.py \
-	SystemTree.py \
-	TextObject.py \
-	Utils.py \
-	VariableObject.py \
-	MEVariableReferenceEditor.py \
-	ViewComponent.py \
-	Window.py \
-	PathwayCanvas.py \
-	Config.py \
-	CommandMultiplexer.py \
-	PackingStrategy.py \
-	opengui.py \
-	VariableReferenceEditorComponent.py \
-	ShapePropertyComponent.py \
-	ShapeDescriptor.py \
-	ObjectEditorWindow.py \
-	LinePropertyComponent.py \
-	GraphicalUtils.py \
-	ConnectionObjectEditorWindow.py \
-	ComplexShape.py
+PYTHON_ = env PYTHONPATH=$(PYECELL_STAGING_HOME) sysconfdir=$(sysconfdir) datarootdir=$(datarootdir) libdir=$(libdir) $(PYTHON)
 
-modeleditor_DATA = \
-	preferences.ini
+EXTRA_DIST = \
+	ecell/ui/model_editor/__init__.py\
+	ecell/ui/model_editor/AboutModelEditor.py\
+	ecell/ui/model_editor/AutoLayout.py\
+	ecell/ui/model_editor/AutosaveWindow.py\
+	ecell/ui/model_editor/Buffer.py\
+	ecell/ui/model_editor/BufferFactory.py\
+	ecell/ui/model_editor/ClassEditor.py\
+	ecell/ui/model_editor/ClassEditorWindow.py\
+	ecell/ui/model_editor/ClassList.py\
+	ecell/ui/model_editor/ClassPropertyList.py\
+	ecell/ui/model_editor/Clipboard.py\
+	ecell/ui/model_editor/Command.py\
+	ecell/ui/model_editor/CommandMultiplexer.py\
+	ecell/ui/model_editor/CommandQueue.py\
+	ecell/ui/model_editor/ComplexLine.py\
+	ecell/ui/model_editor/ComplexShape.py\
+	ecell/ui/model_editor/Config.py\
+	ecell/ui/model_editor/ConfirmWindow.py\
+	ecell/ui/model_editor/ConnectionObject.py\
+	ecell/ui/model_editor/ConnectionObjectEditorWindow.py\
+	ecell/ui/model_editor/Constants.py\
+	ecell/ui/model_editor/DMInfo.py\
+	ecell/ui/model_editor/EditorObject.py\
+	ecell/ui/model_editor/EntityCommand.py\
+	ecell/ui/model_editor/EntityEditor.py\
+	ecell/ui/model_editor/EntityList.py\
+	ecell/ui/model_editor/EntityListTab.py\
+	ecell/ui/model_editor/Error.py\
+	ecell/ui/model_editor/FullIDBrowserWindow.py\
+	ecell/ui/model_editor/GraphicalUtils.py\
+	ecell/ui/model_editor/Layout.py\
+	ecell/ui/model_editor/LayoutBuffer.py\
+	ecell/ui/model_editor/LayoutBufferFactory.py\
+	ecell/ui/model_editor/LayoutCommand.py\
+	ecell/ui/model_editor/LayoutEml.py\
+	ecell/ui/model_editor/LayoutManager.py\
+	ecell/ui/model_editor/LayoutXML.py\
+	ecell/ui/model_editor/LineDescriptor.py\
+	ecell/ui/model_editor/LinePropertyComponent.py\
+	ecell/ui/model_editor/LinePropertyEditor.py\
+	ecell/ui/model_editor/ListWindow.py\
+	ecell/ui/model_editor/MEMainWindow.py\
+	ecell/ui/model_editor/MEVariableReferenceEditor.py\
+	ecell/ui/model_editor/ModelEditor.py\
+	ecell/ui/model_editor/ModelStore.py\
+	ecell/ui/model_editor/MultiLineEditor.py\
+	ecell/ui/model_editor/NestedListEditor.py\
+	ecell/ui/model_editor/ObjectEditorWindow.py\
+	ecell/ui/model_editor/PackingStrategy.py\
+	ecell/ui/model_editor/PathwayCanvas.py\
+	ecell/ui/model_editor/PathwayEditor.py\
+	ecell/ui/model_editor/PopupMenu.py\
+	ecell/ui/model_editor/ProcessObject.py\
+	ecell/ui/model_editor/PropertyEditor.py\
+	ecell/ui/model_editor/PropertyList.py\
+	ecell/ui/model_editor/ResizeableText.py\
+	ecell/ui/model_editor/RunTester.py\
+	ecell/ui/model_editor/Runtime.py\
+	ecell/ui/model_editor/ShapeDescriptor.py\
+	ecell/ui/model_editor/ShapePluginManager.py\
+	ecell/ui/model_editor/ShapePropertyComponent.py\
+	ecell/ui/model_editor/StepperChooser.py\
+	ecell/ui/model_editor/StepperCommand.py\
+	ecell/ui/model_editor/StepperEditor.py\
+	ecell/ui/model_editor/StepperList.py\
+	ecell/ui/model_editor/StepperTab.py\
+	ecell/ui/model_editor/SystemObject.py\
+	ecell/ui/model_editor/SystemTree.py\
+	ecell/ui/model_editor/TextObject.py\
+	ecell/ui/model_editor/Utils.py\
+	ecell/ui/model_editor/VariableObject.py\
+	ecell/ui/model_editor/VariableReferenceEditorComponent.py\
+	ecell/ui/model_editor/ViewComponent.py\
+	ecell/ui/model_editor/Window.py\
+	ecell/ui/model_editor/opengui.py
 
-bin_SCRIPTS = ecell3-model-editor
+EXTRA_DIST +=\
+	model-editor.ini\
+	setup.py
 
-EXTRA_DIST = $(modeleditor_PYTHON) $(modeleditor_DATA) $(bin_SCRIPTS)
+EXTRA_DIST +=\
+	ecell3-model-editor
 
-clean-local:
-	$(RM) -rf build *.exe *.zip *.dll *.pyd
+all-local:
+	$(PYTHON_) setup.py config
+	$(PYTHON_) setup.py build
 
+mostlyclean-local:
+	$(PYTHON_) setup.py clean
+
+install-exec-local:
+	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )

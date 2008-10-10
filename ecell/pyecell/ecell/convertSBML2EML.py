@@ -24,8 +24,8 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # 
 #END_HEADER
+
 import sys
-import string
 import re
 import os
 import time

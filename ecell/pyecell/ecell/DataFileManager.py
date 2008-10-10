@@ -31,8 +31,7 @@
 # E-Cell Project, Lab. for Bioinformatics, Keio University.
 #
 
-from DataFile import *
-from string import *
+from ecell.DataFile import *
 
 # ------------------------------------------------------------------
 # DataFileManager (This is abstract class)
@@ -100,7 +99,7 @@ class DataFileManager:
 
         for aKey in self.theFileMap.keys():
             aFileName = self.theFileMap[aKey].getFileName()
-            aFileName = split(aFileName,'/')[-1]
+            aFileName = aFileName.split('/')[-1]
             aFileName = self.theRootDirectory + '/' + aFileName
             self.theFileMap[aKey].save(aFileName)
 

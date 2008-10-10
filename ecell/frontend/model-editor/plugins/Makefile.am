@@ -1,7 +1,4 @@
-ECELL_LIB_DIR = $(libdir)/$(ECELL_DIRNAME)
-modeleditorplugindir = $(ECELL_LIB_DIR)/model-editor/plugins
-
-modeleditorplugin_DATA = \
+EXTRA_DIST =\
 	AminoAcidVariableSD.py \
 	Amino.png \
 	Anion.png \
@@ -31,5 +28,3 @@ modeleditorplugin_DATA = \
 	SmallMolVariableSD.py \
 	SystemSD.py \
 	VariableSD.py
-
-EXTRA_DIST = $(modeleditorplugin_DATA)

@@ -1,78 +1,55 @@
-SUBDIRS = plugins
+SUBDIRS = glade plugins
 
-ECELL_LIB_DIR = $(libdir)/$(ECELL_DIRNAME)
+ECELL_STAGING_HOME=$(abs_top_builddir)/tmp
+PYECELL_STAGING_HOME=$(ECELL_STAGING_HOME)/pyecell
 
-sessionmonitordir = $(ECELL_LIB_DIR)/session-monitor
+PYTHON_ = env PYTHONPATH=$(PYECELL_STAGING_HOME) sysconfdir=$(sysconfdir) datarootdir=$(datarootdir) libdir=$(libdir) $(PYTHON)
 
-sessionmonitor_DATA = \
-	AboutSessionMonitor.glade \
-	BoardWindow.glade \
-	EntityListWindow.glade \
-	FullPNQueue.glade \
-	InterfaceWindow.glade \
-	LoggerWindow.glade \
-	LoggingPolicy.glade \
-	MainWindow.glade \
-	MessageWindow.glade \
-	PluginInstanceSelection.glade \
-	PluginWindowPopupMenu.glade \
-	StepperWindow.glade \
-	board.glade \
-	osogo.ini \
-	ecell.png \
-	ecell32-1.png \
-	ecell32-2.png \
-	ecell32-3.png \
-	ecell32-4.png \
-	ecell32-5.png \
-	ecell32-6.png \
-	ecell32-7.png \
-	ecell32-8.png \
-	ecell32.png \
-	ecell_large.png \
-	icon_board.png \
-	icon_ecell.png \
-	icon_entity.png \
-	icon_interface.png \
-	icon_logger.png \
-	icon_message.png \
-	icon_start.png \
-	icon_step.png \
-	icon_stepper.png \
-	icon_stop.png
-
-sessionmonitor_PYTHON= \
-	AboutSessionMonitor.py \
-	BoardWindow.py \
-	ConfirmWindow.py \
-	DataGenerator.py \
-	EntityListWindow.py \
-	FullPNQueue.py \
-	GtkSessionMonitor.py \
-	InterfaceWindow.py \
-	LoggerFactory.py \
-	LoggerWindow.py \
-	LoggingPolicy.py \
-	MainWindow.py \
-	MessageWindow.py \
-	OsogoPluginManager.py \
-	OsogoPluginWindow.py \
-	OsogoUtil.py \
-	OsogoWindow.py \
-	Plot.py \
-	PluginInstanceSelection.py \
-	StepperWindow.py \
-	VariableReferenceEditor.py \
-	ViewWindow.py \
-	gui_config.py \
-	config.py \
-	main.py \
+EXTRA_DIST = \
+	ecell/ui/__init__.py\
+	AboutSessionMonitor.py\
+	BoardWindow.py\
+	ConfirmWindow.py\
+	DataGenerator.py\
+	EntityListWindow.py\
+	FullPNQueue.py\
+	GtkSessionMonitor.py\
+	InterfaceWindow.py\
+	LoggerFactory.py\
+	LoggerWindow.py\
+	LoggingPolicy.py\
+	MainWindow.py\
+	MessageWindow.py\
+	ModelWalker.py\
+	OsogoPluginManager.py\
+	OsogoPluginWindow.py\
+	OsogoUtil.py\
+	OsogoWindow.py\
+	Plot.py\
+	PluginInstanceSelection.py\
+	PluginWindow.py\
+	StepperWindow.py\
+	VariableReferenceEditor.py\
+	ViewWindow.py\
+	Window.py\
+	__init__.py\
+	config.py\
+	main.py\
 	opengui.py
 
-bin_SCRIPTS = ecell3-session-monitor
+EXTRA_DIST +=\
+	osogo.ini\
+	setup.py
 
-EXTRA_DIST = $(sessionmonitor_DATA) $(bin_SCRIPTS)
+EXTRA_DIST +=\
+	ecell3-session-monitor
 
-clean-local:
-	${RM} -rf build *.exe *.zip *.dll *.pyd
+all-local:
+	$(PYTHON_) setup.py config
+	$(PYTHON_) setup.py build
 
+mostlyclean-local:
+	$(PYTHON_) setup.py clean
+
+install-exec-local:
+	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )

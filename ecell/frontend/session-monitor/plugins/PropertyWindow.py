@@ -26,19 +26,20 @@
 # 
 #END_HEADER
 
-from OsogoPluginWindow import *
-from VariableReferenceEditor import *
-from FullPNQueue import *
+import os
+import gtk
+import gobject
+
+import ecell.ui.osogo.config as config
+from ecell.ui.osogo.OsogoPluginWindow import *
+from ecell.ui.osogo.VariableReferenceEditor import *
+from ecell.ui.osogo.FullPNQueue import *
 
 # column index of clist
 GETABLE_COL   = 0
 SETTABLE_COL  = 1
 PROPERTY_COL  = 2
 VALUE_COL     = 3
-
-import gobject
-import gtk
-import os
 
 PROPERTY_COL_TYPE=gobject.TYPE_STRING
 VALUE_COL_TYPE=gobject.TYPE_STRING
@@ -167,8 +168,8 @@ class PropertyWindow(OsogoPluginWindow):
         self['checkViewAll'].set_active( False )
 
         self.setIconList(
-            os.environ['SESSIONMONITORPATH'] + os.sep + "ecell.png",
-            os.environ['SESSIONMONITORPATH'] + os.sep + "ecell32.png")
+            os.path.join( config.GLADEFILE_PATH, "ecell.png" ),
+            os.path.join( config.GLADEFILE_PATH, "ecell32.png" ) )
         #self.__setFullPNList()
         self.update(True)
 
@@ -215,7 +216,7 @@ class PropertyWindow(OsogoPluginWindow):
                more than 2 lines, connects them as one line.
         """
 
-        aMessage = string.join( string.split(aMessage,'\n'), ', ' )
+        aMessage = ', '.join( aMessage.split( '\n' ) )
 
         self.theStatusBarWidget.push(1,aMessage)
 
@@ -328,9 +329,9 @@ class PropertyWindow(OsogoPluginWindow):
             
             self['labelEntityType'].set_text( anEntityType + ' Property' )
             self['entryClassName'].set_text( anEntityStub.getClassname() )
-            self['entryFullID'].set_text( string.join( [ anEntityType,
-                                                         aSystemPath,
-                                                         anID], ':' ) )
+            self['entryFullID'].set_text( ':'.join( [ anEntityType,
+                                                      aSystemPath,
+                                                      anID ] ) )
             
             # saves properties to buffer
             self.thePrePropertyMap = {}
@@ -568,14 +569,13 @@ class PropertyWindow(OsogoPluginWindow):
             # ------------------------------------
             if type(aPreValue) == type(0):
                 try:
-                    aValue = string.atoi(aValue)
+                    aValue = int(aValue)
                 except:
                     import sys
                     import traceback
-                    anErrorMessage = string.join(
+                    anErrorMessage = '\n'.join(
                         traceback.format_exception( 
-                            sys.exc_type,sys.exc_value,sys.exc_traceback ),
-                                                 '\n' )
+                            sys.exc_type,sys.exc_value,sys.exc_traceback ) )
                     self.theSession.message("-----An error happens.-----")
                     self.theSession.message(anErrorMessage)
                     self.theSession.message("---------------------------")
@@ -593,12 +593,11 @@ class PropertyWindow(OsogoPluginWindow):
             # ------------------------------------
             elif type(aPreValue) == type(0.0):
                 try:
-                    aValue = string.atof(aValue)
+                    aValue = float(aValue)
                 except:
                     import sys
                     import traceback
-                    anErrorMessage = string.join( traceback.format_exception( \
-                        sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+                    anErrorMessage = '\n'.join( traceback.format_exception(  sys.exc_type,sys.exc_value,sys.exc_traceback ) )
                     self.theSession.message("-----An error happened.-----")
                     self.theSession.message(anErrorMessage)
                     self.theSession.message("---------------------------")
@@ -621,7 +620,7 @@ class PropertyWindow(OsogoPluginWindow):
                 except:
                     import sys
                     import traceback
-                    anErrorMessage = string.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+                    anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback ) )
                     self.theSession.message("-----An error happens.-----")
                     self.theSession.message(anErrorMessage)
                     self.theSession.message("---------------------------")
@@ -648,7 +647,7 @@ class PropertyWindow(OsogoPluginWindow):
 
             import sys
             import traceback
-            anErrorMessage = string.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback), '\n' )
+            anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback ) )
             self.theSession.message("-----An error happens.-----")
             self.theSession.message(anErrorMessage)
             self.theSession.message("---------------------------")

@@ -30,10 +30,10 @@
 # E-Cell Project, Lab. for Bioinformatics, Keio University.
 #
 
-import string
-from DataFile import *
 import numpy
-import TableIO
+
+from ecell.DataFile import *
+import ecell.TableIO
 
 # extension
 ECD_EXTENSION='ecd'
@@ -109,7 +109,7 @@ class ECDDataFile( DataFile ):
             aBuff = aInputFile.readline() 
             if aBuff.find( aKey ) != 0:
                 raise "Error: %s is not ECD format. '%s' line can't be found." %aKey
-            return string.strip(aBuff[len(aKey):]) 
+            return aBuff[len(aKey):].strip()
 
 
         if( len(self.theFileName) == 0):
@@ -226,7 +226,7 @@ class ECDDataFile( DataFile ):
     # ------------------------------------------------------------------
     def setLabel( self, aLabel ):
         
-        self.theLabel = string.split( aLabel )
+        self.theLabel = aLabel.split()
 
     # end of setLabel
 
@@ -391,7 +391,7 @@ class ECDDataFile( DataFile ):
         aHeaderList = []        
         aHeaderList.append( '#DATA: %s' %self.theDataName )
         aHeaderList.append( '#SIZE: %d %d' %(self.theSizeOfColumn,self.theSizeOfLine) )
-        aHeaderList.append( '#LABEL: %s' % string.join( self.theLabel, '\t' ) )
+        aHeaderList.append( '#LABEL: %s' % '\t'.join( self.theLabel ) )
         aHeaderList.append( '#NOTE: %s' %self.theNote )
         aHeaderList.append( '#' )
         aHeaderList.append( '#----------------------' )

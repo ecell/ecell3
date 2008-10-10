@@ -28,17 +28,15 @@
 
 # this module is deprecated
 
-#from ObjectStub import *
 from EntityStub import *
 from LoggerStub import *
 from StepperStub import *
 
-import string
 from ecs_constants import *
 
 def createFullID( fullidstring ):
 
-    aFullID = string.split( fullidstring, ':' )
+    aFullID = fullidstring.split( ':' )
     try:
         aFullID[0] = ENTITYTYPE_DICT[aFullID[0]]
     except IndexError:
@@ -49,7 +47,7 @@ def createFullID( fullidstring ):
 
 def createFullPN( fullpnstring ):
 
-    aFullPN = string.split( fullpnstring, ':' )
+    aFullPN = fullpnstring.split( ':' )
     try:
         aFullPN[0] = ENTITYTYPE_DICT[aFullPN[0]]
     except IndexError:
@@ -63,14 +61,14 @@ def createFullIDString( fullid ):
 
     validateFullID( fullid )
     aTypeString = ENTITYTYPE_STRING_LIST[int(fullid[0])]
-    return aTypeString + ':' + string.join( fullid[1:], ':' )
+    return aTypeString + ':' + ':'.join( fullid[1:] )
 
 
 def createFullPNString( fullpn ):
 
     validateFullPN( fullpn )
     aTypeString = ENTITYTYPE_STRING_LIST[fullpn[0]]
-    return aTypeString + ':' + string.join( fullpn[1:], ':' )
+    return aTypeString + ':' + ':'.join( fullpn[1:] )
 
 
 def convertFullIDToFullPN( fullid, property='' ):

@@ -25,19 +25,20 @@
 # 
 #END_HEADER
 
-import gtk 
-from numpy import *
-import gtk.gdk
-import re
-import string
-import operator
 import os
-from Plot import *
+import re
+import operator
+from numpy import *
+import gtk 
+import gtk.gdk
+
 from ecell.ecssupport import *
-from OsogoPluginWindow import *
+
+import ecell.ui.osogo.config as config
+from ecell.ui.osogo.Plot import *
+from ecell.ui.osogo.OsogoPluginWindow import *
 
 class BargraphWindow( OsogoPluginWindow ):
-
 	def __init__( self, dirname, data, pluginmanager, rootWidget=None ):
 		#initializa variables:
 		#initiates window
@@ -47,23 +48,8 @@ class BargraphWindow( OsogoPluginWindow ):
 		self.BAR_WIDTH=150
 		self.BAR_HEIGTH=20
 
-		#aFullPNString = createFullPNString( self.theFullPN() )
-		#aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
-		#if operator.isNumberType( aValue ) == FALSE:
-		#	aMessage = "Error: (%s) is not numerical data" %aFullPNString
-		#	self.thePluginManager.printMessage( aMessage )
-		#	aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,'Error!')
-		#	raise TypeError( aMessage )
-
-
-
 	def openWindow( self ):
 		OsogoPluginWindow.openWindow(self)
-		#self.openWindow()
-		#this should be removed:
-		#self.root = self[self.__class__.__name__]
-		#rootWidget=self.getWidget('BargraphWindow')
-		#gets HandleBox
 		self.handlebox=self.getWidget('handlebox1')
 		self.drawingarea=self.getWidget('drawingarea1')
 		self.numberlabel=self.getWidget('label4')
@@ -73,9 +59,6 @@ class BargraphWindow( OsogoPluginWindow ):
 		self.drawingframe=self.getWidget('frame8')
 		self.buttonstate=1
 		self.button.set_active(self.buttonstate)
-		#sets callback for drawingarea
-		#sets up picturebuffer
-#		self.drawingarea.set_size_request(self.BAR_WIDTH,self.BAR_HEIGTH)
 
 		self.ColorMap=self.handlebox.get_colormap()
 		#sets colorcodes, codetable
@@ -100,11 +83,9 @@ class BargraphWindow( OsogoPluginWindow ):
 		self.lastscale=0
 		self.lastposition=0
 		#paint pixbuf according to lastvalue - draw everything to default
-		#self.pm=gtk.gdk.Pixmap(root.window,BAR_WIDTH,BAR_HEIGTH,-1)
 		self.pm=gtk.gdk.Pixmap(root.window,self.BAR_WIDTH,self.BAR_HEIGTH,-1)
 		
 		self.pm.draw_rectangle(self.colored_ranges[1][2],True,0,0,
-			    #BAR_WIDTH,BAR_HEIGTH)
 			    self.BAR_WIDTH,self.BAR_HEIGTH)
 
 		self.addHandlers({\
@@ -113,18 +94,14 @@ class BargraphWindow( OsogoPluginWindow ):
 
 		self.drawingarea.queue_draw_area(0,0,self.BAR_WIDTH, self.BAR_HEIGTH)			
 		#calls update
-		#pluginmanager.appendInstance(self)
 		self.thePluginManager.appendInstance(self)
-		#self.ccFullPN=convertFullIDToFullPN(self.theFullID(),
-		#'Value')
-		#nameFullPN=str(self.ccFullPN[SYSTEMPATH])+':'+\
-		#    str(self.ccFullPN[ID])
 		self.ccFullPN=self.theFullPNList()[0]
 		nameFullPN=createFullPNString(self.ccFullPN)
 		self.textlabel.set_text(nameFullPN)
                 self.setIconList(
-			os.environ['SESSIONMONITORPATH'] + os.sep + "ecell.png",
-			os.environ['SESSIONMONITORPATH'] + os.sep + "ecell32.png")
+			os.path.join( config.GLADEFILE_PATH, "ecell.png" ),
+			os.path.join( config.GLADEFILE_PATH, "ecell32.png")
+			)
 		self.update()
 
 	def update(self):
@@ -198,12 +175,8 @@ class BargraphWindow( OsogoPluginWindow ):
 		#needs resize
 		self.BAR_WIDTH=new_width
 		self.BAR_HEIGTH=new_heigth
-#		self.drawingarea.set_size_request(self.BAR_WIDTH,self.BAR_HEIGTH)
-#		del self.pm
-		#rootWidget=self.getWidget('BargraphWindow')
 		aRootWindow=self.getParent()
 		root = aRootWindow[aRootWindow.__class__.__name__]
-		#self.pm=gtk.gdk.Pixmap(self.root.window,self.BAR_WIDTH,self.BAR_HEIGTH,-1)
 		self.pm=gtk.gdk.Pixmap(root.window,self.BAR_WIDTH,self.BAR_HEIGTH,-1)
 		
 		self.lastscale=-2
@@ -215,8 +188,6 @@ class BargraphWindow( OsogoPluginWindow ):
 	    self.button.set_active(self.buttonstate)
 
 	def getlatestdata(self):
-#	    newFullPN[3]='Concentration'
-#	    print newFullPN
 	    return self.getValue(self.ccFullPN)
 	    
 	def get_scale(self,value): 
