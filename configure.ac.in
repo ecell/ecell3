@@ -1,17 +1,10 @@
 AC_REVISION([$Id$])
-AC_INIT
+AC_INIT([ecell], [@ECELL_VERSION_NUMBER@])
 AC_CONFIG_SRCDIR([autogen.sh])
 
-dnl
-sinclude([./ecell_version.sh])
-
-dnl AC_CONFIG_AUX_DIR()
-
 AC_CANONICAL_TARGET([])
-AM_INIT_AUTOMAKE([ecell],${ECELL_VERSION_NUMBER})
+AM_INIT_AUTOMAKE([filename-length-max=255 tar-ustar dist-bzip2])
 AC_PROG_MAKE_SET
-
-dnl AC_LIBLTDL_INSTALLABLE
 
 AC_LIBLTDL_CONVENIENCE
 AC_SUBST(INCLTDL)
