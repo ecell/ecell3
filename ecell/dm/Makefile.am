@@ -8,7 +8,7 @@ SHELL = @SHELL@
 
 AM_CXXFLAGS = @CXXFLAGS@
 
-ECELL3_DMC = ../pyecs/ecell3-python ../bin/ecell3-dmc
+ECELL3_DMC = $(top_builddir)/pyecell/ecell3-python ../bin/ecell3-dmc
 
 ECELL_DIRNAME = @ECELL_DIRNAME@
 
