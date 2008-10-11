@@ -2,7 +2,7 @@ AC_REVISION([$Id$])dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT
+AC_INIT([ecell], [@ECELL_VERSION_NUMBER@])
 AC_CONFIG_SRCDIR([libecs/Entity.hpp])
 
 sinclude([../ecell_version.sh])
@@ -10,7 +10,7 @@ sinclude([../ecell_version.sh])
 
 AM_CONFIG_HEADER(ecell_config.h)
 
-AM_INIT_AUTOMAKE([ecell],${ECELL_VERSION_NUMBER})
+AM_INIT_AUTOMAKE
 
 ECELL_DIRNAME=${PACKAGE}-${ECELL_MAJOR_VERSION}.${ECELL_MINOR_VERSION}
 
