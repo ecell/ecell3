@@ -1,4 +1,4 @@
-SUBDIRS = glade plugins
+SUBDIRS = glade plugins doc
 
 ECELL_STAGING_HOME=$(abs_top_builddir)/tmp
 PYECELL_STAGING_HOME=$(ECELL_STAGING_HOME)/pyecell
@@ -94,7 +94,7 @@ all-local:
 	$(PYTHON_) setup.py build
 
 mostlyclean-local:
-	$(PYTHON_) setup.py clean
+	rm -rf build
 
 install-exec-local:
 	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )

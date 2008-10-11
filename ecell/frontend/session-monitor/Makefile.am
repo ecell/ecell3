@@ -7,35 +7,35 @@ PYTHON_ = env PYTHONPATH=$(PYECELL_STAGING_HOME) sysconfdir=$(sysconfdir) dataro
 
 EXTRA_DIST = \
 	ecell/ui/__init__.py\
-	AboutSessionMonitor.py\
-	BoardWindow.py\
-	ConfirmWindow.py\
-	DataGenerator.py\
-	EntityListWindow.py\
-	FullPNQueue.py\
-	GtkSessionMonitor.py\
-	InterfaceWindow.py\
-	LoggerFactory.py\
-	LoggerWindow.py\
-	LoggingPolicy.py\
-	MainWindow.py\
-	MessageWindow.py\
-	ModelWalker.py\
-	OsogoPluginManager.py\
-	OsogoPluginWindow.py\
-	OsogoUtil.py\
-	OsogoWindow.py\
-	Plot.py\
-	PluginInstanceSelection.py\
-	PluginWindow.py\
-	StepperWindow.py\
-	VariableReferenceEditor.py\
-	ViewWindow.py\
-	Window.py\
-	__init__.py\
-	config.py\
-	main.py\
-	opengui.py
+	ecell/ui/osogo/AboutSessionMonitor.py\
+	ecell/ui/osogo/BoardWindow.py\
+	ecell/ui/osogo/ConfirmWindow.py\
+	ecell/ui/osogo/DataGenerator.py\
+	ecell/ui/osogo/EntityListWindow.py\
+	ecell/ui/osogo/FullPNQueue.py\
+	ecell/ui/osogo/GtkSessionMonitor.py\
+	ecell/ui/osogo/InterfaceWindow.py\
+	ecell/ui/osogo/LoggerFactory.py\
+	ecell/ui/osogo/LoggerWindow.py\
+	ecell/ui/osogo/LoggingPolicy.py\
+	ecell/ui/osogo/MainWindow.py\
+	ecell/ui/osogo/MessageWindow.py\
+	ecell/ui/osogo/ModelWalker.py\
+	ecell/ui/osogo/OsogoPluginManager.py\
+	ecell/ui/osogo/OsogoPluginWindow.py\
+	ecell/ui/osogo/OsogoUtil.py\
+	ecell/ui/osogo/OsogoWindow.py\
+	ecell/ui/osogo/Plot.py\
+	ecell/ui/osogo/PluginInstanceSelection.py\
+	ecell/ui/osogo/PluginWindow.py\
+	ecell/ui/osogo/StepperWindow.py\
+	ecell/ui/osogo/VariableReferenceEditor.py\
+	ecell/ui/osogo/ViewWindow.py\
+	ecell/ui/osogo/Window.py\
+	ecell/ui/osogo/__init__.py\
+	ecell/ui/osogo/config.py\
+	ecell/ui/osogo/main.py\
+	ecell/ui/osogo/opengui.py
 
 EXTRA_DIST +=\
 	osogo.ini\
@@ -49,7 +49,7 @@ all-local:
 	$(PYTHON_) setup.py build
 
 mostlyclean-local:
-	$(PYTHON_) setup.py clean
+	rm -rf build
 
 install-exec-local:
 	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )
