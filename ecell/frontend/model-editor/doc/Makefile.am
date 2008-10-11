@@ -1,4 +1,4 @@
-modeleditordocdir = $(htmldir)/model-editor
+modeleditordocdir = $(docdir)/model-editor
 
 modeleditordoc_DATA = \
 	differential1.gif \
