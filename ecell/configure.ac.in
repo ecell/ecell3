@@ -2,7 +2,7 @@ AC_REVISION([$Id$])dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT
+AC_INIT([ecell], [@ECELL_VERSION_NUMBER@])
 AC_CONFIG_SRCDIR([libecs/Entity.hpp])
 
 sinclude([../ecell_version.sh])
@@ -10,7 +10,7 @@ sinclude([../ecell_version.sh])
 
 AM_CONFIG_HEADER(ecell_config.h)
 
-AM_INIT_AUTOMAKE([ecell],${ECELL_VERSION_NUMBER})
+AM_INIT_AUTOMAKE
 
 ECELL_DIRNAME=${PACKAGE}-${ECELL_MAJOR_VERSION}.${ECELL_MINOR_VERSION}
 
@@ -159,23 +159,9 @@ dnl Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_STDC
 
-AC_CHECK_HEADERS([fcntl.h errno.h unistd.h memory.h sys/stat.h sys/types.h sys/mman.h sys/param.h sys/statvfs.h sys/statfs.h sys/mount.h sys/vfs.h])
+AC_CHECK_HEADERS([fcntl.h unistd.h memory.h sys/stat.h sys/types.h sys/mman.h sys/param.h sys/statvfs.h sys/statfs.h sys/mount.h sys/vfs.h])
+AC_CHECK_HEADERS([unordered_map tr1/unordered_map])
 AC_CHECK_HEADERS([windows.h])
-
-ECELL_HAVE_UNOREDERED_MAP="#undef ECELL_HAVE_UNORDERED_MAP"
-ECELL_HAVE_TR1_UNOREDERED_MAP="#undef ECELL_HAVE_TR1_UNORDERED_MAP"
-AC_CHECK_HEADER([unordered_map], [
-  AC_DEFINE([HAVE_UNORDERED_MAP], [1], [Define to 1 if you have the <unordered_map> header file])
-  ECELL_HAVE_UNORDERED_MAP="#define ECELL_HAVE_UNORDERED_MAP 1"
-])
-
-AC_CHECK_HEADER([tr1/unordered_map], [
-  AC_DEFINE([HAVE_TR1_UNORDERED_MAP], [1], [Define to 1 if you have the <unordered_map> header file])
-  ECELL_HAVE_TR1_UNORDERED_MAP="#define ECELL_HAVE_TR1_UNORDERED_MAP 1"
-])
-
-AC_SUBST([ECELL_HAVE_UNORDERED_MAP])
-AC_SUBST([ECELL_HAVE_TR1_UNORDERED_MAP])
 
 AC_CHECK_HEADERS([stdint.h], [
   INT64_T_DECLARATION="#include <stdint.h>"
@@ -206,17 +192,7 @@ elif test "$HAVE_HUGE_VAL" = 1; then
 fi
 AC_SUBST([INFINITY_VAL])
 
-ECELL_HAVE_PRETTY_FUNCTION_MACRO="#undef ECELL_HAVE_PRETTY_FUNCTION_MACRO"
-ECELL_HAVE_FUNCTION_MACRO="#undef ECELL_HAVE_FUNCTION_MACRO"
-ECELL_CHECK_PRETTY_FUNCTION([
-  ECELL_HAVE_PRETTY_FUNCTION_MACRO="#define ECELL_HAVE_PRETTY_FUNCTION_MACRO 1"
-])
-ECELL_CHECK_FUNCTION([
-  ECELL_HAVE_FUNCTION_MACRO="#define ECELL_HAVE_FUNCTION_MACRO 1"
-])
-AC_SUBST([ECELL_HAVE_PRETTY_FUNCTION_MACRO])
-AC_SUBST([ECELL_HAVE_FUNCTION_MACRO])
-
+ECELL_CHECK_PRETTY_FUNCTION
 
 EXT_GUESS="../../../.. ../../.. ../.. ../ ./ $prefix /usr /usr/local /opt"
 
@@ -325,9 +301,12 @@ AC_CONFIG_FILES([
     libecs/Makefile
     libecs/scripting/Makefile
     libecs/tests/Makefile
+    libemc/Makefile
     pyecell/Makefile
     pyecell/setup.py
     pyecell/ecell/config.py
+    pyecs/Makefile
+    pyecs/setup.py
     frontend/Makefile
     frontend/session-monitor/Makefile
     frontend/session-monitor/plugins/Makefile
