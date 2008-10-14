@@ -144,6 +144,8 @@ def main():
         PYTHON_WIN_VERSION = ( '%d%d' )%( sys.version_info[:2] )
         ADDFLAGS = ' -Wl,--enable-runtime-pseudo-reloc -Wl,-s -lpython' + \
                    PYTHON_WIN_VERSION
+    elif sys.platform == 'darwin':
+        ADDFLAGS = ' -Wl,-undefined,dynamic_lookup'
     else:
         ADDFLAGS = ''
         cmdList.append( sys.executable )
@@ -171,7 +173,7 @@ def main():
         
     LDFLAGS = LDFLAGS + ADDFLAGS + ' -lecs -lgsl ' + BOOST_LIBRARIES
     os.environ['LDFLAGS'] = LDFLAGS
-    
+
     if NO_DEFINE_CXXFLAGS:
         os.environ['CXXFLAGS'] = CXXFLAGS.join()
 
