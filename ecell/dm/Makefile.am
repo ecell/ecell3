@@ -6,7 +6,7 @@ SUFFIXES = .cpp $(LTDL_SHLIB_EXT)
 
 SHELL = @SHELL@
 
-AM_CXXFLAGS = @CXXFLAGS@ -undefined dynamic_lookup
+AM_CXXFLAGS = @CXXFLAGS@
 
 ECELL3_DMC = $(top_builddir)/pyecell/ecell3-python ../bin/ecell3-dmc
 
