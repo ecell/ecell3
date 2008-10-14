@@ -30,6 +30,8 @@ EXTRA_DIST = \
 	ecell/convertEML2SBML.py \
 	ecell/convertSBML2EML.py \
 	ecell/convertSBMLFunctions.py \
+	ecell/ecs.py \
+	ecell/emc.py \
 	ecell/ecs_constants.py \
 	ecell/ecssupport.py \
 	ecell/em.py \

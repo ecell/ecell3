@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign
 
-SUBDIRS = libecs libemc pyecs pyecell bin dm frontend
+SUBDIRS = libecs libemc pyecell bin dm frontend
 
 ECELL_DIRNAME = @ECELL_DIRNAME@
 

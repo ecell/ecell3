@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2008 Keio University
+#       Copyright (C) 2005-2008 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -24,9 +24,19 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # 
 #END_HEADER
-import ecsinit
+import os
 
-# _emc.so
-from _emc import *
+if os.name != "nt":
+    import sys
+    try:
+        import DLFCN
+        
+        # RTLD_GLOBAL is needed so that rtti across dynamic modules can work
+        # RTLD_LAZY   may be needed so that the system can resolve dependency among
+        #             dynamic modules after dlopened it
+        
+        sys.setdlopenflags( DLFCN.RTLD_LAZY | DLFCN.RTLD_GLOBAL )
+    except:
+        None
 
-
+from ecell._ecs import *
