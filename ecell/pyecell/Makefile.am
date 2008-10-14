@@ -10,7 +10,7 @@ ECELL_INCLUDE_DIR = ${includedir}/${ECELL_DIRNAME}
 ECELL_STAGING_HOME=$(abs_top_builddir)/tmp
 PYECELL_STAGING_HOME=$(ECELL_STAGING_HOME)/pyecell
 
-PYTHON_ = env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" INCLTDL="$(INCLTDL)" libdir=$(libdir) $(PYTHON)
+PYTHON_ = env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libdir=$(libdir) $(PYTHON)
 
 EXTRA_DIST = \
 	ecell/DataFile.py \
@@ -31,8 +31,6 @@ EXTRA_DIST = \
 	ecell/convertEML2SBML.py \
 	ecell/convertSBML2EML.py \
 	ecell/convertSBMLFunctions.py \
-	ecell/ecs.py \
-	ecell/emc.py \
 	ecell/ecs_constants.py \
 	ecell/ecssupport.py \
 	ecell/em.py \
