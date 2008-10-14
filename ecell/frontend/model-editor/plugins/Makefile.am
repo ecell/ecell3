@@ -11,6 +11,8 @@ EXTRA_DIST =\
 	DNAVariableSD.py \
 	FattyAcid.png \
 	FattyAcidVariableSD.py \
+	IonVariableSD.py \
+	IonVariableSD.png \
 	Lipid.png \
 	LipidVariableSD.py \
 	Nucleotide.png \
