@@ -1,15 +1,16 @@
-CPPFLAGS+=@INCLTDL@
+DMTOOL_INCLUDE = -I@DMTOOL_INCLUDE_DIR@
+INCLTDL = @INCLTDL@
+LIBLTDL = @LIBLTDL@
+NUMPY_INCLUDE_DIR = @NUMPY_INCLUDE_DIR@
+PYTHON_INCLUDES = @PYTHON_INCLUDES@ -I${NUMPY_INCLUDE_DIR}
+PYTHON_VERSION = @PYTHON_VERSION@
 
-all-local:
-	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libdir="$(libdir)" $(PYTHON) setup.py config
-	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libdir="$(libdir)" $(PYTHON) setup.py build
+ECELL_DIRNAME = @ECELL_DIRNAME@
+ECELL_INCLUDE_DIR = ${includedir}/${ECELL_DIRNAME}
+ECELL_STAGING_HOME=$(abs_top_builddir)/tmp
+PYECELL_STAGING_HOME=$(ECELL_STAGING_HOME)/pyecell
 
-mostlyclean-local:
-	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libdir="$(libdir)" $(PYTHON) setup.py clean
-	$(RM) -rf build
-
-install-exec-local:
-	env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libdir="$(libdir)" $(PYTHON) setup.py install -f --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )
+PYTHON_ = env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS)" INCLTDL="$(INCLTDL)" libdir=$(libdir) $(PYTHON)
 
 EXTRA_DIST = \
 	ecell/DataFile.py \
@@ -85,6 +86,16 @@ EXTRA_DIST = \
 	ecell3-em2eml \
 	ecell3-eml2em
 
+all-local:
+	$(PYTHON_) setup.py config
+	$(PYTHON_) setup.py build
+
 clean-local:
 	${RM} -rf build *.exe *.zip *.dll *.pyd
 
+mostlyclean-local:
+	$(PYTHON_) setup.py clean
+	$(RM) -rf build
+
+install-exec-local:
+	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )

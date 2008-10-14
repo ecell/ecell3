@@ -2,11 +2,11 @@
 
 import os
 import sys
-from distutils.core import setup, Extension
+from numpy.distutils.core import setup, Extension
 
 include_dirs = [
     '@DMTOOL_INCLUDE_DIR@',
-    '@NUMPY_INCLUDE_DIR@',
+    os.environ['INCLTDL'][2:],
     '@top_srcdir@',
     '@top_srcdir@/libecs',
     ]
@@ -50,7 +50,7 @@ setup(
             library_dirs = [ ecell_staging_home + os.environ['libdir'] ],
             libraries = common_libraries + [ 'ecs' ],
             define_macros = sys.platform == 'win32' and
-				[ ('BOOST_ALL_NO_LIB', '1'), ('WIN32','1'), ('_WIN32','1'), ('__STDC__', 1) ],
+				[ ('BOOST_ALL_NO_LIB', '1'), ('WIN32','1'), ('_WIN32','1'), ('__STDC__', 1), ('_WIN32_WINNT', 0x500) ],
             sources = [ 'ecell/_ecs.cpp' ] ),
         Extension( 'ecell._tableio',
 			sources = [ 'ecell/_tableio.c' ],

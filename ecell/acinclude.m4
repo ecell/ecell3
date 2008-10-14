@@ -119,62 +119,6 @@ Py_Initialize();
 ])
 
 
-dnl numpy package.
-dnl find arrayobject.h.
-dnl
-AC_DEFUN([ECELL_CHECK_NUMPY], [
-  AC_REQUIRE([AM_CHECK_PYTHON_HEADERS])
-
-  AC_ARG_WITH(numpy-includes,
-    AC_HELP_STRING([--with-numpy-includes=DIR],
-                   [specify the numpy header location]),
-    [NUMPY_INCLUDE_DIR=$withval],
-    [NUMPY_INCLUDE_DIR=]
-  )
-
-  AC_MSG_CHECKING([for numpy include directory])
-  if test -z "$NUMPY_INCLUDE_DIR"; then
-    if ! NUMPY_INCLUDE_DIR=`$PYTHON -c "import numpy; print numpy.get_include();"`; then
-      py_prefix=`$PYTHON -c "import sys; print sys.prefix"`
-      pydir=python${PYTHON_VERSION}
-      numpy_include="site-packages/numpy/core/include"
-      EXT_GUESS= \
-        "${py_prefix}/Lib/${numpy_include}" \
-        "${py_prefix}/lib/${pydir}/${numpy_include}" \
-        "${py_prefix}/lib64/${pydir}/${numpy_include}" \
-        "/usr/lib/${pydir}/${numpy_include}" \
-        "/usr/lib64/${pydir}/${numpy_include}" \
-        "/usr/local/lib/${pydir}/${numpy_include}" \
-        "/usr/local/lib64/${pydir}/${numpy_include}" \
-        "${prefix}/include" \
-        "/usr/include/${pydir}" \
-        "/usr/local/include" \
-        "/opt/numpy/include"
-      NUMPY_INCLUDE_DIR=""
-      for ac_dir in $EXT_GUESS ; do
-        if test -f ${ac_dir}/numpy/arrayobject.h ; then
-           NUMPY_INCLUDE_DIR=`(cd $ac_dir ; pwd)`
-        fi
-      done
-    fi
-  fi
-  if test -z "${NUMPY_INCLUDE_DIR}"; then        
-    AC_MSG_RESULT([not found in ${EXT_GUESS}.])
-  else
-    AC_MSG_RESULT(${NUMPY_INCLUDE_DIR})
-  fi
-  ac_save_CPPFLAGS="${CPPFLAGS}"
-  CPPFLAGS="-I${NUMPY_INCLUDE_DIR} ${PYTHON_INCLUDES}"
-  AC_CHECK_HEADERS([numpy/arrayobject.h], [], [
-    AC_MSG_ERROR([no usable NumPy headers were found. please check the installation of NumPy package.])
-  ], [
-#include <Python.h>
-  ])
-  CPPFLAGS="${ac_save_CPPFLAGS}"
-  AC_SUBST(NUMPY_INCLUDE_DIR)
-])
-
-
 AC_DEFUN([ECELL_CHECK_MATH_HEADER], [
   STD_MATH_HEADER=
 
@@ -351,3 +295,40 @@ gsl_vector_alloc(0);
       ;;
   esac
 ])
+
+AC_DEFUN([ECELL_CHECK_BOOST], [
+  AC_CHECK_HEADER([boost/config.hpp], [
+    AC_DEFINE(HAVE_BOOST, 1, [Define to 1 if Boost C++ library is installed])
+    ifelse([$1], [],, [$1])
+  ], [
+    ifelse([$2], [],, [$2])
+  ])
+])
+
+AC_DEFUN([ECELL_CHECK_BOOST_PYTHON], [
+  AC_REQUIRE([AM_CHECK_PYTHON_HEADERS])
+  ac_save_CPPFLAGS="$CPPFLAGS"
+  CPPFLAGS="$CPPFLAGS $PYTHON_INCLUDES"
+  AC_CHECK_HEADER([boost/python.hpp], [
+    ac_save_LIBS="$LIBS"
+    LIBS="$LIBS -lboost_python $PYTHON_LIBS"
+    AC_MSG_CHECKING([for Boost.Python runtime library avaiability])
+    AC_TRY_LINK([
+#include <boost/python/module.hpp>
+    ], [
+boost::python::detail::init_module("dummy", 0);
+    ], [
+      AC_MSG_RESULT([yes])
+      AC_DEFINE(HAVE_BOOST_PYTHON, 1, [Define to 1 if Boost.Python is available])
+      ifelse([$1], [],, [$1])
+    ], [
+      AC_MSG_RESULT([no])
+      ifelse([$2], [],, [$2])
+    ])
+    LIBS="$ac_save_LIBS"
+  ], [
+    ifelse([$2], [],, [$2])
+  ])
+  CPPFLAGS="$ac_save_CPPFLAGS"
+])
+
