@@ -16,7 +16,8 @@ EXTRA_DIST = \
 	$(BASIC_DOCS) \
 	depcomp \
 	autogen.sh \
-	ecell_version.sh
+	ecell_version.sh \
+	configure.ac.in
 
 doc_DATA = $(BASIC_DOCS)
 
