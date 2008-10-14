@@ -29,7 +29,7 @@ import sys
 
 __all__ = (
     'PACKAGE',
-    'PACkAGE_TARNAME',
+    'PACKAGE_TARNAME',
     'per_app_dir_name',
     'version',
     'version_info',
