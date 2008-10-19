@@ -32,8 +32,7 @@ libemc_HEADERS=\
 libemc.hpp\
 LocalSimulatorImplementation.hpp\
 Simulator.hpp\
-SimulatorImplementation.hpp\
-SimulatorMaker.hpp
+SimulatorImplementation.hpp
 
 ECELL_STAGING_HOME=$(abs_top_builddir)/tmp
 OUTPUT=$(ECELL_STAGING_HOME)$(libdir)/libemc$(SHLEXT)
