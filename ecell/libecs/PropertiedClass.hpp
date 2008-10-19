@@ -98,6 +98,47 @@ namespace libecs
   void CLASSNAME::initializeModule() \
   { \
     new(thePropertyInterface) libecs::PropertyInterface<CLASSNAME>( #CLASSNAME, theDMTypeName ); \
+  } \
+  PropertySlotBaseCptr CLASSNAME::getPropertySlot( libecs::StringCref aPropertyName ) const \
+  { \
+    return _getPropertyInterface().getPropertySlot( aPropertyName ); \
+  } \
+  void CLASSNAME::setProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ) \
+  { \
+    return _getPropertyInterface().setProperty( *this, aPropertyName, aValue ); \
+  } \
+  const libecs::Polymorph CLASSNAME::getProperty( libecs::StringCref aPropertyName ) const \
+  { \
+    return _getPropertyInterface().getProperty( *this, aPropertyName ); \
+  } \
+  void CLASSNAME::loadProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ) \
+  { \
+    return _getPropertyInterface().loadProperty( *this, aPropertyName, aValue ); \
+  } \
+  const libecs::Polymorph CLASSNAME::saveProperty( libecs::StringCref aPropertyName ) const \
+  { \
+   return _getPropertyInterface().saveProperty( *this, aPropertyName ); \
+  } \
+  const libecs::StringVector CLASSNAME::getPropertyList() const \
+  { \
+   return _getPropertyInterface().getPropertyList( *this ); \
+  } \
+  libecs::PropertySlotProxyPtr CLASSNAME::createPropertySlotProxy( libecs::StringCref aPropertyName ) \
+  { \
+   return _getPropertyInterface().createPropertySlotProxy( *this, aPropertyName ); \
+  } \
+  const libecs::PropertyAttributes \
+  CLASSNAME::getPropertyAttributes( libecs::StringCref aPropertyName ) const \
+  { \
+   return _getPropertyInterface().getPropertyAttributes( *this, aPropertyName ); \
+  } \
+  const libecs::PropertyInterfaceBase& CLASSNAME::getPropertyInterface() const \
+  {\
+   return _getPropertyInterface(); \
+  } \
+  const DynamicModuleInfo* CLASSNAME::getClassInfoPtr()\
+  {\
+   return static_cast<const DynamicModuleInfo*>( &_getPropertyInterface() );\
   }
 
   ///@internal
@@ -116,47 +157,16 @@ private:\
  static libecs::PropertyInterface<CLASSNAME>& _getPropertyInterface(); \
 public:\
  static void initializeModule(); \
- virtual PropertySlotBaseCptr getPropertySlot( libecs::StringCref aPropertyName ) const \
- { \
-  return _getPropertyInterface().getPropertySlot( aPropertyName ); \
- } \
- virtual void setProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ) \
- { \
-  return _getPropertyInterface().setProperty( *this, aPropertyName, aValue ); \
- } \
- virtual const libecs::Polymorph getProperty( libecs::StringCref aPropertyName ) const \
- { \
-  return _getPropertyInterface().getProperty( *this, aPropertyName ); \
- } \
- virtual void loadProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ) \
- { \
-  return _getPropertyInterface().loadProperty( *this, aPropertyName, aValue ); \
- } \
- virtual const libecs::Polymorph saveProperty( libecs::StringCref aPropertyName ) const \
- { \
-  return _getPropertyInterface().saveProperty( *this, aPropertyName ); \
- } \
- virtual const libecs::StringVector getPropertyList() const \
- { \
-  return _getPropertyInterface().getPropertyList( *this ); \
- } \
- virtual libecs::PropertySlotProxyPtr createPropertySlotProxy( libecs::StringCref aPropertyName ) \
- { \
-  return _getPropertyInterface().createPropertySlotProxy( *this, aPropertyName ); \
- } \
- virtual const libecs::PropertyAttributes \
- getPropertyAttributes( libecs::StringCref aPropertyName ) const \
- { \
-  return _getPropertyInterface().getPropertyAttributes( *this, aPropertyName ); \
- } \
- virtual const libecs::PropertyInterfaceBase& getPropertyInterface() const \
- {\
-  return _getPropertyInterface(); \
- } \
- static const DynamicModuleInfo* getClassInfoPtr()\
- {\
-  return static_cast<const DynamicModuleInfo*>( &_getPropertyInterface() );\
- }
+ static const DynamicModuleInfo* getClassInfoPtr(); \
+ virtual PropertySlotBaseCptr getPropertySlot( libecs::StringCref aPropertyName ) const; \
+ virtual void setProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ); \
+ virtual const libecs::Polymorph getProperty( libecs::StringCref aPropertyName ) const; \
+ virtual void loadProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ); \
+ virtual const libecs::Polymorph saveProperty( libecs::StringCref aPropertyName ) const; \
+ virtual const libecs::StringVector getPropertyList() const; \
+ virtual libecs::PropertySlotProxyPtr createPropertySlotProxy( libecs::StringCref aPropertyName ); \
+ virtual const libecs::PropertyAttributes getPropertyAttributes( libecs::StringCref aPropertyName ) const; \
+ virtual const libecs::PropertyInterfaceBase& getPropertyInterface() const;
  //
 
 

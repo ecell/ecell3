@@ -801,6 +801,10 @@
 			RelativePath="..\..\ecell\frontend\session-monitor\osogo.ini"
 			>
 		</File>
+		<File
+			RelativePath="..\..\ecell\frontend\session-monitor\setup.py"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

@@ -1125,6 +1125,10 @@
 			RelativePath="..\..\ecell\frontend\model-editor\model-editor.ini"
 			>
 		</File>
+		<File
+			RelativePath="..\..\ecell\frontend\model-editor\setup.py"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
