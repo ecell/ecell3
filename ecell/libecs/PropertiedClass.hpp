@@ -90,8 +90,15 @@ namespace libecs
 #define LIBECS_DM_INIT_STATIC( CLASSNAME, DMTYPE ) \
   template class PropertyInterface<CLASSNAME>;\
   char CLASSNAME::thePropertyInterface[sizeof(libecs::PropertyInterface<CLASSNAME>)]; \
-  char CLASSNAME::theDMTypeName[] = #DMTYPE;
-
+  char CLASSNAME::theDMTypeName[] = #DMTYPE; \
+  libecs::PropertyInterface<CLASSNAME>& CLASSNAME::_getPropertyInterface() \
+  { \
+    return *reinterpret_cast< libecs::PropertyInterface<CLASSNAME>* >( thePropertyInterface ); \
+  } \
+  void CLASSNAME::initializeModule() \
+  { \
+    new(thePropertyInterface) libecs::PropertyInterface<CLASSNAME>( #CLASSNAME, theDMTypeName ); \
+  }
 
   ///@internal
 #define LIBECS_DM_OBJECT_DEF( CLASSNAME, DMTYPE )\
@@ -106,11 +113,9 @@ namespace libecs
 private:\
  static char thePropertyInterface[sizeof(libecs::PropertyInterface<CLASSNAME>)]; \
  static char theDMTypeName[]; \
- static libecs::PropertyInterface<CLASSNAME>& _getPropertyInterface() \
- { \
-   return *reinterpret_cast< libecs::PropertyInterface<CLASSNAME>* >( thePropertyInterface ); \
- } \
+ static libecs::PropertyInterface<CLASSNAME>& _getPropertyInterface(); \
 public:\
+ static void initializeModule(); \
  virtual PropertySlotBaseCptr getPropertySlot( libecs::StringCref aPropertyName ) const \
  { \
   return _getPropertyInterface().getPropertySlot( aPropertyName ); \
@@ -151,10 +156,6 @@ public:\
  static const DynamicModuleInfo* getClassInfoPtr()\
  {\
   return static_cast<const DynamicModuleInfo*>( &_getPropertyInterface() );\
- } \
- static void initializeModule() \
- { \
-   new(thePropertyInterface) libecs::PropertyInterface<CLASSNAME>( #CLASSNAME, theDMTypeName ); \
  }
  //
 

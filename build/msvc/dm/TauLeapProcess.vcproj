@@ -355,13 +355,8 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-		</Filter>
-		<Filter
-			Name="Descriptor Files"
-			>
 			<File
-				RelativePath="..\..\..\ecell\dm\TauLeapProcess.desc"
-				DeploymentContent="true"
+				RelativePath="..\..\..\ecell\dm\TauLeapProcess.hpp"
 				>
 			</File>
 		</Filter>

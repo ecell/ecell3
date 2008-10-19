@@ -360,15 +360,6 @@
 				>
 			</File>
 		</Filter>
-		<Filter
-			Name="Descriptor Files"
-			>
-			<File
-				RelativePath="..\..\..\ecell\dm\GillespieProcess.desc"
-				DeploymentContent="true"
-				>
-			</File>
-		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

@@ -29,11 +29,11 @@
 #define __DMOBJECT_HPP
 
 #ifdef WIN32
-#if defined( DM_EXPORTS ) || defined( DLL_EXPORT )
+#ifndef DM_IMPORTS
 #define DM_IF __declspec(dllexport)
 #else
 #define DM_IF __declspec(dllimport)
-#endif /* DM_EXPORTS */
+#endif /* !DM_IMPORTS */
 #else
 #define DM_IF
 #endif /* WIN32 */

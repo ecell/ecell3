@@ -26,6 +26,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FixedODE1Stepper", "dm\FixedODE1Stepper.vcproj", "{9BB24FFB-7FAD-0ABF-1B2A-8661269BBC5F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FluxDistributionStepper", "dm\FluxDistributionStepper.vcproj", "{AF63789A-4E5C-30F8-CD06-A82201BEEFA0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2111D731-342D-F13B-5D67-7FB4986DBBF8} = {2111D731-342D-F13B-5D67-7FB4986DBBF8}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GillespieProcess", "dm\GillespieProcess.vcproj", "{F0831364-D36A-F63C-A77A-10D63EC55545}"
 EndProject
@@ -52,6 +55,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TauLeapProcess", "dm\TauLeapProcess.vcproj", "{BB6CE87B-1CA5-8B1D-A769-C9B729B05BE5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TauLeapStepper", "dm\TauLeapStepper.vcproj", "{55A8E51E-1921-1376-D9B0-61A42E7B6DBF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F0831364-D36A-F63C-A77A-10D63EC55545} = {F0831364-D36A-F63C-A77A-10D63EC55545}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConstantFluxProcess", "dm\ConstantFluxProcess.vcproj", "{CC333C8E-EF7F-4126-B40B-9B1994592097}"
 EndProject

@@ -32,7 +32,7 @@
 #include <gsl/gsl_randist.h>
 
 #include "TauLeapStepper.hpp"
- 
+
 LIBECS_DM_INIT( TauLeapStepper, Stepper );
 
 void TauLeapStepper::initialize()
