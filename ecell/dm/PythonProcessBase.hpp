@@ -108,7 +108,7 @@ public:
 	  i->second = aValue;
 	}
       theLocalNamespace[ aPropertyName ] =
-	python::object( python::handle<>( PyFloat_FromDouble( aValue ) ) );
+	python::object( python::handle<>( PyFloat_FromDouble( aValue.as< Real >() ) ) );
     }
 
   const Polymorph defaultGetProperty( StringCref aPropertyName ) const
