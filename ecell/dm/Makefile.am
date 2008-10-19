@@ -63,30 +63,6 @@ DMH =  \
 	TauLeapStepper.hpp \
 	ODE45Stepper.hpp
 
-DESCS =  \
-	ConstantFluxProcess.desc \
-	DAEStepper.desc \
-	DecayFluxProcess.desc \
-	ESSYNSStepper.desc \
-	ExpressionAlgebraicProcess.desc \
-	ExpressionFluxProcess.desc \
-	FixedDAE1Stepper.desc \
-	FixedODE1Stepper.desc \
-	FluxDistributionStepper.desc \
-	QuasiDynamicFluxProcess.desc \
-	GillespieProcess.desc \
-	GMAProcess.desc \
-	MassActionFluxProcess.desc \
-	MichaelisUniUniFluxProcess.desc \
-	ODEStepper.desc \
-	ODE23Stepper.desc \
-	ODE45Stepper.desc \
-	PythonFluxProcess.desc \
-	PythonProcess.desc \
-	SSystemProcess.desc \
-	System.desc \
-	Variable.desc
-
 SOS = \
 	MassActionFluxProcess$(LTDL_SHLIB_EXT) \
 	MichaelisUniUniFluxProcess$(LTDL_SHLIB_EXT) \
@@ -117,7 +93,7 @@ SOS += \
 	PythonProcess$(LTDL_SHLIB_EXT)
 endif
 
-EXTRA_DIST = ${DMS} ${DMH} ${DESCS}
+EXTRA_DIST = ${DMS} ${DMH}
 dmdir = ${DM_SRC_DIR}
 dm_DATA = ${DMS} ${DMH}
 
