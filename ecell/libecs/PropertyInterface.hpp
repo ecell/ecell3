@@ -93,6 +93,7 @@ namespace libecs
 	    return false;
 	}
 	firstTime = false;
+	return true;
       }
 
       virtual std::pair< String, const void* > current()
