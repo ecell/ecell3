@@ -48,6 +48,8 @@ LIBECS_DM_CLASS( MassActionFluxProcess, ContinuousProcess )
     {
       INHERIT_PROPERTIES( Process );
 
+      CLASS_DESCRIPTION("MassActionFluxProcess denotes a simple mass-action. This class calculates a flux rate according to the irreversible mass-action.  Use the property \"k\" to specify the rate constant.");
+
       PROPERTYSLOT_SET_GET( Real, k );
     }
 
