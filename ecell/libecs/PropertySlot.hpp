@@ -270,7 +270,7 @@ namespace libecs
     static GetMethodPtr GetMethod( GetMethodPtr aGetMethodPtr );
 
   protected:
-    const String theName;
+    const libecs::String theName;
     const enum PropertySlotBase::Type theType;
     const SetMethodPtr theSetMethodPtr;
     const GetMethodPtr theGetMethodPtr;
@@ -331,12 +331,12 @@ namespace libecs
       return isGetableMethod( theSaveMethodPtr );
     }
 
-    DM_IF virtual void loadPolymorph( T& anObject, Param<Polymorph>::type aValue ) const
+    DM_IF virtual void loadPolymorph( T& anObject, Param< libecs::Polymorph >::type aValue ) const
     {
       loadImpl( anObject, aValue );
     }
 
-    DM_IF virtual const Polymorph savePolymorph( const T& anObject ) const
+    DM_IF virtual const libecs::Polymorph savePolymorph( const T& anObject ) const
     {
       return saveImpl( anObject );
     }
@@ -359,9 +359,9 @@ namespace libecs
       callLoadMethod( anObject, convertTo<SlotType>( aValue ) );
     }
     
-    inline const Polymorph saveImpl( const T& anObject ) const
+    inline const libecs::Polymorph saveImpl( const T& anObject ) const
     {
-      return convertTo<Polymorph>( callSaveMethod( anObject ) );
+      return convertTo< libecs::Polymorph >( callSaveMethod( anObject ) );
     }
 
   protected:

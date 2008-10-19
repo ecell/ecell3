@@ -31,11 +31,13 @@
 #include <string>
 #include <utility>
 
+#include "dmtool/DMObject.hpp"
+
 /**
   DynamicModuleInfo defines an interface that provides the meta-information
   that can be used to annotate the module.
  */
-class DynamicModuleInfo
+class DM_IF DynamicModuleInfo
 {
 public:
     class EntryIterator

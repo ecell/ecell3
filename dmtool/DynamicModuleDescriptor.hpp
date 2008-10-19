@@ -28,7 +28,7 @@
 #ifndef __DYNAMIC_MODULE_DESCRIPTOR_HPP
 #define __DYNAMIC_MODULE_DESCRIPTOR_HPP
 
-#include "dmtool/DynamicModuleInfo.hpp"
+class DynamicModuleInfo;
 
 /**
   DynamicModuleDescriptor is a POD class that holds the information about

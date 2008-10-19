@@ -48,7 +48,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\libltdl;..\..\osdep\win32;..\..;..\..\ecell;..\..\ecell\libecs;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBECS_EXPORTS;GSL_DLL;HAVE_CONFIG_H;__STDC__=1;_WIN32_WINNT=0x500"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBECS_EXPORTS;DM_EXPORTS;GSL_DLL;HAVE_CONFIG_H;__STDC__=1;_WIN32_WINNT=0x500"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
@@ -134,7 +134,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\libltdl;..\..\osdep\win32;..\..;..\..\ecell;..\..\ecell\libecs;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBECS_EXPORTS;GSL_DLL;HAVE_CONFIG_H;__STDC__=1;_WIN32_WINNT=0x500"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBECS_EXPORTS;DM_EXPORTS;GSL_DLL;HAVE_CONFIG_H;__STDC__=1;_WIN32_WINNT=0x500"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
@@ -219,7 +219,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\libltdl;..\..\osdep\win32;..\..;..\..\ecell;..\..\ecell\libecs;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBECS_EXPORTS;GSL_DLL;HAVE_CONFIG_H;__STDC__=1;_WIN32_WINNT=0x500"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBECS_EXPORTS;DM_EXPORTS;GSL_DLL;HAVE_CONFIG_H;__STDC__=1;_WIN32_WINNT=0x500"
 				ExceptionHandling="1"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -305,7 +305,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\libltdl;..\..\osdep\win32;..\..;..\..\ecell;..\..\ecell\libecs;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBECS_EXPORTS;GSL_DLL;HAVE_CONFIG_H;__STDC__=1;_WIN32_WINNT=0x500"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBECS_EXPORTS;DM_EXPORTS;GSL_DLL;HAVE_CONFIG_H;__STDC__=1;_WIN32_WINNT=0x500"
 				ExceptionHandling="1"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -450,23 +450,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\libecs\Polymorph.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ecell\libecs\Process.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\libecs\ProcessMaker.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ecell\libecs\PropertiedClass.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ecell\libecs\PropertiedObjectMaker.cpp"
 				>
 			</File>
 			<File
@@ -486,15 +474,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\libecs\StepperMaker.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ecell\libecs\System.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ecell\libecs\SystemMaker.cpp"
 				>
 			</File>
 			<File
@@ -507,10 +487,6 @@
 			</File>
 			<File
 				RelativePath="..\..\ecell\libecs\Variable.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ecell\libecs\VariableMaker.cpp"
 				>
 			</File>
 			<File
@@ -660,6 +636,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ecell\libecs\PropertyAttributes.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ecell\libecs\PropertyInterface.hpp"
 				>
 			</File>
@@ -725,10 +705,6 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-			<File
-				RelativePath=".\ecs.rct"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Templates"

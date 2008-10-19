@@ -35,6 +35,7 @@
 #include <string>
 #include <cassert>
 #include "ltdl.h"
+
 #include "DynamicModule.hpp"
 
 /**
