@@ -102,9 +102,7 @@ namespace libemc
 
 
     virtual const libecs::PolymorphMap
-	   	 getClassInfo( libecs::StringCref aClasstype,
-			       libecs::StringCref aClassname,
-			       const libecs::Integer forceReload );
+	   	 getClassInfo( libecs::StringCref aClassname ) const;
 
     
     virtual void createEntity( libecs::StringCref aClassname, 
@@ -199,7 +197,16 @@ namespace libemc
 
     virtual void setEventHandler( EventHandlerSharedPtrCref anEventHandler );
 
-    virtual const libecs::Polymorph getDMInfo();
+    virtual const libecs::PolymorphVector getDMInfo() const;
+
+    virtual const libecs::PolymorphMap
+		  getPropertyInfo( libecs::StringCref aClassName ) const;
+
+    virtual const char getDMSearchPathSeparator() const;
+
+    virtual const std::string getDMSearchPath() const;
+
+    virtual void setDMSearchPath( const std::string& aDMSearchPath );
 
   protected:
 
@@ -258,6 +265,8 @@ namespace libemc
     void runWithEvent();
     void runWithoutEvent();
 
+    static libecs::PolymorphVector buildPolymorphVector( const libecs::PropertyAttributes );
+
   private:
 
     bool                          theRunningFlag;
@@ -266,7 +275,7 @@ namespace libemc
 
     libecs::Integer               theEventCheckInterval;
 
-    libecs::PropertiedObjectMaker thePropertiedObjectMaker;
+    SharedModuleMaker< libecs::PropertiedClass > thePropertiedObjectMaker;
     libecs::Model                 theModel;
 
     EventCheckerSharedPtr         theEventChecker;

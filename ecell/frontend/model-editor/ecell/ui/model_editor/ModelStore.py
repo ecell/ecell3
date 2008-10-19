@@ -244,21 +244,15 @@ class ModelStore:
         aPropertyList = {}
         aPropertyNames = self.__theDM.getClassInfo( aClass, DM_PROPERTYLIST )
         for aPropertyName in aPropertyNames:
-#            if aClass == DM_SYSTEM_CLASS and ( aPropertyName == MS_STEPPER_PROCESSLIST or aPropertyName == MS_STEPPER_SYSTEMLIST ):
-#                aDefaultValue = []
-#                aType = DM_PROPERTY_NESTEDLIST
-#                aFlags = ( False, False, False, False, False )
-#            else:
-            if True:
-                aDefaultValue = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_DEFAULTVALUE )
-                aType = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_TYPE )
-                settable = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_SETTABLE_FLAG )
-                gettable = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_GETTABLE_FLAG )
-                deleteable = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_DELETEABLE_FLAG )
-                loadable = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_LOADABLE_FLAG )
-                saveable = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_SAVEABLE_FLAG )
-                changed = 0
-                aFlags = [ settable,gettable, loadable, saveable, deleteable,changed ]
+            aDefaultValue = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_DEFAULTVALUE )
+            aType = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_TYPE )
+            settable = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_SETTABLE_FLAG )
+            gettable = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_GETTABLE_FLAG )
+            deleteable = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_DELETEABLE_FLAG )
+            loadable = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_LOADABLE_FLAG )
+            saveable = self.__theDM.getClassPropertyInfo( aClass, aPropertyName, DM_PROPERTY_SAVEABLE_FLAG )
+            changed = 0
+            aFlags = [ settable,gettable, loadable, saveable, deleteable,changed ]
             aPropertyList[aPropertyName] = [ aDefaultValue, aFlags, aType]
 
         

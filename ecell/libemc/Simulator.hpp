@@ -247,20 +247,6 @@ namespace libemc
 
     //@}
 
-    const libecs::PolymorphMap getClassInfo( libecs::StringCref aClasstype,
-		    			   libecs::StringCref aClassname) 
-    {
-
-	    return theSimulatorImplementation->getClassInfo( aClasstype, aClassname, 0 );
-    }
-
-    const libecs::PolymorphMap getClassInfo( libecs::StringCref aClasstype,
-		    			   libecs::StringCref aClassname, 
-		    			   const libecs::Integer forceReload ) 
-    {
-	    return theSimulatorImplementation->getClassInfo( aClasstype, aClassname, forceReload );
-    }
-
     
     /**
        @name Entity methods.
@@ -664,9 +650,35 @@ namespace libemc
        theSimulatorImplementation->setEventHandler( anEventHandler );
     }
 
-    const libecs::Polymorph getDMInfo()
+    const libecs::PolymorphVector getDMInfo() const
     {
       return theSimulatorImplementation->getDMInfo();
+    }
+
+    const libecs::PolymorphMap getPropertyInfo( libecs::StringCref aClassname ) const
+    {
+      return theSimulatorImplementation->getPropertyInfo( aClassname );
+    }
+
+    const libecs::PolymorphMap getClassInfo( libecs::StringCref aClassname ) const 
+    {
+
+      return theSimulatorImplementation->getClassInfo( aClassname );
+    }
+
+    const char getDMSearchPathSeparator() const
+    {
+      return theSimulatorImplementation->getDMSearchPathSeparator();
+    }
+
+    void setDMSearchPath( const std::string& dmSearchPath )
+    {
+      theSimulatorImplementation->setDMSearchPath( dmSearchPath );
+    }
+
+    const std::string getDMSearchPath() const
+    {
+      return theSimulatorImplementation->getDMSearchPath();
     }
 
   //@}
@@ -685,8 +697,3 @@ namespace libemc
 } // namespace libemc
 
 #endif   /* __SIMULATOR_HPP */
-
-
-
-
-

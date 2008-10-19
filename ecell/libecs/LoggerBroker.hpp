@@ -35,9 +35,9 @@
 
 #include <map>
 
-#include "libecs.hpp"
-#include "FullID.hpp"
-#include "Logger.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/FullID.hpp"
+#include "libecs/Logger.hpp"
 
 namespace libecs
 {

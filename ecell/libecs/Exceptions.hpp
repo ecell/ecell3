@@ -31,9 +31,10 @@
 
 #ifndef __EXCEPTIONS_HPP
 #define __EXCEPTIONS_HPP
+
 #include <stdexcept>
 
-#include "Defs.hpp"
+#include "libecs/Defs.hpp"
 
 namespace libecs
 {
@@ -119,8 +120,8 @@ public:\
   DEFINE_EXCEPTION( NotFound,               Exception );
   DEFINE_EXCEPTION( IOException,            Exception );
   DEFINE_EXCEPTION( NotImplemented,         Exception ); 
+  DEFINE_EXCEPTION( Instantiation,          Exception );
 
-//    DEFINE_EXCEPTION( CallbackFailed,         Exception );
   DEFINE_EXCEPTION( AssertionFailed,        Exception );
   DEFINE_EXCEPTION( AlreadyExist,           Exception );
   DEFINE_EXCEPTION( ValueError,             Exception );
@@ -137,6 +138,9 @@ public:\
   DEFINE_EXCEPTION( PropertyException,      Exception );
   DEFINE_EXCEPTION( NoSlot,                 PropertyException );
   DEFINE_EXCEPTION( AttributeError,         PropertyException );
+
+  // Introspection errors
+  DEFINE_EXCEPTION( NoInfoField,            Exception );
 
   // FullID errors
   DEFINE_EXCEPTION( BadID,                  Exception ); 

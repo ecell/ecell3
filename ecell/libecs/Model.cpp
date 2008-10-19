@@ -34,19 +34,21 @@
 
 #include "Util.hpp"
 #include "EntityType.hpp"
-#include "StepperMaker.hpp"
-#include "VariableMaker.hpp"
-#include "ProcessMaker.hpp"
-#include "SystemMaker.hpp"
 #include "LoggerBroker.hpp"
 #include "Stepper.hpp"
 #include "SystemStepper.hpp"
 
 #include "Model.hpp"
 
+#include "DiscreteTimeStepper.hpp"
+#include "DiscreteEventStepper.hpp"
+#include "PassiveStepper.hpp"
+#include "System.hpp"
+#include "Variable.hpp"
+
 namespace libecs
 {
-  Model::Model( PropertiedObjectMaker& maker )
+  Model::Model( StaticModuleMaker< PropertiedClass >& maker )
     :
     theCurrentTime( 0.0 ),
     theLoggerBroker(),
@@ -58,6 +60,8 @@ namespace libecs
     theVariableMaker( thePropertiedObjectMaker ),
     theProcessMaker( thePropertiedObjectMaker )
   {
+    registerBuiltinModules();
+
     theLoggerBroker.setModel( this );
     // initialize theRootSystem
     theRootSystemPtr = getSystemMaker().make( "System" );
@@ -96,37 +100,9 @@ namespace libecs
   }
 
 
-  PolymorphMap Model::getClassInfo( StringCref aClassType, StringCref aClassname, Integer forceReload )
+  const PropertyInterfaceBase& Model::getPropertyInterface( StringCref aClassname ) const
   {
-	const void* (*InfoPtrFunc)();
-     
-    if ( aClassType == "Stepper" )
-      {
-        InfoPtrFunc = getStepperMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
-      }
-    else
-      {
-        EntityType anEntityType( aClassType );
-        if ( anEntityType.getType() == EntityType::VARIABLE )
-	      {    
-		    InfoPtrFunc = getVariableMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
-	      }
-        else if ( anEntityType.getType() == EntityType::PROCESS )
-	      {
-		    InfoPtrFunc = getProcessMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
-	      }
-        else if ( anEntityType.getType() == EntityType::SYSTEM )
-	      {
-		    InfoPtrFunc = getSystemMaker().getModule( aClassname, forceReload != 0 ).getInfoLoader();
-	      }
-        else 
-	      {
-		    THROW_EXCEPTION( InvalidEntityType,
-			  			     "bad ClassType specified." );
-	      }
-      }
-      
-	return *(reinterpret_cast<const PolymorphMap*>( InfoPtrFunc() ) );
+    return *(reinterpret_cast<const PropertyInterfaceBase*>( thePropertiedObjectMaker.getModule( aClassname ).getInfo() ) );
   }
 
 
@@ -352,14 +328,26 @@ namespace libecs
       {
 	theScheduler.getEvent(c).reschedule();
       }
-
-
-
-
-
-
   }
 
+  void Model::setDMSearchPath( const std::string& path )
+  {
+    thePropertiedObjectMaker.setSearchPath( path );
+  }
+
+  const std::string Model::getDMSearchPath() const
+  {
+    return thePropertiedObjectMaker.getSearchPath();
+  }
+
+  void Model::registerBuiltinModules()
+  {
+    DM_NEW_STATIC( &thePropertiedObjectMaker, PropertiedClass, DiscreteEventStepper );
+    DM_NEW_STATIC( &thePropertiedObjectMaker, PropertiedClass, DiscreteTimeStepper );
+    DM_NEW_STATIC( &thePropertiedObjectMaker, PropertiedClass, PassiveStepper );
+    DM_NEW_STATIC( &thePropertiedObjectMaker, PropertiedClass, System );
+    DM_NEW_STATIC( &thePropertiedObjectMaker, PropertiedClass, Variable );
+  }
 
 } // namespace libecs
 

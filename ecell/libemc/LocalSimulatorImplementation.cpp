@@ -39,10 +39,6 @@
 #include "libecs/Process.hpp"
 #include "libecs/Variable.hpp"
 #include "libecs/LoggerBroker.hpp"
-#include "libecs/StepperMaker.hpp"
-#include "libecs/ProcessMaker.hpp"
-#include "libecs/SystemMaker.hpp"
-#include "libecs/VariableMaker.hpp"
 #include "libecs/SystemStepper.hpp"
 
 #ifdef _DLL_EXPORT
@@ -94,6 +90,31 @@ namespace libemc
     getModel().createStepper( aClassname, anId );
   }
 
+  inline libecs::PolymorphVector LocalSimulatorImplementation::buildPolymorphVector( const libecs::PropertyAttributes attrs )
+  {
+    libecs::PolymorphVector retval;
+    // is setable?
+    retval.push_back( static_cast<Integer>( attrs.isSetable() ) );
+
+    // is getable?
+    retval.push_back( static_cast<Integer>( attrs.isGetable() ) );
+
+    // is getable?
+    retval.push_back( static_cast<Integer>( attrs.isLoadable() ) );
+
+    // is getable?
+    retval.push_back( static_cast<Integer>( attrs.isSavable() ) );
+
+    // is dynamic?
+    retval.push_back( static_cast<Integer>( attrs.isDynamic() ) );
+
+    // type
+    retval.push_back( static_cast<Integer>( attrs.getType() ) );
+
+    return retval;
+  }
+
+
   void LocalSimulatorImplementation::deleteStepper( libecs::StringCref anID )
   {
     THROW_EXCEPTION( libecs::NotImplemented,
@@ -132,8 +153,8 @@ namespace libemc
 				libecs::StringCref aPropertyName ) const
   {
     StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
-
-    return aStepperPtr->getPropertyAttributes( aPropertyName );
+    return buildPolymorphVector(
+      aStepperPtr->getPropertyAttributes( aPropertyName ) );
   }
   
 
@@ -186,17 +207,10 @@ namespace libemc
   {
     StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
 
-    return aStepperPtr->getClassNameString();
+    return aStepperPtr->getClassName();
   }
 
 
-  const libecs::PolymorphMap 
-  LocalSimulatorImplementation::getClassInfo( libecs::StringCref aClasstype,
-					      libecs::StringCref aClassname, const libecs::Integer forceReload )
-  {
-    return getModel().getClassInfo( aClasstype, aClassname, forceReload );
-  }
-  
   void LocalSimulatorImplementation::createEntity( StringCref aClassname,
 						   StringCref aFullIDString )
   {
@@ -326,7 +340,7 @@ namespace libemc
     FullPN aFullPN( aFullPNString );
     EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
-    return anEntityPtr->getPropertyAttributes( aFullPN.getPropertyName() );
+    return buildPolymorphVector( anEntityPtr->getPropertyAttributes( aFullPN.getPropertyName() ) );
   }
 
   const libecs::String LocalSimulatorImplementation::
@@ -335,7 +349,7 @@ namespace libemc
     FullID aFullID( aFullIDString );
     EntityCptr anEntityPtr( getModel().getEntity( aFullID ) );
 
-    return anEntityPtr->getClassNameString();
+    return anEntityPtr->getClassName();
   }
 
 
@@ -361,10 +375,10 @@ namespace libemc
 			 "Cannot create a Logger while running." );
       }
 
-    if ( aParamList.getType() != libecs::Polymorph::POLYMORPH_VECTOR )
+    if ( aParamList.getType() != libecs::PolymorphValue::TUPLE )
       {
 	THROW_EXCEPTION( libecs::Exception,
-			 "2nd argument of createLogger must be a list.");
+			 "2nd argument of createLogger must be a tuple.");
       }
 
     FullPN aFullPN( aFullPNString );
@@ -372,7 +386,7 @@ namespace libemc
     clearDirty();
 
     getModel().getLoggerBroker().
-      createLogger( aFullPN, aParamList.asPolymorphVector() );
+      createLogger( aFullPN, aParamList.as<PolymorphVector>() );
 
     setDirty();
   }
@@ -451,10 +465,10 @@ namespace libemc
   setLoggerPolicy( libecs::StringCref aFullPNString, 
 		   libecs::Polymorph aParamList )
   {
-    if( aParamList.getType() != libecs::Polymorph::POLYMORPH_VECTOR )
+    if( aParamList.getType() != libecs::PolymorphValue::TUPLE )
       {
 	THROW_EXCEPTION( libecs::Exception,
-			 "2nd parameter of logger policy must be a list.");
+			 "2nd parameter of logger policy must be a tuple.");
       }
 
     getLogger( aFullPNString )->setLoggerPolicy( aParamList );
@@ -670,19 +684,55 @@ namespace libemc
     setEventChecker( EventCheckerSharedPtr( new DefaultEventChecker() ) );
   }
 
-  const libecs::Polymorph LocalSimulatorImplementation::getDMInfo()
+  const libecs::PolymorphMap 
+  LocalSimulatorImplementation::getClassInfo( libecs::StringCref aClassname ) const
   {
-    libecs::PolymorphVector aVector;
+    libecs::PolymorphMap aBuiltInfoMap;
+    for ( DynamicModuleInfo::EntryIterator* anInfo(
+            getModel().getPropertyInterface( aClassname ).getInfoFields() );
+	  anInfo->next(); )
+    {
+      aBuiltInfoMap.insert(
+	std::make_pair( anInfo->current().first,
+			*reinterpret_cast< const Polymorph* >( anInfo->current().second ) ) );
+    }
+    return aBuiltInfoMap;
+  }
+ 
+  const libecs::PolymorphMap
+  LocalSimulatorImplementation::getPropertyInfo( libecs::StringCref aClassname ) const
+  {
+    typedef libecs::PropertyInterfaceBase::PropertySlotMap PropertySlotMap;
+    libecs::PolymorphMap retval;
+    const PropertySlotMap& slots( getModel().getPropertyInterface( aClassname ).getPropertySlotMap() );
 
-    for( libecs::PropertiedObjectMaker::ModuleMap::const_iterator
-	   i( thePropertiedObjectMaker.getModuleMap().begin() ); 
-	 i != thePropertiedObjectMaker.getModuleMap().end(); ++i )
+    for( PropertySlotMap::const_iterator i( slots.begin() );
+	 i != slots.end(); ++i)
+    {
+      retval.insert( std::make_pair( i->first,
+	  buildPolymorphVector( PropertyAttributes( *i->second ) ) ) );
+    }
+
+    return retval;
+  }
+ 
+  const libecs::PolymorphVector LocalSimulatorImplementation::getDMInfo() const
+  {
+    typedef SharedModuleMaker< PropertiedClass >::ModuleMap ModuleMap;
+    libecs::PolymorphVector aVector;
+    const ModuleMap& modules( thePropertiedObjectMaker.getModuleMap() );
+
+    for( ModuleMap::const_iterator i( modules.begin() );
+ 	 i != modules.end(); ++i )
       {
 	libecs::PolymorphVector anInnerVector;
-
-	anInnerVector.push_back( Polymorph( i->second->getTypeName() ) );
-	anInnerVector.push_back( Polymorph( i->first ) );
-	anInnerVector.push_back( Polymorph( i->second->getFileName() ) );
+	const libecs::PropertyInterfaceBase* info(
+	  reinterpret_cast< const libecs::PropertyInterfaceBase *>(
+	    i->second->getInfo() ) );
+	const char* aFilename( i->second->getFileName() );
+	anInnerVector.push_back( Polymorph( info->getTypeName() ) );
+	anInnerVector.push_back( Polymorph( i->second->getModuleName() ) );
+	anInnerVector.push_back( Polymorph( aFilename ? aFilename: "" ) );
 
 	aVector.push_back( anInnerVector );
       }
@@ -690,5 +740,19 @@ namespace libemc
     return aVector;
   }
 
+  const char LocalSimulatorImplementation::getDMSearchPathSeparator() const
+  {
+    return libecs::Model::PATH_SEPARATOR;
+  }
+
+  const std::string LocalSimulatorImplementation::getDMSearchPath() const
+  {
+    return theModel.getDMSearchPath();
+  }
+
+  void LocalSimulatorImplementation::setDMSearchPath( const std::string& aDMSearchPath )
+  {
+    theModel.setDMSearchPath( aDMSearchPath );
+  }
 
 } // namespace libemc,

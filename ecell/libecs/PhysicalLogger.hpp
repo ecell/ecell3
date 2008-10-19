@@ -32,10 +32,10 @@
 #if !defined(__PHYSICALLOGGER_HPP)
 #define __PHYSICALLOGGER_HPP
 
-#include "libecs.hpp"
-#include "Exceptions.hpp"
-#include "DataPoint.hpp"
-#include "DataPointVector.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Exceptions.hpp"
+#include "libecs/DataPoint.hpp"
+#include "libecs/DataPointVector.hpp"
 
 template <typename T> class vvector;
 

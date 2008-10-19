@@ -32,416 +32,1606 @@
 #ifndef __POLYMORPH_HPP
 #define __POLYMORPH_HPP
 
+#include <stdexcept>
+#include <algorithm>
+#include <cstddef>
+#include <cassert>
 #include <boost/static_assert.hpp>
+#include <boost/intrusive_ptr.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
+#include <boost/range/size.hpp>
+#include <boost/range/const_iterator.hpp>
 
 #include "dmtool/DMObject.hpp"
-#include "libecs.hpp"
-#include "convertTo.hpp"
-#include "Util.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/convertTo.hpp"
+#include "libecs/Util.hpp"
+
+/** @addtogroup polymorph The Polymorph.
+The Polymorph
+
+@ingroup libecs
+@{ 
+*/ 
+
+/** @file */
 
 namespace libecs
 {
 
-  /** @addtogroup polymorph The Polymorph.
-   The Polymorph
+DECLARE_CLASS( PolymorphValue );
 
-   @ingroup libecs
-   @{ 
-   */ 
+class LIBECS_API PolymorphValue
+{
+    friend void intrusive_ptr_add_ref( PolymorphValue* );
+    friend void intrusive_ptr_release( PolymorphValue* );
 
-  /** @file */
-  
-  DECLARE_CLASS( PolymorphValue );
+public:
+    enum Type
+    {
+        NONE     = 0,
+        REAL     = 1,
+        INTEGER  = 2,
+        STRING   = 3,
+        TUPLE    = 4
+    };
 
-  class LIBECS_API PolymorphValue
-  {
+    typedef boost::intrusive_ptr< PolymorphValue > Handle;
 
-  public:
+    class Tuple
+    {
+        friend class PolymorphValue;
 
-    virtual ~PolymorphValue();
+    public:
+        typedef std::size_t size_type;
+        typedef Polymorph value_type;
 
-    virtual const String  asString()        const = 0;
-    virtual const Real    asReal()          const = 0;
-    virtual const Integer asInteger()       const = 0;
-    virtual const PolymorphVector asPolymorphVector() const = 0;
+    public:
+        size_type size() const
+        {
+            return theNumberOfItems;
+        }
+
+        bool operator==( Tuple const& rhs ) const;
+
+        template< typename T_ >
+        bool operator!=( Tuple const& rhs ) const
+        {
+            return !operator==( rhs );
+        }
+
+        bool operator<( Tuple const& rhs ) const;
+
+        template< typename T_ >
+        bool operator>=( Tuple const& rhs ) const
+        {
+            return !operator<( rhs );
+        }
+
+        bool operator>( Tuple const& rhs ) const;
+
+        template< typename T_ >
+        bool operator<=( Tuple const& rhs ) const
+        {
+            return !operator<( rhs );
+        }
+
+        operator value_type*();
+
+        operator value_type const*() const;
+
+    private:
+        size_type theNumberOfItems;
+        char ptr[1];
+    };
+
+    class RawString
+    {
+        friend class PolymorphValue;
+    public:
+        typedef std::size_t size_type;
+        typedef std::string::value_type value_type;
+
+        size_type size() const
+        {
+            return theLength;
+        }
+
+        bool operator==( RawString const& rhs ) const
+        {
+            return theLength == rhs.theLength &&
+                0 == memcmp( ptr, rhs.ptr, sizeof( value_type ) * theLength );
+        }
+
+        bool operator==( String const& rhs ) const
+        {
+            return 0 == rhs.compare( 0, theLength, ptr );
+        }
+
+        template< typename T_ >
+        bool operator!=( T_ const& rhs ) const
+        {
+            return !operator==( rhs );
+        }
+
+        bool operator<( RawString const& rhs ) const
+        {
+            size_type l( std::min( theLength, rhs.theLength ) );
+            int c( memcmp( ptr, rhs.ptr, sizeof( value_type ) * l ) );
+            return c < 0 || ( c == 0 && l == theLength );
+        }
+
+        bool operator<( String const& rhs ) const
+        {
+            return rhs.compare( 0, theLength, ptr ) > 0;
+        }
+
+        template< typename T_ >
+        bool operator>=( T_ const& rhs ) const
+        {
+            return !operator<( rhs );
+        }
+
+        bool operator>( RawString const& rhs ) const
+        {
+            size_type l( std::min( theLength, rhs.theLength ) );
+            int c( memcmp( ptr, rhs.ptr, sizeof( value_type ) * l ) );
+            return c < 0 || (c == 0 && l == theLength );
+        }
+
+        bool operator>( String const& rhs ) const
+        {
+            return rhs.compare( 0, theLength, ptr ) < 0;
+        }
+
+        template< typename T_ >
+        bool operator<=( T_ const& rhs ) const
+        {
+            return !operator>( rhs );
+        }
+
+        operator value_type const*() const
+        {
+            return reinterpret_cast< value_type const* >( ptr );
+        }
+
+        operator value_type*()
+        {
+            return reinterpret_cast< value_type* >( ptr );
+        }
+
+    private:
+        size_type theLength;
+        char ptr[1];
+    };
+
+public:
+
+    ~PolymorphValue() {}
+
+    enum Type getType() const
+    {
+        return theType;
+    }
+
+    const PolymorphVector asPolymorphVector() const;
 
     template< typename T >
-    const T as() const;
-
-    virtual PolymorphValuePtr createClone() const = 0;
-
-  protected:
-  
-    PolymorphValue( PolymorphValueCref ) {}
-    PolymorphValue() {}
-
-  private:
-
-    PolymorphCref operator= ( PolymorphCref );
-
-  };
-
-
-  template <>
-  inline const String PolymorphValue::as() const
-  {
-    return asString();
-  }
-
-  template <>
-  inline const Real PolymorphValue::as() const
-  {
-    return asReal();
-  }
-
-  template <>
-  inline const Integer PolymorphValue::as() const
-  {
-    return asInteger();
-  }
-
-  template <>
-  inline const PolymorphVector PolymorphValue::as() const
-  {
-    return asPolymorphVector();
-  }
-
-
-
-  template< typename T >
-  class LIBECS_API ConcretePolymorphValue 
-    : 
-    public PolymorphValue
-  {
-
-    typedef typename libecs::Param<T>::type TParam;
-
-  public:
-
-    ConcretePolymorphValue( TParam aValue ) 
-      :
-      theValue( aValue )
+    T as() const
     {
-      ; // do nothing
+        class CONVERSION_IS_NOT_FEASIBLE;
+        sizeof( CONVERSION_IS_NOT_FEASIBLE );
     }
 
-    ConcretePolymorphValue( PolymorphValueCref aValue )
-      :
-      theValue( aValue.as<T>() )
+    static Handle create()
     {
-      ; // do nothing
+        return new PolymorphValue();
     }
 
-    virtual ~ConcretePolymorphValue()
+    static Handle create( IntegerParam aValue )
     {
-      ; // do nothing
-    }
-  
-    virtual const String asString() const 
-    { 
-      return convertTo<String>( theValue ); 
+        return new PolymorphValue( aValue );
     }
 
-    virtual const Real   asReal()  const 
-    { 
-      return convertTo<Real>( theValue );
-    }
-
-    virtual const Integer asInteger()   const 
-    { 
-      return convertTo<Integer>( theValue ); 
-    }
-
-    virtual const PolymorphVector asPolymorphVector() const
-    { 
-      return convertTo<PolymorphVector>( theValue ); 
-    }
-
-    virtual PolymorphValuePtr createClone() const
+    static Handle create( RealParam aValue )
     {
-      return new ConcretePolymorphValue<T>( *this );
+        return new PolymorphValue( aValue );
     }
 
-  private:
-
-    T theValue;
-
-  };
-
-
-
-
-  class LIBECS_API PolymorphNoneValue 
-    : 
-    public PolymorphValue
-  {
-
-  public: 
-
-    PolymorphNoneValue() {}
-
-    virtual ~PolymorphNoneValue();
-
-    virtual const String  asString() const;
-    virtual const Real    asReal() const       { return 0.0; }
-    virtual const Integer asInteger() const    { return 0; }
-    virtual const PolymorphVector asPolymorphVector() const;
-  
-    virtual PolymorphValuePtr createClone() const
+    static Handle create( String const& aValue )
     {
-      return new PolymorphNoneValue;
+        assert( sizeof( PolymorphValue ) + aValue.size() >= sizeof( PolymorphValue ) );
+        void* ptr( std::malloc( sizeof( PolymorphValue ) + aValue.size() ) );
+        if ( !ptr )
+        {
+            throw std::bad_alloc();
+        }
+
+        return new(ptr) PolymorphValue( aValue );
     }
 
-  };
+    template< typename Trange_ >
+    static Handle create( Trange_ const& aValue );
 
+    bool operator==( Real const& rhs ) const;
 
+    bool operator==( Integer const& rhs ) const;
 
-  class LIBECS_API Polymorph
-  {
+    bool operator==( RawString const& rhs ) const;
 
-  public:
+    bool operator==( Tuple const& rhs ) const;
 
-    enum Type
-      {
-	NONE,
-	REAL, 
-	INTEGER,  
-	STRING,
-	POLYMORPH_VECTOR
-      };
+    bool operator==( String const& rhs ) const;
 
-  
-    Polymorph()
-      :
-      theValue( new PolymorphNoneValue )
+    bool operator==( PolymorphVector const& rhs ) const;
+
+    bool operator==( PolymorphValue const& rhs ) const;
+
+    template< typename T_ >
+    bool operator!=( T_ const& rhs ) const
     {
-      ; // do nothing
+        return !operator==( rhs );
     }
 
-    Polymorph( StringCref  aValue ) 
-      :
-      theValue( new ConcretePolymorphValue<String>( aValue ) )
+    bool operator<( Real const& rhs ) const;
+
+    bool operator<( Integer const& rhs ) const;
+
+    bool operator<( RawString const& rhs ) const;
+
+    bool operator<( Tuple const& rhs ) const;
+
+    bool operator<( String const& rhs ) const;
+
+    bool operator<( PolymorphVector const& rhs ) const;
+
+    bool operator<( PolymorphValue const& rhs ) const;
+
+    template< typename T_ >
+    bool operator>=( T_ const& rhs ) const
     {
-      ; // do nothing
-    }
-  
-    Polymorph( RealParam aValue )      
-      :
-      theValue( new ConcretePolymorphValue<Real>( aValue ) )
-    {
-      ; // do nothing
+        return !operator<( rhs );
     }
 
-    Polymorph( IntegerParam aValue )      
-      :
-      theValue( new ConcretePolymorphValue<Integer>( aValue ) )
+    bool operator>( Real const& rhs ) const;
+
+    bool operator>( Integer const& rhs ) const;
+
+    bool operator>( RawString const& rhs ) const;
+
+    bool operator>( Tuple const& rhs ) const;
+
+    bool operator>( String const& rhs ) const;
+
+    bool operator>( PolymorphVector const& rhs ) const;
+
+    bool operator>( PolymorphValue const& rhs ) const;
+
+    template< typename T_ >
+    bool operator<=( T_ const& rhs ) const
     {
-      ; // do nothing
+        return !operator>( rhs );
     }
+
+    operator String() const;
+
+    operator PolymorphVector() const;
+
+    operator PolymorphValue::RawString const& () const;
+
+    operator PolymorphValue::Tuple const& () const;
+
+protected:
+    explicit PolymorphValue()
+        : theType( NONE ), theRefCount( 0 ) {}
+
+    explicit PolymorphValue( Integer aValue )
+        : theType( INTEGER ), theRefCount( 0 ), theIntegerValue( aValue ) {}
+
+    explicit PolymorphValue( Real aValue )
+        : theType( REAL ), theRefCount( 0 ), theRealValue( aValue ) {}
+
+    explicit PolymorphValue( String const& aValue )
+        : theType( STRING ), theRefCount( 0 )
+    {
+        theStringValue.theLength = aValue.size();
+        std::memcpy( theStringValue.ptr, aValue.data(), aValue.size() );
+        theStringValue.ptr[ aValue.size() ] = '\0';
+    }
+
+    template< typename Trange_ >
+    explicit PolymorphValue( Trange_ const& r );
+
+private:
+    PolymorphValue( const PolymorphValue& that ) {}
+    PolymorphValue const& operator= ( PolymorphValue const& )
+    {
+        return *this;
+    }
+
+private:
+    Type theType;
+    int theRefCount;
+
+    // must be the last element of the class.
+    union {
+        Integer theIntegerValue;
+        Real theRealValue;
+        RawString theStringValue;
+        Tuple theTupleValue;
+    };
+};
+
+inline void intrusive_ptr_add_ref( PolymorphValue* p )
+{
+    ++p->theRefCount;
+}
+
+inline void intrusive_ptr_release( PolymorphValue* p )
+{
+    if ( --p->theRefCount <= 0 )
+    {
+        switch ( p->theType )
+        {
+        case PolymorphValue::NONE:
+        case PolymorphValue::INTEGER:
+        case PolymorphValue::REAL:
+            delete p;
+            break;
+        case PolymorphValue::STRING:
+        case PolymorphValue::TUPLE:
+            std::free(p);
+            break;
+        }
+    }
+}
+
+} // nameespace libecs
+
+namespace boost
+{
+    using libecs::intrusive_ptr_add_ref;
+    using libecs::intrusive_ptr_release;
+}
+
+namespace libecs
+{
+
+class LIBECS_API Polymorph
+{
+    friend class PolymorphValue;
+
+public:
+    typedef PolymorphValue::Type Type;
+
+public:
+
+    Polymorph():
+        theValue( PolymorphValue::create() ) { }
+
+    Polymorph( Polymorph const& aValue )
+        : theValue( aValue.theValue ) { } 
+
+    explicit Polymorph( PolymorphValue::Handle aHandle )
+        : theValue( aHandle ) { }
+
+    Polymorph( StringCref    aValue ) 
+        : theValue( PolymorphValue::create( aValue ) ) { }
+
+    Polymorph( RealParam aValue )            
+        : theValue( PolymorphValue::create( aValue ) ) { }
+
+    Polymorph( IntegerParam aValue )            
+        : theValue( PolymorphValue::create( aValue ) ) { }
 
     Polymorph( PolymorphVectorCref aValue )
-      :
-      theValue( new ConcretePolymorphValue<PolymorphVector>( aValue ) )
-    {
-      ; // do nothing
-    }
+        : theValue( PolymorphValue::create( aValue ) ) { }
 
-    Polymorph( PolymorphCref aValue )
-      :
-      theValue( aValue.createValueClone() )
-    {
-      ; // do nothing
-    }
+    Polymorph( StringVector const& aValue )
+        : theValue( PolymorphValue::create( aValue ) ) { }
 
-    ~Polymorph()
-    {
-      delete theValue;
-    }
-
-    PolymorphCref operator=( PolymorphCref rhs )
-    {
-      if( this != &rhs )
-	{
-	  delete theValue;
-	  theValue = rhs.createValueClone();
-	}
-    
-      return *this;
-    }
-
-    const String asString() const
-    { 
-      return theValue->asString(); 
-    }
-
-    const Real   asReal() const
-    { 
-      return theValue->asReal(); 
-    }
-  
-    const Integer asInteger() const
-    { 
-      return theValue->asInteger();
-    }
-
-    const PolymorphVector asPolymorphVector() const
-    { 
-      return theValue->asPolymorphVector();
-    }
+    ~Polymorph() { }
 
     template< typename T >
-    const T as() const;
-      //    {
-      //      DefaultSpecializationInhibited();
-      //    }
-
-    const Type getType() const;
-
-    void changeType( const Type aType );
-
-
-    operator String() const
+    T as() const
     {
-      return asString();
+        return theValue->as<T>();
     }
 
-    operator Real() const
+    const Type getType() const
     {
-      return asReal();
+        return theValue->getType();
     }
 
-    operator Integer() const
-    {
-      return asInteger();
+    /** @deprecated */
+    const String asString() const
+    { 
+        return as<String>(); 
     }
 
-    operator PolymorphVector() const
-    {
-      return asPolymorphVector();
+    /** @deprecated */
+    const Real   asReal() const
+    { 
+        return as<Real>(); 
+    }
+  
+    /** @deprecated */
+    const Integer asInteger() const
+    { 
+        return as<Integer>();
     }
 
-  protected:
-
-    PolymorphValuePtr createValueClone() const
-    {
-      return theValue->createClone();
+    /** @deprecated */
+    const PolymorphVector asPolymorphVector() const
+    { 
+        return as<PolymorphVector>();
     }
 
-  protected:
 
-    PolymorphValuePtr theValue;
-
-  };
-
-
-
-
-  template <>
-  inline const String Polymorph::as() const
-  {
-    return asString();
-  }
-
-  template <>
-  inline const Real   Polymorph::as() const
-  {
-    return asReal();
-  }
-
-  template <>
-  inline const Integer Polymorph::as() const
-  {
-    return asInteger();
-  }
-
-  template <>
-  inline const PolymorphVector Polymorph::as() const
-  {
-    return asPolymorphVector();
-  }
-
-
-
-  //
-  // nullValue() specialization for Polymorph. See Util.hpp
-  //
-
-  template<>
-  inline const Polymorph nullValue()
-  {
-    return Polymorph();
-  }
-
-
-
-
-  //
-  // convertTo template specializations for PolymorphVector.
-  //
-
-  // identity
-  template<>
-  class ConvertTo< PolymorphVector, PolymorphVector >
-  {
-  public:
-    const PolymorphVector operator()( const PolymorphVector& aValue )
+    Polymorph const& operator=( Polymorph const& rhs )
     {
-      return aValue;
+        if( this != &rhs )
+        {
+            theValue = rhs.theValue;
+        }
+    
+        return *this;
     }
-  };
 
-  // to PolymorphVector
-
-  template< typename FromType >
-  class ConvertTo< PolymorphVector, FromType >
-  {
-  public:
-    const PolymorphVector operator()( const FromType& aValue )
+    operator PolymorphValue&()
     {
-      return PolymorphVector( 1, aValue );
+        return *theValue;
     }
-  };
 
-  // Override the <T,String> case defined in convertTo.hpp.
-  template<>
-  class ConvertTo< PolymorphVector, String >
-  {
-  public:
-    const PolymorphVector operator()( const String& aValue )
+    operator PolymorphValue const&() const
     {
-      return PolymorphVector( 1, aValue );
+        return *theValue;
     }
-  };
 
+protected:
 
-  // from PolymorphVector 
-  template< typename ToType >
-  class ConvertTo< ToType, PolymorphVector >
-  {
-  public:
-    const ToType operator()( PolymorphVectorCref aValue )
-    {
-      checkSequenceSize( aValue, 1 );
-      return static_cast<Polymorph>(aValue[0]).as<ToType>();
-    }
-  };
+    PolymorphValue::Handle theValue;
 
-  // Override the <String,T> case defined in convertTo.hpp.
-  template<>
-  class ConvertTo< String, PolymorphVector >
-  {
-  public:
-    const String operator()( PolymorphVectorCref aValue )
-    {
-      checkSequenceSize( aValue, 1 );
-      return static_cast<Polymorph>(aValue[0]).as<String>();
-    }
-  };
+};
 
+template<>
+inline Polymorph Polymorph::as() const
+{
+    return *this;
+}
 
-  // @} // polymorph
+inline bool operator==( Real lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator==( lhs );
+}
+
+inline bool operator==( Integer lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator==( lhs );
+}
+
+inline bool operator==( PolymorphValue::RawString const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator==( lhs );
+}
+
+inline bool operator==( PolymorphValue::Tuple& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator==( lhs );
+}
+
+inline bool operator==( String const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator==( lhs );
+}
+
+inline bool operator==( PolymorphVector const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator==( lhs );
+}
+
+inline bool operator==( Polymorph const& lhs, PolymorphValue const& rhs )
+{
+    return static_cast< PolymorphValue const& >( lhs ).operator==( rhs );
+}
+
+inline bool operator!=( Real lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator!=( lhs );
+}
+
+inline bool operator!=( Integer lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator!=( lhs );
+}
+
+inline bool operator!=( PolymorphValue::RawString const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator!=( lhs );
+}
+
+inline bool operator!=( PolymorphValue::Tuple& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator!=( lhs );
+}
+
+inline bool operator!=( String const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator!=( lhs );
+}
+
+inline bool operator!=( PolymorphVector const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator!=( lhs );
+}
+
+inline bool operator!=( Polymorph const& lhs, PolymorphValue const& rhs )
+{
+    return static_cast< PolymorphValue const& >( lhs ).operator!=( rhs );
+}
+
+inline bool operator<( Real lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator>( lhs );
+}
+
+inline bool operator<( Integer lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator>( lhs );
+}
+
+inline bool operator<( PolymorphValue::RawString const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator>( lhs );
+}
+
+inline bool operator<( PolymorphValue::Tuple& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator>( lhs );
+}
+
+inline bool operator<( String const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator>( lhs );
+}
+
+inline bool operator<( PolymorphVector const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator>( lhs );
+}
+
+inline bool operator<( Polymorph const& lhs, PolymorphValue const& rhs )
+{
+    return static_cast< PolymorphValue const& >( lhs ).operator<( rhs );
+}
+
+inline bool operator>=( Real lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator<=( lhs );
+}
+
+inline bool operator>=( Integer lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator<=( lhs );
+}
+
+inline bool operator>=( PolymorphValue::RawString const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator<=( lhs );
+}
+
+inline bool operator>=( PolymorphValue::Tuple& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator<=( lhs );
+}
+
+inline bool operator>=( String const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator<=( lhs );
+}
+
+inline bool operator>=( PolymorphVector const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator<=( lhs );
+}
+
+inline bool operator>=( Polymorph const& lhs, PolymorphValue const& rhs )
+{
+    return static_cast< PolymorphValue const & >( lhs ).operator>=( rhs );
+}
+
+inline bool operator>( Real lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator<( lhs );
+}
+
+inline bool operator>( Integer lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator<( lhs );
+}
+
+inline bool operator>( PolymorphValue::RawString const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator<( lhs );
+}
+
+inline bool operator>( PolymorphValue::Tuple& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator<( lhs );
+}
+
+inline bool operator>( String const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator<( lhs );
+}
+
+inline bool operator>( PolymorphVector const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator<( lhs );
+}
+
+inline bool operator>( Polymorph const& lhs, PolymorphValue const& rhs )
+{
+    return static_cast< PolymorphValue const& >( lhs ).operator>( rhs );
+}
+
+inline bool operator<=( Real lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator>=( lhs );
+}
+
+inline bool operator<=( Integer lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator>=( lhs );
+}
+
+inline bool operator<=( PolymorphValue::RawString const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator>=( lhs );
+}
+
+inline bool operator<=( PolymorphValue::Tuple& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator>=( lhs );
+}
+
+inline bool operator<=( String const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator>=( lhs );
+}
+
+inline bool operator<=( PolymorphVector const& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator>=( lhs );
+}
+
+inline bool operator<=( Polymorph const& lhs, PolymorphValue const& rhs )
+{
+    return static_cast< PolymorphValue const & >( lhs ).operator<=( rhs );
+}
+
+// ---------------------------------------------------------------------------
+inline bool operator==( Real lhs, Polymorph const& rhs )
+{
+    return lhs == static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator==( Integer lhs, Polymorph const& rhs )
+{
+    return lhs == static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator==( PolymorphValue::RawString const& lhs, Polymorph const& rhs )
+{
+    return lhs == static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator==( PolymorphValue::Tuple& lhs, Polymorph const& rhs )
+{
+    return lhs == static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator==( const char* lhs, Polymorph const& rhs )
+{
+    return lhs == static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator==( String const& lhs, Polymorph const& rhs )
+{
+    return lhs == static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator==( PolymorphVector const& lhs, Polymorph const& rhs )
+{
+    return lhs == static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator==( Polymorph const& lhs, Polymorph const& rhs )
+{
+    return lhs == static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator!=( Real lhs, Polymorph const& rhs )
+{
+    return lhs != static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator!=( Integer lhs, Polymorph const& rhs )
+{
+    return lhs != static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator!=( PolymorphValue::RawString const& lhs, Polymorph const& rhs )
+{
+    return lhs != static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator!=( PolymorphValue::Tuple& lhs, Polymorph const& rhs )
+{
+    return lhs != static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator!=( const char* lhs, Polymorph const& rhs )
+{
+    return lhs != static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator!=( String const& lhs, Polymorph const& rhs )
+{
+    return lhs != static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator!=( PolymorphVector const& lhs, Polymorph const& rhs )
+{
+    return lhs != static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator!=( Polymorph const& lhs, Polymorph const& rhs )
+{
+    return lhs != static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator<( Real lhs, Polymorph const& rhs )
+{
+    return lhs < static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator<( Integer lhs, Polymorph const& rhs )
+{
+    return lhs < static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator<( PolymorphValue::RawString const& lhs, Polymorph const& rhs )
+{
+    return lhs < static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator<( PolymorphValue::Tuple& lhs, Polymorph const& rhs )
+{
+    return lhs < static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator<( const char* lhs, Polymorph const& rhs )
+{
+    return lhs < static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator<( String const& lhs, Polymorph const& rhs )
+{
+    return lhs < static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator<( PolymorphVector const& lhs, Polymorph const& rhs )
+{
+    return lhs < static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator<( Polymorph const& lhs, Polymorph const& rhs )
+{
+    return lhs < static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>=( Real lhs, Polymorph const& rhs )
+{
+    return lhs >= static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>=( Integer lhs, Polymorph const& rhs )
+{
+    return lhs >= static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>=( PolymorphValue::RawString const& lhs, Polymorph const& rhs )
+{
+    return lhs >= static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>=( PolymorphValue::Tuple& lhs, Polymorph const& rhs )
+{
+    return lhs >= static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>=( const char* lhs, Polymorph const& rhs )
+{
+    return lhs >= static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>=( String const& lhs, Polymorph const& rhs )
+{
+    return lhs >= static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>=( PolymorphVector const& lhs, Polymorph const& rhs )
+{
+    return lhs >= static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>=( Polymorph const& lhs, Polymorph const& rhs )
+{
+    return lhs >= static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>( Real lhs, Polymorph const& rhs )
+{
+    return lhs > static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>( Integer lhs, Polymorph const& rhs )
+{
+    return lhs > static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>( PolymorphValue::RawString const& lhs, Polymorph const& rhs )
+{
+    return lhs > static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>( PolymorphValue::Tuple& lhs, Polymorph const& rhs )
+{
+    return lhs > static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>( const char* lhs, Polymorph const& rhs )
+{
+    return lhs > static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>( String const& lhs, Polymorph const& rhs )
+{
+    return lhs > static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>( PolymorphVector const& lhs, Polymorph const& rhs )
+{
+    return lhs > static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator>( Polymorph const& lhs, Polymorph const& rhs )
+{
+    return lhs > static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator<=( Real lhs, Polymorph const& rhs )
+{
+    return lhs <= static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator<=( Integer lhs, Polymorph const& rhs )
+{
+    return lhs <= static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator<=( PolymorphValue::RawString const& lhs, Polymorph const& rhs )
+{
+    return lhs <= static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator<=( PolymorphValue::Tuple& lhs, Polymorph const& rhs )
+{
+    return lhs <= static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator<=( const char* lhs, Polymorph const& rhs )
+{
+    return lhs <= static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator<=( String const& lhs, Polymorph const& rhs )
+{
+    return lhs <= static_cast< PolymorphValue const& >( rhs );
+}
+
+inline bool operator<=( PolymorphVector const& lhs, Polymorph const& rhs )
+{
+    return lhs <= static_cast< PolymorphValue const& >( rhs );
+}
+
+template< typename T_>
+inline bool operator==( Polymorph const& lhs, T_ rhs )
+{
+    return static_cast< PolymorphValue const& >( lhs ) == rhs;
+}
+
+template< typename T_>
+inline bool operator!=( Polymorph const& lhs, T_ rhs )
+{
+    return static_cast< PolymorphValue const& >( lhs ) != rhs;
+}
+
+template< typename T_>
+inline bool operator<( Polymorph const& lhs, T_ rhs )
+{
+    return static_cast< PolymorphValue const& >( lhs ) < rhs;
+}
+
+template< typename T_>
+inline bool operator>=( Polymorph const& lhs, T_ rhs )
+{
+    return static_cast< PolymorphValue const& >( lhs ) >= rhs;
+}
+
+template< typename T_>
+inline bool operator>( Polymorph const& lhs, T_ rhs )
+{
+    return static_cast< PolymorphValue const& >( lhs ) > rhs;
+}
+
+template< typename T_>
+inline bool operator<=( Polymorph const& lhs, T_ rhs )
+{
+    return static_cast< PolymorphValue const& >( lhs ) <= rhs;
+}
 
 } // namespace libecs
+
+namespace boost
+{
+template<>
+struct range_iterator< libecs::PolymorphValue::Tuple >
+{
+    typedef libecs::PolymorphValue::Tuple::value_type* type;
+};
+
+template<>
+struct range_const_iterator< libecs::PolymorphValue::Tuple >
+{
+    typedef libecs::PolymorphValue::Tuple::value_type const* type;
+};
+
+template<>
+inline range_iterator< libecs::PolymorphValue::Tuple >::type
+begin< libecs::PolymorphValue::Tuple >( libecs::PolymorphValue::Tuple& r )
+{
+    return static_cast< libecs::Polymorph* >( r );
+}
+
+template<>
+inline range_const_iterator< libecs::PolymorphValue::Tuple >::type
+begin< libecs::PolymorphValue::Tuple >( libecs::PolymorphValue::Tuple const& r )
+{
+    return static_cast< libecs::Polymorph const* >( r );
+}
+
+template<>
+inline range_iterator< libecs::PolymorphValue::Tuple >::type
+end< libecs::PolymorphValue::Tuple >(
+        libecs::PolymorphValue::Tuple& r )
+{
+    return static_cast< libecs::Polymorph* >( r ) + r.size();
+}
+
+template<>
+inline range_const_iterator< libecs::PolymorphValue::Tuple >::type
+end< libecs::PolymorphValue::Tuple >(
+        libecs::PolymorphValue::Tuple const& r )
+{
+    return static_cast< libecs::Polymorph const* >( r ) + r.size();
+}
+
+} // namespace boost
+
+namespace libecs
+{
+
+inline bool PolymorphValue::Tuple::operator==( PolymorphValue::Tuple const& rhs ) const
+{
+    if ( theNumberOfItems != rhs.theNumberOfItems )
+        return false;
+    return std::equal( reinterpret_cast< Polymorph const* >( ptr ),
+                       reinterpret_cast< Polymorph const* >( ptr ) + theNumberOfItems,
+                       reinterpret_cast< Polymorph const* >( rhs.ptr ) );
+}
+
+
+inline bool PolymorphValue::Tuple::operator<( PolymorphValue::Tuple const& rhs ) const
+{
+    size_type l( std::min( theNumberOfItems, rhs.theNumberOfItems ) );
+    std::pair< Polymorph const*, Polymorph const* > c(
+        std::mismatch( reinterpret_cast< Polymorph const* >( ptr ),
+                       reinterpret_cast< Polymorph const* >( ptr ) + l,
+                       reinterpret_cast< Polymorph const* >( rhs.ptr ) ) );
+    return *c.first < *c.second
+            || ( theNumberOfItems < l &&
+                 c.first == reinterpret_cast< Polymorph const * >( ptr ) + l );
+}
+
+
+inline bool PolymorphValue::Tuple::operator>( PolymorphValue::Tuple const& rhs ) const
+{
+    size_type l( std::min( theNumberOfItems, rhs.theNumberOfItems ) );
+    std::pair< Polymorph const*, Polymorph const* > c(
+        std::mismatch( reinterpret_cast< Polymorph const* >( ptr ),
+                       reinterpret_cast< Polymorph const* >( ptr ) + l,
+                       reinterpret_cast< Polymorph const* >( rhs.ptr ) ) );
+    return *c.first > *c.second
+            || ( theNumberOfItems > l &&
+                 c.second == reinterpret_cast< Polymorph const * >( rhs.ptr ) + l );
+}
+
+inline PolymorphValue::Tuple::operator Polymorph*()
+{
+    return reinterpret_cast< Polymorph* >( ptr );
+}
+
+inline PolymorphValue::Tuple::operator Polymorph const*() const
+{
+    return reinterpret_cast< Polymorph const* >( ptr );
+}
+
+
+template <>
+inline String PolymorphValue::as() const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return "";
+    case INTEGER:
+        return convertTo< String >( theIntegerValue );
+    case REAL:
+        return convertTo< String >( theRealValue );
+    case STRING:
+        return String( theStringValue.ptr, theStringValue.theLength );
+    case TUPLE:
+        {
+            checkSequenceSize( theTupleValue, 1 );
+            return theTupleValue[ 0 ].as< String >();
+        }
+    }
+    NEVER_GET_HERE;
+}
+
+
+template <>
+inline Real PolymorphValue::as() const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return 0.0;
+    case INTEGER:
+        return convertTo< Real >( theIntegerValue );
+    case REAL:
+        return theRealValue;
+    case STRING:
+        return convertTo< Real >( as< String >() );
+    case TUPLE:
+        {
+            checkSequenceSize( theTupleValue, 1 );
+            return theTupleValue[ 0 ].as< Real >();
+        }
+    }
+    NEVER_GET_HERE;
+}
+
+
+template <>
+inline Integer PolymorphValue::as() const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return 0;
+    case INTEGER:
+        return theIntegerValue;
+    case REAL:
+        return convertTo< Integer >( theRealValue );
+    case STRING:
+        return convertTo< Integer >( as< String >() );
+    case TUPLE:
+        {
+            checkSequenceSize( theTupleValue, 1 );
+            return theTupleValue[ 0 ].as< Integer >();
+        }
+    }
+    NEVER_GET_HERE;
+}
+
+
+template <>
+inline PolymorphVector PolymorphValue::as() const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return PolymorphVector();
+    case TUPLE:
+        return PolymorphVector( boost::begin( theTupleValue ), boost::end( theTupleValue ) );
+    default:
+        return PolymorphVector( 1, Polymorph( const_cast< PolymorphValue * >( this ) ) );
+    }
+}
+
+
+template <>
+inline PolymorphValue::RawString const& PolymorphValue::as() const
+{
+    if ( theType != STRING )
+        THROW_EXCEPTION( TypeError, "Conversion not feasible" );
+
+    return theStringValue;
+}
+
+
+template <>
+inline PolymorphValue::Tuple const& PolymorphValue::as() const
+{
+    if ( theType != TUPLE )
+        THROW_EXCEPTION( TypeError, "Conversion not feasible" );
+
+    return theTupleValue;
+}
+
+
+template< typename Trange_ >
+inline PolymorphValue::PolymorphValue( Trange_ const& r )
+    : theType( TUPLE ), theRefCount( 0 )
+{
+    typedef typename boost::range_const_iterator< Trange_ >::type const_iterator;
+
+    theTupleValue.theNumberOfItems = boost::size( r );
+
+    std::copy( boost::begin( r ), boost::end( r ), boost::begin( theTupleValue ) );
+}
+
+template< typename Trange_ >
+inline PolymorphValue::Handle PolymorphValue::create( Trange_ const& aValue )
+{
+    std::size_t pbytes( sizeof( Polymorph ) * boost::size( aValue ) );
+    assert( pbytes / sizeof( Polymorph ) == boost::size( aValue ) &&
+            sizeof( PolymorphValue ) + pbytes >= sizeof( PolymorphValue ));
+    void* ptr( std::malloc( sizeof( PolymorphValue ) + pbytes ) );
+    if ( !ptr )
+    {
+        throw std::bad_alloc();
+    }
+
+    // The following is a fast alternative of
+    // for ( i = 0; i < boost::size( aValue ); ++i )
+    // {
+    //   new(static_cast< PolymorphValue* >( ptr )->theTupleValue[ i ]) Polymorph();
+    // }
+    std::memset( static_cast< PolymorphValue* >( ptr )->theTupleValue,
+                 0, pbytes );
+
+    return new(ptr) PolymorphValue( aValue );
+} 
+
+inline bool PolymorphValue::operator==( Real const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return false;
+    case REAL:
+        return theRealValue == rhs;
+    case INTEGER:
+        return static_cast< Real >( theIntegerValue ) == rhs;
+    case STRING:
+        return false;
+    case TUPLE: 
+        return theTupleValue.size() == 1 &&
+            static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) == rhs;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator==( Integer const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return false;
+    case REAL:
+        return theRealValue == static_cast< Real>( rhs );
+    case INTEGER:
+        return theIntegerValue == rhs;
+    case STRING:
+        return false;
+    case TUPLE: 
+        return theTupleValue.size() == 1 &&
+            static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) == rhs;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator==( RawString const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return false;
+    case REAL:
+        return false;
+    case INTEGER:
+        return false;
+    case STRING:
+        return theStringValue == rhs;
+    case TUPLE:
+        // XXX: check if this works without static_cast later...
+        return theTupleValue.size() == 1 &&
+            static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) == rhs;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator==( Tuple const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return false;
+    case TUPLE:
+        return theTupleValue == rhs;
+    default:
+        return rhs.size() == 1 && theRealValue == rhs[ 0 ];
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator==( String const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return false;
+    case REAL:
+        return theRealValue == convertTo< Real >( rhs );
+    case INTEGER:
+        return theIntegerValue == convertTo< Integer >( rhs );
+    case STRING:
+        return rhs.compare(0, theStringValue.size(), theStringValue ) == 0;
+    case TUPLE:
+        return theTupleValue.size() == 1 &&
+            static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) == rhs;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator==( PolymorphValue const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return rhs.getType() == NONE;
+    case REAL:
+        return rhs == theRealValue;
+    case INTEGER:
+        return rhs == theIntegerValue;
+    case STRING:
+        return rhs == theStringValue;
+    case TUPLE:
+        return rhs == theTupleValue;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator<( Real const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return true;
+    case REAL:
+        return theRealValue < rhs;
+    case INTEGER:
+        return static_cast< Real >( theIntegerValue ) < rhs;
+    case STRING:
+        return false;
+    case TUPLE: 
+        return theTupleValue.size() < 1 || static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) < rhs;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator<( Integer const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return true;
+    case REAL:
+        return theRealValue < static_cast< Real >( rhs );
+    case INTEGER:
+        return theIntegerValue < rhs;
+    case STRING:
+        return false;
+    case TUPLE: 
+        return theTupleValue.size() < 1 ||
+            static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) < rhs;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator<( RawString const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return true;
+    case REAL:
+        return true;
+    case INTEGER:
+        return true;
+    case STRING:
+        return theStringValue < rhs;
+    case TUPLE:
+        return theTupleValue.size() < 1 || static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) < rhs;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator<( Tuple const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return true;
+    case REAL:
+        return rhs.size() < 1 && theRealValue < static_cast< PolymorphValue const& >( rhs[ 0 ] );
+    case INTEGER:
+        return rhs.size() < 1 && theIntegerValue < static_cast< PolymorphValue const& >( rhs[ 0 ] );
+    case STRING:
+        return rhs.size() < 1 && theStringValue < static_cast< PolymorphValue const& >( rhs[ 0 ] );
+    case TUPLE:
+        return theTupleValue < rhs;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator<( String const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return true;
+    case REAL:
+        return true;
+    case INTEGER:
+        return true;
+    case STRING:
+        return rhs.compare(0, theStringValue.size(), theStringValue ) > 0;
+    case TUPLE:
+        return theTupleValue.size() < 1 || static_cast< PolymorphValue const& >( theTupleValue[ 0 ] )< rhs;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator<( PolymorphValue const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return rhs.getType() != NONE;
+    case REAL:
+        return rhs > theRealValue;
+    case INTEGER:
+        return rhs > theIntegerValue;
+    case STRING:
+        return rhs > theStringValue;
+    case TUPLE:
+        return rhs > theTupleValue;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator>( Real const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return false;
+    case REAL:
+        return theRealValue > rhs;
+    case INTEGER:
+        return static_cast< Real >( theIntegerValue ) > rhs;
+    case STRING:
+        return true;
+    case TUPLE: 
+        return theTupleValue.size() >= 1 &&
+            static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator>( Integer const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return false;
+    case REAL:
+        return theRealValue > static_cast< Real >( rhs );
+    case INTEGER:
+        return theIntegerValue > rhs;
+    case STRING:
+        return true;
+    case TUPLE: 
+        return theTupleValue.size() >= 1 &&
+            static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator>( RawString const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return false;
+    case REAL:
+        return false;
+    case INTEGER:
+        return false;
+    case STRING:
+        return theStringValue > rhs;
+    case TUPLE:
+        return theTupleValue.size() >= 1 && static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator>( Tuple const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return false;
+    case REAL:
+        return rhs.size() == 0
+                || ( rhs.size() == 1 && static_cast< PolymorphValue const& >( rhs[ 0 ] ) < theRealValue );
+    case INTEGER:
+        return rhs.size() == 0
+                || ( rhs.size() == 1 && static_cast< PolymorphValue const& >( rhs[ 0 ] ) < theIntegerValue );
+    case STRING:
+        return rhs.size() == 0
+                || ( rhs.size() == 1 && static_cast< PolymorphValue const& >( rhs[ 0 ] )< theStringValue );
+    case TUPLE:
+        return theTupleValue > rhs;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator>( String const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return false;
+    case REAL:
+        return false;
+    case INTEGER:
+        return false;
+    case STRING:
+        return rhs.compare(0, theStringValue.size(), theStringValue ) < 0;
+    case TUPLE:
+        return theTupleValue.size() >= 1 && static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs;
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator>( PolymorphValue const& rhs ) const
+{
+    switch ( rhs.getType() )
+    {
+    case NONE:
+        return false;
+    case REAL:
+        return operator>( rhs.as< Real >() );
+    case INTEGER:
+        return operator>( rhs.as< Integer >() );
+    case STRING:
+        return operator>( rhs.as< RawString const& >() );
+    case TUPLE:
+        return operator>( rhs.as< Tuple const& >() );
+    }
+    NEVER_GET_HERE;
+}
+
+
+inline PolymorphValue::operator String() const
+{
+    return as<String>();
+}
+
+inline PolymorphValue::operator PolymorphVector() const
+{
+    return as<PolymorphVector>();
+}
+
+inline PolymorphValue::operator PolymorphValue::RawString const& () const
+{
+    return as<PolymorphValue::RawString const& >();
+}
+
+inline PolymorphValue::operator PolymorphValue::Tuple const& () const
+{
+    return as<PolymorphValue::Tuple const& >();
+}
+
+
+template< typename Tnew_ >
+inline const Tnew_ convertTo( const Polymorph& aValue )
+{
+    return aValue.as< Tnew_ >();
+}
+
+
+//
+// nullValue() specialization for Polymorph. See Util.hpp
+//
+
+template<>
+inline const Polymorph nullValue()
+{
+    return Polymorph();
+}
+
+} // namespace libecs
+
+#include <ostream>
+
+namespace std {
+
+template< typename T1_, typename T2_ >
+inline std::basic_ostream< T1_, T2_ >&
+operator<<( std::basic_ostream< T1_, T2_ >& s,
+            libecs::Polymorph const& aValue )
+{
+    switch ( aValue.getType() )
+    {
+    case libecs::PolymorphValue::REAL:
+        s << aValue.as< libecs::Real >();
+        break;
+    case libecs::PolymorphValue::INTEGER:
+        s << aValue.as< libecs::Integer >();
+        break;
+    case libecs::PolymorphValue::TUPLE:
+        {
+            s << '[';
+            libecs::PolymorphValue::Tuple const& aTuple( aValue.as< libecs::PolymorphValue::Tuple const& >() );
+
+            for ( boost::range_const_iterator< libecs::PolymorphValue::Tuple >::type i( boost::begin( aTuple ) ); i != boost::end( aTuple ); ++i )
+            {
+                if ( i != boost::begin( aTuple ) )
+                    s << ", ";
+                s << *i;
+            }
+            s << ']';
+        }
+        break;
+    case libecs::PolymorphValue::STRING:
+        s << '"';
+        s << aValue.as< libecs::String >();
+        s << '"';
+    }
+    return s;
+}
+
+} // namespcae std
+
+// @} // polymorph
 
 
 #endif /* __POLYMORPH_HPP */

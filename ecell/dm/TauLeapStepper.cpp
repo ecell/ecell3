@@ -50,7 +50,7 @@ void TauLeapStepper::initialize()
   catch( const libecs::TypeError& )
     {
       THROW_EXCEPTION( InitializationFailed,
-		       getClassNameString() +
+		       getClassName() +
 		       ": Only GillespieProcesses are allowed to exist "
 		       "in this Stepper." );
     }

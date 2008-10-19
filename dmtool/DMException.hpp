@@ -24,51 +24,44 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-//
-// written by Koichi Takahashi <shafi@e-cell.org>,
-// E-Cell Project.
-//
-#ifdef HAVE_CONFIG_H
-#include "ecell_config.h"
-#endif /* HAVE_CONFIG_H */
 
-#include "ProcessMaker.hpp"
+#ifndef __DM_EXCEPTION_HPP
+#define __DM_EXCEPTION_HPP
 
+#include <exception>
+#include <string>
 
-namespace libecs
+/**
+   Exception class for dmtool.
+*/
+class DMException : public std::exception
 {
-  ProcessMaker::ProcessMaker( PropertiedObjectMaker& maker )
-    : theBackend( maker )
+public: 
+
+  DMException( const std::string& message ) 
+    : 
+    theMessage( message )
   {
     ; // do nothing
   }
 
-  ProcessMaker::~ProcessMaker()
+  ~DMException() throw()
   {
     ; // do nothing
   }
 
-  Process* ProcessMaker::make( const std::string& aClassName )
-  {
-    const PropertiedObjectMaker::SharedModule& mod(
-	theBackend.getModule( aClassName, false ) );
-    if ( mod.getTypeName() != "Process" )
-      {
-	throw TypeError( "specified class is not a Process" );
-      }
-    return reinterpret_cast< Process* >( theBackend.make( aClassName ) );
+  /**
+     Get dynamically created exception message.
+   */
+  virtual const char* what() const throw()
+  { 
+    return theMessage.c_str();
   }
 
-  const PropertiedObjectMaker::SharedModule& ProcessMaker::getModule(
-      const std::string& aClassName, bool forceReload )
-  {
-    const PropertiedObjectMaker::SharedModule& mod(
-	theBackend.getModule( aClassName, forceReload ) );
-    if ( mod.getTypeName() != "Process" )
-      {
-	throw TypeError( "specified class is not a Process" );
-      }
-    return mod;
-  }
+private:
+  
+  const std::string theMessage;
 
-} // namespace libecs
+};
+
+#endif /* __DM_EXCEPTION_HPP */

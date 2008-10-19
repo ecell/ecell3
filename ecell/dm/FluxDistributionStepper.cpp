@@ -108,7 +108,7 @@ void FluxDistributionStepper::initialize()
   catch( const libecs::TypeError& )
     {
       THROW_EXCEPTION( InitializationFailed,
-		       getClassNameString() +
+		       getClassName() +
 		       ": Only QuasiDynamicFluxProcesses are allowed to exist "
 		       "in this Stepper." );
     }

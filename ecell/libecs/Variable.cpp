@@ -101,15 +101,6 @@ namespace libecs
     theInterpolantVector.push_back( anInterpolantPtr );
   }
 
-  //  void Variable::removeInterpolant( InterpolantPtr const anInterpolantPtr )
-  //  {
-  //    theInterpolantVector.erase( std::remove( theInterpolantVector.begin(),
-  //					       theInterpolantVector.end(),
-  //					       anInterpolantPtr ) );
-  //  }
-
-
-
 } // namespace libecs
 
 

@@ -32,7 +32,7 @@
 #ifndef __ENTITYTYPE_HPP 
 #define __ENTITYTYPE_HPP 
 
-#include "libecs.hpp"
+#include "libecs/libecs.hpp"
 
 
 namespace libecs

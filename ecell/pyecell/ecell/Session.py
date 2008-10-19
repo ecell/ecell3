@@ -34,25 +34,30 @@ import time
 
 from numpy import *
 import ecell.ecs
-import ecell.emc
-
+import ecell.config as config
 
 from ecell.ecssupport import *
 from ecell.DataFileManager import *
 from ecell.ECDDataFile import *
 
+__all__ = (
+    'Session',
+    )
+
 class Session:
     '''Session class'''
 
-    def __init__( self, aSimulator=None ):
+    def __init__( self, aSimulator = None ):
         'constructor'
 
         self.theMessageMethod = self.__plainMessageMethod
 
         if aSimulator is None:
-            self.theSimulator = ecell.emc.Simulator()
-        else:
-            self.theSimulator = aSimulator
+            aSimulator = ecell.ecs.Simulator()
+            aSimulator.setDMSearchPath(
+                aSimulator.DMSearchPathSeparator.join( config.dm_path ) )
+
+        self.theSimulator = aSimulator
 
         self.theModelName = ''
 

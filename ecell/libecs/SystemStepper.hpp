@@ -32,9 +32,9 @@
 #ifndef __SYSTEMSTEPPER_HPP
 #define __SYSTEMSTEPPER_HPP
 
-#include "libecs.hpp"
+#include "libecs/libecs.hpp"
 
-#include "Stepper.hpp"
+#include "libecs/Stepper.hpp"
 
 
 

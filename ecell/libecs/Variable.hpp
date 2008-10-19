@@ -34,10 +34,10 @@
 
 #include <utility>
 
-#include "libecs.hpp"
-#include "Entity.hpp"
-#include "Interpolant.hpp"
-#include "System.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Entity.hpp"
+#include "libecs/Interpolant.hpp"
+#include "libecs/System.hpp"
 
 
 namespace libecs

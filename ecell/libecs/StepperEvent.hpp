@@ -32,8 +32,8 @@
 #ifndef __STEPPEREVENT_HPP
 #define __STEPPEREVENT_HPP
 
-#include "libecs.hpp"
-#include "Stepper.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Stepper.hpp"
 
 
 namespace libecs

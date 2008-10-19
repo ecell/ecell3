@@ -32,9 +32,9 @@
 #ifndef __PASSIVESTEPPER_HPP
 #define __PASSIVESTEPPER_HPP
 
-#include "libecs.hpp"
+#include "libecs/libecs.hpp"
 
-#include "Stepper.hpp"
+#include "libecs/Stepper.hpp"
 
 
 namespace libecs

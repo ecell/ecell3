@@ -195,9 +195,6 @@ Options:
 
 ''' % { 'appname': aProgramName }
 
-    ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
-
-
     # commandline processing
     try:
         opts, args = getopt.getopt( sys.argv[1:], "hfo:",

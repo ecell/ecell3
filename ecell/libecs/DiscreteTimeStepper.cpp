@@ -53,7 +53,7 @@ namespace libecs
     if( getDiscreteProcessOffset() != 0 && ! getProcessVector().empty() )
       {
 	THROW_EXCEPTION( InitializationFailed,
-			 getClassNameString() 
+			 getClassName() 
 			 + " does not support continuous process." );
 
       }

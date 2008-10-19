@@ -110,8 +110,6 @@ Configurations:
 '''% { 'appname': aProgramName, 'pathsep': os.pathsep }
 
 def main():
-    ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
-
     # -------------------------------------
     # initialize file names
     # -------------------------------------
@@ -211,6 +209,8 @@ def main():
                 
             
     aSimulator = ecell.emc.Simulator()
+    aSimulator.setDMSearchPath( aSimulator.DMSearchPathSeparator.join( ecell.config.dm_path ) )
+
     aSession = Session( aSimulator )
 
     aConsole = Console( aSession, 

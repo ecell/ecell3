@@ -32,10 +32,10 @@
 #ifndef __ENTITY_HPP
 #define __ENTITY_HPP
 
-#include "libecs.hpp"
-#include "EntityType.hpp"
-#include "PropertiedClass.hpp"
-#include "PropertyInterface.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/EntityType.hpp"
+#include "libecs/PropertiedClass.hpp"
+#include "libecs/PropertyInterface.hpp"
 
 
 namespace libecs

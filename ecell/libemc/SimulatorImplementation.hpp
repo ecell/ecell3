@@ -104,12 +104,6 @@ namespace libemc
     virtual const libecs::String
     getStepperClassName( libecs::StringCref aStepperID ) const = 0;
 
-
-    virtual const libecs::PolymorphMap
-	    	  getClassInfo( libecs::StringCref aClasstype,
-		    		libecs::StringCref aClassname,
-		    		const libecs::Integer forceReload  ) = 0;
-
     
     virtual void createEntity( libecs::StringCref   aClassname, 
 			       libecs::StringCref   aFullIDString ) = 0;
@@ -202,7 +196,19 @@ namespace libemc
 
     virtual void setEventHandler( EventHandlerSharedPtrCref anEventHandler ) = 0;
 
-    virtual const libecs::Polymorph getDMInfo() = 0;
+    virtual const libecs::PolymorphMap
+	    	  getClassInfo( libecs::StringCref aClassname ) const = 0;
+
+    virtual const libecs::PolymorphMap
+		  getPropertyInfo( libecs::StringCref aClassName ) const = 0; 
+
+    virtual const libecs::PolymorphVector getDMInfo() const = 0;
+
+    virtual const char getDMSearchPathSeparator() const = 0;
+
+    virtual const std::string getDMSearchPath() const = 0;
+
+    virtual void setDMSearchPath( const std::string& aDMSearchPath ) = 0;
 
   };   //end of class Simulator
 

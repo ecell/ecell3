@@ -172,7 +172,7 @@ SET_METHOD_DEF( Integer, Order, SSystemProcess )
 SET_METHOD_DEF( Polymorph, SSystemMatrix, SSystemProcess )
 {
   SSystemMatrix = value;
-  PolymorphVector aValueVector( value.asPolymorphVector() );
+  PolymorphVector aValueVector( value.as<PolymorphVector>() );
   theSystemSize = aValueVector.size();
 
   // init Substance Vector
@@ -232,25 +232,25 @@ SET_METHOD_DEF( Polymorph, SSystemMatrix, SSystemProcess )
   for( int i( 0 ); i < theSystemSize; i++ )
     {
       
-      theAlpha[i+1] = (aValueVector[i].asPolymorphVector())[0].asReal() ;
+      theAlpha[i+1] = (aValueVector[i].as<PolymorphVector>())[0].as<Real>() ;
       for( int j( 0 ); j < theSystemSize; j++ )	
 	{
 	  if( i == j )
 	    {
 	      
-	      (theG[i+1])[j+1] = (aValueVector[i].asPolymorphVector())[j+1].asReal() - 1 ;
+	      (theG[i+1])[j+1] = (aValueVector[i].as<PolymorphVector>())[j+1].as<Real>() - 1 ;
 	    }else{
-	      (theG[i+1])[j+1] = (aValueVector[i].asPolymorphVector())[j+1].asReal() ;
+	      (theG[i+1])[j+1] = (aValueVector[i].as<PolymorphVector>())[j+1].as<Real>() ;
 	    }
 	}
-      theBeta[i+1] = (aValueVector[i].asPolymorphVector())[1+theSystemSize].asReal() ;
+      theBeta[i+1] = (aValueVector[i].as<PolymorphVector>())[1+theSystemSize].as<Real>() ;
       for( int j( 0 ); j < theSystemSize; j++ )	
 	{
 	  if( i == j )
 	    {
-	      (theH[i+1])[j+1] = (aValueVector[i].asPolymorphVector())[2+j+theSystemSize].asReal() -1 ;
+	      (theH[i+1])[j+1] = (aValueVector[i].as<PolymorphVector>())[2+j+theSystemSize].as<Real>() -1 ;
 	    }else{
-	      (theH[i+1])[j+1] = (aValueVector[i].asPolymorphVector())[2+j+theSystemSize].asReal() ;
+	      (theH[i+1])[j+1] = (aValueVector[i].as<PolymorphVector>())[2+j+theSystemSize].as<Real>() ;
 	    }
 	}
     }

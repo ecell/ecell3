@@ -48,9 +48,11 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/static_assert.hpp>
 #include <boost/type_traits.hpp>
+#include <boost/range/size.hpp>
+#include <boost/range/size_type.hpp>
 
-#include "libecs.hpp"
-#include "Exceptions.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Exceptions.hpp"
 
 namespace libecs
 {
@@ -81,9 +83,6 @@ namespace libecs
   template< typename NEW, typename GIVEN >
   const NEW stringCast( const GIVEN& aValue )
   {
-    BOOST_STATIC_ASSERT( ( boost::is_same<String,GIVEN>::value ||
-			   boost::is_same<String,NEW>::value ) );
-
     return boost::lexical_cast<NEW>( aValue );
   }
 
@@ -141,10 +140,10 @@ namespace libecs
 
   template <class Sequence>
   void checkSequenceSize( const Sequence& aSequence, 
-			  const typename Sequence::size_type aMin, 
-			  const typename Sequence::size_type aMax )
+			  const typename boost::range_size< Sequence >::type aMin,
+			  const typename boost::range_size< Sequence >::type aMax )
   {
-    const typename Sequence::size_type aSize( aSequence.size() );
+    const typename Sequence::size_type aSize( boost::size( aSequence ) );
     if( aSize < aMin || aSize > aMax )
       {
 	throwSequenceSizeError( aSize, aMin, aMax );
@@ -161,9 +160,9 @@ namespace libecs
 
   template <class Sequence>
   void checkSequenceSize( const Sequence& aSequence, 
-			  const typename Sequence::size_type aMin )
+			  const typename boost::range_size< Sequence >::type aMin )
   {
-    const typename Sequence::size_type aSize( aSequence.size() );
+    const typename Sequence::size_type aSize( boost::size( aSequence ) );
     if( aSize < aMin )
       {
 	throwSequenceSizeError( aSize, aMin );

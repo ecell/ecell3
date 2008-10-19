@@ -86,16 +86,6 @@ namespace libecs
     ModuleMaker::finalize();
   }
 
-  void setDMSearchPath( const std::string& path )
-  {
-    ModuleMaker::setSearchPath( path );
-  }
-
-  const std::string getDMSearchPath()
-  {
-    return ModuleMaker::getSearchPath();
-  }
-
   const int getMajorVersion()
   {
     return MAJOR_VERSION;

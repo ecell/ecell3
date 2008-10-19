@@ -36,8 +36,8 @@
 #include <boost/type_traits.hpp>
 #include <boost/mpl/if.hpp>
 
-#include "libecs.hpp"
-#include "Util.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Util.hpp"
 
 namespace libecs
 {
@@ -97,6 +97,93 @@ namespace libecs
 	boost::is_arithmetic< ToType >,
 	LexicalCaster< ToType, String >,     // is arithmetic
 	StaticCaster< ToType, String >       // is not
+	>::type
+	Converter;
+
+      return Converter()( aValue );
+    }
+  };
+
+  template< typename ToType, std::size_t _N >
+  class ConvertTo< ToType, char[_N] >
+  {
+  public:
+    inline const ToType operator()( char const* aValue )
+    {
+      // strategy:
+      // (1) if ToType is arithmetic, use LexicalCaster.
+      // (2) otherwise try StaticCaster
+
+      typedef typename boost::mpl::if_< 
+	boost::is_arithmetic< ToType >,
+	LexicalCaster< ToType, const char* >,     // is arithmetic
+	StaticCaster< ToType, const char* >       // is not
+	>::type
+	Converter;
+
+      return Converter()( aValue );
+    }
+  };
+  
+
+  template< typename ToType, std::size_t _N >
+  class ConvertTo< ToType, const char[_N] >
+  {
+  public:
+    inline const ToType operator()( char const* aValue )
+    {
+      // strategy:
+      // (1) if ToType is arithmetic, use LexicalCaster.
+      // (2) otherwise try StaticCaster
+
+      typedef typename boost::mpl::if_< 
+	boost::is_arithmetic< ToType >,
+	LexicalCaster< ToType, const char* >,     // is arithmetic
+	StaticCaster< ToType, const char* >       // is not
+	>::type
+	Converter;
+
+      return Converter()( aValue );
+    }
+  };
+  
+
+  template< typename ToType >
+  class ConvertTo< ToType, char* >
+  {
+  public:
+    inline const ToType operator()( char const* const& aValue )
+    {
+      // strategy:
+      // (1) if ToType is arithmetic, use LexicalCaster.
+      // (2) otherwise try StaticCaster
+
+      typedef typename boost::mpl::if_< 
+	boost::is_arithmetic< ToType >,
+	LexicalCaster< ToType, const char* >,     // is arithmetic
+	StaticCaster< ToType, const char* >       // is not
+	>::type
+	Converter;
+
+      return Converter()( aValue );
+    }
+  };
+
+  
+  template< typename ToType >
+  class ConvertTo< ToType, char const* >
+  {
+  public:
+    inline const ToType operator()( char const* const& aValue )
+    {
+      // strategy:
+      // (1) if ToType is arithmetic, use LexicalCaster.
+      // (2) otherwise try StaticCaster
+
+      typedef typename boost::mpl::if_< 
+	boost::is_arithmetic< ToType >,
+	LexicalCaster< ToType, const char* >,     // is arithmetic
+	StaticCaster< ToType, const char* >       // is not
 	>::type
 	Converter;
 

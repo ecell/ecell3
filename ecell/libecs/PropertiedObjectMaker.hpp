@@ -32,30 +32,104 @@
 #ifndef ___PROPERTIEDOBJECTMAKER_H___
 #define ___PROPERTIEDOBJECTMAKER_H___
 
-#include "PropertiedClass.hpp"
 #include "dmtool/ModuleMaker.hpp"
+#include "dmtool/DynamicModuleInfo.hpp"
 
+#include "libecs/PropertiedClass.hpp"
+#include "libecs/PropertyInterface.hpp"
 
 namespace libecs
 {
   
-  /* *defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
-  class LIBECS_API PropertiedObjectMaker 
-    : 
-    public SharedModuleMaker<PropertiedClass>
-  {
-  public:
-    PropertiedObjectMaker();
-    virtual ~PropertiedObjectMaker();
-  };
+/* *defgroup libecs_module The Libecs Module 
+* This is the libecs module 
+* @{ 
+*/ 
+
+template< typename T_ >  
+class PropertiedObjectMaker 
+{
+public:
+    typedef StaticModuleMaker< PropertiedClass > Backend;
+    typedef T_ DMType;
+
+public:
+    PropertiedObjectMaker( Backend& aBackend )
+      : theBackend( aBackend )
+    {
+        // do nothing;
+    }
+
+    static const char* getTypeName();
+
+    /**
+         Instantiates given class of an object.
+ 
+         @param classname name of class to be instantiated.
+         @return pointer to a new instance.
+    */
+    DMType* make( const std::string& aClassname )
+    {
+        Backend::Module::DMAllocator anAllocator( getModule( aClassname ).getAllocator() );
+        if ( !anAllocator )
+        {
+            THROW_EXCEPTION( Instantiation, "Unexpected error" );
+        }
+
+        DMType* anInstance( reinterpret_cast< DMType *>( anAllocator() ) );
+        if ( !anInstance )
+        {
+            THROW_EXCEPTION( Instantiation, "Can't instantiate [" + aClassname + "]." );
+        }
+
+        return anInstance;
+    }
+
+    const Backend::Module& getModule(StringCref aClassName )
+    {
+        const Backend::Module& mod( theBackend.getModule( aClassName ) );
+        const PropertyInterface< DMType >* info(
+                reinterpret_cast< const PropertyInterface< DMType >* >( mod.getInfo() ) );
+        if ( !info || info->getTypeName() != getTypeName() )
+        {
+            THROW_EXCEPTION( TypeError,
+                    String( "Specified class [" + aClassName + "] is not a " )
+                    + getTypeName() );
+        }
+        return mod;
+    }
+
+protected:
+    Backend& theBackend;
+};
+
+template<>  
+inline const char* PropertiedObjectMaker<Stepper>::getTypeName()
+{
+    return "Stepper";
+}
+
+template<>  
+inline const char* PropertiedObjectMaker<Process>::getTypeName()
+{
+    return "Process";
+}
+
+template<>  
+inline const char* PropertiedObjectMaker<Variable>::getTypeName()
+{
+    return "Variable";
+}
+
+template<>  
+inline const char* PropertiedObjectMaker<System>::getTypeName()
+{
+    return "System";
+}
 
 #define NewPropertiedObjectModule(CLASS) NewDynamicModule(PropertiedObject,CLASS)
 
-  /** @} */ //end of libecs_module 
+/** @} */ //end of libecs_module 
 
 } // namespace libecs
 

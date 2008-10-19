@@ -24,42 +24,26 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-//
-// written by Koichi Takahashi <shafi@e-cell.org>,
-// E-Cell Project.
-//
 
-#ifndef ___PROCESSMAKER_H___
-#define ___PROCESSMAKER_H___
+#ifndef __DYNAMIC_MODULE_DESCRIPTOR_HPP
+#define __DYNAMIC_MODULE_DESCRIPTOR_HPP
 
-#include "Process.hpp"
-#include "PropertiedObjectMaker.hpp"
+#include "dmtool/DynamicModuleInfo.hpp"
 
-namespace libecs
+/**
+  DynamicModuleDescriptor is a POD class that holds the information about
+  the module.
+ */
+struct DynamicModuleDescriptor
 {
-  
-  /* *defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
-  class LIBECS_API ProcessMaker 
-  {
-  private:
-    PropertiedObjectMaker& theBackend;
+    typedef void* (*AllocatorType)();
+    typedef const DynamicModuleInfo* (*InfoLoaderType)();
+    typedef void (*ModuleInitializerType)();
 
-  public:
-    ProcessMaker( PropertiedObjectMaker& maker );
-    virtual ~ProcessMaker();
-    Process* make( const std::string& aClassName );
-    const PropertiedObjectMaker::SharedModule& getModule(
-	const std::string& aClassName, bool forceReload );
-  };
+    const char* moduleName;
+    AllocatorType allocator;
+    InfoLoaderType infoLoader;
+    ModuleInitializerType moduleInitializer;
+};
 
-#define NewProcessModule(CLASS) NewDynamicModule(Process,CLASS)
-
-  /** @} */ //end of libecs_module 
-
-} // namespace libecs
-
-#endif /* ___PROCESSMAKER_H___ */
+#endif /* __DYNAMIC_MODULE_DESCRIPTOR_HPP */

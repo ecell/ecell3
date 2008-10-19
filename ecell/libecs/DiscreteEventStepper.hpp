@@ -32,12 +32,12 @@
 #ifndef __DISCRETEEVENTSTEPPER_HPP
 #define __DISCRETEEVENTSTEPPER_HPP
 
-#include "libecs.hpp"
-#include "Stepper.hpp"
-#include "Process.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Stepper.hpp"
+#include "libecs/Process.hpp"
 
-#include "EventScheduler.hpp"
-#include "ProcessEvent.hpp"
+#include "libecs/EventScheduler.hpp"
+#include "libecs/ProcessEvent.hpp"
 
 
 namespace libecs

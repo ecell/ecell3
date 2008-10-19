@@ -79,7 +79,7 @@ namespace libecs
     if ( theProcessVector.empty() )
       {
 	THROW_EXCEPTION( InitializationFailed,
-			 getClassNameString() + 
+			 getClassName() + 
 			 ": at least one Process "
 			 "must be defined in this Stepper." );
       }

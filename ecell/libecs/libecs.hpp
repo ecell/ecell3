@@ -32,7 +32,8 @@
 #ifndef __LIBECS_HPP
 #define __LIBECS_HPP
 
-#include "Defs.hpp"
+#include "libecs/Defs.hpp"
+
 #include <list>
 #include <vector>
 #include <map>
@@ -62,8 +63,6 @@ namespace libecs
 
   LIBECS_API bool initialize();
   LIBECS_API void finalize();
-  LIBECS_API void setDMSearchPath( const String& path );
-  LIBECS_API const String getDMSearchPath();
   // LIBECS_API const String getLoadedDMList(); // XXX: not implemented
 
   // Forward declarations.
@@ -101,7 +100,7 @@ namespace libecs
   DECLARE_CLASS( System );
   DECLARE_CLASS( SystemMaker );
   DECLARE_CLASS( PropertySlotBase );
-  //  DECLARE_CLASS( PropertyInterface );
+  DECLARE_CLASS( PropertyInterfaceBase );
   DECLARE_CLASS( PropertiedClass );
   DECLARE_CLASS( PropertySlotProxy );
   DECLARE_CLASS( Polymorph );

@@ -32,19 +32,16 @@
 #ifndef __MODEL_HPP
 #define __MODEL_HPP
 
-#include "AssocVector.h"
+#include "libecs/AssocVector.h"
 
-#include "libecs.hpp"
-
-#include "EventScheduler.hpp"
-#include "StepperEvent.hpp"
-#include "StepperMaker.hpp"
-#include "VariableMaker.hpp"
-#include "ProcessMaker.hpp"
-#include "SystemMaker.hpp"
-#include "LoggerBroker.hpp"
-#include "Stepper.hpp"
-#include "SystemStepper.hpp"
+#include "libecs/libecs.hpp"
+#include "dmtool/ModuleMaker.hpp"
+#include "libecs/PropertiedObjectMaker.hpp"
+#include "libecs/EventScheduler.hpp"
+#include "libecs/StepperEvent.hpp"
+#include "libecs/LoggerBroker.hpp"
+#include "libecs/Stepper.hpp"
+#include "libecs/SystemStepper.hpp"
 
 namespace libecs
 {
@@ -78,10 +75,14 @@ namespace libecs
 
     typedef EventScheduler<StepperEvent> StepperEventScheduler;
     typedef StepperEventScheduler::EventIndex EventIndex;
+    typedef PropertiedObjectMaker< Stepper > StepperMaker;
+    typedef PropertiedObjectMaker< System > SystemMaker;
+    typedef PropertiedObjectMaker< Variable > VariableMaker;
+    typedef PropertiedObjectMaker< Process > ProcessMaker;
 
   public:
 
-    Model( PropertiedObjectMaker& maker );
+    Model( StaticModuleMaker< PropertiedClass >& maker );
     ~Model();
 
     /**
@@ -150,14 +151,12 @@ namespace libecs
     }
 
     /**
-       Creates a new Entity object and register it in an appropriate System
-       in  the Model.
+       Get the property interface for the specified class.
 
        @param aClassname
-       @param aClassType
     */
 
-    PolymorphMap getClassInfo( StringCref aClassType, StringCref aClassname, Integer forceReload );
+    const PropertyInterfaceBase& getPropertyInterface( StringCref aClassname ) const;
 
     /**
        Creates a new Entity object and register it in an appropriate System
@@ -276,21 +275,27 @@ namespace libecs
 
     StepperEventScheduler&   getScheduler() { return theScheduler; }
 
-    /// @internal
-    StepperMakerRef     getStepperMaker()     { return theStepperMaker; }
+    void setDMSearchPath( const String& path );
+
+    const String getDMSearchPath() const;
 
     /// @internal
+    void registerBuiltinModules();
 
-    ProcessMakerRef     getProcessMaker()     { return theProcessMaker; }
+    /// @internal
+    StepperMaker&       getStepperMaker()     { return theStepperMaker; }
 
     /// @internal
 
-    VariableMakerRef    getVariableMaker()    { return theVariableMaker; }
+    ProcessMaker&       getProcessMaker()     { return theProcessMaker; }
 
     /// @internal
 
-    SystemMakerRef      getSystemMaker()      { return theSystemMaker; }
+    VariableMaker&      getVariableMaker()    { return theVariableMaker; }
 
+    /// @internal
+
+    SystemMaker&        getSystemMaker()      { return theSystemMaker; }
 
   private:
 
@@ -309,6 +314,9 @@ namespace libecs
 
     static void initializeSystems( SystemPtr const aSystem );
 
+  public:
+    static const char PATH_SEPARATOR = ModuleMaker::PATH_SEPARATOR;
+
   private:
 
     Time                theCurrentTime;
@@ -324,12 +332,11 @@ namespace libecs
 
     StepperMap          theStepperMap;
 
-    PropertiedObjectMaker& thePropertiedObjectMaker;
+    StaticModuleMaker< PropertiedClass >& thePropertiedObjectMaker;
     StepperMaker          theStepperMaker;
     SystemMaker           theSystemMaker;
     VariableMaker         theVariableMaker;
     ProcessMaker          theProcessMaker;
-
   };
 
   

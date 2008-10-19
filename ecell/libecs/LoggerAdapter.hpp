@@ -29,7 +29,7 @@
 #if !defined(__LOGGERADAPTER_HPP)
 #define __LOGGERADAPTER_HPP
 
-#include "libecs.hpp"
+#include "libecs/libecs.hpp"
 
 namespace libecs
 {

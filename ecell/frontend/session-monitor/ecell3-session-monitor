@@ -7,8 +7,6 @@ import string
 import ecell.ecs
 import ecell.config
 
-ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
-
 import ecell.ui.osogo.opengui as opengui
 try:
     opengui.main()

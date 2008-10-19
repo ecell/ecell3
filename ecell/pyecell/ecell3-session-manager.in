@@ -144,7 +144,6 @@ Configurations:
 
 def main( argv ):
     global programName
-    ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
     # initialize 
     anEsmFile = None
     aParameters = {}

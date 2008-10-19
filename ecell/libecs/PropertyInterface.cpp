@@ -40,50 +40,29 @@
 namespace libecs
 {
 
-  void PropertyInterfaceBase::throwNoSlot( StringCref aClassName, 
-					   StringCref aPropertyName )
+  void PropertyInterfaceBase::throwNoSlot( StringCref aPropertyName ) const
   {
     THROW_EXCEPTION( NoSlot,
-		     aClassName + 
+		     getClassName() + 
 		     String( " has no [" ) +
 		     aPropertyName + String( "] property.\n" ) );	  
   }
 
-  void PropertyInterfaceBase::throwNotLoadable( PropertiedClassCref anObject,
-						StringCref aPropertyName )
+  void PropertyInterfaceBase::throwNotLoadable( StringCref aPropertyName ) const
   {
     THROW_EXCEPTION( NoSlot,
-		     anObject.getClassNameString() + 
+		     getClassName() + 
 		     String( ": property [" ) +
 		     aPropertyName + String( "] is not loadable.\n" ) );
   }
 
-  void PropertyInterfaceBase::throwNotSavable( PropertiedClassCref anObject,
-					       StringCref aPropertyName )
+  void PropertyInterfaceBase::throwNotSavable( StringCref aPropertyName ) const
   {
     THROW_EXCEPTION( NoSlot,
-		     anObject.getClassNameString() + 
+		     getClassName() + 
 		     String( ": property [" ) +
 		     aPropertyName + String( "] is not savable.\n" ) );
   }
-
-
-  /*
-  void PropertyInterfaceBase::setInfoField( StringMapRef anInfoMap,
-					    StringCref aFieldName, 
-					    StringCref anInfoString )
-  {
-    anInfoMap[ aFieldName ] = anInfoString;
-
-    //    anInfoMap.insert( std::make_pair( aFieldName, anInfoString ) );
-  }
-
-  const Polymorph 
-  PropertyInterfaceBase::convertInfoMapToPolymorph( StringMap const& anInfoMap )
-  {
-    return convertStringMapToPolymorph( anInfoMap );
-  }
-  */
 
 } // namespace libecs
 

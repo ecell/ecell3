@@ -32,7 +32,7 @@
 #ifndef __DYNAMICPRIORITYQUEUE_HPP
 #define __DYNAMICPRIORITYQUEUE_HPP
 
-#include "Defs.hpp"
+#include "libecs/Defs.hpp"
 
 #include <functional>
 #include <vector>

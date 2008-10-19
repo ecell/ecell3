@@ -24,15 +24,12 @@ libecs_la_LIBADD=  -lstdc++ ${LIBLTDL} ${GSL_LIBADD}
 libecs_la_SOURCES=\
 libecs.cpp\
 Util.cpp\
-Polymorph.cpp\
 FullID.cpp\
 PropertySlot.cpp\
 PropertySlotProxy.cpp\
 PropertyInterface.cpp\
 PropertiedClass.cpp\
-ProcessMaker.cpp\
 Variable.cpp\
-VariableMaker.cpp\
 Stepper.cpp\
 DifferentialStepper.cpp\
 DiscreteTimeStepper.cpp\
@@ -46,8 +43,6 @@ System.cpp\
 Entity.cpp\
 Process.cpp\
 ContinuousProcess.cpp\
-StepperMaker.cpp\
-SystemMaker.cpp\
 DataPoint.cpp\
 DataPointVector.cpp\
 VVector.cpp\
@@ -57,8 +52,7 @@ LoggerAdapter.cpp\
 PhysicalLogger.cpp\
 VariableReference.cpp\
 LoggerBroker.cpp\
-Exceptions.cpp\
-PropertiedObjectMaker.cpp
+Exceptions.cpp
 
 
 libecsdir=${ECELL_INCLUDE_DIR}/libecs
@@ -73,9 +67,7 @@ PropertySlot.hpp\
 PropertySlotProxy.hpp\
 PropertyInterface.hpp\
 PropertiedClass.hpp\
-ProcessMaker.hpp\
 Variable.hpp\
-VariableMaker.hpp\
 Stepper.hpp\
 ProcessEvent.hpp\
 StepperEvent.hpp\
@@ -92,8 +84,6 @@ System.hpp\
 Entity.hpp\
 Process.hpp\
 ContinuousProcess.hpp\
-StepperMaker.hpp\
-SystemMaker.hpp\
 DataPoint.hpp\
 DataPointVector.hpp\
 PhysicalLogger.hpp\
@@ -107,7 +97,8 @@ DynamicPriorityQueue.hpp\
 FluxProcess.hpp\
 MethodProxy.hpp\
 PropertiedObjectMaker.hpp\
-PropertySlotProxyLoggerAdapter.hpp
+PropertySlotProxyLoggerAdapter.hpp\
+PropertyAttributes.hpp
 
 noinst_HEADERS=\
 osif.h\

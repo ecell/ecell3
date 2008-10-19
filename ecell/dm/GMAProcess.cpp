@@ -189,7 +189,7 @@ SET_METHOD_DEF( Integer, Order, GMAProcess )
 void GMAProcess::setGMASystemMatrix( PolymorphCref aValue )
 {
   GMASystemMatrix = aValue;
-  PolymorphVector aValueVector( aValue.asPolymorphVector() );
+  PolymorphVector aValueVector( aValue.as<PolymorphVector>() );
   theSystemSize = aValueVector.size();
   theLawSize = theSystemSize + 1;
 
@@ -260,18 +260,18 @@ void GMAProcess::setGMASystemMatrix( PolymorphCref aValue )
 
       for( Integer j( 0 ); j < theSystemSize; j++ )	
 	{
-	  theAlpha[i+1][j+1] = (aValueVector[i].asPolymorphVector())[j].asReal() ;	  
+	  theAlpha[i+1][j+1] = (aValueVector[i].as<PolymorphVector>())[j].as<Real>() ;	  
 	  //std::cout <<'A'<< theAlpha[i+1][j+1]<<std::endl;
 	  for (Integer k( 0 ); k < theSystemSize; k++)
 	    {
 	      if( i == k )
 		{
 		  
-		  (theG[i+1])[j+1][k+1] = ((aValueVector[i].asPolymorphVector())[theSystemSize + j ].asPolymorphVector())[k].asReal() -1;  
+		  (theG[i+1])[j+1][k+1] = ((aValueVector[i].as<PolymorphVector>())[theSystemSize + j ].as<PolymorphVector>())[k].as<Real>() -1;  
 		  //std::cout <<"  G"<<theG[i+1][j+1][k+1];
 		}else{
 		  
-		  (theG[i+1])[j+1][k+1] = ((aValueVector[i].asPolymorphVector())[theSystemSize + j ].asPolymorphVector())[k].asReal();
+		  (theG[i+1])[j+1][k+1] = ((aValueVector[i].as<PolymorphVector>())[theSystemSize + j ].as<PolymorphVector>())[k].as<Real>();
 		  //std::cout <<"  G"<<theG[i+1][j+1][k+1];
 		}	      
 	      // std::cout <<std::endl;

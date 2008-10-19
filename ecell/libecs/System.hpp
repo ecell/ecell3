@@ -32,9 +32,9 @@
 #ifndef __SYSTEM_HPP
 #define __SYSTEM_HPP
 
-#include "libecs.hpp"
+#include "libecs/libecs.hpp"
 
-#include "Entity.hpp"
+#include "libecs/Entity.hpp"
 
 namespace libecs
 {

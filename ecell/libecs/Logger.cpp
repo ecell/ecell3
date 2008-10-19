@@ -83,17 +83,17 @@ namespace libecs
   
   void Logger::setLoggerPolicy( PolymorphCref aParamList )
   {
-    if ( aParamList.asPolymorphVector().size() != 4 )
+    PolymorphVector aParamListAsVector( aParamList.as<PolymorphVector>() );
+    if ( aParamListAsVector.size() != 4 )
       {
 	THROW_EXCEPTION( libecs::Exception, 
 			 "Logger policy array should be 4 element long.\n" );
       }
 
-    setLoggerPolicy( aParamList.asPolymorphVector()[ STEP_SIZE ].asInteger(),
-		     aParamList.asPolymorphVector()[ TIME_INTERVAL ].asReal(),
-		     aParamList.asPolymorphVector()[ END_POLICY ].asInteger(),
-		     aParamList.asPolymorphVector()[ MAX_SPACE ].asInteger()
-		     );
+    setLoggerPolicy( aParamListAsVector[ STEP_SIZE ].as<Integer>(),
+		     aParamListAsVector[ TIME_INTERVAL ].as<Real>(),
+		     aParamListAsVector[ END_POLICY ].as<Integer>(),
+		     aParamListAsVector[ MAX_SPACE ].as<Integer>() );
   }
 
   const Polymorph Logger::getLoggerPolicy( void )

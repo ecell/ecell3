@@ -24,45 +24,34 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-//
-// written by Koichi Takahashi <shafi@e-cell.org>,
-// E-Cell Project.
-//
 
-#ifndef ___STEPPERMAKER_H___
-#define ___STEPPERMAKER_H___
+#ifndef __DYNAMIC_MODULE_INFO_HPP
+#define __DYNAMIC_MODULE_INFO_HPP
 
-#include "Stepper.hpp"
-#include "PropertiedObjectMaker.hpp"
+#include <string>
+#include <utility>
 
-namespace libecs
+/**
+  DynamicModuleInfo defines an interface that provides the meta-information
+  that can be used to annotate the module.
+ */
+class DynamicModuleInfo
 {
+public:
+    class EntryIterator
+    {
+    public:
+        virtual ~EntryIterator() {}
 
-  /* *defgroup libecs_module The Libecs Module 
-   * This is the libecs module 
-   * @{ 
-   */ 
-  
+        virtual bool next() = 0;
 
-  class LIBECS_API StepperMaker 
-  {
-  private:
-    PropertiedObjectMaker& theBackend;
+        virtual std::pair< std::string, const void* > current() = 0;
+    };
 
-  protected:
-    virtual void makeClassList();
+public:
+    virtual ~DynamicModuleInfo() {}
+    virtual const void* getInfoField( std::string const& aFieldName ) const = 0;
+    virtual EntryIterator* getInfoFields() const = 0;
+};
 
-  public:
-    StepperMaker( PropertiedObjectMaker& maker );
-    virtual ~StepperMaker();
-    Stepper* make( const std::string& aClassName );
-    const PropertiedObjectMaker::SharedModule& getModule(
-	const std::string& aClassName, bool forceReload );
-  };
-
-  /** @} */ //end of libecs_module 
-  
-} // namespace libecs
-
-
-#endif /* ___STEPPERMAKER_H___ */
+#endif /* __DYNAMIC_MODULE_INFO_HPP */

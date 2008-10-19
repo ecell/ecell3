@@ -34,11 +34,11 @@
 
 #include <functional>
 
-#include "libecs.hpp"
-#include "Util.hpp"
-#include "PropertySlot.hpp"
-#include "convertTo.hpp"
-#include "Polymorph.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Util.hpp"
+#include "libecs/PropertySlot.hpp"
+#include "libecs/convertTo.hpp"
+#include "libecs/Polymorph.hpp"
 
 namespace libecs
 {
@@ -166,7 +166,7 @@ namespace libecs
     DECLARE_TYPE( PropertySlot_, PropertySlot );
 
     DM_IF ConcretePropertySlotProxy( T& anObject, 
-			       PropertySlotRef aPropertySlot )
+			       PropertySlotCref aPropertySlot )
       :
       theObject( anObject ),
       thePropertySlot( aPropertySlot )
@@ -223,7 +223,7 @@ namespace libecs
     DM_IF ConcretePropertySlotProxy();
 
     T&               theObject;
-    PropertySlotRef  thePropertySlot;
+    PropertySlotCref  thePropertySlot;
 
   };
 

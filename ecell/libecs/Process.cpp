@@ -51,11 +51,11 @@ namespace libecs
 
   SET_METHOD_DEF( Polymorph, VariableReferenceList, Process )
   {
-    const PolymorphVector aVector( value.asPolymorphVector() );
+    const PolymorphVector aVector( value.as<PolymorphVector>() );
     for( PolymorphVectorConstIterator i( aVector.begin() );
 	 i != aVector.end(); ++i )
       {
-	const PolymorphVector anInnerVector( (*i).asPolymorphVector() );
+	const PolymorphVector anInnerVector( (*i).as<PolymorphVector>() );
 
 	setVariableReference( anInnerVector );
       }
@@ -246,7 +246,7 @@ namespace libecs
 			 + "]: ill-formed VariableReference given." );
       }
 
-    const String aVariableReferenceName( aValue[0].asString() );
+    const String aVariableReferenceName( aValue[0].as<String>() );
 
     // If it contains only the VariableReference name,
     // remove the VariableReference from this process
@@ -256,8 +256,8 @@ namespace libecs
       }
 
 
-    const String aFullIDString( aValue[1].asString() );
-    const FullID aFullID( aValue[1].asString() );
+    const String aFullIDString( aValue[1].as<String>() );
+    const FullID aFullID( aValue[1].as<String>() );
     Integer      aCoefficient( 0 );
     
     // relative search; allow relative systempath
@@ -268,12 +268,12 @@ namespace libecs
     
     if( aVectorSize >= 3 )
       {
-	aCoefficient = aValue[2].asInteger();
+	aCoefficient = aValue[2].as<Integer>();
       }
     
     if( aVectorSize >= 4 )
       {
-	const bool anIsAccessorFlag( aValue[3].asInteger() != 0 );
+	const bool anIsAccessorFlag( aValue[3].as<Integer>() != 0 );
 	registerVariableReference( aVariableReferenceName, aVariable,
 				   aCoefficient, anIsAccessorFlag );
       }

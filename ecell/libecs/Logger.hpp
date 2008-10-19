@@ -40,10 +40,10 @@
 
 #include <boost/utility.hpp>
 
-#include "libecs.hpp"
-#include "LoggerAdapter.hpp"
-#include "PhysicalLogger.hpp"
-#include "DataPointVector.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/LoggerAdapter.hpp"
+#include "libecs/PhysicalLogger.hpp"
+#include "libecs/DataPointVector.hpp"
 
 
 namespace libecs

@@ -24,8 +24,9 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-#include "libecs.hpp"
-#include "Process.hpp"
+
+#include "libecs/libecs.hpp"
+#include "libecs/Process.hpp"
 
 namespace libecs
 {

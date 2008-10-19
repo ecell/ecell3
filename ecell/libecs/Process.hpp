@@ -35,11 +35,11 @@
 #include <boost/mem_fn.hpp>
 #include <boost/functional.hpp>
 
-#include "AssocVector.h"
+#include "libecs/AssocVector.h"
 
-#include "libecs.hpp"
-#include "Entity.hpp"
-#include "VariableReference.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Entity.hpp"
+#include "libecs/VariableReference.hpp"
 
 namespace libecs
 {

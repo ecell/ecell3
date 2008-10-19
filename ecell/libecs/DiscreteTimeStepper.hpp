@@ -32,9 +32,9 @@
 #ifndef __DISCRETETIMESTEPPER_HPP
 #define __DISCRETETIMESTEPPER_HPP
 
-#include "libecs.hpp"
+#include "libecs/libecs.hpp"
 
-#include "Stepper.hpp"
+#include "libecs/Stepper.hpp"
 
 
 

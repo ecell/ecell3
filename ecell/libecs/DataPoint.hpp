@@ -32,8 +32,8 @@
 #if !defined(__DATAPOINT_HPP)
 #define __DATAPOINT_HPP
 
-#include "libecs.hpp"
-#include "Polymorph.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Polymorph.hpp"
 
 namespace libecs
 {

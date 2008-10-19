@@ -32,8 +32,8 @@
 #ifndef __VARIABLEREFERENCE_HPP
 #define __VARIABLEREFERENCE_HPP
 
-#include "libecs.hpp"
-#include "Variable.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Variable.hpp"
 
 namespace libecs
 {

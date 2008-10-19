@@ -40,12 +40,12 @@
 #include <gsl/gsl_rng.h>
 #endif
 
-#include "libecs.hpp"
+#include "libecs/libecs.hpp"
 
-#include "Util.hpp"
-#include "Polymorph.hpp"
-#include "Interpolant.hpp"
-#include "PropertyInterface.hpp"
+#include "libecs/Util.hpp"
+#include "libecs/Polymorph.hpp"
+#include "libecs/Interpolant.hpp"
+#include "libecs/PropertyInterface.hpp"
 
 
 
@@ -90,7 +90,6 @@ namespace libecs
 	PROPERTYSLOT_SET_GET( Real,      MaxStepInterval );
 	PROPERTYSLOT_SET_GET( Real,      MinStepInterval );
 	PROPERTYSLOT_SET    ( String,    RngSeed );
-
 
 	// these properties are not loaded/saved.
 	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Real,      CurrentTime );

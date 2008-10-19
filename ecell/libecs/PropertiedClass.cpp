@@ -45,8 +45,7 @@ namespace libecs
 
 
   ///////////////////////////// PropertiedClass
-
-  const Polymorph PropertiedClass::
+  const PropertyAttributes PropertiedClass::
   defaultGetPropertyAttributes( StringCref aPropertyName ) const
   {
     THROW_EXCEPTION( NoSlot, 
@@ -55,12 +54,11 @@ namespace libecs
 		     + aPropertyName + "].  Get property attributes failed." );
   }
 
-  const Polymorph 
+  const StringVector&
   PropertiedClass::defaultGetPropertyList() const
   {
-    PolymorphVector aVector;
-
-    return aVector;
+    static StringVector emptyVector;
+    return emptyVector;
   }
   
   void PropertiedClass::defaultSetProperty( StringCref aPropertyName, 
@@ -114,6 +112,10 @@ namespace libecs
     THROW_EXCEPTION( AttributeError, "Not getable." );
   }
 
+  StringCref PropertiedClass::getClassName() const
+  {
+     return getPropertyInterface().getClassName();
+  }
 
 #define NULLSET_SPECIALIZATION_DEF( TYPE )\
   template <> void PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )\

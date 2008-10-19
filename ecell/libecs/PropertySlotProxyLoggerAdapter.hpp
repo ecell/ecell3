@@ -29,8 +29,8 @@
 #if !defined(__PROPERTYSLOTLOGGERADAPTER_HPP)
 #define __PROPERTYSLOTLOGGERADAPTER_HPP
 
-#include "PropertySlotProxy.hpp"
-#include "LoggerAdapter.hpp"
+#include "libecs/PropertySlotProxy.hpp"
+#include "libecs/LoggerAdapter.hpp"
 
 namespace libecs
 {
