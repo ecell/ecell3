@@ -6,6 +6,14 @@ from glob import glob
 from distutils.core import setup, Extension
 import ecell.config as config
 
+def relative( basePath, path ):
+	separators = os.sep + ( os.altsep or "" )
+	commonPrefix = os.path.commonprefix( [ basePath, path ] )
+	if len( basePath[ len( commonPrefix ): ].rstrip( separators ) ) != 0:
+		return path
+	else:
+		return path[ len( commonPrefix ): ].lstrip( separators )
+
 resources = glob(
     os.path.join( os.path.dirname( __file__ ), 'glade', '*' ) )
 
@@ -22,8 +30,8 @@ setup(
     packages = [ 'ecell.ui', 'ecell.ui.osogo' ],
     scripts = [ 'ecell3-session-monitor' ],
     data_files = [
-        ( config.conf_dir, [ 'osogo.ini' ] ),
-        ( os.path.join( config.data_dir, 'session-monitor', 'glade' ), resources ),
-        ( os.path.join( config.lib_dir, 'session-monitor', 'plugins' ), plugins ),
+        ( relative( config.prefix, config.conf_dir ), [ 'osogo.ini' ] ),
+        ( os.path.join( relative( config.prefix, config.data_dir ), 'session-monitor', 'glade' ), resources ),
+        ( os.path.join( relative( config.prefix, config.lib_dir), 'session-monitor', 'plugins' ), plugins ),
         ]
     )

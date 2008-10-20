@@ -119,7 +119,7 @@ var tasks = {
             [
                 'setup.py',
                 'build',
-                '-b', this.vcOutDir + 'osogo.build'
+                '-b', this.vcOutDir + 'session-monitor.build'
             ].concat(this.debugBuild ? [ '-g' ]: []).concat([
                 'install',
                 '--prefix', '\\',
@@ -134,7 +134,7 @@ var tasks = {
             [
                 'setup.py',
                 'build',
-                '-b', this.vcOutDir + 'model_editor.build'
+                '-b', this.vcOutDir + 'model-editor.build'
             ].concat(this.debugBuild ? [ '-g' ]: []).concat([
                 'install',
                 '--prefix', '\\',
