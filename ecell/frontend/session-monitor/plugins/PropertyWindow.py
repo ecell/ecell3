@@ -288,17 +288,6 @@ class PropertyWindow(OsogoPluginWindow):
         # check the fullID
         if self.thePreFullID != self.theFullID():
             fullUpdate = True
-            
-        # check all property's value
-        #if aChangedFlag == FALSE:
-        #    anEntityStub = EntityStub( self.theSession.theSimulator, \
-        #                   createFullIDString(self.theFullID()) )
-        #
-        #    for aProperty in anEntityStub.getPropertyList():
-                # When a value is changed, 
-        #        if self.thePrePropertyMap[aProperty] != anEntityStub.getProperty(aProperty):
-        #            aChangedFlag = TRUE
-        #            break
 
         # ----------------------------------------------------
         # updates widgets
@@ -561,7 +550,7 @@ class PropertyWindow(OsogoPluginWindow):
         # ------------------------------------
         # checks the type of inputted value 
         # ------------------------------------
-        if aGetable == TRUE:
+        if aGetable:
             aPreValue = self.theListStore.get_value( anIter, aColumn )
 
             # ------------------------------------

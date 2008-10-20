@@ -72,7 +72,7 @@ class PluginInstanceSelection(OsogoWindow):
 	def deleted( self, *arg ):
 		self['PluginInstanceSelection'].hide_all()
 		#self.theEntityListWindow.closePluginInstanceSelectionWindow()
-		return FALSE
+		return False
 
 	# ====================================================================
 	def update( self ):

@@ -84,8 +84,8 @@ class OsogoWindow(Window):
 		
 
 	def exists( self ):
-		"""Returns TRUE:When glade file is loaded and does not deleted.
-		        FALSE:When glade file is not loaded yet or already deleted.
+		"""Returns True:When glade file is loaded and does not deleted.
+		        False:When glade file is not loaded yet or already deleted.
 		"""
 
 		return self.__theExist
@@ -147,16 +147,16 @@ class OsogoWindow(Window):
 	def deleted( self, *arg ):
 		""" When 'delete_event' signal is chatcked( for example, [X] button is clicked ),
 		iconize this window.
-		Returns TRUE
-		[Note]: 'return TRUE' means when 'delete_event' signal is checked, does not 
+		Returns True
+		[Note]: 'return True' means when 'delete_event' signal is checked, does not 
 		        delete widgets of this class. If you'd like to delete widget, overwrite
-		        this method that returns FALSE. And in the method you must set 
+		        this method that returns False. And in the method you must set 
 		        self.__theExist = FASLE.
 		        example of subclass's method.
 
 				def deleted( self, *arg ):
-		            self.__theExist = FALSE
-		            return FALSE
+		            self.__theExist = False
+		            return False
 
 		"""
 
@@ -164,7 +164,7 @@ class OsogoWindow(Window):
 		self.close()
 
 		# does not widgets
-		return TRUE
+		return True
 
 
 
@@ -176,9 +176,9 @@ class OsogoWindow(Window):
 		"""
 
 		# when glade file is not loaded yet or already deleted.
-		if self.__theExist == False:
+		if not self.__theExist:
 
-			# sets __theExist flag is TRUE
+			# sets __theExist flag is True
 			self.__theExist = True
 
 			# calls superclass's method 
@@ -198,7 +198,7 @@ class OsogoWindow(Window):
 		pass
 
 	def close ( self ):
-		""" destroys Widgets and sets __theExist FALSE """
+		""" destroys Widgets and sets __theExist False"""
 		if self.exists():
 			self[self.theTopWidget].destroy()
 			self.__theExist = False

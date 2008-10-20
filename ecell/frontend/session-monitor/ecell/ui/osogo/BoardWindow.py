@@ -174,7 +174,7 @@ class BoardWindow(OsogoWindow):
 
 
     def deletePluginWindowByTitle( self, aTitle ):
-        if self.exists() == TRUE:
+        if self.exists():
             for aPluginFrame in self['board_table'].get_children():
                 if self.thePluginMap[str(aPluginFrame)].getTitle() == aTitle:
                     self.theSelectedPluginFrame = aPluginFrame
@@ -249,7 +249,7 @@ class BoardWindow(OsogoWindow):
 
         aSize = int( self['size_spinbutton'].get_text() )
         # When 'forward' is toggled.
-        if self['forward_radiobutton'].get_active() == TRUE:
+        if self['forward_radiobutton'].get_active():
             self.theRowSize = -1
             self.theColSize = aSize
 
@@ -323,7 +323,7 @@ class BoardWindow(OsogoWindow):
         # --------------------------------------------
         # When 'forward' is toggled.
         # --------------------------------------------
-        if self['forward_radiobutton'].get_active() == TRUE:
+        if self['forward_radiobutton'].get_active():
             self['size_label'].set_text('Cols :')
             self.__updateSize()
             self.updatePositions()
