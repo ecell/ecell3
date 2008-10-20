@@ -398,6 +398,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ecell\libecs\EcsObject.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ecell\libecs\Entity.cpp"
 				>
 			</File>
@@ -451,10 +455,6 @@
 			</File>
 			<File
 				RelativePath="..\..\ecell\libecs\Process.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ecell\libecs\EcsObject.cpp"
 				>
 			</File>
 			<File
@@ -548,6 +548,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ecell\libecs\EcsObject.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\libecs\EcsObjectMaker.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ecell\libecs\Entity.hpp"
 				>
 			</File>
@@ -625,14 +633,6 @@
 			</File>
 			<File
 				RelativePath="..\..\ecell\libecs\ProcessMaker.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ecell\libecs\EcsObject.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ecell\libecs\EcsObjectMaker.hpp"
 				>
 			</File>
 			<File
