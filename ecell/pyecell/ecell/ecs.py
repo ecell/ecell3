@@ -24,19 +24,42 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # 
 #END_HEADER
-import os
 
-if os.name != "nt":
-    import sys
-    try:
-        import DLFCN
-        
-        # RTLD_GLOBAL is needed so that rtti across dynamic modules can work
-        # RTLD_LAZY   may be needed so that the system can resolve dependency among
-        #             dynamic modules after dlopened it
-        
-        sys.setdlopenflags( DLFCN.RTLD_LAZY | DLFCN.RTLD_GLOBAL )
-    except:
-        None
+import ecell._ecs
 
-from ecell._ecs import *
+__all__ = (
+    'getLibECSVersionInfo',
+    'getLibECSVersion',
+    'VariableReference',
+    'Process',
+    'System',
+    'VariableReferenceVector',
+    'Simulator'
+    )
+
+def __init__():
+    import os
+    if os.name != "nt":
+        import sys
+        try:
+            import DLFCN
+            
+            # RTLD_GLOBAL is needed so that rtti across dynamic modules can work
+            # RTLD_LAZY   may be needed so that the system can resolve dependency among
+            #             dynamic modules after dlopened it
+            
+            sys.setdlopenflags( DLFCN.RTLD_LAZY | DLFCN.RTLD_GLOBAL )
+        except:
+            None
+
+    for i in __all__:
+        globals()[ i ] = getattr( ecell._ecs, i )
+
+__init__()
+
+class Simulator( ecell._ecs.Simulator ):
+    def __init__( self, *args, **kwargs ):
+        import ecell.config
+        ecell._ecs.Simulator.__init__( self, *args, **kwargs )
+        self.setDMSearchPath( self.DMSearchPathSeparator.join( ecell.config.dm_path ) )
+
