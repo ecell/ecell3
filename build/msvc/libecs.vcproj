@@ -454,7 +454,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\libecs\PropertiedClass.cpp"
+				RelativePath="..\..\ecell\libecs\EcsObject.cpp"
 				>
 			</File>
 			<File
@@ -628,11 +628,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\libecs\PropertiedClass.hpp"
+				RelativePath="..\..\ecell\libecs\EcsObject.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\libecs\PropertiedObjectMaker.hpp"
+				RelativePath="..\..\ecell\libecs\EcsObjectMaker.hpp"
 				>
 			</File>
 			<File
