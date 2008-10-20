@@ -123,6 +123,7 @@ var tasks = {
             ].concat(this.debugBuild ? [ '-g' ]: []).concat([
                 'install',
                 '--prefix', '\\',
+                '--install-scripts', 'bin',
                 '--root', this.distDir
             ]));
     },
@@ -138,6 +139,7 @@ var tasks = {
             ].concat(this.debugBuild ? [ '-g' ]: []).concat([
                 'install',
                 '--prefix', '\\',
+                '--install-scripts', 'bin',
                 '--root', this.distDir
             ]));
     },
