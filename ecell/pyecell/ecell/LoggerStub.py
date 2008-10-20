@@ -79,10 +79,7 @@ class LoggerStub( ObjectStub ):
         """
         # When the FullPN of this instance exists in 
         # the FullPN list, returns TRUE
-        if self.theFullPNString in self.theSimulator.getLoggerList():
-            return True
-        else:
-            return False
+        return self.theFullPNString in self.theSimulator.getLoggerList():
 
     def getData( self, aStartTime=None, anEndTime=None, anInterval=None ):
         """
