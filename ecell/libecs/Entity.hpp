@@ -34,7 +34,7 @@
 
 #include "libecs/libecs.hpp"
 #include "libecs/EntityType.hpp"
-#include "libecs/PropertiedClass.hpp"
+#include "libecs/EcsObject.hpp"
 #include "libecs/PropertyInterface.hpp"
 
 
@@ -61,14 +61,14 @@ namespace libecs
   */
 
 
-  LIBECS_DM_CLASS( Entity, PropertiedClass )
+  LIBECS_DM_CLASS( Entity, EcsObject )
   {
 
   public:
 
     LIBECS_DM_OBJECT_ABSTRACT( Entity ) 
       {
-	INHERIT_PROPERTIES( PropertiedClass );
+	INHERIT_PROPERTIES( EcsObject );
 
 	PROPERTYSLOT_SET_GET( String, Name );
 

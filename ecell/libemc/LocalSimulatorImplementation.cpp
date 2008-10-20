@@ -718,7 +718,7 @@ namespace libemc
  
   const libecs::PolymorphVector LocalSimulatorImplementation::getDMInfo() const
   {
-    typedef SharedModuleMaker< PropertiedClass >::ModuleMap ModuleMap;
+    typedef SharedModuleMaker< EcsObject >::ModuleMap ModuleMap;
     libecs::PolymorphVector aVector;
     const ModuleMap& modules( thePropertiedObjectMaker.getModuleMap() );
 

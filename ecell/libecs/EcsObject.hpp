@@ -353,7 +353,7 @@ public:\
 
   */
 
-  class LIBECS_API PropertiedClass
+  class LIBECS_API EcsObject
   {
 
   public:
@@ -364,12 +364,12 @@ public:\
     }
 
 
-    PropertiedClass()
+    EcsObject()
     {
       ; // do nothing
     }
 
-    virtual ~PropertiedClass()
+    virtual ~EcsObject()
     {
       ; // do nothing
     }
@@ -453,7 +453,7 @@ public:\
   // inline copies of them around.  This reduces sizes of DM .so files a bit.
 
 #define NULLSET_SPECIALIZATION( TYPE )\
-  template <> LIBECS_API void PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )
+  template <> LIBECS_API void EcsObject::nullSet<TYPE>( Param<TYPE>::type )
 
   NULLSET_SPECIALIZATION( Real );
   NULLSET_SPECIALIZATION( Integer );
@@ -461,7 +461,7 @@ public:\
   NULLSET_SPECIALIZATION( Polymorph );
 
 #define NULLGET_SPECIALIZATION( TYPE )\
-  template <> LIBECS_API const TYPE PropertiedClass::nullGet<TYPE>() const
+  template <> LIBECS_API const TYPE EcsObject::nullGet<TYPE>() const
 
   NULLGET_SPECIALIZATION( Real );
   NULLGET_SPECIALIZATION( Integer );

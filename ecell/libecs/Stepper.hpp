@@ -74,7 +74,7 @@ namespace libecs
   */
 
 
-  LIBECS_DM_CLASS( Stepper, PropertiedClass )
+  LIBECS_DM_CLASS( Stepper, EcsObject )
   {
 
   public:
@@ -83,7 +83,7 @@ namespace libecs
 
     LIBECS_DM_OBJECT_ABSTRACT( Stepper )
       {
-	INHERIT_PROPERTIES( PropertiedClass );
+	INHERIT_PROPERTIES( EcsObject );
 	
 	PROPERTYSLOT_SET_GET( Integer,       Priority );
 	PROPERTYSLOT_SET_GET( Real,      StepInterval );

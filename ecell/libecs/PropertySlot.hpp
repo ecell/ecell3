@@ -375,14 +375,14 @@ namespace libecs
 
 #ifndef __LIBECS_CONCRETEPROPERTYSLOT_MEMBER_DEFINED
 #define __LIBECS_CONCRETEPROPERTYSLOT_MEMBER_DEFINED
-#include "libecs/PropertiedClass.hpp"
+#include "libecs/EcsObject.hpp"
 
 namespace libecs
 {
   template< class T, typename SlotType_ >
   const bool ConcretePropertySlot< T, SlotType_ >::isSetableMethod( const SetMethodPtr aSetMethodPtr )
   {
-    const SetMethodPtr aNullMethodPtr( &PropertiedClass::nullSet<SlotType> );
+    const SetMethodPtr aNullMethodPtr( &EcsObject::nullSet<SlotType> );
     return aSetMethodPtr != aNullMethodPtr;
   }
 
@@ -390,7 +390,7 @@ namespace libecs
   const bool ConcretePropertySlot< T, SlotType_ >::isGetableMethod( const GetMethodPtr aGetMethodPtr )
   {
     const GetMethodPtr
-      aNullMethodPtr( &PropertiedClass::nullGet<SlotType> );
+      aNullMethodPtr( &EcsObject::nullGet<SlotType> );
     return aGetMethodPtr != aNullMethodPtr;
   }
 
@@ -400,7 +400,7 @@ namespace libecs
   {
     if( aSetMethodPtr == NULLPTR )
       {
-	return &PropertiedClass::nullSet<SlotType>;
+	return &EcsObject::nullSet<SlotType>;
       }
     else
       {
@@ -414,7 +414,7 @@ namespace libecs
   {
     if( aGetMethodPtr == NULLPTR )
       {
-	return &PropertiedClass::nullGet<SlotType>;
+	return &EcsObject::nullGet<SlotType>;
       }
     else
       {

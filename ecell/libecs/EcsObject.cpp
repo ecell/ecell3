@@ -38,14 +38,14 @@
 #include "PropertyInterface.hpp"
 #include "Exceptions.hpp"
 
-#include "PropertiedClass.hpp"
+#include "EcsObject.hpp"
 
 namespace libecs
 {
 
 
-  ///////////////////////////// PropertiedClass
-  const PropertyAttributes PropertiedClass::
+  ///////////////////////////// EcsObject
+  const PropertyAttributes EcsObject::
   defaultGetPropertyAttributes( StringCref aPropertyName ) const
   {
     THROW_EXCEPTION( NoSlot, 
@@ -55,13 +55,13 @@ namespace libecs
   }
 
   const StringVector&
-  PropertiedClass::defaultGetPropertyList() const
+  EcsObject::defaultGetPropertyList() const
   {
     static StringVector emptyVector;
     return emptyVector;
   }
   
-  void PropertiedClass::defaultSetProperty( StringCref aPropertyName, 
+  void EcsObject::defaultSetProperty( StringCref aPropertyName, 
 					    PolymorphCref aValue )
   {
     THROW_EXCEPTION( NoSlot,
@@ -71,7 +71,7 @@ namespace libecs
   }
 
   const Polymorph 
-  PropertiedClass::defaultGetProperty( StringCref aPropertyName ) const
+  EcsObject::defaultGetProperty( StringCref aPropertyName ) const
   {
     THROW_EXCEPTION( NoSlot, 
 		     getClassName() + 
@@ -79,7 +79,7 @@ namespace libecs
 		     + aPropertyName + "].  Get property failed." );
   }
   
-  void PropertiedClass::registerLogger( LoggerPtr aLoggerPtr )
+  void EcsObject::registerLogger( LoggerPtr aLoggerPtr )
   {
     if( std::find( theLoggerVector.begin(), theLoggerVector.end(), aLoggerPtr )
 	== theLoggerVector.end() )
@@ -88,7 +88,7 @@ namespace libecs
       }
   }
 
-  void PropertiedClass::removeLogger( LoggerPtr aLoggerPtr )
+  void EcsObject::removeLogger( LoggerPtr aLoggerPtr )
   {
     LoggerVectorIterator i( find( theLoggerVector.begin(), 
 				  theLoggerVector.end(),
@@ -102,23 +102,23 @@ namespace libecs
   }
 
 
-  void PropertiedClass::throwNotSetable()
+  void EcsObject::throwNotSetable()
   {
     THROW_EXCEPTION( AttributeError, "Not setable." );
   }
 
-  void PropertiedClass::throwNotGetable()
+  void EcsObject::throwNotGetable()
   {
     THROW_EXCEPTION( AttributeError, "Not getable." );
   }
 
-  StringCref PropertiedClass::getClassName() const
+  StringCref EcsObject::getClassName() const
   {
      return getPropertyInterface().getClassName();
   }
 
 #define NULLSET_SPECIALIZATION_DEF( TYPE )\
-  template <> void PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )\
+  template <> void EcsObject::nullSet<TYPE>( Param<TYPE>::type )\
   {\
     throwNotSetable();\
   } //
@@ -129,7 +129,7 @@ namespace libecs
   NULLSET_SPECIALIZATION_DEF( Polymorph );
 
 #define NULLGET_SPECIALIZATION_DEF( TYPE )\
-  template <> const TYPE PropertiedClass::nullGet<TYPE>() const\
+  template <> const TYPE EcsObject::nullGet<TYPE>() const\
   {\
     throwNotGetable();\
     return TYPE(); \

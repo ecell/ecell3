@@ -36,7 +36,7 @@
 
 #include "libecs/libecs.hpp"
 #include "dmtool/ModuleMaker.hpp"
-#include "libecs/PropertiedObjectMaker.hpp"
+#include "libecs/EcsObjectMaker.hpp"
 #include "libecs/EventScheduler.hpp"
 #include "libecs/StepperEvent.hpp"
 #include "libecs/LoggerBroker.hpp"
@@ -75,14 +75,14 @@ namespace libecs
 
     typedef EventScheduler<StepperEvent> StepperEventScheduler;
     typedef StepperEventScheduler::EventIndex EventIndex;
-    typedef PropertiedObjectMaker< Stepper > StepperMaker;
-    typedef PropertiedObjectMaker< System > SystemMaker;
-    typedef PropertiedObjectMaker< Variable > VariableMaker;
-    typedef PropertiedObjectMaker< Process > ProcessMaker;
+    typedef EcsObjectMaker< Stepper > StepperMaker;
+    typedef EcsObjectMaker< System > SystemMaker;
+    typedef EcsObjectMaker< Variable > VariableMaker;
+    typedef EcsObjectMaker< Process > ProcessMaker;
 
   public:
 
-    Model( StaticModuleMaker< PropertiedClass >& maker );
+    Model( StaticModuleMaker< EcsObject >& maker );
     ~Model();
 
     /**
@@ -332,7 +332,7 @@ namespace libecs
 
     StepperMap          theStepperMap;
 
-    StaticModuleMaker< PropertiedClass >& thePropertiedObjectMaker;
+    StaticModuleMaker< EcsObject >& theEcsObjectMaker;
     StepperMaker          theStepperMaker;
     SystemMaker           theSystemMaker;
     VariableMaker         theVariableMaker;

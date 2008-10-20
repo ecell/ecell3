@@ -101,7 +101,7 @@ namespace libecs
   DECLARE_CLASS( SystemMaker );
   DECLARE_CLASS( PropertySlotBase );
   DECLARE_CLASS( PropertyInterfaceBase );
-  DECLARE_CLASS( PropertiedClass );
+  DECLARE_CLASS( EcsObject );
   DECLARE_CLASS( PropertySlotProxy );
   DECLARE_CLASS( Polymorph );
   DECLARE_CLASS( LoggerBroker );

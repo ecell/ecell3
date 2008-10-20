@@ -28,7 +28,7 @@ FullID.cpp\
 PropertySlot.cpp\
 PropertySlotProxy.cpp\
 PropertyInterface.cpp\
-PropertiedClass.cpp\
+EcsObject.cpp\
 Variable.cpp\
 Stepper.cpp\
 DifferentialStepper.cpp\
@@ -66,7 +66,7 @@ FullID.hpp\
 PropertySlot.hpp\
 PropertySlotProxy.hpp\
 PropertyInterface.hpp\
-PropertiedClass.hpp\
+EcsObject.hpp\
 Variable.hpp\
 Stepper.hpp\
 ProcessEvent.hpp\
@@ -96,7 +96,7 @@ VariableReference.hpp\
 DynamicPriorityQueue.hpp\
 FluxProcess.hpp\
 MethodProxy.hpp\
-PropertiedObjectMaker.hpp\
+EcsObjectMaker.hpp\
 PropertySlotProxyLoggerAdapter.hpp\
 PropertyAttributes.hpp
 

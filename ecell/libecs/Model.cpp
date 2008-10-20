@@ -48,17 +48,17 @@
 
 namespace libecs
 {
-  Model::Model( StaticModuleMaker< PropertiedClass >& maker )
+  Model::Model( StaticModuleMaker< EcsObject >& maker )
     :
     theCurrentTime( 0.0 ),
     theLoggerBroker(),
     theRootSystemPtr(0),
     theSystemStepper(),
-    thePropertiedObjectMaker( maker ),
-    theStepperMaker( thePropertiedObjectMaker ),
-    theSystemMaker( thePropertiedObjectMaker ),
-    theVariableMaker( thePropertiedObjectMaker ),
-    theProcessMaker( thePropertiedObjectMaker )
+    theEcsObjectMaker( maker ),
+    theStepperMaker( theEcsObjectMaker ),
+    theSystemMaker( theEcsObjectMaker ),
+    theVariableMaker( theEcsObjectMaker ),
+    theProcessMaker( theEcsObjectMaker )
   {
     registerBuiltinModules();
 
@@ -102,7 +102,7 @@ namespace libecs
 
   const PropertyInterfaceBase& Model::getPropertyInterface( StringCref aClassname ) const
   {
-    return *(reinterpret_cast<const PropertyInterfaceBase*>( thePropertiedObjectMaker.getModule( aClassname ).getInfo() ) );
+    return *(reinterpret_cast<const PropertyInterfaceBase*>( theEcsObjectMaker.getModule( aClassname ).getInfo() ) );
   }
 
 
@@ -332,21 +332,21 @@ namespace libecs
 
   void Model::setDMSearchPath( const std::string& path )
   {
-    thePropertiedObjectMaker.setSearchPath( path );
+    theEcsObjectMaker.setSearchPath( path );
   }
 
   const std::string Model::getDMSearchPath() const
   {
-    return thePropertiedObjectMaker.getSearchPath();
+    return theEcsObjectMaker.getSearchPath();
   }
 
   void Model::registerBuiltinModules()
   {
-    DM_NEW_STATIC( &thePropertiedObjectMaker, PropertiedClass, DiscreteEventStepper );
-    DM_NEW_STATIC( &thePropertiedObjectMaker, PropertiedClass, DiscreteTimeStepper );
-    DM_NEW_STATIC( &thePropertiedObjectMaker, PropertiedClass, PassiveStepper );
-    DM_NEW_STATIC( &thePropertiedObjectMaker, PropertiedClass, System );
-    DM_NEW_STATIC( &thePropertiedObjectMaker, PropertiedClass, Variable );
+    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, DiscreteEventStepper );
+    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, DiscreteTimeStepper );
+    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, PassiveStepper );
+    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, System );
+    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, Variable );
   }
 
 } // namespace libecs

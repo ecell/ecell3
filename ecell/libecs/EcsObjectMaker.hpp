@@ -35,7 +35,7 @@
 #include "dmtool/ModuleMaker.hpp"
 #include "dmtool/DynamicModuleInfo.hpp"
 
-#include "libecs/PropertiedClass.hpp"
+#include "libecs/EcsObject.hpp"
 #include "libecs/PropertyInterface.hpp"
 
 namespace libecs
@@ -47,14 +47,14 @@ namespace libecs
 */ 
 
 template< typename T_ >  
-class PropertiedObjectMaker 
+class EcsObjectMaker 
 {
 public:
-    typedef StaticModuleMaker< PropertiedClass > Backend;
+    typedef StaticModuleMaker< EcsObject > Backend;
     typedef T_ DMType;
 
 public:
-    PropertiedObjectMaker( Backend& aBackend )
+    EcsObjectMaker( Backend& aBackend )
       : theBackend( aBackend )
     {
         // do nothing;
@@ -104,30 +104,30 @@ protected:
 };
 
 template<>  
-inline const char* PropertiedObjectMaker<Stepper>::getTypeName()
+inline const char* EcsObjectMaker<Stepper>::getTypeName()
 {
     return "Stepper";
 }
 
 template<>  
-inline const char* PropertiedObjectMaker<Process>::getTypeName()
+inline const char* EcsObjectMaker<Process>::getTypeName()
 {
     return "Process";
 }
 
 template<>  
-inline const char* PropertiedObjectMaker<Variable>::getTypeName()
+inline const char* EcsObjectMaker<Variable>::getTypeName()
 {
     return "Variable";
 }
 
 template<>  
-inline const char* PropertiedObjectMaker<System>::getTypeName()
+inline const char* EcsObjectMaker<System>::getTypeName()
 {
     return "System";
 }
 
-#define NewPropertiedObjectModule(CLASS) NewDynamicModule(PropertiedObject,CLASS)
+#define NewEcsObjectModule(CLASS) NewDynamicModule(EcsObject,CLASS)
 
 /** @} */ //end of libecs_module 
 
