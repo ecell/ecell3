@@ -50,8 +50,6 @@
 #include "libecs/Process.hpp"
 #include "libecs/MethodProxy.hpp"
 
-#include <iostream>
-
 using namespace boost::spirit;
 
 USE_LIBECS;
@@ -811,7 +809,6 @@ void ExpressionCompiler::compileTree
 
 	const String aFloatString( aTreeIterator->value.begin(),
 				   aTreeIterator->value.end() );
-         std::cout << aFloatString << std::endl;
 	const Real aFloatValue = stringCast<Real>( aFloatString );
 	  
 	appendInstruction( aCode, Instruction<PUSH_REAL>( aFloatValue ) );
