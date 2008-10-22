@@ -12,27 +12,27 @@ AM_CPPFLAGS=-DBOOST_TEST_DYN_LINK=1 -DBOOST_TEST_MAIN=1
 
 check_PROGRAMS=
 
-check_PROGRAMS+=DynamicPriorityQueue_test
+check_PROGRAMS += DynamicPriorityQueue_test
 DynamicPriorityQueue_test_SOURCES = DynamicPriorityQueue_test.cpp
 DynamicPriorityQueue_test_CPPFLAGS=-DBOOST_TEST_DYN_LINK=1
 
-check_PROGRAMS+=DataPointAggregator_test
+check_PROGRAMS += DataPointAggregator_test
 DataPointAggregator_test_SOURCES = DataPointAggregator_test.cpp
 
-check_PROGRAMS+=FullID_test
+check_PROGRAMS += FullID_test
 FullID_test_SOURCES = FullID_test.cpp
 
-check_PROGRAMS+=VVector_test
+check_PROGRAMS += VVector_test
 VVector_test_SOURCES = VVector_test.cpp
 VVector_test_CPPFLAGS=-DBOOST_TEST_DYN_LINK=1
 
-check_PROGRAMS+=Util_test
+check_PROGRAMS += Util_test
 Util_test_SOURCES = Util_test.cpp
 
-check_PROGRAMS+=ExpressionCompiler_test
+check_PROGRAMS += ExpressionCompiler_test
 ExpressionCompiler_test_SOURCES = ExpressionCompiler_test.cpp
 
-check_PROGRAMS+=VirtualMachine_test
+check_PROGRAMS += VirtualMachine_test
 VirtualMachine_test_SOURCES = VirtualMachine_test.cpp
 
 TESTS=$(check_PROGRAMS)
