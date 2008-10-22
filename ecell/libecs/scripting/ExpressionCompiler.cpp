@@ -96,8 +96,8 @@ class CompileGrammar: public grammar<CompileGrammar>, public Tokens
 public:
     template <typename ScannerT>
     struct definition {
-#define leafNode( str ) leaf_node_d[lexeme_d[str]]
-#define rootNode( str ) root_node_d[lexeme_d[str]]
+#define leafNode( str ) lexeme_d[leaf_node_d[str]]
+#define rootNode( str ) lexeme_d[root_node_d[str]]
 
         definition( CompileGrammar const& /*self*/ ) {
             integer     =   leafNode( +digit_p );
