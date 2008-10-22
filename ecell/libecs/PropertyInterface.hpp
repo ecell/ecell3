@@ -177,6 +177,7 @@ namespace libecs
 	  return PropertyAttributes( *aPropertySlotPtr );
         }
       throwNoSlot( aPropertyName );
+	  return PropertyAttributes();
     }
 
 
