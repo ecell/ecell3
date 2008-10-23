@@ -24,8 +24,9 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
+
 #include <gsl/gsl_sf.h>
-#include <vector>
+#include <boost/multi_array.hpp>
 
 #include "libecs.hpp"
 #include "System.hpp"
@@ -92,7 +93,7 @@ LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
       ;
     }
 
-  const std::vector<RealVector>& getESSYNSMatrix();
+  const boost::multi_array< Real, 2 >& getESSYNSMatrix();
 
   GET_METHOD( Integer, SystemSize )
   {
@@ -113,17 +114,17 @@ LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
   Polymorph GMASystemMatrix;
   
   // State variables in log space
-  std::vector< RealVector > theY;
+  boost::multi_array< Real, 2 > theY;
   
   // GMA-System vectors
-  std::vector< RealVector > theAlpha;
+  boost::multi_array< Real, 2 > theAlpha;
 
-  std::vector< std::vector< RealVector > > theG;
+  boost::multi_array< Real, 3 > theG;
   
   // tmp GMA-System vectors
-  std::vector< std::vector< RealVector > > theAlphaBuffer;
-  std::vector< std::vector< RealVector > > theGBuffer;
-  std::vector< RealVector > theFBuffer;
+  boost::multi_array< Real, 3 > theAlphaBuffer;
+  boost::multi_array< Real, 3 > theGBuffer;
+  boost::multi_array< Real, 2 > theFBuffer;
   
 };
 
@@ -133,56 +134,18 @@ SET_METHOD_DEF( Integer, Order, GMAProcess )
 { 
   Order = value;
   
-  //init ESSYNS Matrix
-  RealVector tmp;
-  tmp.resize(Order+1);
-  
   // init Substance Vector
-  theY.resize(theSystemSize+1);
-  tmp.resize(Order+1);
-  for(Integer i( 0 ); i < theLawSize; i++)
-    {
-      theY[i] = tmp;
-    }
+  theY.resize( boost::extents[ theSystemSize + 1 ][ Order + 1 ] );
 
   // init GMA Vector & Matrix
-  theAlpha.resize(theLawSize);
-  theG.resize( theLawSize);
-  tmp.resize(theLawSize);
-  for(Integer i( 0 ); i < theLawSize; i++)
-    {
-
-      theG[i].resize( theLawSize);
-      for(Integer j( 0 ); j < theLawSize; j++)
-	{
-	  theG[i][j] = tmp;
-	}
-      
-        theAlpha[i] = tmp;
-   }
+  theAlpha.resize( boost::extents[ theLawSize ][ theLawSize ] );
+  theG.resize( boost::extents[ theLawSize ][ theLawSize ][ theLawSize ] );
 
   // init S-System tmp Vector & Matrix
-  theAlphaBuffer.resize( theLawSize);
-  theGBuffer.resize( theLawSize);
-  tmp.resize(Order+1);
-  for(Integer i( 0 ); i < theLawSize; i++)
-    {
-      theAlphaBuffer[i].resize( theLawSize );
-      theGBuffer[i].resize( theLawSize );
-      for(Integer j( 0 ); j < theLawSize; j++)
-	{
-	  theAlphaBuffer[i][j] = tmp;
-	  theGBuffer[i][j] = tmp;
-	}
-    }
+  theAlphaBuffer.resize( boost::extents[ theLawSize ][ theLawSize ][ Order + 1 ] );
+  theGBuffer.resize( boost::extents[ theLawSize ][ theLawSize ][ Order + 1 ] );
 
-  theFBuffer.resize( Order + 1);
-  tmp.resize(Order);
-  for(Integer i( 0 ); i < Order + 1; i++)
-    {
-      theFBuffer[i] = tmp;
-    }  
-
+  theFBuffer.resize( boost::extents[ Order + 1 ][ Order ] );
 }
 
 
@@ -194,55 +157,17 @@ void GMAProcess::setGMASystemMatrix( PolymorphCref aValue )
   theLawSize = theSystemSize + 1;
 
   // init Substance Vector
-  theY.resize(theLawSize);
-  RealVector tmp;
-  tmp.resize(Order+1);
-  for(Integer i( 0 ); i < theLawSize; i++)
-    {
-      theY[i] = tmp;
-    }
+  theY.resize( boost::extents[ theLawSize ][ Order + 1 ] );
 
   // init GMA-System Vector & Matrix
-  theAlpha.resize( theLawSize );
-  theG.resize( theLawSize);
-  tmp.resize(theLawSize);
-  for(Integer i( 0 ); i < theLawSize; i++)
-    {
-      theAlpha[i] = tmp;
-      //      theG[i] = tmp;
-      theG[i].resize( theLawSize );
-
-      for(Integer j( 0 ); j < theLawSize; j++)
-	{
-	  theG[i][j] = tmp;
-	}
-    }
+  theAlpha.resize( boost::extents[ theLawSize ][ theLawSize ] );
+  theG.resize( boost::extents[ theLawSize ][ theLawSize ][ theLawSize ] );
 
   // init GMA-System tmp Vector & Matrix
-  theAlphaBuffer.resize( theLawSize);
-  theGBuffer.resize( theLawSize);
-  tmp.resize(Order+1);
+  theAlphaBuffer.resize( boost::extents[ theLawSize ][ theLawSize ][ Order + 1] );
+  theGBuffer.resize( boost::extents[ theLawSize ][ theLawSize ][ Order + 1 ] );
 
-  for(Integer i( 0 ); i < theLawSize; i++)
-    {
-      // theAlphaBuffer[i] = tmp;
-      // theGBuffer[i] = tmp;
-      theAlphaBuffer[i].resize( theLawSize );
-      theGBuffer[i].resize( theLawSize );
-
-      for(Integer j( 0 ); j < theLawSize; j++)
-	{
-	  theAlphaBuffer[i][j] = tmp;
-	  theGBuffer[i][j] = tmp;
-	}
-    }
-
-  theFBuffer.resize( Order + 1);
-  tmp.resize(Order);
-  for(Integer i( 0 ); i < Order + 1; i++)
-    {
-      theFBuffer[i] = tmp;
-    }  
+  theFBuffer.resize( boost::extents[ Order + 1 ][ Order ] );
 
   // init Factorial matrix
   for(Integer m( 2 ) ; m < Order+1 ; m++)
@@ -281,7 +206,7 @@ void GMAProcess::setGMASystemMatrix( PolymorphCref aValue )
     }
 }
 
-const std::vector<RealVector>& GMAProcess::getESSYNSMatrix()
+const boost::multi_array< Real, 2 >& GMAProcess::getESSYNSMatrix()
 {
   // get theY
   Integer anIndex( 0 );
