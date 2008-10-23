@@ -126,19 +126,20 @@ void Model::createEntity( StringCref aClassname, FullIDCref aFullID )
         aVariablePtr = theVariableMaker.make( aClassname );
         aVariablePtr->setID( aFullID.getID() );
         aContainerSystemPtr->registerVariable( aVariablePtr );
-        break;
+        return;
+
     case EntityType::PROCESS:
         aProcessPtr = theProcessMaker.make( aClassname );
         aProcessPtr->setID( aFullID.getID() );
         aContainerSystemPtr->registerProcess( aProcessPtr );
+        return;
 
-        break;
     case EntityType::SYSTEM:
         aSystemPtr = theSystemMaker.make( aClassname );
         aSystemPtr->setID( aFullID.getID() );
         aSystemPtr->setModel( this );
         aContainerSystemPtr->registerSystem( aSystemPtr );
-        break;
+        return;
     }
 
     THROW_EXCEPTION( InvalidEntityType, "bad EntityType specified." );
