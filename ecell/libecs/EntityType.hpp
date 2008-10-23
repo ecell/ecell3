@@ -49,7 +49,7 @@ namespace libecs
 
 /** @file */
 
-class PropertiedClassKind;
+class EcsObjectKind;
 
 /**
   A decorated enumeration type that lists the types of entities
@@ -100,7 +100,7 @@ public:
 
     static const EntityType& get( enum Code );
 
-    static const EntityType& fromPropertiedClassKind( const PropertiedClassKind& );
+    static const EntityType& fromEcsObjectKind( const EcsObjectKind& );
 
     operator const String&() const
     {

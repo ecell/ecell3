@@ -80,7 +80,7 @@ class DM_IF CLASSNAME: public BASE
   libecs::ConcretePropertyInterface<CLASSNAME> \
       CLASSNAME::propertyInterface_( \
           #CLASSNAME, \
-          ::libecs::Type2PropertiedClassKind< ::libecs::DMTYPE >::value )
+          ::libecs::Type2EcsObjectKind< ::libecs::DMTYPE >::value )
 
   ///@internal
 #define LIBECS_DM_OBJECT_DEF( CLASSNAME, DMTYPE )\
@@ -157,8 +157,8 @@ public:\
 
 #define PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD )\
     PROPERTYSLOT_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD,\
-                            &::libecs::PropertiedClass::nullLoad, \
-                            &::libecs::PropertiedClass::nullSave )
+                            &::libecs::EcsObject::nullLoad, \
+                            &::libecs::EcsObject::nullSave )
 
 #define PROPERTYSLOT_SET_GET( TYPE, NAME )\
   PROPERTYSLOT( TYPE, NAME,\
@@ -278,22 +278,22 @@ class Model;
 
 */
 
-class LIBECS_API PropertiedClass: private boost::noncopyable
+class LIBECS_API EcsObject: private boost::noncopyable
 {
 public:
     typedef void _LIBECS_BASE_CLASS_;
-    typedef DynamicModuleBase<PropertiedClass> Module;
+    typedef DynamicModuleBase<EcsObject> Module;
 
 public:
     LIBECS_DM_DEFINE_PROPERTIES();
 
-    PropertiedClass( const Module* mod )
+    EcsObject( const Module* mod )
         : module_( mod )
     {
       ; // do nothing
     }
 
-    virtual ~PropertiedClass();
+    virtual ~EcsObject();
 
     void setModel( Model* val )
     {
@@ -410,7 +410,7 @@ public:
     }
 
 protected:
-    static ConcretePropertyInterface< PropertiedClass > propertyInterface_;
+    static ConcretePropertyInterface< EcsObject > propertyInterface_;
     const Module* module_;
     Model* model_;
 };
@@ -419,14 +419,14 @@ protected:
 // inline copies of them around.  This reduces sizes of DM .so files a bit.
 
 #define NULLSET_SPECIALIZATION( TYPE )\
-    template <> LIBECS_API void libecs::PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )
+    template <> LIBECS_API void libecs::EcsObject::nullSet<TYPE>( Param<TYPE>::type )
 NULLSET_SPECIALIZATION( Real );
 NULLSET_SPECIALIZATION( Integer );
 NULLSET_SPECIALIZATION( String );
 NULLSET_SPECIALIZATION( Polymorph );
 
 #define NULLGET_SPECIALIZATION( TYPE )\
-    template <> LIBECS_API const TYPE libecs::PropertiedClass::nullGet<TYPE>() const
+    template <> LIBECS_API const TYPE libecs::EcsObject::nullGet<TYPE>() const
 
 NULLGET_SPECIALIZATION( Real );
 NULLGET_SPECIALIZATION( Integer );
@@ -440,7 +440,7 @@ NULLGET_SPECIALIZATION( Polymorph );
 namespace libecs {
 
 template< typename T_ >
-void PropertiedClass::setProperty( const String& aPropertyName,
+void EcsObject::setProperty( const String& aPropertyName,
                   typename Param< T_ >::type aValue )
 {
     const PropertySlot* slot( getPropertySlot( aPropertyName ) );
@@ -455,7 +455,7 @@ void PropertiedClass::setProperty( const String& aPropertyName,
 }
 
 template< typename T_ >
-const T_ PropertiedClass::getProperty( const String& aPropertyName ) const
+const T_ EcsObject::getProperty( const String& aPropertyName ) const
 {
     const PropertySlot* slot( getPropertySlot( aPropertyName ) );
     if ( slot )

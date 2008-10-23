@@ -41,9 +41,9 @@ ModuleManager.cpp\
 PassiveStepper.cpp\
 Polymorph.cpp\
 Process.cpp\
-PropertiedClass.cpp\
-PropertiedClassKind.cpp\
-PropertiedObjectMaker.cpp\
+EcsObject.cpp\
+EcsObjectKind.cpp\
+EcsObjectMaker.cpp\
 PropertyInterface.cpp\
 PropertySlotProxyLoggerAdapter.cpp\
 PropertyType.cpp\
@@ -95,9 +95,9 @@ PassiveStepper.hpp\
 Polymorph.hpp\
 Process.hpp\
 ProcessEvent.hpp\
-PropertiedClass.hpp\
-PropertiedClassKind.hpp\
-PropertiedObjectMaker.hpp\
+EcsObject.hpp\
+EcsObjectKind.hpp\
+EcsObjectMaker.hpp\
 PropertyInterface.hpp\
 PropertySlot.hpp\
 PropertySlotProxy.hpp\

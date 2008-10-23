@@ -35,22 +35,22 @@
 
 #include <assert.h>
 
-#include "PropertiedClassKind.hpp"
+#include "EcsObjectKind.hpp"
 #include "EntityType.hpp"
 #include "Exceptions.hpp"
 
 namespace libecs {
 
-const PropertiedClassKind* PropertiedClassKind::last( 0 );
-const PropertiedClassKind PropertiedClassKind::      NONE( _NONE    , "None" );
-const PropertiedClassKind PropertiedClassKind::   STEPPER( _STEPPER , "Stepper" );
-const PropertiedClassKind PropertiedClassKind::  VARIABLE( _VARIABLE, "Variable" );
-const PropertiedClassKind PropertiedClassKind::   PROCESS( _PROCESS,  "Process" );
-const PropertiedClassKind PropertiedClassKind::    SYSTEM( _SYSTEM,   "System" );
+const EcsObjectKind* EcsObjectKind::last( 0 );
+const EcsObjectKind EcsObjectKind::      NONE( _NONE    , "None" );
+const EcsObjectKind EcsObjectKind::   STEPPER( _STEPPER , "Stepper" );
+const EcsObjectKind EcsObjectKind::  VARIABLE( _VARIABLE, "Variable" );
+const EcsObjectKind EcsObjectKind::   PROCESS( _PROCESS,  "Process" );
+const EcsObjectKind EcsObjectKind::    SYSTEM( _SYSTEM,   "System" );
 
-const PropertiedClassKind& PropertiedClassKind::get( const String& name )
+const EcsObjectKind& EcsObjectKind::get( const String& name )
 {
-    for ( const PropertiedClassKind* item = last; item; item = item->prev )
+    for ( const EcsObjectKind* item = last; item; item = item->prev )
     {
         if ( item->name == name )
         {
@@ -59,9 +59,9 @@ const PropertiedClassKind& PropertiedClassKind::get( const String& name )
     }
 }
 
-const PropertiedClassKind& PropertiedClassKind::get( enum Code code )
+const EcsObjectKind& EcsObjectKind::get( enum Code code )
 {
-    for ( const PropertiedClassKind* item = last; item; item = item->prev )
+    for ( const EcsObjectKind* item = last; item; item = item->prev )
     {
         if ( item->code == code )
         {
@@ -70,38 +70,38 @@ const PropertiedClassKind& PropertiedClassKind::get( enum Code code )
     }
 }
 
-const PropertiedClassKind&
-PropertiedClassKind::fromEntityType( const EntityType& et )
+const EcsObjectKind&
+EcsObjectKind::fromEntityType( const EntityType& et )
 {
     switch ( et.code )
     {
     case EntityType::_PROCESS:
-        return PropertiedClassKind::PROCESS;
+        return EcsObjectKind::PROCESS;
     case EntityType::_VARIABLE:
-        return PropertiedClassKind::VARIABLE;
+        return EcsObjectKind::VARIABLE;
     case EntityType::_SYSTEM:
-        return PropertiedClassKind::SYSTEM;
+        return EcsObjectKind::SYSTEM;
     }
     THROW_EXCEPTION( ValueError,
-        String( "no PropertiedClassKind counterpart for " )
+        String( "no EcsObjectKind counterpart for " )
         + static_cast< const String& >( et ) );
 }
 
 template<>
-const PropertiedClassKind& Type2PropertiedClassKind<Stepper>::value(
-        PropertiedClassKind::STEPPER );
+const EcsObjectKind& Type2EcsObjectKind<Stepper>::value(
+        EcsObjectKind::STEPPER );
 
 template<>
-const PropertiedClassKind& Type2PropertiedClassKind<Variable>::value(
-        PropertiedClassKind::VARIABLE );
+const EcsObjectKind& Type2EcsObjectKind<Variable>::value(
+        EcsObjectKind::VARIABLE );
 
 template<>
-const PropertiedClassKind& Type2PropertiedClassKind<Process>::value(
-        PropertiedClassKind::PROCESS );
+const EcsObjectKind& Type2EcsObjectKind<Process>::value(
+        EcsObjectKind::PROCESS );
 
 template<>
-const PropertiedClassKind& Type2PropertiedClassKind<System>::value(
-        PropertiedClassKind::SYSTEM );
+const EcsObjectKind& Type2EcsObjectKind<System>::value(
+        EcsObjectKind::SYSTEM );
 
 
 } // namespace libecs

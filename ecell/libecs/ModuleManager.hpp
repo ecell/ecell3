@@ -34,7 +34,7 @@
 
 #include <set>
 #include <boost/shared_ptr.hpp>
-#include "PropertiedClass.hpp"
+#include "EcsObject.hpp"
 #include "dmtool/ModuleMaker.hpp"
 
 namespace libecs
@@ -48,7 +48,7 @@ namespace libecs
 class LIBECS_API ModuleManager
 {
 public:
-    typedef StaticModuleMaker< PropertiedClass > ModuleMaker;
+    typedef StaticModuleMaker< EcsObject > ModuleMaker;
     typedef ModuleMaker::Module Module;
     typedef std::set< boost::shared_ptr< ModuleMaker > > ModuleMakerSet;
 
@@ -63,7 +63,7 @@ private:
     ModuleMakerSet moduleMakers_;
 };
 
-//#define NewPropertiedObjectModule(CLASS) NewDynamicModule(PropertiedObject,CLASS)
+//#define NewEcsObjectModule(CLASS) NewDynamicModule(EcsObject,CLASS)
 
 /** @} */ //end of libecs_module
 

@@ -41,7 +41,7 @@ class Variable;
 class System;
 class EntityType;
 
-class PropertiedClassKind
+class EcsObjectKind
 {
 public:
     enum Code {
@@ -53,11 +53,11 @@ public:
     };
 
 public:
-    static const PropertiedClassKind& get( const String& );
+    static const EcsObjectKind& get( const String& );
 
-    static const PropertiedClassKind& get( enum Code );
+    static const EcsObjectKind& get( enum Code );
 
-    static const PropertiedClassKind& fromEntityType( const EntityType& );
+    static const EcsObjectKind& fromEntityType( const EntityType& );
 
     operator const String&() const
     {
@@ -70,36 +70,36 @@ public:
     }
 
 private:
-    PropertiedClassKind( enum Code _code, const String& _name )
+    EcsObjectKind( enum Code _code, const String& _name )
         : code( _code ), name( _name )
     {
         ; // do nothing
     }
 
 public:
-    static const PropertiedClassKind NONE;
-    static const PropertiedClassKind STEPPER;
-    static const PropertiedClassKind VARIABLE;
-    static const PropertiedClassKind PROCESS;
-    static const PropertiedClassKind SYSTEM;
+    static const EcsObjectKind NONE;
+    static const EcsObjectKind STEPPER;
+    static const EcsObjectKind VARIABLE;
+    static const EcsObjectKind PROCESS;
+    static const EcsObjectKind SYSTEM;
 
     enum Code code;
     const String& name;
 
 private:
-    const PropertiedClassKind* prev;
-    static const PropertiedClassKind* last;
+    const EcsObjectKind* prev;
+    static const EcsObjectKind* last;
 };
 
 template<typename T>
-struct Type2PropertiedClassKind
+struct Type2EcsObjectKind
 {
-    static const PropertiedClassKind& value;
+    static const EcsObjectKind& value;
 };
 
 template<typename T>
-const PropertiedClassKind& Type2PropertiedClassKind<T>::value(
-        PropertiedClassKind::NONE );
+const EcsObjectKind& Type2EcsObjectKind<T>::value(
+        EcsObjectKind::NONE );
 
 } // namespace libesc
 

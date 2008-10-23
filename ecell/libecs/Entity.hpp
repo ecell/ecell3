@@ -33,7 +33,7 @@
 #define __LIBECS_ENTITY_DEFINED
 
 #include "libecs.hpp"
-#include "PropertiedClass.hpp"
+#include "EcsObject.hpp"
 #include "EntityType.hpp"
 #include "FullID.hpp"
 
@@ -53,13 +53,13 @@ class System;
 /**
    Entity class is a base class for all components in the cell model.
 */
-LIBECS_DM_CLASS( Entity, PropertiedClass )
+LIBECS_DM_CLASS( Entity, EcsObject )
 {
     friend class System;
 public:
     LIBECS_DM_OBJECT_ABSTRACT( Entity )
     {
-        INHERIT_PROPERTIES( PropertiedClass );
+        INHERIT_PROPERTIES( EcsObject );
         PROPERTYSLOT_SET_GET( String, Name );
     }
 
@@ -99,7 +99,7 @@ public:
     */
     const EntityType& getEntityType() const
     {
-        return EntityType::fromPropertiedClassKind(
+        return EntityType::fromEcsObjectKind(
                 getPropertyInterface().getKind() );
     }
     /// \name Properties

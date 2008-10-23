@@ -49,7 +49,7 @@
 
 namespace libecs {
 
-class PropertiedClass;
+class EcsObject;
 
 class PropertySlot
 {
@@ -97,52 +97,52 @@ public:
     }
 
     template < typename Type >
-    void set( PropertiedClass& anObject,
+    void set( EcsObject& anObject,
             typename Param<Type>::type aValue ) const
     {
     }
 
     template < typename Type >
-    const Type get( const PropertiedClass& anObject ) const
+    const Type get( const EcsObject& anObject ) const
     {
     }
 
-    virtual void load( PropertiedClass& anObject,
+    virtual void load( EcsObject& anObject,
         Param<Polymorph>::type aValue ) const
     {
         setPolymorph( anObject, aValue );
     }
 
-    virtual const Polymorph save( const PropertiedClass& anObject ) const
+    virtual const Polymorph save( const EcsObject& anObject ) const
     {
         return getPolymorph( anObject );
     }
 
 protected:
     virtual void setPolymorph(
-        PropertiedClass& anObject,
+        EcsObject& anObject,
         Param<Polymorph>::type aValue ) const = 0;
 
     virtual const Polymorph getPolymorph(
-        const PropertiedClass& anObject ) const = 0;
+        const EcsObject& anObject ) const = 0;
 
     virtual void setInteger(
-        PropertiedClass& anObject,
+        EcsObject& anObject,
         Param<Integer>::type aValue ) const = 0;
     virtual const Integer getInteger(
-        const PropertiedClass& anObject ) const = 0;
+        const EcsObject& anObject ) const = 0;
 
     virtual void setReal(
-        PropertiedClass& anObject,
+        EcsObject& anObject,
         Param<Real>::type aValue ) const = 0;
     virtual const Real getReal(
-        const PropertiedClass& anObject ) const = 0;
+        const EcsObject& anObject ) const = 0;
 
     virtual void setString(
-        PropertiedClass& anObject,
+        EcsObject& anObject,
         Param<String>::type aValue ) const = 0;
     virtual const String getString(
-        const PropertiedClass& anObject ) const = 0;
+        const EcsObject& anObject ) const = 0;
 
 protected:
     const String theName;
@@ -150,53 +150,53 @@ protected:
 };
 
 template<> inline void
-PropertySlot::set<Integer>( PropertiedClass& anObject,
+PropertySlot::set<Integer>( EcsObject& anObject,
         Param<Integer>::type aValue ) const
 {
     setInteger( anObject, aValue );
 }
 
 template<> inline const Integer
-PropertySlot::get<Integer>( const PropertiedClass& anObject ) const
+PropertySlot::get<Integer>( const EcsObject& anObject ) const
 {
     return getInteger( anObject );
 }
 
 template<> inline void
-PropertySlot::set<Real>( PropertiedClass& anObject,
+PropertySlot::set<Real>( EcsObject& anObject,
         Param<Real>::type aValue ) const
 {
     setReal( anObject, aValue );
 }
 
 template<> inline const Real
-PropertySlot::get<Real>( const PropertiedClass& anObject ) const
+PropertySlot::get<Real>( const EcsObject& anObject ) const
 {
     return getReal( anObject );
 }
 
 template<> inline void
-PropertySlot::set<String>( PropertiedClass& anObject,
+PropertySlot::set<String>( EcsObject& anObject,
         Param<String>::type aValue ) const
 {
     setString( anObject, aValue );
 }
 
 template<> inline const String
-PropertySlot::get<String>( const PropertiedClass& anObject ) const
+PropertySlot::get<String>( const EcsObject& anObject ) const
 {
     return getString( anObject );
 }
 
 template<> inline void
-PropertySlot::set<Polymorph>( PropertiedClass& anObject,
+PropertySlot::set<Polymorph>( EcsObject& anObject,
         Param<Polymorph>::type aValue ) const
 {
     setPolymorph( anObject, aValue );
 }
 
 template<> inline const Polymorph
-PropertySlot::get<Polymorph>( const PropertiedClass& anObject ) const
+PropertySlot::get<Polymorph>( const EcsObject& anObject ) const
 {
     return getPolymorph( anObject );
 }
@@ -248,7 +248,7 @@ public:
     virtual bool isSavable() const;
 
 protected:
-    virtual void load( PropertiedClass& anObject, const Polymorph& aValue ) const
+    virtual void load( EcsObject& anObject, const Polymorph& aValue ) const
     {
         if ( !theLoadMethodPtr )
         {
@@ -260,7 +260,7 @@ protected:
         ( dynamic_cast< T& >( anObject ).*theLoadMethodPtr )( aValue );
     }
 
-    virtual const Polymorph save( const PropertiedClass& anObject ) const
+    virtual const Polymorph save( const EcsObject& anObject ) const
     {
         if ( !theSaveMethodPtr )
         {
@@ -271,7 +271,7 @@ protected:
     }
 
     virtual void setPolymorph(
-        PropertiedClass& anObject,
+        EcsObject& anObject,
         Param<Polymorph>::type aValue ) const
     {
         ( dynamic_cast< T& >( anObject ).*theSetMethodPtr )(
@@ -279,14 +279,14 @@ protected:
     }
 
     virtual const Polymorph getPolymorph(
-        const PropertiedClass& anObject ) const
+        const EcsObject& anObject ) const
     {
         return convertTo< Polymorph >(
             ( dynamic_cast<const T&>( anObject ).*theGetMethodPtr )() );
     }
 
     virtual void setInteger(
-        PropertiedClass& anObject,
+        EcsObject& anObject,
         Param<Integer>::type aValue ) const
     {
         ( dynamic_cast< T& >( anObject ).*theSetMethodPtr )(
@@ -294,14 +294,14 @@ protected:
     }
 
     virtual const Integer getInteger(
-        const PropertiedClass& anObject ) const
+        const EcsObject& anObject ) const
     {
         return convertTo< Integer >(
             ( dynamic_cast<const T&>( anObject ).*theGetMethodPtr )() );
     }
 
     virtual void setReal(
-        PropertiedClass& anObject,
+        EcsObject& anObject,
         Param<Real>::type aValue ) const
     {
         ( dynamic_cast< T& >( anObject ).*theSetMethodPtr )(
@@ -309,14 +309,14 @@ protected:
     }
 
     virtual const Real getReal(
-        const PropertiedClass& anObject ) const
+        const EcsObject& anObject ) const
     {
         return convertTo< Real >(
             ( dynamic_cast<const T&>( anObject ).*theGetMethodPtr )() );
     }
 
     virtual void setString(
-        PropertiedClass& anObject,
+        EcsObject& anObject,
         Param<String>::type aValue ) const
     {
         ( dynamic_cast< T& >( anObject ).*theSetMethodPtr )(
@@ -324,7 +324,7 @@ protected:
     }
 
     virtual const String getString(
-        const PropertiedClass& anObject ) const
+        const EcsObject& anObject ) const
     {
         return convertTo< String >(
             ( dynamic_cast<const T&>( anObject ).*theGetMethodPtr )() );
@@ -340,7 +340,7 @@ protected:
 
 } // namespace libecs
 
-#include "PropertiedClass.hpp"
+#include "EcsObject.hpp"
 
 namespace libecs {
 
@@ -348,28 +348,28 @@ template< class T, typename SlotType_ >
 bool ConcretePropertySlot<T, SlotType_>::isSetable() const
 {
     return theSetMethodPtr != static_cast< SetMethod >(
-            &PropertiedClass::template nullSet<SlotType> );
+            &EcsObject::template nullSet<SlotType> );
 }
 
 template< class T, typename SlotType_ >
 bool ConcretePropertySlot<T, SlotType_>::isGetable() const
 {
     return theGetMethodPtr != static_cast< GetMethod >(
-            &PropertiedClass::template nullGet<SlotType> );
+            &EcsObject::template nullGet<SlotType> );
 }
 
 template< class T, typename SlotType_ >
 bool ConcretePropertySlot<T, SlotType_>::isLoadable() const
 {
     return theLoadMethodPtr != reinterpret_cast< LoadMethod >(
-            &PropertiedClass::nullLoad );
+            &EcsObject::nullLoad );
 }
 
 template< class T, typename SlotType_ >
 bool ConcretePropertySlot<T, SlotType_>::isSavable() const
 {
     return theSaveMethodPtr != reinterpret_cast< SaveMethod >(
-            &PropertiedClass::nullSave );
+            &EcsObject::nullSave );
 }
 
 } // namespace libecs

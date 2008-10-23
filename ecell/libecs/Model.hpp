@@ -40,7 +40,7 @@
 #include "libecs.hpp"
 #include "FullID.hpp"
 #include "CastUtils.hpp"
-#include "PropertiedClass.hpp"
+#include "EcsObject.hpp"
 #include "System.hpp"
 #include "RangeConcatenator.hpp"
 
@@ -61,7 +61,7 @@ class Entity;
 class Stepper;
 class Variable;
 class Process;
-class PropertiedObjectMaker;
+class EcsObjectMaker;
 
 /**
    Model class represents a simulation model.
@@ -69,7 +69,7 @@ class PropertiedObjectMaker;
    Model has a list of Steppers and a pointer to the root system.
 
 */
-LIBECS_DM_CLASS( Model, PropertiedClass )
+LIBECS_DM_CLASS( Model, EcsObject )
 {
 public:
     typedef ::Loki::AssocVector< String, Stepper* > StepperMap;
@@ -365,13 +365,13 @@ private:
     ProcessMap             processes_;
     VariableMap            variables_;
     mutable EntityMap*     entities_;
-    PropertiedObjectMaker* propertiedObjectMaker_;
+    EcsObjectMaker* propertiedObjectMaker_;
     EntityEventObserver    observer_;
 };
 
 } // namespace libecs
 
-#include "PropertiedObjectMaker.hpp"
+#include "EcsObjectMaker.hpp"
 
 namespace libecs {
 

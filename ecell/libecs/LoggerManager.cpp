@@ -86,7 +86,7 @@ void LoggerManager::log( TimeParam currentTime, const Entity* ent ) const
         ( i->second.second )(
             Logger::DataPoint( currentTime,
                 i->second.first->get<Real>(
-                    static_cast<const PropertiedClass&>( *ent ) ) ) ); 
+                    static_cast<const EcsObject&>( *ent ) ) ) ); 
     }
 }
 

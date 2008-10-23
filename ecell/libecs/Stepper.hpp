@@ -41,7 +41,7 @@
 #include "Interpolant.hpp"
 #include "PropertyInterface.hpp"
 #include "PartitionedList.hpp"
-#include "PropertiedClass.hpp"
+#include "EcsObject.hpp"
 
 /**
    @addtogroup stepper
@@ -61,7 +61,7 @@ class LoggerManager;
    Stepper class defines and governs a computation unit in a model.
    The computation unit is defined as a set of Process objects.
 */
-LIBECS_DM_CLASS( Stepper, PropertiedClass )
+LIBECS_DM_CLASS( Stepper, EcsObject )
 {
     friend class Model;
 
@@ -83,7 +83,7 @@ public:
 public:
     LIBECS_DM_OBJECT_ABSTRACT( Stepper )
     {
-        INHERIT_PROPERTIES( PropertiedClass );
+        INHERIT_PROPERTIES( EcsObject );
 
         PROPERTYSLOT_SET_GET( Integer,   Priority );
         PROPERTYSLOT_SET_GET( Real,      StepInterval );

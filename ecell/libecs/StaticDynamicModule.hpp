@@ -32,7 +32,7 @@
 #define __STATICDYNAMICMODULE_HPP
 
 #include "PropertyInterface.hpp"
-#include "PropertiedClass.hpp"
+#include "EcsObject.hpp"
 #include "dmtool/DynamicModule.hpp"
 
 namespace libecs {

@@ -47,12 +47,12 @@
 #define __LIBECS_PROPERTYSLOTPROXYPROXY_DEFINED
 namespace libecs {
 
-class PropertiedClass;
+class EcsObject;
 
 class PropertySlotProxy
 {
 public:
-    PropertySlotProxy( PropertiedClass* anObject,
+    PropertySlotProxy( EcsObject* anObject,
             const PropertySlot* aSlot )
         : obj_( anObject ), slot_( aSlot )
     {
@@ -80,7 +80,7 @@ public:
     }
 
 protected:
-    PropertiedClass* obj_;
+    EcsObject* obj_;
     const PropertySlot* slot_;
 };
 

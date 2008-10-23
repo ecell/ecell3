@@ -48,7 +48,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "libecs.hpp"
-#include "PropertiedObjectMaker.hpp"
+#include "EcsObjectMaker.hpp"
 #include "ModuleManager.hpp"
 #include "StaticDynamicModule.hpp"
 #include "System.hpp"
@@ -69,9 +69,9 @@ static volatile bool isInitialized = false;
 
 static ModuleManager moduleManager;
 
-static PropertiedObjectMaker propertiedObjectMaker( &moduleManager );
+static EcsObjectMaker propertiedObjectMaker( &moduleManager );
 
-const PropertiedObjectMaker& getPropertiedObjectMaker()
+const EcsObjectMaker& getEcsObjectMaker()
 {
     return propertiedObjectMaker;
 }
@@ -101,30 +101,30 @@ bool initialize()
     moduleManager.addModuleMaker(
             boost::shared_ptr< ModuleManager::ModuleMaker >(
                 reinterpret_cast< ModuleManager::ModuleMaker* >(
-                        new SharedModuleMaker< PropertiedClass >() ) ) );
+                        new SharedModuleMaker< EcsObject >() ) ) );
 
-    StaticModuleMaker< PropertiedClass >* builtinModuleMaker = 
-            reinterpret_cast< StaticModuleMaker< PropertiedClass >* >(
-                new StaticModuleMaker< PropertiedClass >() );
+    StaticModuleMaker< EcsObject >* builtinModuleMaker = 
+            reinterpret_cast< StaticModuleMaker< EcsObject >* >(
+                new StaticModuleMaker< EcsObject >() );
 
     builtinModuleMaker->addClass(
-            reinterpret_cast< StaticDynamicModule< PropertiedClass >* >(
+            reinterpret_cast< StaticDynamicModule< EcsObject >* >(
                 new StaticDynamicModule< System >() ) );
 
     builtinModuleMaker->addClass(
-            reinterpret_cast< StaticDynamicModule< PropertiedClass >* >(
+            reinterpret_cast< StaticDynamicModule< EcsObject >* >(
                 new StaticDynamicModule< Variable >() ) );
 
     builtinModuleMaker->addClass(
-            reinterpret_cast< StaticDynamicModule< PropertiedClass >* >(
+            reinterpret_cast< StaticDynamicModule< EcsObject >* >(
                 new StaticDynamicModule< DiscreteEventStepper >() ) );
 
     builtinModuleMaker->addClass(
-            reinterpret_cast< StaticDynamicModule< PropertiedClass >* >(
+            reinterpret_cast< StaticDynamicModule< EcsObject >* >(
                 new StaticDynamicModule< DiscreteTimeStepper >() ) );
 
     builtinModuleMaker->addClass(
-            reinterpret_cast< StaticDynamicModule< PropertiedClass >* >(
+            reinterpret_cast< StaticDynamicModule< EcsObject >* >(
                 new StaticDynamicModule< PassiveStepper >() ) );
 
     moduleManager.addModuleMaker(

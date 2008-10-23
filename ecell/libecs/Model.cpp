@@ -42,7 +42,7 @@
 #include "Process.hpp"
 #include "SimulationContext.hpp"
 #include "Model.hpp"
-#include "PropertiedObjectMaker.hpp"
+#include "EcsObjectMaker.hpp"
 
 namespace libecs
 {

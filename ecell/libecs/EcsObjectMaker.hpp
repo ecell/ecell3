@@ -42,15 +42,15 @@ namespace libecs
  * @{
  */
 
-class LIBECS_API PropertiedObjectMaker
+class LIBECS_API EcsObjectMaker
 {
 public:
-    PropertiedObjectMaker( ModuleManager* moduleManager )
+    EcsObjectMaker( ModuleManager* moduleManager )
         : moduleManager_( moduleManager )
     {
     }
 
-    ~PropertiedObjectMaker();
+    ~EcsObjectMaker();
 
     template<typename T_>
     T_* make( const String& className )
@@ -58,10 +58,10 @@ public:
         // should not use dynamic_cast<> because quering RTTI to the
         // dynamicall added class is not well defined in the C++ spec.
         return reinterpret_cast< T_* >(
-                make( Type2PropertiedClassKind< T_ >::value, className ) );
+                make( Type2EcsObjectKind< T_ >::value, className ) );
     }
 
-    PropertiedClass* make( const PropertiedClassKind& kind,
+    EcsObject* make( const EcsObjectKind& kind,
             const String& className  )
     {
         const ModuleManager::Module& mod(
@@ -89,7 +89,7 @@ private:
     ModuleManager* moduleManager_;
 };
 
-#define NewPropertiedObjectModule(CLASS) NewDynamicModule(PropertiedObject,CLASS)
+#define NewEcsObjectModule(CLASS) NewDynamicModule(EcsObject,CLASS)
 
 /** @} */ //end of libecs_module
 

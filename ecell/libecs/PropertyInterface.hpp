@@ -40,13 +40,13 @@
 
 #include <boost/assert.hpp>
 #include "libecs.hpp"
-#include "PropertiedClassKind.hpp"
+#include "EcsObjectKind.hpp"
 #include "Polymorph.hpp"
 
 namespace libecs {
 
 class PropertySlot;
-class PropertiedClass;
+class EcsObject;
 
 class LIBECS_API PropertyInterface
 {
@@ -62,7 +62,7 @@ public:
         return theClassName;
     }
 
-    const PropertiedClassKind& getKind() const
+    const EcsObjectKind& getKind() const
     {
         return theKind;
     }
@@ -101,7 +101,7 @@ protected:
 
     PropertyInterface(
             const String& className,
-            const PropertiedClassKind& kind )
+            const EcsObjectKind& kind )
         : theClassName( className ), theKind( kind )
     {
         ; // do nothing
@@ -110,10 +110,10 @@ protected:
     static void throwNoSlot( const String& aClassName, const String& aPropertyName );
 
     static void throwNotLoadable( const String& aClassName,
-                                  const PropertiedClass& aClassName,
+                                  const EcsObject& aClassName,
                                   const String& aPropertyName );
     static void throwNotSavable( const String& aClassName,
-                                 const PropertiedClass& aClassName,
+                                 const EcsObject& aClassName,
                                  const String& aPropertyName );
 protected:
     PropertySlotMap::const_iterator
@@ -126,7 +126,7 @@ protected:
     PropertySlotMap thePropertySlotMap;
     InfoMap theInfoMap;
     const String theClassName;
-    const PropertiedClassKind& theKind;
+    const EcsObjectKind& theKind;
 };
 
 } // namespace libecs
@@ -138,9 +138,9 @@ protected:
 
 #include <boost/assert.hpp>
 #include "libecs.hpp"
-#include "PropertiedClassKind.hpp"
+#include "EcsObjectKind.hpp"
 #include "Polymorph.hpp"
-#include "PropertiedClass.hpp"
+#include "EcsObject.hpp"
 
 namespace libecs {
 
@@ -154,7 +154,7 @@ struct SuperPropertyInterfaceOf
 };
 
 template<>
-struct SuperPropertyInterfaceOf< PropertiedClass >
+struct SuperPropertyInterfaceOf< EcsObject >
 {
     typedef PropertyInterface type;
 };
@@ -168,7 +168,7 @@ public:
 
     ConcretePropertyInterface(
             const String& className,
-            const PropertiedClassKind& kind )
+            const EcsObjectKind& kind )
         : Base( className, kind )
     {
         T::initializePropertyInterface(

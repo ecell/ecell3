@@ -37,7 +37,7 @@
 
 #include "Exceptions.hpp"
 #include "EntityType.hpp"
-#include "PropertiedClassKind.hpp"
+#include "EcsObjectKind.hpp"
 
 namespace libecs {
 
@@ -49,15 +49,15 @@ const EntityType EntityType:: PROCESS( _PROCESS,  "Process" );
 const EntityType EntityType::  SYSTEM( _SYSTEM,   "System" );
 
 const EntityType&
-EntityType::fromPropertiedClassKind( const PropertiedClassKind& pck )
+EntityType::fromEcsObjectKind( const EcsObjectKind& pck )
 {
     switch ( pck.code )
     {
-    case PropertiedClassKind::_PROCESS:
+    case EcsObjectKind::_PROCESS:
         return EntityType::PROCESS;
-    case PropertiedClassKind::_VARIABLE:
+    case EcsObjectKind::_VARIABLE:
         return EntityType::VARIABLE;
-    case PropertiedClassKind::_SYSTEM:
+    case EcsObjectKind::_SYSTEM:
         return EntityType::SYSTEM;
     }
     THROW_EXCEPTION( ValueError,

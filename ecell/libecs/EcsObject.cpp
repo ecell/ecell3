@@ -37,55 +37,55 @@
 #endif /* HAVE_CONFIG_H */
 
 #include "Exceptions.hpp"
-#include "PropertiedClass.hpp"
+#include "EcsObject.hpp"
 #include "PropertySlotProxy.hpp"
 
 namespace libecs
 {
 
-PropertiedClass::~PropertiedClass()
+EcsObject::~EcsObject()
 {
     ; // do nothing
 }
 
-void PropertiedClass::startup()
+void EcsObject::startup()
 {
 }
 
-void PropertiedClass::initialize()
+void EcsObject::initialize()
 {
 }
 
-void PropertiedClass::postInitialize()
+void EcsObject::postInitialize()
 {
 }
 
-void PropertiedClass::interrupt( TimeParam )
+void EcsObject::interrupt( TimeParam )
 {
 }
 
-const String& PropertiedClass::asString() const
+const String& EcsObject::asString() const
 {
     return getPropertyInterface().getClassName();
 }
 
-void PropertiedClass::initializePropertyInterface( ::libecs::PropertyInterface& thePropertyInterface )
+void EcsObject::initializePropertyInterface( ::libecs::PropertyInterface& thePropertyInterface )
 {
 }
 
-const PropertyInterface& PropertiedClass::getPropertyInterface() const
+const PropertyInterface& EcsObject::getPropertyInterface() const
 {
     return propertyInterface_;
 }
 
 const PropertySlot*
-PropertiedClass::getPropertySlot( const String& propertyName ) const
+EcsObject::getPropertySlot( const String& propertyName ) const
 {
     return getPropertyInterface().getPropertySlot( propertyName );
 }
 
 void
-PropertiedClass::loadProperty( const String& propertyName,
+EcsObject::loadProperty( const String& propertyName,
                                const Polymorph& aValue )
 {
     const PropertySlot* slot( getPropertySlot( propertyName ) );
@@ -100,7 +100,7 @@ PropertiedClass::loadProperty( const String& propertyName,
 }
 
 Polymorph
-PropertiedClass::saveProperty( const String& propertyName ) const
+EcsObject::saveProperty( const String& propertyName ) const
 {
     const PropertySlot* slot( getPropertySlot( propertyName ) );
     if ( slot )
@@ -114,7 +114,7 @@ PropertiedClass::saveProperty( const String& propertyName ) const
 }
 
 PropertySlotProxy
-PropertiedClass::createPropertySlotProxy( const String& propertyName )
+EcsObject::createPropertySlotProxy( const String& propertyName )
 {
     const PropertySlot* aPropertySlot( getPropertySlot( propertyName ) );
     if ( !aPropertySlot ) {
@@ -129,7 +129,7 @@ PropertiedClass::createPropertySlotProxy( const String& propertyName )
 }
 
 
-const Polymorph PropertiedClass::
+const Polymorph EcsObject::
 defaultGetPropertyAttributes( const String& propertyName ) const
 {
     THROW_EXCEPTION( NoSlot,
@@ -139,14 +139,14 @@ defaultGetPropertyAttributes( const String& propertyName ) const
 }
 
 const Polymorph
-PropertiedClass::defaultGetPropertyList() const
+EcsObject::defaultGetPropertyList() const
 {
     PolymorphVector aVector;
 
     return aVector;
 }
 
-void PropertiedClass::defaultSetProperty( const String& propertyName,
+void EcsObject::defaultSetProperty( const String& propertyName,
         const Polymorph& aValue )
 {
     THROW_EXCEPTION( NoSlot,
@@ -156,7 +156,7 @@ void PropertiedClass::defaultSetProperty( const String& propertyName,
 }
 
 const Polymorph
-PropertiedClass::defaultGetProperty( const String& propertyName ) const
+EcsObject::defaultGetProperty( const String& propertyName ) const
 {
     THROW_EXCEPTION( NoSlot,
                      getPropertyInterface().getClassName() +
@@ -165,25 +165,25 @@ PropertiedClass::defaultGetProperty( const String& propertyName ) const
 }
 
 // @internal
-void PropertiedClass::nullLoad( Param<Polymorph>::type )
+void EcsObject::nullLoad( Param<Polymorph>::type )
 {
     THROW_EXCEPTION( IllegalOperation, "Not loadable." );
 }
 
 /// @internal
-const Polymorph PropertiedClass::nullSave() const
+const Polymorph EcsObject::nullSave() const
 {
     THROW_EXCEPTION( IllegalOperation, "Not savable." );
     return Polymorph();
 }
 
 
-ConcretePropertyInterface< PropertiedClass >
-PropertiedClass::propertyInterface_(
-    "PropertiedClass", PropertiedClassKind::NONE );
+ConcretePropertyInterface< EcsObject >
+EcsObject::propertyInterface_(
+    "EcsObject", EcsObjectKind::NONE );
 
 #define NULLSET_SPECIALIZATION_DEF( TYPE )\
-template <> void PropertiedClass::nullSet<TYPE>( Param<TYPE>::type )\
+template <> void EcsObject::nullSet<TYPE>( Param<TYPE>::type )\
 {\
     THROW_EXCEPTION( IllegalOperation, "Not settable." ); \
 }
@@ -194,7 +194,7 @@ NULLSET_SPECIALIZATION_DEF( String );
 NULLSET_SPECIALIZATION_DEF( Polymorph );
 
 #define NULLGET_SPECIALIZATION_DEF( TYPE )\
-template <> const TYPE PropertiedClass::nullGet<TYPE>() const\
+template <> const TYPE EcsObject::nullGet<TYPE>() const\
 {\
     THROW_EXCEPTION( IllegalOperation, "Not gettable." ); \
     return TYPE(); \

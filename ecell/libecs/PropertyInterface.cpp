@@ -50,7 +50,7 @@ void PropertyInterface::throwNoSlot( const String& aClassName,
 }
 
 void PropertyInterface::throwNotLoadable( const String& aClassName,
-        const PropertiedClass& anObject, const String& aPropertyName )
+        const EcsObject& anObject, const String& aPropertyName )
 {
     THROW_EXCEPTION( NoSlot,
                      aClassName + ": property [" +
@@ -58,7 +58,7 @@ void PropertyInterface::throwNotLoadable( const String& aClassName,
 }
 
 void PropertyInterface::throwNotSavable( const String& aClassName,
-        const PropertiedClass& anObject, const String& aPropertyName )
+        const EcsObject& anObject, const String& aPropertyName )
 {
     THROW_EXCEPTION( NoSlot,
                      aClassName + ": property [" +
