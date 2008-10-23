@@ -117,18 +117,6 @@ class LoggerStub( ObjectStub ):
     def getSize( self ):
         return self.theSimulator.getLoggerSize( self.theFullPNString )
 
-    def setMinimumInterval( self, anInterval ):
-        warnings.warn( "Use setLoggerPolicy instead", DeprecationWarning )
-        return self.theSimulator.setLoggerMinimumInterval( self.theFullPNString, anInterval )
-
-    def getMinimumInterval( self ):
-        """
-        Returns the minimum interval
-        This method can throw exceptions.
-        """
-        warnings.warn( "Use getLoggerPolicy() instead", DeprecationWarning )
-        return self.theSimulator.getLoggerMinimumInterval( self.theFullPNString )
-
     def getLoggerPolicy( self ):
         """
         Returns the logger policy
