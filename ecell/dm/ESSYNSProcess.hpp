@@ -65,7 +65,7 @@ LIBECS_DM_CLASS( ESSYNSProcess, libecs::Process )
       ;
     }
     
-  virtual const std::vector<RealVector>& getESSYNSMatrix() = 0;
+  virtual const boost::multi_array< Real, 2 >& getESSYNSMatrix() = 0;
 
   virtual GET_METHOD( libecs::Integer, SystemSize ) = 0;
     
