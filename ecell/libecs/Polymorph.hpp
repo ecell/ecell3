@@ -71,27 +71,27 @@ class LIBECS_API PolymorphValue
     friend void intrusive_ptr_release( PolymorphValue* );
 
 private:
-    template< int idx, typename Tlhs_, typename Trhs_, bool nok_ = idx < boost::tuples::length< Trhs_ >::value >
+    template< int Nidx_, typename Tlhs_, typename Trhs_, bool Nok_ = Nidx_ < boost::tuples::length< Trhs_ >::value >
     struct __assignIfNotNull
     {
         void operator()( Tlhs_& lhs, Trhs_ const& rhs )
         {
-            lhs = rhs;
+            lhs = boost::get< Nidx_ >( rhs );
         }
     };
 
-    template< int idx, typename Tlhs_, typename Trhs_ >
-    struct __assignIfNotNull< idx, Tlhs_, Trhs_, false >
+    template< int Nidx_, typename Tlhs_, typename Trhs_ >
+    struct __assignIfNotNull< Nidx_, Tlhs_, Trhs_, false >
     {
         void operator()( Tlhs_& lhs, Trhs_ const& rhs )
         {
         }
     };
 
-    template< int idx, typename Tlhs_, typename Trhs_ >
+    template< int Nidx_, typename Tlhs_, typename Trhs_ >
     void assignIfNotNull( Tlhs_& lhs, Trhs_ const& rhs )
     {
-        __assignIfNotNull< idx, Tlhs_, Trhs_ >()( lhs, rhs );
+        __assignIfNotNull< Nidx_, Tlhs_, Trhs_ >()( lhs, rhs );
     }
 
 public:

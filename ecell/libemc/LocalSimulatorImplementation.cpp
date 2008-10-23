@@ -103,11 +103,14 @@ inline libecs::Polymorph LocalSimulatorImplementation::buildPolymorph( const lib
 
 inline libecs::Polymorph LocalSimulatorImplementation::buildPolymorph( const libecs::PropertyAttributes& attrs )
 {
+    using namespace libecs;
     return libecs::Polymorph(
-        boost::make_tuple( attrs.isSetable(), attrs.isGetable(),
-                           attrs.isLoadable(), attrs.isSavable(),
-                           attrs.isDynamic(), attrs.getType() ) );
-
+        boost::make_tuple( static_cast< Integer >( attrs.isSetable() ),
+                           static_cast< Integer >( attrs.isGetable() ),
+                           static_cast< Integer >( attrs.isLoadable() ),
+                           static_cast< Integer >( attrs.isSavable() ),
+                           static_cast< Integer >( attrs.isDynamic() ),
+                           static_cast< Integer >( attrs.getType() ) ) ); 
 }
 
 
@@ -352,7 +355,7 @@ void LocalSimulatorImplementation::
 createLogger( libecs::StringCref aFullPNString )
 {
     libecs::PolymorphVector aVector;
-    createLogger( aFullPNString );
+    createLogger( aFullPNString, boost::make_tuple( 1l, 0.0, 0l, 0l ) );
 }
 
 
