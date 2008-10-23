@@ -33,7 +33,7 @@
 #define __ODE45_HPP
 
 #include "libecs/Interpolant.hpp"
-#include "libecs/DifferentialStepper.hpp"
+#include "libecs/AdaptiveDifferentialStepper.hpp"
 
 USE_LIBECS;
 

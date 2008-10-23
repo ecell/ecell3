@@ -32,7 +32,7 @@
 #ifndef __ODE_HPP
 #define __ODE_HPP
 
-#include "libecs/DifferentialStepper.hpp"
+#include "libecs/AdaptiveDifferentialStepper.hpp"
 
 USE_LIBECS;
 
