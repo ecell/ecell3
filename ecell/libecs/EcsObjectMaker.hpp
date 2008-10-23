@@ -29,8 +29,8 @@
 // E-Cell Project.
 //
 
-#ifndef ___PROPERTIEDOBJECTMAKER_H___
-#define ___PROPERTIEDOBJECTMAKER_H___
+#ifndef ___ECSOBJECTMAKER_H
+#define ___ECSOBJECTMAKER_H
 
 #include "dmtool/ModuleMaker.hpp"
 #include "dmtool/DynamicModuleInfo.hpp"
@@ -40,11 +40,6 @@
 
 namespace libecs
 {
-  
-/* *defgroup libecs_module The Libecs Module 
-* This is the libecs module 
-* @{ 
-*/ 
 
 template< typename T_ >  
 class EcsObjectMaker 
@@ -63,10 +58,10 @@ public:
     static const char* getTypeName();
 
     /**
-         Instantiates given class of an object.
- 
-         @param classname name of class to be instantiated.
-         @return pointer to a new instance.
+       Instantiates given class of an object.
+
+       @param classname name of class to be instantiated.
+       @return pointer to a new instance.
     */
     DMType* make( const std::string& aClassname )
     {
@@ -127,10 +122,6 @@ inline const char* EcsObjectMaker<System>::getTypeName()
     return "System";
 }
 
-#define NewEcsObjectModule(CLASS) NewDynamicModule(EcsObject,CLASS)
-
-/** @} */ //end of libecs_module 
-
 } // namespace libecs
 
-#endif /* ___PROPERTIEDOBJECTMAKER_H___ */
+#endif /* ___ECSOBJECTMAKER_H */

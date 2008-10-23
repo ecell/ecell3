@@ -31,20 +31,20 @@
 // modified by Masayuki Okayama <smash@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
 #include "PropertySlotProxy.hpp"
 
-
 namespace libecs
 {
-  PropertySlotProxy::~PropertySlotProxy()
-  {
-    ; // do nothing
-  }
 
+PropertySlotProxy::~PropertySlotProxy()
+{
+    ; // do nothing
+}
 
 }
 

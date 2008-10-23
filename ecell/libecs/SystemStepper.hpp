@@ -33,46 +33,29 @@
 #define __SYSTEMSTEPPER_HPP
 
 #include "libecs/libecs.hpp"
-
 #include "libecs/Stepper.hpp"
 
-
-
+/**
+   @addtogroup stepper
+   @{
+ */
 namespace libecs
 {
 
-  /** @addtogroup stepper
-   *@{
-   */
-
-  /** @file */
-
-
-  /**
-
-
-  */
-
-
-  LIBECS_DM_CLASS( SystemStepper, Stepper )
-  {
-
-  public:
-
+LIBECS_DM_CLASS( SystemStepper, Stepper )
+{
+public:
     LIBECS_DM_OBJECT( SystemStepper, Stepper )
-      {
-	INHERIT_PROPERTIES( Stepper );
-	
-      }
-
-
+    {
+        INHERIT_PROPERTIES( Stepper );
+    }
 
     SystemStepper(); 
     virtual ~SystemStepper();
 
     virtual GET_METHOD( Real, TimeScale )
     {
-      return 0.0;
+        return 0.0;
     }
 
 
@@ -84,28 +67,17 @@ namespace libecs
 
     virtual void interrupt( TimeParam aTime )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
 
-  protected:
+protected:
 
     void integrateVariablesRecursively( SystemPtr const aSystem,
-					RealParam aTime );
+                                                                            RealParam aTime );
 
-  };
-
+};
 
 } // namespace libecs
 
 #endif /* __SYSTEMSTEPPER_HPP */
-
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

@@ -117,7 +117,7 @@ namespace libemc
     virtual const libecs::Polymorph 
     getEntityPropertyList( libecs::StringCref aFullID ) const;
 
-    virtual const bool isEntityExist( libecs::StringCref aFullIDString ) const;
+    virtual const bool entityExists( libecs::StringCref aFullIDString ) const;
 
     virtual void setEntityProperty( libecs::StringCref    aFullPNString,
 				    libecs::PolymorphCref aValue );
@@ -265,7 +265,8 @@ namespace libemc
     void runWithEvent();
     void runWithoutEvent();
 
-    static libecs::PolymorphVector buildPolymorphVector( const libecs::PropertyAttributes );
+    static libecs::Polymorph buildPolymorph( libecs::Logger::Policy const& );
+    static libecs::Polymorph buildPolymorph( libecs::PropertyAttributes const& );
 
   private:
 

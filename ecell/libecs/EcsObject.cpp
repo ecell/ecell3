@@ -31,6 +31,7 @@
 // modified by Masayuki Okayama <smash@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -44,110 +45,94 @@ namespace libecs
 {
 
 
-  ///////////////////////////// EcsObject
-  const PropertyAttributes EcsObject::
-  defaultGetPropertyAttributes( StringCref aPropertyName ) const
-  {
+///////////////////////////// EcsObject
+const PropertyAttributes EcsObject::
+defaultGetPropertyAttributes( StringCref aPropertyName ) const
+{
     THROW_EXCEPTION( NoSlot, 
-		     getClassName() + 
-		     String( ": No property slot [" )
-		     + aPropertyName + "].  Get property attributes failed." );
-  }
+                     getClassName() + 
+                     String( ": No property slot [" )
+                     + aPropertyName + "].    Get property attributes failed." );
+}
 
-  const StringVector&
-  EcsObject::defaultGetPropertyList() const
-  {
+const StringVector&
+EcsObject::defaultGetPropertyList() const
+{
     static StringVector emptyVector;
     return emptyVector;
-  }
-  
-  void EcsObject::defaultSetProperty( StringCref aPropertyName, 
-					    PolymorphCref aValue )
-  {
+}
+
+void EcsObject::defaultSetProperty( StringCref aPropertyName, 
+                                                                                    PolymorphCref aValue )
+{
     THROW_EXCEPTION( NoSlot,
-		     getClassName() + 
-		     String( ": No property slot [" )
-		     + aPropertyName + "].  Set property failed." );
-  }
+                     getClassName() + 
+                     ( ": No property slot [" )
+                     + aPropertyName + "].    Set property failed." );
+}
 
-  const Polymorph 
-  EcsObject::defaultGetProperty( StringCref aPropertyName ) const
-  {
+const Polymorph 
+EcsObject::defaultGetProperty( StringCref aPropertyName ) const
+{
     THROW_EXCEPTION( NoSlot, 
-		     getClassName() + 
-		     String( ": No property slot [" )
-		     + aPropertyName + "].  Get property failed." );
-  }
-  
-  void EcsObject::registerLogger( LoggerPtr aLoggerPtr )
-  {
-    if( std::find( theLoggerVector.begin(), theLoggerVector.end(), aLoggerPtr )
-	== theLoggerVector.end() )
-      {
-   	theLoggerVector.push_back( aLoggerPtr );
-      }
-  }
+                     getClassName() + 
+                     String( ": No property slot [" )
+                     + aPropertyName + "].    Get property failed." );
+}
 
-  void EcsObject::removeLogger( LoggerPtr aLoggerPtr )
-  {
+void EcsObject::registerLogger( LoggerPtr aLoggerPtr )
+{
+    if( std::find( theLoggerVector.begin(), theLoggerVector.end(), aLoggerPtr )
+            == theLoggerVector.end() )
+    {
+         theLoggerVector.push_back( aLoggerPtr );
+    }
+}
+
+void EcsObject::removeLogger( LoggerPtr aLoggerPtr )
+{
     LoggerVectorIterator i( find( theLoggerVector.begin(), 
-				  theLoggerVector.end(),
-				  aLoggerPtr ) );
+                                  theLoggerVector.end(),
+                                  aLoggerPtr ) );
     
     if( i != theLoggerVector.end() )
-      {
-	theLoggerVector.erase( i );
-      }
+    {
+        theLoggerVector.erase( i );
+    }
+}
 
-  }
 
-
-  void EcsObject::throwNotSetable()
-  {
+void EcsObject::throwNotSetable()
+{
     THROW_EXCEPTION( AttributeError, "Not setable." );
-  }
+}
 
-  void EcsObject::throwNotGetable()
-  {
+
+void EcsObject::throwNotGetable()
+{
     THROW_EXCEPTION( AttributeError, "Not getable." );
-  }
+}
 
-  StringCref EcsObject::getClassName() const
-  {
+
+StringCref EcsObject::getClassName() const
+{
      return getPropertyInterface().getClassName();
-  }
+}
 
-#define NULLSET_SPECIALIZATION_DEF( TYPE )\
-  template <> void EcsObject::nullSet<TYPE>( Param<TYPE>::type )\
-  {\
+#define NULLGETSET_SPECIALIZATION_DEF( TYPE )\
+template <> void EcsObject::nullSet<TYPE>( Param<TYPE>::type )\
+{\
     throwNotSetable();\
-  } //
-
-  NULLSET_SPECIALIZATION_DEF( Real );
-  NULLSET_SPECIALIZATION_DEF( Integer );
-  NULLSET_SPECIALIZATION_DEF( String );
-  NULLSET_SPECIALIZATION_DEF( Polymorph );
-
-#define NULLGET_SPECIALIZATION_DEF( TYPE )\
-  template <> const TYPE EcsObject::nullGet<TYPE>() const\
-  {\
+}\
+template <> const TYPE EcsObject::nullGet<TYPE>() const\
+{\
     throwNotGetable();\
     return TYPE(); \
-  } //
+} //
 
-  NULLGET_SPECIALIZATION_DEF( Real );
-  NULLGET_SPECIALIZATION_DEF( Integer );
-  NULLGET_SPECIALIZATION_DEF( String );
-  NULLGET_SPECIALIZATION_DEF( Polymorph );
-
+NULLGETSET_SPECIALIZATION_DEF( Real );
+NULLGETSET_SPECIALIZATION_DEF( Integer );
+NULLGETSET_SPECIALIZATION_DEF( String );
+NULLGETSET_SPECIALIZATION_DEF( Polymorph );
 
 } // namespace libecs
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

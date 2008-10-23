@@ -572,8 +572,8 @@ BOOST_PYTHON_MODULE( _ecs )
               &Simulator::deleteEntity )
         .def( "getEntityList",
               &Simulator::getEntityList )
-        .def( "isEntityExist",
-              &Simulator::isEntityExist )
+        .def( "entityExists",
+              &Simulator::entityExists )
         .def( "getEntityPropertyList",
               &Simulator::getEntityPropertyList )
         .def( "setEntityProperty",
@@ -617,10 +617,6 @@ BOOST_PYTHON_MODULE( _ecs )
               &Simulator::getLoggerStartTime )    
         .def( "getLoggerEndTime",
               &Simulator::getLoggerEndTime )        
-        .def( "getLoggerMinimumInterval",
-              &Simulator::getLoggerMinimumInterval )
-        .def( "setLoggerMinimumInterval",
-              &Simulator::setLoggerMinimumInterval )
         .def( "getLoggerPolicy",
               &Simulator::getLoggerPolicy )
         .def( "setLoggerPolicy",

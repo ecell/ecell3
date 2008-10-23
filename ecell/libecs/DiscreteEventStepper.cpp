@@ -40,49 +40,44 @@
 
 #include "DiscreteEventStepper.hpp"
 
-
 namespace libecs
 {
 
-  LIBECS_DM_INIT_STATIC( DiscreteEventStepper, Stepper );
+LIBECS_DM_INIT_STATIC( DiscreteEventStepper, Stepper );
 
-  //////////////////// DiscreteEventStepper
-
-  DiscreteEventStepper::DiscreteEventStepper()
-    :
-    //    theTimeScale( 0.0 ),
-    theTolerance( 0.0 ),
-    theLastEventID( -1 )
-  {
+DiscreteEventStepper::DiscreteEventStepper()
+    : theTolerance( 0.0 ),
+      theLastEventID( -1 )
+{
     ; // do nothing
-  }
+}
 
-  GET_METHOD_DEF( String, LastProcess, DiscreteEventStepper )
-  {
+GET_METHOD_DEF( String, LastProcess, DiscreteEventStepper )
+{
     if( theLastEventID != -1 )
-      {
-	const ProcessCptr aLastProcess(
-	    theScheduler.getEvent( theLastEventID ).getProcess() );
-	
-	return aLastProcess->getFullID().getString();
-      }
+    {
+        const ProcessCptr aLastProcess(
+                theScheduler.getEvent( theLastEventID ).getProcess() );
+        
+        return aLastProcess->getFullID().getString();
+    }
     else
-      {
-	return "";
-      }
-  }
+    {
+        return "";
+    }
+}
 
-  void DiscreteEventStepper::initialize()
-  {
+void DiscreteEventStepper::initialize()
+{
     Stepper::initialize();
 
     if ( theProcessVector.empty() )
-      {
-	THROW_EXCEPTION( InitializationFailed,
-			 getClassName() + 
-			 ": at least one Process "
-			 "must be defined in this Stepper." );
-      }
+    {
+        THROW_EXCEPTION( InitializationFailed,
+                         getClassName() + 
+                         ": at least one Process "
+                         "must be defined in this Stepper." );
+    }
 
     const Real aCurrentTime( getCurrentTime() );
 
@@ -93,16 +88,15 @@ namespace libecs
 
     theScheduler.clear();
     for( ProcessVectorConstIterator i( theProcessVector.begin() );
-	 i != theProcessVector.end(); ++i )
-      {      
-	ProcessPtr aProcessPtr( *i );
-	
-	// register a Process (as an event generator) to 
-	// the priority queue.
-	theScheduler.addEvent( ProcessEvent( aProcessPtr->getStepInterval()
-					     + aCurrentTime,
-					     aProcessPtr ) );
-      }
+             i != theProcessVector.end(); ++i )
+    {            
+        ProcessPtr aProcessPtr( *i );
+        
+        // register a Process (as an event generator) to 
+        // the priority queue.
+        theScheduler.addEvent( ProcessEvent( aProcessPtr->getStepInterval()
+                               + aCurrentTime, aProcessPtr ) );
+    }
 
     // (2) (re)construct the event dependency array.
 
@@ -112,7 +106,7 @@ namespace libecs
     // (3) Reschedule this Stepper.
 
     // Here all the Processes are updated, then set new
-    // stepinterval.  This Stepper will be rescheduled
+    // stepinterval.    This Stepper will be rescheduled
     // by the scheduler with the new stepinterval.
     // That means, this Stepper doesn't necessary step immediately
     // after initialize().
@@ -120,13 +114,13 @@ namespace libecs
     const Real aNewTime( aTopEvent.getTime() );
 
     loadStepInterval( aNewTime - aCurrentTime );
-  }
+}
 
 
 
 
-  void DiscreteEventStepper::step()
-  {
+void DiscreteEventStepper::step()
+{
     theLastEventID = theScheduler.getTopID();
 
     // assert( getCurrentTime() == theScheduler.getTopEvent().getTime() )
@@ -142,57 +136,50 @@ namespace libecs
     // ProcessPtr const aNewTopProcess( aTopEvent.getProcess() );
     // Calculate new timescale.
     // To prevent 0.0 * INF -> NaN from happening, simply set zero 
-    // if the tolerance is zero.  
+    // if the tolerance is zero.    
     // ( DiscreteEventProcess::getTimeScale() can return INF. )
-
-    // temporarily disabled
-    //    theTimeScale = ( theTolerance == 0.0 ) ? 
-    //      0.0 : theTolerance * aNewTopProcess->getTimeScale();
 
     // FIXME: should be setStepInterval()
     loadStepInterval( aNewStepInterval );
-  }
+}
 
 
-  void DiscreteEventStepper::interrupt( TimeParam aTime )
-  {
+void DiscreteEventStepper::interrupt( TimeParam aTime )
+{
     // update current time, because the procedure below
     // is effectively a stepping.
     setCurrentTime( aTime );
 
     // update step intervals of all the Processes.
-    //    for( ProcessVector::const_iterator i( theProcessVector.begin() );
-    //	 i != theProcessVector.end(); ++i )
     theScheduler.updateAllEvents( getCurrentTime() );
 
     ProcessEventCref aTopEvent( theScheduler.getTopEvent() );
     const Real aNewTime( aTopEvent.getTime() );
 
     loadStepInterval( aNewTime - getCurrentTime() );
-  }
+}
 
-  void DiscreteEventStepper::log()
-  {
+void DiscreteEventStepper::log()
+{
     if( theLoggerVector.empty() )
-      {
-	return;
-      }
+    {
+        return;
+    }
 
     // call Logger::log() of Loggers that are attached to
     // the last fired Process and Variables in its VariableReferenceVector.
 
     const Real aCurrentTime( getCurrentTime() );
 
-    ProcessEventCref 
-      aLastEvent( theScheduler.getEvent( theLastEventID ) );
+    ProcessEventCref aLastEvent( theScheduler.getEvent( theLastEventID ) );
     const ProcessCptr aLastProcess( aLastEvent.getProcess() );
 
     LoggerVectorCref aProcessLoggerVector( aLastProcess->getLoggerVector() );
 
     FOR_ALL( LoggerVector, aProcessLoggerVector )
-      {
-	(*i)->log( aCurrentTime );
-      }
+    {
+        (*i)->log( aCurrentTime );
+    }
 
     // Log all relevant processes.
     //
@@ -201,53 +188,42 @@ namespace libecs
     //
     typedef ProcessEventScheduler::EventIDVector EventIDVector;
     const EventIDVector& anEventIDVector(
-	theScheduler.getDependencyVector( theLastEventID ) );
+            theScheduler.getDependencyVector( theLastEventID ) );
 
     for ( EventIDVector::const_iterator i( anEventIDVector.begin() );
-	  i != anEventIDVector.end(); ++i ) 
-      {
-	ProcessEventCref 
-	  aDependentEvent( theScheduler.getEvent( *i ) );
-	ProcessPtr const aDependentProcess( aDependentEvent.getProcess() );
+            i != anEventIDVector.end(); ++i ) 
+    {
+        ProcessEventCref aDependentEvent( theScheduler.getEvent( *i ) );
+        ProcessPtr const aDependentProcess( aDependentEvent.getProcess() );
 
 
-	LoggerVectorCref aDependentProcessLoggerVector( aDependentProcess->
-							getLoggerVector() );
-	for ( LoggerVectorConstIterator 
-		j( aDependentProcessLoggerVector.begin() ); 
-	      j != aDependentProcessLoggerVector.end(); ++j )
-	  {
-	    const LoggerPtr aLogger( *j );
-	    aLogger->log( aCurrentTime );
-	  }
-      }
+        LoggerVectorCref aDependentProcessLoggerVector(
+                aDependentProcess->getLoggerVector() );
+        for ( LoggerVectorConstIterator j(
+                aDependentProcessLoggerVector.begin() ); 
+              j != aDependentProcessLoggerVector.end(); ++j )
+        {
+            const LoggerPtr aLogger( *j );
+            aLogger->log( aCurrentTime );
+        }
+    }
 
 
-    VariableReferenceVectorCref
-      aVariableReferenceVector( aLastProcess->getVariableReferenceVector() );
+    VariableReferenceVectorCref aVariableReferenceVector(
+            aLastProcess->getVariableReferenceVector() );
 
     for( VariableReferenceVectorConstIterator 
-	   j( aVariableReferenceVector.begin() );
-	 j != aVariableReferenceVector.end(); ++j )
-      {
-	const VariableCptr aVariablePtr( (*j).getVariable() );
-	LoggerVectorCref aLoggerVector( aVariablePtr->getLoggerVector() );
+                 j( aVariableReferenceVector.begin() );
+         j != aVariableReferenceVector.end(); ++j )
+    {
+        const VariableCptr aVariablePtr( (*j).getVariable() );
+        LoggerVectorCref aLoggerVector( aVariablePtr->getLoggerVector() );
 
-	FOR_ALL( LoggerVector, aLoggerVector )
-	  {
-	    (*i)->log( aCurrentTime );
-	  }
-      }
-  }
+        FOR_ALL( LoggerVector, aLoggerVector )
+        {
+            (*i)->log( aCurrentTime );
+        }
+    }
+}
 
 } // namespace libecs
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/
-

@@ -38,12 +38,11 @@
 
 #include <boost/version.hpp>
 
-#if BOOST_VERSION >= 103200  // for boost-1.32.0 or later.
-#    include <boost/numeric/conversion/cast.hpp>
-#else                        // use this instead for boost-1.31 or earlier.
-#    include <boost/cast.hpp>
+#if BOOST_VERSION >= 103200 // for boost-1.32.0 or later.
+#   include <boost/numeric/conversion/cast.hpp>
+#else // use this instead for boost-1.31 or earlier.
+#   include <boost/cast.hpp>
 #endif
-
 
 #include <boost/lexical_cast.hpp>
 #include <boost/static_assert.hpp>
@@ -54,502 +53,472 @@
 #include "libecs/libecs.hpp"
 #include "libecs/Exceptions.hpp"
 
-namespace libecs
-{
-
-  /** @addtogroup util The Utilities.
-   Utilities.
-
+/**
+   @addtogroup util The Utilities.
    @ingroup libecs
    @{ 
-   */ 
+ */ 
+namespace libecs
+{
+/** 
+   A universal to String / from String converter.
 
-  /** @file */
+   Two usages:
+   - stringCast( VALUE )        -- convert VALUE to a string.
+   - stringCast<TYPE>( STRING ) -- convert STRING to a TYPE object.
 
-  /** 
-      A universal to String / from String converter.
-
-      Two usages:
-      - stringCast( VALUE )        -- convert VALUE to a string.
-      - stringCast<TYPE>( STRING ) -- convert STRING to a TYPE object.
-
-      This is a thin wrapper over boost::lexical_cast.
-      This stringCast template function has some specializations for
-      common numeric types such as Real and Integer are defined, and
-      use of this instead of boost::lexical_cast for those types
-      can reduce resulting binary size.
-  */
-
-  template< typename NEW, typename GIVEN >
-  const NEW stringCast( const GIVEN& aValue )
-  {
+   This is a thin wrapper over boost::lexical_cast.
+   This stringCast template function has some specializations for
+   common numeric types such as Real and Integer are defined, and
+   use of this instead of boost::lexical_cast for those types
+   can reduce resulting binary size.
+*/
+template< typename NEW, typename GIVEN >
+const NEW stringCast( const GIVEN& aValue )
+{
     return boost::lexical_cast<NEW>( aValue );
-  }
+}
 
 
-  ///@internal
-  template< typename GIVEN >
-  const String stringCast( const GIVEN& aValue )
-  {
+/** @internal */
+template< typename GIVEN >
+const String stringCast( const GIVEN& aValue )
+{
     return stringCast<String,GIVEN>( aValue );
-  }
+}
 
 #define __STRINGCAST_SPECIALIZATION_DECL( NEW, GIVEN )\
-  template<> LIBECS_API const NEW stringCast<NEW,GIVEN>( const GIVEN& )
+template<> LIBECS_API const NEW stringCast<NEW,GIVEN>( const GIVEN& )
 
-  __STRINGCAST_SPECIALIZATION_DECL( String, Real );
-  __STRINGCAST_SPECIALIZATION_DECL( String, HighReal );
-  __STRINGCAST_SPECIALIZATION_DECL( String, Integer );
-  __STRINGCAST_SPECIALIZATION_DECL( String, UnsignedInteger );
-  __STRINGCAST_SPECIALIZATION_DECL( Real, String );
-  __STRINGCAST_SPECIALIZATION_DECL( HighReal, String );
-  __STRINGCAST_SPECIALIZATION_DECL( Integer, String );
-  __STRINGCAST_SPECIALIZATION_DECL( UnsignedInteger, String );
-  // __STRINGCAST_SPECIALIZATION_DECL( String, String );
+__STRINGCAST_SPECIALIZATION_DECL( String, Real );
+__STRINGCAST_SPECIALIZATION_DECL( String, HighReal );
+__STRINGCAST_SPECIALIZATION_DECL( String, Integer );
+__STRINGCAST_SPECIALIZATION_DECL( String, UnsignedInteger );
+__STRINGCAST_SPECIALIZATION_DECL( Real, String );
+__STRINGCAST_SPECIALIZATION_DECL( HighReal, String );
+__STRINGCAST_SPECIALIZATION_DECL( Integer, String );
+__STRINGCAST_SPECIALIZATION_DECL( UnsignedInteger, String );
+// __STRINGCAST_SPECIALIZATION_DECL( String, String );
 
 #undef __STRINGCAST_SPECIALIZATION_DECL
 
 
+/**
+   Erase white space characters ( ' ', '\t', and '\n' ) from a string
+*/
+void eraseWhiteSpaces( StringRef str );
 
-  /**
-     Erase white space characters ( ' ', '\t', and '\n' ) from a string
-  */
-  void eraseWhiteSpaces( StringRef str );
-
-  template < class T >
-  struct PtrGreater
-  {
+template < class T >
+struct PtrGreater
+{
     bool operator()( T x, T y ) const { return *y < *x; }
-  };
+};
 
 
-  template < class T >
-  struct PtrLess
-  {
+template < class T >
+struct PtrLess
+{
     bool operator()( T x, T y ) const { return *y > *x; }
-  };
+};
 
 
 
-  /**
-     Check if aSequence's size() is within [ aMin, aMax ].  
+/**
+   Check if aSequence's size() is within [ aMin, aMax ].    
 
-     If not, throw a RangeError exception.
-
-  */
-
-  template <class Sequence>
-  void checkSequenceSize( const Sequence& aSequence, 
-			  const typename boost::range_size< Sequence >::type aMin,
-			  const typename boost::range_size< Sequence >::type aMax )
-  {
+   If not, throw a RangeError exception.
+*/
+template <class Sequence>
+void checkSequenceSize( const Sequence& aSequence, 
+                        const typename boost::range_size< Sequence >::type aMin,
+                        const typename boost::range_size< Sequence >::type aMax )
+{
     const typename Sequence::size_type aSize( boost::size( aSequence ) );
     if( aSize < aMin || aSize > aMax )
-      {
-	throwSequenceSizeError( aSize, aMin, aMax );
-      }
-  }
+    {
+        throwSequenceSizeError( aSize, aMin, aMax );
+    }
+}
 
 
-  /**
-     Check if aSequence's size() is at least aMin.
+/**
+   Check if aSequence's size() is at least aMin.
 
-     If not, throw a RangeError exception.
+   If not, throw a RangeError exception.
+*/
 
-  */
-
-  template <class Sequence>
-  void checkSequenceSize( const Sequence& aSequence, 
-			  const typename boost::range_size< Sequence >::type aMin )
-  {
+template <class Sequence>
+void checkSequenceSize( const Sequence& aSequence, 
+                        const typename boost::range_size< Sequence >::type aMin )
+{
     const typename Sequence::size_type aSize( boost::size( aSequence ) );
     if( aSize < aMin )
-      {
-	throwSequenceSizeError( aSize, aMin );
-      }
-  }
+    {
+        throwSequenceSizeError( aSize, aMin );
+    }
+}
 
 
-  ///@internal
-  LIBECS_API void throwSequenceSizeError( const size_t aSize, 
-			       const size_t aMin, const size_t aMax );
+/** @internal */
+LIBECS_API void throwSequenceSizeError( const size_t aSize, 
+                                        const size_t aMin, const size_t aMax );
 
-  ///@internal
-  LIBECS_API void throwSequenceSizeError( const size_t aSize, const size_t aMin );
+/** @internal */
+LIBECS_API void throwSequenceSizeError( const size_t aSize, const size_t aMin );
 
 
-  /**
-     Form a 'for' loop over a STL sequence.
+/**
+   Form a 'for' loop over a STL sequence.
 
-     Use this like:
+   Use this like:
 
-     FOR_ALL( std::vector<int>, anIntVector )
-     {
+   FOR_ALL( std::vector<int>, anIntVector )
+   {
        int anInt( *i ); // the iterator is 'i'.
        ...
-     }
+   }
 
-     @arg SEQCLASS the classname of the STL sequence. 
-     @arg SEQ the STL sequence.
-  */
-
+   @arg SEQCLASS the classname of the STL sequence. 
+   @arg SEQ the STL sequence.
+*/
 #define FOR_ALL( SEQCLASS, SEQ )\
-  for( SEQCLASS ::const_iterator i( (SEQ) .begin() ) ;\
-      i != (SEQ) .end() ; ++i )
+for( SEQCLASS ::const_iterator i( (SEQ) .begin() ) ;\
+        i != (SEQ) .end() ; ++i )
 
+/**
+   For each 'second' member of element in a sequence, call a given method.
 
+   @note This will be deprecated.    Use select2nd instead.
 
-  /**
-     For each 'second' member of element in a sequence, call a given method.
-
-     @note This will be deprecated.  Use select2nd instead.
-
-     @arg SEQCLASS the classname of the STL sequence. 
-     @arg SEQ the STL sequence.
-     @arg METHOD the name of the method.
-     
-     @see FOR_ALL
-  */
-
+   @arg SEQCLASS the classname of the STL sequence. 
+   @arg SEQ the STL sequence.
+   @arg METHOD the name of the method.
+   
+   @see FOR_ALL
+*/
 #define FOR_ALL_SECOND( SEQCLASS, SEQ, METHOD )\
-  FOR_ALL( SEQCLASS, SEQ )\
+FOR_ALL( SEQCLASS, SEQ )\
     { (*i).second-> METHOD (); }
 
 
-
-
-  template< typename T >
-  inline const T nullValue()
-  {
+template< typename T >
+inline const T nullValue()
+{
     return 0;
-  }
+}
 
-  template<>
-  inline const Real nullValue()
-  {
+
+template<>
+inline const Real nullValue()
+{
     return 0.0;
-  }
+}
 
-  template<>
-  inline const String nullValue()
-  {
+
+template<>
+inline const String nullValue()
+{
     return String();
-  }
+}
 
-  template< class NEW, class GIVEN >
-  class StaticCaster
-    :
-    std::unary_function< GIVEN, NEW >
-  {
-  public:
+
+template< class NEW, class GIVEN >
+class StaticCaster: std::unary_function< GIVEN, NEW >
+{
+public:
     inline NEW operator()( const GIVEN& aValue )
     {
-      BOOST_STATIC_ASSERT( ( boost::is_convertible<GIVEN,NEW>::value ) );
-      return static_cast<NEW>( aValue );
+        BOOST_STATIC_ASSERT( ( boost::is_convertible<GIVEN,NEW>::value ) );
+        return static_cast<NEW>( aValue );
     }
-  };
+};
 
-  template< class NEW, class GIVEN >
-  class DynamicCaster
-    :
-    std::unary_function< GIVEN, NEW >
-  {
-  public:
+template< class NEW, class GIVEN >
+class DynamicCaster: std::unary_function< GIVEN, NEW >
+{
+public:
     NEW operator()( const GIVEN& aPtr )
     {
-      NEW aNew( dynamic_cast<NEW>( aPtr ) );
-      if( aNew != NULLPTR )
-	{
-	  return aNew;
-	}
-      else
-	{
-	  THROW_EXCEPTION( TypeError, "dynamic cast failed." );
-	}
+        NEW aNew( dynamic_cast<NEW>( aPtr ) );
+        if( aNew != NULLPTR )
+            {
+                return aNew;
+            }
+        else
+            {
+                THROW_EXCEPTION( TypeError, "dynamic cast failed." );
+            }
     }
-  };
+};
 
-  template< class NEW, class GIVEN >
-  class LexicalCaster
-    :
-    std::unary_function< GIVEN, NEW >
-  {
-  public:
+template< class NEW, class GIVEN >
+class LexicalCaster: std::unary_function< GIVEN, NEW >
+{
+public:
     const NEW operator()( const GIVEN& aValue )
     {
-      return stringCast<NEW>( aValue );
+        return stringCast<NEW>( aValue );
     }
-  };
+};
 
 
 
-
-  template< class NEW, class GIVEN >
-  class NumericCaster
+template< class NEW, class GIVEN >
+class NumericCaster
     :
     std::unary_function< GIVEN, NEW >
-  {
-  public:
+{
+public:
     inline NEW operator()( GIVEN aValue )
     {
-      return boost::numeric_cast<NEW>( aValue );
+        return boost::numeric_cast<NEW>( aValue );
     }
-  };
+};
 
 
 
-  /**
-     These functions are prepared for ExpressionFluxProcess
-     and are used in it. asinh, acosh and atanh are not available in 
-     MS Windows (MinGW).
-  */
-
-
-  template <typename T>
-  Real real_not( T n )
-  {
+/**
+   These functions are prepared for ExpressionFluxProcess
+   and are used in it. asinh, acosh and atanh are not available in 
+   MS Windows (MinGW).
+*/
+template <typename T>
+inline Real real_not( T n )
+{
     if( n == 0 )
-      {
-	return 1.0;
-      }
+    {
+        return 1.0;
+    }
     else
-      {
-	return 0.0;
-      }
-  }
+    {
+        return 0.0;
+    }
+}
 
-  template <typename T>
-  Real real_eq( T n1, T n2 )
-  {
+template <typename T>
+inline Real real_eq( T n1, T n2 )
+{
     if( n1 == n2 )
-      {
-	return 1.0;
-      }
+    {
+        return 1.0;
+    }
     else
-      {
-	return 0.0;
-      }
-  }
+    {
+        return 0.0;
+    }
+}
 
-  template <typename T>
-  Real real_neq( T n1, T n2 )
-  {
+template <typename T>
+inline Real real_neq( T n1, T n2 )
+{
     if( n1 == n2 )
-      {
-	return 0.0;
-      }
+    {
+        return 0.0;
+    }
     else
-      {
-	return 1.0;
-      }
-  }
+    {
+        return 1.0;
+    }
+}
 
-  template <typename T>
-  Real real_gt( T n1, T n2 )
-  {
+template <typename T>
+inline Real real_gt( T n1, T n2 )
+{
     if( n1 > n2 )
-      {
-	return 1.0;
-      }
+    {
+        return 1.0;
+    }
     else
-      {
-	return 0.0;
-      }
-  }
+    {
+        return 0.0;
+    }
+}
 
-  template <typename T>
-  Real real_lt( T n1, T n2 )
-  {
+template <typename T>
+inline Real real_lt( T n1, T n2 )
+{
     if( n1 < n2 )
-      {
-	return 1.0;
-      }
+    {
+        return 1.0;
+    }
     else
-      {
-	return 0.0;
-      }
-  }
+    {
+        return 0.0;
+    }
+}
 
-  template <typename T>
-  Real real_geq( T n1, T n2 )
-  {
+template <typename T>
+inline Real real_geq( T n1, T n2 )
+{
     if( n1 >= n2 )
-      {
-	return 1.0;
-      }
+    {
+        return 1.0;
+    }
     else
-      {
-	return 0.0;
-      }
-  }
+    {
+        return 0.0;
+    }
+}
 
-  template <typename T>
-  Real real_leq( T n1, T n2 )
-  {
+template <typename T>
+inline Real real_leq( T n1, T n2 )
+{
     if( n1 <= n2 )
-      {
-	return 1.0;
-      }
+    {
+        return 1.0;
+    }
     else
-      {
-	return 0.0;
-      }
-  }
+    {
+        return 0.0;
+    }
+}
 
-  template <typename T>
-  Real real_and( T n1, T n2 )
-  {
+template <typename T>
+inline Real real_and( T n1, T n2 )
+{
     if( ( n1 != 0 ) && ( n2 != 0 ) )
-      {
-	return 1.0;
-      }
+    {
+        return 1.0;
+    }
     else
-      {
-	return 0.0;
-      }
-  }
+    {
+        return 0.0;
+    }
+}
 
-  template <typename T>
-  Real real_or( T n1, T n2 )
-  {
+template <typename T>
+inline Real real_or( T n1, T n2 )
+{
     if( ( n1 != 0 ) || ( n2 != 0 ) )
-      {
-	return 1.0;
-      }
+    {
+        return 1.0;
+    }
     else
-      {
-	return 0.0;
-      }
-  }
+    {
+        return 0.0;
+    }
+}
 
-  template <typename T>
-  Real real_xor( T n1, T n2 )
-  {
+template <typename T>
+inline Real real_xor( T n1, T n2 )
+{
     if( ( n1 != 0 ) && !( n2 != 0 ) )
-      {
-	return 1.0;
-      }
+    {
+        return 1.0;
+    }
     else
-      {
-	return 0.0;
-      }
-  }
+    {
+        return 0.0;
+    }
+}
 
-  template <typename T>
-  T asinh( T n )
-  {
+template <typename T>
+inline T asinh( T n )
+{
     return log( n + sqrt( n * n + 1 ) );
-  }
+}
 
-  template <typename T>
-  T acosh( T n )
-  {
+template <typename T>
+inline T acosh( T n )
+{
     return log( n - sqrt( n * n - 1 ) );
-  }
+}
 
-  template <typename T>
-  T atanh( T n )
-  {
+template <typename T>
+inline T atanh( T n )
+{
     return 0.5 * log( ( 1 + n ) / ( 1 - n ) );
-  }
+}
 
-  template <typename T>
-  T sec( T n )
-  {
+template <typename T>
+inline T sec( T n )
+{
     return 1 / cos( n );
-  }
+}
 
-  template <typename T>
-  T csc( T n )
-  {
+template <typename T>
+inline T csc( T n )
+{
     return 1 / sin( n );
-  }
+}
 
-  template <typename T>
-  T cot( T n )
-  {
+template <typename T>
+inline T cot( T n )
+{
     return 1 / tan( n );
-  }
+}
 
-  template <typename T>
-  T asec( T n )
-  {
+template <typename T>
+inline T asec( T n )
+{
     return 1 / acos( n );
-  }
+}
 
-  template <typename T>
-  T acsc( T n )
-  {
+template <typename T>
+inline T acsc( T n )
+{
     return 1 / asin( n );
-  }
+}
 
-  template <typename T>
-  T acot( T n )
-  {
+template <typename T>
+inline T acot( T n )
+{
     return 1 / atan( n );
-  }
+}
 
-  template <typename T>
-  T sech( T n )
-  {
+template <typename T>
+inline T sech( T n )
+{
     return 1 / cosh( n );
-  }
-  
-  template <typename T>
-  T csch( T n )
-  {
+}
+
+template <typename T>
+inline T csch( T n )
+{
     return 1 / sinh( n );
-  }
-  
-  template <typename T>
-  T coth( T n )
-  {
+}
+
+template <typename T>
+inline T coth( T n )
+{
     return 1 / tanh( n );
-  }
-  
-  template <typename T>
-  T asech( T n )
-  {
+}
+
+template <typename T>
+inline T asech( T n )
+{
     return 1 / acosh( n );
-  }
+}
 
-  template <typename T>
-  T acsch( T n )
-  {
+template <typename T>
+inline T acsch( T n )
+{
     return 1 / asinh( n );
-  }
+}
 
-  template <typename T>
-  T acoth( T n )
-  {
+template <typename T>
+inline T acoth( T n )
+{
     return 1 / atanh( n );
-  }
+}
 
-  template <typename T>
-  T fact( T n )
-  {
+template <typename T>
+inline T fact( T n )
+{
     if( n <= 1 )
-      return 1;
+    {
+        return 1;
+    }
     else
-      return n * fact( n-1 );
-  }
-  
-  const Polymorph convertStringMapToPolymorph( StringMap const& aMap );
+    {
+        return n * fact( n-1 );
+    }
+}
 
-
-  //@}
+const Polymorph convertStringMapToPolymorph( StringMap const& aMap );
 
 } // namespace libecs
 
+/** @} */
 
 #endif /* __UTIL_HPP */
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/
-

@@ -31,37 +31,31 @@
 
 #include "libecs/libecs.hpp"
 
+/**
+   @addtogroup logging The Data Logging Module.
+   The Data Logging Module.
+   @ingroup libecs
+   @{ 
+*/ 
+
 namespace libecs
 {
-  /**@addtogroup logging The Data Logging Module.
-      The Data Logging Module.
 
-      @ingroup libecs
-      @{ 
-  */ 
-
-  /** @file */
-
-  class LIBECS_API LoggerAdapter
-  {
-
-  public:
+class LIBECS_API LoggerAdapter
+{
+public:
 
     virtual ~LoggerAdapter();
 
     virtual const Real getValue() const = 0;
 
-  protected:
+protected:
 
     LoggerAdapter();
-
-  };
-
-
-  /** @} */ // logging module
+};
 
 } // namespace libecs
 
+/** @} */
 
 #endif /* __LOGGERADAPTER_HPP */
-

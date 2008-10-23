@@ -28,36 +28,39 @@
 #include "libecs/libecs.hpp"
 #include "libecs/Process.hpp"
 
+/**
+   @addtogroup entities
+   @ingroup libecs
+   @{
+ */
 namespace libecs
 {
 
-  LIBECS_DM_CLASS( ContinuousProcess, Process )
-  {
+LIBECS_DM_CLASS( ContinuousProcess, Process )
+{
 
-  public:
-
+public:
     LIBECS_DM_OBJECT_ABSTRACT( ContinuousProcess )
-      {
-	INHERIT_PROPERTIES( Process );
-      }
-  
+    {
+        INHERIT_PROPERTIES( Process );
+    }
+
     ContinuousProcess()
-      {
-	; // do nothing
-      }
-  
+    {
+        ; // do nothing
+    }
+
     virtual ~ContinuousProcess()
-      {
-	;
-      }
+    {
+        ;
+    }
 
     virtual const bool isContinuous() const
     {
-      return true;
+        return true;
     }
+};
 
-  protected:
-  
-  };
+} // namespace libecs
 
-}
+/** @} */

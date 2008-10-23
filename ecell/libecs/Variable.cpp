@@ -28,6 +28,7 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -44,70 +45,61 @@
 namespace libecs
 {
 
-  LIBECS_DM_INIT_STATIC( Variable, Variable );
+LIBECS_DM_INIT_STATIC( Variable, Variable );
 
 
-  Variable::Variable()
+Variable::Variable()
     : 
-    theValue( 0.0 ),  
+    theValue( 0.0 ),    
     theLastTime( 0.0 ),
     theFixed( false )
-  {
+{
     ; // do nothing
-  } 
+} 
 
 
-  Variable::~Variable()
-  {
+Variable::~Variable()
+{
     clearInterpolantVector();
-  }
+}
 
 
-  void Variable::initialize()
-  {
+void Variable::initialize()
+{
     clearInterpolantVector();
-  }
+}
 
 
-  LOAD_METHOD_DEF( Real, NumberConc, Variable )
-  {
+LOAD_METHOD_DEF( Real, NumberConc, Variable )
+{
     // Find the SIZE Variable by own.
     // Here, it assumes that System::findSizeVariable() of the supersystem 
     // of this Variable works correctly even at this stage of the model
-    // loading.  In other words, properties of Entities of the model should be
+    // loading.    In other words, properties of Entities of the model should be
     // loaded in the order from the root (/) to leaves, AND Value property
     // of the found SIZE Variable is already set.
     VariableCptr const aSizeVariable( getSuperSystem()->findSizeVariable() );
     
     setValue( value * aSizeVariable->getValue() );
-  }
+}
 
 
 
-  void Variable::clearInterpolantVector()
-  {
+void Variable::clearInterpolantVector()
+{
     for( InterpolantVectorIterator i( theInterpolantVector.begin() );
-	   i != theInterpolantVector.end(); ++i )
-      {
-	delete (*i);
-      }
+         i != theInterpolantVector.end(); ++i )
+    {
+        delete (*i);
+    }
 
     theInterpolantVector.clear();
-  }
+}
 
 
-  void Variable::registerInterpolant( InterpolantPtr const anInterpolantPtr )
-  {
+void Variable::registerInterpolant( InterpolantPtr const anInterpolantPtr )
+{
     theInterpolantVector.push_back( anInterpolantPtr );
-  }
+    }
 
 } // namespace libecs
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

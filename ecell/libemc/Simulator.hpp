@@ -317,9 +317,9 @@ namespace libemc
        @return true if the Entity exists, false if not.
     */
 
-    const bool isEntityExist( libecs::StringCref         aFullIDString ) const
+    const bool entityExists( libecs::StringCref aFullIDString ) const
     {
-      return theSimulatorImplementation->isEntityExist( aFullIDString );
+      return theSimulatorImplementation->entityExists( aFullIDString );
     }
 
     /**
@@ -502,20 +502,6 @@ namespace libemc
     getLoggerEndTime( libecs::StringCref aFullPNString ) const
     {
       return theSimulatorImplementation->getLoggerEndTime( aFullPNString );
-    }
-
-    void setLoggerMinimumInterval( libecs::StringCref aFullPNString, 
-				   libecs::RealCref anInterval )
-    {
-      return theSimulatorImplementation->
-	setLoggerMinimumInterval( aFullPNString, anInterval );
-    }
-
-    const libecs::Real 
-    getLoggerMinimumInterval( libecs::StringCref aFullPNString ) const
-    {
-      return theSimulatorImplementation->
-	getLoggerMinimumInterval( aFullPNString );
     }
 
     void setLoggerPolicy( libecs::StringCref aFullPNString, 

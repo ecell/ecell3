@@ -34,7 +34,9 @@
 
 #include <stdexcept>
 #include <algorithm>
+#include <cstdlib>
 #include <cstddef>
+#include <cstring>
 #include <cassert>
 #include <boost/static_assert.hpp>
 #include <boost/intrusive_ptr.hpp>
@@ -42,6 +44,7 @@
 #include <boost/range/end.hpp>
 #include <boost/range/size.hpp>
 #include <boost/range/const_iterator.hpp>
+#include <boost/tuple/tuple.hpp>
 
 #include "dmtool/DMObject.hpp"
 #include "libecs/libecs.hpp"
@@ -66,6 +69,30 @@ class LIBECS_API PolymorphValue
 {
     friend void intrusive_ptr_add_ref( PolymorphValue* );
     friend void intrusive_ptr_release( PolymorphValue* );
+
+private:
+    template< int idx, typename Tlhs_, typename Trhs_, bool nok_ = idx < boost::tuples::length< Trhs_ >::value >
+    struct __assignIfNotNull
+    {
+        void operator()( Tlhs_& lhs, Trhs_ const& rhs )
+        {
+            lhs = rhs;
+        }
+    };
+
+    template< int idx, typename Tlhs_, typename Trhs_ >
+    struct __assignIfNotNull< idx, Tlhs_, Trhs_, false >
+    {
+        void operator()( Tlhs_& lhs, Trhs_ const& rhs )
+        {
+        }
+    };
+
+    template< int idx, typename Tlhs_, typename Trhs_ >
+    void assignIfNotNull( Tlhs_& lhs, Trhs_ const& rhs )
+    {
+        __assignIfNotNull< idx, Tlhs_, Trhs_ >()( lhs, rhs );
+    }
 
 public:
     enum Type
@@ -144,6 +171,12 @@ public:
                 0 == memcmp( ptr, rhs.ptr, sizeof( value_type ) * theLength );
         }
 
+        bool operator==( const char* rhs ) const
+        {
+            return theLength == std::strlen( rhs ) &&
+                0 == memcmp( ptr, rhs, sizeof( value_type ) * theLength );
+        }
+
         bool operator==( String const& rhs ) const
         {
             return 0 == rhs.compare( 0, theLength, ptr );
@@ -162,6 +195,13 @@ public:
             return c < 0 || ( c == 0 && l == theLength );
         }
 
+        bool operator<( const char* rhs ) const
+        {
+            size_type l( std::min( theLength, std::strlen( rhs ) ) );
+            int c( memcmp( ptr, rhs, sizeof( value_type ) * l ) );
+            return c < 0 || ( c == 0 && l == theLength );
+        }
+
         bool operator<( String const& rhs ) const
         {
             return rhs.compare( 0, theLength, ptr ) > 0;
@@ -177,6 +217,13 @@ public:
         {
             size_type l( std::min( theLength, rhs.theLength ) );
             int c( memcmp( ptr, rhs.ptr, sizeof( value_type ) * l ) );
+            return c < 0 || (c == 0 && l == theLength );
+        }
+
+        bool operator>( const char* rhs ) const
+        {
+            size_type l( std::min( theLength, std::strlen( rhs ) ) );
+            int c( memcmp( ptr, rhs, sizeof( value_type ) * l ) );
             return c < 0 || (c == 0 && l == theLength );
         }
 
@@ -239,10 +286,27 @@ public:
         return new PolymorphValue( aValue );
     }
 
+    static Handle create( const char* sptr,
+                          std::size_t sz = static_cast< std::size_t >( -1 ) )
+    {
+        if ( sz == static_cast< std::size_t >( -1 ) )
+        {
+            sz = std::strlen( sptr );
+        }
+        assert( sizeof( PolymorphValue ) + sz + 1 >= sizeof( PolymorphValue ) );
+        void* ptr( std::malloc( sizeof( PolymorphValue ) + sz + 1) );
+        if ( !ptr )
+        {
+            throw std::bad_alloc();
+        }
+
+        return new(ptr) PolymorphValue( sptr );
+    }
+
     static Handle create( String const& aValue )
     {
-        assert( sizeof( PolymorphValue ) + aValue.size() >= sizeof( PolymorphValue ) );
-        void* ptr( std::malloc( sizeof( PolymorphValue ) + aValue.size() ) );
+        assert( aValue.size() + 1 >= 1 && sizeof( PolymorphValue ) + aValue.size() + 1 >= sizeof( PolymorphValue ) );
+        void* ptr( std::malloc( sizeof( PolymorphValue ) + aValue.size() + 1) );
         if ( !ptr )
         {
             throw std::bad_alloc();
@@ -250,6 +314,12 @@ public:
 
         return new(ptr) PolymorphValue( aValue );
     }
+
+    template< typename T0_, typename T1_, typename T2_, typename T3_,
+              typename T4_, typename T5_, typename T6_, typename T7_,
+              typename T8_, typename T9_ >
+    static Handle create( boost::tuple< T0_, T1_, T2_, T3_, T4_,
+                                        T5_, T6_, T7_, T8_, T9_ > const& aTuple );
 
     template< typename Trange_ >
     static Handle create( Trange_ const& aValue );
@@ -261,6 +331,8 @@ public:
     bool operator==( RawString const& rhs ) const;
 
     bool operator==( Tuple const& rhs ) const;
+
+    bool operator==( const char* rhs ) const;
 
     bool operator==( String const& rhs ) const;
 
@@ -282,6 +354,8 @@ public:
 
     bool operator<( Tuple const& rhs ) const;
 
+    bool operator<( const char* rhs ) const;
+
     bool operator<( String const& rhs ) const;
 
     bool operator<( PolymorphVector const& rhs ) const;
@@ -301,6 +375,8 @@ public:
     bool operator>( RawString const& rhs ) const;
 
     bool operator>( Tuple const& rhs ) const;
+
+    bool operator>( const char* rhs ) const;
 
     bool operator>( String const& rhs ) const;
 
@@ -332,6 +408,19 @@ protected:
     explicit PolymorphValue( Real aValue )
         : theType( REAL ), theRefCount( 0 ), theRealValue( aValue ) {}
 
+    explicit PolymorphValue( const char* sptr,
+                             std::size_t sz = static_cast< std::size_t >( -1 ) )
+        : theType( STRING ), theRefCount( 0 )
+    {
+        if ( sz == static_cast< std::size_t >( -1 ) )
+        {
+            sz = std::strlen( sptr );
+        }
+        theStringValue.theLength = sz;
+        std::memcpy( theStringValue.ptr, sptr, sz );
+        theStringValue.ptr[ sz ] = '\0';
+    }
+
     explicit PolymorphValue( String const& aValue )
         : theType( STRING ), theRefCount( 0 )
     {
@@ -339,6 +428,11 @@ protected:
         std::memcpy( theStringValue.ptr, aValue.data(), aValue.size() );
         theStringValue.ptr[ aValue.size() ] = '\0';
     }
+
+    template< typename T0_, typename T1_, typename T2_, typename T3_,
+              typename T4_, typename T5_, typename T6_, typename T7_,
+              typename T8_, typename T9_ >
+    explicit PolymorphValue( boost::tuple< T0_, T1_, T2_, T3_, T4_, T5_, T6_, T7_, T8_, T9_ > const& aTuple );
 
     template< typename Trange_ >
     explicit PolymorphValue( Trange_ const& r );
@@ -419,6 +513,10 @@ public:
     Polymorph( StringCref    aValue ) 
         : theValue( PolymorphValue::create( aValue ) ) { }
 
+    Polymorph( const char* ptr,
+               std::size_t sz = static_cast< std::size_t >( -1 ) ) 
+        : theValue( PolymorphValue::create( ptr, sz ) ) { }
+
     Polymorph( RealParam aValue )            
         : theValue( PolymorphValue::create( aValue ) ) { }
 
@@ -430,6 +528,11 @@ public:
 
     Polymorph( StringVector const& aValue )
         : theValue( PolymorphValue::create( aValue ) ) { }
+
+    template< typename T0_, typename T1_, typename T2_, typename T3_,
+              typename T4_, typename T5_, typename T6_, typename T7_,
+              typename T8_, typename T9_ >
+    Polymorph( boost::tuple< T0_, T1_, T2_, T3_, T4_, T5_, T6_, T7_, T8_, T9_> const& that ): theValue( PolymorphValue::create( that ) ) { }
 
     ~Polymorph() { }
 
@@ -521,6 +624,11 @@ inline bool operator==( PolymorphValue::Tuple& lhs, PolymorphValue const& rhs )
     return rhs.operator==( lhs );
 }
 
+inline bool operator==( const char* lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator==( lhs );
+}
+
 inline bool operator==( String const& lhs, PolymorphValue const& rhs )
 {
     return rhs.operator==( lhs );
@@ -552,6 +660,11 @@ inline bool operator!=( PolymorphValue::RawString const& lhs, PolymorphValue con
 }
 
 inline bool operator!=( PolymorphValue::Tuple& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator!=( lhs );
+}
+
+inline bool operator!=( const char* lhs, PolymorphValue const& rhs )
 {
     return rhs.operator!=( lhs );
 }
@@ -591,6 +704,11 @@ inline bool operator<( PolymorphValue::Tuple& lhs, PolymorphValue const& rhs )
     return rhs.operator>( lhs );
 }
 
+inline bool operator<( const char* lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator>( lhs );
+}
+
 inline bool operator<( String const& lhs, PolymorphValue const& rhs )
 {
     return rhs.operator>( lhs );
@@ -622,6 +740,11 @@ inline bool operator>=( PolymorphValue::RawString const& lhs, PolymorphValue con
 }
 
 inline bool operator>=( PolymorphValue::Tuple& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator<=( lhs );
+}
+
+inline bool operator>=( const char* lhs, PolymorphValue const& rhs )
 {
     return rhs.operator<=( lhs );
 }
@@ -661,6 +784,11 @@ inline bool operator>( PolymorphValue::Tuple& lhs, PolymorphValue const& rhs )
     return rhs.operator<( lhs );
 }
 
+inline bool operator>( const char* lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator<( lhs );
+}
+
 inline bool operator>( String const& lhs, PolymorphValue const& rhs )
 {
     return rhs.operator<( lhs );
@@ -692,6 +820,11 @@ inline bool operator<=( PolymorphValue::RawString const& lhs, PolymorphValue con
 }
 
 inline bool operator<=( PolymorphValue::Tuple& lhs, PolymorphValue const& rhs )
+{
+    return rhs.operator>=( lhs );
+}
+
+inline bool operator<=( const char* lhs, PolymorphValue const& rhs )
 {
     return rhs.operator>=( lhs );
 }
@@ -1184,6 +1317,56 @@ inline PolymorphValue::Tuple const& PolymorphValue::as() const
 }
 
 
+template< typename T0_, typename T1_, typename T2_, typename T3_, typename T4_,
+          typename T5_, typename T6_, typename T7_, typename T8_, typename T9_ >
+inline PolymorphValue::PolymorphValue(
+        boost::tuple< T0_, T1_, T2_, T3_, T4_, T5_, T6_, T7_, T8_, T9_ > const& aTuple )
+    : theType( TUPLE ), theRefCount( 0 )
+{
+    typedef boost::tuple< T0_, T1_, T2_, T3_, T4_, T5_, T6_, T7_, T8_, T9_ > arg_type;
+    const int numberOfItems( boost::tuples::length< arg_type >::value );
+    theTupleValue.theNumberOfItems = numberOfItems;
+
+    assignIfNotNull< 0 >( theTupleValue[ 0 ], aTuple );
+    assignIfNotNull< 1 >( theTupleValue[ 1 ], aTuple );
+    assignIfNotNull< 2 >( theTupleValue[ 2 ], aTuple );
+    assignIfNotNull< 3 >( theTupleValue[ 3 ], aTuple );
+    assignIfNotNull< 4 >( theTupleValue[ 4 ], aTuple );
+    assignIfNotNull< 5 >( theTupleValue[ 5 ], aTuple );
+    assignIfNotNull< 6 >( theTupleValue[ 6 ], aTuple );
+    assignIfNotNull< 7 >( theTupleValue[ 7 ], aTuple );
+    assignIfNotNull< 8 >( theTupleValue[ 8 ], aTuple );
+    assignIfNotNull< 9 >( theTupleValue[ 9 ], aTuple );
+}
+
+
+template< typename T0_, typename T1_, typename T2_, typename T3_, typename T4_,
+          typename T5_, typename T6_, typename T7_, typename T8_, typename T9_ >
+PolymorphValue::Handle PolymorphValue::create( boost::tuple< T0_, T1_, T2_, T3_, T4_, T5_, T6_, T7_, T8_, T9_ > const& aTuple )
+{
+    typedef boost::tuple< T0_, T1_, T2_, T3_, T4_, T5_, T6_, T7_, T8_, T9_ > arg_type;
+    const int numberOfItems( boost::tuples::length< arg_type >::value );
+    std::size_t pbytes( sizeof( Polymorph ) * numberOfItems );
+    assert( pbytes / sizeof( Polymorph ) == numberOfItems &&
+            sizeof( PolymorphValue ) + pbytes >= sizeof( PolymorphValue ));
+    void* ptr( std::malloc( sizeof( PolymorphValue ) + pbytes ) );
+    if ( !ptr )
+    {
+        throw std::bad_alloc();
+    }
+
+    // The following is a fast alternative of
+    // for ( i = 0; i < boost::size( aValue ); ++i )
+    // {
+    //   new(static_cast< PolymorphValue* >( ptr )->theTupleValue[ i ]) Polymorph();
+    // }
+    std::memset( static_cast< PolymorphValue* >( ptr )->theTupleValue,
+                 0, pbytes );
+
+    return new(ptr) PolymorphValue( aTuple );
+}
+
+
 template< typename Trange_ >
 inline PolymorphValue::PolymorphValue( Trange_ const& r )
     : theType( TUPLE ), theRefCount( 0 )
@@ -1198,8 +1381,9 @@ inline PolymorphValue::PolymorphValue( Trange_ const& r )
 template< typename Trange_ >
 inline PolymorphValue::Handle PolymorphValue::create( Trange_ const& aValue )
 {
-    std::size_t pbytes( sizeof( Polymorph ) * boost::size( aValue ) );
-    assert( pbytes / sizeof( Polymorph ) == boost::size( aValue ) &&
+    typename boost::range_size< Trange_ >::type numberOfItems( boost::size( aValue ) );
+    std::size_t pbytes( sizeof( Polymorph ) * numberOfItems );
+    assert( pbytes / sizeof( Polymorph ) == numberOfItems &&
             sizeof( PolymorphValue ) + pbytes >= sizeof( PolymorphValue ));
     void* ptr( std::malloc( sizeof( PolymorphValue ) + pbytes ) );
     if ( !ptr )
@@ -1290,6 +1474,26 @@ inline bool PolymorphValue::operator==( Tuple const& rhs ) const
     NEVER_GET_HERE;
 }
 
+inline bool PolymorphValue::operator==( const char* rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return false;
+    case REAL:
+        return false;
+    case INTEGER:
+        return false;
+    case STRING:
+        return theStringValue == rhs;
+    case TUPLE:
+        // XXX: check if this works without static_cast later...
+        return theTupleValue.size() == 1 &&
+            static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) == rhs;
+    }
+    NEVER_GET_HERE;
+}
+
 inline bool PolymorphValue::operator==( String const& rhs ) const
 {
     switch ( theType )
@@ -1297,9 +1501,9 @@ inline bool PolymorphValue::operator==( String const& rhs ) const
     case NONE:
         return false;
     case REAL:
-        return theRealValue == convertTo< Real >( rhs );
+        return false;
     case INTEGER:
-        return theIntegerValue == convertTo< Integer >( rhs );
+        return false;
     case STRING:
         return rhs.compare(0, theStringValue.size(), theStringValue ) == 0;
     case TUPLE:
@@ -1400,6 +1604,24 @@ inline bool PolymorphValue::operator<( Tuple const& rhs ) const
     NEVER_GET_HERE;
 }
 
+inline bool PolymorphValue::operator<( const char* rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return true;
+    case REAL:
+        return true;
+    case INTEGER:
+        return true;
+    case STRING:
+        return theStringValue < rhs;
+    case TUPLE:
+        return theTupleValue.size() < 1 || static_cast< PolymorphValue const& >( theTupleValue[ 0 ] )< rhs;
+    }
+    NEVER_GET_HERE;
+}
+
 inline bool PolymorphValue::operator<( String const& rhs ) const
 {
     switch ( theType )
@@ -1411,7 +1633,7 @@ inline bool PolymorphValue::operator<( String const& rhs ) const
     case INTEGER:
         return true;
     case STRING:
-        return rhs.compare(0, theStringValue.size(), theStringValue ) > 0;
+        return theStringValue < rhs;
     case TUPLE:
         return theTupleValue.size() < 1 || static_cast< PolymorphValue const& >( theTupleValue[ 0 ] )< rhs;
     }
@@ -1513,6 +1735,24 @@ inline bool PolymorphValue::operator>( Tuple const& rhs ) const
     NEVER_GET_HERE;
 }
 
+inline bool PolymorphValue::operator>( const char* rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return false;
+    case REAL:
+        return false;
+    case INTEGER:
+        return false;
+    case STRING:
+        return theStringValue > rhs;
+    case TUPLE:
+        return theTupleValue.size() >= 1 && static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs;
+    }
+    NEVER_GET_HERE;
+}
+
 inline bool PolymorphValue::operator>( String const& rhs ) const
 {
     switch ( theType )
@@ -1524,7 +1764,7 @@ inline bool PolymorphValue::operator>( String const& rhs ) const
     case INTEGER:
         return false;
     case STRING:
-        return rhs.compare(0, theStringValue.size(), theStringValue ) < 0;
+        return theStringValue > rhs;
     case TUPLE:
         return theTupleValue.size() >= 1 && static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs;
     }

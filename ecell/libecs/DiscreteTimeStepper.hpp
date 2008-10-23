@@ -33,91 +33,64 @@
 #define __DISCRETETIMESTEPPER_HPP
 
 #include "libecs/libecs.hpp"
-
 #include "libecs/Stepper.hpp"
 
 
-
+/**
+   @addtogroup stepper
+   @{
+ */
 namespace libecs
 {
-
-  /** @addtogroup stepper
-   *@{
-   */
-
-  /** @file */
-
-
-
-  /**
-     DiscreteTimeStepper has a fixed step interval.
-     
-     This stepper ignores incoming interruptions, but dispatches 
-     interruptions always when it steps.
-
-     Process objects in this Stepper isn't allowed to use 
-     Variable::addVelocity() method, but Variable::setValue() method only.
-
-  */
-
-  LIBECS_DM_CLASS( DiscreteTimeStepper, Stepper )
-  {
-
-  public:
-
-    LIBECS_DM_OBJECT( DiscreteTimeStepper, Stepper )
-      {
-	INHERIT_PROPERTIES( Stepper );
-      }
-
-
-    DiscreteTimeStepper();
-    virtual ~DiscreteTimeStepper() {}
-
-
-    virtual void initialize();
-
     /**
-       This method calls fire() method of all Processes.
+       DiscreteTimeStepper has a fixed step interval.
+       
+       This stepper ignores incoming interruptions, but dispatches 
+       interruptions always when it steps.
+
+       Process objects in this Stepper isn't allowed to use 
+       Variable::addVelocity() method, but Variable::setValue() method only.
     */
-
-    virtual void step();
-
-    /**
-       Do nothing.   This Stepper ignores interruption.
-    */
-
-    virtual void interrupt( TimeParam )
+    LIBECS_DM_CLASS( DiscreteTimeStepper, Stepper )
     {
-      ; // do nothing -- ignore interruption
-    }
+    public:
+        LIBECS_DM_OBJECT( DiscreteTimeStepper, Stepper )
+        {
+            INHERIT_PROPERTIES( Stepper );
+        }
+
+        DiscreteTimeStepper();
+        virtual ~DiscreteTimeStepper() {}
+
+        virtual void initialize();
+
+        /**
+           This method calls fire() method of all Processes.
+        */
+
+        virtual void step();
+
+        /**
+           Do nothing.     This Stepper ignores interruption.
+        */
+        virtual void interrupt( TimeParam )
+        {
+            ; // do nothing -- ignore interruption
+        }
 
 
-    /**
-       TimeScale of this Stepper is always zero by default.
+        /**
+           TimeScale of this Stepper is always zero by default.
 
-       This behavior may be changed in subclasses.
-    */
-
-    virtual GET_METHOD( Real, TimeScale )
-    {
-      return 0.0;
-    }
-
-  };
-
-
-
+           This behavior may be changed in subclasses.
+        */
+        virtual GET_METHOD( Real, TimeScale )
+        {
+            return 0.0;
+        }
+    };
 } // namespace libecs
 
 #endif /* __DISCRETETIMESTEPPER_HPP */
 
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/
+/** @} */

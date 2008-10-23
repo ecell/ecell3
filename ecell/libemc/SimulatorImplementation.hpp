@@ -118,7 +118,7 @@ namespace libemc
     getEntityPropertyList( libecs::StringCref aFullIDString ) const = 0;
 
     virtual const bool 
-    isEntityExist( libecs::StringCref  aFullIDString ) const = 0;
+    entityExists( libecs::StringCref  aFullIDString ) const = 0;
 
     virtual void setEntityProperty( libecs::StringCref    aFullPNString,
 				    libecs::PolymorphCref aValue ) = 0;
@@ -162,13 +162,6 @@ namespace libemc
 
     virtual const libecs::Real 
     getLoggerEndTime( libecs::StringCref aFullPNString ) const = 0;
-
-    virtual void 
-    setLoggerMinimumInterval( libecs::StringCref aFullPNString, 
-			      libecs::RealCref anInterval ) = 0;
-
-    virtual const libecs::Real 
-    getLoggerMinimumInterval( libecs::StringCref aFullPNString ) const = 0;
 
     virtual void 
     setLoggerPolicy( libecs::StringCref aFullPNString, 

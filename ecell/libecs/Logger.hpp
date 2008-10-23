@@ -31,8 +31,6 @@
 // modified by Gabor Bereczki <gabor.bereczki@talk21.com>
 // modified by Koichi Takahashi <shafi@e-cell.org>
 
-
-
 #if !defined(__LOGGER_HPP)
 #define __LOGGER_HPP
 
@@ -44,86 +42,150 @@
 #include "libecs/LoggerAdapter.hpp"
 #include "libecs/PhysicalLogger.hpp"
 #include "libecs/DataPointVector.hpp"
+#include "Exceptions.hpp"
 
-
+/**
+   @addtogroup logging The Data Logging Module.
+   @ingroup libecs
+   @{
+*/ 
 namespace libecs
 {
 
-
-  /** @addtogroup logging The Data Logging Module.
-      The Data Logging Module.
-
-      @ingroup libecs
-      
-      @{ 
-   */ 
-
-  /** @file */
-
-  /**
-
-  Logger module for logging and retrieving data runtime.
-   
-  */
-
-  class Logger
-    :
-    private boost::noncopyable
-  {
-
-  public:
-
+/**
+    Logger module for logging and retrieving data runtime.
+*/
+class LIBECS_API Logger: private boost::noncopyable
+{
+public:
     DECLARE_TYPE( PhysicalLogger::size_type, size_type );
     
-    // enumeration for logging policy
-    enum Policy
-      {
-	STEP_SIZE = 0,
-	TIME_INTERVAL,
-	END_POLICY,
-	MAX_SPACE
-      };
+    class Policy
+    {
+    public:
+        Policy( IntegerParam aMinimumStep = 1,
+                RealParam    aMinimumTimeInterval = 0,
+                bool         _continueOnError = false,
+                IntegerParam aMaxSpace = 0 )
+            : theMinimumStep( aMinimumStep ),
+              theMinimumTimeInterval( aMinimumTimeInterval ),
+              continueOnError( _continueOnError ),
+              theMaxSpace( aMaxSpace )
+        {
+            if( aMinimumTimeInterval < 0 )
+            {
+                THROW_EXCEPTION( ValueError,
+                                 "Negative value not allowed for minimum time interval");
+            }
+            if ( aMinimumStep < 0 )
+            {
+                THROW_EXCEPTION( ValueError,
+                                 "Negative value not allowed for minimum step");
+            }
+            if ( aMaxSpace <= 0 )
+            {
+                THROW_EXCEPTION( ValueError,
+                                 "Invalid value for max space" );
+            }
+        }
 
+        Integer getMinimumStep() const
+        {
+            return theMinimumStep;
+        }
 
-  public:
+        void setMinimumStep( IntegerParam aMinimumStep )
+        {
+            if ( aMinimumStep < 0 )
+            {
+                THROW_EXCEPTION( ValueError,
+                                 "Negative value not allowed for minimum step");
+            }
+            theMinimumStep = aMinimumStep;
+        }
+
+        Real getMinimumTimeInterval() const
+        {
+            return theMinimumTimeInterval;
+        }
+
+        void setMinimumTimeInterval( RealParam aMinimumTimeInterval )
+        {
+            if( aMinimumTimeInterval < 0 )
+            {
+                THROW_EXCEPTION( ValueError,
+                                 "Negative value not allowed for minimum time interval");
+            }
+            theMinimumTimeInterval = aMinimumTimeInterval;
+        }
+
+        bool doesContinueOnError() const
+        {
+            return continueOnError;
+        }
+
+        void setContinueOnError( bool _continueOnError )
+        {
+            continueOnError = _continueOnError;
+        }
+
+        Integer getMaxSpace() const
+        {
+            return theMaxSpace;
+        }
+
+        void setMaxSpace( IntegerParam aMaxSpace )
+        {
+            if ( aMaxSpace <= 0 )
+            {
+                THROW_EXCEPTION( ValueError,
+                                 "Invalid value for max space" );
+            }
+            theMaxSpace = aMaxSpace;
+        }
+
+        Policy const& operator=( Policy const& rhs )
+        {
+            theMinimumStep         = rhs.theMinimumStep;
+            theMinimumTimeInterval = rhs.theMinimumTimeInterval;
+            continueOnError        = rhs.continueOnError;
+            theMaxSpace            = rhs.theMaxSpace;
+            return *this;
+        }
+
+    private:
+        Integer theMinimumStep;
+        Real theMinimumTimeInterval;
+        bool continueOnError;
+        Integer theMaxSpace;
+    };
+
+public:
 
     /**
-       Constructor.
+         Constructor.
 
-       Takes up the ownership of the given LoggerAdapter.
+         Takes up the ownership of the given LoggerAdapter.
 
     */
-  
-    LIBECS_API Logger( LoggerAdapterPtr aLoggerAdapter );
-  
+
+    Logger( LoggerAdapterPtr aLoggerAdapter, Policy const& aPolicy = Policy() );
+
     /// Destructor
 
-    LIBECS_API ~Logger( void );
+    ~Logger( void );
 
 
     /**
     
     Sets logging policy that is a vector of 4 numerical values. 
-    0 (int)  - minimum step size between logs
+    0 (int)    - minimum step size between logs
     1 (real) - minimum time interval between logs
     2 (int) - action to be taken when disk space runs out
     3 (int) - user set max disk space, if 0 nothing 
     
     */
-
-    LIBECS_API void setLoggerPolicy( IntegerParam aMinimumStep,
-			  RealParam    aMinimumTimeInterval,
-			  IntegerParam anEndPolicy,
-			  IntegerParam aMaxSpace );
-
-    /**
-    
-    Sets logging policy as a PolymorphVector of 4 numerical values. 
-    
-    */
-
-    LIBECS_API void setLoggerPolicy( PolymorphCref aParamList );
-
+    void setLoggerPolicy( Policy const& pol );
 
     /**
 
@@ -131,93 +193,76 @@ namespace libecs
 
     */
 
-    LIBECS_API const Polymorph getLoggerPolicy( void );
+    const Policy& getLoggerPolicy( void );
 
     /**
 
-      Log current value that theLoggerAdapter gives with aTime.
+        Log current value that theLoggerAdapter gives with aTime.
 
     */
 
-    LIBECS_API void log( RealParam aTime );
+    void log( RealParam aTime );
 
 
     /**
-       Returns contents of the whole logger.
+         Returns contents of the whole logger.
 
     */
 
-    LIBECS_API DataPointVectorSharedPtr getData( void ) const;
+    DataPointVectorSharedPtr getData( void ) const;
 
     /**
-       Returns a slice of the data from aStartTime to anEndTime.
+         Returns a slice of the data from aStartTime to anEndTime.
 
     */
 
-    LIBECS_API DataPointVectorSharedPtr getData( RealParam aStartTime,
-				      RealParam anEndTime ) const;
+    DataPointVectorSharedPtr getData( RealParam aStartTime,
+                                                                        RealParam anEndTime ) const;
 
     /**
-       Returns a summary of the data from aStartTime to anEndTime with
-       intervals anInterval between data elements.
+         Returns a summary of the data from aStartTime to anEndTime with
+         intervals anInterval between data elements.
     */
 
-    LIBECS_API DataPointVectorSharedPtr getData( RealParam aStartTime,
-				      RealParam anEndTime, 
-				      RealParam anInterval ) const;
+    DataPointVectorSharedPtr getData( RealParam aStartTime,
+                                                                        RealParam anEndTime, 
+                                                                        RealParam anInterval ) const;
     
 
 
     /**
-       Returns time of the first element  in Logger.
+         Returns time of the first element    in Logger.
     */
 
-    LIBECS_API const Real getStartTime( void ) const;
+    const Real getStartTime( void ) const;
 
     /**
-       Returns time of the last element in Logger
+         Returns time of the last element in Logger
     */
 
-    LIBECS_API const Real getEndTime( void ) const;
+    const Real getEndTime( void ) const;
 
     /**
-      Returns size of logger
+        Returns size of logger
     */
 
     const size_type getSize() const
     {
-      return thePhysicalLogger.size();
-    }
-
-    /**
-       DEPRECATED - Use setLoggerPolicy 
-    */
-
-    LIBECS_API void setMinimumInterval( RealParam anInterval );
-
-    /**
-       DEPRECATED - Use getLoggerPolicy
-
-    */
-
-    const Real getMinimumInterval( void ) const
-    {
-      return theMinimumInterval;
+        return thePhysicalLogger.size();
     }
 
 
-
     /**
-       This method does nothing as of version 3.1.103.
+         This method does nothing as of version 3.1.103.
     */
 
     void flush()
     {
-      ; // do nothing
+        ; // do nothing
     }
 
 
-  protected:
+protected:
 
     /**
 
@@ -226,54 +271,49 @@ namespace libecs
     */
 
     DataPointVectorIterator binary_search( DataPointVectorIterator begin,
-					   DataPointVectorIterator end,
-					   RealParam t ) 
+                                           DataPointVectorIterator end,
+                                           RealParam t ) 
     {
-      return thePhysicalLogger.lower_bound( thePhysicalLogger.begin(), 
-					    thePhysicalLogger.end(), 
-					    t );
+        return thePhysicalLogger.lower_bound( thePhysicalLogger.begin(), 
+                                              thePhysicalLogger.end(), t );
     }
     
-  protected:
+protected:
 
     /**
-       Writes data (aTime, aValue ) onto the logger
+         Writes data (aTime, aValue ) onto the logger
     */
 
     void pushData( RealParam aTime, RealParam aValue )
     {
-      thePhysicalLogger.push( DataPoint( aTime, aValue ) );
+        thePhysicalLogger.push( DataPoint( aTime, aValue ) );
     }
 
-    LIBECS_API static DataPointVectorSharedPtr createEmptyVector();
+    static DataPointVectorSharedPtr createEmptyVector();
 
-  private:
+private:
 
     /// no default constructor
     Logger( void );
 
 
-  private:
+private:
 
     /// Data members
 
-    PhysicalLogger              thePhysicalLogger;
+    PhysicalLogger                thePhysicalLogger;
 
-    LoggerAdapterPtr            theLoggerAdapter;
+    LoggerAdapterPtr              theLoggerAdapter;
 
-    PhysicalLogger::size_type   theStepCounter;
-    PhysicalLogger::size_type   theMinimumStep; 
+    PhysicalLogger::size_type     theStepCounter;
+    Real                          theLastTime;
 
-    Real                        theLastTime;
-    Real                        theMinimumInterval;
-
-  };
-
-
-  /** @} */ // logging module
+    Policy                        thePolicy;
+};
 
 } // namespace libecs
 
+/** @} */
 
 #endif /* __LOGGER_HPP */
 

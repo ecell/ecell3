@@ -39,40 +39,29 @@
 #include "libecs/EventScheduler.hpp"
 #include "libecs/ProcessEvent.hpp"
 
+/**
+   @addtogroup stepper
+   @{
+ */
 
 namespace libecs
 {
 
-  /** @addtogroup stepper
-   *@{
-   */
-
-  /** @file */
-
-  /**
-
-  */
-
-  LIBECS_DM_CLASS( DiscreteEventStepper, Stepper )
-  {
-
-  protected:
-
+LIBECS_DM_CLASS( DiscreteEventStepper, Stepper )
+{
+protected:
     typedef EventScheduler<ProcessEvent> ProcessEventScheduler;
     typedef ProcessEventScheduler::EventID EventID;
 
-
-
-  public:
-
+public:
     LIBECS_DM_OBJECT( DiscreteEventStepper, Stepper )
-      {
-	INHERIT_PROPERTIES( Stepper );
+    {
+        INHERIT_PROPERTIES( Stepper );
 
-	PROPERTYSLOT_SET_GET( Real, Tolerance );
-	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TimeScale );
-	PROPERTYSLOT_GET_NO_LOAD_SAVE( String, LastProcess );
-      }
+        PROPERTYSLOT_SET_GET( Real, Tolerance );
+        PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, TimeScale );
+        PROPERTYSLOT_GET_NO_LOAD_SAVE( String, LastProcess );
+    }
 
     DiscreteEventStepper();
     virtual ~DiscreteEventStepper() {}
@@ -84,52 +73,35 @@ namespace libecs
 
 
     SET_METHOD( Real, Tolerance )
-      {
-	theTolerance = value;
-      }
+    {
+        theTolerance = value;
+    }
     
     GET_METHOD( Real, Tolerance )
-      {
-	return theTolerance;
-      }
+    {
+        return theTolerance;
+    }
     
     virtual GET_METHOD( Real, TimeScale )
-      {
-	//	return theTimeScale;  temporarily disabled
-	return 0.0;
-      }
+    {
+        return 0.0;
+    }
 
     GET_METHOD( String, LastProcess );
 
     ProcessVectorCref getProcessVector() const
-      {
-	return theProcessVector;
-      }
+    {
+        return theProcessVector;
+    }
 
-  protected:
-
-    ProcessEventScheduler  theScheduler;
-
-    // temporarily disabled
-    //    Real            theTimeScale;
-    Real            theTolerance;
-
-    EventID         theLastEventID;
-
-
-
-  };
+protected:
+    ProcessEventScheduler    theScheduler;
+    Real                        theTolerance;
+    EventID                 theLastEventID;
+};
 
 } // namespace libecs
 
 #endif /* __STEPPER_HPP */
 
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/
+/** @} */

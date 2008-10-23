@@ -31,8 +31,8 @@
 
 #include "libecs/PropertyAttributes.hpp"
 
-#ifndef __PROPERTIEDCLASS_HPP
-#define __PROPERTIEDCLASS_HPP
+#ifndef __ECSOBJECT_HPP
+#define __ECSOBJECT_HPP
 
 #include "libecs/libecs.hpp"
 
@@ -48,138 +48,194 @@ class DynamicModuleInfo;
 namespace libecs
 {
 
-  //
-  // Macros for DM class definition.
-  //
+/**
+   @addtogroup property The Inter-object Communication.
+   @{
+*/
 
-#define LIBECS_DM_CLASS( CLASSNAME, BASE )\
-  DECLARE_CLASS( CLASSNAME );\
-  class DM_IF CLASSNAME\
-   :\
-  public BASE 
+/**
+   Define a EcsObject
+   @param CLASSNAME the name of the class to declare.
+   @param DMTYPE    the root class of the class to declare.
+                    (Process, Variable, System, Stepper)
+ */
+#define LIBECS_DM_CLASS( CLASSNAME, DMTYPE )\
+    DECLARE_CLASS( CLASSNAME );\
+    class DM_IF CLASSNAME: public DMTYPE
+
+/**
+   @internal
+ */
+#define LIBECS_DM_DEFINE_PROPERTIES()\
+    static void initializePropertyInterface( PropertyInterfaceBase* aPropertyInterface )
 
 
+/**
+   Put in front of the property definition block of an abstract EcsObject
+   @param CLASSNAME the name of the abstract EcsObject class
+ */
 #define LIBECS_DM_OBJECT_ABSTRACT( CLASSNAME )\
-  LIBECS_DM_OBJECT_DEF_ABSTRACT( CLASSNAME );\
-  LIBECS_DM_EXPOSE_PROPERTYINTERFACE( CLASSNAME );\
-  LIBECS_DM_DEFINE_PROPERTIES()
+    LIBECS_DM_OBJECT_DEF_ABSTRACT( CLASSNAME );\
+    LIBECS_DM_EXPOSE_PROPERTYINTERFACE( CLASSNAME );\
+    LIBECS_DM_DEFINE_PROPERTIES()
 
 
+/**
+   Put in front of the property definition block of an EcsObject
+   @param CLASSNAME the name of the EcsObject class
+ */
 #define LIBECS_DM_OBJECT( CLASSNAME, DMTYPE )\
-  DM_OBJECT( CLASSNAME );\
-  LIBECS_DM_OBJECT_DEF( CLASSNAME, DMTYPE );\
-  LIBECS_DM_EXPOSE_PROPERTYINTERFACE( CLASSNAME );\
-  LIBECS_DM_DEFINE_PROPERTIES()
+    DM_OBJECT( CLASSNAME );\
+    LIBECS_DM_OBJECT_DEF( CLASSNAME, DMTYPE );\
+    LIBECS_DM_EXPOSE_PROPERTYINTERFACE( CLASSNAME );\
+    LIBECS_DM_DEFINE_PROPERTIES()
 
 
+/**
+   Used when defining a root class (Process, Variable, System, Stepper)
+   @internal
+   @param CLASSNAME the name of the EcsObject class
+ */
 #define LIBECS_DM_BASECLASS( CLASSNAME )\
-  DM_BASECLASS( CLASSNAME )     
+    DM_BASECLASS( CLASSNAME )         
 
 
+/**
+   Define the class stub.
+   @param CLASSNAME the name of the EcsObject class
+   @param DMTYPE    the root class of the class to declare.
+                    (Process, Variable, System, Stepper)
+ */
 #define LIBECS_DM_INIT( CLASSNAME, DMTYPE )\
-  DM_INIT( CLASSNAME )\
-  LIBECS_DM_INIT_STATIC( CLASSNAME, DMTYPE )
+    DM_INIT( CLASSNAME )\
+    LIBECS_DM_INIT_STATIC( CLASSNAME, DMTYPE )
 
 
-  // This macro does two things:
-  // (1) template specialization of PropertyInterface for CLASSNAME
-  //     is necessary at this point to instantiate thePropertySlotMap static
-  //     variable.
-  // (2) thePropertyInterface static variable must also be instantiated.
+/**
+   Defines methods for the class stub.
 
+   This macro does two things:
+   (1) template specialization of PropertyInterface for CLASSNAME
+       is necessary at this point to instantiate thePropertySlotMap static
+       variable.
+   (2) thePropertyInterface static variable must also be instantiated.
+
+   @param CLASSNAME the name of the EcsObject class
+   @param DMTYPE    the root class of the class to declare.
+                    (Process, Variable, System, Stepper)
+ */
 #define LIBECS_DM_INIT_STATIC( CLASSNAME, DMTYPE ) \
-  template class PropertyInterface<CLASSNAME>;\
-  char CLASSNAME::thePropertyInterface[sizeof(libecs::PropertyInterface<CLASSNAME>)]; \
-  char CLASSNAME::theDMTypeName[] = #DMTYPE; \
-  libecs::PropertyInterface<CLASSNAME>& CLASSNAME::_getPropertyInterface() \
-  { \
-    return *reinterpret_cast< libecs::PropertyInterface<CLASSNAME>* >( thePropertyInterface ); \
-  } \
-  void CLASSNAME::initializeModule() \
-  { \
-    new(thePropertyInterface) libecs::PropertyInterface<CLASSNAME>( #CLASSNAME, theDMTypeName ); \
-  } \
-  PropertySlotBaseCptr CLASSNAME::getPropertySlot( libecs::StringCref aPropertyName ) const \
-  { \
-    return _getPropertyInterface().getPropertySlot( aPropertyName ); \
-  } \
-  void CLASSNAME::setProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ) \
-  { \
-    return _getPropertyInterface().setProperty( *this, aPropertyName, aValue ); \
-  } \
-  const libecs::Polymorph CLASSNAME::getProperty( libecs::StringCref aPropertyName ) const \
-  { \
-    return _getPropertyInterface().getProperty( *this, aPropertyName ); \
-  } \
-  void CLASSNAME::loadProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ) \
-  { \
-    return _getPropertyInterface().loadProperty( *this, aPropertyName, aValue ); \
-  } \
-  const libecs::Polymorph CLASSNAME::saveProperty( libecs::StringCref aPropertyName ) const \
-  { \
-   return _getPropertyInterface().saveProperty( *this, aPropertyName ); \
-  } \
-  const libecs::StringVector CLASSNAME::getPropertyList() const \
-  { \
-   return _getPropertyInterface().getPropertyList( *this ); \
-  } \
-  libecs::PropertySlotProxyPtr CLASSNAME::createPropertySlotProxy( libecs::StringCref aPropertyName ) \
-  { \
-   return _getPropertyInterface().createPropertySlotProxy( *this, aPropertyName ); \
-  } \
-  const libecs::PropertyAttributes \
-  CLASSNAME::getPropertyAttributes( libecs::StringCref aPropertyName ) const \
-  { \
-   return _getPropertyInterface().getPropertyAttributes( *this, aPropertyName ); \
-  } \
-  const libecs::PropertyInterfaceBase& CLASSNAME::getPropertyInterface() const \
-  {\
-   return _getPropertyInterface(); \
-  } \
-  const DynamicModuleInfo* CLASSNAME::getClassInfoPtr()\
-  {\
-   return static_cast<const DynamicModuleInfo*>( &_getPropertyInterface() );\
-  }
+    template class PropertyInterface<CLASSNAME>;\
+    char CLASSNAME::thePropertyInterface[sizeof(libecs::PropertyInterface<CLASSNAME>)]; \
+    char CLASSNAME::theDMTypeName[] = #DMTYPE; \
+    libecs::PropertyInterface<CLASSNAME>& CLASSNAME::_getPropertyInterface() \
+    { \
+        return *reinterpret_cast< libecs::PropertyInterface<CLASSNAME>* >( thePropertyInterface ); \
+    } \
+    void CLASSNAME::initializeModule() \
+    { \
+        new(thePropertyInterface) libecs::PropertyInterface<CLASSNAME>( #CLASSNAME, theDMTypeName ); \
+    } \
+    PropertySlotBaseCptr CLASSNAME::getPropertySlot( libecs::StringCref aPropertyName ) const \
+    { \
+        return _getPropertyInterface().getPropertySlot( aPropertyName ); \
+    } \
+    void CLASSNAME::setProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ) \
+    { \
+        return _getPropertyInterface().setProperty( *this, aPropertyName, aValue ); \
+    } \
+    const libecs::Polymorph CLASSNAME::getProperty( libecs::StringCref aPropertyName ) const \
+    { \
+        return _getPropertyInterface().getProperty( *this, aPropertyName ); \
+    } \
+    void CLASSNAME::loadProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ) \
+    { \
+        return _getPropertyInterface().loadProperty( *this, aPropertyName, aValue ); \
+    } \
+    const libecs::Polymorph CLASSNAME::saveProperty( libecs::StringCref aPropertyName ) const \
+    { \
+        return _getPropertyInterface().saveProperty( *this, aPropertyName ); \
+    } \
+    const libecs::StringVector CLASSNAME::getPropertyList() const \
+    { \
+        return _getPropertyInterface().getPropertyList( *this ); \
+    } \
+    libecs::PropertySlotProxyPtr CLASSNAME::createPropertySlotProxy( libecs::StringCref aPropertyName ) \
+    { \
+        return _getPropertyInterface().createPropertySlotProxy( *this, aPropertyName ); \
+    } \
+    const libecs::PropertyAttributes \
+    CLASSNAME::getPropertyAttributes( libecs::StringCref aPropertyName ) const \
+    { \
+        return _getPropertyInterface().getPropertyAttributes( *this, aPropertyName ); \
+    } \
+    const libecs::PropertyInterfaceBase& CLASSNAME::getPropertyInterface() const \
+    {\
+        return _getPropertyInterface(); \
+    } \
+    const DynamicModuleInfo* CLASSNAME::getClassInfoPtr()\
+    {\
+        return static_cast<const DynamicModuleInfo*>( &_getPropertyInterface() );\
+    }
 
-  ///@internal
+/**
+   Expanded to typedefs of the class itself (_LUBECS_CLASS_) and the root class
+   (_LIBECS_DMTYPE_).
+   @param CLASSNAME the name of the class to declare.
+   @param DMTYPE    the root class of the class to declare.
+                    (Process, Variable, System, Stepper)
+ */ 
 #define LIBECS_DM_OBJECT_DEF( CLASSNAME, DMTYPE )\
-  typedef DMTYPE _LIBECS_DMTYPE_;\
-  LIBECS_DM_OBJECT_DEF_ABSTRACT( CLASSNAME )
+    typedef DMTYPE _LIBECS_DMTYPE_;\
+    LIBECS_DM_OBJECT_DEF_ABSTRACT( CLASSNAME )
 
+/**
+   Expanded to a typedef of the class itself (_LUBECS_CLASS_).
+   @param CLASSNAME the name of the class to declare.
+ */ 
 #define LIBECS_DM_OBJECT_DEF_ABSTRACT( CLASSNAME )\
-  typedef CLASSNAME _LIBECS_CLASS_;
+    typedef CLASSNAME _LIBECS_CLASS_;
 
-  ///@internal
+/**
+   Declare methods for the class stub.
+   @param CLASSNAME the name of the EcsObject class
+ */
 #define LIBECS_DM_EXPOSE_PROPERTYINTERFACE( CLASSNAME )\
 private:\
- static char thePropertyInterface[sizeof(libecs::PropertyInterface<CLASSNAME>)]; \
- static char theDMTypeName[]; \
- static libecs::PropertyInterface<CLASSNAME>& _getPropertyInterface(); \
+    static char thePropertyInterface[sizeof(libecs::PropertyInterface<CLASSNAME>)]; \
+    static char theDMTypeName[]; \
+    static libecs::PropertyInterface<CLASSNAME>& _getPropertyInterface(); \
 public:\
- static void initializeModule(); \
- static const DynamicModuleInfo* getClassInfoPtr(); \
- virtual PropertySlotBaseCptr getPropertySlot( libecs::StringCref aPropertyName ) const; \
- virtual void setProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ); \
- virtual const libecs::Polymorph getProperty( libecs::StringCref aPropertyName ) const; \
- virtual void loadProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ); \
- virtual const libecs::Polymorph saveProperty( libecs::StringCref aPropertyName ) const; \
- virtual const libecs::StringVector getPropertyList() const; \
- virtual libecs::PropertySlotProxyPtr createPropertySlotProxy( libecs::StringCref aPropertyName ); \
- virtual const libecs::PropertyAttributes getPropertyAttributes( libecs::StringCref aPropertyName ) const; \
- virtual const libecs::PropertyInterfaceBase& getPropertyInterface() const;
- //
+    static void initializeModule(); \
+    static const DynamicModuleInfo* getClassInfoPtr(); \
+    virtual PropertySlotBaseCptr getPropertySlot( libecs::StringCref aPropertyName ) const; \
+    virtual void setProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ); \
+    virtual const libecs::Polymorph getProperty( libecs::StringCref aPropertyName ) const; \
+    virtual void loadProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ); \
+    virtual const libecs::Polymorph saveProperty( libecs::StringCref aPropertyName ) const; \
+    virtual const libecs::StringVector getPropertyList() const; \
+    virtual libecs::PropertySlotProxyPtr createPropertySlotProxy( libecs::StringCref aPropertyName ); \
+    virtual const libecs::PropertyAttributes getPropertyAttributes( libecs::StringCref aPropertyName ) const; \
+    virtual const libecs::PropertyInterfaceBase& getPropertyInterface() const;
 
-
-  //
-  // Macros for property definitions
-  //
-
+/**
+   Used within a property definition block to inherit the properties of the
+   base class.
+   @param BASECLASS the name of the base class from which the properties are
+                    inherited.
+ */
 #define INHERIT_PROPERTIES( BASECLASS )\
-    BASECLASS::initializePropertyInterface( aPropertyInterface );\
-    CLASS_INFO( "Baseclass", # BASECLASS )
-    
+        BASECLASS::initializePropertyInterface( aPropertyInterface );\
+        CLASS_INFO( "Baseclass", # BASECLASS )
+
+
+/**
+   Used within a property definition block to define a class info entry
+   that describes the function of the class.
+   @param DESCRIPTION the description of the class.
+ */
 #define CLASS_DESCRIPTION( DESCRIPTION )\
-    CLASS_INFO( "Description", DESCRIPTION )
+        CLASS_INFO( "Description", DESCRIPTION )
 
 #define NOMETHOD NULLPTR
 
@@ -187,191 +243,255 @@ public:\
 #define CLASSINFO_FALSE 0
 
 #define METHODFLAG( METHODPTR, NULLVALUE ) \
- METHODFLAG2( METHODPTR, NULLVALUE )
+    METHODFLAG2( METHODPTR, NULLVALUE )
 
 #define METHODFLAG2( METHODPTR, NULLVALUE ) \
- ( METHODPTR == NULLVALUE ? CLASSINFO_FALSE : CLASSINFO_TRUE )
-  /**
-	 macro for setting class Info string
-	 Info is expected as PropertyName, Value both Strings
-	Property descriptor strings 
-  */
+    ( ( METHODPTR ) == NULLVALUE ? CLASSINFO_FALSE : CLASSINFO_TRUE )
 
+/**
+   Define a class info entry.
+   @param FIELDNAME the name of the field.
+   @param FIELDVALUE the value of the field.
+*/
 #define CLASS_INFO( FIELDNAME, FIELDVALUE) \
- aPropertyInterface->setInfoField( String ( FIELDNAME ), String( FIELDVALUE ) )
+    aPropertyInterface->setInfoField( FIELDNAME, FIELDVALUE )
 
 
-  /** 
-	  macro for setting Property class info
-	 PropertyName, Type, set_flag, get_flag, save_flag, load_flag
-  */
+/** 
+   Expanded to the function pointer of a getter function.
+   @param TYPE the type of the property.
+   @param PTR  the pointer to the function.
+*/
 #define PROPERTYSLOT_GET_METHOD_PTR( TYPE, PTR ) \
-    ( static_cast< typename ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::GetMethodPtr>( PTR ) )
+    static_cast< typename ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::GetMethodPtr>( PTR )
 
+
+/** 
+   Expanded to the function pointer of a setter function.
+   @param TYPE the type of the property.
+   @param PTR  the pointer to the function.
+*/
 #define PROPERTYSLOT_SET_METHOD_PTR( TYPE, PTR ) \
-    ( static_cast< typename ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::SetMethodPtr>( PTR ) )
+    static_cast< typename ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::SetMethodPtr>( PTR )
 
+
+/** 
+   Expanded to the function pointer of a save handler function.
+   @param TYPE the type of the property.
+   @param PTR  the pointer to the function.
+*/
 #define PROPERTYSLOT_SAVE_METHOD_PTR( TYPE, PTR ) \
-    ( static_cast< typename ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::GetMethodPtr>( PTR ) )
+    static_cast< typename ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::GetMethodPtr>( PTR )
 
+
+/** 
+   Expanded to the function pointer of a load handler function.
+   @param TYPE the type of the property.
+   @param PTR  the pointer to the function.
+*/
 #define PROPERTYSLOT_LOAD_METHOD_PTR( TYPE, PTR ) \
-    ( static_cast< typename ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::SetMethodPtr>( PTR ) )
+    static_cast< typename ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::SetMethodPtr>( PTR )
 
 
+/**
+   Define a property slot.
+
+   @param TYPE the type of the property.
+   @param NAME the name of the property.
+   @param SETMETHOD the pointer to the setter.
+   @param GETMETHOD the pointer to the getter.
+ */
 #define PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
-  aPropertyInterface->registerPropertySlot( new ConcretePropertySlot<_LIBECS_CLASS_ ,TYPE>( #NAME, PropertySlotBase::TYPE, SETMETHOD, GETMETHOD ) );
+    aPropertyInterface->registerPropertySlot( \
+        new ConcretePropertySlot< _LIBECS_CLASS_ ,TYPE >( \
+            #NAME, PropertySlotBase::TYPE, SETMETHOD, GETMETHOD ) );
 
-#define PROPERTYSLOT_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD,\
-				LOADMETHOD, SAVEMETHOD )\
-  aPropertyInterface->registerPropertySlot( \
-         new LoadSaveConcretePropertySlot<_LIBECS_CLASS_, TYPE>( \
-	  #NAME, PropertySlotBase::TYPE, \
-	  SETMETHOD, GETMETHOD, LOADMETHOD, SAVEMETHOD ) );
+/**
+   Define a property slot.
 
+   @param TYPE the type of the property.
+   @param NAME the name of the property.
+   @param SETMETHOD the pointer to the setter.
+   @param GETMETHOD the pointer to the getter.
+   @param LOADMETHOD the pointer to the load handler.
+   @param SAVEMETHOD the pointer to the save handler.
+ */
+#define PROPERTYSLOT_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD, \
+                                LOADMETHOD, SAVEMETHOD ) \
+    aPropertyInterface->registerPropertySlot( \
+         new LoadSaveConcretePropertySlot< _LIBECS_CLASS_, TYPE >( \
+            #NAME, PropertySlotBase::TYPE, \
+            SETMETHOD, GETMETHOD, LOADMETHOD, SAVEMETHOD ) );
+
+
+/**
+   Define a property slot that are not savable nor loadable.
+
+   @param TYPE the type of the property.
+   @param NAME the name of the property.
+   @param SETMETHOD the pointer to the setter.
+   @param GETMETHOD the pointer to the getter.
+ */
 #define PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD )\
-        PROPERTYSLOT_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD,\
-				NULLPTR, NULLPTR )
+    PROPERTYSLOT_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD, \
+                            NULLPTR, NULLPTR )
 
+/**
+   Define a property slot such that its getter and setter functions are
+   Class::getNAME() or Class::setNAME().
+
+   @param TYPE the type of the property.
+   @param NAME the name of the property.
+ */
 #define PROPERTYSLOT_SET_GET( TYPE, NAME )\
-  PROPERTYSLOT( TYPE, NAME,\
-                & _LIBECS_CLASS_::set ## NAME,\
-                & _LIBECS_CLASS_::get ## NAME )
+    PROPERTYSLOT( TYPE, NAME, & _LIBECS_CLASS_::set ## NAME, \
+                              & _LIBECS_CLASS_::get ## NAME )
 
+/**
+   Define a write-only property slot such that its setter function is
+   Class::setNAME().
+
+   @param TYPE the type of the property.
+   @param NAME the name of the property.
+ */
 #define PROPERTYSLOT_SET( TYPE, NAME )\
-  PROPERTYSLOT( TYPE, NAME,\
-                & _LIBECS_CLASS_::set ## NAME,\
-                NULLPTR )
+    PROPERTYSLOT( TYPE, NAME, & _LIBECS_CLASS_::set ## NAME, NULLPTR )
 
 
+/**
+   Define a read-only property slot such that its getter function is
+   Class::getNAME().
+
+   @param TYPE the type of the property.
+   @param NAME the name of the property.
+ */
 #define PROPERTYSLOT_GET( TYPE, NAME )\
-  PROPERTYSLOT( TYPE, NAME,\
-                NULLPTR,\
-                & _LIBECS_CLASS_::get ## NAME )
+    PROPERTYSLOT( TYPE, NAME, NULLPTR, & _LIBECS_CLASS_::get ## NAME )
 
+
+/**
+   Define a property slot such that its getter and setter functions are
+   Class::getNAME() and Class::setName(), and is not savable nor loadable.
+
+   @param TYPE the type of the property.
+   @param NAME the name of the property.
+ */
 #define PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( TYPE, NAME )\
-  PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME,\
-                             & _LIBECS_CLASS_::set ## NAME,\
-                             & _LIBECS_CLASS_::get ## NAME )
+    PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME, & _LIBECS_CLASS_::set ## NAME,\
+                                           & _LIBECS_CLASS_::get ## NAME )
 
+/**
+   Define a write-only property slot such that its setter function is
+   Class::setName(), and is not savable nor loadable.
+
+   @param TYPE the type of the property.
+   @param NAME the name of the property.
+ */
 #define PROPERTYSLOT_SET_NO_LOAD_SAVE( TYPE, NAME )\
-  PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME,\
-                             & _LIBECS_CLASS_::set ## NAME,\
-                             NULLPTR )
+    PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME, & _LIBECS_CLASS_::set ## NAME,\
+                                           NULLPTR )
 
+
+/**
+   Define a read-only property slot such that its getter function is
+   Class::getName(), and is not savable nor loadable.
+
+   @param TYPE the type of the property.
+   @param NAME the name of the property.
+ */
 #define PROPERTYSLOT_GET_NO_LOAD_SAVE( TYPE, NAME )\
-  PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME,\
-                             NULLPTR,\
-                             & _LIBECS_CLASS_::get ## NAME )
-
-  // Info
-
-
-  ///@internal
-#define LIBECS_DM_DEFINE_PROPERTIES()\
-  static void initializePropertyInterface( PropertyInterfaceBase* aPropertyInterface )
+    PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME, NULLPTR, \
+                                           & _LIBECS_CLASS_::get ## NAME )
 
 
 
-  // 
-  // Macros for property method declaration / definitions.
-  //
+// 
+// Macros for property method declaration / definitions.
+//
 
 #define SET_SLOT( TYPE, METHODNAME )\
-  void METHODNAME( libecs::Param<TYPE>::type value )
+    void METHODNAME( libecs::Param<TYPE>::type value )
 
 #define GET_SLOT( TYPE, METHODNAME )\
-  const TYPE METHODNAME() const
+    const TYPE METHODNAME() const
 
 #define SET_SLOT_DEF( TYPE, METHODNAME, CLASS )\
-  SET_SLOT( TYPE, CLASS::METHODNAME )
+    SET_SLOT( TYPE, CLASS::METHODNAME )
 
 #define GET_SLOT_DEF( TYPE, METHODNAME, CLASS )\
-  GET_SLOT( TYPE, CLASS::METHODNAME )
+    GET_SLOT( TYPE, CLASS::METHODNAME )
 
 
 #define SET_METHOD( TYPE, NAME )\
-  SET_SLOT( TYPE, set ## NAME )
+    SET_SLOT( TYPE, set ## NAME )
 
 #define GET_METHOD( TYPE, NAME )\
-  GET_SLOT( TYPE, get ## NAME )
+    GET_SLOT( TYPE, get ## NAME )
 
 #define LOAD_METHOD( TYPE, NAME )\
-  SET_SLOT( TYPE, load ## NAME )
+    SET_SLOT( TYPE, load ## NAME )
 
 #define SAVE_METHOD( TYPE, NAME )\
-  GET_SLOT( TYPE, save ## NAME )
+    GET_SLOT( TYPE, save ## NAME )
 
 
 #define SET_METHOD_DEF( TYPE, NAME, CLASS )\
-  SET_SLOT_DEF( TYPE, set ## NAME, CLASS )
+    SET_SLOT_DEF( TYPE, set ## NAME, CLASS )
 
 #define GET_METHOD_DEF( TYPE, NAME, CLASS )\
-  GET_SLOT_DEF( TYPE, get ## NAME, CLASS )
+    GET_SLOT_DEF( TYPE, get ## NAME, CLASS )
 
 #define LOAD_METHOD_DEF( TYPE, NAME, CLASS )\
-  SET_SLOT_DEF( TYPE, load ## NAME, CLASS )
+    SET_SLOT_DEF( TYPE, load ## NAME, CLASS )
 
 #define SAVE_METHOD_DEF( TYPE, NAME, CLASS )\
-  GET_SLOT_DEF( TYPE, save ## NAME, CLASS )
+    GET_SLOT_DEF( TYPE, save ## NAME, CLASS )
 
 
 
 #define SIMPLE_GET_METHOD( TYPE, NAME )\
-  GET_METHOD( TYPE, NAME )\
-  {\
-    return NAME;\
-  } //
+    GET_METHOD( TYPE, NAME )\
+    {\
+        return NAME;\
+    } //
 
 #define SIMPLE_SET_METHOD( TYPE, NAME )\
-  SET_METHOD( TYPE, NAME )\
-  {\
-    NAME = value;\
-  } //
+    SET_METHOD( TYPE, NAME )\
+    {\
+        NAME = value;\
+    } //
 
 #define SIMPLE_SET_GET_METHOD( TYPE, NAME )\
-  SIMPLE_SET_METHOD( TYPE, NAME )\
-  SIMPLE_GET_METHOD( TYPE, NAME )
+    SIMPLE_SET_METHOD( TYPE, NAME )\
+    SIMPLE_GET_METHOD( TYPE, NAME )
 
-  template<typename T> class PropertyInterface;
+template< typename T > class PropertyInterface;
 
-  /** @addtogroup property The Inter-object Communication.
-   *  The Interobject Communication.
-   *@{
+/**
+   Common base class for classes with PropertySlots.
 
-  */
+   @see PropertySlot
+*/
 
-  /** @file */
-  
-  // probably better to replace by AssocVector.
-  //  DECLARE_MAP( const String, PropertySlotPtr, 
-  //	       std::less<const String>, PropertySlotMap );
+class LIBECS_API EcsObject
+{
 
-  /**
-     Common base class for classes with PropertySlots.
-
-     @see PropertySlot
-
-  */
-
-  class LIBECS_API EcsObject
-  {
-
-  public:
+public:
 
     LIBECS_DM_DEFINE_PROPERTIES()
     {
-      ; // empty, but this must be here.
+        ; // empty, but this must be here.
     }
 
 
     EcsObject()
     {
-      ; // do nothing
+        ; // do nothing
     }
 
     virtual ~EcsObject()
     {
-      ; // do nothing
+        ; // do nothing
     }
 
     virtual PropertySlotBaseCptr 
@@ -397,7 +517,7 @@ public:\
     virtual const PropertyInterfaceBase& getPropertyInterface() const = 0;
 
     virtual void defaultSetProperty( StringCref aPropertyName, 
-				     PolymorphCref aValue );
+                                     PolymorphCref aValue );
     
     virtual const Polymorph 
     defaultGetProperty( StringCref aPorpertyName ) const;
@@ -413,19 +533,19 @@ public:\
 
     LoggerVectorCref getLoggerVector() const
     {
-      return theLoggerVector;
+        return theLoggerVector;
     }
 
     StringCref getClassName() const;
 
-  public:
+public:
 
     /// @internal
 
     template <typename Type>
     void nullSet( typename Param<Type>::type )
     {
-      throwNotSetable();
+        throwNotSetable();
     }
 
     /// @internal
@@ -433,52 +553,36 @@ public:\
     template <typename Type>
     const Type nullGet() const
     {
-      throwNotGetable();
+        throwNotGetable();
     }
 
-  private:
+private:
 
     static void throwNotSetable();
     static void throwNotGetable();
 
-  protected:
+protected:
 
     LoggerVector theLoggerVector;
 
-  };
+};
 
+// these specializations of nullSet/nullGet are here to avoid spreading
+// inline copies of them around.    This reduces sizes of DM .so files a bit.
 
+#define NULLGETSET_SPECIALIZATION( TYPE )\
+    template <> LIBECS_API void EcsObject::nullSet<TYPE>( Param<TYPE>::type ); \
+    template <> LIBECS_API const TYPE EcsObject::nullGet<TYPE>() const
 
-  // these specializations of nullSet/nullGet are here to avoid spreading
-  // inline copies of them around.  This reduces sizes of DM .so files a bit.
+NULLGETSET_SPECIALIZATION( Real );
+NULLGETSET_SPECIALIZATION( Integer );
+NULLGETSET_SPECIALIZATION( String );
+NULLGETSET_SPECIALIZATION( Polymorph );
 
-#define NULLSET_SPECIALIZATION( TYPE )\
-  template <> LIBECS_API void EcsObject::nullSet<TYPE>( Param<TYPE>::type )
+#undef NULLGETSET_SPECIALIZATION
 
-  NULLSET_SPECIALIZATION( Real );
-  NULLSET_SPECIALIZATION( Integer );
-  NULLSET_SPECIALIZATION( String );
-  NULLSET_SPECIALIZATION( Polymorph );
-
-#define NULLGET_SPECIALIZATION( TYPE )\
-  template <> LIBECS_API const TYPE EcsObject::nullGet<TYPE>() const
-
-  NULLGET_SPECIALIZATION( Real );
-  NULLGET_SPECIALIZATION( Integer );
-  NULLGET_SPECIALIZATION( String );
-  NULLGET_SPECIALIZATION( Polymorph );
-
-
-  /*@}*/
-  
 } // namespace libecs
 
-#endif /* __PROPERTIEDCLASS_HPP */
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/
+/** @} */
+    
+#endif /* __ECSOBJECT_HPP */

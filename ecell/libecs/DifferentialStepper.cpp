@@ -28,6 +28,7 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -50,193 +51,190 @@
 namespace libecs
 {
 
-  LIBECS_DM_INIT_STATIC( DifferentialStepper, Stepper );
-  LIBECS_DM_INIT_STATIC( AdaptiveDifferentialStepper, Stepper );
+LIBECS_DM_INIT_STATIC( DifferentialStepper, Stepper );
+LIBECS_DM_INIT_STATIC( AdaptiveDifferentialStepper, Stepper );
 
-  DifferentialStepper::DifferentialStepper()
-    :
-    theNextStepInterval( 0.001 ),
-    theTolerableStepInterval( 0.001 ),
-    theStateFlag( true )
-  {
+DifferentialStepper::DifferentialStepper()
+    : theNextStepInterval( 0.001 ),
+      theTolerableStepInterval( 0.001 ),
+      theStateFlag( true )
+{
     ; // do nothing
-  }
+}
 
-  DifferentialStepper::~DifferentialStepper()
-  {
+
+DifferentialStepper::~DifferentialStepper()
+{
     ; // do nothing
-  }
+}
 
-  void DifferentialStepper::initialize()
-  {
+
+void DifferentialStepper::initialize()
+{
     Stepper::initialize();
 
     createInterpolants();
 
     theTaylorSeries.resize( boost::extents[ getStage() ][
-            static_cast< RealMatrix::index >(
-                getReadOnlyVariableOffset() ) ] );
+                                static_cast< RealMatrix::index >(
+                                    getReadOnlyVariableOffset() ) ] );
 
-    // should registerProcess be overrided?
+    // XXX: should go into registerProcess?
+    /*
     if ( getDiscreteProcessOffset() < theProcessVector.size() )
-      {
-	for ( ProcessVectorConstIterator
-		i( theProcessVector.begin() + getDiscreteProcessOffset() );
-	      i < theProcessVector.end(); ++i )
-	  {
-	    // XXX: To be addressed later.
-	    // std::cerr << "WARNING: Process [" << (*i)->getID() << "] is not continuous." << std::endl;
-	  }
-      }
+    {
+        for ( ProcessVectorConstIterator i(
+                theProcessVector.begin() + getDiscreteProcessOffset() );
+                i < theProcessVector.end(); ++i )
+        {
+            std::cerr << "WARNING: Process [" << (*i)->getID() << "] is not continuous." << std::endl;
+        }
+    }
+    */
 
     initializeVariableReferenceList();
+}
 
-    // should create another method for property slot ?
-    //    setNextStepInterval( getStepInterval() );
 
-    //    theStateFlag = false;
-  }
-
-  void DifferentialStepper::initializeVariableReferenceList()
-  {
-    const ProcessVector::size_type 
-      aDiscreteProcessOffset( getDiscreteProcessOffset() );
+void DifferentialStepper::initializeVariableReferenceList()
+{
+    const ProcessVector::size_type aDiscreteProcessOffset(
+            getDiscreteProcessOffset() );
 
     theVariableReferenceListVector.clear();
     theVariableReferenceListVector.resize( aDiscreteProcessOffset );
     
     for ( ProcessVector::size_type i( 0 ); i < aDiscreteProcessOffset; ++i )
-      {
-	ProcessPtr const aProcess( theProcessVector[ i ] );
+    {
+        ProcessPtr const aProcess( theProcessVector[ i ] );
 
-	VariableReferenceVectorCref aVariableReferenceVector(
-	    aProcess->getVariableReferenceVector() );
+        VariableReferenceVectorCref aVariableReferenceVector(
+                aProcess->getVariableReferenceVector() );
 
-	VariableReferenceVector::size_type const 
-	    aZeroVariableReferenceOffset(
-		aProcess->getZeroVariableReferenceOffset() );
-	VariableReferenceVector::size_type const 
-	    aPositiveVariableReferenceOffset(
-		aProcess->getPositiveVariableReferenceOffset() );
+        VariableReferenceVector::size_type const aZeroVariableReferenceOffset(
+                aProcess->getZeroVariableReferenceOffset() );
+        VariableReferenceVector::size_type const aPositiveVariableReferenceOffset(
+                aProcess->getPositiveVariableReferenceOffset() );
 
-	theVariableReferenceListVector[ i ].reserve(
-	    ( aVariableReferenceVector.size() - 
-		aPositiveVariableReferenceOffset + 
-		aZeroVariableReferenceOffset ) );
+        theVariableReferenceListVector[ i ].reserve(
+                ( aVariableReferenceVector.size() - 
+                        aPositiveVariableReferenceOffset + 
+                        aZeroVariableReferenceOffset ) );
 
-	for ( VariableReferenceVectorConstIterator 
-		anIterator( aVariableReferenceVector.begin() ),
-		anEnd ( aVariableReferenceVector.begin() +
-		       aZeroVariableReferenceOffset );
-	      anIterator < anEnd; ++anIterator )
-	  {
-	    VariableReference const& aVariableReference( *anIterator );
+        for ( VariableReferenceVectorConstIterator 
+                anIterator( aVariableReferenceVector.begin() ),
+                anEnd ( aVariableReferenceVector.begin()
+                        + aZeroVariableReferenceOffset );
+              anIterator < anEnd; ++anIterator )
+        {
+            VariableReference const& aVariableReference( *anIterator );
 
-	    theVariableReferenceListVector[ i ].push_back(
-		ExprComponent( getVariableIndex(
-			           aVariableReference.getVariable() ),
-                               aVariableReference.getCoefficient() ) );
-	  }
+            theVariableReferenceListVector[ i ].push_back(
+                ExprComponent( getVariableIndex(
+                         aVariableReference.getVariable() ),
+                         aVariableReference.getCoefficient() ) );
+        }
 
-	for ( VariableReferenceVectorConstIterator anIterator(
-		aVariableReferenceVector.begin() +
-	        aPositiveVariableReferenceOffset ); 
-	      anIterator < aVariableReferenceVector.end(); 
-	      ++anIterator )
-	  {
-	    VariableReference const& aVariableReference( *anIterator );
+        for ( VariableReferenceVectorConstIterator
+                anIterator( aVariableReferenceVector.begin()
+                            + aPositiveVariableReferenceOffset ); 
+              anIterator < aVariableReferenceVector.end(); ++anIterator )
+        {
+            VariableReference const& aVariableReference( *anIterator );
 
-	    theVariableReferenceListVector[ i ].push_back(
-		ExprComponent( getVariableIndex(
-			           aVariableReference.getVariable() ),
-                               aVariableReference.getCoefficient() ) );
-	  }
-      }
-  }
+            theVariableReferenceListVector[ i ].push_back(
+                    ExprComponent( getVariableIndex(
+                            aVariableReference.getVariable() ),
+                            aVariableReference.getCoefficient() ) );
+        }
+    }
+}
 
-  void DifferentialStepper::
-  setVariableVelocity( boost::detail::multi_array::sub_array<Real, 1>
-		       aVelocityBuffer )
-  {
+
+void DifferentialStepper::setVariableVelocity(
+        boost::detail::multi_array::sub_array<Real, 1> aVelocityBuffer )
+{
     const ProcessVector::size_type 
-      aDiscreteProcessOffset( getDiscreteProcessOffset() );
+        aDiscreteProcessOffset( getDiscreteProcessOffset() );
 
     for ( RealMatrix::index i( 0 );
-	  i < static_cast< RealMatrix::index >( aVelocityBuffer.size() );
-	  ++i )
-      {
-	aVelocityBuffer[ i ] = 0.0;
-      }
+          i < static_cast< RealMatrix::index >( aVelocityBuffer.size() );
+          ++i )
+    {
+        aVelocityBuffer[ i ] = 0.0;
+    }
 
     for ( ProcessVector::size_type i( 0 ); i < aDiscreteProcessOffset; ++i )
-      {
-	const Real anActivity( theProcessVector[ i ]->getActivity() );
+    {
+        const Real anActivity( theProcessVector[ i ]->getActivity() );
 
-	for ( VariableReferenceList::const_iterator 
-		anIterator( theVariableReferenceListVector[ i ].begin() );
-	      anIterator < theVariableReferenceListVector[ i ].end();
-	      anIterator++ )
-	  {
-	    ExprComponent const& aComponent = *anIterator;
-	    const RealMatrix::index anIndex(
-		static_cast< RealMatrix::index >(
-		    aComponent.first ) );
-	    aVelocityBuffer[ anIndex ] += aComponent.second * anActivity;
-	  }
-      }
-  }
+        for ( VariableReferenceList::const_iterator anIterator(
+                theVariableReferenceListVector[ i ].begin() );
+              anIterator < theVariableReferenceListVector[ i ].end();
+              anIterator++ )
+        {
+            ExprComponent const& aComponent = *anIterator;
+            const RealMatrix::index anIndex(
+                    static_cast< RealMatrix::index >( aComponent.first ) );
+            aVelocityBuffer[ anIndex ] += aComponent.second * anActivity;
+        }
+    }
+}
 
-  void DifferentialStepper::reset()
-  {
+
+void DifferentialStepper::reset()
+{
     // is this needed?
     for ( RealMatrix::index i( 0 ); i != getStage(); ++i )
-      for ( RealMatrix::index j( 0 );
-	    j != getReadOnlyVariableOffset(); ++j )
-      {
-	theTaylorSeries[ i ][ j ] = 0.0;
-
-	//	RealMatrix::index_gen indices;
-	//	theTaylorSeries[ indices[ i ][ RealMatrix::index_range( 0, getReadOnlyVariableOffset() ) ] ].assign( 0.0 );
-      }
+    {
+        for ( RealMatrix::index j( 0 );
+              j != getReadOnlyVariableOffset(); ++j )
+        {
+            theTaylorSeries[ i ][ j ] = 0.0;
+        }
+    }
 
     Stepper::reset();
-  }
+}
 
-  void DifferentialStepper::resetAll()
-  {
+
+void DifferentialStepper::resetAll()
+{
     const VariableVector::size_type aSize( theVariableVector.size() );
     for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
-      {
-	VariablePtr const aVariable( theVariableVector[ c ] );
-	aVariable->loadValue( theValueBuffer[ c ] );
-      }
-  }
+    {
+        VariablePtr const aVariable( theVariableVector[ c ] );
+        aVariable->loadValue( theValueBuffer[ c ] );
+    }
+}
 
-  void DifferentialStepper::interIntegrate()
-  {
+
+void DifferentialStepper::interIntegrate()
+{
     Real const aCurrentTime( getCurrentTime() );
 
     VariableVector::size_type c( theReadWriteVariableOffset );
     for( ; c != theReadOnlyVariableOffset; ++c )
-      {
-      	VariablePtr const aVariable( theVariableVector[ c ] );
+    {
+        VariablePtr const aVariable( theVariableVector[ c ] );
 
-	aVariable->interIntegrate( aCurrentTime );
-      }
+        aVariable->interIntegrate( aCurrentTime );
+    }
 
     // RealOnly Variables must be reset by the values in theValueBuffer
     // before interIntegrate().
     for( ; c != theVariableVector.size(); ++c )
-      {
-	VariablePtr const aVariable( theVariableVector[ c ] );
+    {
+        VariablePtr const aVariable( theVariableVector[ c ] );
 
-	aVariable->loadValue( theValueBuffer[ c ] );
-	aVariable->interIntegrate( aCurrentTime );
-      }
-  }
+        aVariable->loadValue( theValueBuffer[ c ] );
+        aVariable->interIntegrate( aCurrentTime );
+    }
+}
 
-  void DifferentialStepper::interrupt( TimeParam aTime )
-  {
+
+void DifferentialStepper::interrupt( TimeParam aTime )
+{
     const Real aCallerCurrentTime( aTime );
 
     const Real aCallerTimeScale( getModel()->getLastStepper()->getTimeScale() );
@@ -245,115 +243,214 @@ namespace libecs
     // If the step size of this is less than caller's timescale,
     // ignore this interruption.
     if( aCallerTimeScale >= aStepInterval )
-      {
-	return;
-      }
+    {
+        return;
+    }
 
     const Real aCurrentTime( getCurrentTime() );
 
     // aCallerTimeScale == 0 implies need for immediate reset
     if( aCallerTimeScale != 0.0 )
-      {
-	// Shrink the next step size to that of caller's
-	setNextStepInterval( aCallerTimeScale );
+    {
+        // Shrink the next step size to that of caller's
+        setNextStepInterval( aCallerTimeScale );
 
-	const Real aNextStep( aCurrentTime + aStepInterval );
-	const Real aCallerNextStep( aCallerCurrentTime + aCallerTimeScale );
+        const Real aNextStep( aCurrentTime + aStepInterval );
+        const Real aCallerNextStep( aCallerCurrentTime + aCallerTimeScale );
 
-	// If the next step of this occurs *before* the next step 
-	// of the caller, just shrink step size of this Stepper.
-	if( aNextStep <= aCallerNextStep )
-	  {
-	    return;
-	  }
-
-	
-	// If the next step of this will occur *after* the caller,
-	// reschedule this Stepper, as well as shrinking the next step size.
-	//    setStepInterval( aCallerCurrentTime + ( aCallerTimeScale * 0.5 ) 
-	//		     - aCurrentTime );
-      }
+        // If the next step of this occurs *before* the next step 
+        // of the caller, just shrink step size of this Stepper.
+        if( aNextStep <= aCallerNextStep )
+        {
+            return;
+        }
+    }
     else
-      {
-	// reset step interval to the default
-	setNextStepInterval( 0.001 );
-      }
-      
+    {
+        // reset step interval to the default
+        setNextStepInterval( 0.001 );
+    }
+        
     const Real aNewStepInterval( aCallerCurrentTime - aCurrentTime );
 
     loadStepInterval( aNewStepInterval );
-  }
+}
 
 
-  ////////////////////////// AdaptiveDifferentialStepper
+const Real DifferentialStepper::Interpolant::getDifference(
+        RealParam aTime, RealParam anInterval ) const
+{
+    if ( !theStepper.theStateFlag )
+    {
+        return 0.0;
+    }
 
-  AdaptiveDifferentialStepper::AdaptiveDifferentialStepper()
-    :
-    theTolerance( 1.0e-6 ),
-    theAbsoluteToleranceFactor( 1.0 ),
-    theStateToleranceFactor( 1.0 ),
-    theDerivativeToleranceFactor( 1.0 ),
-    theEpsilonChecked( 0 ),
-    theAbsoluteEpsilon( 0.1 ),
-    theRelativeEpsilon( 0.1 ),
-    safety( 0.9 ),
-    theMaxErrorRatio( 1.0 )
-  {
+    const Real aTimeInterval1( aTime - theStepper.getCurrentTime() );
+    const Real aTimeInterval2( aTimeInterval1 - anInterval );
+
+    RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
+    RealCptr aTaylorCoefficientPtr( aTaylorSeries.origin() + theIndex );
+
+    // calculate first order.
+    // here it assumes that always aTaylorSeries.size() >= 1
+
+    // *aTaylorCoefficientPtr := aTaylorSeries[ 0 ][ theIndex ]
+    Real aValue1( *aTaylorCoefficientPtr * aTimeInterval1 );
+    Real aValue2( *aTaylorCoefficientPtr * aTimeInterval2 );
+
+
+    // check if second and higher order calculations are necessary.
+    const RealMatrix::size_type aTaylorSize( theStepper.getOrder() );
+    if( aTaylorSize >= 2)
+    {
+        const Real aStepIntervalInv(
+            1.0 / theStepper.getTolerableStepInterval() );
+        
+        const RealMatrix::size_type aStride( aTaylorSeries.strides()[0] );
+
+        Real aFactorialInv1( aTimeInterval1 );
+        Real aFactorialInv2( aTimeInterval2 );
+
+        RealMatrix::size_type s( aTaylorSize - 1 );
+
+        const Real theta1( aTimeInterval1 * aStepIntervalInv );
+        const Real theta2( aTimeInterval2 * aStepIntervalInv );
+
+        do 
+        {
+            // main calculation for the 2+ order
+            
+            // aTaylorSeries[ s ][ theIndex ]
+            aTaylorCoefficientPtr += aStride;
+            const Real aTaylorCoefficient( *aTaylorCoefficientPtr );
+            
+            aFactorialInv1 *= theta1;
+            aFactorialInv2 *= theta2;
+            
+            aValue1 += aTaylorCoefficient * aFactorialInv1;
+            aValue2 += aTaylorCoefficient * aFactorialInv2;
+            
+            --s;
+        } while( s != 0 );
+    }
+
+    return aValue1 - aValue2;
+}
+
+
+const Real DifferentialStepper::Interpolant::getVelocity( RealParam aTime ) const
+{
+    if ( !theStepper.theStateFlag )
+    {
+        return 0.0;
+    }
+
+    const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
+
+    RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
+    RealCptr aTaylorCoefficientPtr( aTaylorSeries.origin() + theIndex );
+
+    // calculate first order.
+    // here it assumes that always aTaylorSeries.size() >= 1
+
+    // *aTaylorCoefficientPtr := aTaylorSeries[ 0 ][ theIndex ]
+    Real aValue( *aTaylorCoefficientPtr );
+
+    // check if second and higher order calculations are necessary.
+    const RealMatrix::size_type aTaylorSize( theStepper.getStage() );
+    if( aTaylorSize >= 2 && aTimeInterval != 0.0 )
+    {
+        const RealMatrix::size_type aStride( aTaylorSeries.strides()[0] );
+
+        Real aFactorialInv( 1.0 );
+
+        RealMatrix::size_type s( 1 );
+
+        const Real theta( aTimeInterval 
+                          / theStepper.getTolerableStepInterval() );
+
+        do 
+        {
+            // main calculation for the 2+ order
+            ++s;
+            
+            aTaylorCoefficientPtr += aStride;
+            const Real aTaylorCoefficient( *aTaylorCoefficientPtr );
+            
+            aFactorialInv *= theta * s;
+            
+            aValue += aTaylorCoefficient * aFactorialInv;
+            
+            // LIBECS_PREFETCH( aTaylorCoefficientPtr + aStride, 0, 1 );
+        } while( s != aTaylorSize );
+    }
+
+    return aValue;
+}
+
+
+////////////////////////// AdaptiveDifferentialStepper
+
+AdaptiveDifferentialStepper::AdaptiveDifferentialStepper()
+    : theTolerance( 1.0e-6 ),
+      theAbsoluteToleranceFactor( 1.0 ),
+      theStateToleranceFactor( 1.0 ),
+      theDerivativeToleranceFactor( 1.0 ),
+      theEpsilonChecked( 0 ),
+      theAbsoluteEpsilon( 0.1 ),
+      theRelativeEpsilon( 0.1 ),
+      safety( 0.9 ),
+      theMaxErrorRatio( 1.0 )
+{
     // use more narrow range
     setMinStepInterval( 1e-100 );
     setMaxStepInterval( 1e+10 );
-  }
+}
 
-  AdaptiveDifferentialStepper::~AdaptiveDifferentialStepper()
-  {
+AdaptiveDifferentialStepper::~AdaptiveDifferentialStepper()
+{
     ; // do nothing
-  }
+}
 
 
-  void AdaptiveDifferentialStepper::initialize()
-  {
+void AdaptiveDifferentialStepper::initialize()
+{
     DifferentialStepper::initialize();
+}
 
-    //FIXME:!!
-    //    theEpsilonChecked = ( theEpsilonChecked 
-    //			  || ( theDependentStepperVector.size() > 1 ) );
-  }
-
-  void AdaptiveDifferentialStepper::step()
-  {
+void AdaptiveDifferentialStepper::step()
+{
     theStateFlag = false;
 
     clearVariables();
 
     setStepInterval( getNextStepInterval() );
-    //    setTolerableInterval( 0.0 );
 
     while ( !calculate() )
-      {
-	const Real anExpectedStepInterval( safety * getStepInterval() 
-					   * pow( getMaxErrorRatio(),
-						  -1.0 / getOrder() ) );
-	//	const Real anExpectedStepInterval( 0.5 * getStepInterval() );
+    {
+        const Real anExpectedStepInterval( safety * getStepInterval() 
+                                           * pow( getMaxErrorRatio(),
+                                                  -1.0 / getOrder() ) );
 
-	if ( anExpectedStepInterval > getMinStepInterval() )
-	  {
-	    // shrink it if the error exceeds 110%
-	    setStepInterval( anExpectedStepInterval );
-	  }
-	else
-	  {
-	    setStepInterval( getMinStepInterval() );
+        if ( anExpectedStepInterval > getMinStepInterval() )
+        {
+            // shrink it if the error exceeds 110%
+            setStepInterval( anExpectedStepInterval );
+        }
+        else
+        {
+            setStepInterval( getMinStepInterval() );
 
-	    // this must return false,
-	    // so theTolerableStepInterval does NOT LIMIT the error.
-	    THROW_EXCEPTION( SimulationError,
-			     "The error-limit step interval of Stepper [" + 
-			     getID() + "] is too small." );
- 
-	    calculate();
-	    break;
-	  }
-      }
+            // this must return false,
+            // so theTolerableStepInterval does NOT LIMIT the error.
+            THROW_EXCEPTION( SimulationError,
+                             "The error-limit step interval of Stepper ["
+                             + getID() + "] is too small." );
+
+            calculate();
+            break;
+        }
+    }
 
     // an extra calculation for resetting the activities of processes
     fireProcesses();
@@ -365,51 +462,16 @@ namespace libecs
     // grow it if error is 50% less than desired
     const Real maxError( getMaxErrorRatio() );
     if ( maxError < 0.5 )
-      {
-	const Real aNewStepInterval( getTolerableStepInterval() * safety
-				     * pow( maxError ,
-					    -1.0 / ( getOrder() + 1 ) ) );
-	//	const Real aNewStepInterval( getStepInterval() * 2.0 );
-
-	setNextStepInterval( aNewStepInterval );
-      }
+    {
+        const Real aNewStepInterval( getTolerableStepInterval() * safety
+                                     * pow( maxError,
+                                            -1.0 / ( getOrder() + 1 ) ) );
+        setNextStepInterval( aNewStepInterval );
+    }
     else 
-      {
-	setNextStepInterval( getTolerableStepInterval() );
-      }
-
-    /**
-    // check the tolerances for Epsilon
-    if ( isEpsilonChecked() ) 
-      {
-	const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
-
-	for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
-	  {
-	    VariablePtr const aVariable( theVariableVector[ c ] );
-	    
-	    const Real aTolerance( FMA( fabs( aVariable->getValue() ),
-					theRelativeEpsilon,
-					theAbsoluteEpsilon ) );
-
-	    const Real aVelocity( fabs( theVelocityBuffer[ c ] ) );
-	    
-	    if ( aTolerance < aVelocity * getStepInterval() )
-	      {
-		setStepInterval( aTolerance / aVelocity );
-	      }
-	  }
-      }
-    */
-  }
+    {
+        setNextStepInterval( getTolerableStepInterval() );
+    }
+}
 
 } // namespace libecs
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

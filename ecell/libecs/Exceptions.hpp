@@ -36,49 +36,32 @@
 
 #include "libecs/Defs.hpp"
 
+
+/**
+   @defgroup exception The Exceptions
+   @ingroup libecs
+   @{
+*/ 
 namespace libecs
 {
-
-  /** @defgroup exception The Exceptions
-      The exceptions.
-
-      @ingroup libecs
-      @{
-  */ 
-  
-
-  /// A macro to throw an exception, with method name
+/**
+   A macro to throw an exception, with method name
+   @param CLASS the exception class.
+   @param MESSAGE the message attached to the exception.
+ */
 #define THROW_EXCEPTION( CLASS, MESSAGE )\
-throw CLASS( __PRETTY_FUNCTION__, MESSAGE )
+    throw CLASS( __PRETTY_FUNCTION__, MESSAGE )
 
-#if defined( DEBUG ) 
-#define DEBUG_EXCEPTION( EXPRESSION, CLASS, MESSAGE )\
-if( ! ( EXPRESSION ) )\
-{\
-  THROW_EXCEPTION( CLASS, "[ " + String( STR( EXPRESSION )  ) + " ]\n\t"\
-                   + MESSAGE );\
-}
-#else
-#define DEBUG_EXCEPTION( EXPRESSION, CLASS, MESSAGE ) ;
-#endif
-
-
-
-  /// Base exception class
-  class LIBECS_API Exception 
-    : 
-    public std::exception 
-  {
-
-  public:
-
+/// Base exception class
+class LIBECS_API Exception: public std::exception 
+{
+public:
     Exception( StringCref method, StringCref message = "" )
-      : 
-      theMethod( method ), 
-      theMessage( message ),
-      theWhatMsg()
+        : theMethod( method ), 
+          theMessage( message ),
+          theWhatMsg()
     {
-      ; // do nothing
+        ; // do nothing
     }
 
     virtual ~Exception() throw();
@@ -89,63 +72,60 @@ if( ! ( EXPRESSION ) )\
 
     virtual const char* const getClassName() const
     {
-      return "Exception";
+        return "Exception";
     }
 
-  protected:
+protected:
     const String theMethod;
     const String theMessage;
     mutable String theWhatMsg;
-  };
+};
 
-  /**
-
-  @internal
-  */
-
+/**
+    @internal
+ */
 #define DEFINE_EXCEPTION( CLASSNAME, BASECLASS )\
 class LIBECS_API CLASSNAME : public BASECLASS\
 {\
 public:\
-  CLASSNAME( StringCref method, StringCref message = "" )\
-    :  BASECLASS( method, message ) {}\
-  virtual ~CLASSNAME() throw() {}\
-  virtual StringLiteral getClassName() const\
-    { return #CLASSNAME ; }\
+    CLASSNAME( StringCref method, StringCref message = "" )\
+        : BASECLASS( method, message ) {}\
+    virtual ~CLASSNAME() throw() {}\
+    virtual StringLiteral getClassName() const { return #CLASSNAME ; }\
 };\
 
 
-  // system errors
-  DEFINE_EXCEPTION( UnexpectedError,        Exception );
-  DEFINE_EXCEPTION( NotFound,               Exception );
-  DEFINE_EXCEPTION( IOException,            Exception );
-  DEFINE_EXCEPTION( NotImplemented,         Exception ); 
-  DEFINE_EXCEPTION( Instantiation,          Exception );
+// system errors
+DEFINE_EXCEPTION( UnexpectedError,                Exception );
+DEFINE_EXCEPTION( NotFound,                             Exception );
+DEFINE_EXCEPTION( IOException,                        Exception );
+DEFINE_EXCEPTION( NotImplemented,                 Exception ); 
+DEFINE_EXCEPTION( Instantiation,                    Exception );
 
-  DEFINE_EXCEPTION( AssertionFailed,        Exception );
-  DEFINE_EXCEPTION( AlreadyExist,           Exception );
-  DEFINE_EXCEPTION( ValueError,             Exception );
-  DEFINE_EXCEPTION( TypeError,              Exception );
-  DEFINE_EXCEPTION( OutOfRange,             Exception );
-  DEFINE_EXCEPTION( IllegalOperation,       Exception );
+DEFINE_EXCEPTION( AssertionFailed,                Exception );
+DEFINE_EXCEPTION( AlreadyExist,                     Exception );
+DEFINE_EXCEPTION( ValueError,                         Exception );
+DEFINE_EXCEPTION( TypeError,                            Exception );
+DEFINE_EXCEPTION( OutOfRange,                         Exception );
+DEFINE_EXCEPTION( IllegalOperation,             Exception );
 
-  // simulation errors
-  DEFINE_EXCEPTION( SimulationError,        Exception );
-  DEFINE_EXCEPTION( InitializationFailed,   SimulationError );
-  DEFINE_EXCEPTION( RangeError,             SimulationError );
+// simulation errors
+DEFINE_EXCEPTION( SimulationError,                Exception );
+DEFINE_EXCEPTION( InitializationFailed,     SimulationError );
+DEFINE_EXCEPTION( RangeError,                         SimulationError );
 
-  // PropertySlot errors
-  DEFINE_EXCEPTION( PropertyException,      Exception );
-  DEFINE_EXCEPTION( NoSlot,                 PropertyException );
-  DEFINE_EXCEPTION( AttributeError,         PropertyException );
+// PropertySlot errors
+DEFINE_EXCEPTION( PropertyException,            Exception );
+DEFINE_EXCEPTION( NoSlot,                                 PropertyException );
+DEFINE_EXCEPTION( AttributeError,                 PropertyException );
 
-  // Introspection errors
-  DEFINE_EXCEPTION( NoInfoField,            Exception );
+// Introspection errors
+DEFINE_EXCEPTION( NoInfoField,                        Exception );
 
-  // FullID errors
-  DEFINE_EXCEPTION( BadID,                  Exception ); 
-  DEFINE_EXCEPTION( BadSystemPath,          BadID );
-  DEFINE_EXCEPTION( InvalidEntityType,      BadID);
+// FullID errors
+DEFINE_EXCEPTION( BadID,                                    Exception ); 
+DEFINE_EXCEPTION( BadSystemPath,                    BadID );
+DEFINE_EXCEPTION( InvalidEntityType,            BadID);
 
 
 /**
@@ -153,24 +133,13 @@ public:\
 
    Use this macro to indicate where must not be reached.
 */
-
 #define NEVER_GET_HERE\
-      THROW_EXCEPTION( libecs::UnexpectedError, \
-		       "never get here (" + libecs::String( __PRETTY_FUNCTION__ )\
-		       + ")." )
-
-
-  /** @} */ //end of exception module
+    THROW_EXCEPTION( libecs::UnexpectedError, \
+                     "never get here (" + libecs::String( __PRETTY_FUNCTION__ )\
+                     + ")." )
 
 } // namespace libecs
 
+/** @} */
+
 #endif /* __EXCEPTIONS_HPP */
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

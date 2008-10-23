@@ -41,54 +41,44 @@
 namespace libecs
 {
 
-  LIBECS_DM_INIT_STATIC( Entity, Entity );
+LIBECS_DM_INIT_STATIC( Entity, Entity );
+
+Entity::Entity()
+    : theSuperSystem( NULLPTR ),
+      theID( "" ),
+      theName( "" ) 
+{
+
+}
 
 
-  Entity::Entity()
-    : 
-    theSuperSystem( NULLPTR ),
-    theID( "" ),
-    theName( "" ) 
-  {
-
-  }
-
-
-  Entity::~Entity()
-  {
+Entity::~Entity()
+{
     ; // do nothing
-  }
+}
 
-  const FullID Entity::getFullID() const
-  {
+const FullID Entity::getFullID() const
+{
     return FullID( getEntityType(), getSystemPath(), getID() );
-  }
+}
 
-  const String Entity::getFullIDString() const
-  {
+const String Entity::getFullIDString() const
+{
     return getFullID().getString();
-  }
+}
 
-  const SystemPath Entity::getSystemPath() const
-  {
+const SystemPath Entity::getSystemPath() const
+{
     SystemPtr aSystemPtr( getSuperSystem() );
 
     if( aSystemPtr == NULLPTR )
-      {
-	return SystemPath();
-      }
+    {
+        return SystemPath();
+    }
 
     SystemPath aSystemPath( aSystemPtr->getSystemPath() );
     aSystemPath.push_back( aSystemPtr->getID() );
     return aSystemPath;
-  }
+}
 
 } // namespace libecs
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

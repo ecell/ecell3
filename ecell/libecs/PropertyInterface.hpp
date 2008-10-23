@@ -45,73 +45,69 @@
 #include "libecs/PropertySlot.hpp"
 #include "libecs/PropertySlotProxy.hpp"
 
+
+/**
+   @addtogroup property The Inter-object Communication.
+   The Interobject Communication.
+   @{
+ */
 namespace libecs
 {
 
-  /** @addtogroup property The Inter-object Communication.
-   *  The Interobject Communication.
-   *@{
-
-  */
-
-  /** @file */
-
-  class LIBECS_API PropertyInterfaceBase: public DynamicModuleInfo
-  {
-  public:
-
+class LIBECS_API PropertyInterfaceBase: public DynamicModuleInfo
+{
+public:
     typedef ::Loki::AssocVector< String, Polymorph, std::less<const String> >
-	    PolymorphAssocVector;
+            PolymorphAssocVector;
     typedef std::pair< PolymorphAssocVector::const_iterator,
-		       PolymorphAssocVector::const_iterator >
-	    PolymorphAssocVectorCrange;
+                       PolymorphAssocVector::const_iterator >
+            PolymorphAssocVectorCrange;
     typedef ::Loki::AssocVector< String, PropertySlotBase*,
-				 std::less<const String> > PropertySlotMap;
+                                 std::less<const String> > PropertySlotMap;
     typedef const PropertySlotMap& PropertySlotMapCref;
     typedef PropertySlotMap::const_iterator PropertySlotMapConstIterator;
 
-  private:
-
+private:
     template< typename Trange_ >
     class EntryIterator: public DynamicModuleInfo::EntryIterator
     {
     public:
-      EntryIterator( const Trange_& aRange )
-	: firstTime( true ),
-          theEnd( boost::end( aRange ) ), theIter( boost::begin( aRange ) ) {}
+        EntryIterator( const Trange_& aRange )
+            : firstTime( true ),
+              theEnd( boost::end( aRange ) ),
+              theIter( boost::begin( aRange ) ) {}
 
-      virtual ~EntryIterator() {}
+        virtual ~EntryIterator() {}
 
-      virtual bool next()
-      {
-	if ( theIter == theEnd )
-	  return false;
-	if ( !firstTime )
-	{
-	  ++theIter;
-	  if ( theIter == theEnd )
-	    return false;
-	}
-	firstTime = false;
-	return true;
-      }
+        virtual bool next()
+        {
+            if ( theIter == theEnd )
+                return false;
+            if ( !firstTime )
+            {
+                ++theIter;
+                if ( theIter == theEnd )
+                    return false;
+            }
+            firstTime = false;
+            return true;
+        }
 
-      virtual std::pair< String, const void* > current()
-      {
-	return std::pair< String, const void * >( theIter->first, &theIter->second );
-      }
- 
+        virtual std::pair< String, const void* > current()
+        {
+            return std::pair< String, const void * >( theIter->first, &theIter->second );
+        }
+
     private:
-      bool firstTime;
-      boost::range_iterator< PolymorphAssocVectorCrange >::type theEnd;
-      boost::range_iterator< PolymorphAssocVectorCrange >::type theIter;
+        bool firstTime;
+        boost::range_iterator< PolymorphAssocVectorCrange >::type theEnd;
+        boost::range_iterator< PolymorphAssocVectorCrange >::type theIter;
     };
 
-  public:
-
+public:
     virtual ~PropertyInterfaceBase()
     {
-      ; // do nothing
+        ; // do nothing
     }
 
     /**
@@ -121,116 +117,114 @@ namespace libecs
 
        @return a borrowed pointer to the PropertySlot with that name.
     */
-
     const PropertySlotBasePtr getPropertySlot( StringCref aPropertyName ) const
     {
-      PropertySlotMapConstIterator i( findPropertySlot( aPropertyName ) );
+        PropertySlotMapConstIterator i( findPropertySlot( aPropertyName ) );
 
-      if( i == thePropertySlotMap.end() )
-	{
-	  throwNoSlot( aPropertyName );
-	}
+        if( i == thePropertySlotMap.end() )
+        {
+            throwNoSlot( aPropertyName );
+        }
 
-      return i->second;
+        return i->second;
     }
 
 
     const StringVector getPropertyList() const
     {
-      StringVector aVector;
+        StringVector aVector;
 
-      for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
-	   i != thePropertySlotMap.end() ; ++i )
-	{
-	  aVector.push_back( i->first );
-	}
+        for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
+             i != thePropertySlotMap.end() ; ++i )
+        {
+            aVector.push_back( i->first );
+        }
 
-      return aVector;
+        return aVector;
     }
 
     
     void 
     registerPropertySlot( PropertySlotBasePtr aPropertySlotPtr )
     {
-      StringCref aName( aPropertySlotPtr->getName() );
-      if( findPropertySlot( aName ) != thePropertySlotMap.end() )
-	{
-	  // it already exists. take the latter one.
-	  delete thePropertySlotMap[ aName ];
-	  thePropertySlotMap.erase( aName );
-	}
+        StringCref aName( aPropertySlotPtr->getName() );
+        if( findPropertySlot( aName ) != thePropertySlotMap.end() )
+        {
+            // it already exists. take the latter one.
+            delete thePropertySlotMap[ aName ];
+            thePropertySlotMap.erase( aName );
+        }
 
-      //      thePropertySlotMap[ aName ] = aPropertySlotPtr;
-      thePropertySlotMap.insert( std::make_pair( aName, aPropertySlotPtr ) );
+        thePropertySlotMap.insert( std::make_pair( aName, aPropertySlotPtr ) );
     }
 
 
     const PropertyAttributes
     getPropertyAttributes( StringCref aPropertyName ) const
     {
-      PropertySlotMapConstIterator i( findPropertySlot( aPropertyName ) );
+        PropertySlotMapConstIterator i( findPropertySlot( aPropertyName ) );
 
-      if( i != thePropertySlotMap.end() )
+        if( i != thePropertySlotMap.end() )
         {
-	  PropertySlotBaseCptr aPropertySlotPtr( getPropertySlot( aPropertyName ) );
-	  
-	  return PropertyAttributes( *aPropertySlotPtr );
+            PropertySlotBaseCptr aPropertySlotPtr( getPropertySlot( aPropertyName ) );
+            
+            return PropertyAttributes( *aPropertySlotPtr );
         }
-      throwNoSlot( aPropertyName );
+        throwNoSlot( aPropertyName );
 	  return PropertyAttributes();
     }
 
 
     PropertySlotMapCref getPropertySlotMap() const
     {
-      return thePropertySlotMap;
+        return thePropertySlotMap;
     }
 
     void setInfoField( StringCref aFieldName, PolymorphCref aFieldValue )
     {
-      theInfoMap.insert( std::make_pair( aFieldName, aFieldValue ) );
+        theInfoMap.insert( std::make_pair( aFieldName, aFieldValue ) );
     }
 
     virtual const void* getInfoField( StringCref aFieldName ) const
     {
-      PolymorphAssocVector::const_iterator i( theInfoMap.find( aFieldName ) );
-      if( i == theInfoMap.end() )
-	THROW_EXCEPTION( NoInfoField, "No such info field: " + aFieldName );
-      return &i->second;
+        PolymorphAssocVector::const_iterator i( theInfoMap.find( aFieldName ) );
+        if( i == theInfoMap.end() )
+            THROW_EXCEPTION( NoInfoField, "No such info field: " + aFieldName );
+        return &i->second;
     }
 
     virtual DynamicModuleInfo::EntryIterator* getInfoFields() const
     {
-      return createEntryIterator( theInfoMap.begin(), theInfoMap.end() );
+        return createEntryIterator( theInfoMap.begin(), theInfoMap.end() );
     }
 
     StringCref getClassName() const
     {
-      return theClassName;
+        return theClassName;
     }
 
     StringCref getTypeName() const
     {
-      return theTypeName;
+        return theTypeName;
     }
 
     void throwNoSlot( StringCref aPropertyName ) const;
     void throwNotLoadable( StringCref aPropertyName ) const;
     void throwNotSavable( StringCref aPropertyName ) const;
 
-  protected:
+protected:
 
     PropertyInterfaceBase( StringCref aClassName, String aTypeName )
-      : theClassName( aClassName ), theTypeName( aTypeName )
+        : theClassName( aClassName ), theTypeName( aTypeName )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
 
     PropertySlotMapConstIterator 
     findPropertySlot( StringCref aPropertyName ) const
     {
-      return thePropertySlotMap.find( aPropertyName );
+        return thePropertySlotMap.find( aPropertyName );
     }
 
 
@@ -238,31 +232,29 @@ namespace libecs
     EntryIterator< std::pair< Titer_, Titer_ > >*
     createEntryIterator( const Titer_& begin, const Titer_& end ) const
     {
-      return new EntryIterator< std::pair< Titer_, Titer_ > >( std::make_pair( begin, end ) );
+        return new EntryIterator< std::pair< Titer_, Titer_ > >( std::make_pair( begin, end ) );
     }
 
-  protected:
+protected:
 
-    PropertySlotMap  thePropertySlotMap;
+    PropertySlotMap    thePropertySlotMap;
 
     PolymorphAssocVector theInfoMap;
 
     String theClassName;
 
     String theTypeName;
-  };
+};
 
-  template < class T >
-  class PropertyInterface
-    :
-    public PropertyInterfaceBase
-  {
-
-  public:
+template < class T >
+class PropertyInterface
+    : public PropertyInterfaceBase
+{
+public:
     PropertyInterface( StringCref aClassName, StringCref aTypeName )
-	: PropertyInterfaceBase( aClassName, aTypeName )
+        : PropertyInterfaceBase( aClassName, aTypeName )
     {
-      T::initializePropertyInterface( this );
+        T::initializePropertyInterface( this );
     }
 
 
@@ -273,43 +265,43 @@ namespace libecs
 
     const StringVector getPropertyList( const T& anObject ) const
     {
-      StringVector aVector1;
-      // aVector.reserve( thePropertySlotMap.size() );
-      
-      for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
-	   i != thePropertySlotMap.end() ; ++i )
-	{
-	  aVector1.push_back( i->first );
-	}
+        StringVector aVector1;
+        // aVector.reserve( thePropertySlotMap.size() );
+        
+        for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
+             i != thePropertySlotMap.end() ; ++i )
+        {
+            aVector1.push_back( i->first );
+        }
 
-      const StringVector& aVector2( anObject.defaultGetPropertyList() );
+        const StringVector& aVector2( anObject.defaultGetPropertyList() );
 
-      for( StringVector::const_iterator i( aVector2.begin() );
-	   i != aVector2.end(); ++i )
-	{
-	  aVector1.push_back( *i );
-	}
+        for( StringVector::const_iterator i( aVector2.begin() );
+             i != aVector2.end(); ++i )
+        {
+            aVector1.push_back( *i );
+        }
 
-      return aVector1;
+        return aVector1;
     }
 
     
     PropertySlotProxyPtr 
     createPropertySlotProxy( T& anObject,
-			     StringCref aPropertyName ) const
+                             StringCref aPropertyName ) const
     {
-      try
-	{
-	  PropertySlotBaseCptr aPropertySlot( getPropertySlot( aPropertyName ) );
-	  return new ConcretePropertySlotProxy<T>(
-	      anObject,
-	      *static_cast< PropertySlot<T> const* >( aPropertySlot ) );
-	}
-      catch( NoSlotCref )
-	{
-	  throwNoSlot( aPropertyName );
-	}
-      return 0; // never get here
+        try
+        {
+            PropertySlotBaseCptr aPropertySlot( getPropertySlot( aPropertyName ) );
+            return new ConcretePropertySlotProxy<T>(
+                    anObject,
+                    *static_cast< PropertySlot<T> const* >( aPropertySlot ) );
+        }
+        catch( NoSlotCref )
+        {
+            throwNoSlot( aPropertyName );
+        }
+        return 0; // never get here
     }
 
 
@@ -323,21 +315,20 @@ namespace libecs
        @param aValue the value to set as a Polymorph.
        @throw NoSlot 
     */
-
     void setProperty( T& anObject, StringCref aPropertyName, 
-		      PolymorphCref aValue ) const
+                                        PolymorphCref aValue ) const
     {
-      PropertySlotMapConstIterator 
-	aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
-      
-      if( aPropertySlotMapIterator != thePropertySlotMap.end() )
-	{
-	  static_cast< PropertySlot< T > const* >( aPropertySlotMapIterator->second )->setPolymorph( anObject, aValue );
-	}
-      else
-	{
-	  anObject.defaultSetProperty( aPropertyName, aValue );	  
-	}
+        PropertySlotMapConstIterator aPropertySlotMapIterator(
+                findPropertySlot( aPropertyName ) );
+        
+        if( aPropertySlotMapIterator != thePropertySlotMap.end() )
+        {
+            static_cast< PropertySlot< T > const* >( aPropertySlotMapIterator->second )->setPolymorph( anObject, aValue );
+        }
+        else
+        {
+            anObject.defaultSetProperty( aPropertyName, aValue );                    
+        }
     }
     
 
@@ -351,104 +342,95 @@ namespace libecs
        @return the value as a Polymorph.
        @throw NoSlot
     */
-
     const Polymorph getProperty( const T& anObject,
-				 StringCref aPropertyName ) const
+                                 StringCref aPropertyName ) const
     {
-      PropertySlotMapConstIterator 
-	aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
-      
-      if( aPropertySlotMapIterator != thePropertySlotMap.end() )
-	{
-	  return static_cast< PropertySlot< T > const* >( aPropertySlotMapIterator->second )->getPolymorph( anObject );
-	}
-      else
-	{
-	  return anObject.defaultGetProperty( aPropertyName );
-	}
+        PropertySlotMapConstIterator 
+            aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
+        
+        if( aPropertySlotMapIterator != thePropertySlotMap.end() )
+        {
+            return static_cast< PropertySlot< T > const* >( aPropertySlotMapIterator->second )->getPolymorph( anObject );
+        }
+        else
+        {
+            return anObject.defaultGetProperty( aPropertyName );
+        }
     }
 
 
     void loadProperty( T& anObject, StringCref aPropertyName, 
-		       PolymorphCref aValue ) const
+                       PolymorphCref aValue ) const
     {
-      PropertySlotMapConstIterator 
-	aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
+        PropertySlotMapConstIterator 
+            aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
 
-      if( aPropertySlotMapIterator != thePropertySlotMap.end() )
-	{
-	  PropertySlotBaseCptr aPropertySlotPtr( aPropertySlotMapIterator->second );
+        if( aPropertySlotMapIterator != thePropertySlotMap.end() )
+        {
+            PropertySlotBaseCptr aPropertySlotPtr( aPropertySlotMapIterator->second );
 
-	  if( aPropertySlotPtr->isLoadable() )
-	    {
-	      static_cast< PropertySlot< T > const* >( aPropertySlotPtr )->loadPolymorph( anObject, aValue );
-	    }
-	  else
-	    {
-	      throwNotLoadable( aPropertyName );
-	    }
-	}
-      else
-	{
-	  anObject.defaultSetProperty( aPropertyName, aValue );
-	}
+            if( aPropertySlotPtr->isLoadable() )
+            {
+                static_cast< PropertySlot< T > const* >( aPropertySlotPtr )->loadPolymorph( anObject, aValue );
+            }
+            else
+            {
+                throwNotLoadable( aPropertyName );
+            }
+        }
+        else
+        {
+            anObject.defaultSetProperty( aPropertyName, aValue );
+        }
     }
     
 
     const Polymorph
     saveProperty( const T& anObject, StringCref aPropertyName ) const
     {
-      PropertySlotMapConstIterator 
-	aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
+        PropertySlotMapConstIterator 
+            aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
 
-      if( aPropertySlotMapIterator != thePropertySlotMap.end() )
-	{
-	  PropertySlotBaseCptr aPropertySlotPtr( aPropertySlotMapIterator->second );
-	  if( aPropertySlotPtr->isSavable() )
-	    {
-	      return static_cast< PropertySlot< T > const* >( aPropertySlotPtr )->savePolymorph( anObject );
-	    }
-	  else
-	    {
-	      throwNotSavable( aPropertyName );
-	    }
-	}
-      else
-	{
-	  return anObject.defaultGetProperty( aPropertyName );
-	}
-      return Polymorph(); // never get here
+        if( aPropertySlotMapIterator != thePropertySlotMap.end() )
+        {
+            PropertySlotBaseCptr aPropertySlotPtr( aPropertySlotMapIterator->second );
+            if( aPropertySlotPtr->isSavable() )
+            {
+                return static_cast< PropertySlot< T > const* >( aPropertySlotPtr )->savePolymorph( anObject );
+            }
+            else
+            {
+                throwNotSavable( aPropertyName );
+            }
+        }
+        else
+        {
+            return anObject.defaultGetProperty( aPropertyName );
+        }
+        return Polymorph(); // never get here
     }
 
 
     const PropertyAttributes
     getPropertyAttributes( const T& anObject, StringCref aPropertyName ) const
     {
-      PropertySlotMapConstIterator i( findPropertySlot( aPropertyName ) );
+        PropertySlotMapConstIterator i( findPropertySlot( aPropertyName ) );
 
-      if( i != thePropertySlotMap.end() )
+        if( i != thePropertySlotMap.end() )
         {
-	  PropertySlotBaseCptr aPropertySlotPtr( getPropertySlot( aPropertyName ) );
-	  
-	  return PropertyAttributes( *aPropertySlotPtr );
+            PropertySlotBaseCptr aPropertySlotPtr( getPropertySlot( aPropertyName ) );
+            
+            return PropertyAttributes( *aPropertySlotPtr );
         }
-      else
+        else
         {
-	  return anObject.defaultGetPropertyAttributes( aPropertyName );
+            return anObject.defaultGetPropertyAttributes( aPropertyName );
         }
     }
-  };
+};
 
-  /*@}*/
-  
 } // namespace libecs
 
+/** @} */
+    
 #endif /* __PROPERTYINTERFACE_HPP */
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

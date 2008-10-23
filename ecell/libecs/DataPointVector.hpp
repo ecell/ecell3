@@ -37,25 +37,21 @@
 #include <sys/types.h>
 
 
+/**
+   @addtogroup logging
+   @{
+*/
+
 namespace libecs
 {
 
-  /** @addtogroup logging
-   *@{
-   */
+DECLARE_TYPE( size_t, DataPointVectorIterator );
 
-  /** @file */
+DECLARE_SHAREDPTR( DataPointVector );
 
-
-  DECLARE_TYPE( size_t, DataPointVectorIterator );
-
-  DECLARE_SHAREDPTR( DataPointVector );
-
-  class LIBECS_API DataPointVector
-  {
-
-  public:
-
+class LIBECS_API DataPointVector
+{
+public:
     DataPointVector( DataPointVectorIterator, int aPointSize );
 
     ~DataPointVector();
@@ -70,27 +66,26 @@ namespace libecs
 
     DataPointVectorIterator getSize() const
     {
-      return theSize;
+        return theSize;
     }
 
     size_t getElementSize() const;
-	
+            
     DataPointVectorIterator begin() const
     {
-      return 0;
+        return 0;
     }
-	
+            
     DataPointVectorIterator end() const
     {
-      return getSize();
+        return getSize();
     }
-	
+            
     const void* getRawArray() const;
 
     Integer getPointSize();
 
-  private:
-
+private:
     DataPointVectorIterator theSize;
 
     Integer thePointSize;
@@ -98,12 +93,10 @@ namespace libecs
     DataPoint* theRawArray;
 
     LongDataPoint* theRawArrayLong;
-
-  };
-
-  //@}
+};
 
 } // namespace libecs
 
+/** @} */
 
 #endif /* __DATAPOINTVECTOR_HPP */

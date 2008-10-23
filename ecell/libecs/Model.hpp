@@ -43,48 +43,40 @@
 #include "libecs/Stepper.hpp"
 #include "libecs/SystemStepper.hpp"
 
+/**
+   @addtogroup model The Model.
+
+   The model.
+
+   @ingroup libecs
+   @{ 
+*/ 
+
 namespace libecs
 {
 
-  /** @addtogroup model The Model.
-
-      The model.
-
-      @ingroup libecs
-      @{ 
-   */ 
-
-  /** @file */
+DECLARE_ASSOCVECTOR( String, StepperPtr, std::less< const String >,
+                                         StepperMap ); 
 
 
-  DECLARE_ASSOCVECTOR( String, StepperPtr, std::less< const String >,
-		       StepperMap ); 
+/**
+   Model class represents a simulation model.
 
-
-  /**
-     Model class represents a simulation model.
-
-     Model has a list of Steppers and a pointer to the root system.
-
-  */
-
-  class LIBECS_API Model
-  {
-
-  protected:
-
-    typedef EventScheduler<StepperEvent> StepperEventScheduler;
+   Model has a list of Steppers and a pointer to the root system.
+*/
+class LIBECS_API Model
+{
+protected:
+    typedef EventScheduler< StepperEvent > StepperEventScheduler;
     typedef StepperEventScheduler::EventIndex EventIndex;
     typedef EcsObjectMaker< Stepper > StepperMaker;
     typedef EcsObjectMaker< System > SystemMaker;
     typedef EcsObjectMaker< Variable > VariableMaker;
     typedef EcsObjectMaker< Process > ProcessMaker;
 
-  public:
-
+public:
     Model( StaticModuleMaker< EcsObject >& maker );
     ~Model();
-
     /**
        Initialize the whole model.
 
@@ -94,42 +86,32 @@ namespace libecs
        Procedure of the initialization is as follows:
 
        1. Initialize Systems recursively starting from theRootSystem.
-          ( System::initialize() )
+              ( System::initialize() )
        2. Check if all the Systems have a Stepper each.
        3. Initialize Steppers. ( Stepper::initialize() )
        4. Construct Stepper interdependency graph 
-          ( Stepper::updateDependentStepperVector() )
+              ( Stepper::updateDependentStepperVector() )
 
 
        @throw InitializationFailed
     */
-
     void initialize();
+
 
     /**
        Conduct a step of the simulation.
 
        @see Scheduler
     */
-
-    void step()
-    {
-      StepperEventCref aNextEvent( theScheduler.getTopEvent() );
-      theCurrentTime = aNextEvent.getTime();
-      theLastStepper = aNextEvent.getStepper();
-
-      theScheduler.step();
-    }
+    void step();
 
 
     /**
        Get the next event to occur on the scheduler.
-
      */
-
     const StepperEvent& getTopEvent() const
     {
-      return theScheduler.getTopEvent();
+        return theScheduler.getTopEvent();
     }
 
 
@@ -138,68 +120,62 @@ namespace libecs
 
        @return time elasped since start of the simulation.
     */
-
     const Real getCurrentTime() const
     {
-      return theCurrentTime;
+        return theCurrentTime;
     }
 
 
     const StepperPtr getLastStepper() const
     {
-      return theLastStepper;
+        return theLastStepper;
     }
+
 
     /**
        Get the property interface for the specified class.
 
        @param aClassname
     */
+    const PropertyInterfaceBase& getPropertyInterface(
+            StringCref aClassname ) const;
 
-    const PropertyInterfaceBase& getPropertyInterface( StringCref aClassname ) const;
 
     /**
        Creates a new Entity object and register it in an appropriate System
-       in  the Model.
+       in the Model.
 
        @param aClassname
        @param aFullID
        @param aName
     */
-
     void createEntity( StringCref aClassname, FullIDCref aFullID );
 
 
     /**
-       This method finds an Entity object pointed by the FullID.
+       Retrieves an Entity object pointed by the FullID.
 
        @param aFullID a FullID of the requested Entity.
        @return A borrowed pointer to an Entity specified by the FullID.
     */
-
     EntityPtr getEntity( FullIDCref aFullID ) const;
 
-    /**
-       This method finds a System object pointed by the SystemPath.  
 
+    /**
+       Retrieves a System object pointed by the SystemPath.    
 
        @param aSystemPath a SystemPath of the requested System.
        @return A borrowed pointer to a System.
     */
-
-
     SystemPtr getSystem( SystemPathCref aSystemPath ) const;;
 
 
     /**
        Create a stepper with an ID and a classname. 
 
-       @param aClassname  a classname of the Stepper to create.  
-
-       @param anID        a Stepper ID string of the Stepper to create.  
-
+       @param aClassname  a classname of the Stepper to create.    
+       @param anID        a Stepper ID string of the Stepper to create.    
     */
-
     void createStepper( StringCref aClassname, StringCref anID );
 
 
@@ -209,7 +185,6 @@ namespace libecs
        @param anID a Stepper ID string of the Stepper to get.
        @return a borrowed pointer to the Stepper.
     */
-
     StepperPtr getStepper( StringCref anID ) const;
 
 
@@ -218,24 +193,19 @@ namespace libecs
 
        @return the const reference of the StepperMap.
     */
-
     StepperMapCref getStepperMap() const
     {
-      return theStepperMap;
+        return theStepperMap;
     }
-
-
 
 
     /**
        Flush the data in all Loggers immediately.
 
-       Usually Loggers record data with logging intervals.  This method
+       Usually Loggers record data with logging intervals.    This method
        orders every Logger to write the data immediately ignoring the
        logging interval.
-
     */
-
     void flushLoggers();
 
 
@@ -244,60 +214,52 @@ namespace libecs
 
        @return a borrowed pointer to the RootSystem.
     */
-
     SystemPtr getRootSystem() const
     {
-      return theRootSystemPtr;
+        return theRootSystemPtr;
     }
+
 
     SystemStepperPtr getSystemStepper()
     {
-      return &theSystemStepper;
+        return &theSystemStepper;
     }
-
 
     /**
        Get the LoggerBroker.
 
        @return a borrowed pointer to the LoggerBroker.
     */
-
     LoggerBrokerRef getLoggerBroker()
     { 
-      return theLoggerBroker; 
+        return theLoggerBroker; 
     }
+
 
     LoggerBrokerCref getLoggerBroker() const
     { 
-      return theLoggerBroker; 
+        return theLoggerBroker; 
     }
 
 
-    StepperEventScheduler&   getScheduler() { return theScheduler; }
+    StepperEventScheduler& getScheduler()
+    {
+        return theScheduler;
+    }
+
+
+    StepperEventScheduler const& getScheduler() const
+    {
+        return theScheduler;
+    }
 
     void setDMSearchPath( const String& path );
 
     const String getDMSearchPath() const;
 
+private:
     /// @internal
     void registerBuiltinModules();
-
-    /// @internal
-    StepperMaker&       getStepperMaker()     { return theStepperMaker; }
-
-    /// @internal
-
-    ProcessMaker&       getProcessMaker()     { return theProcessMaker; }
-
-    /// @internal
-
-    VariableMaker&      getVariableMaker()    { return theVariableMaker; }
-
-    /// @internal
-
-    SystemMaker&        getSystemMaker()      { return theSystemMaker; }
-
-  private:
 
     /**
        This method checks recursively if all systems have Steppers
@@ -307,56 +269,40 @@ namespace libecs
        
        @throw InitializationFailed if the check is failed.
     */
-
     void checkStepper( SystemCptr const aSystem ) const;
 
     void checkSizeVariable( SystemCptr const aSystem );
 
     static void initializeSystems( SystemPtr const aSystem );
 
-  public:
+public:
     static const char PATH_SEPARATOR = ModuleMaker::PATH_SEPARATOR;
 
-  private:
+private:
 
-    Time                theCurrentTime;
-    StepperPtr          theLastStepper;
+    Time                            theCurrentTime;
+    StepperPtr                      theLastStepper;
 
-    StepperEventScheduler theScheduler;
+    StepperEventScheduler           theScheduler;
 
-    LoggerBroker        theLoggerBroker;
+    LoggerBroker                    theLoggerBroker;
 
-    System              *theRootSystemPtr;
- 
-    SystemStepper       theSystemStepper;
+    System                          *theRootSystemPtr;
 
-    StepperMap          theStepperMap;
+    SystemStepper                   theSystemStepper;
+
+    StepperMap                      theStepperMap;
 
     StaticModuleMaker< EcsObject >& theEcsObjectMaker;
-    StepperMaker          theStepperMaker;
-    SystemMaker           theSystemMaker;
-    VariableMaker         theVariableMaker;
-    ProcessMaker          theProcessMaker;
-  };
-
-  
-  /*@}*/
+    StepperMaker                    theStepperMaker;
+    SystemMaker                     theSystemMaker;
+    VariableMaker                   theVariableMaker;
+    ProcessMaker                    theProcessMaker;
+};
 
 } // namespace libecs
 
+/*@}*/
 
 
-
-#endif /* __STEPPERLEADER_HPP */
-
-
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/
-
+#endif /* __MODEL_HPP */

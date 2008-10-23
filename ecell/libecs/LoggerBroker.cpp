@@ -28,6 +28,7 @@
 // written by Masayuki Okayama <smash@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -44,85 +45,67 @@
 #include "PropertySlotProxyLoggerAdapter.hpp"
 #include "LoggerBroker.hpp"
 
-
 namespace libecs
 {
 
-  LoggerBroker::LoggerBroker()
-    : theModel(0)
-  {
+LoggerBroker::LoggerBroker( Model const& aModel )
+    : theModel( aModel )
+{
     ; // do nothing
-  }
+}
 
-  LoggerBroker::~LoggerBroker()
-  {
+LoggerBroker::~LoggerBroker()
+{
     FOR_ALL_SECOND( LoggerMap, theLoggerMap, ~Logger );
-  }
+}
 
-
-  void LoggerBroker::flush()
-  {
+void LoggerBroker::flush()
+{
     FOR_ALL_SECOND( LoggerMap, theLoggerMap, flush );
-  }
+}
 
-  LoggerPtr 
-  LoggerBroker::getLogger( FullPNCref aFullPN ) const
-  {
+LoggerPtr LoggerBroker::getLogger( FullPNCref aFullPN ) const
+{
     LoggerMapConstIterator aLoggerMapIterator( theLoggerMap.find( aFullPN ) );
 
     if( aLoggerMapIterator == theLoggerMap.end() )
-      {
-	THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.getString() 
-			 + "] not found." );
-      }
+    {
+        THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.getString() 
+                                   + "] not found." );
+    }
 
     return aLoggerMapIterator->second;
-  }
+}
 
 
-  LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,   PolymorphVectorCref aParamList ) 
-  {
+LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,
+                                      Logger::Policy const& aPolicy )
+{
     if( theLoggerMap.find( aFullPN ) != theLoggerMap.end() )
-      {
-	THROW_EXCEPTION( AlreadyExist, "Logger [" + aFullPN.getString()
-			 + "] already exist." );
-      }
+    {
+        THROW_EXCEPTION( AlreadyExist, "Logger [" + aFullPN.getString()
+                                       + "] already exist." );
+    }
 
-    EntityPtr anEntityPtr( theModel->getEntity( aFullPN.getFullID() ) );
+    EntityPtr anEntityPtr( theModel.getEntity( aFullPN.getFullID() ) );
 
     const String aPropertyName( aFullPN.getPropertyName() );
 
-    PropertySlotProxyPtr 
-      aPropertySlotProxy( anEntityPtr->
-			  createPropertySlotProxy( aPropertyName ) );
+    PropertySlotProxyPtr aPropertySlotProxy(
+        anEntityPtr->createPropertySlotProxy( aPropertyName ) );
 
-    LoggerAdapterPtr aLoggerAdapter
-      ( new PropertySlotProxyLoggerAdapter( aPropertySlotProxy ) );
+    LoggerAdapterPtr aLoggerAdapter(
+        new PropertySlotProxyLoggerAdapter( aPropertySlotProxy ) );
 
-
-    LoggerPtr aNewLogger( new Logger( aLoggerAdapter) );
+    LoggerPtr aNewLogger( new Logger( aLoggerAdapter, aPolicy ) );
 
     anEntityPtr->registerLogger( aNewLogger );
-    theLoggerMap[aFullPN] = aNewLogger;
+    theLoggerMap[ aFullPN ] = aNewLogger;
     // it should have at least one datapoint to work correctly.
-    aNewLogger->log( theModel->getCurrentTime() );
+    aNewLogger->log( theModel.getCurrentTime() );
     aNewLogger->flush();
 
-    // set logger policy
-    aNewLogger->setLoggerPolicy( aParamList );
-
-
     return aNewLogger;
-  }
-
-  
+}
 
 } // namespace libecs
-
-
-
-
-
-
-
-

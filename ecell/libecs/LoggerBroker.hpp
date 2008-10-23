@@ -35,51 +35,43 @@
 
 #include <map>
 
+#include <boost/noncopyable.hpp>
+
 #include "libecs/libecs.hpp"
 #include "libecs/FullID.hpp"
 #include "libecs/Logger.hpp"
 
+/**
+   @addtogroup logging
+   @{
+ */
+
 namespace libecs
 {
-  // forward declaration
-  class Model;
+// forward declaration
+class Model;
 
-  /** @addtogroup logging
-   *@{
-   */
+/**
+   LoggerBroker creates and administrates Loggers in a model.
 
-  /** @file */
+   This class creates, holds in a map which associates FullPN with a Logger,
+   and responds to requests to Loggers.
 
-  /**
-     LoggerBroker creates and administrates Loggers in a model.
-
-     This class creates, holds in a map which associates FullPN with a Logger,
-     and responds to requests to Loggers.
-
-     @see FullPN
-     @see Logger
-
-  */
-
-  class LIBECS_API LoggerBroker
-  {
-
-  public:
-
+   @see FullPN
+   @see Logger
+*/
+class LIBECS_API LoggerBroker: public boost::noncopyable
+{
+public:
     DECLARE_MAP( const FullPN, LoggerPtr, std::less<const FullPN>, LoggerMap );
 
-    LoggerBroker();
+    LoggerBroker( Model const& aModel );
 
     ~LoggerBroker();
 
-    void setModel( Model* model )
+    Model const& getModel() const
     {
-      theModel = model;
-    }
-
-    Model* getModel()
-    {
-      return theModel;
+        return theModel;
     }
 
     /**
@@ -87,32 +79,30 @@ namespace libecs
 
        This method first look for a Logger object which is logging
        the specified PropertySlot, and if it is found, returns the
-       Logger.  If there is no Logger connected to the PropertySlot yet,
-       it creates and returns a new Logger.  
+       Logger.    If there is no Logger connected to the PropertySlot yet,
+       it creates and returns a new Logger.    
 
        FIXME: doc for interval needed
 
-       @param aFullPN     a FullPN of the requested FullPN
-       @param anInterval  a logging interval
+       @param aFullPN         a FullPN of the requested FullPN
+       @param anInterval    a logging interval
        @return a borrowed pointer to the Logger
        
     */
 
     LoggerPtr getLogger( FullPNCref aFullPN ) const;
 
-    LoggerPtr createLogger( FullPNCref aFullPN, PolymorphVectorCref aParamList );
+    LoggerPtr createLogger( FullPNCref aFullPN, Logger::Policy const& aParamList );
 
     /**
        Flush the data in all the Loggers immediately.
 
-       Usually Loggers record data with logging intervals.  This method
+       Usually Loggers record data with logging intervals.    This method
        orders every Logger to write the data immediately ignoring the
        logging interval.
-    
+   
     */
-
     void flush();
-
 
     /**
        Get a const reference to the LoggerMap.
@@ -125,33 +115,15 @@ namespace libecs
 
     LoggerMapCref getLoggerMap() const
     {
-      return theLoggerMap;
+        return theLoggerMap;
     }
 
-  private:
-    
-    Model* getModel() const
-    {
-      return theModel;
-    }
-
-
-    // prevent copy
-    LoggerBroker( LoggerBrokerCref );
-    LoggerBrokerRef operator=( const LoggerBroker& );
-
-  private:
-
-    LoggerMap     theLoggerMap;
-    Model*        theModel;
-
-  };
-
-  //@}
-  
+private:
+    LoggerMap    theLoggerMap;
+    Model const& theModel;
+};
 } // namespace libecs
 
-#endif
+/** @} */
 
-
-
+#endif /* __LOGGER_BROKER_HPP */

@@ -32,48 +32,39 @@
 #include "libecs/PropertySlotProxy.hpp"
 #include "libecs/LoggerAdapter.hpp"
 
+/**
+   @addtogroup property
+   @ingroup libecs
+   @{
+*/
 namespace libecs
 {
-  /** @addtogroup property
-      
-  @ingroup libecs
-  @{
-  */
 
-  /** @file */
-
-  class PropertySlotProxyLoggerAdapter
-    :
-    public LoggerAdapter
-  {
-
-  public:
-
-    DM_IF PropertySlotProxyLoggerAdapter( PropertySlotProxyPtr aPropertySlotProxy )
-      :
-      thePropertySlotProxy( aPropertySlotProxy )
+class LIBECS_API PropertySlotProxyLoggerAdapter: public LoggerAdapter
+{
+public:
+    PropertySlotProxyLoggerAdapter( PropertySlotProxyPtr aPropertySlotProxy )
+        : thePropertySlotProxy( aPropertySlotProxy )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
-    DM_IF virtual ~PropertySlotProxyLoggerAdapter()
+    virtual ~PropertySlotProxyLoggerAdapter()
     {
-      delete thePropertySlotProxy;
+        delete thePropertySlotProxy;
     }
 
-    DM_IF virtual const Real getValue() const
+    virtual const Real getValue() const
     {
-      return thePropertySlotProxy->getReal();
+        return thePropertySlotProxy->getReal();
     }
 
-  private:
-
+private:
     PropertySlotProxyPtr thePropertySlotProxy;
-
-  };
-
-  /** @} */ // logging module
+};
 
 } // namespace libecs
+
+/** @} */
 
 #endif /* __PROPERTYSLOTLOGGERADAPTER_HPP */

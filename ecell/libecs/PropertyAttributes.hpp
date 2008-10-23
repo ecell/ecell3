@@ -36,81 +36,79 @@
 
 #include "libecs/libecs.hpp"
 
-/** @addtogroup property
-    
-@ingroup libecs
-@{
+/**
+   @addtogroup property
+   @ingroup libecs
+   @{
 */
-
-/** @file */
-
 namespace libecs
 {
 
 class PropertyAttributes
 {
 public:
-  PropertyAttributes() {}
+    PropertyAttributes() {}
 
-  PropertyAttributes( const PropertySlotBase& aPropertySlot )
-    : theType( aPropertySlot.getType() ),
-      setable( aPropertySlot.isSetable() ),
-      getable( aPropertySlot.isGetable() ),
-      loadable( aPropertySlot.isLoadable() ),
-      savable( aPropertySlot.isSavable() ),
-      dynamic( aPropertySlot.isDynamic() )
-  {
-  }
+    PropertyAttributes( const PropertySlotBase& aPropertySlot )
+        : theType( aPropertySlot.getType() ),
+          setable( aPropertySlot.isSetable() ),
+          getable( aPropertySlot.isGetable() ),
+          loadable( aPropertySlot.isLoadable() ),
+          savable( aPropertySlot.isSavable() ),
+          dynamic( aPropertySlot.isDynamic() )
+    {
+    }
 
-  PropertyAttributes( enum PropertySlotBase::Type aType,
-		      bool isSetable, bool isGetable,
-		      bool isLoadable, bool isSavable, bool isDynamic )
-    : theType( aType ), setable( isSetable ), getable( isGetable ),
-      loadable( isLoadable ), savable( isSavable ), dynamic( isDynamic )
-  {
-    
-  }
+    PropertyAttributes( enum PropertySlotBase::Type aType,
+                        bool isSetable, bool isGetable,
+                        bool isLoadable, bool isSavable, bool isDynamic )
+        : theType( aType ), setable( isSetable ), getable( isGetable ),
+          loadable( isLoadable ), savable( isSavable ), dynamic( isDynamic )
+    {
+        
+    }
 
-  enum PropertySlotBase::Type getType() const
-  {
-    return theType;
-  }
+    enum PropertySlotBase::Type getType() const
+    {
+        return theType;
+    }
 
-  bool isSetable() const
-  {
-    return setable;
-  }
+    bool isSetable() const
+    {
+        return setable;
+    }
 
-  bool isGetable() const
-  {
-    return getable;
-  }
+    bool isGetable() const
+    {
+        return getable;
+    }
 
-  bool isLoadable() const
-  {
-    return loadable;
-  }
+    bool isLoadable() const
+    {
+        return loadable;
+    }
 
-  bool isSavable() const
-  {
-    return savable;
-  }
+    bool isSavable() const
+    {
+        return savable;
+    }
 
-  bool isDynamic() const
-  {
-    return dynamic;
-  }  
+    bool isDynamic() const
+    {
+        return dynamic;
+    }    
 
 private:
-  enum PropertySlotBase::Type theType;
-  bool setable;
-  bool getable;
-  bool loadable;
-  bool savable;
-  bool dynamic;
+    enum PropertySlotBase::Type theType;
+    bool setable;
+    bool getable;
+    bool loadable;
+    bool savable;
+    bool dynamic;
 };
 
 } // namespace libecs
 
-/* @} */
+/** @} */
+
 #endif /* __PROPERTYATTRIBUTE_HPP */

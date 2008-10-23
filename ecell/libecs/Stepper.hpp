@@ -47,97 +47,72 @@
 #include "libecs/Interpolant.hpp"
 #include "libecs/PropertyInterface.hpp"
 
-
-
+/**
+   @addtogroup stepper
+   @{
+ */
 namespace libecs
 {
 
-  class Model;
+class Model;
 
-  /** @addtogroup stepper
-   *@{
-   */
+/**
+   Stepper class defines and governs a computation unit in a model.
 
-  /** @file */
+   The computation unit is defined as a set of Process objects.
+*/
+LIBECS_DM_CLASS( Stepper, EcsObject )
+{
+public:
+    DECLARE_VECTOR( Real, RealVector );
 
-
-  //  DECLARE_TYPE( std::valarray<Real>, RealValarray );
-
-  DECLARE_VECTOR( Real, RealVector );
-  typedef VariableVector::size_type VariableIndex;
-
-  /**
-     Stepper class defines and governs a computation unit in a model.
-
-     The computation unit is defined as a set of Process objects.
-
-  */
-
-
-  LIBECS_DM_CLASS( Stepper, EcsObject )
-  {
-
-  public:
+    typedef VariableVector::size_type VariableIndex;
 
     LIBECS_DM_BASECLASS( Stepper );
 
     LIBECS_DM_OBJECT_ABSTRACT( Stepper )
-      {
-	INHERIT_PROPERTIES( EcsObject );
-	
-	PROPERTYSLOT_SET_GET( Integer,       Priority );
-	PROPERTYSLOT_SET_GET( Real,      StepInterval );
-	PROPERTYSLOT_SET_GET( Real,      MaxStepInterval );
-	PROPERTYSLOT_SET_GET( Real,      MinStepInterval );
-	PROPERTYSLOT_SET    ( String,    RngSeed );
+    {
+        INHERIT_PROPERTIES( EcsObject );
+        
+        PROPERTYSLOT_SET_GET( Integer, Priority );
+        PROPERTYSLOT_SET_GET( Real,    StepInterval );
+        PROPERTYSLOT_SET_GET( Real,    MaxStepInterval );
+        PROPERTYSLOT_SET_GET( Real,    MinStepInterval );
+        PROPERTYSLOT_SET( String, RngSeed );
 
-	// these properties are not loaded/saved.
-	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Real,      CurrentTime );
-	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, ProcessList );
-	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, SystemList );
-	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, ReadVariableList );
-	PROPERTYSLOT_GET_NO_LOAD_SAVE    ( Polymorph, WriteVariableList );
-
-
-	// setting rng type:  not yet supported
-	//PROPERTYSLOT_SET_GET( Polymorph, Rng,              Stepper );
-      }
+        // these properties are not loaded/saved.
+        PROPERTYSLOT_GET_NO_LOAD_SAVE( Real,      CurrentTime );
+        PROPERTYSLOT_GET_NO_LOAD_SAVE( Polymorph, ProcessList );
+        PROPERTYSLOT_GET_NO_LOAD_SAVE( Polymorph, SystemList );
+        PROPERTYSLOT_GET_NO_LOAD_SAVE( Polymorph, ReadVariableList );
+        PROPERTYSLOT_GET_NO_LOAD_SAVE( Polymorph, WriteVariableList );
+    }
 
 
     class PriorityCompare
     {
     public:
-      bool operator()( StepperPtr aLhs, StepperPtr aRhs ) const
-      {
-	return compare( aLhs->getPriority(), aRhs->getPriority() );
-      }
+        bool operator()( StepperPtr aLhs, StepperPtr aRhs ) const
+        {
+            return compare( aLhs->getPriority(), aRhs->getPriority() );
+        }
 
-      bool operator()( StepperPtr aLhs, IntegerParam aRhs ) const
-      {
-	return compare( aLhs->getPriority(), aRhs );
-      }
+        bool operator()( StepperPtr aLhs, IntegerParam aRhs ) const
+        {
+            return compare( aLhs->getPriority(), aRhs );
+        }
 
-      bool operator()( IntegerParam aLhs, StepperPtr aRhs ) const
-      {
-	return compare( aLhs, aRhs->getPriority() );
-      }
+        bool operator()( IntegerParam aLhs, StepperPtr aRhs ) const
+        {
+            return compare( aLhs, aRhs->getPriority() );
+        }
 
     private:
-
-      // if statement can be faster than returning an expression directly
-      inline static bool compare( IntegerParam aLhs, IntegerParam aRhs )
-      {
-	if( aLhs > aRhs )
-	  {
-	    return true;
-	  }
-	else
-	  {
-	    return false;
-	  }
-      }
-
-
+        // if statement can be faster than returning an expression directly
+        static bool compare( IntegerParam aLhs, IntegerParam aRhs )
+        {
+            return aLhs > aRhs;
+        }
     };
 
 
@@ -153,36 +128,33 @@ namespace libecs
 
        @return the current time in Real.
     */
-
     GET_METHOD( Real, CurrentTime )
     {
-      return theCurrentTime;
+        return theCurrentTime;
     }
 
     SET_METHOD( Real, CurrentTime )
     {
-      theCurrentTime = value;
+        theCurrentTime = value;
     }
 
     /**
        This may be overridden in dynamically scheduled steppers.
-
     */
-
     virtual SET_METHOD( Real, StepInterval )
     {
-      Real aNewStepInterval( value );
+        Real aNewStepInterval( value );
 
-      if( aNewStepInterval > getMaxStepInterval() )
-	{
-	  aNewStepInterval = getMaxStepInterval();
-	}
-      else if ( aNewStepInterval < getMinStepInterval() )
-	{
-	  aNewStepInterval = getMinStepInterval();
-	}
+        if( aNewStepInterval > getMaxStepInterval() )
+        {
+            aNewStepInterval = getMaxStepInterval();
+        }
+        else if ( aNewStepInterval < getMinStepInterval() )
+        {
+            aNewStepInterval = getMinStepInterval();
+        }
 
-      loadStepInterval( aNewStepInterval );
+        loadStepInterval( aNewStepInterval );
     }
 
 
@@ -194,47 +166,45 @@ namespace libecs
        
        @return the step interval of this Stepper
     */
-
-
     GET_METHOD( Real, StepInterval )
     {
-      return theStepInterval;
+        return theStepInterval;
     }
 
     virtual GET_METHOD( Real, TimeScale )
     {
-      return getStepInterval();
+        return getStepInterval();
     }
 
     SET_METHOD( String, ID )
     {
-      theID = value;
+        theID = value;
     }
 
     GET_METHOD( String, ID )
     {
-      return theID;
+        return theID;
     }
 
 
     SET_METHOD( Real, MinStepInterval )
     {
-      theMinStepInterval = value;
+        theMinStepInterval = value;
     }
 
     GET_METHOD( Real, MinStepInterval )
     {
-      return theMinStepInterval;
+        return theMinStepInterval;
     }
 
     SET_METHOD( Real, MaxStepInterval )
     {
-      theMaxStepInterval = value;
+        theMaxStepInterval = value;
     }
 
     GET_METHOD( Real, MaxStepInterval )
     {
-      return theMaxStepInterval;
+        return theMaxStepInterval;
     }
 
 
@@ -247,23 +217,17 @@ namespace libecs
 
     GET_METHOD( String, RngType );
 
-
-    /**
-
-    */
-
     virtual void initialize();
 
     void initializeProcesses();
 
 
-    /**       
+    /**             
        Each subclass of Stepper defines this.
 
        @note Subclass of Stepper must call this by Stepper::calculate() from
        their step().
     */
-
     virtual void step() = 0;
 
     virtual void integrate( RealParam aTime );
@@ -274,7 +238,6 @@ namespace libecs
        The default behavior is to call all the Loggers attached to
        any Entities related to this Stepper.
     */
-
     virtual void log();
     
     /**
@@ -282,26 +245,23 @@ namespace libecs
 
        @param aSystemPtr a pointer to a System object to register
     */
-
     void registerSystem( SystemPtr aSystemPtr );
 
     /**
        Remove a System from this Stepper.
 
-       @note This method is not currently supported.  Calling this method
+       @note This method is not currently supported.    Calling this method
        causes undefined behavior.
 
        @param aSystemPtr a pointer to a System object
     */
-
     void removeSystem( SystemPtr aSystemPtr );
 
     /**
-       Register a Process to this Stepper.
+         Register a Process to this Stepper.
 
-       @param aProcessPtr a pointer to a Process object to register
+         @param aProcessPtr a pointer to a Process object to register
     */
-
     void registerProcess( ProcessPtr aProcessPtr );
 
     /**
@@ -311,74 +271,67 @@ namespace libecs
 
        @param aProcessPtr a pointer to a Process object
     */
-
     void removeProcess( ProcessPtr aProcessPtr );
 
 
     void loadStepInterval( RealParam aStepInterval )
     {
-      theStepInterval = aStepInterval;
+        theStepInterval = aStepInterval;
     }
 
     void registerLogger( LoggerPtr );
 
     ModelPtr getModel() const
     {
-      return theModel;
+        return theModel;
     }
 
     /**
        @internal
-
     */
-
     void setModel( ModelPtr const aModel )
     {
-      theModel = aModel;
+        theModel = aModel;
     }
 
     void setSchedulerIndex( const int anIndex )
     {
-      theSchedulerIndex = anIndex;
+        theSchedulerIndex = anIndex;
     }
 
     const int getSchedulerIndex() const
     {
-      return theSchedulerIndex;
+        return theSchedulerIndex;
     }
-
 
     /**
        Set a priority value of this Stepper.
 
        The priority is an Int value which is used to determine the
        order of step when more than one Stepper is scheduled at the
-       same point in time (such as starting up: t=0).   
+       same point in time (such as starting up: t=0).     
 
        Larger value means higher priority, and called first.
 
        @param value the priority value as an Int.
        @see Scheduler
     */
-
     SET_METHOD( Integer, Priority )
     {
-      thePriority = value;
+        thePriority = value;
     }
 
     /**
        @see setPriority()
     */
-
     GET_METHOD( Integer, Priority )
     {
-      return thePriority;
+        return thePriority;
     }
 
-  
     SystemVectorCref getSystemVector() const
     {
-      return theSystemVector;
+        return theSystemVector;
     }
 
     /**
@@ -388,7 +341,7 @@ namespace libecs
 
        The ProcessVector is partitioned in this way:
 
-       |  Continuous Processes  |  Discrete Processes |
+       |    Continuous Processes    |    Discrete Processes |
 
        getDiscreteProcessOffset() method returns the offset (index number)
        of the first discrete Process in this Stepper.
@@ -397,21 +350,17 @@ namespace libecs
        of Processes.
 
     */
-
     ProcessVectorCref getProcessVector() const
     {
-      return theProcessVector;
+        return theProcessVector;
     }
 
     /**
-
-    @see getProcessVector()
-
+       @see getProcessVector()
     */
-
     const ProcessVector::size_type getDiscreteProcessOffset() const
     {
-      return theDiscreteProcessOffset;
+        return theDiscreteProcessOffset;
     }
 
     /**
@@ -423,100 +372,87 @@ namespace libecs
        | Write-Only Variables | Read-Write Variables | Read-Only Variables |
 
        Use getReadWriteVariableOffset() method to get the index of the first 
-       Read-Write Variable in the VariableVector.  
+       Read-Write Variable in the VariableVector.    
 
        Use getReadOnlyVariableOffset() method to get the index of the first
        Read-Only Variable in the VariableVector.
-       
-
     */
-
     VariableVectorCref getVariableVector() const
     {
-      return theVariableVector;
+        return theVariableVector;
     }
 
     /**
        @see getVariableVector()
     */
-
     const VariableVector::size_type getReadWriteVariableOffset() const
     {
-      return theReadWriteVariableOffset;
+        return theReadWriteVariableOffset;
     }
 
     /**
        @see getVariableVector()
     */
-
     const VariableVector::size_type getReadOnlyVariableOffset() const
     {
-      return theReadOnlyVariableOffset;
+        return theReadOnlyVariableOffset;
     }
 
 
     RealVectorCref getValueBuffer() const
     {
-      return theValueBuffer;
+        return theValueBuffer;
     }
 
 
-    const VariableIndex
-      getVariableIndex( VariableCptr const aVariable );
-
+    const VariableIndex getVariableIndex( VariableCptr const aVariable );
 
     virtual void interrupt( TimeParam aTime ) = 0;
 
     /**
-	Definition of the Stepper dependency:
-	Stepper A depends on Stepper B 
-	if:
-	- A and B share at least one Variable, AND
-	- A reads AND B writes on (changes) the same Variable.
+       Definition of the Stepper dependency:
+       Stepper A depends on Stepper B 
+       if:
+       - A and B share at least one Variable, AND
+       - A reads AND B writes on (changes) the same Variable.
 
-	See VariableReference class about the definitions of
-	Variable 'read' and 'write'.
+       See VariableReference class about the definitions of
+       Variable 'read' and 'write'.
 
 
-	@see Process, VariableReference
+       @see Process, VariableReference
     */
-
     const bool isDependentOn( const StepperCptr aStepper );
 
     /** 
-	This method updates theIntegratedVariableVector.
+       This method updates theIntegratedVariableVector.
 
-	theIntegratedVariableVector holds the Variables those
-	isIntegrationNeeded() method return true.   
+       theIntegratedVariableVector holds the Variables those
+       isIntegrationNeeded() method return true.     
     
-	This method must be called after initialize().
+       This method must be called after initialize().
 
-	@internal
+       @internal
      */
-
     void updateIntegratedVariableVector();
 
 
     virtual InterpolantPtr createInterpolant( VariablePtr aVariablePtr )
     {
-      return new Interpolant( aVariablePtr );
+        return new Interpolant( aVariablePtr );
     }
 
     const gsl_rng* getRng() const
     {
-      return theRng;
+        return theRng;
     }
 
     bool operator<( StepperCref rhs )
     {
-      return getCurrentTime() < rhs.getCurrentTime();
+        return getCurrentTime() < rhs.getCurrentTime();
     }
 
-    //    virtual StringLiteral getClassName() const  { return "Stepper"; }
-
-
-  protected:
-
+protected:
     void clearVariables();
 
     void fireProcesses();
@@ -526,19 +462,14 @@ namespace libecs
 
     /**
        Update theProcessVector.
-
     */
-
     void updateProcessVector();
 
 
     /**
        Update theVariableVector.
-
     */
-
     void updateVariableVector();
-
 
 
     /**
@@ -549,7 +480,6 @@ namespace libecs
 
        @see Variable::registerInterpolant()
     */
-
     void createInterpolants();
 
     /**
@@ -557,17 +487,14 @@ namespace libecs
        the list of loggers.
 
        The list, theLoggerVector, is used in log() method.
-
     */
-
     void updateLoggerVector();
 
 
-  protected:
+protected:
+    SystemVector              theSystemVector;
 
-    SystemVector        theSystemVector;
-
-    LoggerVector  theLoggerVector;
+    LoggerVector              theLoggerVector;
 
     VariableVector            theVariableVector;
     VariableVector::size_type theReadWriteVariableOffset;
@@ -578,43 +505,28 @@ namespace libecs
     ProcessVector             theProcessVector;
     ProcessVector::size_type  theDiscreteProcessOffset;
 
-    RealVector theValueBuffer;
+    RealVector                theValueBuffer;
 
+private:
+    Model*                    theModel;
 
+    /** the index on the scheduler */
+    int                       theSchedulerIndex;
 
-  private:
+    Integer                   thePriority;
 
-    Model*              theModel;
-    
-    // the index on the scheduler
-    int                 theSchedulerIndex;
+    Real                      theCurrentTime;
 
-    Integer             thePriority;
+    Real                      theStepInterval;
 
-    Real                theCurrentTime;
+    Real                      theMinStepInterval;
+    Real                      theMaxStepInterval;
 
-    Real                theStepInterval;
+    String                    theID;
 
-    Real                theMinStepInterval;
-    Real                theMaxStepInterval;
-
-    String              theID;
-
-    gsl_rng*   theRng;
-
-  };
-
+    gsl_rng*                  theRng;
+};
 
 } // namespace libecs
 
 #endif /* __STEPPER_HPP */
-
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

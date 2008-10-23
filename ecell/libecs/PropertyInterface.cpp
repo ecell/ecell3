@@ -31,6 +31,7 @@
 // modified by Masayuki Okayama <smash@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -40,37 +41,30 @@
 namespace libecs
 {
 
-  void PropertyInterfaceBase::throwNoSlot( StringCref aPropertyName ) const
-  {
+void PropertyInterfaceBase::throwNoSlot( StringCref aPropertyName ) const
+{
     THROW_EXCEPTION( NoSlot,
-		     getClassName() + 
-		     String( " has no [" ) +
-		     aPropertyName + String( "] property.\n" ) );	  
-  }
+                     getClassName() + 
+                     String( " has no [" ) +
+                     aPropertyName + String( "] property.\n" ) );                    
+}
 
-  void PropertyInterfaceBase::throwNotLoadable( StringCref aPropertyName ) const
-  {
-    THROW_EXCEPTION( NoSlot,
-		     getClassName() + 
-		     String( ": property [" ) +
-		     aPropertyName + String( "] is not loadable.\n" ) );
-  }
 
-  void PropertyInterfaceBase::throwNotSavable( StringCref aPropertyName ) const
-  {
+void PropertyInterfaceBase::throwNotLoadable( StringCref aPropertyName ) const
+{
     THROW_EXCEPTION( NoSlot,
-		     getClassName() + 
-		     String( ": property [" ) +
-		     aPropertyName + String( "] is not savable.\n" ) );
-  }
+                                     getClassName() + 
+                                     String( ": property [" ) +
+                                     aPropertyName + String( "] is not loadable.\n" ) );
+}
+
+
+void PropertyInterfaceBase::throwNotSavable( StringCref aPropertyName ) const
+{
+    THROW_EXCEPTION( NoSlot,
+                                     getClassName() + 
+                                     String( ": property [" ) +
+                                     aPropertyName + String( "] is not savable.\n" ) );
+}
 
 } // namespace libecs
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

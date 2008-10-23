@@ -28,6 +28,7 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -42,68 +43,69 @@
 
 namespace libecs
 {
-  int const MAJOR_VERSION( ECELL_MAJOR_VERSION );
-  int const MINOR_VERSION( ECELL_MINOR_VERSION );
-  int const MICRO_VERSION( ECELL_MICRO_VERSION );
 
-  char const* const VERSION_STRING( ECELL_VERSION_STRING );
+int const MAJOR_VERSION( ECELL_MAJOR_VERSION );
+int const MINOR_VERSION( ECELL_MINOR_VERSION );
+int const MICRO_VERSION( ECELL_MICRO_VERSION );
 
-  static volatile bool isInitialized = false;
+char const* const VERSION_STRING( ECELL_VERSION_STRING );
 
-  bool initialize()
-  {
+static volatile bool isInitialized = false;
+
+bool initialize()
+{
     /* XXX: not atomic - "compare and swap" needed for concurrency */
     if (isInitialized)
-      return true;
+        return true;
     else
-      isInitialized = true;
+        isInitialized = true;
 
     if ( ModuleMaker::initialize() )
-      {
-	return false;
-      }
+    {
+        return false;
+    }
 #if defined( WIN32 ) && !defined( __CYGWIN__ )
     if ( libecs_win32_init() )
-      {
-	ModuleMaker::finalize();
-	return false;
-      }
+    {
+        ModuleMaker::finalize();
+        return false;
+    }
 #endif
     return true;
-  }
+}
 
-  void finalize()
-  {
+void finalize()
+{
     /* XXX: not atomic - "compare and swap" needed for concurrency */
     if (!isInitialized)
-      return;
+        return;
     else
-      isInitialized = false;
+        isInitialized = false;
 
 #if defined( WIN32 ) && !defined( __CYGWIN__ )
     libecs_win32_fini();
 #endif
     ModuleMaker::finalize();
-  }
+}
 
-  const int getMajorVersion()
-  {
+const int getMajorVersion()
+{
     return MAJOR_VERSION;
-  }
+}
 
-  const int getMinorVersion()
-  {
+const int getMinorVersion()
+{
     return MINOR_VERSION;
-  }
+}
 
-  const int getMicroVersion()
-  {
+const int getMicroVersion()
+{
     return MICRO_VERSION;
-  }
+}
 
-  const std::string getVersion()
-  {
+const std::string getVersion()
+{
     return VERSION_STRING;
-  }
+}
 
 } // namespace libecs

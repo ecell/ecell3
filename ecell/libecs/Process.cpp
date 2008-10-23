@@ -28,6 +28,7 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -47,395 +48,341 @@
 namespace libecs
 {
 
-  LIBECS_DM_INIT_STATIC( Process, Process );
+LIBECS_DM_INIT_STATIC( Process, Process );
 
-  SET_METHOD_DEF( Polymorph, VariableReferenceList, Process )
-  {
-    const PolymorphVector aVector( value.as<PolymorphVector>() );
-    for( PolymorphVectorConstIterator i( aVector.begin() );
-	 i != aVector.end(); ++i )
-      {
-	const PolymorphVector anInnerVector( (*i).as<PolymorphVector>() );
+SET_METHOD_DEF( Polymorph, VariableReferenceList, Process )
+{
+    if ( value.getType() != PolymorphValue::TUPLE )
+    {
+        THROW_EXCEPTION( ValueError, "Argument must be a tuple" );
+    }
 
-	setVariableReference( anInnerVector );
-      }
+    typedef boost::range_const_iterator< PolymorphValue::Tuple >::type const_iterator;
+    PolymorphValue::Tuple const& aTuple( value.as< PolymorphValue::Tuple const& >() );
 
-  }
+    for ( const_iterator i( boost::begin( aTuple ) ); i != boost::end( aTuple );
+          ++i )
+    {
+        if ( (*i).getType() != PolymorphValue::TUPLE )
+        {
+            THROW_EXCEPTION( ValueError, "Every element of the tuple must also be a tuple" );
+        }
+        PolymorphValue::Tuple const& anElem( (*i).as< PolymorphValue::Tuple const & >() );
+        if ( anElem.size() < 2 )
+        {
+            THROW_EXCEPTION( ValueError, "Each element of the tuple must have at least 4 elements" );
+        }
+        registerVariableReference(
+            anElem[ 0 ].as< String >(),
+            FullID( anElem[ 1 ].as< String >() ),
+            anElem.size() > 2 ? anElem[ 2 ].as< Integer >(): 0l,
+            static_cast< bool >( anElem.size() > 3 ?
+                anElem[ 3 ].as< Integer >(): 0l ) );
+    }
+}
 
-  GET_METHOD_DEF( Polymorph, VariableReferenceList, Process )
-  {
+GET_METHOD_DEF( Polymorph, VariableReferenceList, Process )
+{
     PolymorphVector aVector;
     aVector.reserve( theVariableReferenceVector.size() );
-  
-    for( VariableReferenceVectorConstIterator 
-	   i( theVariableReferenceVector.begin() );
-	 i != theVariableReferenceVector.end() ; ++i )
-      {
-	PolymorphVector anInnerVector;
-	VariableReferenceCref aVariableReference( *i );
 
-	// Tagname
-	anInnerVector.push_back( aVariableReference.getName() );
-	// FullID
+    for( VariableReferenceVectorConstIterator i(
+            theVariableReferenceVector.begin() );
+         i != theVariableReferenceVector.end() ; ++i )
+    {
+        VariableReferenceCref aVariableReference( *i );
+        FullID aFullID( aVariableReference.getVariable()->getFullID() );
+        aFullID.setEntityType( EntityType::NONE );
 
-	FullID aFullID( aVariableReference.getVariable()->getFullID() );
-	aFullID.setEntityType( EntityType::NONE );
-	anInnerVector.push_back( aFullID.getString() );
-	// Coefficient
-	anInnerVector.push_back( aVariableReference.getCoefficient() );
-	// isAccessor
-	anInnerVector.
-	  push_back( static_cast<Integer>( aVariableReference.isAccessor() ) );
-
-	aVector.push_back( anInnerVector );
-      }
+        aVector.push_back( boost::tuple< String, String, Real, Integer >(
+            aVariableReference.getName(),
+            aFullID.getString(),
+            aVariableReference.getCoefficient(),
+            aVariableReference.isAccessor() ) );
+    }
 
     return aVector;
-  }
+}
 
-  SAVE_METHOD_DEF( Polymorph, VariableReferenceList, Process )
-  {
+SAVE_METHOD_DEF( Polymorph, VariableReferenceList, Process )
+{
     PolymorphVector aVector;
     aVector.reserve( theVariableReferenceVector.size() );
-  
-    for( VariableReferenceVectorConstIterator 
-	   i( theVariableReferenceVector.begin() );
-	 i != theVariableReferenceVector.end() ; ++i )
-      {
-	PolymorphVector anInnerVector;
-	VariableReferenceCref aVariableReference( *i );
 
-	// (1) Variable reference name
+    for( VariableReferenceVectorConstIterator i(
+            theVariableReferenceVector.begin() );
+         i != theVariableReferenceVector.end() ; ++i )
+    {
+        VariableReferenceCref aVariableReference( *i );
 
-	// convert back all variable reference ellipses to the default '_'.
-	String aReferenceName( aVariableReference.getName() );
+        // (1) Variable reference name
 
-	if( VariableReference::
-	    isEllipsisNameString( aReferenceName ) )
-	  {
-	    aReferenceName = VariableReference::DEFAULT_NAME;
-	  }
+        // convert back all variable reference ellipses to the default '_'.
+        String aReferenceName( aVariableReference.getName() );
 
-	anInnerVector.push_back( aReferenceName );
+        if( VariableReference::isEllipsisNameString( aReferenceName ) )
+        {
+            aReferenceName = VariableReference::DEFAULT_NAME;
+        }
 
-	// (2) FullID
+        // (2) FullID
 
-	FullID aFullID( aVariableReference.getVariable()->getFullID() );
-	aFullID.setEntityType( EntityType::NONE );
-
-	anInnerVector.push_back( aFullID.getString() );
-
-	// (3) Coefficient and (4) IsAccessor
-	const Integer aCoefficient( aVariableReference.getCoefficient() );
-	const bool    anIsAccessorFlag( aVariableReference.isAccessor() );
+        FullID aFullID( aVariableReference.getVariable()->getFullID() );
+        aFullID.setEntityType( EntityType::NONE );
 
 
-	// include both if IsAccessor is non-default (not true).
-	if( anIsAccessorFlag != true )
-	  {
-	    anInnerVector.push_back( aCoefficient );	    
-	    anInnerVector.
-	      push_back( static_cast<Integer>( anIsAccessorFlag ) );
-	  }
-	else
-	  {
-	    // output only the coefficient if IsAccessor has a 
-	    // default value, and the coefficient is non-default.
-	    if( aCoefficient != 0 )
-	      {
-		anInnerVector.push_back( aCoefficient );	    
-	      }
-	    else
-	      {
-		; // do nothing -- both are the default
-	      }
-	  }
+        // (3) Coefficient and (4) IsAccessor
+        const Integer aCoefficient( aVariableReference.getCoefficient() );
+        const bool        anIsAccessorFlag( aVariableReference.isAccessor() );
 
-	aVector.push_back( anInnerVector );
-      }
+        // include both if IsAccessor is non-default (not true).
+        if( anIsAccessorFlag != true )
+        {
+            aVector.push_back( boost::tuple< String, String, Real, Integer >(
+                aReferenceName,
+                aFullID.getString(),
+                aCoefficient,
+                static_cast<Integer>( anIsAccessorFlag ) ) );
+        }
+        else
+        {
+            // output only the coefficient if IsAccessor has a 
+            // default value, and the coefficient is non-default.
+            if( aCoefficient != 0 )
+            {
+                aVector.push_back( boost::tuple< String, String, Real >(
+                    aReferenceName,
+                    aFullID.getString(),
+                    aCoefficient ) );
+            }
+            else
+            {
+                aVector.push_back( boost::tuple< String, String >(
+                    aReferenceName,
+                    aFullID.getString() ) );
+            }
+        }
+    }
 
     return aVector;
-  }
+}
 
 
-  Process::Process() 
-    :
-    theZeroVariableReferenceIterator( theVariableReferenceVector.end() ),
-    thePositiveVariableReferenceIterator( theVariableReferenceVector.end() ),
-    theActivity( 0.0 ),
-    thePriority( 0 ),
-    theStepper( NULLPTR )
-  {
+Process::Process() 
+    : theZeroVariableReferenceIterator( theVariableReferenceVector.end() ),
+      thePositiveVariableReferenceIterator( theVariableReferenceVector.end() ),
+      theActivity( 0.0 ),
+      thePriority( 0 ),
+      theStepper( NULLPTR )
+{
     ; // do nothing
-  }
+}
 
-  Process::~Process()
-  {
+
+Process::~Process()
+{
     if( getStepper() != NULLPTR )
-      {
-	getStepper()->removeProcess( this );
-      }
-  }
+        {
+            getStepper()->removeProcess( this );
+        }
+}
 
 
-  SET_METHOD_DEF( String, StepperID, Process )
-  {
+SET_METHOD_DEF( String, StepperID, Process )
+{
     StepperPtr aStepperPtr( getModel()->getStepper( value ) );
 
     setStepper( aStepperPtr );
-  }
+}
 
-  GET_METHOD_DEF( String, StepperID, Process )
-  {
+GET_METHOD_DEF( String, StepperID, Process )
+{
     return getStepper()->getID();
-  }
+}
 
 
-  void Process::setStepper( StepperPtr const aStepper )
-  {
+void Process::setStepper( StepperPtr const aStepper )
+{
     if( theStepper != aStepper )
-      {
-	if( aStepper != NULLPTR )
-	  {
-	    aStepper->registerProcess( this );
-	  }
-	else
-	  {
-	    theStepper->removeProcess( this );
-	  }
+    {
+        if( aStepper != NULLPTR )
+        {
+            aStepper->registerProcess( this );
+        }
+        else
+        {
+            theStepper->removeProcess( this );
+        }
 
-	theStepper = aStepper;
-      }
+        theStepper = aStepper;
+    }
+}
 
-  }
-
-  VariableReferenceCref Process::getVariableReference( StringCref 
-						   aVariableReferenceName )
-  {
-    VariableReferenceVectorConstIterator 
-      anIterator( findVariableReference( aVariableReferenceName ) );
+VariableReferenceCref
+Process::getVariableReference( StringCref aVariableReferenceName )
+{
+    VariableReferenceVectorConstIterator anIterator(
+            findVariableReference( aVariableReferenceName ) );
 
     if( anIterator != theVariableReferenceVector.end() )
-      {
-	return *anIterator;
-      }
+    {
+        return *anIterator;
+    }
     else
-      {
-	THROW_EXCEPTION( NotFound,
-			 "[" + getFullID().getString() + 
-			 "]: VariableReference [" + aVariableReferenceName + 
-			 "] not found in this Process." );
-      }
+    {
+        THROW_EXCEPTION( NotFound,
+                         "[" + getFullID().getString() + 
+                         "]: VariableReference [" + aVariableReferenceName + 
+                         "] not found in this Process." );
+    }
+}
 
-  }
-
-  void Process::removeVariableReference( StringCref aName )
-  {
+void Process::removeVariableReference( StringCref aName )
+{
     theVariableReferenceVector.erase( findVariableReference( aName ) );
-  }
+}
 
-  void Process::setVariableReference( PolymorphVectorCref aValue )
-  {
-
-    size_t aVectorSize( aValue.size() );
-    
-    // Require at least a VariableReference name.
-    if( aVectorSize == 0 )
-      {
-	THROW_EXCEPTION( ValueError, "Process [" + getFullID().getString()
-			 + "]: ill-formed VariableReference given." );
-      }
-
-    const String aVariableReferenceName( aValue[0].as<String>() );
-
-    // If it contains only the VariableReference name,
-    // remove the VariableReference from this process
-    if( aVectorSize == 1 )
-      {
-	removeVariableReference( aVariableReferenceName );
-      }
-
-
-    const String aFullIDString( aValue[1].as<String>() );
-    const FullID aFullID( aValue[1].as<String>() );
-    Integer      aCoefficient( 0 );
-    
+void Process::registerVariableReference( StringCref aName,
+                                         FullID const& aFullID,
+                                         IntegerParam aCoefficient,
+                                         const bool isAccessor )
+{
     // relative search; allow relative systempath
-    SystemPtr aSystem( getSuperSystem()->
-		       getSystem( aFullID.getSystemPath() ) );
+    SystemPtr aSystem( getSuperSystem()->getSystem( aFullID.getSystemPath() ) );
 
     VariablePtr aVariable( aSystem->getVariable( aFullID.getID() ) );
-    
-    if( aVectorSize >= 3 )
-      {
-	aCoefficient = aValue[2].as<Integer>();
-      }
-    
-    if( aVectorSize >= 4 )
-      {
-	const bool anIsAccessorFlag( aValue[3].as<Integer>() != 0 );
-	registerVariableReference( aVariableReferenceName, aVariable,
-				   aCoefficient, anIsAccessorFlag );
-      }
-    else
-      {
-	registerVariableReference( aVariableReferenceName, aVariable, 
-				   aCoefficient );
-      }
-    
-  }
+
+    setVariableReference(
+        VariableReference( aName, aVariable, aCoefficient, isAccessor ) );
+}
 
 
-  void Process::registerVariableReference( StringCref aName, 
-					   VariablePtr aVariable, 
-					   IntegerParam aCoefficient,
-					   const bool isAccessor )
-  {
-    String aVariableReferenceName( aName );
+void Process::setVariableReference( VariableReference aVarRef )
+{
+    if( aVarRef.isDefaultName() )
+    {
+        try
+        {
+            Integer anEllipsisNumber( 0 );
+            if( ! theVariableReferenceVector.empty() )
+            {
+                VariableReferenceVectorConstIterator
+                    aLastEllipsisIterator(
+                        std::max_element( theVariableReferenceVector.begin(), 
+                                          theVariableReferenceVector.end(), 
+                                          VariableReference::NameLess() ) );
+                
+                VariableReferenceCref aLastEllipsis( *aLastEllipsisIterator );
+                
+                anEllipsisNumber = aLastEllipsis.getEllipsisNumber();
+                ++anEllipsisNumber;
+            }
+            aVarRef.setName( VariableReference::ELLIPSIS_PREFIX + 
+                ( boost::format( "%03d" ) % anEllipsisNumber ).str() );
+        }
+        catch( const ValueError& )
+        {
+            ; // do nothing
+        }
+    }
 
-    if( VariableReference::isDefaultNameString( aVariableReferenceName ) )
-      {
-	try
-	  {
-	    Integer anEllipsisNumber( 0 );
-	    if( ! theVariableReferenceVector.empty() )
-	      {
-		VariableReferenceVectorConstIterator 
-		  aLastEllipsisIterator
-		  ( std::max_element( theVariableReferenceVector.begin(), 
-				      theVariableReferenceVector.end(), 
-				      VariableReference::NameLess() ) );
-		
-		VariableReferenceCref aLastEllipsis( *aLastEllipsisIterator );
-		
-		anEllipsisNumber = aLastEllipsis.getEllipsisNumber();
-		++anEllipsisNumber;
-	      }
-	    
-	    aVariableReferenceName = VariableReference::ELLIPSIS_PREFIX + 
-	      ( boost::format( "%03d" ) % anEllipsisNumber ).str();
-	  }
-	catch( const ValueError& )
-	  {
-	    ; // pass
-	  }
-      }
+    if( findVariableReference( aVarRef.getName() ) != theVariableReferenceVector.end() )
+    {
+        THROW_EXCEPTION( AlreadyExist,
+                         "[" + getFullID().getString() + 
+                         "]: VariableReference [" + aVarRef.getName() + 
+                         "] already exists in this Process." );
+    }
 
-    if( findVariableReference( aVariableReferenceName ) != 
-	theVariableReferenceVector.end() )
-      {
-	THROW_EXCEPTION( AlreadyExist,
-			 "[" + getFullID().getString() + 
-			 "]: VariableReference [" + aVariableReferenceName + 
-			 "] already exists in this Process." );
-
-      }
-
-    VariableReference aVariableReference( aVariableReferenceName, 
-					  aVariable, aCoefficient );
-    theVariableReferenceVector.push_back( aVariableReference );
-
+    theVariableReferenceVector.push_back( aVarRef );
 
     //FIXME: can the following be moved to initialize()?
     updateVariableReferenceVector();
-  }
+}
 
-  void Process::updateVariableReferenceVector()
-  {
+
+void Process::updateVariableReferenceVector()
+{
     // first sort by reference name
     std::sort( theVariableReferenceVector.begin(), 
-	       theVariableReferenceVector.end(), 
-	       VariableReference::Less() );
+               theVariableReferenceVector.end(), 
+               VariableReference::Less() );
 
     // find the first VariableReference whose coefficient is 0,
     // and the first VariableReference whose coefficient is positive.
-    std::pair
-      <VariableReferenceVectorIterator, VariableReferenceVectorIterator> 
-      aZeroRange( std::equal_range( theVariableReferenceVector.begin(), 
-				    theVariableReferenceVector.end(), 
-				    0, 
-				    VariableReference::CoefficientLess()
-				    ) );
+    std::pair <VariableReferenceVectorIterator,
+               VariableReferenceVectorIterator> aZeroRange(
+        std::equal_range( theVariableReferenceVector.begin(), 
+                          theVariableReferenceVector.end(), 
+                          0, VariableReference::CoefficientLess() ) );
 
     theZeroVariableReferenceIterator     = aZeroRange.first;
     thePositiveVariableReferenceIterator = aZeroRange.second;
-  }
+}
 
 
 
-  VariableReferenceVectorIterator 
-  Process::findVariableReference( StringCref aVariableReferenceName )
-  {
+VariableReferenceVectorIterator 
+Process::findVariableReference( StringCref aVariableReferenceName )
+{
     // well this is a linear search.. but this won't be used during simulation.
-    for( VariableReferenceVectorIterator 
-	   i( theVariableReferenceVector.begin() );
-	 i != theVariableReferenceVector.end(); ++i )
-      {
-	if( (*i).getName() == aVariableReferenceName )
-	  {
-	    return i;
-	  }
-      }
+    for( VariableReferenceVectorIterator i(
+            theVariableReferenceVector.begin() );
+         i != theVariableReferenceVector.end(); ++i )
+    {
+        if( (*i).getName() == aVariableReferenceName )
+        {
+            return i;
+        }
+    }
 
     return theVariableReferenceVector.end();
-  }
+}
 
-  void Process::declareUnidirectional()
-  {
+
+void Process::declareUnidirectional()
+{
     std::for_each( thePositiveVariableReferenceIterator,
-		   theVariableReferenceVector.end(),
-		   boost::bind2nd
-		   ( boost::mem_fun_ref
-		     ( &VariableReference::setIsAccessor ), false ) );
-  }
+                   theVariableReferenceVector.end(),
+                   boost::bind2nd( boost::mem_fun_ref( &VariableReference::setIsAccessor ), false ) );
+}
 
-  
 
-  const bool Process::isDependentOn( const ProcessCptr aProcessPtr ) const
-  {
-    VariableReferenceVectorCref 
-      aVariableReferenceVector( aProcessPtr->getVariableReferenceVector() );
+
+const bool Process::isDependentOn( const ProcessCptr aProcessPtr ) const
+{
+    VariableReferenceVectorCref aVariableReferenceVector(
+            aProcessPtr->getVariableReferenceVector() );
     
-    for( VariableReferenceVectorConstIterator 
-	   i( theVariableReferenceVector.begin() );
-	 i != theVariableReferenceVector.end() ; ++i )
-      {
-	VariableReferenceCref aVariableReference1( *i );
+    for( VariableReferenceVectorConstIterator i(
+            theVariableReferenceVector.begin() );
+         i != theVariableReferenceVector.end() ; ++i )
+    {
+        VariableReferenceCref aVariableReference1( *i );
 
-	for( VariableReferenceVectorConstIterator 
-	       j( aVariableReferenceVector.begin() );
-	     j != aVariableReferenceVector.end(); ++j )
-	  {
-	    VariableReferenceCref aVariableReference2( *j );
-	    
-	    if( aVariableReference1.getVariable() == 
-		aVariableReference2.getVariable() && 
-		aVariableReference1.isAccessor() && 
-		aVariableReference2.isMutator() )
-
-	      {
-		return true;
-	      }
-	  }
-      }
+        for( VariableReferenceVectorConstIterator j(
+                aVariableReferenceVector.begin() );
+             j != aVariableReferenceVector.end(); ++j )
+        {
+            VariableReferenceCref aVariableReference2( *j );
+            
+            if( aVariableReference1.getVariable() == 
+                    aVariableReference2.getVariable() && 
+                aVariableReference1.isAccessor() && 
+                aVariableReference2.isMutator() )
+            {
+                return true;
+            }
+        }
+    }
 
     return false;
-  }
+}
 
 
-  void Process::initialize()
-  {
+void Process::initialize()
+{
     ; // do nothing
-  }
-
+}
 
 } // namespace libecs
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/
