@@ -300,7 +300,7 @@ public:
             throw std::bad_alloc();
         }
 
-        return new(ptr) PolymorphValue( sptr );
+        return new(ptr) PolymorphValue( sptr, sz );
     }
 
     static Handle create( String const& aValue )
@@ -408,14 +408,9 @@ protected:
     explicit PolymorphValue( Real aValue )
         : theType( REAL ), theRefCount( 0 ), theRealValue( aValue ) {}
 
-    explicit PolymorphValue( const char* sptr,
-                             std::size_t sz = static_cast< std::size_t >( -1 ) )
+    explicit PolymorphValue( const char* sptr, std::size_t sz )
         : theType( STRING ), theRefCount( 0 )
     {
-        if ( sz == static_cast< std::size_t >( -1 ) )
-        {
-            sz = std::strlen( sptr );
-        }
         theStringValue.theLength = sz;
         std::memcpy( theStringValue.ptr, sptr, sz );
         theStringValue.ptr[ sz ] = '\0';

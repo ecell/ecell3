@@ -374,6 +374,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\ecell\libecs\AdaptiveDifferentialStepper.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ecell\libecs\ContinuousProcess.cpp"
 				>
 			</File>
@@ -503,6 +507,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\ecell\libecs\AdaptiveDifferentialStepper.hpp"
+				>
+			</File>
 			<File
 				RelativePath="..\..\ecell\libecs\AssocVector.h"
 				>

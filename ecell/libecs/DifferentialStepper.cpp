@@ -50,9 +50,7 @@
 
 namespace libecs
 {
-
 LIBECS_DM_INIT_STATIC( DifferentialStepper, Stepper );
-LIBECS_DM_INIT_STATIC( AdaptiveDifferentialStepper, Stepper );
 
 DifferentialStepper::DifferentialStepper()
     : theNextStepInterval( 0.001 ),
@@ -386,92 +384,6 @@ const Real DifferentialStepper::Interpolant::getVelocity( RealParam aTime ) cons
     }
 
     return aValue;
-}
-
-
-////////////////////////// AdaptiveDifferentialStepper
-
-AdaptiveDifferentialStepper::AdaptiveDifferentialStepper()
-    : theTolerance( 1.0e-6 ),
-      theAbsoluteToleranceFactor( 1.0 ),
-      theStateToleranceFactor( 1.0 ),
-      theDerivativeToleranceFactor( 1.0 ),
-      theEpsilonChecked( 0 ),
-      theAbsoluteEpsilon( 0.1 ),
-      theRelativeEpsilon( 0.1 ),
-      safety( 0.9 ),
-      theMaxErrorRatio( 1.0 )
-{
-    // use more narrow range
-    setMinStepInterval( 1e-100 );
-    setMaxStepInterval( 1e+10 );
-}
-
-AdaptiveDifferentialStepper::~AdaptiveDifferentialStepper()
-{
-    ; // do nothing
-}
-
-
-void AdaptiveDifferentialStepper::initialize()
-{
-    DifferentialStepper::initialize();
-}
-
-void AdaptiveDifferentialStepper::step()
-{
-    theStateFlag = false;
-
-    clearVariables();
-
-    setStepInterval( getNextStepInterval() );
-
-    while ( !calculate() )
-    {
-        const Real anExpectedStepInterval( safety * getStepInterval() 
-                                           * pow( getMaxErrorRatio(),
-                                                  -1.0 / getOrder() ) );
-
-        if ( anExpectedStepInterval > getMinStepInterval() )
-        {
-            // shrink it if the error exceeds 110%
-            setStepInterval( anExpectedStepInterval );
-        }
-        else
-        {
-            setStepInterval( getMinStepInterval() );
-
-            // this must return false,
-            // so theTolerableStepInterval does NOT LIMIT the error.
-            THROW_EXCEPTION( SimulationError,
-                             "The error-limit step interval of Stepper ["
-                             + getID() + "] is too small." );
-
-            calculate();
-            break;
-        }
-    }
-
-    // an extra calculation for resetting the activities of processes
-    fireProcesses();
-
-    setTolerableStepInterval( getStepInterval() );
-
-    theStateFlag = true;
-
-    // grow it if error is 50% less than desired
-    const Real maxError( getMaxErrorRatio() );
-    if ( maxError < 0.5 )
-    {
-        const Real aNewStepInterval( getTolerableStepInterval() * safety
-                                     * pow( maxError,
-                                            -1.0 / ( getOrder() + 1 ) ) );
-        setNextStepInterval( aNewStepInterval );
-    }
-    else 
-    {
-        setNextStepInterval( getTolerableStepInterval() );
-    }
 }
 
 } // namespace libecs

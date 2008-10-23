@@ -32,6 +32,7 @@ EcsObject.cpp\
 Variable.cpp\
 Stepper.cpp\
 DifferentialStepper.cpp\
+AdaptiveDifferentialStepper.cpp\
 DiscreteTimeStepper.cpp\
 DiscreteEventStepper.cpp\
 PassiveStepper.cpp\
@@ -73,6 +74,7 @@ ProcessEvent.hpp\
 StepperEvent.hpp\
 EventScheduler.hpp\
 DifferentialStepper.hpp\
+AdaptiveDifferentialStepper.hpp\
 DiscreteTimeStepper.hpp\
 DiscreteEventStepper.hpp\
 PassiveStepper.hpp\
