@@ -27,7 +27,7 @@
 #ifndef __ESSYNSPROCESS_HPP
 #define __ESSYNSPROCESS_HPP
 
-#include <vector>
+#include <boost/multi_array.hpp>
 
 #include "libecs.hpp"
 #include "Process.hpp"
