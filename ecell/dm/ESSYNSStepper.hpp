@@ -32,7 +32,8 @@
 #ifndef __ESSYNSSTEPPER_HPP
 #define __ESSYNSSTEPPER_HPP
 
-#include "libecs/DifferentialStepper.hpp"
+#include <boost/multi_array.hpp>
+#include "libecs/AdaptiveDifferentialStepper.hpp"
 #include "ESSYNSProcess.hpp"
 
 USE_LIBECS;
@@ -86,7 +87,7 @@ protected:
   Integer theSystemSize;
   Integer theTaylorOrder;
   ESSYNSProcessPtr   theESSYNSProcessPtr;
-  std::vector<RealVector> theESSYNSMatrix;
+  boost::multi_array< Real, 2 > theESSYNSMatrix;
   std::vector<VariableVector::size_type> theIndexVector;
 
   //  RealVector theK1;
