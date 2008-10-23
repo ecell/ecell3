@@ -47,7 +47,7 @@ namespace libecs { namespace math {
    MS Windows (MinGW).
 */
 template <typename T>
-Real real_not( T n )
+inline Real real_not( T n )
 {
     if ( n == 0 )
     {
@@ -60,7 +60,7 @@ Real real_not( T n )
 }
 
 template <typename T>
-Real real_eq( T n1, T n2 )
+inline Real real_eq( T n1, T n2 )
 {
     if ( n1 == n2 )
     {
@@ -73,7 +73,7 @@ Real real_eq( T n1, T n2 )
 }
 
 template <typename T>
-Real real_neq( T n1, T n2 )
+inline Real real_neq( T n1, T n2 )
 {
     if ( n1 == n2 )
     {
@@ -86,7 +86,7 @@ Real real_neq( T n1, T n2 )
 }
 
 template <typename T>
-Real real_gt( T n1, T n2 )
+inline Real real_gt( T n1, T n2 )
 {
     if ( n1 > n2 )
     {
@@ -99,7 +99,7 @@ Real real_gt( T n1, T n2 )
 }
 
 template <typename T>
-Real real_lt( T n1, T n2 )
+inline Real real_lt( T n1, T n2 )
 {
     if ( n1 < n2 )
     {
@@ -112,7 +112,7 @@ Real real_lt( T n1, T n2 )
 }
 
 template <typename T>
-Real real_geq( T n1, T n2 )
+inline Real real_geq( T n1, T n2 )
 {
     if ( n1 >= n2 )
     {
@@ -125,7 +125,7 @@ Real real_geq( T n1, T n2 )
 }
 
 template <typename T>
-Real real_leq( T n1, T n2 )
+inline Real real_leq( T n1, T n2 )
 {
     if ( n1 <= n2 )
     {
@@ -138,7 +138,7 @@ Real real_leq( T n1, T n2 )
 }
 
 template <typename T>
-Real real_and( T n1, T n2 )
+inline Real real_and( T n1, T n2 )
 {
     if ( ( n1 != 0 ) && ( n2 != 0 ) )
     {
@@ -151,7 +151,7 @@ Real real_and( T n1, T n2 )
 }
 
 template <typename T>
-Real real_or( T n1, T n2 )
+inline Real real_or( T n1, T n2 )
 {
     if ( ( n1 != 0 ) || ( n2 != 0 ) )
     {
@@ -164,7 +164,7 @@ Real real_or( T n1, T n2 )
 }
 
 template <typename T>
-Real real_xor( T n1, T n2 )
+inline Real real_xor( T n1, T n2 )
 {
     if ( ( n1 != 0 ) && !( n2 != 0 ) )
     {
@@ -177,97 +177,97 @@ Real real_xor( T n1, T n2 )
 }
 
 template <typename T>
-T asinh( T n )
+inline T asinh( T n )
 {
     return log( n + sqrt( n * n + 1 ) );
 }
 
 template <typename T>
-T acosh( T n )
+inline T acosh( T n )
 {
     return log( n - sqrt( n * n - 1 ) );
 }
 
 template <typename T>
-T atanh( T n )
+inline T atanh( T n )
 {
     return 0.5 * log( ( 1 + n ) / ( 1 - n ) );
 }
 
 template <typename T>
-T sec( T n )
+inline T sec( T n )
 {
     return 1 / cos( n );
 }
 
 template <typename T>
-T csc( T n )
+inline T csc( T n )
 {
     return 1 / sin( n );
 }
 
 template <typename T>
-T cot( T n )
+inline T cot( T n )
 {
     return 1 / tan( n );
 }
 
 template <typename T>
-T asec( T n )
+inline T asec( T n )
 {
     return 1 / acos( n );
 }
 
 template <typename T>
-T acsc( T n )
+inline T acsc( T n )
 {
     return 1 / asin( n );
 }
 
 template <typename T>
-T acot( T n )
+inline T acot( T n )
 {
     return 1 / atan( n );
 }
 
 template <typename T>
-T sech( T n )
+inline T sech( T n )
 {
     return 1 / cosh( n );
 }
 
 template <typename T>
-T csch( T n )
+inline T csch( T n )
 {
     return 1 / sinh( n );
 }
 
 template <typename T>
-T coth( T n )
+inline T coth( T n )
 {
     return 1 / tanh( n );
 }
 
 template <typename T>
-T asech( T n )
+inline T asech( T n )
 {
     return 1 / acosh( n );
 }
 
 template <typename T>
-T acsch( T n )
+inline T acsch( T n )
 {
     return 1 / asinh( n );
 }
 
 template <typename T>
-T acoth( T n )
+inline T acoth( T n )
 {
     return 1 / atanh( n );
 }
 
 template <typename T>
-T fact( T n )
+inline T fact( T n )
 {
     if ( n <= 1 )
         return 1;
