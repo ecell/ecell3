@@ -213,7 +213,7 @@ public:
 
     const bool isMutator() const
     {
-        return theCoefficient == 0;
+        return theCoefficient != 0;
     }
 
     void setIsAccessor( const bool anIsAccessor )

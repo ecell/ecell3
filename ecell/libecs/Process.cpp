@@ -77,7 +77,7 @@ SET_METHOD_DEF( Polymorph, VariableReferenceList, Process )
             FullID( anElem[ 1 ].as< String >() ),
             anElem.size() > 2 ? anElem[ 2 ].as< Integer >(): 0l,
             static_cast< bool >( anElem.size() > 3 ?
-                anElem[ 3 ].as< Integer >(): 0l ) );
+                anElem[ 3 ].as< Integer >(): 1l ) );
     }
 }
 
@@ -94,7 +94,7 @@ GET_METHOD_DEF( Polymorph, VariableReferenceList, Process )
         FullID aFullID( aVariableReference.getVariable()->getFullID() );
         aFullID.setEntityType( EntityType::NONE );
 
-        aVector.push_back( boost::tuple< String, String, Real, Integer >(
+        aVector.push_back( boost::tuple< String, String, Integer, Integer >(
             aVariableReference.getName(),
             aFullID.getString(),
             aVariableReference.getCoefficient(),
@@ -138,7 +138,7 @@ SAVE_METHOD_DEF( Polymorph, VariableReferenceList, Process )
         // include both if IsAccessor is non-default (not true).
         if( anIsAccessorFlag != true )
         {
-            aVector.push_back( boost::tuple< String, String, Real, Integer >(
+            aVector.push_back( boost::tuple< String, String, Integer, Integer >(
                 aReferenceName,
                 aFullID.getString(),
                 aCoefficient,
@@ -150,7 +150,7 @@ SAVE_METHOD_DEF( Polymorph, VariableReferenceList, Process )
             // default value, and the coefficient is non-default.
             if( aCoefficient != 0 )
             {
-                aVector.push_back( boost::tuple< String, String, Real >(
+                aVector.push_back( boost::tuple< String, String, Integer >(
                     aReferenceName,
                     aFullID.getString(),
                     aCoefficient ) );

@@ -163,7 +163,7 @@ void Stepper::updateVariableVector()
                 
                 aVariableReference.setCoefficient(
                     abs( aVariableReference.getCoefficient() )
-                    + abs( aNewVariableReference.  getCoefficient() ) );
+                    + abs( aNewVariableReference.getCoefficient() ) );
             }
         }
     }
