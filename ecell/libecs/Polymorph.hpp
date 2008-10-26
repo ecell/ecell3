@@ -45,6 +45,8 @@
 #include <boost/range/size.hpp>
 #include <boost/range/const_iterator.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/mpl/int.hpp>
+#include <boost/mpl/less.hpp>
 
 #include "dmtool/DMObject.hpp"
 #include "libecs/libecs.hpp"
@@ -71,7 +73,7 @@ class LIBECS_API PolymorphValue
     friend void intrusive_ptr_release( PolymorphValue* );
 
 private:
-    template< int Nidx_, typename Tlhs_, typename Trhs_, bool Nok_ = Nidx_ < boost::tuples::length< Trhs_ >::value >
+    template< int Nidx_, typename Tlhs_, typename Trhs_, bool Nok_ = boost::mpl::less< boost::mpl::int_< Nidx_ >, boost::tuples::length< Trhs_ > >::value >
     struct __assignIfNotNull
     {
         void operator()( Tlhs_& lhs, Trhs_ const& rhs )
