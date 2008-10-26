@@ -476,7 +476,7 @@ inline void intrusive_ptr_release( PolymorphValue* p )
     }
 }
 
-} // nameespace libecs
+} // namespace libecs
 
 namespace boost
 {

@@ -49,6 +49,7 @@ Interpolant::Interpolant( VariablePtr const aVariable )
 
 Interpolant::~Interpolant()
 {
-}
 
 }
+
+} // namespace libecs
