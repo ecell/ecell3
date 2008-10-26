@@ -60,7 +60,7 @@ class Model;
    @see FullPN
    @see Logger
 */
-class LIBECS_API LoggerBroker: public boost::noncopyable
+class LIBECS_API LoggerBroker
 {
 public:
     DECLARE_MAP( const FullPN, LoggerPtr, std::less<const FullPN>, LoggerMap );
@@ -117,6 +117,10 @@ public:
     {
         return theLoggerMap;
     }
+
+private:
+    /// non-copyable
+    LoggerBroker( LoggerBroker const& );
 
 private:
     LoggerMap    theLoggerMap;

@@ -55,7 +55,7 @@ namespace libecs
 /**
     Logger module for logging and retrieving data runtime.
 */
-class LIBECS_API Logger: private boost::noncopyable
+class LIBECS_API Logger
 {
 public:
     DECLARE_TYPE( PhysicalLogger::size_type, size_type );
@@ -295,6 +295,9 @@ private:
 
     /// no default constructor
     Logger( void );
+
+    /// noncopyable
+    Logger( Logger const& );
 
 
 private:
