@@ -292,11 +292,3 @@ protected:
 };
 
 #endif /* __MODULEMAKER_HPP */
-
-/*
-    Do not modify
-    $Author$
-    $Revision$
-    $Date$
-    $Locker$
-*/

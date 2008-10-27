@@ -198,11 +198,3 @@ private:
 };
 
 #endif /* __DYNAMICMODULE_HPP */
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

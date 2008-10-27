@@ -70,12 +70,3 @@ public:\
 
 
 #endif /* __DMOBJECT_HPP */
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/
