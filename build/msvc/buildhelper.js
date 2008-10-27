@@ -107,6 +107,7 @@ BuildHelper.prototype = {
         WScript.Echo("Creating launcher script " + script_file_name);
         var scr = '';
         scr += '@ECHO OFF\n';
+        src += 'SETLOCAL\n';
         scr += 'SET PWD=%~dp0\n';
         scr += 'IF "%ECELL_HOME%" == "" SET ECELL_HOME=%PWD%\\..\n';
         scr += 'SET PYTHONPATH=%PYTHONPATH%;%ECELL_HOME%\\lib\\site-packages\n';
