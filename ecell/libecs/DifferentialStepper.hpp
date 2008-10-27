@@ -74,7 +74,7 @@ public:
         PROPERTYSLOT_GET_NO_LOAD_SAVE( Integer,    Order );
     }
 
-    class Interpolant
+    class LIBECS_API Interpolant
         : public libecs::Interpolant
     {
 
