@@ -32,7 +32,7 @@
 #ifndef __DIFFERENTIALSTEPPER_HPP
 #define __DIFFERENTIALSTEPPER_HPP
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/Stepper.hpp"
 
 #include <boost/multi_array.hpp>

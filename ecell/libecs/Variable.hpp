@@ -34,7 +34,7 @@
 
 #include <utility>
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/Entity.hpp"
 #include "libecs/Interpolant.hpp"
 #include "libecs/System.hpp"

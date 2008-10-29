@@ -32,7 +32,7 @@
 #ifndef __INTERPOLANT_HPP
 #define __INTERPOLANT_HPP
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 
 namespace libecs
 {

@@ -37,7 +37,7 @@
 
 #include <boost/noncopyable.hpp>
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/FullID.hpp"
 #include "libecs/Logger.hpp"
 

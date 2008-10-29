@@ -40,7 +40,7 @@
 #include <gsl/gsl_rng.h>
 #endif
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 
 #include "libecs/Util.hpp"
 #include "libecs/Polymorph.hpp"

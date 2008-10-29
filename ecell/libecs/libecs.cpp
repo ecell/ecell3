@@ -37,9 +37,8 @@
 #include "win32_utils.h"
 #endif /* WIN32 */
 
-#include "dmtool/ModuleMaker.hpp"
-
 #include "libecs.hpp"
+#include "EcsObject.hpp"
 
 namespace libecs
 {
@@ -72,6 +71,11 @@ bool initialize()
     }
 #endif
     return true;
+}
+
+StaticModuleMaker< EcsObject >* createDefaultModuleMaker()
+{
+    return new SharedModuleMaker< EcsObject >();
 }
 
 void finalize()

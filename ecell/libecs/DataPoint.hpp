@@ -32,7 +32,7 @@
 #if !defined(__DATAPOINT_HPP)
 #define __DATAPOINT_HPP
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/Polymorph.hpp"
 
 /**

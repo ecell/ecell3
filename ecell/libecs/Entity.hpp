@@ -32,7 +32,7 @@
 #ifndef __ENTITY_HPP
 #define __ENTITY_HPP
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/EntityType.hpp"
 #include "libecs/EcsObject.hpp"
 #include "libecs/PropertyInterface.hpp"

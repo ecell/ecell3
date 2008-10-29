@@ -31,7 +31,7 @@
 #if !defined(__PHYSICALLOGGER_HPP)
 #define __PHYSICALLOGGER_HPP
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/Exceptions.hpp"
 #include "libecs/DataPoint.hpp"
 #include "libecs/DataPointVector.hpp"

@@ -32,7 +32,7 @@
 #ifndef __METHODPROXY_HPP
 #define __METHODPROXY_HPP
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 
 namespace libecs {
 

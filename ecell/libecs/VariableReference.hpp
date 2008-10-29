@@ -32,7 +32,7 @@
 #ifndef __VARIABLEREFERENCE_HPP
 #define __VARIABLEREFERENCE_HPP
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/Variable.hpp"
 #include <cctype>
 

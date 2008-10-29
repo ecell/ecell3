@@ -32,7 +32,7 @@
 #ifndef __PROCESSEVENT_HPP
 #define __PROCESSEVENT_HPP
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/Process.hpp"
 
 #include "libecs/EventScheduler.hpp"

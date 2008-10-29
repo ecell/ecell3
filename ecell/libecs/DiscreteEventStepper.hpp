@@ -32,7 +32,7 @@
 #ifndef __DISCRETEEVENTSTEPPER_HPP
 #define __DISCRETEEVENTSTEPPER_HPP
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/Stepper.hpp"
 #include "libecs/Process.hpp"
 

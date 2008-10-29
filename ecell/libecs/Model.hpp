@@ -32,10 +32,10 @@
 #ifndef __MODEL_HPP
 #define __MODEL_HPP
 
-#include "libecs/AssocVector.h"
-
-#include "libecs/libecs.hpp"
 #include "dmtool/ModuleMaker.hpp"
+
+#include "libecs/Defs.hpp"
+#include "libecs/AssocVector.h"
 #include "libecs/EcsObjectMaker.hpp"
 #include "libecs/EventScheduler.hpp"
 #include "libecs/StepperEvent.hpp"

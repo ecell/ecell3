@@ -34,7 +34,7 @@
 
 #include <functional>
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/Util.hpp"
 #include "libecs/PropertySlot.hpp"
 #include "libecs/convertTo.hpp"

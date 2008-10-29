@@ -34,7 +34,7 @@
 #ifndef __PROPERTYATTRIBUTES_HPP
 #define __PROPERTYATTRIBUTES_HPP
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 
 /**
    @addtogroup property

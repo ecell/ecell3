@@ -37,10 +37,10 @@
 #include <boost/range/iterator.hpp>
 #include <boost/assert.hpp>
 
-#include "libecs/AssocVector.h"
-
 #include "dmtool/DynamicModuleInfo.hpp"
-#include "libecs/libecs.hpp"
+
+#include "libecs/Defs.hpp"
+#include "libecs/AssocVector.h"
 #include "libecs/PropertyAttributes.hpp"
 #include "libecs/PropertySlot.hpp"
 #include "libecs/PropertySlotProxy.hpp"

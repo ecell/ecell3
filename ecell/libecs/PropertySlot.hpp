@@ -31,7 +31,9 @@
 
 #include <functional>
 
-#include "libecs/libecs.hpp"
+#include "dmtool/DMObject.hpp"
+
+#include "libecs/Defs.hpp"
 #include "libecs/convertTo.hpp"
 #include "libecs/Polymorph.hpp"
 

@@ -50,7 +50,7 @@
 #include <boost/range/size.hpp>
 #include <boost/range/size_type.hpp>
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/Exceptions.hpp"
 
 /**

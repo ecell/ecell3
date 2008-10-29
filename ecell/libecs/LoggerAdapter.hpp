@@ -29,7 +29,7 @@
 #if !defined(__LOGGERADAPTER_HPP)
 #define __LOGGERADAPTER_HPP
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 
 /**
    @addtogroup logging The Data Logging Module.

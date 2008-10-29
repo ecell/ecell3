@@ -32,7 +32,7 @@
 #ifndef __EVENTSCHEDULER_HPP
 #define __EVENTSCHEDULER_HPP
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/DynamicPriorityQueue.hpp"
 #include "libecs/AssocVector.h"
 

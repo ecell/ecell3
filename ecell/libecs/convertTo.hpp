@@ -38,7 +38,7 @@
 #include <boost/mpl/and.hpp>
 #include <boost/mpl/not.hpp>
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/Util.hpp"
 
 /**

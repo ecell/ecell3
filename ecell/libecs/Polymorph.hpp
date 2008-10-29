@@ -48,8 +48,7 @@
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/less.hpp>
 
-#include "dmtool/DMObject.hpp"
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/convertTo.hpp"
 #include "libecs/Util.hpp"
 

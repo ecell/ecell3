@@ -38,7 +38,7 @@
 
 #include <boost/utility.hpp>
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/LoggerAdapter.hpp"
 #include "libecs/PhysicalLogger.hpp"
 #include "libecs/DataPointVector.hpp"

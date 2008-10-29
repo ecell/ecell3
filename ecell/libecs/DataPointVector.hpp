@@ -32,8 +32,8 @@
 #if !defined( __DATAPOINTVECTOR_HPP )
 #define __DATAPOINTVECTOR_HPP
 
-#include "libecs/DataPoint.hpp"
 #include "libecs/Defs.hpp"
+#include "libecs/DataPoint.hpp"
 #include <sys/types.h>
 
 

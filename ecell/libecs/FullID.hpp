@@ -32,7 +32,7 @@
 #ifndef __FULLID_HPP
 #define __FULLID_HPP
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 #include "libecs/EntityType.hpp"
 
 

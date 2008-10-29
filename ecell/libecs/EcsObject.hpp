@@ -34,7 +34,7 @@
 #ifndef __ECSOBJECT_HPP
 #define __ECSOBJECT_HPP
 
-#include "libecs/libecs.hpp"
+#include "libecs/Defs.hpp"
 
 #if defined( WIN32 )
 // a bit hackish, but works.
