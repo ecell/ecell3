@@ -54,7 +54,7 @@ var tasks = {
         var ltdlDir = this.projectDir + 'libltdl\\';
         var destDir;
 
-        destDir = this.distIncludeEcellDir;
+        destDir = this.distIncludeDir;
         BuildHelper.mkdir(destDir);
         BuildHelper.copy(ltdlDir + 'ltdl.h', destDir);
 
