@@ -50,6 +50,18 @@ var tasks = {
         BuildHelper.copy(this.vcOutDir + 'ecs.dll', this.distBinDir);
     },
 
+    installLTDL: function() {
+        var ltdlDir = this.projectDir + 'libltdl\\';
+        var destDir;
+
+        destDir = this.distIncludeEcellDir;
+        BuildHelper.mkdir(destDir);
+        BuildHelper.copy(ltdlDir + 'ltdl.h', destDir);
+
+        BuildHelper.mkdir(this.distLibDir);
+        BuildHelper.copy(this.vcOutDir + 'ltdl.lib', this.distLibDir);
+    },
+
     installPyECell: function() {
         var pyECellDir = this.projectDir + 'ecell\\pyecell\\';
         var destDir = this.distBinDir;
@@ -171,6 +183,7 @@ var tasks = {
     },
 
     install: function() {
+        this.installLTDL();
         this.installECS();
         this.installEMC();
         this.installDMTool();
