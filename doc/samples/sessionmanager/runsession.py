@@ -7,5 +7,4 @@ S[ 'Value' ] = VALUE_OF_S              # Set the value VALUE_OF_S given by the
 
 run( 200 )                             # Run the simulation for 200 seconds.
 
-message( S[ 'Value' ] )                # Print the value of 'Variable:/:S'.
-
+print S[ 'Value' ]                     # Print the value of 'Variable:/:S'.
