@@ -33,7 +33,6 @@ import popen2
 import signal
 import sys
 import time
-from ecell.SessionManager.Constants import *
 
 try:
 #    raise Exception
@@ -54,8 +53,9 @@ except:
         def wait( self ):
             return os.WEXITSTATUS( os.waitpid( self.pid, 0 )[ 1 ] )
 
-from ecell.SessionManager.SessionManager import *
-from ecell.SessionManager.Util import *
+from ecell.session_manager.SessionManager import *
+from ecell.session_manager.Constants import *
+from ecell.session_manager.Util import *
 
 class SessionProxy( AbstractSessionProxy ):
     '''LocalSessionProxy class

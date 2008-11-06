@@ -38,9 +38,9 @@ import popen2
 
 
 # imports ecell modules
-from ecell.SessionManager.Util import *
-from ecell.SessionManager.SessionManager import *
-from ecell.SessionManager.Constants import *
+from ecell.session_manager.Util import *
+from ecell.session_manager.SessionManager import *
+from ecell.session_manager.Constants import *
 
 GRID_INFO_SEARCH = 'grid-info-search'
 GLOBUS_JOB_RUN='globus-job-run'

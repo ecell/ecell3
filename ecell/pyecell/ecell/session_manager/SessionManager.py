@@ -41,8 +41,8 @@ import signal
 import inspect
 import ecell.eml
 
-from ecell.SessionManager.Constants import *
-from ecell.SessionManager.Util import *
+from ecell.session_manager.Constants import *
+from ecell.session_manager.Util import *
 
 __all__ = (
     'AbstractSessionProxy',

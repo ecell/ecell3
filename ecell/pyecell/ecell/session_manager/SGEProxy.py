@@ -36,9 +36,9 @@ import sys
 import time
 from itertools import ifilter
 
-from ecell.SessionManager.Util import *
-from ecell.SessionManager.SessionManager import *
-from ecell.SessionManager.Constants import *
+from ecell.session_manager.Util import *
+from ecell.session_manager.SessionManager import *
+from ecell.session_manager.Constants import *
 
 QSUB = 'qsub'
 QSTAT = 'qstat'

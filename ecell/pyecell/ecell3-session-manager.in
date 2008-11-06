@@ -40,7 +40,7 @@ import ecell.config
 import ecell.ecs
 import ecell.emc
 import ecell.Session
-import ecell.SessionManager
+import ecell.session_manager
 
 DEFAULT_ENVIRONMENT = 'Local'
 
@@ -255,9 +255,9 @@ def main( argv ):
             if argv[ -1 ] != argv[ 0 ]:
                 anEsmFile = argv[ -1 ]
 
-    aModulePath = [ os.path.join( ecell.__path__[ 0 ], "SessionManager" ) ]
+    aModulePath = [ os.path.join( ecell.__path__[ 0 ], "session_manager" ) ]
 
-    aSessionManager = ecell.SessionManager.SessionManager(
+    aSessionManager = ecell.session_manager.SessionManager(
         aModulePath, aConcurrency, anEnvironment )
     aSessionManager.setOptionList( optionList )
     aConsole = Console( aSessionManager,
