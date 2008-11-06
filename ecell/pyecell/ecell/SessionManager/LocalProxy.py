@@ -33,6 +33,7 @@ import popen2
 import signal
 import sys
 import time
+from ecell.SessionManager.Constants import *
 
 try:
 #    raise Exception

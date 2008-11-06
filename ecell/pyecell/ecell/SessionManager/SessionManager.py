@@ -826,12 +826,10 @@ class SessionManager( object ):
         # creates AbstractSessionProxy
         job = self.__theSystemProxy.createSessionProxy()
         job.setScriptFileName( ess )
-        job.setInterpreter( ECELL3_PYTHON )
+        job.setInterpreter( ECELL3_SESSION )
         job.setArguments(
             (
-                ECELL3_SESSION,
-                '-e', ess,
-                '--parameters', str( arguments )
+                '--parameters=' + str( arguments ),
                 ) )
         job.setEnvironmentVariable( 'ECELL3_DM_PATH', dmpath )
         for i in INTERESTING_ENV_VARS:

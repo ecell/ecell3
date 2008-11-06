@@ -152,7 +152,7 @@ def main( argv ):
 
     # gets options
     try:
-        opts, args = getopt.getopt(
+        opts, args = getopt.gnu_getopt(
             argv[ 1: ] , 'he:f:D:c:E:O:',
             [
                 "parameters=",
