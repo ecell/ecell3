@@ -571,7 +571,8 @@ class SessionProxy( AbstractSessionProxy ):
         job.directory = absJobDirectory
         job.environment.update( self.getEnvironmentVariables() )
         job.executable = self.getInterpreter()
-        job.arguments = self.getScriptFileArguments() + self.getArguments()
+        job.arguments = [ self.getScriptFileName() ]
+        job.arguments += self.getArguments()
 
         tmpfile = None
         tmpfile = mkstemp()
@@ -635,7 +636,7 @@ class SessionProxy( AbstractSessionProxy ):
         self.setStatus( ERROR )
 
 class SystemProxy( AbstractSystemProxy ):
-    '''Globus2SystemProxy'''
+    '''Globus4SystemProxy'''
     def __init__( self, sessionManager ):
         '''Constructor
         sessionManager -- the reference to SessionManager
