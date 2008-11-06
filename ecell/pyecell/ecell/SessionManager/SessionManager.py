@@ -499,7 +499,7 @@ class AbstractSystemProxy:
         
         Return str : the stdout
         '''
-        return self.__jobDict[ jobid ].getStdout()
+        return self.jobs[ jobid ].getStdout()
 
     def getStderr( self, jobid ):
         '''return the stderr of the job
@@ -508,7 +508,7 @@ class AbstractSystemProxy:
         
         Return str : the stderr
         '''
-        return self.__jobDict[ jobid ].getStderr()
+        return self.jobs[ jobid ].getStderr()
 
     def getJobDirectory( self, jobid ):
         '''Return the job directory name
@@ -519,7 +519,7 @@ class AbstractSystemProxy:
         '''
 
         # return the path of the job directory
-        return self.__jobDict[ jobid ].getJobDirectory()
+        return self.jobs[ jobid ].getJobDirectory()
 
     def setRetryMaxCount( self, count ):
         '''Set retry max count.
@@ -1134,7 +1134,7 @@ class SessionManager( object ):
                 signal.getsignal( emitted_signum[ 0 ] )( emitted_signum,
                     inspect.currentframe() )
 
-    def stop( self, jobid=0 ):
+    def stop( self, jobid = 0 ):
         '''stop jobs.
         Change the statuses of QUEUED or RUNNING jobs to ERROR.
         About FINISHED jobs, do nothing.
@@ -1146,12 +1146,12 @@ class SessionManager( object ):
 
         # stops all jobs
         if jobid == 0:
-            for job in self.__jobDict.values():
+            for job in self.jobs.values():
                 job.stop()
 
         # stops one job
         else:
-            self.__jobDict[jobid].stop()
+            self.jobs[jobid].stop()
 
     def stopRunningSessionProxies( self ):
         '''Stop running jobs.
