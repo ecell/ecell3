@@ -247,11 +247,7 @@ public:
     }
 
 
-    VariableCptr const getSizeVariable() const
-    {
-        return theSizeVariable;
-    }
-
+    VariableCptr const getSizeVariable() const;
 
     void notifyChangeOfEntityList();
 

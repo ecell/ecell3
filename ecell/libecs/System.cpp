@@ -320,6 +320,17 @@ void System::notifyChangeOfEntityList()
 {
 }
 
+Variable const* const System::getSizeVariable() const
+{
+    if ( !theSizeVariable )
+    {
+        THROW_EXCEPTION( IllegalOperation,
+                         "SIZE variable is not associated to "
+                         + getFullID().getString() );
+    }
+    return theSizeVariable;
+}
+
 const SystemPath System::getSystemPath() const
 {
     if( isRootSystem() )

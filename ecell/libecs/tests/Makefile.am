@@ -32,4 +32,7 @@ Util_test_SOURCES = Util_test.cpp
 check_PROGRAMS += Polymorph_test
 Polymorph_test_SOURCES = Polymorph_test.cpp
 
+check_PROGRAMS += System_test
+System_test_SOURCES = System_test.cpp
+
 TESTS=$(check_PROGRAMS)
