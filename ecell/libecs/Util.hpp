@@ -515,8 +515,6 @@ inline T fact( T n )
     }
 }
 
-const Polymorph convertStringMapToPolymorph( StringMap const& aMap );
-
 } // namespace libecs
 
 /** @} */

@@ -134,23 +134,4 @@ void throwSequenceSizeError( const size_t aSize, const size_t aMin )
                      + " ( " + stringCast( aSize ) + " given)." );
 }
 
-
-const Polymorph convertStringMapToPolymorph( StringMap const& aMap )
-{
-    PolymorphVector aVector;
-    aVector.reserve( aMap.size() );
-
-    for( StringMap::const_iterator i( aMap.begin() ); 
-         i != aMap.end();    ++i )
-    {
-        PolymorphVector anInnerVector;
-        anInnerVector.push_back( i->first );
-        anInnerVector.push_back( i->second );
-
-        aVector.push_back( anInnerVector );
-    }
-
-    return aVector;
-}
-
 } // namespace libecs
