@@ -170,7 +170,7 @@ VariableCptr const System::findSizeVariable() const
 
 GET_METHOD_DEF( Real, Size, System )
 {
-    return theSizeVariable->getValue();
+    return getSizeVariable()->getValue();
 }
 
 void System::configureSizeVariable()
