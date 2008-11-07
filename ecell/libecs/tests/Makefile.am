@@ -35,4 +35,7 @@ Polymorph_test_SOURCES = Polymorph_test.cpp
 check_PROGRAMS += System_test
 System_test_SOURCES = System_test.cpp
 
+check_PROGRAMS += Process_test
+Process_test_SOURCES = Process_test.cpp
+
 TESTS=$(check_PROGRAMS)

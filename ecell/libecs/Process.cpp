@@ -182,9 +182,9 @@ Process::Process()
 Process::~Process()
 {
     if( getStepper() != NULLPTR )
-        {
-            getStepper()->removeProcess( this );
-        }
+    {
+        getStepper()->removeProcess( this );
+    }
 }
 
 
@@ -197,7 +197,8 @@ SET_METHOD_DEF( String, StepperID, Process )
 
 GET_METHOD_DEF( String, StepperID, Process )
 {
-    return getStepper()->getID();
+    Stepper const* aStepper( getStepper() );
+    return aStepper ? aStepper->getID(): "";
 }
 
 
