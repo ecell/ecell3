@@ -26,6 +26,7 @@ buildInfo.productInfo = {
     version: {
         major: buildInfo.env.ECELL_MAJOR_VERSION,
         minor: buildInfo.env.ECELL_MINOR_VERSION,
-        micro: buildInfo.env.ECELL_MICRO_VERSION
+        micro: buildInfo.env.ECELL_MICRO_VERSION,
+        revision: buildInfo.env.ECELL_PACKAGE_REVISION
     }
 };
