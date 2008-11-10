@@ -82,7 +82,7 @@ public:
                 THROW_EXCEPTION( ValueError,
                                  "Negative value not allowed for minimum step");
             }
-            if ( aMaxSpace <= 0 )
+            if ( aMaxSpace < 0 )
             {
                 THROW_EXCEPTION( ValueError,
                                  "Invalid value for max space" );
@@ -136,7 +136,7 @@ public:
 
         void setMaxSpace( IntegerParam aMaxSpace )
         {
-            if ( aMaxSpace <= 0 )
+            if ( aMaxSpace < 0 )
             {
                 THROW_EXCEPTION( ValueError,
                                  "Invalid value for max space" );
