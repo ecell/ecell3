@@ -143,6 +143,7 @@
 #define	__VVECTOR_H__
 
 #include <vector>
+#include <string>
 
 #if !defined(HAVE_SSIZE_T)
 typedef int ssize_t;
@@ -173,41 +174,40 @@ const unsigned int VVECTOR_READ_CACHE_INDEX_SIZE = 2;
 const unsigned int VVECTOR_WRITE_CACHE_INDEX_SIZE = 2;
 
 class vvector_full : public std::exception { 
-  public:
-
-   virtual char const* what() throw()
-        {
-            return "Total disk space or allocated space is full.\n";
-        } 
-    };
+public:
+  virtual char const* what() throw()
+  {
+    return "Total disk space or allocated space is full.\n";
+  } 
+};
 
 class vvector_write_error : public std::exception { 
-  public:
+public:
 
-   virtual char const* what() throw()
-        {
-            return "I/O error while attempting to write on disk.\n";
-        } 
-    };
+  virtual char const* what() throw()
+  {
+    return "I/O error while attempting to write on disk.\n";
+  } 
+};
 
 class vvector_read_error : public std::exception { 
-  public:
+public:
 
-   virtual char const* what() throw()
-        {
-            return "I/O error while attempting to read from disk.\n";
-        } 
-    };
+  virtual char const* what() throw()
+  {
+    return "I/O error while attempting to read from disk.\n";
+  } 
+};
 
 
 class vvector_init_error : public std::exception { 
-  public:
+public:
 
-   virtual char const* what() throw()
-        {
-            return "VVector initialization error.\n";
-        } 
-    };
+  virtual char const* what() throw()
+  {
+    return "VVector initialization error.\n";
+  } 
+};
 
 class vvectorbase {
   // types
@@ -216,10 +216,10 @@ class vvectorbase {
   // private valiables
  private:
   static int _serialNumber;
-  static char const *_defaultDirectory;
+  static std::string _defaultDirectory;
   static int _directoryPriority;
 
-  static std::vector<char const *> _tmp_name;
+  static std::vector<std::string> _tmp_name;
   static std::vector<int> _file_desc_read;
   static std::vector<int> _file_desc_write;
 
@@ -231,7 +231,7 @@ class vvectorbase {
   // protected variables
  protected:
   int _myNumber;
-  char *_file_name;
+  std::string _file_name;
   int _fdr,_fdw;
   void unlinkfile();
 
@@ -241,6 +241,9 @@ class vvectorbase {
   void my_open_to_read(off_t offset);
   void my_close_read();
   void my_close_write();
+
+ private:
+  vvectorbase( vvectorbase const& );
 
   // constructor, destructor
  public:
