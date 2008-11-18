@@ -46,7 +46,8 @@ LIBECS_DM_INIT_STATIC( Entity, Entity );
 Entity::Entity()
     : theSuperSystem( NULLPTR ),
       theID( "" ),
-      theName( "" ) 
+      theName( "" ),
+      theLoggerMap( NULLPTR )
 {
 
 }
