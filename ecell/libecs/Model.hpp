@@ -42,6 +42,7 @@
 #include "libecs/LoggerBroker.hpp"
 #include "libecs/Stepper.hpp"
 #include "libecs/SystemStepper.hpp"
+#include "libecs/Handle.hpp"
 
 /**
    @addtogroup model The Model.
@@ -55,10 +56,6 @@
 namespace libecs
 {
 
-DECLARE_ASSOCVECTOR( String, StepperPtr, std::less< const String >,
-                                         StepperMap ); 
-
-
 /**
    Model class represents a simulation model.
 
@@ -66,6 +63,9 @@ DECLARE_ASSOCVECTOR( String, StepperPtr, std::less< const String >,
 */
 class LIBECS_API Model
 {
+public:
+    DECLARE_ASSOCVECTOR( String, StepperPtr, std::less< const String >,
+                         StepperMap ); 
 protected:
     typedef EventScheduler< StepperEvent > StepperEventScheduler;
     typedef StepperEventScheduler::EventIndex EventIndex;
@@ -73,7 +73,6 @@ protected:
     typedef EcsObjectMaker< System > SystemMaker;
     typedef EcsObjectMaker< Variable > VariableMaker;
     typedef EcsObjectMaker< Process > ProcessMaker;
-
 public:
     Model( StaticModuleMaker< EcsObject >& maker );
     ~Model();
@@ -158,8 +157,16 @@ public:
        @param aFullID a FullID of the requested Entity.
        @return A borrowed pointer to an Entity specified by the FullID.
     */
-    EntityPtr getEntity( FullIDCref aFullID ) const;
+    Entity* getEntity( FullIDCref aFullID ) const;
 
+
+    /**
+       Retrieves an Entity object by the handle.
+
+       @param handle the handle of the requested Entity.
+       @return A borrowed pointer to an Entity specified by the FullID.
+    */
+    Entity* getEntity( int handle ) const;
 
     /**
        Retrieves a System object pointed by the SystemPath.    
@@ -167,7 +174,7 @@ public:
        @param aSystemPath a SystemPath of the requested System.
        @return A borrowed pointer to a System.
     */
-    SystemPtr getSystem( SystemPathCref aSystemPath ) const;;
+    System* getSystem( SystemPath const& aSystemPath ) const;;
 
 
     /**
@@ -273,6 +280,8 @@ private:
 
     void checkSizeVariable( SystemCptr const aSystem );
 
+    Handle generateNextHandle();
+
     static void initializeSystems( SystemPtr const aSystem );
 
 public:
@@ -281,13 +290,18 @@ public:
 private:
 
     Time                            theCurrentTime;
-    StepperPtr                      theLastStepper;
+    Stepper*                        theLastStepper;
 
     StepperEventScheduler           theScheduler;
 
     LoggerBroker                    theLoggerBroker;
 
-    System                          *theRootSystemPtr;
+    std::map< Handle, boost::intrusive_ptr< EcsObject > > theObjectMap;
+    unsigned int                    theNextHandleVal;
+
+    System*                         theRootSystemPtr;
+
+    std::vector< Entity* >          theDeletionQueue;
 
     SystemStepper                   theSystemStepper;
 

@@ -52,6 +52,7 @@ namespace libecs
 
 Model::Model( StaticModuleMaker< EcsObject >& maker )
     : theCurrentTime( 0.0 ),
+      theNextHandleVal( 0 ),
       theLoggerBroker( *this ),
       theRootSystemPtr(0),
       theSystemStepper(),
@@ -116,33 +117,58 @@ void Model::createEntity( StringCref aClassname, FullIDCref aFullID )
 
     SystemPtr aContainerSystemPtr( getSystem( aFullID.getSystemPath() ) );
 
-    ProcessPtr  aProcessPtr( NULLPTR );
-    SystemPtr   aSystemPtr ( NULLPTR );
-    VariablePtr aVariablePtr( NULLPTR );
-
     switch( aFullID.getEntityType() )
     {
     case EntityType::VARIABLE:
-        aVariablePtr = theVariableMaker.make( aClassname );
-        aVariablePtr->setID( aFullID.getID() );
-        aContainerSystemPtr->registerVariable( aVariablePtr );
-        return;
+        {
+            Variable* aVariablePtr( theVariableMaker.make( aClassname ) );
+            aVariablePtr->setID( aFullID.getID() );
+            aVariablePtr->setModel( this );
+            Handle nextHandle( generateNextHandle() );
+            theObjectMap.insert(
+                std::make_pair(
+                    nextHandle,
+                    boost::intrusive_ptr< EcsObject >(
+                        aVariablePtr, true ) ) );
+            aVariablePtr->setHandle( nextHandle );
+            aContainerSystemPtr->registerVariable( aVariablePtr );
+            return;
+        }
 
     case EntityType::PROCESS:
-        aProcessPtr = theProcessMaker.make( aClassname );
-        aProcessPtr->setID( aFullID.getID() );
-        aContainerSystemPtr->registerProcess( aProcessPtr );
-        return;
+        {
+            Process* aProcessPtr( theProcessMaker.make( aClassname ) );
+            aProcessPtr->setID( aFullID.getID() );
+            aProcessPtr->setModel( this );
+            Handle nextHandle( generateNextHandle() );
+            theObjectMap.insert(
+                std::make_pair(
+                    nextHandle,
+                    boost::intrusive_ptr< EcsObject >(
+                        aProcessPtr, true ) ) );
+            aProcessPtr->setHandle( nextHandle );
+            aContainerSystemPtr->registerProcess( aProcessPtr );
+            return;
+        }
 
     case EntityType::SYSTEM:
-        aSystemPtr = theSystemMaker.make( aClassname );
-        aSystemPtr->setID( aFullID.getID() );
-        aSystemPtr->setModel( this );
-        aContainerSystemPtr->registerSystem( aSystemPtr );
-        return;
+        {
+            System* aSystemPtr( theSystemMaker.make( aClassname ) );
+            aSystemPtr->setID( aFullID.getID() );
+            aSystemPtr->setModel( this );
+            Handle nextHandle( generateNextHandle() );
+            theObjectMap.insert(
+                std::make_pair(
+                    nextHandle,
+                    boost::intrusive_ptr< EcsObject >(
+                        aSystemPtr, true ) ) );
+            aSystemPtr->setHandle( nextHandle );
+            aContainerSystemPtr->registerSystem( aSystemPtr );
+            return;
+        }
     }
 
-    THROW_EXCEPTION( InvalidEntityType, "bad EntityType specified." );
+    THROW_EXCEPTION( InvalidEntityType, "Invalid EntityType specified." );
 }
 
 
@@ -234,7 +260,7 @@ void Model::createStepper( StringCref aClassName, StringCref anID )
 }
 
 
-void Model::checkStepper( SystemCptr const aSystem ) const
+void Model::checkStepper( System const* const aSystem ) const
 {
     if( aSystem->getStepper() == NULLPTR )
     {
@@ -243,7 +269,7 @@ void Model::checkStepper( SystemCptr const aSystem ) const
                          aSystem->getFullID().getString() + "]." );
     }
 
-    for( SystemMapConstIterator i( aSystem->getSystemMap().begin() ) ;
+    for( System::SystemMapConstIterator i( aSystem->getSystemMap().begin() ) ;
          i != aSystem->getSystemMap().end() ; ++i )
     {
         // check it recursively
@@ -252,11 +278,11 @@ void Model::checkStepper( SystemCptr const aSystem ) const
 }
 
 
-void Model::initializeSystems( SystemPtr const aSystem )
+void Model::initializeSystems( System* const aSystem )
 {
     aSystem->initialize();
 
-    for( SystemMapConstIterator i( aSystem->getSystemMap().begin() );
+    for( System::SystemMapConstIterator i( aSystem->getSystemMap().begin() );
          i != aSystem->getSystemMap().end() ; ++i )
     {
         // initialize recursively
@@ -264,7 +290,7 @@ void Model::initializeSystems( SystemPtr const aSystem )
     }
 }
 
-void Model::checkSizeVariable( SystemCptr const aSystem )
+void Model::checkSizeVariable( System const* const aSystem )
 {
     FullID aRootSizeFullID( "Variable:/:SIZE" );
 
@@ -340,6 +366,13 @@ void Model::step()
     theLastStepper = aNextEvent.getStepper();
 
     theScheduler.step();
+}
+
+Handle Model::generateNextHandle()
+{
+    if ( Handle::INVALID_HANDLE_VALUE == ++theNextHandleVal )
+        THROW_EXCEPTION( TooManyItems, "Too many entities or steppers created" );
+    return Handle( theNextHandleVal );
 }
 
 } // namespace libecs

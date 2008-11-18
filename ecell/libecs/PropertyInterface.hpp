@@ -107,7 +107,9 @@ private:
 public:
     virtual ~PropertyInterfaceBase()
     {
-        ; // do nothing
+        std::for_each( thePropertySlotMap.begin(), thePropertySlotMap.end(),
+                ComposeUnary( DeletePtr< PropertySlotBase >(),
+                    SelectSecond< PropertySlotMap::value_type >() ) );
     }
 
     /**

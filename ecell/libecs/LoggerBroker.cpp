@@ -33,6 +33,9 @@
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <algorithm>
+#include <functional>
+
 #include "libecs.hpp"
 
 #include "Entity.hpp"
@@ -56,35 +59,59 @@ LoggerBroker::LoggerBroker( Model const& aModel )
 
 LoggerBroker::~LoggerBroker()
 {
-    FOR_ALL_SECOND( LoggerMap, theLoggerMap, ~Logger );
+    std::for_each( begin(), end(),
+            ComposeUnary(
+                DeletePtr< Logger >(),
+                SelectSecond< iterator::value_type >() ) );
 }
 
 void LoggerBroker::flush()
 {
-    FOR_ALL_SECOND( LoggerMap, theLoggerMap, flush );
+    std::for_each( begin(), end(),
+            ComposeUnary(
+                std::mem_fun( &Logger::flush ),
+                SelectSecond< iterator::value_type >() ) );
 }
 
 LoggerPtr LoggerBroker::getLogger( FullPNCref aFullPN ) const
 {
-    LoggerMapConstIterator aLoggerMapIterator( theLoggerMap.find( aFullPN ) );
+    LoggerMap::const_iterator anOuterIter(
+        theLoggerMap.find( aFullPN.getFullID() ) );
 
-    if( aLoggerMapIterator == theLoggerMap.end() )
+    if( anOuterIter == theLoggerMap.end() )
     {
         THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.getString() 
                                    + "] not found." );
     }
 
-    return aLoggerMapIterator->second;
-}
+    PerFullIDMap::const_iterator anInnerIter(
+        anOuterIter->second.find( aFullPN.getPropertyName() ) );
 
+    if( anInnerIter == anOuterIter->second.end() )
+    {
+        THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.getString() 
+                                   + "] not found." );
+    }
+
+    return anInnerIter->second;
+}
 
 LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,
                                       Logger::Policy const& aPolicy )
 {
-    if( theLoggerMap.find( aFullPN ) != theLoggerMap.end() )
+    LoggerMap::const_iterator anOuterIter(
+        theLoggerMap.find( aFullPN.getFullID() ) );
+
+    if( anOuterIter != theLoggerMap.end() )
     {
-        THROW_EXCEPTION( AlreadyExist, "Logger [" + aFullPN.getString()
-                                       + "] already exist." );
+        PerFullIDMap::const_iterator anInnerIter(
+            anOuterIter->second.find( aFullPN.getPropertyName() ) );
+
+        if( anInnerIter != anOuterIter->second.end() )
+        {
+            THROW_EXCEPTION( AlreadyExist, "Logger [" + aFullPN.getString()
+                                           + "] already exist." );
+        }
     }
 
     EntityPtr anEntityPtr( theModel.getEntity( aFullPN.getFullID() ) );
@@ -99,13 +126,100 @@ LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,
 
     LoggerPtr aNewLogger( new Logger( aLoggerAdapter, aPolicy ) );
 
-    anEntityPtr->registerLogger( aNewLogger );
-    theLoggerMap[ aFullPN ] = aNewLogger;
-    // it should have at least one datapoint to work correctly.
-    aNewLogger->log( theModel.getCurrentTime() );
-    aNewLogger->flush();
+    std::pair< LoggerMap::iterator, bool > anInnerMap(
+        theLoggerMap.insert(
+            LoggerMap::value_type( aFullPN.getFullID(), PerFullIDMap() ) ) );
+
+    try
+    {
+        ( (*anInnerMap.first).second )[ aFullPN.getPropertyName() ] = aNewLogger;
+        if ( anInnerMap.second )
+            anEntityPtr->setLoggerMap( &( *anInnerMap.first ).second );
+
+        // it should have at least one datapoint to work correctly.
+        aNewLogger->log( theModel.getCurrentTime() );
+        aNewLogger->flush();
+    }
+    catch ( std::exception const& )
+    {
+        if ( anInnerMap.second )
+        {
+            anEntityPtr->setLoggerMap( 0 );
+            theLoggerMap.erase( anInnerMap.first );
+        }
+        delete aNewLogger;
+        throw;
+    } 
 
     return aNewLogger;
 }
+
+void LoggerBroker::removeLogger( FullPNCref aFullPN )
+{
+    LoggerMap::iterator anOuterIter(
+        theLoggerMap.find( aFullPN.getFullID() ) );
+
+    if( anOuterIter == theLoggerMap.end() )
+    {
+        THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.getString() 
+                                   + "] not found." );
+    }
+
+    PerFullIDMap::iterator anInnerIter(
+        anOuterIter->second.find( aFullPN.getPropertyName() ) );
+
+    if( anInnerIter == anOuterIter->second.end() )
+    {
+        THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.getString() 
+                                   + "] not found." );
+    }
+
+    anOuterIter->second.erase( anInnerIter );
+    if ( anOuterIter->second.empty() )
+    {
+        EntityPtr anEntityPtr( theModel.getEntity( aFullPN.getFullID() ) );
+        anEntityPtr->setLoggerMap( 0 );
+        theLoggerMap.erase( anOuterIter );
+    }
+
+    delete (*anInnerIter).second;
+}
+
+LoggerBroker::LoggersPerFullID
+LoggerBroker::getLoggersByFullID( FullID const& aFullID )
+{
+    LoggerMap::iterator anOuterIter( theLoggerMap.find( aFullID ) );
+    PerFullIDMap& anInnerMap(
+        anOuterIter == theLoggerMap.end() ? theEmptyPerFullIDMap:
+                                            anOuterIter->second );
+
+    return LoggersPerFullID(
+        PerFullIDLoggerIterator(
+            anInnerMap.begin(),
+            SelectSecond< LoggerMap::value_type::second_type::value_type >() ),
+        PerFullIDLoggerIterator(
+            anInnerMap.end(),
+            SelectSecond< LoggerMap::value_type::second_type::value_type >() )
+    );
+}
+
+LoggerBroker::ConstLoggersPerFullID
+LoggerBroker::getLoggersByFullID( FullID const& aFullID ) const
+{
+    LoggerMap::const_iterator anOuterIter( theLoggerMap.find( aFullID ) );
+    PerFullIDMap const& anInnerMap(
+        anOuterIter == theLoggerMap.end() ? theEmptyPerFullIDMap:
+                                            anOuterIter->second );
+
+    return ConstLoggersPerFullID(
+        PerFullIDLoggerConstIterator(
+            anInnerMap.begin(),
+            SelectSecond< LoggerMap::value_type::second_type::value_type >() ),
+        PerFullIDLoggerConstIterator(
+            anInnerMap.end(),
+            SelectSecond< LoggerMap::value_type::second_type::value_type >() )
+    );
+}
+
 
 } // namespace libecs

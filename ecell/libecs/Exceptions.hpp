@@ -97,35 +97,36 @@ public:\
 
 // system errors
 DEFINE_EXCEPTION( UnexpectedError,                Exception );
-DEFINE_EXCEPTION( NotFound,                             Exception );
-DEFINE_EXCEPTION( IOException,                        Exception );
+DEFINE_EXCEPTION( NotFound,                       Exception );
+DEFINE_EXCEPTION( IOException,                    Exception );
 DEFINE_EXCEPTION( NotImplemented,                 Exception ); 
-DEFINE_EXCEPTION( Instantiation,                    Exception );
+DEFINE_EXCEPTION( Instantiation,                  Exception );
 
 DEFINE_EXCEPTION( AssertionFailed,                Exception );
-DEFINE_EXCEPTION( AlreadyExist,                     Exception );
-DEFINE_EXCEPTION( ValueError,                         Exception );
-DEFINE_EXCEPTION( TypeError,                            Exception );
-DEFINE_EXCEPTION( OutOfRange,                         Exception );
-DEFINE_EXCEPTION( IllegalOperation,             Exception );
+DEFINE_EXCEPTION( AlreadyExist,                   Exception );
+DEFINE_EXCEPTION( ValueError,                     Exception );
+DEFINE_EXCEPTION( TypeError,                      Exception );
+DEFINE_EXCEPTION( OutOfRange,                     Exception );
+DEFINE_EXCEPTION( IllegalOperation,               Exception );
+DEFINE_EXCEPTION( TooManyItems,                   Exception );
 
 // simulation errors
 DEFINE_EXCEPTION( SimulationError,                Exception );
-DEFINE_EXCEPTION( InitializationFailed,     SimulationError );
-DEFINE_EXCEPTION( RangeError,                         SimulationError );
+DEFINE_EXCEPTION( InitializationFailed,           SimulationError );
+DEFINE_EXCEPTION( RangeError,                     SimulationError );
 
 // PropertySlot errors
-DEFINE_EXCEPTION( PropertyException,            Exception );
-DEFINE_EXCEPTION( NoSlot,                                 PropertyException );
+DEFINE_EXCEPTION( PropertyException,              Exception );
+DEFINE_EXCEPTION( NoSlot,                         PropertyException );
 DEFINE_EXCEPTION( AttributeError,                 PropertyException );
 
 // Introspection errors
-DEFINE_EXCEPTION( NoInfoField,                        Exception );
+DEFINE_EXCEPTION( NoInfoField,                    Exception );
 
 // FullID errors
-DEFINE_EXCEPTION( BadID,                                    Exception ); 
-DEFINE_EXCEPTION( BadSystemPath,                    BadID );
-DEFINE_EXCEPTION( InvalidEntityType,            BadID);
+DEFINE_EXCEPTION( BadID,                          Exception ); 
+DEFINE_EXCEPTION( BadSystemPath,                  BadID );
+DEFINE_EXCEPTION( InvalidEntityType,              BadID);
 
 
 /**

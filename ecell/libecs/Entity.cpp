@@ -36,7 +36,7 @@
 #include "FullID.hpp"
 
 #include "Entity.hpp"
-
+#include "Model.hpp"
 
 namespace libecs
 {
@@ -80,5 +80,23 @@ const SystemPath Entity::getSystemPath() const
     aSystemPath.push_back( aSystemPtr->getID() );
     return aSystemPath;
 }
+
+LoggerBroker::LoggersPerFullID
+Entity::getLoggers() const
+{
+    LoggerBroker::PerFullIDMap* aLoggerMap(
+        theLoggerMap ? theLoggerMap:
+            &getModel()->getLoggerBroker().theEmptyPerFullIDMap );
+    return LoggerBroker::LoggersPerFullID(
+        LoggerBroker::PerFullIDLoggerIterator(
+            aLoggerMap->begin(),
+            SelectSecond< LoggerBroker::PerFullIDMap::value_type >() ),
+        LoggerBroker::PerFullIDLoggerIterator(
+            aLoggerMap->end(),
+            SelectSecond< LoggerBroker::PerFullIDMap::value_type >() )
+    );
+    // return getModel()->getLoggerBroker().getLoggersByFullID( getFullID() );
+}
+
 
 } // namespace libecs

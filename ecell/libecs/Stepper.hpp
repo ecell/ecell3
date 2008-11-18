@@ -65,6 +65,9 @@ LIBECS_DM_CLASS( Stepper, EcsObject )
 {
 public:
     DECLARE_VECTOR( Real, RealVector );
+    DECLARE_VECTOR( Variable*, VariableVector );
+    DECLARE_VECTOR( Process*, ProcessVector );
+    DECLARE_VECTOR( System*, SystemVector );
 
     typedef VariableVector::size_type VariableIndex;
 
@@ -281,19 +284,6 @@ public:
 
     void registerLogger( LoggerPtr );
 
-    ModelPtr getModel() const
-    {
-        return theModel;
-    }
-
-    /**
-       @internal
-    */
-    void setModel( ModelPtr const aModel )
-    {
-        theModel = aModel;
-    }
-
     void setSchedulerIndex( const int anIndex )
     {
         theSchedulerIndex = anIndex;
@@ -482,19 +472,8 @@ protected:
     */
     void createInterpolants();
 
-    /**
-       Scan all the relevant Entity objects to this Stepper and construct
-       the list of loggers.
-
-       The list, theLoggerVector, is used in log() method.
-    */
-    void updateLoggerVector();
-
-
 protected:
     SystemVector              theSystemVector;
-
-    LoggerVector              theLoggerVector;
 
     VariableVector            theVariableVector;
     VariableVector::size_type theReadWriteVariableOffset;
@@ -508,8 +487,6 @@ protected:
     RealVector                theValueBuffer;
 
 private:
-    Model*                    theModel;
-
     /** the index on the scheduler */
     int                       theSchedulerIndex;
 

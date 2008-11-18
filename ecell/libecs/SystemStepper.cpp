@@ -73,12 +73,12 @@ void SystemStepper::integrate( RealParam aTime )
     setCurrentTime( aTime );
 }
 
-void SystemStepper::integrateVariablesRecursively( SystemPtr const aSystem,
+void SystemStepper::integrateVariablesRecursively( System* aSystem,
                                                    RealParam aTime )
 {
-    FOR_ALL( VariableMap, aSystem->getVariableMap() )
+    FOR_ALL( System::VariableMap, aSystem->getVariableMap() )
     {
-        VariablePtr const aVariable( i->second );
+        Variable* aVariable( i->second );
         
         if( aVariable->isIntegrationNeeded() )
         {
@@ -86,9 +86,9 @@ void SystemStepper::integrateVariablesRecursively( SystemPtr const aSystem,
         }
     }
 
-    FOR_ALL( SystemMap, aSystem->getSystemMap() )
+    FOR_ALL( System::SystemMap, aSystem->getSystemMap() )
     {
-        SystemPtr const aSubSystem( i->second );
+        System* aSubSystem( i->second );
         integrateVariablesRecursively( aSubSystem, aTime );
     }
 }

@@ -121,7 +121,137 @@ struct PtrLess
     bool operator()( T x, T y ) const { return *y > *x; }
 };
 
+template < typename T_ >
+struct SelectFirst
+{
+    typedef T_ argument_type;
+    typedef typename T_::first_type result_type;
 
+    typename T_::first_type& operator()( T_& pair ) const
+    {
+        return pair.first;
+    }
+
+    typename T_::first_type const& operator()( T_ const& pair ) const
+    {
+        return pair.first;
+    }
+};
+
+template < typename T_ >
+struct SelectSecond
+{
+    typedef T_ argument_type;
+    typedef typename T_::second_type result_type;
+
+    typename T_::second_type& operator()( T_& pair ) const
+    {
+        return pair.second;
+    }
+
+    typename T_::second_type const& operator()( T_ const& pair ) const
+    {
+        return pair.second;
+    }
+};
+
+template < typename Tderived_, typename Tfun1_, typename Tfun2_,
+           typename Tretval_ = typename Tfun1_::result_type >
+struct UnaryComposeImpl
+{
+    typedef typename Tfun2_::argument_type argument_type;
+    typedef typename Tfun1_::result_type result_type;
+
+    UnaryComposeImpl( Tfun1_ const& f1, Tfun2_ const& f2 )
+        : f1_( f1 ), f2_( f2 ) {}
+
+    result_type operator()( argument_type const& val ) const
+    {
+        return f1_( f2_( val ) );
+    }
+
+    result_type operator()( argument_type const& val )
+    {
+        return f1_( f2_( val ) );
+    }
+
+    result_type operator()( argument_type& val ) const
+    {
+        return f1_( f2_( val ) );
+    }
+
+    result_type operator()( argument_type& val )
+    {
+        return f1_( f2_( val ) );
+    }
+
+private:
+    Tfun1_ f1_;
+    Tfun2_ f2_;
+};
+
+template < typename Tderived_, typename Tfun1_, typename Tfun2_ >
+struct UnaryComposeImpl< Tderived_, Tfun1_, Tfun2_, void >
+{
+    typedef typename Tfun2_::argument_type argument_type;
+    typedef void result_type;
+
+    UnaryComposeImpl( Tfun1_ const& f1, Tfun2_ const& f2 )
+        : f1_( f1 ), f2_( f2 ) {}
+
+    void operator()( argument_type const& val ) const
+    {
+        f1_( f2_( val ) );
+    }
+
+    void operator()( argument_type const& val )
+    {
+        f1_( f2_( val ) );
+    }
+
+    void operator()( argument_type& val ) const
+    {
+        f1_( f2_( val ) );
+    }
+
+    void operator()( argument_type& val )
+    {
+        f1_( f2_( val ) );
+    }
+
+private:
+    Tfun1_ f1_;
+    Tfun2_ f2_;
+};
+
+
+template < typename Tfun1_, typename Tfun2_ >
+struct UnaryCompose: public UnaryComposeImpl< UnaryCompose< Tfun1_, Tfun2_ >,
+                                              Tfun1_, Tfun2_ >
+{
+public:
+    UnaryCompose( Tfun1_ const& f1, Tfun2_ const& f2 )
+        : UnaryComposeImpl< UnaryCompose, Tfun1_, Tfun2_ >( f1, f2 ) {}
+};
+
+template < typename Tfun1_, typename Tfun2_ >
+inline UnaryCompose< Tfun1_, Tfun2_ >
+ComposeUnary( Tfun1_ const& f1, Tfun2_ const& f2 )
+{
+    return UnaryCompose< Tfun1_, Tfun2_ >( f1, f2 );
+}
+
+template < typename T_ >
+struct DeletePtr
+{
+    typedef void result_type;
+    typedef T_* argument_type;
+
+    void operator()( T_* ptr )
+    {
+        delete ptr;
+    }
+};
 
 /**
    Check if aSequence's size() is within [ aMin, aMax ].    

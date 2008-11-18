@@ -80,27 +80,6 @@ EcsObject::defaultGetProperty( StringCref aPropertyName ) const
                      + aPropertyName + "].    Get property failed." );
 }
 
-void EcsObject::registerLogger( LoggerPtr aLoggerPtr )
-{
-    if( std::find( theLoggerVector.begin(), theLoggerVector.end(), aLoggerPtr )
-            == theLoggerVector.end() )
-    {
-         theLoggerVector.push_back( aLoggerPtr );
-    }
-}
-
-void EcsObject::removeLogger( LoggerPtr aLoggerPtr )
-{
-    LoggerVectorIterator i( find( theLoggerVector.begin(), 
-                                  theLoggerVector.end(),
-                                  aLoggerPtr ) );
-    
-    if( i != theLoggerVector.end() )
-    {
-        theLoggerVector.erase( i );
-    }
-}
-
 
 void EcsObject::throwNotSetable()
 {
@@ -117,6 +96,21 @@ void EcsObject::throwNotGetable()
 StringCref EcsObject::getClassName() const
 {
      return getPropertyInterface().getClassName();
+}
+
+void intrusive_ptr_add_ref( libecs::EcsObject* anEcsObject )
+{
+    // XXX: needs to be atomic
+    ++anEcsObject->theRefCount;
+}
+
+void intrusive_ptr_release( libecs::EcsObject* anEcsObject )
+{
+    // XXX: needs to be atomic
+    if ( --anEcsObject->theRefCount <= 0 )
+    {
+        delete anEcsObject;
+    }
 }
 
 #define NULLGETSET_SPECIALIZATION_DEF( TYPE )\

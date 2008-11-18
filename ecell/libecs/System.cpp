@@ -110,7 +110,6 @@ GET_METHOD_DEF( String, StepperID, System )
 System::System()
     : theStepper( NULLPTR ),
       theSizeVariable( NULLPTR ),
-      theModel( NULLPTR ),
       theEntityListChanged( false )
 {
     ; // do nothing
@@ -121,27 +120,6 @@ System::~System()
     if( getStepper() != NULLPTR )
     {
         getStepper()->removeSystem( this );
-    }
-    
-    // delete Processes first.
-    for( ProcessMapIterator i( theProcessMap.begin() );
-         i != theProcessMap.end() ; ++i )
-    {
-        delete i->second;
-    }
-
-    // then Variables.
-    for( VariableMapIterator i( theVariableMap.begin() );
-         i != theVariableMap.end() ; ++i )
-    {
-        delete i->second;
-    }
-
-    // delete sub-systems.
-    for( SystemMapIterator i( theSystemMap.begin() );
-         i != theSystemMap.end() ; ++i )
-    {
-        delete i->second;
     }
 }
 
@@ -209,7 +187,8 @@ void System::initialize()
     configureSizeVariable();
 }
 
-ProcessPtr System::getProcess( StringCref anID ) const
+Process*
+System::getProcess( StringCref anID ) const
 {
     ProcessMapConstIterator i( getProcessMap().find( anID ) );
 
@@ -225,7 +204,8 @@ ProcessPtr System::getProcess( StringCref anID ) const
 }
 
 
-VariablePtr System::getVariable( StringCref anID ) const
+Variable*
+System::getVariable( StringCref anID ) const
 {
     VariableMapConstIterator i( getVariableMap().find( anID ) );
 
@@ -260,7 +240,8 @@ void System::registerSystem( SystemPtr aSystem )
     notifyChangeOfEntityList();
 }
 
-SystemPtr System::getSystem( SystemPathCref aSystemPath ) const
+System*
+System::getSystem( SystemPathCref aSystemPath ) const
 {
     if( aSystemPath.empty() )
     {
@@ -281,7 +262,8 @@ SystemPtr System::getSystem( SystemPathCref aSystemPath ) const
 }
     
 
-SystemPtr System::getSystem( StringCref anID ) const
+System*
+System::getSystem( StringCref anID ) const
 {
     if( anID[0] == '.' )
     {

@@ -36,7 +36,7 @@
 #include "libecs/EntityType.hpp"
 #include "libecs/EcsObject.hpp"
 #include "libecs/PropertyInterface.hpp"
-
+#include "libecs/LoggerBroker.hpp"
 
 /**
    @addtogroup entities The Entities.
@@ -54,6 +54,7 @@ namespace libecs
     */
     LIBECS_DM_CLASS( Entity, EcsObject )
     {
+        friend class LoggerBroker;
     public:
 
         LIBECS_DM_OBJECT_ABSTRACT( Entity ) 
@@ -170,6 +171,11 @@ namespace libecs
 
 
         /**
+           Get loggers associated to this Entity
+         */
+        LoggerBroker::LoggersPerFullID getLoggers() const;
+
+        /**
            @internal
 
            Set a supersystem of this Entity.    
@@ -184,6 +190,13 @@ namespace libecs
             theSuperSystem = supersystem; 
         }
 
+    protected:
+    
+        void setLoggerMap( LoggerBroker::PerFullIDMap* anLoggerMap )
+        {
+            theLoggerMap = anLoggerMap;
+        }
+
     private:
 
         // hide them
@@ -191,10 +204,10 @@ namespace libecs
         EntityRef operator=( EntityRef );
 
     private:
-        SystemPtr theSuperSystem;
-
-        String        theID;
-        String        theName;
+        SystemPtr                      theSuperSystem;
+        LoggerBroker::PerFullIDMap*    theLoggerMap;
+        String                         theID;
+        String                         theName;
     };
 
 } // namespace libecs

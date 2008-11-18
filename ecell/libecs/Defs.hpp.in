@@ -557,10 +557,6 @@ DECLARE_CLASS( DataPointVector );
 
 // containers
 DECLARE_VECTOR( Polymorph,        PolymorphVector );
-DECLARE_VECTOR( VariablePtr,    VariableVector );
-DECLARE_VECTOR( ProcessPtr,     ProcessVector );
-DECLARE_VECTOR( SystemPtr,        SystemVector );
-DECLARE_VECTOR( StepperPtr,     StepperVector );
 DECLARE_VECTOR( LoggerPtr,        LoggerVector );
 
 // exceptions

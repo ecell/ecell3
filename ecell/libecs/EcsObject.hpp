@@ -35,6 +35,7 @@
 #define __ECSOBJECT_HPP
 
 #include "libecs/Defs.hpp"
+#include "libecs/Handle.hpp"
 
 #if defined( WIN32 )
 // a bit hackish, but works.
@@ -136,6 +137,10 @@ namespace libecs
     { \
         new(thePropertyInterface) libecs::PropertyInterface<CLASSNAME>( #CLASSNAME, theDMTypeName ); \
     } \
+    void CLASSNAME::finalizeModule() \
+    { \
+        reinterpret_cast< libecs::PropertyInterface<CLASSNAME>* >( thePropertyInterface )->~PropertyInterface<CLASSNAME>(); \
+    } \
     PropertySlotBaseCptr CLASSNAME::getPropertySlot( libecs::StringCref aPropertyName ) const \
     { \
         return _getPropertyInterface().getPropertySlot( aPropertyName ); \
@@ -207,6 +212,7 @@ private:\
     static libecs::PropertyInterface<CLASSNAME>& _getPropertyInterface(); \
 public:\
     static void initializeModule(); \
+    static void finalizeModule(); \
     static const DynamicModuleInfo* getClassInfoPtr(); \
     virtual PropertySlotBaseCptr getPropertySlot( libecs::StringCref aPropertyName ) const; \
     virtual void setProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ); \
@@ -475,6 +481,8 @@ template< typename T > class PropertyInterface;
 
 class LIBECS_API EcsObject
 {
+    friend void intrusive_ptr_add_ref( EcsObject* );
+    friend void intrusive_ptr_release( EcsObject* );
 
 public:
 
@@ -484,7 +492,7 @@ public:
     }
 
 
-    EcsObject()
+    EcsObject(): theRefCount( 0 )
     {
         ; // do nothing
     }
@@ -492,6 +500,21 @@ public:
     virtual ~EcsObject()
     {
         ; // do nothing
+    }
+
+    /**
+       Get a Model object to which this System belongs.
+
+       @return a borrowed pointer to the Model.
+    */
+    Model* getModel() const
+    {
+        return theModel;
+    }
+
+    void setModel( Model* const aModel )
+    {
+        theModel = aModel;
     }
 
     virtual PropertySlotBaseCptr 
@@ -527,21 +550,20 @@ public:
     virtual const PropertyAttributes
     defaultGetPropertyAttributes( StringCref aPropertyName ) const;
 
-    void registerLogger( LoggerPtr aLogger );
-
-    void removeLogger( LoggerPtr aLogger );
-
-    LoggerVectorCref getLoggerVector() const
-    {
-        return theLoggerVector;
-    }
-
     StringCref getClassName() const;
 
-public:
+    Handle const& getHandle() const
+    {
+        return theHandle;
+    }
 
     /// @internal
+    void setHandle( Handle const& aHandle )
+    {
+        theHandle = aHandle;
+    } 
 
+    /// @internal
     template <typename Type>
     void nullSet( typename Param<Type>::type )
     {
@@ -549,7 +571,6 @@ public:
     }
 
     /// @internal
-
     template <typename Type>
     const Type nullGet() const
     {
@@ -562,10 +583,16 @@ private:
     static void throwNotGetable();
 
 protected:
-
-    LoggerVector theLoggerVector;
-
+    Model*   theModel;
+    Handle   theHandle;
+    int      theRefCount;
 };
+
+/// @internal
+void intrusive_ptr_add_ref( libecs::EcsObject* anEcsObject );
+
+/// @internal
+void intrusive_ptr_release( libecs::EcsObject* anEcsObject );
 
 // these specializations of nullSet/nullGet are here to avoid spreading
 // inline copies of them around.    This reduces sizes of DM .so files a bit.

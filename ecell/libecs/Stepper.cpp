@@ -36,6 +36,7 @@
 #include <functional>
 #include <algorithm>
 #include <limits>
+#include <boost/bind.hpp>
 
 #include "Util.hpp"
 #include "Variable.hpp"
@@ -59,7 +60,6 @@ Stepper::Stepper()
     : theReadWriteVariableOffset( 0 ),
       theReadOnlyVariableOffset( 0 ),
       theDiscreteProcessOffset( 0 ),
-      theModel( NULLPTR ),
       theSchedulerIndex( -1 ),
       thePriority( 0 ),
       theCurrentTime( 0.0 ),
@@ -87,17 +87,9 @@ void Stepper::initialize()
     //
     updateVariableVector();
 
-
     // size of the value buffer == the number of *all* variables.
     // (not just read or write variables)
     theValueBuffer.resize( theVariableVector.size() );
-
-    updateLoggerVector();
-
-    
-    //    Don't call
-    //        createInterpolants();
-    //    here:    only DifferentialSteppers need this.
 }
 
 
@@ -252,49 +244,6 @@ void Stepper::createInterpolants()
 }
 
 
-void Stepper::updateLoggerVector()
-{
-    EntityVector anEntityVector;
-    anEntityVector.reserve( theProcessVector.size()
-                            + getReadOnlyVariableOffset()
-                            + theSystemVector.size() );
-
-    // copy theProcessVector
-    std::copy( theProcessVector.begin(), theProcessVector.end(),
-               std::back_inserter( anEntityVector ) );
-
-    // append theVariableVector
-    std::copy( theVariableVector.begin(), 
-               theVariableVector.begin() + theReadOnlyVariableOffset,
-               std::back_inserter( anEntityVector ) );
-
-    // append theSystemVector
-    std::copy( theSystemVector.begin(), theSystemVector.end(),
-               std::back_inserter( anEntityVector ) );
-
-
-    theLoggerVector.clear();
-
-    // Scan all the relevant Entities, and find loggers
-    for( EntityVectorConstIterator i( anEntityVector.begin() );
-             i != anEntityVector.end() ; ++i )
-    {
-        EntityPtr anEntityPtr( *i );
-
-        LoggerVectorCref aLoggerVector( anEntityPtr->getLoggerVector() );
-
-        if( ! aLoggerVector.empty() )
-        {
-            theLoggerVector.insert( theLoggerVector.end(),
-                                    aLoggerVector.begin(),
-                                    aLoggerVector.end() );
-        }
-    }
-
-    // optimization: sort by memory address.
-    std::sort( theLoggerVector.begin(), theLoggerVector.end() );
-}
-
 const bool Stepper::isDependentOn( const StepperCptr aStepper )
 {
     // Every Stepper depends on the SystemStepper.
@@ -417,10 +366,32 @@ void Stepper::removeProcess( ProcessPtr aProcessPtr )
 
 void Stepper::log()
 {
-    // update loggers
-    FOR_ALL( LoggerVector, theLoggerVector )
+    for ( ProcessVector::const_iterator i( theProcessVector.begin() ),
+                                        end( theProcessVector.end() );
+          i != end; ++i )
     {
-        (*i)->log( theCurrentTime );
+        LoggerBroker::LoggersPerFullID loggers( (*i)->getLoggers() );
+        std::for_each( loggers.begin(), loggers.end(),
+                       boost::bind( &Logger::log, _1, theCurrentTime ) );
+    }
+
+    for ( VariableVector::const_iterator i( theVariableVector.begin() ),
+                                         end( theVariableVector.begin()
+                                              + theReadOnlyVariableOffset );
+          i != end; ++i )
+    {
+        LoggerBroker::LoggersPerFullID loggers( (*i)->getLoggers() );
+        std::for_each( loggers.begin(), loggers.end(),
+                       boost::bind( &Logger::log, _1, theCurrentTime ) );
+    }
+
+    for ( SystemVector::const_iterator i( theSystemVector.begin() ),
+                                         end( theSystemVector.end() );
+          i != end; ++i )
+    {
+        LoggerBroker::LoggersPerFullID loggers( (*i)->getLoggers() );
+        std::for_each( loggers.begin(), loggers.end(),
+                       boost::bind( &Logger::log, _1, theCurrentTime ) );
     }
 }
 
@@ -467,7 +438,7 @@ GET_METHOD_DEF( Polymorph, ProcessList, Stepper )
     return aVector;
 }
 
-const VariableVector::size_type 
+const Stepper::VariableVector::size_type 
 Stepper::getVariableIndex( VariableCptr const aVariable )
 {
     VariableVectorConstIterator

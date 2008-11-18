@@ -32,10 +32,10 @@
 #ifndef __SYSTEM_HPP
 #define __SYSTEM_HPP
 
+#include <boost/intrusive_ptr.hpp>
+
 #include "libecs/Defs.hpp"
-
 #include "libecs/Entity.hpp"
-
 
 /**
    @addtogroup entities
@@ -45,14 +45,14 @@
 namespace libecs
 {
 
-// Maps used for entry lists
-DECLARE_MAP( const String, VariablePtr, std::less<const String>, VariableMap );
-DECLARE_MAP( const String, ProcessPtr, std::less<const String>, ProcessMap );
-DECLARE_MAP( const String, SystemPtr, std::less<const String>, SystemMap );
-
-
 LIBECS_DM_CLASS( System, Entity )
 {
+public:
+    // Maps used for entry lists
+    DECLARE_MAP( const String, Variable*, std::less<const String>, VariableMap );
+    DECLARE_MAP( const String, Process*, std::less<const String>, ProcessMap );
+    DECLARE_MAP( const String, System*, std::less<const String>, SystemMap );
+
 public:
     LIBECS_DM_BASECLASS( System );
 
@@ -79,7 +79,7 @@ public:
        @return A pointer to a Stepper object that this System belongs or
        NULL pointer if it is not set.
     */
-    StepperPtr getStepper() const 
+    Stepper* getStepper() const 
     { 
         return theStepper; 
     }
@@ -115,8 +115,8 @@ public:
         return getSize() * N_A;
     }
 
-    template <class C>
-    const std::map<const String,C*,std::less<const String> >& getMap() const;
+    template <class T_>
+    const std::map<const String, T_*, std::less<const String> >& getMap() const;
 
     VariableMapCref getVariableMap() const
     {
@@ -141,7 +141,7 @@ public:
 
        @return a borrowed pointer to a Process object in this System named @a id.
     */
-    ProcessPtr getProcess( StringCref anID ) const;
+    Process* getProcess( StringCref anID ) const;
 
 
     /**
@@ -151,7 +151,7 @@ public:
 
        @return a borrowed pointer to a Variable object in this System named @a id.
     */
-    VariablePtr getVariable( StringCref anID ) const;
+    Variable* getVariable( StringCref anID ) const;
 
     /**
        Find a System pointed by the given SystemPath relative to
@@ -167,7 +167,7 @@ public:
        @param aSystemPath A SystemPath object.
        @return a borrowed pointer to a System object pointed by aSystemPath.
     */
-    SystemPtr getSystem( SystemPathCref anID ) const;
+    System* getSystem( SystemPathCref anID ) const;
 
 
     /**
@@ -184,7 +184,7 @@ public:
        @return a borrowed pointer to a System object in this System
        whose ID is anID.
     */
-    SystemPtr getSystem( StringCref id ) const;
+    System* getSystem( StringCref id ) const;
 
 
     /**
@@ -193,7 +193,7 @@ public:
        This method steals ownership of the given pointer, and deletes
        it if there is an error.
     */
-    void registerProcess( ProcessPtr aProcess );
+    void registerProcess( Process* aProcess );
 
 
     /**
@@ -202,7 +202,7 @@ public:
        This method steals ownership of the given pointer, and deletes
        it if there is an error.
     */
-    void registerVariable( VariablePtr aVariable );
+    void registerVariable( Variable* aVariable );
 
 
     /**
@@ -211,7 +211,7 @@ public:
        This method steals ownership of the given pointer, and deletes
        it if there is an error.
     */
-    void registerSystem( SystemPtr aSystem );
+    void registerSystem( System* aSystem );
 
     /**
        Check if this is a root System.
@@ -229,29 +229,11 @@ public:
     */
     virtual const SystemPath getSystemPath() const;
 
-
-    /**
-       Get a Model object to which this System belongs.
-
-       @return a borrowed pointer to the Model.
-    */
-    ModelPtr getModel() const
-    {
-        return theModel;
-    }
-
-
-    void setModel( ModelPtr const aModel )
-    {
-        theModel = aModel;
-    }
-
-
-    VariableCptr const getSizeVariable() const;
+    Variable const* const getSizeVariable() const;
 
     void notifyChangeOfEntityList();
 
-    VariableCptr const findSizeVariable() const;
+    Variable const* const findSizeVariable() const;
 
     void configureSizeVariable();
 
@@ -261,35 +243,33 @@ public: // property slots
     GET_METHOD( Polymorph, ProcessList );
 
 protected:
-    StepperPtr     theStepper;
+    Stepper*        theStepper;
 
 private:
-    ModelPtr       theModel;
+    VariableMap     theVariableMap;
+    ProcessMap      theProcessMap;
+    SystemMap       theSystemMap;
 
-    VariableMap    theVariableMap;
-    ProcessMap     theProcessMap;
-    SystemMap      theSystemMap;
+    Variable const* theSizeVariable;
 
-    VariableCptr   theSizeVariable;
-
-    bool           theEntityListChanged;
+    bool            theEntityListChanged;
 };
 
 
 template <>
-inline VariableMapCref System::getMap() const
+inline System::VariableMapCref System::getMap() const
 {
     return getVariableMap();
 }
 
 template <>
-inline ProcessMapCref  System::getMap() const
+inline System::ProcessMapCref  System::getMap() const
 {
     return getProcessMap();
 }
 
 template <>
-inline SystemMapCref   System::getMap() const
+inline System::SystemMapCref   System::getMap() const
 {
     return getSystemMap();
 }

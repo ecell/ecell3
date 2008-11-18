@@ -161,22 +161,16 @@ void DiscreteEventStepper::interrupt( TimeParam aTime )
 
 void DiscreteEventStepper::log()
 {
-    if( theLoggerVector.empty() )
-    {
-        return;
-    }
-
     // call Logger::log() of Loggers that are attached to
     // the last fired Process and Variables in its VariableReferenceVector.
 
     const Real aCurrentTime( getCurrentTime() );
 
     ProcessEventCref aLastEvent( theScheduler.getEvent( theLastEventID ) );
-    const ProcessCptr aLastProcess( aLastEvent.getProcess() );
+    Process const* aLastProcess( aLastEvent.getProcess() );
 
-    LoggerVectorCref aProcessLoggerVector( aLastProcess->getLoggerVector() );
-
-    FOR_ALL( LoggerVector, aProcessLoggerVector )
+    FOR_ALL( LoggerBroker::LoggersPerFullID,
+             aLastProcess->getLoggers() )
     {
         (*i)->log( aCurrentTime );
     }
@@ -194,17 +188,12 @@ void DiscreteEventStepper::log()
             i != anEventIDVector.end(); ++i ) 
     {
         ProcessEventCref aDependentEvent( theScheduler.getEvent( *i ) );
-        ProcessPtr const aDependentProcess( aDependentEvent.getProcess() );
+        Process const* aDependentProcess( aDependentEvent.getProcess() );
 
-
-        LoggerVectorCref aDependentProcessLoggerVector(
-                aDependentProcess->getLoggerVector() );
-        for ( LoggerVectorConstIterator j(
-                aDependentProcessLoggerVector.begin() ); 
-              j != aDependentProcessLoggerVector.end(); ++j )
+        FOR_ALL( LoggerBroker::LoggersPerFullID,
+                 aDependentProcess->getLoggers() )
         {
-            const LoggerPtr aLogger( *j );
-            aLogger->log( aCurrentTime );
+            (*i)->log( aCurrentTime );
         }
     }
 
@@ -216,10 +205,10 @@ void DiscreteEventStepper::log()
                  j( aVariableReferenceVector.begin() );
          j != aVariableReferenceVector.end(); ++j )
     {
-        const VariableCptr aVariablePtr( (*j).getVariable() );
-        LoggerVectorCref aLoggerVector( aVariablePtr->getLoggerVector() );
+        Variable const* aVariablePtr( (*j).getVariable() );
 
-        FOR_ALL( LoggerVector, aLoggerVector )
+        FOR_ALL( LoggerBroker::LoggersPerFullID,
+                 aVariablePtr->getLoggers() )
         {
             (*i)->log( aCurrentTime );
         }
