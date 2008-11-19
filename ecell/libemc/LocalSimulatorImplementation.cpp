@@ -125,12 +125,12 @@ void LocalSimulatorImplementation::deleteStepper( libecs::StringCref anID )
 
 const libecs::Polymorph LocalSimulatorImplementation::getStepperList() const
 {
-    libecs::StepperMapCref aStepperMap( getModel().getStepperMap() );
+    libecs::Model::StepperMap const& aStepperMap( getModel().getStepperMap() );
 
     libecs::PolymorphVector aPolymorphVector; 
     aPolymorphVector.reserve( aStepperMap.size() );
     
-    for( libecs::StepperMapConstIterator i( aStepperMap.begin() );
+    for( libecs::Model::StepperMap::const_iterator i( aStepperMap.begin() );
          i != aStepperMap.end(); ++i )
     {
         aPolymorphVector.push_back( (*i).first );
@@ -395,16 +395,14 @@ void LocalSimulatorImplementation::createLogger(
 const libecs::Polymorph LocalSimulatorImplementation::getLoggerList() const
 {
     libecs::PolymorphVector aLoggerList;
-    aLoggerList.reserve( getModel().getLoggerBroker().getLoggerMap().size() );
 
-    libecs::LoggerBroker::LoggerMapCref aLoggerMap(
-            getModel().getLoggerBroker().getLoggerMap() );
+    libecs::LoggerBroker const& aLoggerBroker( getModel().getLoggerBroker() );
 
-    for( libecs::LoggerBroker::LoggerMapConstIterator i( aLoggerMap.begin() );
-         i != aLoggerMap.end(); ++i )
+    for( libecs::LoggerBroker::const_iterator
+            i( aLoggerBroker.begin() ), end( aLoggerBroker.end() );
+         i != end; ++i )
     {
-        libecs::FullPNCref aFullPN( (*i).first );
-        aLoggerList.push_back( aFullPN.getString() );
+        aLoggerList.push_back( (*i).first.getString() );
     }
 
     return aLoggerList;
