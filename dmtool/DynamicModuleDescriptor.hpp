@@ -39,11 +39,13 @@ struct DynamicModuleDescriptor
     typedef void* (*AllocatorType)();
     typedef const DynamicModuleInfo* (*InfoLoaderType)();
     typedef void (*ModuleInitializerType)();
+    typedef void (*ModuleFinalizerType)();
 
     const char* moduleName;
     AllocatorType allocator;
     InfoLoaderType infoLoader;
     ModuleInitializerType moduleInitializer;
+    ModuleFinalizerType moduleFinalizer;
 };
 
 #endif /* __DYNAMIC_MODULE_DESCRIPTOR_HPP */

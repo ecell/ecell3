@@ -75,8 +75,9 @@ public:
 
     ~DynamicModule()
     {
+        theDescriptor.moduleFinalizer();
         if ( theFinalizer )
-            (this->*theFinalizer)();
+            ( this->*theFinalizer )();
     }
 
     const DynamicModuleDescriptor& getDescriptor()

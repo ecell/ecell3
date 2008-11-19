@@ -46,6 +46,7 @@
         &CLASSNAME::createInstance, \
         &CLASSNAME::getClassInfoPtr, \
         &CLASSNAME::initializeModule, \
+        &CLASSNAME::finalizeModule \
     }
 
 #define DM_INIT( CLASSNAME )\
@@ -70,3 +71,4 @@ public:\
 
 
 #endif /* __DMOBJECT_HPP */
+
