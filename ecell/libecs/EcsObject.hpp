@@ -481,9 +481,6 @@ template< typename T > class PropertyInterface;
 
 class LIBECS_API EcsObject
 {
-    friend void intrusive_ptr_add_ref( EcsObject* );
-    friend void intrusive_ptr_release( EcsObject* );
-
 public:
 
     LIBECS_DM_DEFINE_PROPERTIES()
@@ -492,7 +489,7 @@ public:
     }
 
 
-    EcsObject(): theRefCount( 0 )
+    EcsObject()
     {
         ; // do nothing
     }
@@ -585,14 +582,7 @@ private:
 protected:
     Model*   theModel;
     Handle   theHandle;
-    int      theRefCount;
 };
-
-/// @internal
-void intrusive_ptr_add_ref( libecs::EcsObject* anEcsObject );
-
-/// @internal
-void intrusive_ptr_release( libecs::EcsObject* anEcsObject );
 
 // these specializations of nullSet/nullGet are here to avoid spreading
 // inline copies of them around.    This reduces sizes of DM .so files a bit.

@@ -125,11 +125,7 @@ void Model::createEntity( StringCref aClassname, FullIDCref aFullID )
             aVariablePtr->setID( aFullID.getID() );
             aVariablePtr->setModel( this );
             Handle nextHandle( generateNextHandle() );
-            theObjectMap.insert(
-                std::make_pair(
-                    nextHandle,
-                    boost::intrusive_ptr< EcsObject >(
-                        aVariablePtr, true ) ) );
+            theObjectMap.insert( std::make_pair( nextHandle, aVariablePtr ) );
             aVariablePtr->setHandle( nextHandle );
             aContainerSystemPtr->registerVariable( aVariablePtr );
             return;
@@ -141,11 +137,7 @@ void Model::createEntity( StringCref aClassname, FullIDCref aFullID )
             aProcessPtr->setID( aFullID.getID() );
             aProcessPtr->setModel( this );
             Handle nextHandle( generateNextHandle() );
-            theObjectMap.insert(
-                std::make_pair(
-                    nextHandle,
-                    boost::intrusive_ptr< EcsObject >(
-                        aProcessPtr, true ) ) );
+            theObjectMap.insert( std::make_pair( nextHandle, aProcessPtr ) );
             aProcessPtr->setHandle( nextHandle );
             aContainerSystemPtr->registerProcess( aProcessPtr );
             return;
@@ -157,11 +149,7 @@ void Model::createEntity( StringCref aClassname, FullIDCref aFullID )
             aSystemPtr->setID( aFullID.getID() );
             aSystemPtr->setModel( this );
             Handle nextHandle( generateNextHandle() );
-            theObjectMap.insert(
-                std::make_pair(
-                    nextHandle,
-                    boost::intrusive_ptr< EcsObject >(
-                        aSystemPtr, true ) ) );
+            theObjectMap.insert( std::make_pair( nextHandle, aSystemPtr ) );
             aSystemPtr->setHandle( nextHandle );
             aContainerSystemPtr->registerSystem( aSystemPtr );
             return;

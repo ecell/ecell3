@@ -296,7 +296,7 @@ private:
 
     LoggerBroker                    theLoggerBroker;
 
-    std::map< Handle, boost::intrusive_ptr< EcsObject > > theObjectMap;
+    std::map< Handle, EcsObject* >  theObjectMap;
     unsigned int                    theNextHandleVal;
 
     System*                         theRootSystemPtr;

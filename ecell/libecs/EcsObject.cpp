@@ -98,21 +98,6 @@ StringCref EcsObject::getClassName() const
      return getPropertyInterface().getClassName();
 }
 
-void intrusive_ptr_add_ref( libecs::EcsObject* anEcsObject )
-{
-    // XXX: needs to be atomic
-    ++anEcsObject->theRefCount;
-}
-
-void intrusive_ptr_release( libecs::EcsObject* anEcsObject )
-{
-    // XXX: needs to be atomic
-    if ( --anEcsObject->theRefCount <= 0 )
-    {
-        delete anEcsObject;
-    }
-}
-
 #define NULLGETSET_SPECIALIZATION_DEF( TYPE )\
 template <> void EcsObject::nullSet<TYPE>( Param<TYPE>::type )\
 {\

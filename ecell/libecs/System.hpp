@@ -32,8 +32,6 @@
 #ifndef __SYSTEM_HPP
 #define __SYSTEM_HPP
 
-#include <boost/intrusive_ptr.hpp>
-
 #include "libecs/Defs.hpp"
 #include "libecs/Entity.hpp"
 

@@ -121,6 +121,16 @@ System::~System()
     {
         getStepper()->removeSystem( this );
     }
+
+    std::for_each( theProcessMap.begin(), theProcessMap.end(),
+            ComposeUnary( DeletePtr< Process >(),
+                          SelectSecond< ProcessMap::value_type >() ) );
+    std::for_each( theVariableMap.begin(), theVariableMap.end(),
+            ComposeUnary( DeletePtr< Variable >(),
+                          SelectSecond< VariableMap::value_type >() ) );
+    std::for_each( theSystemMap.begin(), theSystemMap.end(),
+            ComposeUnary( DeletePtr< System >(),
+                          SelectSecond< SystemMap::value_type >() ) );
 }
 
 
