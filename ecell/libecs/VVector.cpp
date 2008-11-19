@@ -140,6 +140,10 @@
 #include <sys/stat.h>
 #endif /* HAVE_SYS_STAT_H */
 
+#ifdef _MSC_VER
+#define snprintf _snprintf
+#endif /* _MSC_VER */
+
 #if defined( WIN32 ) && !defined( __CYGWIN__ )
 #define PATH_SEPARATOR '\\'
 #else
