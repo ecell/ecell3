@@ -64,7 +64,7 @@ public:
     {
     public:
         Policy( IntegerParam aMinimumStep = 1,
-                RealParam    aMinimumTimeInterval = 0,
+                RealParam    aMinimumTimeInterval = 0.0,
                 bool         _continueOnError = false,
                 IntegerParam aMaxSpace = 0 )
             : theMinimumStep( aMinimumStep ),
