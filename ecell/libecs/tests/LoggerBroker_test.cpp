@@ -45,8 +45,7 @@
 #include "dmtool/ModuleMaker.hpp"
 #include "dmtool/DMObject.hpp"
 
-#include <iostream>
-
+#include <algorithm>
 
 BOOST_AUTO_TEST_CASE(testNonExistent)
 {
@@ -71,7 +70,29 @@ BOOST_AUTO_TEST_CASE(testValid)
     Model model( mmaker );
 
     model.createEntity( "Variable", FullID( "Variable:/:test" ) );
-    model.getLoggerBroker().createLogger(
+    Entity* var( model.getEntity( FullID( "Variable:/:test" ) ) );
+    Logger* valueLogger( model.getLoggerBroker().createLogger(
             FullPN( "Variable:/:test:Value" ),
-            Logger::Policy() );
+            Logger::Policy() ) );
+    LoggerBroker::LoggersPerFullID loggers( var->getLoggers() );
+    std::vector< Logger* > logVec;
+    std::copy( loggers.begin(), loggers.end(), std::back_inserter( logVec ) );
+    BOOST_CHECK_EQUAL( 1, logVec.size() );
+    BOOST_CHECK_EQUAL( valueLogger, logVec[ 0 ] );
+    Logger* velocityLogger( model.getLoggerBroker().createLogger(
+            FullPN( "Variable:/:test:Velocity" ),
+            Logger::Policy() ) );
+    logVec.clear();
+    std::copy( loggers.begin(), loggers.end(), std::back_inserter( logVec ) );
+    BOOST_CHECK_EQUAL( 2, logVec.size() );
+    BOOST_CHECK( logVec.end() != std::find( logVec.begin(), logVec.end(), valueLogger ) );
+    BOOST_CHECK( logVec.end() != std::find( logVec.begin(), logVec.end(), velocityLogger ) );
+    valueLogger->log( 1.0 );
+    valueLogger->log( 2.0 );
+    valueLogger->log( 3.0 );
+    DataPointVectorSharedPtr vec( valueLogger->getData() );
+    BOOST_CHECK( DataPoint( 0.0, 0.0 ) == vec->asShort( 0 ) );
+    BOOST_CHECK( DataPoint( 1.0, 0.0 ) == vec->asShort( 1 ) );
+    BOOST_CHECK( DataPoint( 2.0, 0.0 ) == vec->asShort( 2 ) );
+    BOOST_CHECK( DataPoint( 3.0, 0.0 ) == vec->asShort( 3 ) );
 }
