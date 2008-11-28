@@ -99,7 +99,8 @@ DynamicPriorityQueue.hpp\
 MethodProxy.hpp\
 EcsObjectMaker.hpp\
 PropertySlotProxyLoggerAdapter.hpp\
-PropertyAttributes.hpp
+PropertyAttributes.hpp\
+Handle.hpp
 
 noinst_HEADERS=\
 osif.h\

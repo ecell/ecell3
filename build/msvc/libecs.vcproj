@@ -584,6 +584,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ecell\libecs\Handle.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ecell\libecs\Interpolant.hpp"
 				>
 			</File>
