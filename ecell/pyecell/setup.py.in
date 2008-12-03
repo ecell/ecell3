@@ -5,11 +5,11 @@ import sys
 from numpy.distutils.core import setup, Extension
 
 include_dirs = [
-    '@DMTOOL_INCLUDE_DIR@',
+    r'@DMTOOL_INCLUDE_DIR@',
     os.environ['INCLTDL'][2:],
-    '@top_srcdir@',
-    '@top_srcdir@/libecs',
-    '@top_srcdir@/libemc',
+    r'@top_srcdir@',
+    r'@top_srcdir@/libecs',
+    r'@top_srcdir@/libemc',
     ]
 
 common_libraries = [
@@ -17,7 +17,7 @@ common_libraries = [
     'gsl'
     ]
 
-ecell_staging_home = '@abs_top_builddir@/tmp'
+ecell_staging_home = r'@abs_top_builddir@/tmp'
 
 setup(
     name = 'E-Cell',

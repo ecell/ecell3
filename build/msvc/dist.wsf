@@ -126,6 +126,9 @@ var tasks = {
 
     installSessionMonitor: function() {
         var sessionMonitorDir = this.projectDir + 'ecell\\frontend\\session-monitor\\';
+        var sessionMonitorScripts = [
+            'ecell3-session-monitor'
+        ];
         BuildHelper.chdir(sessionMonitorDir);
         this.execPythonScript(
             [
@@ -138,10 +141,17 @@ var tasks = {
                 '--install-scripts', 'bin',
                 '--root', this.distDir
             ]));
+        var self = this;
+        sessionMonitorScripts.apply(function(fname) {
+                self.makePythonLauncher(destDir + '\\' + fname, 'pythonw', true);
+            });
     },
 
     installModelEditor: function() {
         var modelEditorDir = this.projectDir + 'ecell\\frontend\\model-editor\\';
+        var modelEditorScripts = [
+            'ecell3-model-editor'
+        ];
         BuildHelper.chdir(modelEditorDir);
         this.execPythonScript(
             [
@@ -154,6 +164,10 @@ var tasks = {
                 '--install-scripts', 'bin',
                 '--root', this.distDir
             ]));
+        var self = this;
+        modelEditorScripts.apply(function(fname) {
+                self.makePythonLauncher(destDir + '\\' + fname, 'pythonw', true);
+            });
     },
 
     installDoc: function() {
