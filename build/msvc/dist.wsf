@@ -143,7 +143,7 @@ var tasks = {
             ]));
         var self = this;
         sessionMonitorScripts.apply(function(fname) {
-                self.makePythonLauncher(destDir + '\\' + fname, 'pythonw', true);
+                self.makePythonLauncher(self.distBinDir + '\\' + fname, 'pythonw', true);
             });
     },
 
@@ -166,7 +166,7 @@ var tasks = {
             ]));
         var self = this;
         modelEditorScripts.apply(function(fname) {
-                self.makePythonLauncher(destDir + '\\' + fname, 'pythonw', true);
+                self.makePythonLauncher(self.distBinDir + '\\' + fname, 'pythonw', true);
             });
     },
 
