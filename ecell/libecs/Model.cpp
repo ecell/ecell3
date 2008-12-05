@@ -33,6 +33,8 @@
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include "dmtool/SharedModuleMaker.hpp"
+
 #include "Util.hpp"
 #include "EntityType.hpp"
 #include "LoggerBroker.hpp"
@@ -50,7 +52,9 @@
 namespace libecs
 {
 
-Model::Model( StaticModuleMaker< EcsObject >& maker )
+const char Model::PATH_SEPARATOR = SharedModuleMakerBase::PATH_SEPARATOR;
+
+Model::Model( ModuleMaker< EcsObject >& maker )
     : theCurrentTime( 0.0 ),
       theNextHandleVal( 0 ),
       theLoggerBroker( *this ),
@@ -330,12 +334,28 @@ void Model::initialize()
 
 void Model::setDMSearchPath( const std::string& path )
 {
-    theEcsObjectMaker.setSearchPath( path );
+    SharedModuleMakerBase* smmbase(
+        dynamic_cast< SharedModuleMakerBase* >( &theEcsObjectMaker ) );
+    if ( !smmbase )
+    {
+        THROW_EXCEPTION( IllegalOperation,
+                         "The ModuleMaker assigned to this model is not a "
+                         "SharedModuleMaker.");
+    }
+    smmbase->setSearchPath( path );
 }
 
 const std::string Model::getDMSearchPath() const
 {
-    return theEcsObjectMaker.getSearchPath();
+    SharedModuleMakerBase const* smmbase(
+        dynamic_cast< SharedModuleMakerBase const* >( &theEcsObjectMaker ) );
+    if ( !smmbase )
+    {
+        THROW_EXCEPTION( IllegalOperation,
+                         "The ModuleMaker assigned to this model is not a "
+                         "SharedModuleMaker.");
+    }
+    return smmbase->getSearchPath();
 }
 
 void Model::registerBuiltinModules()

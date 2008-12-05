@@ -6,6 +6,8 @@ pkginclude_HEADERS = \
 	DynamicModuleDescriptor.hpp\
 	DMException.hpp\
 	ModuleMaker.hpp\
+	SharedDynamicModule.hpp\
+	SharedModuleMaker.hpp\
 	DMObject.hpp 
 
 bin_SCRIPTS = dmcompile

@@ -269,7 +269,7 @@ namespace libemc
 
     libecs::Integer               theEventCheckInterval;
 
-    StaticModuleMaker< libecs::EcsObject >* thePropertiedObjectMaker;
+    ModuleMaker< libecs::EcsObject >* thePropertiedObjectMaker;
     libecs::Model                 theModel;
 
     EventCheckerSharedPtr         theEventChecker;

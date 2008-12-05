@@ -59,7 +59,7 @@ LIBECS_API const std::string getVersion();
 
 LIBECS_API bool initialize();
 LIBECS_API void finalize();
-LIBECS_API StaticModuleMaker< EcsObject >* createDefaultModuleMaker();
+LIBECS_API ModuleMaker< EcsObject >* createDefaultModuleMaker();
 
 // Forward declarations.
 } // namespace libecs

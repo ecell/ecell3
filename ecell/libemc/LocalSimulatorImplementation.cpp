@@ -719,7 +719,7 @@ LocalSimulatorImplementation::getPropertyInfo( libecs::StringCref aClassname ) c
 
 const libecs::PolymorphVector LocalSimulatorImplementation::getDMInfo() const
 {
-    typedef StaticModuleMaker< libecs::EcsObject >::ModuleMap ModuleMap;
+    typedef ModuleMaker< libecs::EcsObject >::ModuleMap ModuleMap;
     libecs::PolymorphVector aVector;
     const ModuleMap& modules( thePropertiedObjectMaker->getModuleMap() );
 

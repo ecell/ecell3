@@ -69,7 +69,7 @@ LIBECS_DM_INIT_STATIC( MockProcess, Process );
 
 BOOST_AUTO_TEST_CASE(testInstantiation)
 {
-    StaticModuleMaker< EcsObject > mmaker;
+    ModuleMaker< EcsObject > mmaker;
     DM_NEW_STATIC( &mmaker, EcsObject, MockProcess );
     
     MockProcess* proc = reinterpret_cast< MockProcess * >( mmaker.getModule( "MockProcess" ).getAllocator()() );
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(testGetMolarActivity)
 {
     using namespace libecs;
 
-    StaticModuleMaker< EcsObject > mmaker;
+    ModuleMaker< EcsObject > mmaker;
     DM_NEW_STATIC( &mmaker, EcsObject, MockProcess );
     DM_NEW_STATIC( &mmaker, EcsObject, Variable );
     DM_NEW_STATIC( &mmaker, EcsObject, System );
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(testGetStepper)
 {
     using namespace libecs;
 
-    StaticModuleMaker< EcsObject > mmaker;
+    ModuleMaker< EcsObject > mmaker;
     DM_NEW_STATIC( &mmaker, EcsObject, MockProcess );
     DM_NEW_STATIC( &mmaker, EcsObject, PassiveStepper );
 

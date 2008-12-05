@@ -34,108 +34,16 @@
 #include <set>
 #include <string>
 #include <cassert>
-#include "ltdl.h"
 
 #include "DynamicModule.hpp"
 
 /**
-     A base class for ModuleMakers
- */
-
-class ModuleMaker
-{
-
-public:
-
-    ModuleMaker()
-    {
-        ; // do nothing
-    }
-
-    virtual ~ModuleMaker() 
-    {
-        ; // do nothing
-    }
-
-    void setSearchPath( const std::string& path )
-    {
-        theSearchPath.clear();
-        for ( std::string::size_type i( 0 ), end( path.size() ), next( 0 );
-              i < end; i = next + 1 )
-        {
-            next = path.find( PATH_SEPARATOR, i );
-            next = next == std::string::npos ? end: next;
-            if ( next > i )
-            {
-                theSearchPath.insert( path.substr( i, next - i ) );
-            }
-        }
-    }
-
-    const std::string getSearchPath() const
-    {
-        typedef std::set< std::string > StringSet;
-        std::string retval;
-
-        for ( StringSet::const_iterator i( theSearchPath.begin() );
-              i != theSearchPath.end(); ++i )
-        {
-            retval += (*i);
-            retval += PATH_SEPARATOR; 
-        }
-        if ( !retval.empty() )
-            retval.resize( retval.size() - 1 );
-        return retval;
-    }
-
-    /**
-        Initializes the dynamic module facility.
-        Applications that use this library must call this function
-        prior to any operation involved with the facility.
-        @return true on error, false otherwise.
-     */
-    static bool initialize()
-    {
-        if ( lt_dlinit() > 0 )
-            return true;
-
-        if ( lt_dlsetsearchpath("") > 0 )
-        {
-            lt_dlexit();
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-        Finalizes the dynamic module facility.
-        Applications that use this library must call this function when
-        the facility is no longer necessary so that allocated resources
-        can be reclaimed.
-        @return true on error, false otherwise.
-     */
-    static void finalize()
-    {
-        lt_dlexit();
-    }
-
-public:
-    static const char PATH_SEPARATOR = LT_PATHSEP_CHAR;
-
-protected:
-
-    std::set< std::string > theSearchPath;
-};
-
-
-/**
-    StaticModuleMaker is used to instantiate
+    ModuleMaker is used to instantiate
     various subclasses of certain template parameter class T. 
 */
 
 template<class T, class DMAllocator = typename SimpleAllocatorDef< T >::type >
-class StaticModuleMaker : public ModuleMaker
+class ModuleMaker 
 {
 
 public:
@@ -146,12 +54,12 @@ public:
 
 public: 
 
-    StaticModuleMaker()
+    ModuleMaker()
     {
         ; // do nothing
     }
 
-    virtual ~StaticModuleMaker()
+    virtual ~ModuleMaker()
     {
         for( ModuleMapIterator i = this->theModuleMap.begin();
              i != this->theModuleMap.end(); ++i )
@@ -191,104 +99,6 @@ protected:
 
     ModuleMap theModuleMap;
 
-};
-
-/**
-    SharedModuleMaker dynamically instantiates various classes of 
-    objects encapsulated in shared object(.so) file.
-    @sa StaticClassModuleMaker, SharedDynamicModule
-*/
-
-template<class T, class DMAllocator = typename SimpleAllocatorDef< T >::type >
-class SharedModuleMaker : public StaticModuleMaker< T, DMAllocator >
-{
-public:
-    typedef StaticModuleMaker< T, DMAllocator > Base;
-    typedef DynamicModule< T, DMAllocator > Module;
-    typedef SharedDynamicModule< T, DMAllocator > SharedModule;
-
-    SharedModuleMaker()
-    {
-        ; // do nothing
-    }
-
-    virtual ~SharedModuleMaker()
-    {
-        ; // do nothing
-    }
-
-    virtual const Module& getModule( const std::string& aClassName, bool forceReload = false )
-    {
-        if ( forceReload ) 
-        {
-            typename Base::ModuleMap::iterator i( this->theModuleMap.find( aClassName ) );
-            if ( i != this->theModuleMap.end() &&
-                 (*i).second->getType() == DM_TYPE_SHARED )
-            {
-                this->theModuleMap.erase( i );
-                delete i->second;
-            }
-        }
-
-        if ( this->theModuleMap.find( aClassName ) == this->theModuleMap.end() )
-        {
-            loadModule( aClassName );
-        }
-
-        return *this->theModuleMap[ aClassName ];
-    }
-
-
-protected:
-    void loadModule( const std::string& aClassname )
-    {
-        typedef std::set< std::string > StringSet;
-
-        std::string filename;
-
-        lt_dlhandle handle( 0 );
-        {
-            std::string error;
-
-            for ( StringSet::const_iterator i( this->theSearchPath.begin() );
-                  i != this->theSearchPath.end(); ++i )
-            {
-                filename = (*i) + '/' + aClassname;
-                handle = lt_dlopenext( filename.c_str() );
-                if ( handle ) 
-                {
-                    break;
-                }
-                if ( error.empty() )
-                {
-                    error = lt_dlerror();
-                }
-                else
-                {
-                    if ( error != lt_dlerror() )
-                    {
-                        error = "various reasons";
-                    }
-                }
-            }
-
-            if ( !handle )
-            {
-                throw DMException( "Failed to find or load a DM ["
-                                   + aClassname + "]: " + error );
-            }
-        }
-
-        DynamicModuleDescriptor* desc(
-                reinterpret_cast< DynamicModuleDescriptor* >(
-                    lt_dlsym( handle, "__dm_descriptor" ) ) );
-        if ( !desc )
-        {
-            throw DMException( "[" + filename + "] is not a valid DM file." );
-        }
-
-        addClass( new SharedModule( *desc, filename, handle ) );
-    }
 };
 
 #endif /* __MODULEMAKER_HPP */

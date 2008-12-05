@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(testInstantiation)
 {
     using namespace libecs;
 
-    StaticModuleMaker< EcsObject > mmaker;
+    ModuleMaker< EcsObject > mmaker;
     DM_NEW_STATIC( &mmaker, EcsObject, System );
     
     System* sys = reinterpret_cast< System * >( mmaker.getModule( "System" ).getAllocator()() );
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(testGetSizeVariable)
 {
     using namespace libecs;
 
-    StaticModuleMaker< EcsObject > mmaker;
+    ModuleMaker< EcsObject > mmaker;
     DM_NEW_STATIC( &mmaker, EcsObject, System );
     DM_NEW_STATIC( &mmaker, EcsObject, Variable );
     

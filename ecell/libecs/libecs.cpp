@@ -39,6 +39,7 @@
 
 #include "libecs.hpp"
 #include "EcsObject.hpp"
+#include "dmtool/SharedModuleMaker.hpp"
 
 namespace libecs
 {
@@ -59,21 +60,21 @@ bool initialize()
     else
         isInitialized = true;
 
-    if ( ModuleMaker::initialize() )
+    if ( SharedModuleMakerBase::initialize() )
     {
         return false;
     }
 #if defined( WIN32 ) && !defined( __CYGWIN__ )
     if ( libecs_win32_init() )
     {
-        ModuleMaker::finalize();
+        SharedModuleMaker::finalize();
         return false;
     }
 #endif
     return true;
 }
 
-StaticModuleMaker< EcsObject >* createDefaultModuleMaker()
+ModuleMaker< EcsObject >* createDefaultModuleMaker()
 {
     return new SharedModuleMaker< EcsObject >();
 }
@@ -89,7 +90,7 @@ void finalize()
 #if defined( WIN32 ) && !defined( __CYGWIN__ )
     libecs_win32_fini();
 #endif
-    ModuleMaker::finalize();
+    SharedModuleMakerBase::finalize();
 }
 
 const int getMajorVersion()

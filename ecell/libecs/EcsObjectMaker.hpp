@@ -45,7 +45,7 @@ template< typename T_ >
 class EcsObjectMaker 
 {
 public:
-    typedef StaticModuleMaker< EcsObject > Backend;
+    typedef ModuleMaker< EcsObject > Backend;
     typedef T_ DMType;
 
 public:

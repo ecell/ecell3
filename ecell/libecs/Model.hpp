@@ -74,7 +74,7 @@ protected:
     typedef EcsObjectMaker< Variable > VariableMaker;
     typedef EcsObjectMaker< Process > ProcessMaker;
 public:
-    Model( StaticModuleMaker< EcsObject >& maker );
+    Model( ModuleMaker< EcsObject >& maker );
     ~Model();
     /**
        Initialize the whole model.
@@ -285,7 +285,7 @@ private:
     static void initializeSystems( SystemPtr const aSystem );
 
 public:
-    static const char PATH_SEPARATOR = ModuleMaker::PATH_SEPARATOR;
+    static const char PATH_SEPARATOR;
 
 private:
 
@@ -307,7 +307,7 @@ private:
 
     StepperMap                      theStepperMap;
 
-    StaticModuleMaker< EcsObject >& theEcsObjectMaker;
+    ModuleMaker< EcsObject >&       theEcsObjectMaker;
     StepperMaker                    theStepperMaker;
     SystemMaker                     theSystemMaker;
     VariableMaker                   theVariableMaker;

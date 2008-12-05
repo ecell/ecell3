@@ -18,6 +18,23 @@ ecell-3.2: ?-Nov-2008
    - Two GUI frontends (session-monitor and model-editor) were renewed to be
      two packages of python modules, ecell.ui.osogo and ecell.ui.model_editor.
 
+ * dmtool changes
+
+   - ModuleMaker class is removed and StaticModuleMaker<> template class is
+     renamed to ModuleMaker<>.
+
+   - Added SharedModuleMakerBase class that is the base class of
+     SharedModuleMaker<> template classes.  Initialization and finalization
+     static methods are moved from ModuleMaker to it.
+
+   - SharedModuleMakerBase provides a couple of instance methods,
+     setSearchPath() and getSearchPath() which sets or gets the path used when.
+     looking up for a shared module.
+
+   - Purged SharedDynamicModule and SharedModuleMaker into
+     SharedDynamicModule.hpp and SharedModuleMaker.hpp respectively, in order
+     to remove unwanted dependencies on libltdl.
+
  * libecs changes
 
    - Thoroughly overhauled DM/PropertiedClass ABI. Backwards binary

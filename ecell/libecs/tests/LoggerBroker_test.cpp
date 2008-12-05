@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(testNonExistent)
 {
     using namespace libecs;
 
-    StaticModuleMaker< EcsObject > mmaker;
+    ModuleMaker< EcsObject > mmaker;
     Model model( mmaker );
 
     BOOST_CHECK_THROW(
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(testValid)
 {
     using namespace libecs;
 
-    StaticModuleMaker< EcsObject > mmaker;
+    ModuleMaker< EcsObject > mmaker;
 
     Model model( mmaker );
 
