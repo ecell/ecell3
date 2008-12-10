@@ -385,7 +385,7 @@ BuildHelper.ArgsParser.prototype = {
                         opt_name = tmp[1];
                         if (this.long_opt_map[opt_name] === undefined)
                             return 'Unknown option --' + opt_name;
-                        opt = long_opt_map[opt_name];
+                        opt = this.long_opt_map[opt_name];
                         if (tmp[2] !== undefined) {
                             switch (opt.operand) {
                             case 0:
