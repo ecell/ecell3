@@ -29,7 +29,7 @@
 // modified by Moriyoshi Koizumi
 //
 
-#define BOOST_TEST_MODULE "Util"
+#define BOOST_TEST_MODULE "Polymorph"
 
 #include <sstream>
 

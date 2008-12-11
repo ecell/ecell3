@@ -42,9 +42,16 @@
 
 #include <iostream>
 
-BOOST_AUTO_TEST_CASE(test)
+BOOST_AUTO_TEST_CASE(testEraseWhiteSpaces)
 {
     std::string str( "  \t  a bcde f\tghi\n\t jkl\n \tmnopq     \n   \t " );
     libecs::eraseWhiteSpaces( str );
     BOOST_CHECK_EQUAL(str, "abcdefghijklmnopq");
-};
+}
+
+BOOST_AUTO_TEST_CASE(testStringCast)
+{
+    using namespace libecs;
+
+    std::cout << stringCast< Real >( "123" ) << std::endl;
+}
