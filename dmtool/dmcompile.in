@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 
-# usage: dcompile cfile [[cflags]... ]
+# usage: dmcompile cfile [[cflags]... ]
 
 import sys
 import os
 import glob
-import string
 import getopt
+from distutils.ccompiler import new_compiler
+from distutils.errors import CompileError, LinkError
+from distutils.util import split_quoted
 
 # prefix='@prefix@'
 # exec_prefix='@exec_prefix@'
@@ -15,99 +17,119 @@ ORIG_CXXFLAGS = '@CXXFLAGS@'
 ORIG_CPPFLAGS = '@CPPFLAGS@'
 ORIG_LDFLAGS = '@LDFLAGS@'
 SHLEXT = os.popen('echo @LTDL_SHLIB_EXT@').readline().rstrip()
-CXX = '@CXX@'
 CXXSUFFIX = '.cpp'
 CXXFLAGS = os.environ.get('CXXFLAGS','')
+CPPFLAGS = os.environ.get('CPPFLAGS','')
 LDFLAGS =  os.environ.get('LDFLAGS','')
-VERBOSE = False
+
+progname = os.path.basename( sys.argv[0] )
 
 def help():
-    ext = os.path.basename( sys.argv[0] )
-    aProgramName, ext = os.path.splitext( ext )
+    global progname
     print '''
-%s -- Compile dynamic modules for E-Cell Simulation Environment Version 3
+%(progname)s -- Compile dynamic modules for E-Cell Simulation Environment Version 3
 
 Usage:
-       %s [-v|--verbose] <source.cpp> [compile options]
-       %s [-h|--help]
-    '''% ( aProgramName, aProgramName, aProgramName )
+       %(progname)s [-v|--verbose] [-o file|--output=file] <compiler / linker options> source.cpp
+       %(progname)s [-h|--help]
+
+Acceptable compiler / linker options:
+       -Dname=value
+       -Iincludedir
+       -Llibdir
+       -llib
+    ''' % dict( progname = progname )
 
 def msg( outstr ):
-    print "E-Cell3 dmcompile: " + outstr
+    global progname
+    print "%s: %s" % ( progname, outstr )
 
-def execute( cmdstr ):
-    if VERBOSE:
-	print cmdstr
-    return os.system( cmdstr )
-
-def compile( CXX, CXXCOMPILEFLAGS, SRC ):
-    return execute( CXX + ' ' + CXXCOMPILEFLAGS + ' -fPIC -c ' + SRC )
-
-def link( CXX, CPPFLAGS, OBJ, SOBJ, LDFLAGS ):
-	cflags = CPPFLAGS
-	if sys.platform == 'darwin':
-			cflags = cflags + ' -dynamiclib -install_name ' + SOBJ
-	else:
-			cflags = cflags + ' -shared -Wl,-soname=\"' + SOBJ + '\" ' 
-
-	return execute( CXX + ' ' + cflags + ' ' + OBJ + ' -o ' + SOBJ + ' ' + LDFLAGS)
-
-def cleanup( OBJ ):
-    if os.path.isfile( OBJ ):
-	os.remove( OBJ )
-    
 def main():
-    opts , args = getopt.getopt( sys.argv[1:], "hv", ["help", "verbose"])   
-    global VERBOSE
-    
-    for anOption, anArg in opts:
+    opts , args = getopt.gnu_getopt( sys.argv[1:], "hvI:L:l:o:D:", ["help", "verbose", "output=" ])
+  
+    include_dirs = []
+    library_dirs = []
+    libs = []
+    macros = []
+    out = None
+    verbose = False
 
-	# print help message
-        if anOption in ( "-h", '--help' ):
+    for anOption, anArg in opts:
+        # print help message
+        if anOption in ( '-h', '--help' ):
             help()
-            sys.exit(0)
-      
-  	# be verbose
-        if anOption in ( "-v", '--verbose'):
-	    VERBOSE = True
+            return 0
+        elif anOption in ( '-v', '--verbose'):
+            verbose = True
+        elif anOption == '-I':
+            include_dirs.append( anArg )
+        elif anOption == '-D':
+            macros.append( anArg.split('=') )
+        elif anOption == '-L':
+            library_dirs.append( anArg )
+        elif anOption == '-l':
+            libs.append( anArg )
+        elif anOption in ( '-o', '--output' ):
+            out = anArg
+
 
     # check if source file is given
     if len( args ) < 1:
-	help()
-	msg( "Error: source file was not given." )
-	sys.exit(1)
+        help()
+        msg( "no source file was given." )
+        return 255 
 
-    # check if source file is valid
-    if len( glob.glob ( args[0].replace( '\"', '' ) ) ) < 1:
-	msg( "Error: source file "+ args[0] + " was not found." )
-	sys.exit(1)
-		
-    SRC = args[0]
-    ext = os.path.basename(SRC)
-    CLASSNAME, ext = os.path.splitext( ext.replace( '\"', '' ) )
-    OBJ = CLASSNAME + '.o'
-    SOBJ = CLASSNAME + SHLEXT
-    if len(args) > 0:
-        ARGS = ' \"' + string.join( args[1:], '\" \"' ) + '\"'
+    if out == None:
+        if len( args ) == 1:
+            out, dummy  = os.path.splitext( args[ 0 ] )
+            out += SHLEXT
+        else:
+            msg( "specify the output filename." )
+            return 255 
     else:
-        ARGS = ' '
+        path_without_ext, ext = os.path.splitext( out )
+        if ext == '':
+            out = path_without_ext + SHLEXT
 
-	# compiler: use env + autoconf + plus anything that was given on the cmd line (?) -- FIXME
-    CXXCOMPILEFLAGS = CXXFLAGS + ' ' + ORIG_CXXFLAGS + ' ' + ORIG_CPPFLAGS + ' ' + ARGS
-
+    # compiler: use env + autoconf + plus anything that was given on the cmd line (?) -- FIXME
+    cxxflags = split_quoted( ORIG_CXXFLAGS ) + \
+        split_quoted( CXXFLAGS )
+    cppflags = split_quoted( ORIG_CPPFLAGS ) + \
+        split_quoted( CPPFLAGS )
     # linker: use env + autoconf (?) -- FIXME
-    LINKFLAGS = LDFLAGS + ' ' + ORIG_LDFLAGS
-    
-    if compile( CXX, CXXCOMPILEFLAGS, "\"" + SRC + "\"" ) or not os.path.isfile( OBJ ):
-	msg( "Error: The compiler failed to create " + OBJ )
-	sys.exit(1)
-	
-    if link( CXX, CXXCOMPILEFLAGS, '\"' + OBJ + '\"' , '\"' + SOBJ + '\"', LINKFLAGS ) or not os.path.isfile( SOBJ ):
-	msg( "Error: The compiler failed to create " + SOBJ )
-	sys.exit(1)
-    
-    cleanup( OBJ )
+    ldflags = split_quoted( ORIG_LDFLAGS ) + \
+        split_quoted( LDFLAGS )
+
+    compiler = new_compiler( verbose = verbose )
+    if verbose:
+        old_spawn = compiler.spawn
+        def new_spawn( self, cmd ):
+            print ' '.join( cmd )
+            old_spawn( cmd )
+        compiler.__class__.spawn = new_spawn
+    map( compiler.add_include_dir, include_dirs )
+    map( compiler.add_library_dir, library_dirs )
+    map( compiler.add_library, libs )
+    map( lambda args: compiler.define_macro( *args ), macros )
+
+    objects = None
+    try:
+        objects = compiler.compile( args, extra_preargs = cxxflags + cppflags )
+    except CompileError, e:
+        msg( "failed to compile the specified source files: " + repr( e ) )
+        return 1 
+
+    try:
+        try:
+            compiler.link( output_filename = out,
+                    target_desc = compiler.SHARED_LIBRARY,
+                    objects = objects, extra_preargs = ldflags )
+        except LinkError, e:
+            msg( "failed to link the object files: " + repr( e ) )
+            return 1 
+    finally:
+        map( os.unlink, objects )
 
 if __name__ == '__main__':
-	main()
+    sys.exit( main() )
 
