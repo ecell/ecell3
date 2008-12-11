@@ -52,15 +52,6 @@
 #include "libecs/convertTo.hpp"
 #include "libecs/Util.hpp"
 
-/** @addtogroup polymorph The Polymorph.
-The Polymorph
-
-@ingroup libecs
-@{ 
-*/ 
-
-/** @file */
-
 namespace libecs
 {
 
@@ -1865,9 +1856,6 @@ operator<<( std::basic_ostream< T1_, T2_ >& s,
     return s;
 }
 
-} // namespcae std
-
-// @} // polymorph
-
+} // namespace std
 
 #endif /* __POLYMORPH_HPP */

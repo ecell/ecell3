@@ -36,10 +36,6 @@
 #include "libecs/Variable.hpp"
 #include <cctype>
 
-/**
-   @addtogroup entities
-   @{
- */
 namespace libecs
 {
 
@@ -330,8 +326,6 @@ private:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __VARIABLEREFERENCE_HPP */
 

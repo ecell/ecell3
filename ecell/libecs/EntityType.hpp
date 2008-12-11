@@ -35,10 +35,6 @@
 #include "libecs/Defs.hpp"
 
 
-/**
-   @addtogroup identifier
-   @{
- */
 namespace libecs
 {
 
@@ -142,7 +138,5 @@ private:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __ENTITYTYPE_HPP */

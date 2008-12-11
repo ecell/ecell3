@@ -36,13 +36,9 @@
 #include "dmtool/ModuleMaker.hpp"
 #include "EcsObject.hpp"
 
-/**
-   @defgroup libecs The Libecs library
-   The libecs library
-   @{ 
- */ 
 namespace libecs
 {
+
 class EcsObject;
 
 LIBECS_API extern int const MAJOR_VERSION;
@@ -61,9 +57,6 @@ LIBECS_API bool initialize();
 LIBECS_API void finalize();
 LIBECS_API ModuleMaker< EcsObject >* createDefaultModuleMaker();
 
-// Forward declarations.
 } // namespace libecs
-
-/** @} */ 
 
 #endif // __LIBECS_HPP

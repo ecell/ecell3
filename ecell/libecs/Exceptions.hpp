@@ -36,12 +36,6 @@
 
 #include "libecs/Defs.hpp"
 
-
-/**
-   @defgroup exception The Exceptions
-   @ingroup libecs
-   @{
-*/ 
 namespace libecs
 {
 /**
@@ -140,7 +134,5 @@ DEFINE_EXCEPTION( InvalidEntityType,              BadID);
                      + ")." )
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __EXCEPTIONS_HPP */

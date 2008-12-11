@@ -39,11 +39,6 @@
 #include "libecs/EventScheduler.hpp"
 #include "libecs/ProcessEvent.hpp"
 
-/**
-   @addtogroup stepper
-   @{
- */
-
 namespace libecs
 {
 
@@ -103,5 +98,3 @@ protected:
 } // namespace libecs
 
 #endif /* __STEPPER_HPP */
-
-/** @} */

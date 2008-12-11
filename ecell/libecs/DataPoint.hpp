@@ -35,10 +35,6 @@
 #include "libecs/Defs.hpp"
 #include "libecs/Polymorph.hpp"
 
-/**
-   @addtogroup logging
-   @{
- */
 namespace libecs
 {
 
@@ -326,7 +322,5 @@ private:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __DATAPOINT_HPP */

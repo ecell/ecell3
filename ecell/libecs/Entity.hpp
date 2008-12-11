@@ -38,12 +38,6 @@
 #include "libecs/PropertyInterface.hpp"
 #include "libecs/LoggerBroker.hpp"
 
-/**
-   @addtogroup entities The Entities.
-   Entities.
-   @ingroup libecs
-   @{ 
-*/ 
 namespace libecs
 {
     DECLARE_VECTOR( EntityPtr, EntityVector );
@@ -211,7 +205,5 @@ namespace libecs
     };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __ENTITY_HPP */

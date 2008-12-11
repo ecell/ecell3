@@ -50,11 +50,6 @@ namespace libecs
 {
 
 /**
-   @addtogroup property The Inter-object Communication.
-   @{
-*/
-
-/**
    Define a EcsObject
    @param CLASSNAME the name of the class to declare.
    @param DMTYPE    the root class of the class to declare.
@@ -248,9 +243,15 @@ public:\
 #define CLASSINFO_TRUE 1
 #define CLASSINFO_FALSE 0
 
+/**
+   @internal
+ */
 #define METHODFLAG( METHODPTR, NULLVALUE ) \
     METHODFLAG2( METHODPTR, NULLVALUE )
 
+/**
+   @internal
+ */
 #define METHODFLAG2( METHODPTR, NULLVALUE ) \
     ( ( METHODPTR ) == NULLVALUE ? CLASSINFO_FALSE : CLASSINFO_TRUE )
 
@@ -414,42 +415,128 @@ public:\
 // 
 // Macros for property method declaration / definitions.
 //
+/**
+   Expand to a function signature that can be used both for declaration and
+   definition of a setter method.
 
+   @param TYPE the type of the slot.
+   @param METHODNAME the name of the method.
+ */
 #define SET_SLOT( TYPE, METHODNAME )\
     void METHODNAME( libecs::Param<TYPE>::type value )
 
+/**
+   Expand to a function signature that can be used both for declaration and
+   definition of a getter method.
+
+   @param TYPE the type of the slot.
+   @param METHODNAME the name of the method.
+ */
 #define GET_SLOT( TYPE, METHODNAME )\
     const TYPE METHODNAME() const
 
+/**
+   Expand to the method definition starter of a setter.
+
+   @param TYPE the type of the slot.
+   @param METHODNAME the name of the method.
+   @param CLASS the class name that contains the method.
+ */
 #define SET_SLOT_DEF( TYPE, METHODNAME, CLASS )\
     SET_SLOT( TYPE, CLASS::METHODNAME )
 
+/**
+   Expand to the method definition starter of a getter.
+
+   @param TYPE the type of the slot.
+   @param METHODNAME the name of the method.
+   @param CLASS the class name that contains the method.
+ */
 #define GET_SLOT_DEF( TYPE, METHODNAME, CLASS )\
     GET_SLOT( TYPE, CLASS::METHODNAME )
 
+/**
+   Expand to the signature of the setter function whose name is NAME
+   prefixed with "set".
 
+   @param TYPE the type of the slot.
+   @param NAME the name of the slot.
+ */
 #define SET_METHOD( TYPE, NAME )\
     SET_SLOT( TYPE, set ## NAME )
 
+/**
+   Expand to the signature of the getter function whose name is NAME
+   prefixed with "get".
+
+   @param TYPE the type of the slot.
+   @param NAME the name of the slot.
+ */
 #define GET_METHOD( TYPE, NAME )\
     GET_SLOT( TYPE, get ## NAME )
 
+/**
+   Expand to the signature of the setter function whose name is NAME
+   prefixed with "load".
+
+   @param TYPE the type of the slot.
+   @param NAME the name of the slot.
+ */
 #define LOAD_METHOD( TYPE, NAME )\
     SET_SLOT( TYPE, load ## NAME )
 
+/**
+   Expand to the signature of the getter function whose name is NAME
+   prefixed with "save".
+
+   @param TYPE the type of the slot.
+   @param NAME the name of the slot.
+ */
 #define SAVE_METHOD( TYPE, NAME )\
     GET_SLOT( TYPE, save ## NAME )
 
 
+/**
+   Expand to the method definition starter of a setter whose name is
+   NAME prefixed with "set".
+
+   @param TYPE the type of the slot.
+   @param NAME the name of the method.
+   @param CLASS the class name that contains the method.
+ */
 #define SET_METHOD_DEF( TYPE, NAME, CLASS )\
     SET_SLOT_DEF( TYPE, set ## NAME, CLASS )
 
+/**
+   Expand to the method definition starter of the getter whose name is
+   NAME prefixed with "get"
+
+   @param TYPE the type of the slot.
+   @param NAME the name of the method.
+   @param CLASS the class name that contains the method.
+ */
 #define GET_METHOD_DEF( TYPE, NAME, CLASS )\
     GET_SLOT_DEF( TYPE, get ## NAME, CLASS )
 
+/**
+   Expand to the method definition starter of a setter whose name is
+   NAME prefixed with "load".
+
+   @param TYPE the type of the slot.
+   @param NAME the name of the method.
+   @param CLASS the class name that contains the method.
+ */
 #define LOAD_METHOD_DEF( TYPE, NAME, CLASS )\
     SET_SLOT_DEF( TYPE, load ## NAME, CLASS )
 
+/**
+   Expand to the method definition starter of the getter whose name is
+   NAME prefixed with "save"
+
+   @param TYPE the type of the slot.
+   @param NAME the name of the method.
+   @param CLASS the class name that contains the method.
+ */
 #define SAVE_METHOD_DEF( TYPE, NAME, CLASS )\
     GET_SLOT_DEF( TYPE, save ## NAME, CLASS )
 
@@ -600,6 +687,4 @@ NULLGETSET_SPECIALIZATION( Polymorph );
 
 } // namespace libecs
 
-/** @} */
-    
 #endif /* __ECSOBJECT_HPP */

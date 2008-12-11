@@ -41,11 +41,6 @@
 #include "libecs/Defs.hpp"
 #include "libecs/Util.hpp"
 
-/**
-   @addtogroup property
-   @ingroup libecs
-   @{
-*/
 namespace libecs
 {
 
@@ -202,7 +197,5 @@ inline const ToType convertTo( const FromType& aValue )
 }
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __CONVERTTO_HPP */

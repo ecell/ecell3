@@ -44,11 +44,6 @@
 #include "libecs/DataPointVector.hpp"
 #include "Exceptions.hpp"
 
-/**
-   @addtogroup logging The Data Logging Module.
-   @ingroup libecs
-   @{
-*/ 
 namespace libecs
 {
 
@@ -315,8 +310,6 @@ private:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __LOGGER_HPP */
 

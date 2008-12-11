@@ -53,11 +53,6 @@
 #include "libecs/Defs.hpp"
 #include "libecs/Exceptions.hpp"
 
-/**
-   @addtogroup util The Utilities.
-   @ingroup libecs
-   @{ 
- */ 
 namespace libecs
 {
 /** 
@@ -646,7 +641,5 @@ inline T fact( T n )
 }
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __UTIL_HPP */

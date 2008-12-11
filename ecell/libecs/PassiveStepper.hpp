@@ -36,10 +36,6 @@
 
 #include "libecs/Stepper.hpp"
 
-/**
-   @addtogroup stepper
-   @{
- */
 namespace libecs
 {
 /**

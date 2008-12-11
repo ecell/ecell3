@@ -37,10 +37,6 @@
 
 #include <boost/multi_array.hpp>
 
-/**
-   @addtogroup stepper
-   @{
-*/
 namespace libecs
 {
 
@@ -185,7 +181,5 @@ private:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __DIFFERENTIALSTEPPER_HPP */

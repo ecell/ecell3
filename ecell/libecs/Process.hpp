@@ -40,10 +40,6 @@
 #include "libecs/Entity.hpp"
 #include "libecs/VariableReference.hpp"
 
-/**
-   @addtogroup entities
-   @{
- */
 namespace libecs
 {
 
@@ -397,7 +393,5 @@ private:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __PROCESS_HPP */

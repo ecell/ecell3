@@ -48,11 +48,6 @@
 #include "libecs/FullID.hpp"
 #include "libecs/Logger.hpp"
 
-/**
-   @addtogroup logging
-   @{
- */
-
 namespace libecs
 {
 // forward declaration
@@ -312,7 +307,5 @@ private:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __LOGGER_BROKER_HPP */

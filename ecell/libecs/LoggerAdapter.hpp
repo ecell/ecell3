@@ -31,13 +31,6 @@
 
 #include "libecs/Defs.hpp"
 
-/**
-   @addtogroup logging The Data Logging Module.
-   The Data Logging Module.
-   @ingroup libecs
-   @{ 
-*/ 
-
 namespace libecs
 {
 
@@ -55,7 +48,5 @@ protected:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __LOGGERADAPTER_HPP */

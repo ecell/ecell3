@@ -35,10 +35,6 @@
 #include "libecs/Defs.hpp"
 #include "libecs/Stepper.hpp"
 
-/**
-   @addtogroup stepper
-   @{
- */
 namespace libecs
 {
 

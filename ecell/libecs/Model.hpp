@@ -44,15 +44,6 @@
 #include "libecs/SystemStepper.hpp"
 #include "libecs/Handle.hpp"
 
-/**
-   @addtogroup model The Model.
-
-   The model.
-
-   @ingroup libecs
-   @{ 
-*/ 
-
 namespace libecs
 {
 
@@ -315,8 +306,5 @@ private:
 };
 
 } // namespace libecs
-
-/*@}*/
-
 
 #endif /* __MODEL_HPP */

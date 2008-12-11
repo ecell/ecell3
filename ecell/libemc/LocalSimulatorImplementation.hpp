@@ -48,27 +48,17 @@
 #include "libemc.hpp"
 #include "SimulatorImplementation.hpp"
 
-
 namespace libemc
 {
-
-  /** @defgroup libemc_module The Libemc Module 
-   * This is the libemc module 
-   * @{ 
-   */ 
-  
-  class LIBEMC_API LocalSimulatorImplementation
-    :
-    public SimulatorImplementation
-  {
-
-  public:
-
+class LIBEMC_API LocalSimulatorImplementation
+    : public SimulatorImplementation
+{
+public:
     LocalSimulatorImplementation();
     virtual ~LocalSimulatorImplementation();
 
-    virtual void createStepper( libecs::StringCref         aClassname,
-				libecs::StringCref         anId );
+    virtual void createStepper( libecs::StringCref aClassname,
+                                libecs::StringCref anId );
 
     virtual void deleteStepper( libecs::StringCref anID );
 
@@ -79,54 +69,54 @@ namespace libemc
 
     virtual const libecs::Polymorph 
     getStepperPropertyAttributes( libecs::StringCref aStepperID, 
-				  libecs::StringCref aPropertyName ) const;
+                                  libecs::StringCref aPropertyName ) const;
 
-    virtual void setStepperProperty( libecs::StringCref    aStepperID,
-				     libecs::StringCref    aPropertyName,
-				     libecs::PolymorphCref aValue );
+    virtual void setStepperProperty( libecs::StringCref aStepperID,
+                                     libecs::StringCref aPropertyName,
+                                     libecs::PolymorphCref aValue );
 
     virtual const libecs::Polymorph
     getStepperProperty( libecs::StringCref aStepperID,
-			libecs::StringCref aPropertyName ) const;
+                        libecs::StringCref aPropertyName ) const;
 
-    virtual void loadStepperProperty( libecs::StringCref    aStepperID,
-				      libecs::StringCref    aPropertyName,
-				      libecs::PolymorphCref aValue );
+    virtual void loadStepperProperty( libecs::StringCref aStepperID,
+                                      libecs::StringCref aPropertyName,
+                                      libecs::PolymorphCref aValue );
 
     virtual const libecs::Polymorph
     saveStepperProperty( libecs::StringCref aStepperID,
-			 libecs::StringCref aPropertyName ) const;
+                         libecs::StringCref aPropertyName ) const;
 
     virtual const libecs::String
     getStepperClassName( libecs::StringCref aStepperID ) const;
 
 
-    virtual const libecs::PolymorphMap
-	   	 getClassInfo( libecs::StringCref aClassname ) const;
+    virtual const libecs::PolymorphMap getClassInfo(
+            libecs::StringCref aClassname ) const;
 
     
     virtual void createEntity( libecs::StringCref aClassname, 
-			       libecs::StringCref aFullIDString );
+                               libecs::StringCref aFullIDString );
 
     virtual void deleteEntity( libecs::StringCref aFullIDString );
 
     virtual const libecs::Polymorph 
     getEntityList( libecs::StringCref anEntityTypeString,
-		   libecs::StringCref aSystemPathString ) const;
+                   libecs::StringCref aSystemPathString ) const;
 
     virtual const libecs::Polymorph 
     getEntityPropertyList( libecs::StringCref aFullID ) const;
 
     virtual const bool entityExists( libecs::StringCref aFullIDString ) const;
 
-    virtual void setEntityProperty( libecs::StringCref    aFullPNString,
-				    libecs::PolymorphCref aValue );
+    virtual void setEntityProperty( libecs::StringCref aFullPNString,
+                                    libecs::PolymorphCref aValue );
 
     virtual const libecs::Polymorph
     getEntityProperty( libecs::StringCref aFullPNString ) const;
 
-    virtual void loadEntityProperty( libecs::StringCref    aFullPNString,
-				     libecs::PolymorphCref aValue );
+    virtual void loadEntityProperty( libecs::StringCref aFullPNString,
+                                     libecs::PolymorphCref aValue );
 
     virtual const libecs::Polymorph
     saveEntityProperty( libecs::StringCref aFullPNString ) const;
@@ -139,7 +129,8 @@ namespace libemc
 
     virtual void createLogger( libecs::StringCref aFullPNString );
 
-    virtual void createLogger( libecs::StringCref aFullPNString, libecs::Polymorph aParamList  );
+    virtual void createLogger( libecs::StringCref aFullPNString,
+                               libecs::Polymorph aParamList );
 
     virtual const libecs::Polymorph getLoggerList() const;
 
@@ -148,12 +139,12 @@ namespace libemc
 
     virtual const libecs::DataPointVectorSharedPtr
     getLoggerData( libecs::StringCref aFullPNString, 
-		   libecs::RealCref start, libecs::RealCref end ) const;
+                   libecs::RealCref start, libecs::RealCref end ) const;
 
     virtual const libecs::DataPointVectorSharedPtr
     getLoggerData( libecs::StringCref aFullPNString,
-		   libecs::RealCref start, libecs::RealCref end, 
-		   libecs::RealCref interval ) const;
+                   libecs::RealCref start, libecs::RealCref end, 
+                   libecs::RealCref interval ) const;
 
     virtual const libecs::Real 
     getLoggerStartTime( libecs::StringCref aFullPNString ) const;
@@ -163,7 +154,7 @@ namespace libemc
 
     virtual void 
     setLoggerPolicy( libecs::StringCref aFullPNString, 
-			      libecs::Polymorph aParamList ) ;
+                     libecs::Polymorph aParamList ) ;
 
     virtual const libecs::Polymorph
     getLoggerPolicy( libecs::StringCref aFullPNString ) const;
@@ -193,7 +184,7 @@ namespace libemc
     virtual const libecs::PolymorphVector getDMInfo() const;
 
     virtual const libecs::PolymorphMap
-		  getPropertyInfo( libecs::StringCref aClassName ) const;
+    getPropertyInfo( libecs::StringCref aClassName ) const;
 
     virtual const char getDMSearchPathSeparator() const;
 
@@ -201,16 +192,16 @@ namespace libemc
 
     virtual void setDMSearchPath( const std::string& aDMSearchPath );
 
-  protected:
+protected:
 
     libecs::ModelRef getModel() 
     { 
-      return theModel; 
+        return theModel; 
     }
 
     libecs::ModelCref getModel() const 
     { 
-      return theModel; 
+        return theModel; 
     }
 
     void initialize() const;
@@ -220,39 +211,38 @@ namespace libemc
 
     void setDirty()
     {
-      theDirtyFlag = true;
+        theDirtyFlag = true;
     }
 
     const bool isDirty() const
     {
-      return theDirtyFlag;
+        return theDirtyFlag;
     }
 
     inline void handleEvent()
     {
-      while( (*theEventChecker)() )
-	{
-	  (*theEventHandler)();
-	}
+        while ( (*theEventChecker)() )
+        {
+            (*theEventHandler)();
+        }
 
-      clearDirty();
+        clearDirty();
     }
 
     void clearDirty() const
     {
-      if( isDirty() )
-	{
-	  initialize();
-	  // interruptAll();
-	  
-	  theDirtyFlag = false;
-	}
+        if ( isDirty() )
+        {
+            initialize();
+
+            theDirtyFlag = false;
+        }
     }
 
     void start()
     {
-      clearDirty();
-      theRunningFlag = true;
+        clearDirty();
+        theRunningFlag = true;
     }
 
     void runWithEvent();
@@ -261,23 +251,21 @@ namespace libemc
     static libecs::Polymorph buildPolymorph( libecs::Logger::Policy const& );
     static libecs::Polymorph buildPolymorph( libecs::PropertyAttributes const& );
 
-  private:
+private:
 
-    bool                          theRunningFlag;
+    bool                    theRunningFlag;
 
-    mutable bool                  theDirtyFlag;
+    mutable bool            theDirtyFlag;
 
-    libecs::Integer               theEventCheckInterval;
+    libecs::Integer         theEventCheckInterval;
 
     ModuleMaker< libecs::EcsObject >* thePropertiedObjectMaker;
-    libecs::Model                 theModel;
+    libecs::Model           theModel;
 
-    EventCheckerSharedPtr         theEventChecker;
-    EventHandlerSharedPtr         theEventHandler;
+    EventCheckerSharedPtr   theEventChecker;
+    EventHandlerSharedPtr   theEventHandler;
 
-  };  
-
-  /** @} */ //end of libemc_module 
+};
 
 } // namespace libemc
 

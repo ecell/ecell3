@@ -36,12 +36,6 @@
 #include "libecs/DataPoint.hpp"
 #include <sys/types.h>
 
-
-/**
-   @addtogroup logging
-   @{
-*/
-
 namespace libecs
 {
 
@@ -96,7 +90,5 @@ private:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __DATAPOINTVECTOR_HPP */

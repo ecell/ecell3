@@ -46,11 +46,6 @@
 #include "libecs/PropertySlotProxy.hpp"
 
 
-/**
-   @addtogroup property The Inter-object Communication.
-   The Interobject Communication.
-   @{
- */
 namespace libecs
 {
 
@@ -433,6 +428,4 @@ public:
 
 } // namespace libecs
 
-/** @} */
-    
 #endif /* __PROPERTYINTERFACE_HPP */

@@ -39,10 +39,6 @@
 #include "libecs/Interpolant.hpp"
 #include "libecs/System.hpp"
 
-/**
-   @addtogroup entities
-   @{
- */
 namespace libecs
 {
 /**
@@ -366,7 +362,5 @@ protected:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __VARIABLE_HPP */

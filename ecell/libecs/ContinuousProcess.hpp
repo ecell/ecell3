@@ -28,11 +28,6 @@
 #include "libecs/Defs.hpp"
 #include "libecs/Process.hpp"
 
-/**
-   @addtogroup entities
-   @ingroup libecs
-   @{
- */
 namespace libecs
 {
 
@@ -62,5 +57,3 @@ public:
 };
 
 } // namespace libecs
-
-/** @} */

@@ -37,12 +37,6 @@
 #include "libecs/convertTo.hpp"
 #include "libecs/Polymorph.hpp"
 
-/**
-   @addtogroup property
-   @ingroup libecs
-   @{
-*/
-
 #ifndef __LIBECS_PROPERTYSLOTBASE_DEFINED
 #define __LIBECS_PROPERTYSLOTBASE_DEFINED
 namespace libecs
@@ -407,5 +401,3 @@ ConcretePropertySlot< T, SlotType_ >::GetMethod( GetMethodPtr aGetMethodPtr )
 } // namespace libecs
 
 #endif /* __LIBECS_CONCRETEPROPERTYSLOT_MEMBER_DEFINED */
-
-/** @} * */

@@ -40,13 +40,9 @@
 #include "libecs/convertTo.hpp"
 #include "libecs/Polymorph.hpp"
 
-/**
-   @addtogroup property
-   @ingroup libecs
-   @{
-*/
 namespace libecs
 {
+
 class LIBECS_API PropertySlotProxy
 {
 
@@ -203,7 +199,5 @@ private:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __PROPERTYSLOT_HPP */

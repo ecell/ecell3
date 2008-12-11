@@ -35,11 +35,6 @@
 #include "libecs/Defs.hpp"
 #include "libecs/Entity.hpp"
 
-/**
-   @addtogroup entities
-   @{
- */
-
 namespace libecs
 {
 
@@ -273,7 +268,5 @@ inline System::SystemMapCref   System::getMap() const
 }
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __SYSTEM_HPP */

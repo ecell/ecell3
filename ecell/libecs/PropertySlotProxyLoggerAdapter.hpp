@@ -32,11 +32,6 @@
 #include "libecs/PropertySlotProxy.hpp"
 #include "libecs/LoggerAdapter.hpp"
 
-/**
-   @addtogroup property
-   @ingroup libecs
-   @{
-*/
 namespace libecs
 {
 
@@ -64,7 +59,5 @@ private:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __PROPERTYSLOTLOGGERADAPTER_HPP */

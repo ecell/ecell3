@@ -36,8 +36,6 @@
 
 /**
    ADAPTIVE STEPSIZE DIFFERENTIAL EQUATION SOLVER
-   @addtogroup stepper
-   @{
 */
 namespace libecs
 {
@@ -189,7 +187,5 @@ private:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __ADAPTIVEDIFFERENTIALSTEPPER_HPP */

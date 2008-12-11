@@ -35,14 +35,6 @@
 #include "libecs/Defs.hpp"
 #include "libecs/EntityType.hpp"
 
-
-/**
-   @addtogroup identifier The FullID, FullPN and SystemPath.
-   The FullID, FullPN and SystemPath.
- 
-   @ingroup libecs
-   @{ 
- */ 
 namespace libecs
 {
 
@@ -359,7 +351,5 @@ private:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif // __FULLID_HPP

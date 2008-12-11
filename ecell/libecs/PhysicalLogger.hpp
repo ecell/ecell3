@@ -38,10 +38,6 @@
 
 template <typename T> class vvector;
 
-/**
-   @addtogroup logging
-   @{
- */
 namespace libecs
 {
 
@@ -161,7 +157,5 @@ private:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __PHYSICALLOGGER_HPP */

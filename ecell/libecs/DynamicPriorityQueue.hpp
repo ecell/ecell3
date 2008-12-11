@@ -51,7 +51,6 @@
 namespace libecs
 {
 
-
 class PersistentIDPolicy
 {
 

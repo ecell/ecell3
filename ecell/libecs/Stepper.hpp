@@ -47,10 +47,6 @@
 #include "libecs/Interpolant.hpp"
 #include "libecs/PropertyInterface.hpp"
 
-/**
-   @addtogroup stepper
-   @{
- */
 namespace libecs
 {
 

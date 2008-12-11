@@ -36,11 +36,6 @@
 #include "libecs/DynamicPriorityQueue.hpp"
 #include "libecs/AssocVector.h"
 
-/**
-   @addtogroup model The Model.
-   @ingroup libecs
-   @{ 
- */ 
 namespace libecs
 {
 DECLARE_CLASS( EventBase );
@@ -326,7 +321,5 @@ inline void EventScheduler<Event>::updateEventDependency( const EventID i1 )
 }
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __EVENTSCHEDULER_HPP */

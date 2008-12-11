@@ -36,11 +36,6 @@
 
 #include "libecs/Defs.hpp"
 
-/**
-   @addtogroup property
-   @ingroup libecs
-   @{
-*/
 namespace libecs
 {
 
@@ -108,7 +103,5 @@ private:
 };
 
 } // namespace libecs
-
-/** @} */
 
 #endif /* __PROPERTYATTRIBUTE_HPP */
