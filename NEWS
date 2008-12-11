@@ -60,6 +60,14 @@ ecell-3.2: ?-Nov-2008
      - Added PropertyInterface::getPropertyAttributes() that can be used in
        place of PropertyInterface::getInfoMap().
 
+     - Virtual function definitions are move from LIBECS_DM_OBJECT to
+       LIBECS_DM_INIT_STATIC. This means the vtables and typeinfo entries for
+       the base classes of a DM class are no longer instantiated within the
+       compilation unit of that class, and this may lead to module load failure
+       because of unresolved symbols unless you have explicity linked the
+       resulting DM to the objects of the bases, or you have LIBECS_DM_INIT
+       defined for the bases.
+
    - Removed setAvg() / setMin() / setMax() from DataPoint.
 
    - Addec Logger::Policy class and remove methods that accept polymorph tuples
