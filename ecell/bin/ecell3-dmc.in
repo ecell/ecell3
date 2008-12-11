@@ -119,7 +119,7 @@ def main():
 
         # set ldflags
         if anOption == "--ldflags":
-            LDFLAGS.extend( split_quoted( LDFLAGS ) )
+            LDFLAGS.extend( split_quoted( anArg ) )
 
         # set no-define-cxxflags
         if anOption == "--no-define-cxxflags":
@@ -143,7 +143,7 @@ def main():
         msg( "no source file is given." )
         return 1
 
-    cmdList.append( DMCOMPILE )
+    cmdList.append( dmcompile )
 
     if VERBOSE:
         cmdList.append( '-v' )
