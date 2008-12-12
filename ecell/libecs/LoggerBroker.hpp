@@ -261,7 +261,9 @@ public:
         return iterator(
             iterator::iterator_pair(
                 theLoggerMap.begin(),
-                theLoggerMap.begin()->second.begin() ),
+                theLoggerMap.begin() == theLoggerMap.end() ?
+                    iterator::inner_iterator_type():
+                    theLoggerMap.begin()->second.begin() ),
             theLoggerMap );
     }
 
@@ -270,7 +272,9 @@ public:
         return iterator(
             iterator::iterator_pair(
                 theLoggerMap.end(),
-                theLoggerMap.begin()->second.end() ),
+                theLoggerMap.begin() == theLoggerMap.end() ?
+                    iterator::inner_iterator_type():
+                    theLoggerMap.begin()->second.end() ),
             theLoggerMap );
     }
 
@@ -279,7 +283,9 @@ public:
         return const_iterator(
             const_iterator::iterator_pair(
                 theLoggerMap.begin(),
-                theLoggerMap.begin()->second.begin() ),
+                theLoggerMap.begin() == theLoggerMap.end() ?
+                    iterator::inner_iterator_type():
+                    theLoggerMap.begin()->second.begin() ),
             theLoggerMap );
     }
 
@@ -288,7 +294,9 @@ public:
         return const_iterator(
             const_iterator::iterator_pair(
                 theLoggerMap.end(),
-                theLoggerMap.begin()->second.end() ),
+                theLoggerMap.begin() == theLoggerMap.end() ?
+                    iterator::inner_iterator_type():
+                    theLoggerMap.begin()->second.end() ),
             theLoggerMap );
     }
 
