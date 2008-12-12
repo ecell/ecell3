@@ -37,11 +37,6 @@
 #include "libecs/Defs.hpp"
 #include "libecs/Handle.hpp"
 
-#if defined( WIN32 )
-// a bit hackish, but works.
-class LIBECS_API ModuleMaker;
-#endif /* WIN32 */
-
 #include "dmtool/DMObject.hpp"
 
 class DynamicModuleInfo;

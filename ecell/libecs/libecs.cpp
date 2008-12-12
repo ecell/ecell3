@@ -67,7 +67,7 @@ bool initialize()
 #if defined( WIN32 ) && !defined( __CYGWIN__ )
     if ( libecs_win32_init() )
     {
-        SharedModuleMaker::finalize();
+        SharedModuleMaker< EcsObject >::finalize();
         return false;
     }
 #endif
