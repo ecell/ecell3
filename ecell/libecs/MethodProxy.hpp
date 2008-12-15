@@ -32,7 +32,7 @@
 #ifndef __METHODPROXY_HPP
 #define __METHODPROXY_HPP
 
-#include "libecs/Defs.hpp"
+#include "libecs.hpp"
 
 namespace libecs {
 
@@ -43,51 +43,59 @@ template < class CLASS, typename RET >
 class MethodProxy<CLASS,RET>
 {
 private:
-    typedef const RET (* Invoker )( CLASS* const );
+
+  typedef const RET (* Invoker )( CLASS* const );
 
 public:
-    const RET operator()( CLASS* const anObject ) const 
-    { 
-        return theInvoker( anObject ); 
-    }
 
-    const RET operator()( const CLASS* const anObject ) const 
-    { 
-        return theInvoker( const_cast<CLASS* const>( anObject ) ); 
-    }
+  inline const RET operator()( CLASS* const anObject ) const 
+  { 
+    return theInvoker( anObject ); 
+  }
 
-    template< const RET (CLASS::*METHOD)() const >
-    static MethodProxy create()
-    {
+  inline const RET operator()( const CLASS* const anObject ) const 
+  { 
+    return theInvoker( const_cast<CLASS* const>( anObject ) ); 
+  }
+
+  template < const RET (CLASS::*METHOD)() const >
+  static MethodProxy create()
+  {
 #if defined( LIBECS_USE_PMF_CONVERSIONS )
-        return MethodProxy( Invoker( METHOD ));
-#else    /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
-        return MethodProxy( invoke<METHOD> );
+    return MethodProxy( Invoker( METHOD ));
+#else  /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
+    return MethodProxy( invoke<METHOD> );
 #endif /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
-    }
+  }
 
 private:
-    MethodProxy()
-        : theInvoker( 0 )
-    {
-        ; // do nothing
-    }
-        
-    MethodProxy( Invoker anInvoker ) 
-        : theInvoker( anInvoker )
-    {
-        ; // do nothing
-    }
 
-    template< const RET (CLASS::*METHOD)() const >
-    inline static const RET invoke( CLASS* const anObject )
-    {
-        return ( anObject->*METHOD )();
-    }
+  MethodProxy()
+    : 
+    theInvoker( 0 )
+  {
+    ; // do nothing
+  }
+    
+  MethodProxy( Invoker anInvoker ) 
+    : 
+    theInvoker( anInvoker )
+  {
+    ; // do nothing
+  }
+
+  template < const RET (CLASS::*METHOD)() const >
+  inline static const RET invoke( CLASS* const anObject )
+  {
+    return ( anObject->*METHOD )();
+  }
 
 private:
-    Invoker theInvoker;
+    
+  Invoker   theInvoker;
+
 };
+
 
 
 template < typename RET, typename ARG1 = void > 
@@ -97,49 +105,57 @@ template < typename RET >
 class ObjectMethodProxy<RET>
 {
 private:
-    typedef const RET (* Invoker )( void* const );
+
+  typedef const RET (* Invoker )( void* const );
 
 public:
-    const RET operator()() const 
-    { 
-        return theInvoker( theObject ); 
-    }
 
-    template < class T, const RET (T::*TMethod)() const >
-    static ObjectMethodProxy create( T* const anObject )
-    {
+  inline const RET operator()() const 
+  { 
+    return theInvoker( theObject ); 
+  }
+
+  template < class T, const RET (T::*TMethod)() const >
+  static ObjectMethodProxy create( T* const anObject )
+  {
 #if defined( LIBECS_USE_PMF_CONVERSIONS )
-        return ObjectMethodProxy( Invoker( TMethod ), anObject );
-#else    /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
-        return ObjectMethodProxy( invoke<T,TMethod>, anObject );
+    return ObjectMethodProxy( Invoker( TMethod ), anObject );
+#else  /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
+    return ObjectMethodProxy( invoke<T,TMethod>, anObject );
 #endif /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
-    }
+  }
 
 private:
-    ObjectMethodProxy()
-        : theInvoker( 0 ),
-          theObject( 0 )
-    {
-        ; // do nothing
-    }
-        
-    ObjectMethodProxy( Invoker anInvoker, void* anObject ) 
-        : theInvoker( anInvoker ),
-          theObject( anObject )
-    {
-        ; // do nothing
-    }
 
-    template < class T, const RET (T::*TMethod)() const >
-    static const RET invoke( void* const anObject )
-    {
-        return ( static_cast<T*>(anObject)->*TMethod )();
-    }
+  ObjectMethodProxy()
+    : 
+    theInvoker( 0 ),
+    theObject( 0 )
+  {
+    ; // do nothing
+  }
+    
+  ObjectMethodProxy( Invoker anInvoker, void* anObject ) 
+    : 
+    theInvoker( anInvoker ),
+    theObject( anObject )
+  {
+    ; // do nothing
+  }
+
+  template < class T, const RET (T::*TMethod)() const >
+  inline static const RET invoke( void* const anObject )
+  {
+    return ( static_cast<T*>(anObject)->*TMethod )();
+  }
 
 private:
-    Invoker     theInvoker;
-    void*       theObject;
+    
+  Invoker   theInvoker;
+  void*     theObject;
+
 };
+
 
 } // namespace libecs
 

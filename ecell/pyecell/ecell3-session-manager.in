@@ -40,7 +40,7 @@ import ecell.config
 import ecell.ecs
 import ecell.emc
 import ecell.Session
-import ecell.session_manager
+import ecell.SessionManager
 
 DEFAULT_ENVIRONMENT = 'Local'
 
@@ -144,6 +144,7 @@ Configurations:
 
 def main( argv ):
     global programName
+    ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
     # initialize 
     anEsmFile = None
     aParameters = {}
@@ -152,7 +153,7 @@ def main( argv ):
 
     # gets options
     try:
-        opts, args = getopt.gnu_getopt(
+        opts, args = getopt.getopt(
             argv[ 1: ] , 'he:f:D:c:E:O:',
             [
                 "parameters=",
@@ -255,9 +256,9 @@ def main( argv ):
             if argv[ -1 ] != argv[ 0 ]:
                 anEsmFile = argv[ -1 ]
 
-    aModulePath = [ os.path.join( ecell.__path__[ 0 ], "session_manager" ) ]
+    aModulePath = [ os.path.join( ecell.__path__[ 0 ], "SessionManager" ) ]
 
-    aSessionManager = ecell.session_manager.SessionManager(
+    aSessionManager = ecell.SessionManager.SessionManager(
         aModulePath, aConcurrency, anEnvironment )
     aSessionManager.setOptionList( optionList )
     aConsole = Console( aSessionManager,

@@ -1,261 +1,118 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dist", "dist.vcproj", "{197AF393-562B-4286-A768-A4A1E959E08B}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{41E935FC-CF26-43C9-902E-1E0CBD7D69B7} = {41E935FC-CF26-43C9-902E-1E0CBD7D69B7}
-		{9BB24FFB-7FAD-0ABF-1B2A-8661269BBC5F} = {9BB24FFB-7FAD-0ABF-1B2A-8661269BBC5F}
-		{D5F122F8-56AC-FC91-D875-1E7485C4D1DA} = {D5F122F8-56AC-FC91-D875-1E7485C4D1DA}
-		{BE8241F0-BD24-7CD4-2D61-F2D0CFB74DA1} = {BE8241F0-BD24-7CD4-2D61-F2D0CFB74DA1}
-		{345350DE-5260-4D67-B2DD-9FBE2FD6EE1F} = {345350DE-5260-4D67-B2DD-9FBE2FD6EE1F}
-		{286932BA-0165-3120-2520-3B452FA70CAF} = {286932BA-0165-3120-2520-3B452FA70CAF}
-		{99CE9FB1-8A3B-948E-A9E9-74DEC28A2FEB} = {99CE9FB1-8A3B-948E-A9E9-74DEC28A2FEB}
-		{444C97A6-1472-5D70-E23B-7ECE6475B120} = {444C97A6-1472-5D70-E23B-7ECE6475B120}
-		{DA3780A5-7E9D-6157-1A83-257F710EC6E7} = {DA3780A5-7E9D-6157-1A83-257F710EC6E7}
-		{7C985B9D-6D67-5748-7018-427B3FE0B9F4} = {7C985B9D-6D67-5748-7018-427B3FE0B9F4}
-		{E4351E9C-C919-64B9-0BAD-40F2300A68E9} = {E4351E9C-C919-64B9-0BAD-40F2300A68E9}
-		{AF63789A-4E5C-30F8-CD06-A82201BEEFA0} = {AF63789A-4E5C-30F8-CD06-A82201BEEFA0}
-		{E3403C9A-F5E2-5C56-0E23-036C46BF93CE} = {E3403C9A-F5E2-5C56-0E23-036C46BF93CE}
-		{CC333C8E-EF7F-4126-B40B-9B1994592097} = {CC333C8E-EF7F-4126-B40B-9B1994592097}
-		{E7431D8C-CD55-4F5C-BFB2-6EB7279AD735} = {E7431D8C-CD55-4F5C-BFB2-6EB7279AD735}
-		{BB6CE87B-1CA5-8B1D-A769-C9B729B05BE5} = {BB6CE87B-1CA5-8B1D-A769-C9B729B05BE5}
-		{F0831364-D36A-F63C-A77A-10D63EC55545} = {F0831364-D36A-F63C-A77A-10D63EC55545}
-		{FB99415D-5167-EA46-DCAD-526260FD7EF7} = {FB99415D-5167-EA46-DCAD-526260FD7EF7}
-		{51DAF05B-05B3-117F-0D3E-05B78E540873} = {51DAF05B-05B3-117F-0D3E-05B78E540873}
-		{A8F5495A-D3F5-77F5-EB34-3DE24BB9F31E} = {A8F5495A-D3F5-77F5-EB34-3DE24BB9F31E}
-		{7EE00A57-F1AC-C740-629C-4BD2EE10D926} = {7EE00A57-F1AC-C740-629C-4BD2EE10D926}
-		{2111D731-342D-F13B-5D67-7FB4986DBBF8} = {2111D731-342D-F13B-5D67-7FB4986DBBF8}
-		{55A8E51E-1921-1376-D9B0-61A42E7B6DBF} = {55A8E51E-1921-1376-D9B0-61A42E7B6DBF}
-		{E84B2D1E-6240-F505-4E29-964DC6DD45F5} = {E84B2D1E-6240-F505-4E29-964DC6DD45F5}
-		{668FEF1B-E256-8DCF-562A-551DC05FCC07} = {668FEF1B-E256-8DCF-562A-551DC05FCC07}
-		{A0391112-24C6-4D0D-954D-3279CC483036} = {A0391112-24C6-4D0D-954D-3279CC483036}
-		{87C5983D-B960-4431-830A-54446BF89060} = {87C5983D-B960-4431-830A-54446BF89060}
-		{CAEE2D2B-6108-4E57-E795-8310A7513803} = {CAEE2D2B-6108-4E57-E795-8310A7513803}
-		{FFCE4B0C-5952-4EB5-A00D-CE81B8483F97} = {FFCE4B0C-5952-4EB5-A00D-CE81B8483F97}
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libecs", "libecs.vcproj", "{87C5983D-B960-4431-830A-54446BF89060}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{185E074A-571E-4DC9-980B-338C578D8C1D} = {185E074A-571E-4DC9-980B-338C578D8C1D}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "compat", "compat.vcproj", "{824C90F2-5027-43D9-A4C4-8F90FED1F9E2}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dm", "dm", "{777611F9-3F19-4BE7-B316-AF2B1C9397AD}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DAEStepper", "dm\DAEStepper.vcproj", "{7C985B9D-6D67-5748-7018-427B3FE0B9F4}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DecayFluxProcess", "dm\DecayFluxProcess.vcproj", "{444C97A6-1472-5D70-E23B-7ECE6475B120}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESSYNSStepper", "dm\ESSYNSStepper.vcproj", "{668FEF1B-E256-8DCF-562A-551DC05FCC07}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExpressionAlgebraicProcess", "dm\ExpressionAlgebraicProcess.vcproj", "{51DAF05B-05B3-117F-0D3E-05B78E540873}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExpressionAssignmentProcess", "dm\ExpressionAssignmentProcess.vcproj", "{E84B2D1E-6240-F505-4E29-964DC6DD45F5}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExpressionFluxProcess", "dm\ExpressionFluxProcess.vcproj", "{E7431D8C-CD55-4F5C-BFB2-6EB7279AD735}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FixedDAE1Stepper", "dm\FixedDAE1Stepper.vcproj", "{BE8241F0-BD24-7CD4-2D61-F2D0CFB74DA1}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FixedODE1Stepper", "dm\FixedODE1Stepper.vcproj", "{9BB24FFB-7FAD-0ABF-1B2A-8661269BBC5F}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FluxDistributionStepper", "dm\FluxDistributionStepper.vcproj", "{AF63789A-4E5C-30F8-CD06-A82201BEEFA0}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{2111D731-342D-F13B-5D67-7FB4986DBBF8} = {2111D731-342D-F13B-5D67-7FB4986DBBF8}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GillespieProcess", "dm\GillespieProcess.vcproj", "{F0831364-D36A-F63C-A77A-10D63EC55545}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GMAProcess", "dm\GMAProcess.vcproj", "{E3403C9A-F5E2-5C56-0E23-036C46BF93CE}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MassActionFluxProcess", "dm\MassActionFluxProcess.vcproj", "{286932BA-0165-3120-2520-3B452FA70CAF}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MichaelisUniUniFluxProcess", "dm\MichaelisUniUniFluxProcess.vcproj", "{DA3780A5-7E9D-6157-1A83-257F710EC6E7}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ODE23Stepper", "dm\ODE23Stepper.vcproj", "{FB99415D-5167-EA46-DCAD-526260FD7EF7}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ODE45Stepper", "dm\ODE45Stepper.vcproj", "{7EE00A57-F1AC-C740-629C-4BD2EE10D926}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ODEStepper", "dm\ODEStepper.vcproj", "{A8F5495A-D3F5-77F5-EB34-3DE24BB9F31E}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PingPongBiBiFluxProcess", "dm\PingPongBiBiFluxProcess.vcproj", "{D5F122F8-56AC-FC91-D875-1E7485C4D1DA}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PythonProcess", "dm\PythonProcess.vcproj", "{CAEE2D2B-6108-4E57-E795-8310A7513803}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuasiDynamicFluxProcess", "dm\QuasiDynamicFluxProcess.vcproj", "{2111D731-342D-F13B-5D67-7FB4986DBBF8}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SSystemProcess", "dm\SSystemProcess.vcproj", "{99CE9FB1-8A3B-948E-A9E9-74DEC28A2FEB}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TauLeapProcess", "dm\TauLeapProcess.vcproj", "{BB6CE87B-1CA5-8B1D-A769-C9B729B05BE5}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TauLeapStepper", "dm\TauLeapStepper.vcproj", "{55A8E51E-1921-1376-D9B0-61A42E7B6DBF}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{F0831364-D36A-F63C-A77A-10D63EC55545} = {F0831364-D36A-F63C-A77A-10D63EC55545}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConstantFluxProcess", "dm\ConstantFluxProcess.vcproj", "{CC333C8E-EF7F-4126-B40B-9B1994592097}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libemc", "libemc.vcproj", "{FFCE4B0C-5952-4EB5-A00D-CE81B8483F97}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{87C5983D-B960-4431-830A-54446BF89060} = {87C5983D-B960-4431-830A-54446BF89060}
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Python Frontend", "Python Frontend", "{FAA82BEB-8444-4FFD-A304-5A3C7B7DA110}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyecell", "pyecell.vcproj", "{41E935FC-CF26-43C9-902E-1E0CBD7D69B7}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyecs", "pyecs.vcproj", "{C27B250F-D9CA-4E9F-B3EF-D887F2A65301}"
 	ProjectSection(ProjectDependencies) = postProject
 		{FFCE4B0C-5952-4EB5-A00D-CE81B8483F97} = {FFCE4B0C-5952-4EB5-A00D-CE81B8483F97}
 		{87C5983D-B960-4431-830A-54446BF89060} = {87C5983D-B960-4431-830A-54446BF89060}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libltdl", "libltdl.vcproj", "{185E074A-571E-4DC9-980B-338C578D8C1D}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Python Bindings", "Python Bindings", "{A6DB437F-4BD5-4BDA-9FE5-11495CD7E2E1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dist", "dist.vcproj", "{197AF393-562B-4286-A768-A4A1E959E08B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FFCE4B0C-5952-4EB5-A00D-CE81B8483F97} = {FFCE4B0C-5952-4EB5-A00D-CE81B8483F97}
+		{CAEE2D2B-6108-4E57-E795-8310A7513803} = {CAEE2D2B-6108-4E57-E795-8310A7513803}
+		{87C5983D-B960-4431-830A-54446BF89060} = {87C5983D-B960-4431-830A-54446BF89060}
+		{C27B250F-D9CA-4E9F-B3EF-D887F2A65301} = {C27B250F-D9CA-4E9F-B3EF-D887F2A65301}
+		{A0391112-24C6-4D0D-954D-3279CC483036} = {A0391112-24C6-4D0D-954D-3279CC483036}
+		{668FEF1B-E256-8DCF-562A-551DC05FCC07} = {668FEF1B-E256-8DCF-562A-551DC05FCC07}
+		{E84B2D1E-6240-F505-4E29-964DC6DD45F5} = {E84B2D1E-6240-F505-4E29-964DC6DD45F5}
+		{55A8E51E-1921-1376-D9B0-61A42E7B6DBF} = {55A8E51E-1921-1376-D9B0-61A42E7B6DBF}
+		{2111D731-342D-F13B-5D67-7FB4986DBBF8} = {2111D731-342D-F13B-5D67-7FB4986DBBF8}
+		{7EE00A57-F1AC-C740-629C-4BD2EE10D926} = {7EE00A57-F1AC-C740-629C-4BD2EE10D926}
+		{A8F5495A-D3F5-77F5-EB34-3DE24BB9F31E} = {A8F5495A-D3F5-77F5-EB34-3DE24BB9F31E}
+		{51DAF05B-05B3-117F-0D3E-05B78E540873} = {51DAF05B-05B3-117F-0D3E-05B78E540873}
+		{FB99415D-5167-EA46-DCAD-526260FD7EF7} = {FB99415D-5167-EA46-DCAD-526260FD7EF7}
+		{F0831364-D36A-F63C-A77A-10D63EC55545} = {F0831364-D36A-F63C-A77A-10D63EC55545}
+		{BB6CE87B-1CA5-8B1D-A769-C9B729B05BE5} = {BB6CE87B-1CA5-8B1D-A769-C9B729B05BE5}
+		{E7431D8C-CD55-4F5C-BFB2-6EB7279AD735} = {E7431D8C-CD55-4F5C-BFB2-6EB7279AD735}
+		{CC333C8E-EF7F-4126-B40B-9B1994592097} = {CC333C8E-EF7F-4126-B40B-9B1994592097}
+		{E3403C9A-F5E2-5C56-0E23-036C46BF93CE} = {E3403C9A-F5E2-5C56-0E23-036C46BF93CE}
+		{AF63789A-4E5C-30F8-CD06-A82201BEEFA0} = {AF63789A-4E5C-30F8-CD06-A82201BEEFA0}
+		{E4351E9C-C919-64B9-0BAD-40F2300A68E9} = {E4351E9C-C919-64B9-0BAD-40F2300A68E9}
+		{7C985B9D-6D67-5748-7018-427B3FE0B9F4} = {7C985B9D-6D67-5748-7018-427B3FE0B9F4}
+		{DA3780A5-7E9D-6157-1A83-257F710EC6E7} = {DA3780A5-7E9D-6157-1A83-257F710EC6E7}
+		{444C97A6-1472-5D70-E23B-7ECE6475B120} = {444C97A6-1472-5D70-E23B-7ECE6475B120}
+		{99CE9FB1-8A3B-948E-A9E9-74DEC28A2FEB} = {99CE9FB1-8A3B-948E-A9E9-74DEC28A2FEB}
+		{286932BA-0165-3120-2520-3B452FA70CAF} = {286932BA-0165-3120-2520-3B452FA70CAF}
+		{345350DE-5260-4D67-B2DD-9FBE2FD6EE1F} = {345350DE-5260-4D67-B2DD-9FBE2FD6EE1F}
+		{BE8241F0-BD24-7CD4-2D61-F2D0CFB74DA1} = {BE8241F0-BD24-7CD4-2D61-F2D0CFB74DA1}
+		{D5F122F8-56AC-FC91-D875-1E7485C4D1DA} = {D5F122F8-56AC-FC91-D875-1E7485C4D1DA}
+		{9BB24FFB-7FAD-0ABF-1B2A-8661269BBC5F} = {9BB24FFB-7FAD-0ABF-1B2A-8661269BBC5F}
+		{41E935FC-CF26-43C9-902E-1E0CBD7D69B7} = {41E935FC-CF26-43C9-902E-1E0CBD7D69B7}
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Python Frontend", "Python Frontend", "{FAA82BEB-8444-4FFD-A304-5A3C7B7DA110}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyecell", "pyecell.vcproj", "{41E935FC-CF26-43C9-902E-1E0CBD7D69B7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libltdl", "libltdl.vcproj", "{185E074A-571E-4DC9-980B-338C578D8C1D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "model-editor", "model-editor.vcproj", "{A0391112-24C6-4D0D-954D-3279CC483036}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{41E935FC-CF26-43C9-902E-1E0CBD7D69B7} = {41E935FC-CF26-43C9-902E-1E0CBD7D69B7}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "session-monitor", "session-monitor.vcproj", "{345350DE-5260-4D67-B2DD-9FBE2FD6EE1F}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
-	ProjectSection(ProjectDependencies) = postProject
-		{41E935FC-CF26-43C9-902E-1E0CBD7D69B7} = {41E935FC-CF26-43C9-902E-1E0CBD7D69B7}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PythonFluxProcess", "dm\PythonFluxProcess.vcproj", "{E4351E9C-C919-64B9-0BAD-40F2300A68E9}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -473,6 +330,14 @@ Global
 		{FFCE4B0C-5952-4EB5-A00D-CE81B8483F97}.Release|Win32.Build.0 = Release|Win32
 		{FFCE4B0C-5952-4EB5-A00D-CE81B8483F97}.Release|x64.ActiveCfg = Release|x64
 		{FFCE4B0C-5952-4EB5-A00D-CE81B8483F97}.Release|x64.Build.0 = Release|x64
+		{C27B250F-D9CA-4E9F-B3EF-D887F2A65301}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C27B250F-D9CA-4E9F-B3EF-D887F2A65301}.Debug|Win32.Build.0 = Debug|Win32
+		{C27B250F-D9CA-4E9F-B3EF-D887F2A65301}.Debug|x64.ActiveCfg = Debug|x64
+		{C27B250F-D9CA-4E9F-B3EF-D887F2A65301}.Debug|x64.Build.0 = Debug|x64
+		{C27B250F-D9CA-4E9F-B3EF-D887F2A65301}.Release|Win32.ActiveCfg = Release|Win32
+		{C27B250F-D9CA-4E9F-B3EF-D887F2A65301}.Release|Win32.Build.0 = Release|Win32
+		{C27B250F-D9CA-4E9F-B3EF-D887F2A65301}.Release|x64.ActiveCfg = Release|x64
+		{C27B250F-D9CA-4E9F-B3EF-D887F2A65301}.Release|x64.Build.0 = Release|x64
 		{197AF393-562B-4286-A768-A4A1E959E08B}.Debug|Win32.ActiveCfg = Debug|Win32
 		{197AF393-562B-4286-A768-A4A1E959E08B}.Debug|Win32.Build.0 = Debug|Win32
 		{197AF393-562B-4286-A768-A4A1E959E08B}.Debug|x64.ActiveCfg = Debug|x64
@@ -550,6 +415,7 @@ Global
 		{55A8E51E-1921-1376-D9B0-61A42E7B6DBF} = {777611F9-3F19-4BE7-B316-AF2B1C9397AD}
 		{CC333C8E-EF7F-4126-B40B-9B1994592097} = {777611F9-3F19-4BE7-B316-AF2B1C9397AD}
 		{E4351E9C-C919-64B9-0BAD-40F2300A68E9} = {777611F9-3F19-4BE7-B316-AF2B1C9397AD}
+		{C27B250F-D9CA-4E9F-B3EF-D887F2A65301} = {A6DB437F-4BD5-4BDA-9FE5-11495CD7E2E1}
 		{41E935FC-CF26-43C9-902E-1E0CBD7D69B7} = {FAA82BEB-8444-4FFD-A304-5A3C7B7DA110}
 		{A0391112-24C6-4D0D-954D-3279CC483036} = {FAA82BEB-8444-4FFD-A304-5A3C7B7DA110}
 		{345350DE-5260-4D67-B2DD-9FBE2FD6EE1F} = {FAA82BEB-8444-4FFD-A304-5A3C7B7DA110}

@@ -64,7 +64,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib python*_d.lib $(BOOST_PYTHON_LIB_NAME)-gd.lib"
+				AdditionalDependencies="ecs.lib python25_d.lib boost_python-gd.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				GenerateDebugInformation="true"
@@ -143,7 +143,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib python*_d.lib $(BOOST_PYTHON_LIB_NAME)-gd.lib"
+				AdditionalDependencies="ecs.lib python25_d.lib boost_python-gd.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64)"
 				GenerateDebugInformation="true"
@@ -219,7 +219,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib python*.lib $(BOOST_PYTHON_LIB_NAME).lib"
+				AdditionalDependencies="ecs.lib python25.lib boost_python.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				GenerateDebugInformation="true"
@@ -298,7 +298,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib python*.lib $(BOOST_PYTHON_LIB_NAME).lib"
+				AdditionalDependencies="ecs.lib python25.lib boost_python.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64)"
 				GenerateDebugInformation="true"
@@ -355,6 +355,15 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+		</Filter>
+		<Filter
+			Name="Descriptor Files"
+			>
+			<File
+				RelativePath="..\..\..\ecell\dm\PythonFluxProcess.desc"
+				DeploymentContent="true"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

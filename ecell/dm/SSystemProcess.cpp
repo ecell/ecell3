@@ -28,7 +28,7 @@
 #define __SSYSTEMPROCESS_HPP
 
 #include <gsl/gsl_sf.h>
-#include <boost/multi_array.hpp>
+#include <vector>
 
 #include "libecs.hpp"
 
@@ -80,7 +80,7 @@ LIBECS_DM_CLASS( SSystemProcess, ESSYNSProcess )
       ;
     }  
 
-  const boost::multi_array< Real, 2 >& getESSYNSMatrix();
+  const std::vector<RealVector>& getESSYNSMatrix();
   
   GET_METHOD( Integer, SystemSize )
     {
@@ -101,21 +101,21 @@ LIBECS_DM_CLASS( SSystemProcess, ESSYNSProcess )
   Polymorph SSystemMatrix;
   
   // State variables in log space
-  boost::multi_array< Real, 2 > theY;
+  std::vector< RealVector > theY;
   
   // S-System vectors
-  boost::multi_array< Real, 1 > theAlpha;
-  boost::multi_array< Real, 1 > theBeta;
+  RealVector theAlpha;
+  RealVector theBeta;
 
-  boost::multi_array< Real, 2 > theG;
-  boost::multi_array< Real, 2 > theH;
+  std::vector< RealVector > theG;
+  std::vector< RealVector > theH;
   
   // tmp S-System vectors
-  boost::multi_array< Real, 2 > theAlphaBuffer;
-  boost::multi_array< Real, 2 > theBetaBuffer;
-  boost::multi_array< Real, 2 > theGBuffer;
-  boost::multi_array< Real, 2 > theHBuffer;
-  boost::multi_array< Real, 2 > theFBuffer;
+  std::vector< RealVector > theAlphaBuffer;
+  std::vector< RealVector > theBetaBuffer;
+  std::vector< RealVector > theGBuffer;
+  std::vector< RealVector > theHBuffer;
+  std::vector< RealVector > theFBuffer;
   
 };
 
@@ -126,45 +126,97 @@ SET_METHOD_DEF( Integer, Order, SSystemProcess )
   Order = value;
   
   // init Substance Vector
-  theY.resize( boost::extents[ theSystemSize + 1 ][ Order + 1 ] );
+  theY.resize(theSystemSize+1);
+  RealVector tmp;
+  tmp.resize(Order+1);
+  for(int i( 0 ); i < theSystemSize + 1; i++)
+    {
+      theY[i] = tmp;
+    }
 
   // init S-System Vector & Matrix
-  theAlpha.resize( boost::extents[ theSystemSize + 1 ] );
-  theBeta.resize( boost::extents[ theSystemSize + 1] );
-  theG.resize( boost::extents[ theSystemSize + 1 ][ theSystemSize + 1 ] );
-  theH.resize( boost::extents[ theSystemSize + 1 ][ theSystemSize + 1 ] );
+  theAlpha.resize(theSystemSize+1);
+  theBeta.resize(theSystemSize+1);
+  theG.resize( theSystemSize + 1);
+  theH.resize( theSystemSize + 1);
+  tmp.resize(theSystemSize+1);
+  for(int i( 0 ); i < theSystemSize + 1; i++)
+    {
+      theG[i] = tmp;
+      theH[i] = tmp;
+    }
 
   // init S-System tmp Vector & Matrix
-  theAlphaBuffer.resize( boost::extents[ theSystemSize + 1 ][ Order + 1 ] );
-  theBetaBuffer.resize( boost::extents[ theSystemSize + 1 ][ Order + 1 ] );
-  theGBuffer.resize( boost::extents[ theSystemSize + 1 ][ Order + 1 ] );
-  theHBuffer.resize( boost::extents[ theSystemSize + 1 ][ Order + 1 ] );
+  theAlphaBuffer.resize( theSystemSize + 1);
+  theBetaBuffer.resize( theSystemSize + 1);
+  theGBuffer.resize( theSystemSize + 1);
+  theHBuffer.resize( theSystemSize + 1);
+  tmp.resize(Order+1);
+  for(int i( 0 ); i < theSystemSize + 1; i++)
+    {
+      theAlphaBuffer[i] = tmp;
+      theBetaBuffer[i] = tmp;
+      theGBuffer[i] = tmp;
+      theHBuffer[i] = tmp;
+    }
 
-  theFBuffer.resize( boost::extents[ Order + 1 ][ Order + 1 ] );
+  theFBuffer.resize( Order + 1);
+  tmp.resize(Order);
+  for(int i( 0 ); i < Order + 1; i++)
+    {
+      theFBuffer[i] = tmp;
+    }  
+
 }
 
 SET_METHOD_DEF( Polymorph, SSystemMatrix, SSystemProcess )
 {
   SSystemMatrix = value;
-  PolymorphVector aValueVector( value.as<PolymorphVector>() );
+  PolymorphVector aValueVector( value.asPolymorphVector() );
   theSystemSize = aValueVector.size();
 
   // init Substance Vector
-  theY.resize( boost::extents[ theSystemSize + 1 ][ Order + 1 ] );
+  theY.resize(theSystemSize+1);
+  RealVector tmp;
+  tmp.resize(Order+1);
+  for(int i( 0 ); i < theSystemSize + 1; i++)
+    {
+      theY[i] = tmp;
+    }
 
   // init S-System Vector & Matrix
-  theAlpha.resize( boost::extents[ theSystemSize + 1 ] );
-  theBeta.resize( boost::extents[ theSystemSize + 1] );
-  theG.resize( boost::extents[ theSystemSize + 1 ][ theSystemSize + 1 ] );
-  theH.resize( boost::extents[ theSystemSize + 1 ][ theSystemSize + 1 ] );
+  theAlpha.resize(theSystemSize+1);
+  theBeta.resize(theSystemSize+1);
+  theG.resize( theSystemSize + 1);
+  theH.resize( theSystemSize + 1);
+  tmp.resize(theSystemSize+1);
+  for(int i( 0 ); i < theSystemSize + 1; i++)
+    {
+      theG[i] = tmp;
+      theH[i] = tmp;
+    }
 
   // init S-System tmp Vector & Matrix
-  theAlphaBuffer.resize( boost::extents[ theSystemSize + 1 ][ Order + 1 ] );
-  theBetaBuffer.resize( boost::extents[ theSystemSize + 1 ][ Order + 1 ] );
-  theGBuffer.resize( boost::extents[ theSystemSize + 1 ][ Order + 1 ] );
-  theHBuffer.resize( boost::extents[ theSystemSize + 1 ][ Order + 1 ] );
+  theAlphaBuffer.resize( theSystemSize + 1);
+  theBetaBuffer.resize( theSystemSize + 1);
+  theGBuffer.resize( theSystemSize + 1);
+  theHBuffer.resize( theSystemSize + 1);
+  tmp.resize(Order+1);
 
-  theFBuffer.resize( boost::extents[ Order + 1 ][ Order + 1 ] );
+  for(int i( 0 ); i < theSystemSize + 1; i++)
+    {
+      theAlphaBuffer[i] = tmp;
+      theBetaBuffer[i] = tmp;
+      theGBuffer[i] = tmp;
+      theHBuffer[i] = tmp;
+    }
+
+  theFBuffer.resize( Order + 1);
+  tmp.resize(Order);
+  for(int i( 0 ); i < Order + 1; i++)
+    {
+      theFBuffer[i] = tmp;
+    }  
 
   // init Factorial matrix
   for(int m( 2 ) ; m < Order+1 ; m++)
@@ -180,31 +232,31 @@ SET_METHOD_DEF( Polymorph, SSystemMatrix, SSystemProcess )
   for( int i( 0 ); i < theSystemSize; i++ )
     {
       
-      theAlpha[i+1] = (aValueVector[i].as<PolymorphVector>())[0].as<Real>() ;
+      theAlpha[i+1] = (aValueVector[i].asPolymorphVector())[0].asReal() ;
       for( int j( 0 ); j < theSystemSize; j++ )	
 	{
 	  if( i == j )
 	    {
 	      
-	      (theG[i+1])[j+1] = (aValueVector[i].as<PolymorphVector>())[j+1].as<Real>() - 1 ;
+	      (theG[i+1])[j+1] = (aValueVector[i].asPolymorphVector())[j+1].asReal() - 1 ;
 	    }else{
-	      (theG[i+1])[j+1] = (aValueVector[i].as<PolymorphVector>())[j+1].as<Real>() ;
+	      (theG[i+1])[j+1] = (aValueVector[i].asPolymorphVector())[j+1].asReal() ;
 	    }
 	}
-      theBeta[i+1] = (aValueVector[i].as<PolymorphVector>())[1+theSystemSize].as<Real>() ;
+      theBeta[i+1] = (aValueVector[i].asPolymorphVector())[1+theSystemSize].asReal() ;
       for( int j( 0 ); j < theSystemSize; j++ )	
 	{
 	  if( i == j )
 	    {
-	      (theH[i+1])[j+1] = (aValueVector[i].as<PolymorphVector>())[2+j+theSystemSize].as<Real>() -1 ;
+	      (theH[i+1])[j+1] = (aValueVector[i].asPolymorphVector())[2+j+theSystemSize].asReal() -1 ;
 	    }else{
-	      (theH[i+1])[j+1] = (aValueVector[i].as<PolymorphVector>())[2+j+theSystemSize].as<Real>() ;
+	      (theH[i+1])[j+1] = (aValueVector[i].asPolymorphVector())[2+j+theSystemSize].asReal() ;
 	    }
 	}
     }
 }
 
-const boost::multi_array< Real, 2 >& SSystemProcess::getESSYNSMatrix()
+const std::vector<RealVector>& SSystemProcess::getESSYNSMatrix()
 {
   //get theY
   int anIndex = 0;
@@ -289,6 +341,33 @@ const boost::multi_array< Real, 2 >& SSystemProcess::getESSYNSMatrix()
     }
   
   return theY;
+ 
+  /*
+  //integrate
+  for( int i( 1 ); i < theSystemSize+1; i++)
+  {
+     
+  Real aY( 0.0 );
+  for( int m( 1 ); m <= Order ; m++)
+  {
+  aY += (theY[i-1])[m] * 
+  gsl_sf_pow_int(aStepInterval,m) / gsl_sf_fact(m);
+  }
+  (theY[i-1])[0] =  aY + (theY[i-1])[0] ;
+  }
+
+  //set value
+  anIndex = 0;
+  for( VariableReferenceVectorConstIterator
+  i ( thePositiveVariableReferenceIterator );
+  i != theVariableReferenceVector.end() ; ++i )
+  {
+  (*i).getVariable()->setValue( exp( (theY[anIndex])[0] ) );
+  anIndex++;
+  }
+  */
+ 
+ 
 }
 
 

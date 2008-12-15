@@ -62,8 +62,7 @@ version = "@VERSION@"
 version_info = {
     'major': @ECELL_MAJOR_VERSION@,
     'minor': @ECELL_MINOR_VERSION@,
-    'micro': @ECELL_MICRO_VERSION@,
-    'revision': '@ECELL_PACKAGE_REVISION@'
+    'micro': @ECELL_MICRO_VERSION@
 }
 
 prefix = '''@PREFIX@'''

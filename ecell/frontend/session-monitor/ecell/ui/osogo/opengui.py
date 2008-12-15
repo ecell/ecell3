@@ -41,34 +41,37 @@ import getopt
 import traceback
 
 try:
-    import pygtk
-    pygtk.require('2.0')
-    import gtk
-    import gobject 
-    import ecell.ui.osogo.config as config
-    import ecell.ecs
-    from ecell.ui.osogo.GtkSessionMonitor import GtkSessionMonitor
+	import pygtk
+	pygtk.require('2.0')
+	import gtk
+	import gobject 
+	from ecell.ui.osogo.GtkSessionMonitor import GtkSessionMonitor
 except KeyboardInterrupt:
-    sys.exit(1)
+	sys.exit(1)
 
 def loadScript( aTupple ):
-    aSession = aTupple[0]
-    anEssFile = aTupple[1]
+	aSession = aTupple[0]
+	anEssFile = aTupple[1]
 
-    #loads script after main has been called
-    try:
-            # load ane execute script file
-            aSession.loadScript( anEssFile )
-    except:
-            aSession.message(' can\'t load [%s]' %anEssFile)
-            anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback ) )
-            aSession.message("-----------")
-            aSession.message(anErrorMessage)
-            aSession.message("-----------")
-    #else:
-            # initialize & update windows
-            #aSession.openWindow('MainWindow
-            #aSession.updateWindow()
+	#loads script after main has been called
+	try:
+		# load ane execute script file
+		aSession.loadScript( anEssFile )
+	except:
+		aSession.message(' can\'t load [%s]' %anEssFile)
+		anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback ) )
+		aSession.message("-----------")
+		aSession.message(anErrorMessage)
+		aSession.message("-----------")
+	#else:
+		# initialize & update windows
+		#aSession.openWindow('MainWindow
+		#aSession.updateWindow()
+
+
+
+
+
 
 # -----------------------------------------------------------------
 # main
@@ -80,111 +83,111 @@ def loadScript( aTupple ):
 # -----------------------------------------------------------------
 def main():
 
-    # -------------------------------------
-    # initialize file names
-    # -------------------------------------
-    anEmlFile = None
-    anEssFile = None
+	# -------------------------------------
+	# initialize file names
+	# -------------------------------------
+	anEmlFile = None
+	anEssFile = None
 
-    # -------------------------------------
-    # gets options
-    # -------------------------------------
-    try:
-        opts , args = getopt.getopt( sys.argv[1:] , 'he:f:',
-                                         ["help", "exec=", "file="])
-    except:
-        usage()
-        sys.exit(1)
+	# -------------------------------------
+	# gets options
+	# -------------------------------------
+	try:
+		opts , args = getopt.getopt( sys.argv[1:] , 'he:f:',
+					     ["help", "exec=", "file="])
+	except:
+		usage()
+		sys.exit(1)
 
-    # -------------------------------------
-    # checks argument
-    # -------------------------------------
-    for anOption, anArg in opts:
+	# -------------------------------------
+	# checks argument
+	# -------------------------------------
+	for anOption, anArg in opts:
 
-        # prints help message
-        if anOption in ( "-h", '--help' ):
-            usage()
-            sys.exit(0)
-        # executes script file (.ess)
-        if anOption in ( "-e", '--exec'):
-            anEssFile = anArg
+		# prints help message
+		if anOption in ( "-h", '--help' ):
+			usage()
+			sys.exit(0)
 
-        # load model file (.eml)
-        if anOption in ( "-f", '--file' ):
-            anEmlFile = anArg
-            
-    # -------------------------------------
-    # prohibits to use -e and -f options 
-    # -------------------------------------
-    if anEmlFile != None and anEssFile != None:
-        usage()
-        sys.exit(0)
+		# executes script file (.ess)
+		if anOption in ( "-e", '--exec'):
+			anEssFile = anArg
 
-    # -------------------------------------
-    # creates an instance of GtkSession and 
-    # creates MainWindow instance
-    # -------------------------------------
-    aSimulator = ecell.ecs.Simulator()
-    aSimulator.setDMSearchPath( aSimulator.DMSearchPathSeparator.join( config.dm_path ) )
-    aSession = GtkSessionMonitor()
+		# load model file (.eml)
+		if anOption in ( "-f", '--file' ):
+			anEmlFile = anArg
+			
+	# -------------------------------------
+	# prohibits to use -e and -f options 
+	# -------------------------------------
+	if anEmlFile != None and anEssFile != None:
+		usage()
+		sys.exit(0)
+
+	# -------------------------------------
+	# creates an instance of GtkSession and 
+	# creates MainWindow instance
+	# -------------------------------------
+	aSession = GtkSessionMonitor()
 
 
-    # -------------------------------------
-    # executes options
-    # -------------------------------------
-    # load model file (.eml)
-    if anEmlFile != None:
+	# -------------------------------------
+	# executes options
+	# -------------------------------------
+	# load model file (.eml)
+	if anEmlFile != None:
 
-        # check EML File
-        if os.path.isfile( anEmlFile ):
-            pass
-        else:
-            aMessage = " Error ! [%s] No such file. \n" %anEmlFile
-            aSession.message( aMessage )
-            sys.exit(1)
+		# check EML File
+		if os.path.isfile( anEmlFile ):
+			pass
+		else:
+			aMessage = " Error ! [%s] No such file. \n" %anEmlFile
+			aSession.message( aMessage )
+			sys.exit(1)
 
-        # print message 
-        aSession.message("%s is loaded.\n" %anEmlFile )
+		# print message 
+		aSession.message("%s is loaded.\n" %anEmlFile )
 
-        # load model
-        try:
-            aSession.loadModel( anEmlFile )
-        except:
-        
-            aSession.message(' can\'t load [%s]' %anEmlFile)
-            anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback ) )
-            aSession.message("-----------")
-            aSession.message(anErrorMessage)
-            aSession.message("-----------")
-        else:
+		# load model
+		try:
+			aSession.loadModel( anEmlFile )
+		except:
+		
+			aSession.message(' can\'t load [%s]' %anEmlFile)
+			anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback ) )
+			aSession.message("-----------")
+			aSession.message(anErrorMessage)
+			aSession.message("-----------")
+		else:
 
-            # initialize & update windows
-            aMainWindow = aSession.openWindow('MainWindow')
-            aSession.updateWindows()
+			# initialize & update windows
+			aMainWindow = aSession.openWindow('MainWindow')
+			aSession.updateWindows()
 
-    # executes script file (.ess)
-    elif anEssFile != None:
+	# executes script file (.ess)
+	elif anEssFile != None:
 
-        # check ESS File
-        if os.path.isfile( anEssFile ):
-            pass
-        else:
-            aMessage = " Error ! [%s] No such file. \n" %anEssFile
-            aSession.message( aMessage )
-            sys.exit(1)
+		# check ESS File
+		if os.path.isfile( anEssFile ):
+			pass
+		else:
+			aMessage = " Error ! [%s] No such file. \n" %anEssFile
+			aSession.message( aMessage )
+			sys.exit(1)
 
-        # print message on MainWindow
-        aSession.message("%s is being loaded and executed.\n" %anEssFile )
-        gobject.timeout_add( 1, loadScript, [aSession, anEssFile] )
+		# print message on MainWindow
+		aSession.message("%s is being loaded and executed.\n" %anEssFile )
+		gobject.timeout_add( 1, loadScript, [aSession, anEssFile] )
 
-    else:
-        aMainWindow = aSession.openWindow('MainWindow')
+	else:
+		aMainWindow = aSession.openWindow('MainWindow')
 
-    # -------------------------------------
-    # calls gtk.main()
-    # -------------------------------------
+	# -------------------------------------
+	# calls gtk.main()
+	# -------------------------------------
 
-    aSession.GUI_interact()
+	aSession.GUI_interact()
+
 
 # -----------------------------------------------------------------
 # usage
@@ -192,8 +195,8 @@ def main():
 # return -> None
 # -----------------------------------------------------------------
 def usage():
-    aProgramName = 'ecell3-session-monitor'
-    print '''
+	aProgramName = 'ecell3-session-monitor'
+	print '''
 %(appname)s -- E-Cell3 Session Monitor
 
 Usage:

@@ -1,0 +1,23 @@
+# general description of the class
+DESCRIPTION=FluxDistributionStepper 
+
+# whether class allows new properties (other then the hardcoded ones) created by modeleditor
+ACCEPTNEWPROPERTY=False
+
+# propertyname, type, defaultvalue, flags 
+# flags are: (settable, gettable, loadable, saveable) 1 means True, 0 means false
+# type can be: NESTED_LIST, STRING, MULTILINE, INTEGER, FLOAT
+PROPERTYLIST
+CurrentTime, FLOAT, 0.0, 0100
+DependentStepperList, NESTED_LIST, [], 0100
+MaxStepInterval, FLOAT, 1.79769313486e+308, 1111
+MinStepInterval, FLOAT, 2.22507385851e-308, 1111
+OriginalStepInterval, FLOAT, 0.001, 1100
+Priority, INTEGER, 0, 1111
+ProcessList,NESTED_LIST,[],0100
+RngSeed,STRING,"",1010
+ReadVariableList,NESTED_LIST,[],0100
+StepInterval, FLOAT, 1.79769313486e+308, 1111
+SystemList,NESTED_LIST,[],0100
+WriteVariableList,NESTED_LIST,[],0100
+END

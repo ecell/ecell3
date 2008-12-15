@@ -28,7 +28,6 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
-
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -37,27 +36,27 @@
 
 namespace libecs
 {
-Exception::~Exception() throw()
-{
+
+  Exception::~Exception() throw()
+  {
     ; // do nothing
-}
+  }
 
-const String& Exception::message() const
-{
+  const String& Exception::message() const
+  {
     return theMessage;
-}
+  }
 
-const char* Exception::what() const throw()
-{
+  const char* Exception::what() const throw()
+  {
     if (theWhatMsg.empty())
     {
 #ifdef DEBUG
-        theWhatMsg = theMethod + ":\n" + String( getClassName() ) + ": " + theMessage + "\n";
+      theWhatMsg = theMethod + ":\n" + String( getClassName() ) + ": " + theMessage + "\n";
 #else
-        theWhatMsg = String( getClassName() ) + ": " + theMessage + "\n";
+      theWhatMsg = String( getClassName() ) + ": " + theMessage + "\n";
 #endif /* DEBUG */
     }
     return theWhatMsg.c_str();
-}
-
+  }
 } // namespace libecs

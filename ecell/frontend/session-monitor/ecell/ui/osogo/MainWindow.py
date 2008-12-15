@@ -281,7 +281,7 @@ class MainWindow(OsogoWindow):
             os.path.join( config.GLADEFILE_PATH, "ecell32.png" ) )
                 
 
-        self.__setMenuAndButtonsStatus( False )
+        self.__setMenuAndButtonsStatus( FALSE )
         #self.theSession.updateFundamentalWindows()
 
 
@@ -345,7 +345,7 @@ class MainWindow(OsogoWindow):
     def __setMenuAndButtonsStatus( self, aDataLoadedStatus ):
         """sets initial widgets status
         aDataLoadedStatus  -- the status of loading data
-                 (True: Model or Script is loaded / False: Not loaded)
+                 (TRUE:Model or Script is loaded / FALSE:Not loaded)
         Returns None
         """
 
@@ -537,8 +537,8 @@ class MainWindow(OsogoWindow):
         except:
                         # expants message window, when it is folded.
             if self.exists():
-                if not ( self['message_togglebutton'].get_child() ).get_active():
-                    ( self['message_togglebutton'].get_child() ).set_active( True )
+                if ( self['message_togglebutton'].get_child() ).get_active() == FALSE:
+                    ( self['message_togglebutton'].get_child() ).set_active(TRUE)
 
             # displays confirm window
             aMessage = 'Can\'t load [%s]\nSee MessageWindow for details.' %aFileName
@@ -581,8 +581,8 @@ class MainWindow(OsogoWindow):
         except:
 
             # expants message window, when it is folded.
-            if not ( self['message_togglebutton'].get_child() ).get_active():
-                ( self['message_togglebutton'].get_child() ).set_active( True )
+            if ( self['message_togglebutton'].get_child() ).get_active() == FALSE:
+                ( self['message_togglebutton'].get_child() ).set_active(TRUE)
 
 
             # displays confirm window
@@ -630,8 +630,8 @@ class MainWindow(OsogoWindow):
         except:
 
             # expants message window, when it is folded.
-            if not ( self['message_togglebutton'].get_child() ).get_active():
-                ( self['message_togglebutton'].get_child() ).set_active( True )
+            if ( self['message_togglebutton'].get_child() ).get_active() == FALSE:
+                ( self['message_togglebutton'].get_child() ).set_active(TRUE)
 
             # displays confirm window
             aMessage = 'Can\'t save [%s]\nSee MessageWindow for details.' %aFileName
@@ -823,7 +823,7 @@ class MainWindow(OsogoWindow):
                 aMessage += "Input positive number.\n"
                             
             # when 'step' is selected.
-            if self['step_radiobutton'].get_active():
+            if self['step_radiobutton'].get_active() == TRUE:
 
                 # step must be integer 
                 if int(aNewValue) != aNewValue:
@@ -877,7 +877,7 @@ class MainWindow(OsogoWindow):
         # when Model is already loaded.
         if len(self.theSession.theModelName) > 0:
             # updates status of menu and button 
-            self.__setMenuAndButtonsStatus( True )
+            self.__setMenuAndButtonsStatus( TRUE )
             self.updateButtons()
 
     def getCurrentTime( self, aTime ):
@@ -1089,7 +1089,7 @@ class MainWindow(OsogoWindow):
             anObject = arg[0]
 
         # show
-        if anObject.get_active():
+        if anObject.get_active() == TRUE:
             self.theMessageWindowVisible = True
             self.showMessageWindow() 
             self.__resizeVertically( self.theMessageWindow.getActualSize()[1] )
@@ -1106,7 +1106,7 @@ class MainWindow(OsogoWindow):
         self.updateButtons()
 
     def __toggleEntityListWindow( self, *arg ):
-        if arg[0].get_active():
+        if arg[0].get_active() == TRUE:
             self.theEntityListWindowVisible = True
             self['entitylistarea'].show()
             self.__resizeVertically( self['entitylistarea'].get_allocation()[3] )
@@ -1178,7 +1178,7 @@ class MainWindow(OsogoWindow):
     def deleted( self, *arg ):
         """ When 'delete_event' signal is chatcked( for example, [X] button is clicked ),
         delete this window.
-        Returns True
+        Returns TRUE
         """
         return self.__deleted( *arg )
 

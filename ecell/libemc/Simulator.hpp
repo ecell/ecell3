@@ -52,31 +52,40 @@
 
 namespace libemc
 {
+  
+  /** @defgroup libemc_module The Libemc Module 
+   * This is the libemc module 
+   * @{ 
+   */ 
+  
 
-/**
-   The interface to the simulator.
+  /**
+     The interface to the simulator.
 
-   Simulator class provides a unified API to the libecs, 
-   C++ library for cell modeling and simulation.
+     Simulator class provides a unified API to the libecs, 
+     C++ library for cell modeling and simulation.
 
-   Unlike libecs::Model class, this API does involve only standard
-   C++ types/classes, and doesn't depend on libecs classes.    An only
-   exception is Polymorph class.
+     Unlike libecs::Model class, this API does involve only standard
+     C++ types/classes, and doesn't depend on libecs classes.  An only
+     exception is Polymorph class.
 
-   The public API methods are classified into these four groups:
+     The public API methods are classified into these four groups:
 
-   - Entity methods
-   - Stepper methods
-   - Logger methods, and
-   - Simulator methods
-   
-   @see libecs
-   @see Model
-   @see SimulatorImplementation
-*/
-class LIBEMC_API Simulator
-{
-public:
+     - Entity methods
+     - Stepper methods
+     - Logger methods, and
+     - Simulator methods
+     
+     @see libecs
+     @see Model
+     @see SimulatorImplementation
+  */
+
+  class LIBEMC_API Simulator
+  {
+
+  public:
+
     Simulator();
     virtual ~Simulator();
 
@@ -91,22 +100,24 @@ public:
        Create a new Stepper in the model.
 
        @param aClassname a classname of the Stepper to create.
-       @param anID             an ID of the Stepper.
+       @param anID       an ID of the Stepper.
        @param aParameterList a list of parameters to give to the Stepper
     */
-    void createStepper( libecs::StringCref aClassname,
-                        libecs::StringCref anId )
+
+    void createStepper( libecs::StringCref          aClassname,
+			libecs::StringCref          anId )
     {
-        theSimulatorImplementation->createStepper( aClassname, anId );
+      theSimulatorImplementation->createStepper( aClassname, anId );
     }
 
     /**
-       Delete a Stepper.
-       This method is not supported yet.
+       Delete a Stepper.  This method is not supported yet.
+
     */
+
     void deleteStepper( libecs::StringCref anID )
     {
-        theSimulatorImplementation->deleteStepper( anID );
+      theSimulatorImplementation->deleteStepper( anID );
     }
 
     /**
@@ -114,9 +125,10 @@ public:
 
        @returh a list of Steppers.
     */
+
     const libecs::Polymorph getStepperList() const
     {
-        return theSimulatorImplementation->getStepperList();
+      return theSimulatorImplementation->getStepperList();
     }
 
     /**
@@ -124,42 +136,47 @@ public:
     
        @return a list of properties of a Stepper.
     */
+
     const libecs::Polymorph 
     getStepperPropertyList( libecs::StringCref aStepperID ) const
     {
-        return theSimulatorImplementation->getStepperPropertyList( aStepperID );
+      return theSimulatorImplementation->getStepperPropertyList( aStepperID );
     }
+
 
     /**
        Get attributes of a property of a Stepper.
 
        The attributes are returned as a form of boolean 2-tuple 
-       ( setable, getable ).    ( 1, 0 ) means that the property is setable but
+       ( setable, getable ).  ( 1, 0 ) means that the property is setable but
        not getable,,, and so on.
 
        @return Stepper property attributes.
     */
+
     const libecs::Polymorph 
     getStepperPropertyAttributes( libecs::StringCref aStepperID, 
-                                  libecs::StringCref aPropertyName ) const
+				  libecs::StringCref aPropertyName ) const
     {
-        return theSimulatorImplementation->
-            getStepperPropertyAttributes( aStepperID, aPropertyName );
+      return theSimulatorImplementation->
+	getStepperPropertyAttributes( aStepperID, aPropertyName );
     }
 
+  
     /**
        Set a property value of a Stepper.
 
-       @param aStepperID the Stepper ID.
-       @param aValue     the value to set as a Polymorph.
+       @param aStepperID    the Stepper ID.
+       @param aValue        the value to set as a Polymorph.
     */
-    void setStepperProperty( libecs::StringCref    aStepperID,
-                             libecs::StringCref    aPropertyName,
-                             libecs::PolymorphCref aValue )
+
+    void setStepperProperty( libecs::StringCref          aStepperID,
+			     libecs::StringCref          aPropertyName,
+			     libecs::PolymorphCref aValue )
     {
-        theSimulatorImplementation->setStepperProperty( aStepperID,
-                                                        aPropertyName,
-                                                        aValue );
+      theSimulatorImplementation->setStepperProperty( aStepperID,
+						      aPropertyName,
+						      aValue );
     }
 
     /**
@@ -170,28 +187,30 @@ public:
        @return the property value as a reference counted pointor of a 
        Polymorph.
     */
+
     const libecs::Polymorph
     getStepperProperty( libecs::StringCref aStepperID,
-                        libecs::StringCref aPropertyName ) const
+			libecs::StringCref aPropertyName ) const
     {
-        return theSimulatorImplementation->getStepperProperty( aStepperID,
-                                                               aPropertyName );
+      return theSimulatorImplementation->getStepperProperty( aStepperID,
+							     aPropertyName );
     }
 
 
     /**
        Load a property value of a Stepper.
 
-       @param aStepperID the Stepper ID.
-       @param aValue     the value to set as a Polymorph.
+       @param aStepperID    the Stepper ID.
+       @param aValue        the value to set as a Polymorph.
     */
-    void loadStepperProperty( libecs::StringCref    aStepperID,
-                              libecs::StringCref    aPropertyName,
-                              libecs::PolymorphCref aValue )
+
+    void loadStepperProperty( libecs::StringCref          aStepperID,
+			      libecs::StringCref          aPropertyName,
+			      libecs::PolymorphCref aValue )
     {
-        theSimulatorImplementation->loadStepperProperty( aStepperID,
-                                                         aPropertyName,
-                                                         aValue );
+      theSimulatorImplementation->loadStepperProperty( aStepperID,
+						       aPropertyName,
+						       aValue );
     }
 
     /**
@@ -199,59 +218,80 @@ public:
 
        @param aStepperID the Stepper ID.
        @param aPropertyName the name of the property.
-       @return the property value as a reference counted pointer of a 
-               Polymorph.
+       @return the property value as a reference counted pointor of a 
+       Polymorph.
     */
+
     const libecs::Polymorph
     saveStepperProperty( libecs::StringCref aStepperID,
-                         libecs::StringCref aPropertyName ) const
+			 libecs::StringCref aPropertyName ) const
     {
-        return theSimulatorImplementation->saveStepperProperty( aStepperID,
-                                                                aPropertyName );
+      return theSimulatorImplementation->saveStepperProperty( aStepperID,
+							      aPropertyName );
     }
 
     /**
        Get class name of a Stepper.
 
        @param aStepperID the Stepper ID.
+
        @return the class name.
     */
 
     const libecs::String
     getStepperClassName( libecs::StringCref aStepperID ) const
     {
-        return theSimulatorImplementation->getStepperClassName( aStepperID );
+      return theSimulatorImplementation->getStepperClassName( aStepperID );
     }
 
 
     //@}
 
+    const libecs::PolymorphMap getClassInfo( libecs::StringCref aClasstype,
+		    			   libecs::StringCref aClassname) 
+    {
+
+	    return theSimulatorImplementation->getClassInfo( aClasstype, aClassname, 0 );
+    }
+
+    const libecs::PolymorphMap getClassInfo( libecs::StringCref aClasstype,
+		    			   libecs::StringCref aClassname, 
+		    			   const libecs::Integer forceReload ) 
+    {
+	    return theSimulatorImplementation->getClassInfo( aClasstype, aClassname, forceReload );
+    }
+
     
     /**
        @name Entity methods.
-       @{
-     */
+    */
+
+    //@{
 
 
     /**
        Create a new Entity in the model.
 
-       @param aClassname    a classname of the Entity to create.
+       @param aClassname a classname of the Entity to create.
        @param aFullIDString FullID of the Entity.
-       @param aName         a name of the Entity.
+       @param aName      a name of the Entity.
     */
-    void createEntity( libecs::StringCref aClassname, 
-                       libecs::StringCref aFullIDString )
+
+    void createEntity( libecs::StringCref           aClassname, 
+		       libecs::StringCref           aFullIDString )
     {
-        theSimulatorImplementation->createEntity( aClassname, aFullIDString );
+      theSimulatorImplementation->createEntity( aClassname,
+						aFullIDString );
     }
 
     /**
        Delete an Entity. This method is not supported yet.
+
     */
+
     void deleteEntity( libecs::StringCref aFullIDString )
     {
-        theSimulatorImplementation->deleteEntity( aFullIDString );
+      theSimulatorImplementation->deleteEntity( aFullIDString );
     }
 
     /**
@@ -264,10 +304,10 @@ public:
 
     const libecs::Polymorph 
     getEntityList( libecs::StringCref anEntityTypeString,
-                   libecs::StringCref aSystemPathString ) const
+		   libecs::StringCref aSystemPathString ) const
     {
-        return theSimulatorImplementation->getEntityList( anEntityTypeString,
-                                                          aSystemPathString );
+      return theSimulatorImplementation->getEntityList( anEntityTypeString,
+							aSystemPathString );
     }
 
 
@@ -276,10 +316,12 @@ public:
     
        @return a list of properties of an Entity.
     */
+
     const libecs::Polymorph 
     getEntityPropertyList( libecs::StringCref aFullIDString ) const
     {
-        return theSimulatorImplementation->getEntityPropertyList( aFullIDString );
+      return theSimulatorImplementation->
+	getEntityPropertyList( aFullIDString );
     }
 
     /**
@@ -289,9 +331,9 @@ public:
        @return true if the Entity exists, false if not.
     */
 
-    const bool entityExists( libecs::StringCref aFullIDString ) const
+    const bool isEntityExist( libecs::StringCref         aFullIDString ) const
     {
-        return theSimulatorImplementation->entityExists( aFullIDString );
+      return theSimulatorImplementation->isEntityExist( aFullIDString );
     }
 
     /**
@@ -301,10 +343,11 @@ public:
        @param aValue        the value to be set.
     */
 
-    void setEntityProperty( libecs::StringCref    aFullPNString,
-                            libecs::PolymorphCref aValue )
+    void setEntityProperty( libecs::StringCref      aFullPNString,
+			    libecs::PolymorphCref   aValue )
     {
-        theSimulatorImplementation->setEntityProperty( aFullPNString, aValue );
+      theSimulatorImplementation->setEntityProperty( aFullPNString,
+						     aValue );
     }
 
     /**
@@ -313,10 +356,11 @@ public:
        @param aFullPNString a FullPN of the property.
        @return the property value.
     */
+
     const libecs::Polymorph
     getEntityProperty( libecs::StringCref aFullPNString ) const
     {
-        return theSimulatorImplementation->getEntityProperty( aFullPNString );
+      return theSimulatorImplementation->getEntityProperty( aFullPNString );
     }
 
 
@@ -327,10 +371,11 @@ public:
        @param aValue        the value to be set.
     */
 
-    void loadEntityProperty( libecs::StringCref    aFullPNString,
-                             libecs::PolymorphCref aValue )
+    void loadEntityProperty( libecs::StringCref      aFullPNString,
+			     libecs::PolymorphCref   aValue )
     {
-        theSimulatorImplementation->loadEntityProperty( aFullPNString, aValue );
+      theSimulatorImplementation->loadEntityProperty( aFullPNString,
+						      aValue );
     }
 
     /**
@@ -339,25 +384,28 @@ public:
        @param aFullPNString a FullPN of the property.
        @return the property value.
     */
+
     const libecs::Polymorph
     saveEntityProperty( libecs::StringCref aFullPNString ) const
     {
-        return theSimulatorImplementation->saveEntityProperty( aFullPNString );
+      return theSimulatorImplementation->saveEntityProperty( aFullPNString );
     }
 
     /**
        Get attributes of a property of an Entity.
 
        The attributes are returned as a form of boolean 2-tuple 
-       ( setable, getable ).    ( 1, 0 ) means that the property is setable but
+       ( setable, getable ).  ( 1, 0 ) means that the property is setable but
        not getable,,, and so on.
 
        @return Entity property attributes.
     */
+
     const libecs::Polymorph
     getEntityPropertyAttributes( libecs::StringCref aFullPNString ) const
     {
-        return theSimulatorImplementation->getEntityPropertyAttributes( aFullPNString );
+      return theSimulatorImplementation->
+	getEntityPropertyAttributes( aFullPNString );
     }
 
     /**
@@ -366,19 +414,24 @@ public:
        @param aFullIDString a FullID of the Entity.
        @return the class name.
     */
+
     const libecs::String
     getEntityClassName( libecs::StringCref aFullIDString ) const
     {
-        return theSimulatorImplementation->getEntityClassName( aFullIDString );
+      return theSimulatorImplementation->getEntityClassName( aFullIDString );
     }
 
-    /** @} */
+
+    //@}
+
 
 
     /**
        @name Logger methods.
-       @{
     */
+
+    //@{
+
 
     /**
        Create a Logger.
@@ -390,32 +443,31 @@ public:
 
        @return a borrowed pointer to the Logger
     */
+
     void createLogger( libecs::StringCref aFullPNString ) 
     {
-                            
-        return theSimulatorImplementation->createLogger( aFullPNString );
+		
+      return theSimulatorImplementation->createLogger( aFullPNString );
     }
 
     /**
-         Create a Logger with parameters.
-         - First parameter: minimum log interval dimension
-           0 - none, 1 - by step, 2 - by time
-         - Second parameter: behaviour when run out of disk
-           0 - throw exception, 1 - overwrite data
-         - Third parameter: minimum log interval
+       Create a Logger with parameters.
+		First parameter - minimum log interval dimension 0 - none, 1 - by step, 2 - by time
+		Second parameter - behaviour when run out of disk - 0 - throw exception, 1 - overwrite data
+		Third parameter - minimum log interval
 
-         If the Logger already exists, this method does nothing.
+       If the Logger already exists, this method does nothing.
 
-         @param aFullPNString the FullPN of the PropertySlot which the Logger is
-                observing, as a String 
-         @param aParamLsit the parameters
-         @return a borrowed pointer to the Logger
+       @param aFullPNString a FullPN of the PropertySlot which the Logger is
+       observing, as a String 
+
+       @return a borrowed pointer to the Logger
     */
 
-    void createLogger( libecs::StringCref aFullPNString,
-                       libecs::Polymorph aParamList ) 
+    void createLogger( libecs::StringCref aFullPNString, libecs::Polymorph aParamList ) 
     {
-        return theSimulatorImplementation->createLogger( aFullPNString, aParamList );
+	
+      return theSimulatorImplementation->createLogger( aFullPNString, aParamList );
     }
 
     /**
@@ -426,99 +478,112 @@ public:
 
     const libecs::Polymorph getLoggerList() const
     {
-        return theSimulatorImplementation->getLoggerList();
+      return theSimulatorImplementation->getLoggerList();
     }
 
     const libecs::DataPointVectorSharedPtr 
     getLoggerData( libecs::StringCref aFullPNString ) const
     {
-        return theSimulatorImplementation->getLoggerData( aFullPNString );
+      return theSimulatorImplementation->getLoggerData( aFullPNString );
     }
 
     const libecs::DataPointVectorSharedPtr
     getLoggerData( libecs::StringCref aFullPNString, 
-                   libecs::RealCref aStartTime, 
-                   libecs::RealCref anEndTime ) const 
+		   libecs::RealCref aStartTime, 
+		   libecs::RealCref anEndTime ) const 
     {
-        return theSimulatorImplementation->getLoggerData( aFullPNString,
-                                                          aStartTime, anEndTime );
+      return theSimulatorImplementation->
+	getLoggerData( aFullPNString, aStartTime, anEndTime );
     }
 
     const libecs::DataPointVectorSharedPtr
     getLoggerData( libecs::StringCref aFullPNString,
-                   libecs::RealCref aStartTime, libecs::RealCref anEndTime,
-                   libecs::RealCref anInterval ) const
+		   libecs::RealCref aStartTime, libecs::RealCref anEndTime,
+		   libecs::RealCref anInterval ) const
     {
-        return theSimulatorImplementation->getLoggerData( aFullPNString,
-                                                          aStartTime,
-                                                          anEndTime, 
-                                                          anInterval );
+      return theSimulatorImplementation->getLoggerData( aFullPNString,
+							aStartTime, anEndTime, 
+							anInterval );
     }
 
     const libecs::Real 
     getLoggerStartTime( libecs::StringCref aFullPNString ) const 
     {
-        return theSimulatorImplementation->getLoggerStartTime( aFullPNString );
+      return theSimulatorImplementation->getLoggerStartTime( aFullPNString );
     }
 
     const libecs::Real 
     getLoggerEndTime( libecs::StringCref aFullPNString ) const
     {
-        return theSimulatorImplementation->getLoggerEndTime( aFullPNString );
+      return theSimulatorImplementation->getLoggerEndTime( aFullPNString );
+    }
+
+    void setLoggerMinimumInterval( libecs::StringCref aFullPNString, 
+				   libecs::RealCref anInterval )
+    {
+      return theSimulatorImplementation->
+	setLoggerMinimumInterval( aFullPNString, anInterval );
+    }
+
+    const libecs::Real 
+    getLoggerMinimumInterval( libecs::StringCref aFullPNString ) const
+    {
+      return theSimulatorImplementation->
+	getLoggerMinimumInterval( aFullPNString );
     }
 
     void setLoggerPolicy( libecs::StringCref aFullPNString, 
-                          libecs::Polymorph aParamList )
+				   libecs::Polymorph aParamList )
     {
-        return theSimulatorImplementation->setLoggerPolicy( aFullPNString,
-                                                            aParamList );
+      return theSimulatorImplementation->setLoggerPolicy( aFullPNString, aParamList );
     }
 
     libecs::Polymorph
     getLoggerPolicy( libecs::StringCref aFullPNString ) const
     {
-        return theSimulatorImplementation->getLoggerPolicy( aFullPNString );
+      return theSimulatorImplementation->getLoggerPolicy( aFullPNString );
     }
 
     const libecs::Logger::size_type getLoggerSize( libecs::StringCref aFullPNString ) const
     {
-        return theSimulatorImplementation->getLoggerSize( aFullPNString );
+      return theSimulatorImplementation->getLoggerSize( aFullPNString );
     }
 
-    /** @} */
+    //@}
+
+
 
     /**
        @name Simulator methods.
-       @{
     */
 
+    //@{
+
     /**
-       Advance the simulation a step forward.
+       Conduct a step of the simulation.
+
     */
+
     void step( const libecs::Integer aNumSteps = 1 )
     {
 
-        theSimulatorImplementation->step( aNumSteps );
+      theSimulatorImplementation->step( aNumSteps );
     }
 
-    /**
-       Get a tuple of the time and the stepper ID of the next event
-
-       @return a tuple of the time and the stepper ID of the next event
-     */
     const libecs::Polymorph getNextEvent() const
     {
-        return theSimulatorImplementation->getNextEvent();
+      return theSimulatorImplementation->getNextEvent();
     }
 
     /**
-       Get the current time of the simulator.
+       Get current time of the simulator.
 
        @return current time of the simulator
     */
+
     const libecs::Real getCurrentTime() const
     {
-        return theSimulatorImplementation->getCurrentTime();
+      return theSimulatorImplementation->getCurrentTime();
     }
 
     /**
@@ -530,9 +595,10 @@ public:
        @see setEventChecker
        @see setEventHandler
     */
+
     void run()
     {
-        theSimulatorImplementation->run();
+      theSimulatorImplementation->run();
     }
 
     /**
@@ -540,9 +606,10 @@ public:
 
        @param a duration of the simulation run.
     */
+
     void run( const libecs::Real aDuration )
     {
-        theSimulatorImplementation->run( aDuration );
+      theSimulatorImplementation->run( aDuration );
     }
 
     /**
@@ -550,9 +617,10 @@ public:
 
        Usually this is called from the EventHandler.
     */
+
     void stop()
     {
-        theSimulatorImplementation->stop();
+      theSimulatorImplementation->stop();
     }
 
     /**
@@ -566,16 +634,17 @@ public:
 
        While the simulation is running by the run() method, the function
        object given by this method is called once in several simulation 
-       steps.    If it returns true, the EventHandler given by setEventHandler()
+       steps.  If it returns true, the EventHandler given by setEventHandler()
        method is called.
 
        @param aEventChecker a function object of the event checker
        @see EventChecker
        @see setEventHandler
     */
+
     void setEventChecker( EventCheckerSharedPtr aEventChecker )
     {
-         theSimulatorImplementation->setEventChecker( aEventChecker );
+       theSimulatorImplementation->setEventChecker( aEventChecker );
     }
 
     /**
@@ -589,67 +658,35 @@ public:
        @see EventHandler
        @see setEventChecker
     */
+
     void setEventHandler( EventHandlerSharedPtrCref anEventHandler )
     {
-         theSimulatorImplementation->setEventHandler( anEventHandler );
+       theSimulatorImplementation->setEventHandler( anEventHandler );
     }
 
-    /**
-       Return a list of tuples which contain the information of loaded DMs.
-
-       @return a list of tuples.
-     */
-    const libecs::PolymorphVector getDMInfo() const
+    const libecs::Polymorph getDMInfo()
     {
-        return theSimulatorImplementation->getDMInfo();
+      return theSimulatorImplementation->getDMInfo();
     }
 
-    /**
-       Retrieve the list of the specified DM's properties.
-       @param aClassname the name of the DM from which the property list is
-                         retrieved.
-       @return a tuple of the properties.
-     */
-    const libecs::PolymorphMap getPropertyInfo( libecs::StringCref aClassname ) const
-    {
-        return theSimulatorImplementation->getPropertyInfo( aClassname );
-    }
+  //@}
 
-    /**
-       Retrieve the meta information of a specific DM.
-       @param aClassname the name of the DM to retrieve the information of.
-       @return the meta information keyed by strings.
-     */
-    const libecs::PolymorphMap getClassInfo( libecs::StringCref aClassname ) const 
-    {
-
-        return theSimulatorImplementation->getClassInfo( aClassname );
-    }
-
-    const char getDMSearchPathSeparator() const
-    {
-        return theSimulatorImplementation->getDMSearchPathSeparator();
-    }
-
-    void setDMSearchPath( const std::string& dmSearchPath )
-    {
-        theSimulatorImplementation->setDMSearchPath( dmSearchPath );
-    }
-
-    const std::string getDMSearchPath() const
-    {
-        return theSimulatorImplementation->getDMSearchPath();
-    }
-
-    /** @} */
-
-private:
+  private:
 
     SimulatorImplementation* theSimulatorImplementation;
 
-};
+  };
 
+
+
+
+  /** @} */ //end of libemc_module 
 
 } // namespace libemc
 
 #endif   /* __SIMULATOR_HPP */
+
+
+
+
+

@@ -43,7 +43,6 @@ LIBECS_DM_CLASS( ExpressionFluxProcess, ExpressionProcessBase )
   LIBECS_DM_OBJECT( ExpressionFluxProcess, Process )
     {
       INHERIT_PROPERTIES( ExpressionProcessBase );
-      CLASS_DESCRIPTION("ExpressionFluxProcess is designed for easy and efficient representations of continuous flux rate equations.  \"Expression\" property accepts a plain text rate expression.  The expression must be evaluated to give a flux rate in number per second, not concentration per second.");
     }
 
   ExpressionFluxProcess()

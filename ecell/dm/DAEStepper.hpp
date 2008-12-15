@@ -47,8 +47,6 @@ public:
     {
       INHERIT_PROPERTIES( DifferentialStepper );
 
-      CLASS_DESCRIPTION("DAEStepper");
-
       PROPERTYSLOT_SET_GET( Integer, MaxIterationNumber );
       PROPERTYSLOT_SET_GET( Real, Uround );
 

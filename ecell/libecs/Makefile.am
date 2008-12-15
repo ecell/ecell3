@@ -24,15 +24,17 @@ libecs_la_LIBADD=  -lstdc++ ${LIBLTDL} ${GSL_LIBADD}
 libecs_la_SOURCES=\
 libecs.cpp\
 Util.cpp\
+Polymorph.cpp\
 FullID.cpp\
 PropertySlot.cpp\
 PropertySlotProxy.cpp\
 PropertyInterface.cpp\
-EcsObject.cpp\
+PropertiedClass.cpp\
+ProcessMaker.cpp\
 Variable.cpp\
+VariableMaker.cpp\
 Stepper.cpp\
 DifferentialStepper.cpp\
-AdaptiveDifferentialStepper.cpp\
 DiscreteTimeStepper.cpp\
 DiscreteEventStepper.cpp\
 PassiveStepper.cpp\
@@ -44,6 +46,8 @@ System.cpp\
 Entity.cpp\
 Process.cpp\
 ContinuousProcess.cpp\
+StepperMaker.cpp\
+SystemMaker.cpp\
 DataPoint.cpp\
 DataPointVector.cpp\
 VVector.cpp\
@@ -53,7 +57,8 @@ LoggerAdapter.cpp\
 PhysicalLogger.cpp\
 VariableReference.cpp\
 LoggerBroker.cpp\
-Exceptions.cpp
+Exceptions.cpp\
+PropertiedObjectMaker.cpp
 
 
 libecsdir=${ECELL_INCLUDE_DIR}/libecs
@@ -67,14 +72,15 @@ FullID.hpp\
 PropertySlot.hpp\
 PropertySlotProxy.hpp\
 PropertyInterface.hpp\
-EcsObject.hpp\
+PropertiedClass.hpp\
+ProcessMaker.hpp\
 Variable.hpp\
+VariableMaker.hpp\
 Stepper.hpp\
 ProcessEvent.hpp\
 StepperEvent.hpp\
 EventScheduler.hpp\
 DifferentialStepper.hpp\
-AdaptiveDifferentialStepper.hpp\
 DiscreteTimeStepper.hpp\
 DiscreteEventStepper.hpp\
 PassiveStepper.hpp\
@@ -86,6 +92,8 @@ System.hpp\
 Entity.hpp\
 Process.hpp\
 ContinuousProcess.hpp\
+StepperMaker.hpp\
+SystemMaker.hpp\
 DataPoint.hpp\
 DataPointVector.hpp\
 PhysicalLogger.hpp\
@@ -96,11 +104,10 @@ Exceptions.hpp\
 Util.hpp\
 VariableReference.hpp\
 DynamicPriorityQueue.hpp\
+FluxProcess.hpp\
 MethodProxy.hpp\
-EcsObjectMaker.hpp\
-PropertySlotProxyLoggerAdapter.hpp\
-PropertyAttributes.hpp\
-Handle.hpp
+PropertiedObjectMaker.hpp\
+PropertySlotProxyLoggerAdapter.hpp
 
 noinst_HEADERS=\
 osif.h\

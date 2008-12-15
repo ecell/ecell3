@@ -1,0 +1,18 @@
+# general description of the class
+DESCRIPTION=ConstantFluxProcess
+
+# whether class allows new properties (other then the hardcoded ones) created by modeleditor
+ACCEPTNEWPROPERTY=True
+
+# propertyname, type, defaultvalue, flags 
+# flags are: (settable, gettable, loadable, saveable) 1 means True, 0 means false
+# type can be: NESTED_LIST, STRING, MULTILINE, INTEGER, FLOAT
+PROPERTYLIST
+Activity, FLOAT, 0.0, 1100
+IsContinuous, INTEGER,1, 0100
+Name,STRING,"",1111
+Priority,INTEGER,0, 1111
+StepperID,STRING,"", 1111
+VariableReferenceList,NESTED_LIST,[], 1111
+k,FLOAT, 0.0, 1111
+END

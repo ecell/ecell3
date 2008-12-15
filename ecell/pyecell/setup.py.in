@@ -5,11 +5,11 @@ import sys
 from numpy.distutils.core import setup, Extension
 
 include_dirs = [
-    r'@DMTOOL_INCLUDE_DIR@',
+    '@DMTOOL_INCLUDE_DIR@',
     os.environ['INCLTDL'][2:],
-    r'@top_srcdir@',
-    r'@top_srcdir@/libecs',
-    r'@top_srcdir@/libemc',
+    '@top_srcdir@',
+    '@top_srcdir@/libecs',
+    '@top_srcdir@/libemc',
     ]
 
 common_libraries = [
@@ -17,7 +17,7 @@ common_libraries = [
     'gsl'
     ]
 
-ecell_staging_home = r'@abs_top_builddir@/tmp'
+ecell_staging_home = '@abs_top_builddir@/tmp'
 
 setup(
     name = 'E-Cell',
@@ -26,7 +26,7 @@ setup(
     author = 'E-Cell project',
     author_email = 'info@e-cell.org',
     url = 'http://www.e-cell.org/',
-    packages = [ 'ecell', 'ecell.session_manager', 'ecell.analysis' ],
+    packages = [ 'ecell', 'ecell.SessionManager', 'ecell.analysis' ],
     ext_modules = [
         Extension( 'ecell._tableio',
 			sources = [ 'ecell/_tableio.c' ],

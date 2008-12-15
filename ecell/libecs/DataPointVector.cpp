@@ -27,98 +27,103 @@
 //
 // written by Gabor Bereczki <gabor.bereczki@talk21.com>
 // 14/04/2002
-
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
 #include "DataPointVector.hpp"
-#include <cassert>
+#include <assert.h>
 
 namespace libecs
 {
-
-DataPointVector::~DataPointVector()
-{
+  DataPointVector::~DataPointVector()
+  {
     if( thePointSize==2 )
-    {
-        delete[] theRawArray;
-    }
+      {
+	delete[] theRawArray;
+      }
     else
-    {
-        delete[] theRawArrayLong;
-    }
-}
+      {
+	delete[] theRawArrayLong;
+      }
+  }
 
-DataPointVector::DataPointVector( DataPointVectorIterator aLength, 
-                                  int aPointSize ) 
-    : theSize( aLength ),
-      thePointSize( aPointSize )
-{
+
+
+  DataPointVector::DataPointVector( DataPointVectorIterator aLength, 
+				    int aPointSize ) 
+    :
+    theSize( aLength ),
+    thePointSize( aPointSize )
+  {
     // init the appropriate array
 
     if( thePointSize == 2 )
-    {
-        theRawArray = new DataPoint[ aLength ];
-    }
+      {
+	theRawArray = new DataPoint[ aLength ];
+      }
     else
-    {
-        theRawArrayLong = new LongDataPoint[ aLength ];
-    }
-}
+      {
+	theRawArrayLong = new LongDataPoint[ aLength ];
+      }
+  }
 
 
-size_t DataPointVector::getElementSize() const
-{
+  size_t DataPointVector::getElementSize() const
+  {
     if( thePointSize == 2 )
-    {
-        return sizeof(DataPoint);
-    }
+      {
+	return sizeof(DataPoint);
+      }
     return sizeof(LongDataPoint);
-}
+  }
 
 
-DataPointRef DataPointVector::asShort( DataPointVectorIterator aPosition )
-{
+
+
+
+  DataPointRef DataPointVector::asShort( DataPointVectorIterator aPosition )
+  {
     assert (thePointSize == 2);
     return theRawArray[ aPosition ];
-}
+  }
 
-DataPointCref 
-DataPointVector::asShort( DataPointVectorIterator aPosition ) const
-{
+  DataPointCref 
+  DataPointVector::asShort( DataPointVectorIterator aPosition ) const
+  {
     assert (thePointSize == 2);
     return theRawArray[ aPosition ];
-}
+  }
 
-LongDataPointRef DataPointVector::asLong( DataPointVectorIterator aPosition )
-{
+  LongDataPointRef DataPointVector::asLong( DataPointVectorIterator aPosition )
+  {
     assert (thePointSize == 5);
     return theRawArrayLong[ aPosition ];
-}
+  }
 
 
-LongDataPointCref 
-DataPointVector::asLong( DataPointVectorIterator aPosition ) const
-{
+  LongDataPointCref 
+  DataPointVector::asLong( DataPointVectorIterator aPosition ) const
+  {
     assert (thePointSize == 5);
     return theRawArrayLong[ aPosition ];
-}
+  }
 
 
-const void* DataPointVector::getRawArray() const
-{
+  const void* DataPointVector::getRawArray() const
+  {
     if (thePointSize == 2)
-    {
-        return (void*) theRawArray;
-    }
+      {
+	return (void*) theRawArray;
+      }
     return (void*) theRawArrayLong;
 
-}
+  }
 
-Integer DataPointVector::getPointSize()
-{
-    return DataPointVector::thePointSize;
-}
-
+  Integer DataPointVector::getPointSize()
+  {
+      return DataPointVector::thePointSize;
+  }
 } // namespace libecs
+
+

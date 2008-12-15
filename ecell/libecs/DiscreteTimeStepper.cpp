@@ -28,7 +28,6 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
-
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -38,30 +37,42 @@
 namespace libecs
 {
 
-LIBECS_DM_INIT_STATIC( DiscreteTimeStepper, Stepper );
+  LIBECS_DM_INIT_STATIC( DiscreteTimeStepper, Stepper );
 
-//////////////////// DiscreteTimeStepper
+  //////////////////// DiscreteTimeStepper
 
-DiscreteTimeStepper::DiscreteTimeStepper()
-{
+  DiscreteTimeStepper::DiscreteTimeStepper()
+  {
     ; // do nothing
-}
+  }
 
-void DiscreteTimeStepper::initialize()
-{
+  void DiscreteTimeStepper::initialize()
+  {
     Stepper::initialize();
 
     if( getDiscreteProcessOffset() != 0 && ! getProcessVector().empty() )
-    {
-        THROW_EXCEPTION( InitializationFailed,
-                         getClassName() 
-                         + " does not support continuous process." );
-    }
-}
+      {
+	THROW_EXCEPTION( InitializationFailed,
+			 getClassNameString() 
+			 + " does not support continuous process." );
 
-void DiscreteTimeStepper::step()
-{
+      }
+  }
+
+  void DiscreteTimeStepper::step()
+  {
     fireProcesses();
-}
+  }
+
 
 } // namespace libecs
+
+
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/
+

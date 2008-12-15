@@ -25,7 +25,6 @@
 // 
 //END_HEADER
 //
-
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -35,5 +34,5 @@
 
 namespace libecs
 {
-LIBECS_DM_INIT_STATIC( ContinuousProcess, Process );
+  LIBECS_DM_INIT_STATIC( ContinuousProcess, Process );
 }

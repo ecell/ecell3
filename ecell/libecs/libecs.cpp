@@ -28,7 +28,6 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
-
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -37,80 +36,84 @@
 #include "win32_utils.h"
 #endif /* WIN32 */
 
+#include "dmtool/ModuleMaker.hpp"
+
 #include "libecs.hpp"
-#include "EcsObject.hpp"
-#include "dmtool/SharedModuleMaker.hpp"
 
 namespace libecs
 {
+  int const MAJOR_VERSION( ECELL_MAJOR_VERSION );
+  int const MINOR_VERSION( ECELL_MINOR_VERSION );
+  int const MICRO_VERSION( ECELL_MICRO_VERSION );
 
-int const MAJOR_VERSION( ECELL_MAJOR_VERSION );
-int const MINOR_VERSION( ECELL_MINOR_VERSION );
-int const MICRO_VERSION( ECELL_MICRO_VERSION );
+  char const* const VERSION_STRING( ECELL_VERSION_STRING );
 
-char const* const VERSION_STRING( ECELL_VERSION_STRING );
+  static volatile bool isInitialized = false;
 
-static volatile bool isInitialized = false;
-
-bool initialize()
-{
+  bool initialize()
+  {
     /* XXX: not atomic - "compare and swap" needed for concurrency */
     if (isInitialized)
-        return true;
+      return true;
     else
-        isInitialized = true;
+      isInitialized = true;
 
-    if ( SharedModuleMakerBase::initialize() )
-    {
-        return false;
-    }
+    if ( ModuleMaker::initialize() )
+      {
+	return false;
+      }
 #if defined( WIN32 ) && !defined( __CYGWIN__ )
     if ( libecs_win32_init() )
-    {
-        SharedModuleMaker< EcsObject >::finalize();
-        return false;
-    }
+      {
+	ModuleMaker::finalize();
+	return false;
+      }
 #endif
     return true;
-}
+  }
 
-ModuleMaker< EcsObject >* createDefaultModuleMaker()
-{
-    return new SharedModuleMaker< EcsObject >();
-}
-
-void finalize()
-{
+  void finalize()
+  {
     /* XXX: not atomic - "compare and swap" needed for concurrency */
     if (!isInitialized)
-        return;
+      return;
     else
-        isInitialized = false;
+      isInitialized = false;
 
 #if defined( WIN32 ) && !defined( __CYGWIN__ )
     libecs_win32_fini();
 #endif
-    SharedModuleMakerBase::finalize();
-}
+    ModuleMaker::finalize();
+  }
 
-const int getMajorVersion()
-{
+  void setDMSearchPath( const std::string& path )
+  {
+    ModuleMaker::setSearchPath( path );
+  }
+
+  const std::string getDMSearchPath()
+  {
+    return ModuleMaker::getSearchPath();
+  }
+
+  const int getMajorVersion()
+  {
     return MAJOR_VERSION;
-}
+  }
 
-const int getMinorVersion()
-{
+  const int getMinorVersion()
+  {
     return MINOR_VERSION;
-}
+  }
 
-const int getMicroVersion()
-{
+  const int getMicroVersion()
+  {
     return MICRO_VERSION;
-}
+  }
 
-const std::string getVersion()
-{
+  const std::string getVersion()
+  {
     return VERSION_STRING;
-}
+  }
 
 } // namespace libecs

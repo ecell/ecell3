@@ -121,8 +121,9 @@ class InterfaceWindow( OsogoWindow ):
 			aTitle = anInstance.getTitle()
 			aClass =  anInstance.__class__.__name__
 			aFullPN = createFullPNString( anInstance.theFullPN() )
+			#aList = ( aTitle , aClass , aFullPN )
 
-			if self.exists():
+			if self.exists() == TRUE:
 
 				anIter = aModel.append()
 				aModel.set( anIter,  \

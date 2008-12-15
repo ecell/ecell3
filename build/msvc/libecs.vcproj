@@ -374,10 +374,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\ecell\libecs\AdaptiveDifferentialStepper.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ecell\libecs\ContinuousProcess.cpp"
 				>
 			</File>
@@ -399,10 +395,6 @@
 			</File>
 			<File
 				RelativePath="..\..\ecell\libecs\DiscreteTimeStepper.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ecell\libecs\EcsObject.cpp"
 				>
 			</File>
 			<File
@@ -458,7 +450,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ecell\libecs\Polymorph.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ecell\libecs\Process.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\libecs\ProcessMaker.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\libecs\PropertiedClass.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\libecs\PropertiedObjectMaker.cpp"
 				>
 			</File>
 			<File
@@ -478,7 +486,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ecell\libecs\StepperMaker.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ecell\libecs\System.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\libecs\SystemMaker.cpp"
 				>
 			</File>
 			<File
@@ -491,6 +507,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ecell\libecs\Variable.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\libecs\VariableMaker.cpp"
 				>
 			</File>
 			<File
@@ -507,10 +527,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\ecell\libecs\AdaptiveDifferentialStepper.hpp"
-				>
-			</File>
 			<File
 				RelativePath="..\..\ecell\libecs\AssocVector.h"
 				>
@@ -556,14 +572,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\libecs\EcsObject.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ecell\libecs\EcsObjectMaker.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\ecell\libecs\Entity.hpp"
 				>
 			</File>
@@ -580,11 +588,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\libecs\FullID.hpp"
+				RelativePath="..\..\ecell\libecs\FluxProcess.hpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\libecs\Handle.hpp"
+				RelativePath="..\..\ecell\libecs\FullID.hpp"
 				>
 			</File>
 			<File
@@ -644,7 +652,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\libecs\PropertyAttributes.hpp"
+				RelativePath="..\..\ecell\libecs\PropertiedClass.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\libecs\PropertiedObjectMaker.hpp"
 				>
 			</File>
 			<File
@@ -713,6 +725,10 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath=".\ecs.rct"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Templates"

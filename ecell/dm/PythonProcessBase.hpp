@@ -97,18 +97,10 @@ public:
   void defaultSetProperty( StringCref aPropertyName,
 			   PolymorphCref aValue )
     {
-      PropertyMapIterator i( thePropertyMap.find( aPropertyName ) );
-      if ( i == thePropertyMap.end() )
-	{
-	  thePropertyList.push_back( aPropertyName );
-	  thePropertyMap.insert( std::make_pair( aPropertyName, aValue ) );
-	}
-      else
-	{
-	  i->second = aValue;
-	}
       theLocalNamespace[ aPropertyName ] =
-	python::object( python::handle<>( PyFloat_FromDouble( aValue.as< Real >() ) ) );
+	python::object( python::handle<>( PyFloat_FromDouble( aValue ) ) );
+
+      thePropertyMap[ aPropertyName ] = aValue;
     }
 
   const Polymorph defaultGetProperty( StringCref aPropertyName ) const
@@ -122,21 +114,39 @@ public:
 	}
       else
 	{
-	  THROW_EXCEPTION( NoSlot, getClassName() + " : Property [" +
+	  THROW_EXCEPTION( NoSlot, getClassNameString() + " : Property [" +
 			   aPropertyName + "] is not defined" );
 	}
     }
 
-  const StringVector& defaultGetPropertyList() const
+  const Polymorph defaultGetPropertyList() const
     {
-      return thePropertyList;
+      PolymorphVector aVector;
+
+      for( PropertyMapConstIterator 
+	     aPropertyMapIterator( thePropertyMap.begin() );
+	   aPropertyMapIterator != thePropertyMap.end();
+	   ++aPropertyMapIterator )
+	{
+	  aVector.push_back( aPropertyMapIterator->first );
+	}      
+
+      return aVector;
     }
 
-  const PropertyAttributes
+  const Polymorph
     defaultGetPropertyAttributes( StringCref aPropertyName ) const
     {
-      return PropertyAttributes( PropertySlotBase::POLYMORPH,
-				 true, true, true, true, true );
+      PolymorphVector aVector;
+
+      Integer aPropertyFlag( 1 );
+
+      aVector.push_back( aPropertyFlag ); //isSetable
+      aVector.push_back( aPropertyFlag ); //isGetable
+      aVector.push_back( aPropertyFlag ); //isLoadable
+      aVector.push_back( aPropertyFlag ); //isSavable
+
+      return Polymorph( aVector );
     }
 
   virtual void initialize();
@@ -147,8 +157,6 @@ protected:
   python::dict   theLocalNamespace;
 
   PropertyMap    thePropertyMap;
-
-  StringVector   thePropertyList;
 };
 
 

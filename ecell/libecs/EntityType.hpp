@@ -32,111 +32,126 @@
 #ifndef __ENTITYTYPE_HPP 
 #define __ENTITYTYPE_HPP 
 
-#include "libecs/Defs.hpp"
+#include "libecs.hpp"
 
 
 namespace libecs
 {
 
-class LIBECS_API EntityType
-{
+  /** @addtogroup identifier
+   *
+   *@{
+   */
 
-public:
+  /** @file */
+
+
+  /**
+
+  */
+
+  class LIBECS_API EntityType
+  {
+
+  public:
+    
     enum Type
-    {
-        NONE        = 0,
-        ENTITY      = 1,
-        VARIABLE    = 2,
-        PROCESS     = 3,
-        SYSTEM      = 4
-    };
-
+      {
+	NONE      = 0,
+	ENTITY    = 1,
+	VARIABLE  = 2,
+	PROCESS   = 3,
+	SYSTEM    = 4
+      };
 
     EntityType( StringCref typestring );
 
-
     EntityType( const int number );
 
-
     EntityType( const Type type )
-        : theType( type )
+      :
+      theType( type )
     {
-        ; // do nothing
+      ; // do nothing
     }
-
 
     EntityType( EntityTypeCref primitivetype )
-        : theType( primitivetype.getType() )
+      :
+      theType( primitivetype.getType() )
     {
-        ; // do nothing
+      ; // do nothing
     }
-
 
     EntityType()
-        : theType( NONE )
+      :
+      theType( NONE )
     {
-        ; // do nothing
+      ; // do nothing
     }
 
-        
+      
     StringCref getString() const;
 
     operator StringCref() const
     {
-        return getString();
+      return getString();
     }
 
     const Type& getType() const
     {
-        return theType;
+      return theType;
     }
 
     operator const Type&() const
     {
-        return getType();
+      return getType();
     }
 
-    //        operator const int&() const
-    //        {
-    //            return static_cast<const int&>( getType() ); 
-    //        }
+    //    operator const int&() const
+    //    {
+    //      return static_cast<const int&>( getType() ); 
+    //    }
 
     bool operator<( EntityTypeCref rhs ) const
     {
-        return theType < rhs.getType();
+      return theType < rhs.getType();
     }
 
     bool operator<( const Type rhs ) const
     {
-        return theType < rhs;
+      return theType < rhs;
     }
 
     bool operator==( EntityTypeCref rhs ) const
     {
-        return theType == rhs.getType();
+      return theType == rhs.getType();
     }
 
     bool operator==( const Type rhs ) const
     {
-        return theType == rhs;
+      return theType == rhs;
     }
 
 
-    static const String entityTypeStringOfNone;
+    static StringCref  EntityTypeStringOfNone();
 
-    static const String entityTypeStringOfEntity;
+    static StringCref  EntityTypeStringOfEntity();
 
-    static const String entityTypeStringOfProcess;
+    static StringCref  EntityTypeStringOfProcess();
     
-    static const String entityTypeStringOfVariable;
+    static StringCref  EntityTypeStringOfVariable();
     
-    static const String entityTypeStringOfSystem;
+    static StringCref  EntityTypeStringOfSystem();
 
-private:
+  private:
 
     Type theType;
-};
+
+  };
+
+  /*@}*/
 
 } // namespace libecs
+
 
 #endif /* __ENTITYTYPE_HPP */

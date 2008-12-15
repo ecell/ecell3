@@ -29,24 +29,39 @@
 #if !defined(__LOGGERADAPTER_HPP)
 #define __LOGGERADAPTER_HPP
 
-#include "libecs/Defs.hpp"
+#include "libecs.hpp"
 
 namespace libecs
 {
+  /**@addtogroup logging The Data Logging Module.
+      The Data Logging Module.
 
-class LIBECS_API LoggerAdapter
-{
-public:
+      @ingroup libecs
+      @{ 
+  */ 
+
+  /** @file */
+
+  class LIBECS_API LoggerAdapter
+  {
+
+  public:
 
     virtual ~LoggerAdapter();
 
     virtual const Real getValue() const = 0;
 
-protected:
+  protected:
 
     LoggerAdapter();
-};
+
+  };
+
+
+  /** @} */ // logging module
 
 } // namespace libecs
 
+
 #endif /* __LOGGERADAPTER_HPP */
+

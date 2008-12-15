@@ -57,7 +57,7 @@ class DigitalWindow( OsogoPluginWindow ):
         
 		aFullPNString = createFullPNString( self.theFullPN() )
 		aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
-		if not operator.isNumberType( aValue ):
+		if operator.isNumberType( aValue ) == FALSE:
 			aMessage = "Error: (%s) is not numerical data" %aFullPNString
 			self.thePluginManager.printMessage( aMessage )
 			aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,'Error!')
@@ -84,13 +84,13 @@ class DigitalWindow( OsogoPluginWindow ):
 
 		aString = str( self.theFullPN()[ID] )
 		aString += ':\n' + str( self.theFullPN()[PROPERTY] )
-		self[ "id_label" ].set_text( aString )
+		self["id_label"].set_text( aString )
 
 		# If this property is not settable, sets unsensitive TextEntry and Buttons.
-		if not anAttribute[ SETTABLE ]:
-			self[ "value_frame"     ].set_editable( False )
-			self[ "increase_button" ].set_sensitive( False )
-			self[ "decrease_button" ].set_sensitive( False )
+		if anAttribute[SETTABLE] == FALSE:
+			self["value_frame"].set_editable( FALSE )
+			self["increase_button"].set_sensitive( FALSE )
+			self["decrease_button"].set_sensitive( FALSE )
                 self.setIconList(
 			os.path.join( config.GLADEFILE_PATH, "ecell.png" ),
 			os.path.join( config.GLADEFILE_PATH, "ecell32.png" ) )

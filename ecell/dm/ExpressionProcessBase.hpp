@@ -125,16 +125,7 @@ LIBECS_DM_CLASS( ExpressionProcessBase, Process )
   void defaultSetProperty( StringCref aPropertyName,
 			   PolymorphCref aValue )
     {
-      PropertyMapIterator i( thePropertyMap.find( aPropertyName ) );
-      if ( i == thePropertyMap.end() )
-	{
-	  thePropertyList.push_back( aPropertyName );
-	  thePropertyMap.insert( std::make_pair( aPropertyName, aValue.asReal() ) );
-	}
-      else
-	{
-	  i->second = aValue.asReal();
-	}
+      thePropertyMap[ aPropertyName ] = aValue.asReal();
     } 
 
   const Polymorph defaultGetProperty( StringCref aPropertyName ) const
@@ -148,22 +139,40 @@ LIBECS_DM_CLASS( ExpressionProcessBase, Process )
       }
     else
       {
-	THROW_EXCEPTION( NoSlot, getClassName() +
+	THROW_EXCEPTION( NoSlot, getClassNameString() +
 			 " : Property [" + aPropertyName +
 			 "] is not defined " );
       }
   }
 
-  const StringVector& defaultGetPropertyList() const
+  const Polymorph defaultGetPropertyList() const
     {
-      return thePropertyList;
+      PolymorphVector aVector;
+
+      for( PropertyMapConstIterator
+	     aPropertyMapIterator( thePropertyMap.begin() );
+	   aPropertyMapIterator != thePropertyMap.end();
+	   ++aPropertyMapIterator )
+	{
+	  aVector.push_back( aPropertyMapIterator->first );
+	}
+
+      return aVector;
     }
   
-  const PropertyAttributes
+  const Polymorph 
     defaultGetPropertyAttributes( StringCref aPropertyName ) const
     {
-      return PropertyAttributes( PropertySlotBase::REAL,
-				 true, true, true, true, true );
+      PolymorphVector aVector;
+      
+      Integer aPropertyFlag( 1 );
+      
+      aVector.push_back( aPropertyFlag ); // isSetable
+      aVector.push_back( aPropertyFlag ); // isGetable
+      aVector.push_back( aPropertyFlag ); // isLoadable
+      aVector.push_back( aPropertyFlag ); // isSavable
+      
+      return aVector;
     }
 
 
@@ -211,8 +220,6 @@ LIBECS_DM_CLASS( ExpressionProcessBase, Process )
   bool theRecompileFlag;
 
   PropertyMap thePropertyMap;
-
-  StringVector thePropertyList;
 };
 
 

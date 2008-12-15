@@ -8,7 +8,7 @@ if BUILD_API_REF_html
 _htmldir = $(htmldir)/api
 _html_DATA = api/*
 
-api/index.html: ecell3.doxy
+api/*: ecell3.doxy
 	doxygen ecell3.doxy
 
 clean-local:

@@ -28,7 +28,6 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
-
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -37,23 +36,34 @@
 
 #include "PassiveStepper.hpp"
 
+
 namespace libecs
 {
 
-LIBECS_DM_INIT_STATIC( PassiveStepper, Stepper );
+  LIBECS_DM_INIT_STATIC( PassiveStepper, Stepper );
 
-PassiveStepper::PassiveStepper()
-{
+  PassiveStepper::PassiveStepper()
+  {
     // gcc3 doesn't currently support numeric_limits::infinity.
     // using max() instead.
-    const Real anInfinity( std::numeric_limits<Real>::infinity() );
+      const Real anInfinity( std::numeric_limits<Real>::infinity() );
     setStepInterval( anInfinity );
-}
+  }
 
-void PassiveStepper::initialize()
-{
+  void PassiveStepper::initialize()
+  {
     Stepper::initialize();
-}
+  }
 
 
 } // namespace libecs
+
+
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/
+

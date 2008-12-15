@@ -36,68 +36,59 @@
 #include "FullID.hpp"
 
 #include "Entity.hpp"
-#include "Model.hpp"
+
 
 namespace libecs
 {
 
-LIBECS_DM_INIT_STATIC( Entity, Entity );
-
-Entity::Entity()
-    : theSuperSystem( NULLPTR ),
-      theID( "" ),
-      theName( "" ),
-      theLoggerMap( NULLPTR )
-{
-
-}
+  LIBECS_DM_INIT_STATIC( Entity, Entity );
 
 
-Entity::~Entity()
-{
+  Entity::Entity()
+    : 
+    theSuperSystem( NULLPTR ),
+    theID( "" ),
+    theName( "" ) 
+  {
+
+  }
+
+
+  Entity::~Entity()
+  {
     ; // do nothing
-}
+  }
 
-const FullID Entity::getFullID() const
-{
+  const FullID Entity::getFullID() const
+  {
     return FullID( getEntityType(), getSystemPath(), getID() );
-}
+  }
 
-const String Entity::getFullIDString() const
-{
+  const String Entity::getFullIDString() const
+  {
     return getFullID().getString();
-}
+  }
 
-const SystemPath Entity::getSystemPath() const
-{
+  const SystemPath Entity::getSystemPath() const
+  {
     SystemPtr aSystemPtr( getSuperSystem() );
 
     if( aSystemPtr == NULLPTR )
-    {
-        return SystemPath();
-    }
+      {
+	return SystemPath();
+      }
 
     SystemPath aSystemPath( aSystemPtr->getSystemPath() );
     aSystemPath.push_back( aSystemPtr->getID() );
     return aSystemPath;
-}
-
-LoggerBroker::LoggersPerFullID
-Entity::getLoggers() const
-{
-    LoggerBroker::PerFullIDMap* aLoggerMap(
-        theLoggerMap ? theLoggerMap:
-            &getModel()->getLoggerBroker().theEmptyPerFullIDMap );
-    return LoggerBroker::LoggersPerFullID(
-        LoggerBroker::PerFullIDLoggerIterator(
-            aLoggerMap->begin(),
-            SelectSecond< LoggerBroker::PerFullIDMap::value_type >() ),
-        LoggerBroker::PerFullIDLoggerIterator(
-            aLoggerMap->end(),
-            SelectSecond< LoggerBroker::PerFullIDMap::value_type >() )
-    );
-    // return getModel()->getLoggerBroker().getLoggersByFullID( getFullID() );
-}
-
+  }
 
 } // namespace libecs
+
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/

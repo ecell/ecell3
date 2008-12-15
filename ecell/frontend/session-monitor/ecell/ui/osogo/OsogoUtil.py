@@ -56,7 +56,7 @@ MULTIPLE = 1
 # ----------------------------------------------------------------------
 def decodeAttribute(anAttribute):
 
-	if anAttribute:
+	if anAttribute == TRUE:
 		return '+'
 	else:
 		return '-'

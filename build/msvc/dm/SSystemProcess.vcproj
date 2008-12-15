@@ -356,6 +356,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 		</Filter>
+		<Filter
+			Name="Descriptor Files"
+			>
+			<File
+				RelativePath="..\..\..\ecell\dm\SSystemProcess.desc"
+				DeploymentContent="true"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

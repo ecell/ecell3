@@ -293,339 +293,303 @@
 			Name="Resource Files"
 			>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\AboutSessionMonitor.glade"
+				RelativePath="..\..\ecell\session-monitor\AboutSessionMonitor.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\board.glade"
+				RelativePath="..\..\ecell\session-monitor\board.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\BoardWindow.glade"
+				RelativePath="..\..\ecell\session-monitor\BoardWindow.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\ecell.png"
+				RelativePath="..\..\ecell\session-monitor\ecell.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\ecell32-1.png"
+				RelativePath="..\..\ecell\session-monitor\ecell32-1.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\ecell32-2.png"
+				RelativePath="..\..\ecell\session-monitor\ecell32-2.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\ecell32-3.png"
+				RelativePath="..\..\ecell\session-monitor\ecell32-3.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\ecell32-4.png"
+				RelativePath="..\..\ecell\session-monitor\ecell32-4.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\ecell32-5.png"
+				RelativePath="..\..\ecell\session-monitor\ecell32-5.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\ecell32-6.png"
+				RelativePath="..\..\ecell\session-monitor\ecell32-6.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\ecell32-7.png"
+				RelativePath="..\..\ecell\session-monitor\ecell32-7.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\ecell32-8.png"
+				RelativePath="..\..\ecell\session-monitor\ecell32-8.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\ecell32.png"
+				RelativePath="..\..\ecell\session-monitor\ecell32.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\ecell_large.png"
+				RelativePath="..\..\ecell\session-monitor\ecell_large.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\EntityListWindow.glade"
+				RelativePath="..\..\ecell\session-monitor\EntityListWindow.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\FullPNQueue.glade"
+				RelativePath="..\..\ecell\session-monitor\FullPNQueue.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\icon_board.png"
+				RelativePath="..\..\ecell\session-monitor\icon_board.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\icon_ecell.png"
+				RelativePath="..\..\ecell\session-monitor\icon_ecell.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\icon_entity.png"
+				RelativePath="..\..\ecell\session-monitor\icon_entity.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\icon_interface.png"
+				RelativePath="..\..\ecell\session-monitor\icon_interface.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\icon_logger.png"
+				RelativePath="..\..\ecell\session-monitor\icon_logger.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\icon_message.png"
+				RelativePath="..\..\ecell\session-monitor\icon_message.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\icon_start.png"
+				RelativePath="..\..\ecell\session-monitor\icon_start.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\icon_step.png"
+				RelativePath="..\..\ecell\session-monitor\icon_step.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\icon_stepper.png"
+				RelativePath="..\..\ecell\session-monitor\icon_stepper.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\icon_stop.png"
+				RelativePath="..\..\ecell\session-monitor\icon_stop.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\InterfaceWindow.glade"
+				RelativePath="..\..\ecell\session-monitor\InterfaceWindow.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\LoggerWindow.glade"
+				RelativePath="..\..\ecell\session-monitor\LoggerWindow.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\LoggingPolicy.glade"
+				RelativePath="..\..\ecell\session-monitor\LoggingPolicy.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\MainWindow.glade"
+				RelativePath="..\..\ecell\session-monitor\MainWindow.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\MessageWindow.glade"
+				RelativePath="..\..\ecell\session-monitor\MessageWindow.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\PluginInstanceSelection.glade"
+				RelativePath="..\..\ecell\session-monitor\PluginInstanceSelection.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\PluginWindowPopupMenu.glade"
+				RelativePath="..\..\ecell\session-monitor\PluginWindowPopupMenu.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\StepperWindow.glade"
+				RelativePath="..\..\ecell\session-monitor\StepperWindow.glade"
 				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Script Files"
 			>
-			<Filter
-				Name="ecell"
+			<File
+				RelativePath="..\..\ecell\session-monitor\AboutSessionMonitor.py"
 				>
-				<Filter
-					Name="ui"
-					>
-					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\__init__.py"
-						>
-					</File>
-					<Filter
-						Name="osogo"
-						>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\__init__.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\AboutSessionMonitor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\BoardWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\config.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\ConfirmWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\DataGenerator.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\EntityListWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\FullPNQueue.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\GtkSessionMonitor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\InterfaceWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\LoggerFactory.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\LoggerWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\LoggingPolicy.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\main.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\MainWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\MessageWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\ModelWalker.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\opengui.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\OsogoPluginManager.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\OsogoPluginWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\OsogoUtil.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\OsogoWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\Plot.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\PluginInstanceSelection.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\PluginWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\StepperWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\VariableReferenceEditor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\ViewWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\session-monitor\ecell\ui\osogo\Window.py"
-							>
-						</File>
-					</Filter>
-				</Filter>
-			</Filter>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\BoardWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\config.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\ConfirmWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\DataGenerator.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\EntityListWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\FullPNQueue.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\InterfaceWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\LoggerFactory.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\LoggerWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\LoggingPolicy.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\main.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\MainWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\MessageWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\opengui.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\OsogoPluginManager.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\OsogoPluginWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\OsogoUtil.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\OsogoWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\Plot.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\PluginInstanceSelection.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\StepperWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\VariableReferenceEditor.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\session-monitor\ViewWindow.py"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Plugins"
 			>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\plugins\blue.xpm"
+				RelativePath="..\..\ecell\session-monitor\plugins\blue.xpm"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\plugins\brown.xpm"
+				RelativePath="..\..\ecell\session-monitor\plugins\brown.xpm"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\plugins\ecell.ico"
+				RelativePath="..\..\ecell\session-monitor\plugins\ecell.ico"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\plugins\green.xpm"
+				RelativePath="..\..\ecell\session-monitor\plugins\green.xpm"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\plugins\icon_down.xpm"
+				RelativePath="..\..\ecell\session-monitor\plugins\icon_down.xpm"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\plugins\icon_down_small.xpm"
+				RelativePath="..\..\ecell\session-monitor\plugins\icon_down_small.xpm"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\plugins\icon_left_small.xpm"
+				RelativePath="..\..\ecell\session-monitor\plugins\icon_left_small.xpm"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\plugins\icon_right_small.xpm"
+				RelativePath="..\..\ecell\session-monitor\plugins\icon_right_small.xpm"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\plugins\icon_up.xpm"
+				RelativePath="..\..\ecell\session-monitor\plugins\icon_up.xpm"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\plugins\icon_up_small.xpm"
+				RelativePath="..\..\ecell\session-monitor\plugins\icon_up_small.xpm"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\plugins\Makefile.am"
+				RelativePath="..\..\ecell\session-monitor\plugins\Makefile.am"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\plugins\navy.xpm"
+				RelativePath="..\..\ecell\session-monitor\plugins\navy.xpm"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\plugins\orange.xpm"
+				RelativePath="..\..\ecell\session-monitor\plugins\orange.xpm"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\plugins\purple.xpm"
+				RelativePath="..\..\ecell\session-monitor\plugins\purple.xpm"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\session-monitor\plugins\red.xpm"
+				RelativePath="..\..\ecell\session-monitor\plugins\red.xpm"
 				>
 			</File>
 			<Filter
@@ -635,11 +599,11 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\BargraphWindow.glade"
+						RelativePath="..\..\ecell\session-monitor\plugins\BargraphWindow.glade"
 						>
 					</File>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\BargraphWindow.xpm"
+						RelativePath="..\..\ecell\session-monitor\plugins\BargraphWindow.xpm"
 						>
 					</File>
 				</Filter>
@@ -647,7 +611,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\BargraphWindow.py"
+						RelativePath="..\..\ecell\session-monitor\plugins\BargraphWindow.py"
 						>
 					</File>
 				</Filter>
@@ -659,7 +623,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\DigitalWindow.py"
+						RelativePath="..\..\ecell\session-monitor\plugins\DigitalWindow.py"
 						>
 					</File>
 				</Filter>
@@ -667,11 +631,11 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\DigitalWindow.glade"
+						RelativePath="..\..\ecell\session-monitor\plugins\DigitalWindow.glade"
 						>
 					</File>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\DigitalWindow.xpm"
+						RelativePath="..\..\ecell\session-monitor\plugins\DigitalWindow.xpm"
 						>
 					</File>
 				</Filter>
@@ -683,35 +647,35 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\bluesq.xpm"
+						RelativePath="..\..\ecell\session-monitor\plugins\bluesq.xpm"
 						>
 					</File>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\brownsq.xpm"
+						RelativePath="..\..\ecell\session-monitor\plugins\brownsq.xpm"
 						>
 					</File>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\greensq.xpm"
+						RelativePath="..\..\ecell\session-monitor\plugins\greensq.xpm"
 						>
 					</File>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\InputWindow.glade"
+						RelativePath="..\..\ecell\session-monitor\plugins\InputWindow.glade"
 						>
 					</File>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\navysq.xpm"
+						RelativePath="..\..\ecell\session-monitor\plugins\navysq.xpm"
 						>
 					</File>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\orangesq.xpm"
+						RelativePath="..\..\ecell\session-monitor\plugins\orangesq.xpm"
 						>
 					</File>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\purplesq.xpm"
+						RelativePath="..\..\ecell\session-monitor\plugins\purplesq.xpm"
 						>
 					</File>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\redsq.xpm"
+						RelativePath="..\..\ecell\session-monitor\plugins\redsq.xpm"
 						>
 					</File>
 				</Filter>
@@ -727,7 +691,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\PropertyWindow.py"
+						RelativePath="..\..\ecell\session-monitor\plugins\PropertyWindow.py"
 						>
 					</File>
 				</Filter>
@@ -735,11 +699,11 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\PropertyWindow.glade"
+						RelativePath="..\..\ecell\session-monitor\plugins\PropertyWindow.glade"
 						>
 					</File>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\PropertyWindow.xpm"
+						RelativePath="..\..\ecell\session-monitor\plugins\PropertyWindow.xpm"
 						>
 					</File>
 				</Filter>
@@ -751,7 +715,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\TracerWindow.py"
+						RelativePath="..\..\ecell\session-monitor\plugins\TracerWindow.py"
 						>
 					</File>
 				</Filter>
@@ -759,11 +723,11 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\TracerWindow.glade"
+						RelativePath="..\..\ecell\session-monitor\plugins\TracerWindow.glade"
 						>
 					</File>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\TracerWindow.xpm"
+						RelativePath="..\..\ecell\session-monitor\plugins\TracerWindow.xpm"
 						>
 					</File>
 				</Filter>
@@ -775,7 +739,7 @@
 					Name="Script FIles"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\VariableWindow.py"
+						RelativePath="..\..\ecell\session-monitor\plugins\VariableWindow.py"
 						>
 					</File>
 				</Filter>
@@ -783,67 +747,27 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\VariableWindow.glade"
+						RelativePath="..\..\ecell\session-monitor\plugins\VariableWindow.glade"
 						>
 					</File>
 					<File
-						RelativePath="..\..\ecell\frontend\session-monitor\plugins\VariableWindow.xpm"
+						RelativePath="..\..\ecell\session-monitor\plugins\VariableWindow.xpm"
 						>
 					</File>
 				</Filter>
 			</Filter>
 		</Filter>
 		<File
-			RelativePath="..\..\ecell\frontend\session-monitor\ecell3-session-monitor"
+			RelativePath="..\..\ecell\session-monitor\ecell3-session-monitor"
 			>
 		</File>
 		<File
-			RelativePath="..\..\ecell\frontend\session-monitor\osogo.ini"
+			RelativePath="..\..\ecell\session-monitor\gecell"
 			>
 		</File>
 		<File
-			RelativePath="..\..\ecell\frontend\session-monitor\setup.py"
+			RelativePath="..\..\ecell\session-monitor\osogo.ini"
 			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\frontend\session-monitor&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET PYTHONPATH=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib\site-packages;$(ProjectDir)..\..\ecell\pyecell;%PYTHONPATH%&#x0D;&#x0A;SET INCLTDL=/I$(SolutionDir)\..\..\libltdl&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB);%LIB%&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(ProjectDir)..\..\ecell\frontend\session-monitor\setup.py&quot; build -g -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
-					Outputs="$(OutDir)\$(ProjectName).stamp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|x64"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\frontend\session-monitor&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET PYTHONPATH=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib\site-packages;$(ProjectDir)..\..\ecell\pyecell;%PYTHONPATH%&#x0D;&#x0A;SET INCLTDL=/I$(SolutionDir)\..\..\libltdl&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB);%LIB%;%LIB64%&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(ProjectDir)..\..\ecell\frontend\session-monitor\setup.py&quot; build -g -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
-					Outputs="$(OutDir)\$(ProjectName).stamp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\frontend\session-monitor&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET PYTHONPATH=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib\site-packages;$(ProjectDir)..\..\ecell\pyecell;%PYTHONPATH%&#x0D;&#x0A;SET INCLTDL=/I$(SolutionDir)\..\..\libltdl&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB);%LIB%&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(ProjectDir)..\..\ecell\frontend\session-monitor\setup.py&quot; build -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
-					Outputs="$(OutDir)\$(ProjectName).stamp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|x64"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\frontend\session-monitor&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET PYTHONPATH=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib\site-packages;$(ProjectDir)..\..\ecell\pyecell;%PYTHONPATH%&#x0D;&#x0A;SET INCLTDL=/I$(SolutionDir)\..\..\libltdl&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB);%LIB%;%LIB64%&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(ProjectDir)..\..\ecell\frontend\session-monitor\setup.py&quot; build -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
-					Outputs="$(OutDir)\$(ProjectName).stamp"
-				/>
-			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>

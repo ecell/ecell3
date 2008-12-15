@@ -107,7 +107,6 @@ BuildHelper.prototype = {
         WScript.Echo("Creating launcher script " + script_file_name);
         var scr = '';
         scr += '@ECHO OFF\n';
-        scr += 'SETLOCAL\n';
         scr += 'SET PWD=%~dp0\n';
         scr += 'IF "%ECELL_HOME%" == "" SET ECELL_HOME=%PWD%\\..\n';
         scr += 'SET PYTHONPATH=%PYTHONPATH%;%ECELL_HOME%\\lib\\site-packages\n';
@@ -385,7 +384,7 @@ BuildHelper.ArgsParser.prototype = {
                         opt_name = tmp[1];
                         if (this.long_opt_map[opt_name] === undefined)
                             return 'Unknown option --' + opt_name;
-                        opt = this.long_opt_map[opt_name];
+                        opt = long_opt_map[opt_name];
                         if (tmp[2] !== undefined) {
                             switch (opt.operand) {
                             case 0:

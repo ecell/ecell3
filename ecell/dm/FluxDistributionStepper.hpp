@@ -52,10 +52,8 @@
 #include "Interpolant.hpp"
 #include "libecs/Stepper.hpp"
 #include "libecs/DifferentialStepper.hpp"
-
-#define DM_IMPORTS
 #include "QuasiDynamicFluxProcess.hpp"
-#undef DM_IMPORTS
+
 
 USE_LIBECS;
 

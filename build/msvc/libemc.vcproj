@@ -361,6 +361,10 @@
 				RelativePath="..\..\ecell\libemc\SimulatorImplementation.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\ecell\libemc\SimulatorMaker.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -381,6 +385,10 @@
 			</File>
 			<File
 				RelativePath="..\..\ecell\libemc\SimulatorImplementation.hpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\libemc\SimulatorMaker.hpp"
 				>
 			</File>
 		</Filter>

@@ -110,6 +110,8 @@ Configurations:
 '''% { 'appname': aProgramName, 'pathsep': os.pathsep }
 
 def main():
+    ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
+
     # -------------------------------------
     # initialize file names
     # -------------------------------------
@@ -138,7 +140,7 @@ def main():
     # gets options
     # -------------------------------------
     try:
-        opts, args = getopt.gnu_getopt(
+        opts, args = getopt.getopt(
             sys.argv[ 1: ] , 'he:f:D:',
             [ "parameters=", "help", "exec=", "file=" ] )
     except:
@@ -209,8 +211,6 @@ def main():
                 
             
     aSimulator = ecell.emc.Simulator()
-    aSimulator.setDMSearchPath( aSimulator.DMSearchPathSeparator.join( ecell.config.dm_path ) )
-
     aSession = Session( aSimulator )
 
     aConsole = Console( aSession, 

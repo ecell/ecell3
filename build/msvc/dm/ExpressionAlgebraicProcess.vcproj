@@ -364,6 +364,15 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Descriptor Files"
+			>
+			<File
+				RelativePath="..\..\..\ecell\dm\ExpressionAlgebraicProcess.desc"
+				DeploymentContent="true"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

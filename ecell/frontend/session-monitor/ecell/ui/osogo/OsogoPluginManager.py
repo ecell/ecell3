@@ -120,15 +120,16 @@ class OsogoPluginManager(PluginManager):
             instance.openWindow()
 
             #try:
-            if parent.__class__.__name__ == 'EntityListWindow':
-                self.thePropertyWindowOnEntityListWindows[ instance ] = None
-            else:
-                instance.editTitle( title )
-                self.thePluginTitleDict[ instance ] = title
-                self.theInstanceList.append( instance )
-            # initializes session
-            #self.theSession.theSimulator.initialize()
-            self.updateFundamentalWindows()
+            if TRUE:
+                if parent.__class__.__name__ == 'EntityListWindow':
+                    self.thePropertyWindowOnEntityListWindows[ instance ] = None
+                else:
+                    instance.editTitle( title )
+                    self.thePluginTitleDict[ instance ] = title
+                    self.theInstanceList.append( instance )
+                # initializes session
+                #self.theSession.theSimulator.initialize()
+                self.updateFundamentalWindows()
             #except:
             #    pass
 

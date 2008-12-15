@@ -31,7 +31,6 @@
 // modified by Masayuki Okayama <smash@e-cell.org>,
 // E-Cell Project.
 //
-
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -41,30 +40,58 @@
 namespace libecs
 {
 
-void PropertyInterfaceBase::throwNoSlot( StringCref aPropertyName ) const
-{
+  void PropertyInterfaceBase::throwNoSlot( StringCref aClassName, 
+					   StringCref aPropertyName )
+  {
     THROW_EXCEPTION( NoSlot,
-                     getClassName() + 
-                     String( " has no [" ) +
-                     aPropertyName + String( "] property.\n" ) );                    
-}
+		     aClassName + 
+		     String( " has no [" ) +
+		     aPropertyName + String( "] property.\n" ) );	  
+  }
 
-
-void PropertyInterfaceBase::throwNotLoadable( StringCref aPropertyName ) const
-{
+  void PropertyInterfaceBase::throwNotLoadable( PropertiedClassCref anObject,
+						StringCref aPropertyName )
+  {
     THROW_EXCEPTION( NoSlot,
-                                     getClassName() + 
-                                     String( ": property [" ) +
-                                     aPropertyName + String( "] is not loadable.\n" ) );
-}
+		     anObject.getClassNameString() + 
+		     String( ": property [" ) +
+		     aPropertyName + String( "] is not loadable.\n" ) );
+  }
 
-
-void PropertyInterfaceBase::throwNotSavable( StringCref aPropertyName ) const
-{
+  void PropertyInterfaceBase::throwNotSavable( PropertiedClassCref anObject,
+					       StringCref aPropertyName )
+  {
     THROW_EXCEPTION( NoSlot,
-                                     getClassName() + 
-                                     String( ": property [" ) +
-                                     aPropertyName + String( "] is not savable.\n" ) );
-}
+		     anObject.getClassNameString() + 
+		     String( ": property [" ) +
+		     aPropertyName + String( "] is not savable.\n" ) );
+  }
+
+
+  /*
+  void PropertyInterfaceBase::setInfoField( StringMapRef anInfoMap,
+					    StringCref aFieldName, 
+					    StringCref anInfoString )
+  {
+    anInfoMap[ aFieldName ] = anInfoString;
+
+    //    anInfoMap.insert( std::make_pair( aFieldName, anInfoString ) );
+  }
+
+  const Polymorph 
+  PropertyInterfaceBase::convertInfoMapToPolymorph( StringMap const& anInfoMap )
+  {
+    return convertStringMapToPolymorph( anInfoMap );
+  }
+  */
 
 } // namespace libecs
+
+
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/

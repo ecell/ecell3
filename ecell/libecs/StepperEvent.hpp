@@ -32,140 +32,160 @@
 #ifndef __STEPPEREVENT_HPP
 #define __STEPPEREVENT_HPP
 
-#include "libecs/Defs.hpp"
-#include "libecs/Stepper.hpp"
+#include "libecs.hpp"
+#include "Stepper.hpp"
+
 
 namespace libecs
 {
 
-DECLARE_CLASS( StepperEvent );
+  /** @file */
 
-class StepperEvent: public EventBase
-{
-public:
+  DECLARE_CLASS( StepperEvent );
+
+  class StepperEvent
+    :
+    public EventBase
+  {
+
+
+  public:
+
     StepperEvent( TimeParam aTime, StepperPtr aStepperPtr )
-        : EventBase( aTime ),
-          theStepper( aStepperPtr )
+      :
+      EventBase( aTime ),
+      theStepper( aStepperPtr )
     {
-        ; // do nothing
+      ; // do nothing
     }
 
 
     void fire()
     {
-        theStepper->integrate( getTime() );
-        theStepper->step();
-        theStepper->log();
+      theStepper->integrate( getTime() );
+      theStepper->step();
+      theStepper->log();
 
-        reschedule();
+      reschedule();
     }
-
 
     void update( TimeParam aTime )
     {
-        theStepper->interrupt( aTime );
+      theStepper->interrupt( aTime );
 
-        reschedule();
+      reschedule();
     }
-
 
     void reschedule()
     {
-        const Time aLocalTime( theStepper->getCurrentTime() );
-        const Time aNewStepInterval( theStepper->getStepInterval() );
-        setTime( aNewStepInterval + aLocalTime );
+      const Time aLocalTime( theStepper->getCurrentTime() );
+      const Time aNewStepInterval( theStepper->getStepInterval() );
+      setTime( aNewStepInterval + aLocalTime );
     }
-
 
     const bool isDependentOn( StepperEventCref anEvent ) const
     {
-        return theStepper->isDependentOn( anEvent.getStepper() );
+      return theStepper->isDependentOn( anEvent.getStepper() );
     }
 
 
     const StepperPtr getStepper() const
     {
-        return theStepper;
+      return theStepper;
     }
 
 
-    /**
-       this method is basically used in initializing and rescheduling 
-       in the Scheduler to determine if goUp()/goDown (position change) is
-       needed 
-     */
+    // this method is basically used in initializing and rescheduling 
+    // in the Scheduler to determine if
+    // goUp()/goDown (position change) is needed 
     const bool operator< ( StepperEventCref rhs ) const
     {
-        if( getTime() > rhs.getTime() )
-        {
-            return false;
-        }
-        if( getTime() < rhs.getTime() )
-        {
-            return true;
-        }
-        if( theStepper->getPriority() < rhs.getStepper()->getPriority() )
-        {
-            return true;
-        }
-        return false;
+      if( getTime() > rhs.getTime() )
+	{
+	  return false;
+	}
+      if( getTime() < rhs.getTime() )
+	{
+	  return true;
+	}
+      if( theStepper->getPriority() < rhs.getStepper()->getPriority() )
+	{
+	  return true;
+	}
+      return false;
     }
-
 
     const bool operator> ( StepperEventCref rhs ) const
     {
-        if( getTime() < rhs.getTime() )
-        {
-            return false;
-        }
-        if( getTime() > rhs.getTime() )
-        {
-            return true;
-        }
-        if( theStepper->getPriority() > rhs.getStepper()->getPriority() )
-        {
-            return true;
-        }
-        return false;
+      if( getTime() < rhs.getTime() )
+	{
+	  return false;
+	}
+      if( getTime() > rhs.getTime() )
+	{
+	  return true;
+	}
+      if( theStepper->getPriority() > rhs.getStepper()->getPriority() )
+	{
+	  return true;
+	}
+      return false;
     }
-
 
     const bool operator<= ( StepperEventCref rhs ) const
     {
-        return !( *this > rhs );
+      return !( *this > rhs );
     }
 
     const bool operator>= ( StepperEventCref rhs ) const
     {
-        return !( *this < rhs );
+      return !( *this < rhs );
     }
 
     const bool operator!= ( StepperEventCref rhs ) const
     {
-        if( getStepper() == rhs.getStepper() &&
-                getTime() == rhs.getTime() )
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+      if( getStepper() == rhs.getStepper() &&
+	  getTime() == rhs.getTime() )
+	{
+	  return false;
+	}
+      else
+	{
+	  return true;
+	}
     }
 
 
     // dummy, because DynamicPriorityQueue requires this. better without.
     StepperEvent()
     {
-        ; // do nothing
+      ; // do nothing
     }
 
 
-private:
+  private:
 
     StepperPtr theStepper;
 
-};
+  };
+
+
+
 } // namespace libecs
 
+
+
+
 #endif /* __STEPPEREVENT_HPP */
+
+
+
+
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/
+

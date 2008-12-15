@@ -293,509 +293,497 @@
 			Name="Resource Files"
 			>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\AboutModelEditor.glade"
+				RelativePath="..\..\ecell\model-editor\glade\AboutModelEditor.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\AutosaveWindow.glade"
+				RelativePath="..\..\ecell\model-editor\glade\AutosaveWindow.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\ClassEditor.glade"
+				RelativePath="..\..\ecell\model-editor\glade\ClassEditor.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\ClassEditorWindow.glade"
+				RelativePath="..\..\ecell\model-editor\glade\ClassEditorWindow.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\ConnectionObjectEditorWindow.glade"
+				RelativePath="..\..\ecell\model-editor\glade\ConnectionObjectEditorWindow.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\DialogWindow.glade"
+				RelativePath="..\..\ecell\model-editor\glade\DialogWindow.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\EntityListTab.glade"
+				RelativePath="..\..\ecell\model-editor\glade\EntityListTab.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\FullIDChooser.glade"
+				RelativePath="..\..\ecell\model-editor\glade\FullIDChooser.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\FullPNList.glade"
+				RelativePath="..\..\ecell\model-editor\glade\FullPNList.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_custom.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_custom.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_design.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_design.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_entity.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_entity.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_layoutmanager.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_layoutmanager.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_modeleditor.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_modeleditor.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_pathway.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_pathway.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_process.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_process.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_run.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_run.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_selector.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_selector.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_start.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_start.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_step.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_step.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_stepper.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_stepper.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_stop.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_stop.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_system.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_system.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_textbox.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_textbox.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\icon_variable.png"
+				RelativePath="..\..\ecell\model-editor\glade\icon_variable.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\LayoutManagerWindow.glade"
+				RelativePath="..\..\ecell\model-editor\glade\LayoutManagerWindow.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\LinePropertyComponent.glade"
+				RelativePath="..\..\ecell\model-editor\glade\LinePropertyComponent.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\ListComponent.glade"
+				RelativePath="..\..\ecell\model-editor\glade\ListComponent.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\Makefile"
+				RelativePath="..\..\ecell\model-editor\glade\Makefile"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\Makefile.am"
+				RelativePath="..\..\ecell\model-editor\glade\Makefile.am"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\Makefile.in"
+				RelativePath="..\..\ecell\model-editor\glade\Makefile.in"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\MEMainWindow.glade"
+				RelativePath="..\..\ecell\model-editor\glade\MEMainWindow.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\modeleditor.ico"
+				RelativePath="..\..\ecell\model-editor\glade\modeleditor.ico"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\modeleditor.png"
+				RelativePath="..\..\ecell\model-editor\glade\modeleditor.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\modeleditor32.png"
+				RelativePath="..\..\ecell\model-editor\glade\modeleditor32.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\modeleditor_large.png"
+				RelativePath="..\..\ecell\model-editor\glade\modeleditor_large.png"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\MultiLineEditor.glade"
+				RelativePath="..\..\ecell\model-editor\glade\MultiLineEditor.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\NestedListEditor.glade"
+				RelativePath="..\..\ecell\model-editor\glade\NestedListEditor.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\NewClassWindow.glade"
+				RelativePath="..\..\ecell\model-editor\glade\NewClassWindow.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\ObjectEditor.glade"
+				RelativePath="..\..\ecell\model-editor\glade\ObjectEditor.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\PathwayEditor.glade"
+				RelativePath="..\..\ecell\model-editor\glade\PathwayEditor.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\ShapePropertyComponent.glade"
+				RelativePath="..\..\ecell\model-editor\glade\ShapePropertyComponent.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\StepperChooser.glade"
+				RelativePath="..\..\ecell\model-editor\glade\StepperChooser.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\StepperTab.glade"
+				RelativePath="..\..\ecell\model-editor\glade\StepperTab.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\ValidateWindow.glade"
+				RelativePath="..\..\ecell\model-editor\glade\ValidateWindow.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\VariableReferenceEditorComponent.glade"
+				RelativePath="..\..\ecell\model-editor\glade\VariableReferenceEditorComponent.glade"
 				>
 			</File>
 			<File
-				RelativePath="..\..\ecell\frontend\model-editor\glade\x.png"
+				RelativePath="..\..\ecell\model-editor\glade\x.png"
 				>
 			</File>
 		</Filter>
 		<Filter
 			Name="Script Files"
 			>
-			<Filter
-				Name="ecell"
+			<File
+				RelativePath="..\..\ecell\model-editor\AboutModelEditor.py"
 				>
-				<Filter
-					Name="ui"
-					>
-					<Filter
-						Name="model_editor"
-						>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\__init__.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\AboutModelEditor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\AutoLayout.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\AutosaveWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\Buffer.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\BufferFactory.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ClassEditor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ClassEditorWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ClassList.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ClassPropertyList.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\Clipboard.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\Command.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\CommandMultiplexer.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\CommandQueue.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ComplexLine.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ComplexShape.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\Config.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ConfirmWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ConnectionObject.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ConnectionObjectEditorWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\Constants.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\DMInfo.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\EditorObject.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\EntityCommand.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\EntityEditor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\EntityList.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\EntityListTab.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\Error.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\FullIDBrowserWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\GraphicalUtils.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\Layout.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\LayoutBuffer.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\LayoutBufferFactory.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\LayoutCommand.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\LayoutEml.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\LayoutManager.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\LayoutXML.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\LineDescriptor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\LinePropertyComponent.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\LinePropertyEditor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ListWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\MEMainWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\MEVariableReferenceEditor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ModelEditor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ModelStore.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\MultiLineEditor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\NestedListEditor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ObjectEditorWindow.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\opengui.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\PackingStrategy.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\PathwayCanvas.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\PathwayEditor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\PopupMenu.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ProcessObject.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\PropertyEditor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\PropertyList.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ResizeableText.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\RunTester.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\Runtime.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ShapeDescriptor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ShapePluginManager.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ShapePropertyComponent.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\StepperChooser.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\StepperCommand.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\StepperEditor.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\StepperList.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\StepperTab.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\SystemObject.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\SystemTree.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\TextObject.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\Utils.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\VariableObject.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\VariableReferenceEditorComponent.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\ViewComponent.py"
-							>
-						</File>
-						<File
-							RelativePath="..\..\ecell\frontend\model-editor\ecell\ui\model_editor\Window.py"
-							>
-						</File>
-					</Filter>
-				</Filter>
-			</Filter>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\AutoLayout.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\AutosaveWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\Buffer.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\BufferFactory.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ClassEditor.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ClassEditorWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ClassList.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ClassPropertyList.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\Clipboard.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\Command.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\CommandMultiplexer.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\CommandQueue.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ComplexLine.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ComplexShape.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\Config.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ConfirmWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ConnectionObject.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ConnectionObjectEditorWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\Constants.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\DMInfo.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\EditorObject.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\EntityCommand.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\EntityEditor.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\EntityList.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\EntityListTab.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\Error.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\FullIDBrowserWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\GraphicalUtils.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\Layout.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\LayoutBuffer.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\LayoutBufferFactory.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\LayoutCommand.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\LayoutEml.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\LayoutManager.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\LayoutXML.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\LineDescriptor.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\LinePropertyComponent.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\LinePropertyEditor.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ListWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\Makefile.am"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\MEMainWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\MEVariableReferenceEditor.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ModelEditor.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ModelStore.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\MultiLineEditor.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\NestedListEditor.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ObjectEditorWindow.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\opengui.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\PackingStrategy.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\PathwayCanvas.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\PathwayEditor.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\PopupMenu.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ProcessObject.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\PropertyEditor.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\PropertyList.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ResizeableText.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\RunTester.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\Runtime.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ShapeDescriptor.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ShapePluginManager.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ShapePropertyComponent.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\StepperChooser.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\StepperCommand.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\StepperEditor.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\StepperList.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\StepperTab.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\SystemObject.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\SystemTree.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\TextObject.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\Utils.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\VariableObject.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\VariableReferenceEditorComponent.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\ViewComponent.py"
+				>
+			</File>
+			<File
+				RelativePath="..\..\ecell\model-editor\Window.py"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Plugins"
@@ -807,7 +795,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\AminoAcidVariableSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\AminoAcidVariableSD.py"
 						>
 					</File>
 				</Filter>
@@ -815,7 +803,7 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\Amino.png"
+						RelativePath="..\..\ecell\model-editor\plugins\Amino.png"
 						>
 					</File>
 				</Filter>
@@ -827,7 +815,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\AnionVariableSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\AnionVariableSD.py"
 						>
 					</File>
 				</Filter>
@@ -835,7 +823,7 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\Anion.png"
+						RelativePath="..\..\ecell\model-editor\plugins\Anion.png"
 						>
 					</File>
 				</Filter>
@@ -847,7 +835,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\CarbohydrateVariableSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\CarbohydrateVariableSD.py"
 						>
 					</File>
 				</Filter>
@@ -855,7 +843,7 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\Carbohydrate.png"
+						RelativePath="..\..\ecell\model-editor\plugins\Carbohydrate.png"
 						>
 					</File>
 				</Filter>
@@ -867,7 +855,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\CationVariableSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\CationVariableSD.py"
 						>
 					</File>
 				</Filter>
@@ -875,7 +863,7 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\Cation.png"
+						RelativePath="..\..\ecell\model-editor\plugins\Cation.png"
 						>
 					</File>
 				</Filter>
@@ -887,7 +875,7 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\DNA.png"
+						RelativePath="..\..\ecell\model-editor\plugins\DNA.png"
 						>
 					</File>
 				</Filter>
@@ -895,7 +883,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\DNAVariableSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\DNAVariableSD.py"
 						>
 					</File>
 				</Filter>
@@ -907,7 +895,7 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\FattyAcid.png"
+						RelativePath="..\..\ecell\model-editor\plugins\FattyAcid.png"
 						>
 					</File>
 				</Filter>
@@ -915,7 +903,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\FattyAcidVariableSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\FattyAcidVariableSD.py"
 						>
 					</File>
 				</Filter>
@@ -927,7 +915,7 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\IonVariableSD.png"
+						RelativePath="..\..\ecell\model-editor\plugins\IonVariableSD.png"
 						>
 					</File>
 				</Filter>
@@ -935,7 +923,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\IonVariableSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\IonVariableSD.py"
 						>
 					</File>
 				</Filter>
@@ -947,7 +935,7 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\Lipid.png"
+						RelativePath="..\..\ecell\model-editor\plugins\Lipid.png"
 						>
 					</File>
 				</Filter>
@@ -955,7 +943,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\LipidVariableSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\LipidVariableSD.py"
 						>
 					</File>
 				</Filter>
@@ -964,18 +952,18 @@
 				Name="NucleotideVariableSD"
 				>
 				<File
-					RelativePath="..\..\ecell\frontend\model-editor\plugins\NucleotideVariableSD.py"
+					RelativePath="..\..\ecell\model-editor\plugins\NucleotideVariableSD.py"
 					>
 				</File>
 				<Filter
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\Nucleotide.png"
+						RelativePath="..\..\ecell\model-editor\plugins\Nucleotide.png"
 						>
 					</File>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\Protein.png"
+						RelativePath="..\..\ecell\model-editor\plugins\Protein.png"
 						>
 					</File>
 				</Filter>
@@ -995,7 +983,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\ProteinVariableSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\ProteinVariableSD.py"
 						>
 					</File>
 				</Filter>
@@ -1007,7 +995,7 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\RNA.png"
+						RelativePath="..\..\ecell\model-editor\plugins\RNA.png"
 						>
 					</File>
 				</Filter>
@@ -1015,7 +1003,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\RNAVariableSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\RNAVariableSD.py"
 						>
 					</File>
 				</Filter>
@@ -1027,7 +1015,7 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\Ribosome.png"
+						RelativePath="..\..\ecell\model-editor\plugins\Ribosome.png"
 						>
 					</File>
 				</Filter>
@@ -1035,7 +1023,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\RibozymeVariableSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\RibozymeVariableSD.py"
 						>
 					</File>
 				</Filter>
@@ -1047,7 +1035,7 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\SmallMol.png"
+						RelativePath="..\..\ecell\model-editor\plugins\SmallMol.png"
 						>
 					</File>
 				</Filter>
@@ -1055,7 +1043,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\SmallMolVariableSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\SmallMolVariableSD.py"
 						>
 					</File>
 				</Filter>
@@ -1067,7 +1055,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\ProcessSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\ProcessSD.py"
 						>
 					</File>
 				</Filter>
@@ -1075,7 +1063,7 @@
 					Name="Resource Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\ProcessSD.png"
+						RelativePath="..\..\ecell\model-editor\plugins\ProcessSD.png"
 						>
 					</File>
 				</Filter>
@@ -1087,7 +1075,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\VariableSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\VariableSD.py"
 						>
 					</File>
 				</Filter>
@@ -1099,7 +1087,7 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\OtherProcessSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\OtherProcessSD.py"
 						>
 					</File>
 				</Filter>
@@ -1111,63 +1099,19 @@
 					Name="Script Files"
 					>
 					<File
-						RelativePath="..\..\ecell\frontend\model-editor\plugins\SystemSD.py"
+						RelativePath="..\..\ecell\model-editor\plugins\SystemSD.py"
 						>
 					</File>
 				</Filter>
 			</Filter>
 		</Filter>
 		<File
-			RelativePath="..\..\ecell\frontend\model-editor\ecell3-model-editor"
+			RelativePath="..\..\ecell\model-editor\ecell3-model-editor"
 			>
 		</File>
 		<File
-			RelativePath="..\..\ecell\frontend\model-editor\model-editor.ini"
+			RelativePath="..\..\ecell\model-editor\preferences.ini"
 			>
-		</File>
-		<File
-			RelativePath="..\..\ecell\frontend\model-editor\setup.py"
-			>
-			<FileConfiguration
-				Name="Debug|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\frontend\model-editor&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET PYTHONPATH=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib\site-packages;$(ProjectDir)..\..\ecell\pyecell;%PYTHONPATH%&#x0D;&#x0A;SET INCLTDL=/I$(SolutionDir)\..\..\libltdl&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB);%LIB%&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(ProjectDir)..\..\ecell\frontend\model-editor\setup.py&quot; build -g -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
-					Outputs="$(OutDir)\$(ProjectName).stamp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Debug|x64"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\frontend\model-editor&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET PYTHONPATH=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib\site-packages;$(ProjectDir)..\..\ecell\pyecell;%PYTHONPATH%&#x0D;&#x0A;SET INCLTDL=/I$(SolutionDir)\..\..\libltdl&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB);%LIB%;%LIB64%&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(ProjectDir)..\..\ecell\frontend\model-editor\setup.py&quot; build -g -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
-					Outputs="$(OutDir)\$(ProjectName).stamp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|Win32"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\frontend\model-editor&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET PYTHONPATH=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib\site-packages;$(ProjectDir)..\..\ecell\pyecell;%PYTHONPATH%&#x0D;&#x0A;SET INCLTDL=/I$(SolutionDir)\..\..\libltdl&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB);%LIB%&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(ProjectDir)..\..\ecell\frontend\model-editor\setup.py&quot; build -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;&#x0D;&#x0A;"
-					Outputs="$(OutDir)\$(ProjectName).stamp"
-				/>
-			</FileConfiguration>
-			<FileConfiguration
-				Name="Release|x64"
-				>
-				<Tool
-					Name="VCCustomBuildTool"
-					Description="Running distutils..."
-					CommandLine="cd &quot;$(ProjectDir)..\..\ecell\frontend\model-editor&quot;&#x0D;&#x0A;SET MSSDK=1&#x0D;&#x0A;SET DISTUTILS_USE_SDK=1&#x0D;&#x0A;SET SYSCONFDIR=etc&#x0D;&#x0A;SET DATAROOTDIR=share&#x0D;&#x0A;SET DATADIR=%DATAROOTDIR%&#x0D;&#x0A;SET PYTHONPATH=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib\site-packages;$(ProjectDir)..\..\ecell\pyecell;%PYTHONPATH%&#x0D;&#x0A;SET INCLTDL=/I$(SolutionDir)\..\..\libltdl&#x0D;&#x0A;SET LIBDIR=lib&#x0D;&#x0A;SET INCLUDE=$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE);%INCLUDE%&#x0D;&#x0A;SET LIB=$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB);%LIB%;%LIB64%&#x0D;&#x0A;&quot;$(PYTHONHOME)\python&quot; &quot;$(ProjectDir)..\..\ecell\frontend\model-editor\setup.py&quot; build -b &quot;$(OutDir)\$(ProjectName).build&quot; &amp;&amp; ECHO &quot;1&quot; &gt; &quot;$(OutDir)\$(ProjectName).stamp&quot;"
-					Outputs="$(OutDir)\$(ProjectName).stamp"
-				/>
-			</FileConfiguration>
 		</File>
 	</Files>
 	<Globals>

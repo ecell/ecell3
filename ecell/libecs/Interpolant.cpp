@@ -28,7 +28,6 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
-
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -37,19 +36,32 @@
 
 #include "Interpolant.hpp"
 
+
 namespace libecs
 {
+  
+  Interpolant::Interpolant( VariablePtr const aVariable )
+    :
+    theVariable( aVariable )
+  {
+    //    theVariable->registerInterpolant( this );
+  }
 
-Interpolant::Interpolant( VariablePtr const aVariable )
-    : theVariable( aVariable )
-{
-    // do nothing
+
+  Interpolant::~Interpolant()
+  {
+    //    if( theVariable != NULLPTR )
+    //      {
+    //	theVariable->removeInterpolant( this );
+    //      }
+  }
+
 }
 
-
-Interpolant::~Interpolant()
-{
-
-}
-
-} // namespace libecs
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/

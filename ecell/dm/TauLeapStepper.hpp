@@ -37,12 +37,10 @@
 #define NOMINMAX
 #endif /* WIN32 */
 
+#include "GillespieProcess.hpp"
+
 #include "libecs/DifferentialStepper.hpp"
 #include "libecs/libecs.hpp"
-
-#define DM_IMPORTS
-#include "GillespieProcess.hpp"
-#undef DM_IMPORTS
 
 USE_LIBECS;
 

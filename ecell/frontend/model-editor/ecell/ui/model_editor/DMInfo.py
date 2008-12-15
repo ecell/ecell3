@@ -29,8 +29,7 @@ import os
 import os.path
 import sys
 
-import ecell.ecs
-from ecell.ecs_constants import *
+import ecell.emc
 
 from ecell.ui.model_editor.Config import *
 from ecell.ui.model_editor.Constants import *
@@ -43,28 +42,23 @@ MASTERLIST_PROPERTYLIST = 3
 MASTERLIST_FLAGS = 4
 
 
-DM_TRANSLATIONLIST = {
-    PROPERTY_TYPE_REAL: DM_PROPERTY_FLOAT,
-    PROPERTY_TYPE_INTEGER: DM_PROPERTY_INTEGER,
-    PROPERTY_TYPE_STRING: DM_PROPERTY_STRING,
-    PROPERTY_TYPE_POLYMORPH: DM_PROPERTY_POLYMORPH
-    }
+DM_TRANSLATIONLIST={ "Real":DM_PROPERTY_FLOAT,
+                     "Integer":DM_PROPERTY_INTEGER,
+                     "String":DM_PROPERTY_STRING,
+                     "Polymorph":DM_PROPERTY_NESTEDLIST }
 
 
-DM_DEFAULTVALUES = {
-    PROPERTY_TYPE_REAL: 0.0,
-    PROPERTY_TYPE_INTEGER: 0,
-    PROPERTY_TYPE_STRING:"",
-    PROPERTY_TYPE_POLYMORPH: []
-    }
+DM_DEFAULTVALUES = { DM_PROPERTY_FLOAT : 0.0,
+                     DM_PROPERTY_INTEGER: 0,
+                     DM_PROPERTY_STRING:"",
+                     DM_PROPERTY_NESTEDLIST: [] }
 
-INFO_SETTABLE      = 0
-INFO_GETTABLE      = 1
-INFO_LOADABLE      = 2
-INFO_SAVEABLE      = 3
-INFO_DYNAMIC       = 4
-INFO_TYPE          = 5
-INFO_DEFAULT_VALUE = 6
+INFO_TYPE = 0
+INFO_SETTABLE = 1
+INFO_GETTABLE = 2
+INFO_LOADABLE = 3
+INFO_SAVEABLE = 4
+INFO_DEFAULT_VALUE = 5
 
 TESTCODE ='\
     if mode == "instantiate":\n\
@@ -87,7 +81,7 @@ TESTCODE ='\
                 pass\n\
     else:\n\
         try:\n\
-            theSimulator.getClassInfo( aClass )\n\
+            theSimulator.getClassInfo( aType, aClass )\n\
             print "info loaded"\n\
         except:\n\
             pass\n'
@@ -113,9 +107,7 @@ for i in range( 0, len( typeList ) ):\n\
 class DMInfo:
     # FIRST INITIATE HARDCODED CLASSES SUCH AS VARIABLE, SYSTEM, COMPARTMENT SYSTMEM FROM HERE
     def __init__(self ):
-        self.theSimulator = ecell.ecs.Simulator()
-        self.theSimulator.setDMSearchPath(
-            self.theSimulator.DMSearchPathSeparator.join( dm_path ) )
+        self.theSimulator = ecell.emc.Simulator()
         self.__dummiesList = {}
         self.__createDummies()
         if os.name != "nt":
@@ -133,55 +125,38 @@ class DMInfo:
        
     def __createDummies( self ):
         # createdummy stepper
-        infoList = {
-            DM_DESCRIPTION : "Information cannot be obtained about this class.",
-            DM_BASECLASS : "Unknown",
-            DM_ACCEPTNEWPROPERTY : True
-            }
+        infoList = { DM_DESCRIPTION : "Information cannot be obtained about this class.",
+                    DM_BASECLASS : "Unknown",
+                    DM_ACCEPTNEWPROPERTY : True }
 
         flags = [ False, False, False ]
         #stepper
-        stepperPropertyList = {
-            ME_STEPPER_PROCESSLIST:  ( 0, 1, 0, 0, 0, PROPERTY_TYPE_POLYMORPH, [] ),
-            ME_STEPPER_SYSTEMLIST:   ( 0, 1, 0, 0, 0, PROPERTY_TYPE_POLYMORPH, [] )
-            }
+        stepperPropertyList = { ME_STEPPER_PROCESSLIST : [ "Polymorph", 0,1,0,0, [] ] }
+        stepperPropertyList [ ME_STEPPER_SYSTEMLIST ] =   [ "Polymorph", 0,1,0,0, [] ] 
         stepperInfo = dict( infoList )
-        stepperInfo[ DM_PROPERTYLIST ] = stepperPropertyList.keys()
+        stepperInfo[DM_PROPERTYLIST] = stepperPropertyList.keys()
         
-        self.__dummiesList[ ME_STEPPER_TYPE ] = (
-            ME_STEPPER_TYPE, True, stepperInfo, stepperPropertyList, flags 
-            )
+        self.__dummiesList[ME_STEPPER_TYPE] = [ ME_STEPPER_TYPE , True, stepperInfo, stepperPropertyList, flags ]
         #process
-        processPropertyList = {
-            ME_STEPPERID :          ( 1, 1, 1, 1, 0, PROPERTY_TYPE_STRING, "" ),
-            ME_PROCESS_VARREFLIST : ( 1, 1, 1, 1, 0, PROPERTY_TYPE_POLYMORPH, [] )
-            }
-        processInfo = dict( infoList )
-        processInfo[ DM_PROPERTYLIST ] = processPropertyList.keys()
+        processPropertyList = { ME_STEPPERID : [ "String", 1,1,1,1, "" ],
+                                ME_PROCESS_VARREFLIST : [ "Polymorph", 1, 1, 1, 1, [] ] }
+        processInfo = dict(infoList )
+        processInfo[ DM_PROPERTYLIST] = processPropertyList.keys()
         
-        self.__dummiesList[ ME_PROCESS_TYPE ] = (
-            ME_PROCESS_TYPE, True, processInfo, processPropertyList, flags
-            )
+        self.__dummiesList[ME_PROCESS_TYPE ] = [ME_PROCESS_TYPE, True, processInfo, processPropertyList, flags ]
         #system
-        systemPropertyList = {
-            ME_STEPPERID : ( 1, 1, 1, 1, 0, PROPERTY_TYPE_STRING, "" )
-            }
-        systemInfo = dict( infoList )
-        systemInfo[ DM_PROPERTYLIST ] = systemPropertyList.keys()
+        systemPropertyList = { ME_STEPPERID : [ "String", 1,1,1,1, "" ] }
+        systemInfo = dict(infoList )
+        systemInfo[ DM_PROPERTYLIST] = systemPropertyList.keys()
         
-        self.__dummiesList[ ME_SYSTEM_TYPE ] = (
-            ME_SYSTEM_TYPE, True, systemInfo, systemPropertyList, flags
-            )
+        self.__dummiesList[ME_SYSTEM_TYPE ] = [ME_SYSTEM_TYPE, True, systemInfo, systemPropertyList, flags ]
         #variable
-        variablePropertyList = {
-            ME_VARIABLE_PROCESSLIST : ( 0, 1, 0, 0, 0, PROPERTY_TYPE_POLYMORPH, [] )
-            }
+        variablePropertyList = { ME_VARIABLE_PROCESSLIST : [ "Polymorph", 0,1,0,0, [] ] }
         variableInfo = dict( infoList )
-        variableInfo[ DM_PROPERTYLIST ] = variablePropertyList.keys()
+        variableInfo[DM_PROPERTYLIST] = variablePropertyList.keys()
         
-        self.__dummiesList[ ME_VARIABLE_TYPE ] = (
-            ME_VARIABLE_TYPE , True, variableInfo, variablePropertyList, flags
-            )
+        self.__dummiesList[ME_VARIABLE_TYPE] = [ ME_VARIABLE_TYPE , True, variableInfo, variablePropertyList, flags ]
+
 
 
     def setWorkingDir(self, aPath):
@@ -192,7 +167,6 @@ class DMInfo:
         
     def refresh( self ):
         # loads all so and dll files from DMPATH and curdir
-        self.theMasterList.clear()
         self.__loadBuiltins()
         self.__scanCurrentPath()
         
@@ -210,11 +184,10 @@ class DMInfo:
         # system, variable
 
         self.loadModule( ME_SYSTEM_TYPE, DM_SYSTEM_CLASS, True )
+        self.loadModule( ME_SYSTEM_TYPE, DM_SYSTEM_CLASS_OLD, True )
         self.loadModule( ME_VARIABLE_TYPE, DM_VARIABLE_CLASS,True )
         variableDesc = self.__getClassDescriptor( DM_VARIABLE_CLASS )
-        variableDesc[MASTERLIST_PROPERTYLIST][MS_VARIABLE_PROCESSLIST] = (
-            0, 1, 0, 0, 0, PROPERTY_TYPE_POLYMORPH, []
-            )
+        variableDesc[MASTERLIST_PROPERTYLIST][MS_VARIABLE_PROCESSLIST] = [ "Polymorph", 0,1,0,0 ]
         newList = list(variableDesc[MASTERLIST_INFOLIST][DM_PROPERTYLIST])
         newList.append( MS_VARIABLE_PROCESSLIST )
         variableDesc[MASTERLIST_INFOLIST][DM_PROPERTYLIST] = newList
@@ -340,24 +313,35 @@ class DMInfo:
         if not  aFlags[DM_CAN_LOADINFO] :
             # not info can be obtained valid DM file
             return
+        
+#        if not aFlags[DM_CAN_LOADINFO]: #it can be instantiated
+#            anInfo = { DM_PROPERTYLIST : [], DM_ACCEPTNEWPROPERTY : aFlags[DM_CAN_ADDPROPERTY], DM_DESCRIPTION : "Information cannot be loaded from binary file" } 
+            
         else:
-            anInfo = self.theSimulator.getClassInfo( aName )
+            if aType == ME_SYSTEM_TYPE and aName == DM_SYSTEM_CLASS_OLD:
+                anInfo = self.theSimulator.getClassInfo( aType, DM_SYSTEM_CLASS )
+            else:
+                anInfo = self.theSimulator.getClassInfo( aType, aName, not builtin )
+            if DM_ACCEPTNEWPROPERTY not in anInfo.keys():
+                supposedCanAddProperty = True
+            else:
+                supposedCanAddProperty = anInfo[DM_ACCEPTNEWPROPERTY]
             # overload with real value if available
             if aFlags[DM_CAN_INSTANTIATE]:
                 anInfo[DM_ACCEPTNEWPROPERTY] = aFlags[DM_CAN_ADDPROPERTY]
             else:
-                anInfo[DM_ACCEPTNEWPROPERTY] = True
+                anInfo[DM_ACCEPTNEWPROPERTY] = supposedCanAddProperty
 
-        propertyList = dict(
-            ( name, info + ( DM_DEFAULTVALUES[ info[ INFO_TYPE ] ], ) ) \
-            for name, info in self.theSimulator.getPropertyInfo( aName ).iteritems() \
-            )
-        anInfo[ DM_PROPERTYLIST ] = propertyList.keys()
-
+        propertyList = {}
+        
+        for anInfoName in anInfo.keys()[:]:
+            if anInfoName.startswith("Property__"):
+                propertyList[ anInfoName.replace("Property__","")] = anInfo[ anInfoName ]
+                anInfo.__delitem__( anInfoName )
         if DM_DESCRIPTION not in anInfo.keys():
-            anInfo[ DM_DESCRIPTION ] = "Description not provided by module author."
+            anInfo[DM_DESCRIPTION] = "Description not provided by module author."
         if DM_BASECLASS not in anInfo.keys():
-            anInfo[ DM_BASECLASS ] = "Unknown."
+            anInfo[DM_BASECLASS] = "Unknown."
             
         self.theMasterList[ aName ] = [ aType, builtin, anInfo, propertyList ]
         
@@ -413,20 +397,21 @@ class DMInfo:
         propertyList = self.__getPropertyInfo( aClass, aPropertyName )
        
         if anInfo == DM_PROPERTY_DEFAULTVALUE:
-            aType = propertyList[ aPropertyName ][ INFO_TYPE ]
-            return copyValue(DM_DEFAULTVALUES[  aType ])
+            aType = self.__getPropertyType( aClass, aPropertyName)
+            return copyValue(DM_DEFAULTVALUES[ aType ])
 
         elif anInfo == DM_PROPERTY_SETTABLE_FLAG:
-            return propertyList[ aPropertyName ][ INFO_SETTABLE ]
+            return propertyList[aPropertyName][INFO_SETTABLE]
+
 
         elif anInfo == DM_PROPERTY_GETTABLE_FLAG:
-            return propertyList[ aPropertyName ][ INFO_GETTABLE ]
+            return propertyList[aPropertyName][INFO_GETTABLE]
 
         elif anInfo == DM_PROPERTY_LOADABLE_FLAG:
-            return propertyList[ aPropertyName ][ INFO_LOADABLE ]
+            return propertyList[aPropertyName][INFO_LOADABLE]
 
         elif anInfo == DM_PROPERTY_SAVEABLE_FLAG:
-            return propertyList[ aPropertyName ][ INFO_SAVEABLE ]
+            return propertyList[aPropertyName][INFO_SAVEABLE]
 
         elif anInfo == DM_PROPERTY_DELETEABLE_FLAG:
             return False
@@ -436,15 +421,15 @@ class DMInfo:
 
     def __getPropertyType( self, aClass, aPropertyName ):
         propertyList = self.__getPropertyInfo(aClass, aPropertyName)
-        aType = propertyList[ aPropertyName ][ INFO_TYPE ]
-        return DM_TRANSLATIONLIST[ aType ]
+        aType = propertyList[aPropertyName][INFO_TYPE]
+        return DM_TRANSLATIONLIST[aType]
 
     def __getPropertyInfo( self, aClass, aPropertyName ):
         propertyList = self.__getClassDescriptor(aClass)[MASTERLIST_PROPERTYLIST]
         if aPropertyName not in propertyList:
             if self.__getClassDescriptor(aClass)[MASTERLIST_INFOLIST][DM_ACCEPTNEWPROPERTY] == True:
                 propertyList = dict( propertyList )
-                propertyList[aPropertyName] = [ 1, 1, 1, 1, 1, PROPERTY_TYPE_STRING, "" ] 
+                propertyList[aPropertyName] = ["String", 1,1,1,1] 
             else:
                 raise("aClass %s propertyname %s does not exist and class doesnot accept new properties!"%(aClass,aPropertyName))
         return propertyList
@@ -460,7 +445,7 @@ def DMTypeCheck( aValue, aType ):
             aValue = '/n'.join(aValue)
 
         return str( aValue )
-    elif aType == DM_PROPERTY_POLYMORPH:
+    elif aType == DM_PROPERTY_NESTEDLIST:
         if type(aValue) in ( type( () ), type( [] ) ):
             return aValue
         else:

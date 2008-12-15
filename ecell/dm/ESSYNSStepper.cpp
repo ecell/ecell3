@@ -29,13 +29,12 @@
 // E-Cell Project.
 //
 
-#include <gsl/gsl_sf.h>
-
-#include "libecs/Variable.hpp"
-#include "libecs/Process.hpp"
-#include "libecs/PropertyInterface.hpp"
-
+#include "Variable.hpp"
+#include "Process.hpp"
+#include "PropertyInterface.hpp"
 #include "ESSYNSStepper.hpp"
+
+#include <gsl/gsl_sf.h>
 
 LIBECS_DM_INIT( ESSYNSStepper, Stepper );
 
@@ -59,7 +58,14 @@ void ESSYNSStepper::initialize()
 
   theTaylorOrder = getOrder();
 
-  theESSYNSMatrix.resize( boost::extents[ theSystemSize + 1 ][ theTaylorOrder + 1 ] );
+  theESSYNSMatrix.resize(theSystemSize+1);
+  RealVector tmp;
+  tmp.resize(theTaylorOrder+1);
+
+  for(int i( 0 ); i < theSystemSize; i++)
+    {
+      theESSYNSMatrix[i] = tmp;
+    }
 
   theIndexVector.resize( theSystemSize );
   VariableReferenceVectorCref aVariableReferenceVectorCref
@@ -72,6 +78,12 @@ void ESSYNSStepper::initialize()
 
       theIndexVector[ c ] = getVariableIndex( aVariablePtr );
     }
+
+  /* for( int i( 1 ); i < theSystemSize+1; i++)
+     {
+     std::cout<< (theESSYNSMatrix[i-1])[0] << std::endl;
+     }
+  */
 }
 
 bool ESSYNSStepper::calculate()

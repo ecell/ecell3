@@ -28,41 +28,37 @@
 #ifndef __DMOBJECT_HPP
 #define __DMOBJECT_HPP
 
+
 #ifdef WIN32
-#ifndef DM_IMPORTS
 #define DM_IF __declspec(dllexport)
-#else
-#define DM_IF __declspec(dllimport)
-#endif /* !DM_IMPORTS */
 #else
 #define DM_IF
 #endif /* WIN32 */
 
-#include "dmtool/DynamicModuleDescriptor.hpp"
+/// an allocator function template
 
-#define DM_DESCRIPTOR_ENTRY( CLASSNAME ) \
-    { \
-        #CLASSNAME, \
-        &CLASSNAME::createInstance, \
-        &CLASSNAME::getClassInfoPtr, \
-        &CLASSNAME::initializeModule, \
-        &CLASSNAME::finalizeModule \
-    }
+template< class Base, class Derived >
+Base* ObjectAllocator()
+{
+  return new Derived;
+}
 
-#define DM_INIT( CLASSNAME )\
+
+
+#define DM_INIT( CLASSNAME, TYPE )\
   extern "C"\
   {\
-    DM_IF DynamicModuleDescriptor __dm_descriptor = DM_DESCRIPTOR_ENTRY( CLASSNAME ); \
+    DM_IF TYPE::AllocatorFuncPtr CreateObject =\
+    &ObjectAllocator<TYPE,CLASSNAME>;\
+    DM_IF const char* __DM_CLASSNAME = #CLASSNAME;\
+    DM_IF const char* __DM_TYPE = #TYPE;\
+    DM_IF const void *(*GetClassInfo)() = &CLASSNAME::getClassInfoPtr;\
   } // 
 
-#define DM_NEW_STATIC( MAKER, BASE, CLASSNAME )\
-  { \
-    static DynamicModuleDescriptor desc = DM_DESCRIPTOR_ENTRY( CLASSNAME ); \
-    ( MAKER )->addClass( new StaticDynamicModule< BASE >( desc ) ); \
-  } //
 
-#define DM_OBJECT( CLASSNAME )\
- static void* createInstance() { return new CLASSNAME ; }\
+#define DM_OBJECT( CLASSNAME, TYPE )\
+ static TYPE* createInstance() { return new CLASSNAME ; }\
+ static const char *getTypeName() { return #TYPE; }
 
 
 #define DM_BASECLASS( CLASSNAME )\
@@ -72,3 +68,11 @@ public:\
 
 #endif /* __DMOBJECT_HPP */
 
+
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/

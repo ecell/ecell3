@@ -32,267 +32,283 @@
 #if !defined(__DATAPOINT_HPP)
 #define __DATAPOINT_HPP
 
-#include "libecs/Defs.hpp"
-#include "libecs/Polymorph.hpp"
+#include "libecs.hpp"
+#include "Polymorph.hpp"
 
 namespace libecs
 {
 
-class LongDataPoint;
-class DataPoint;
+  /** @addtogroup logging
+   *@{
+   */
 
-class DataPoint
-{
-public:
+  /** \file */
+
+  class LongDataPoint;
+  class DataPoint;
+
+
+
+  /**
+
+  */
+
+  class DataPoint
+  {
+
+  public:
     class EarlinessOrdering
     {
     public:
-        bool operator()(const DataPoint& x, const DataPoint& y)
-        {
-            return x.getTime() < y.getTime();
-        }
+      bool operator()(const DataPoint& x, const DataPoint& y)
+      {
+        return x.getTime() < y.getTime();
+      }
     };
 
     class LatenessOrdering
     {
     public:
-        bool operator()(const DataPoint& x, const DataPoint& y)
-        {
-            return x.getTime() > y.getTime();
-        }
+      bool operator()(const DataPoint& x, const DataPoint& y)
+      {
+        return x.getTime() > y.getTime();
+      }
     };
 
-public:
+  public:
+
     DataPoint()
-        : theTime ( 0.0 ),
-          theValue( 0.0 )
+      :
+      theTime ( 0.0 ),
+      theValue( 0.0 )
     {
-        ; // do nothing
+      ; // do nothing
     }
 
     DataPoint( RealParam aTime, RealParam aValue )
-        : theTime ( aTime ),
-          theValue( aValue )     
+      :
+      theTime ( aTime ),
+      theValue( aValue )   
     {
-        ; //do nothing
+      ; //do nothing
     }
+
+
 
     ~DataPoint()
     {
-        ; // do nothing
+      ; // do nothing
     }
-
 
     const Real getTime() const
     {
-        return theTime;
+      return theTime;
     }
-
 
     const Real getValue() const
     {
-        return theValue;
+      return theValue;
     }
-
 
     const Real getAvg() const
     {
-        return theValue;
+      return theValue;
     }
-
 
     const Real getMin() const
     {
-        return theValue;
+      return theValue;
     }
-
 
     const Real getMax() const
     {
-        return theValue;
+      return theValue;
     }
 
 
     void setTime( RealParam aReal )
     {
-        theTime = aReal;
+      theTime = aReal;
     }
-
 
     void setValue( RealParam aReal )
     {
-        theValue = aReal;
+      theValue = aReal;
     }
 
+    void setAvg( RealParam aReal )
+    {
+      ;
+    }
+
+    void setMin( RealParam aReal )
+    {
+      ;
+    }
+
+    void setMax( RealParam aReal )
+    {
+      ;
+    }
 
     static const size_t getElementSize()
     {
-        return sizeof( Real );
+      return sizeof( Real );
     }
-
 
     static const int getElementNumber()
     {
-        return 2;
+      return 2;
     }
-
 
     DataPointRef operator= ( LongDataPointCref aLongDataPoint );
 
-
     bool operator==( const DataPoint& that ) const
     {
-        return theTime == that.theTime && theValue == that.theValue;
+        return theTime == that.theTime &&
+               theValue == that.theValue;
     }
 
-protected:
+  protected:
 
     Real theTime;
     Real theValue;
 
-};
+  };
 
 
 
-class LongDataPoint: public DataPoint
-{
+  class LongDataPoint 
+    :
+    public DataPoint
+  {
 
-public:
+  public:
+
     LongDataPoint() //constructor with no arguments
-        : theAvg( 0.0 ),
-          theMin( 0.0 ),
-          theMax( 0.0 )
+      :
+    theAvg( 0.0 ),
+    theMin( 0.0 ),
+    theMax( 0.0 )
     {
-        ; // do nothing
+      ; // do nothing
     }
 
 
     LongDataPoint( RealParam aTime, RealParam aValue )//constructor with 2 args
-        : DataPoint( aTime, aValue ),
-          theAvg( aValue ),
-          theMin( aValue ),
-          theMax( aValue )
+      :
+    DataPoint( aTime, aValue ),
+    theAvg( aValue ),
+    theMin( aValue ),
+    theMax( aValue )
     {
-        ; // do nothing
+      ; // do nothing
     }
 
     LongDataPoint( RealParam aTime, RealParam aValue, 
-                   RealParam anAvg, RealParam aMax, 
-                   RealParam aMin ) //constructor with 5 args
-        : DataPoint( aTime, aValue ),
-          theAvg( anAvg ),
-          theMin( aMin ),
-          theMax( aMax )
+		   RealParam anAvg,
+		   RealParam aMax, 
+		   RealParam aMin ) //constructor with 5 args
+      :
+    DataPoint( aTime, aValue ),
+    theAvg( anAvg ),
+    theMin( aMin ),
+    theMax( aMax )
     {
-        ; // do nothing
+      ; // do nothing
     }
 
 
     LongDataPoint( DataPointCref aDataPoint ) // constructor from DP2
-        : DataPoint( aDataPoint ),
-          theAvg( aDataPoint.getAvg() ),
-          theMin( aDataPoint.getMin() ),
-          theMax( aDataPoint.getMax() )
+      :
+    DataPoint( aDataPoint ),
+    theAvg( aDataPoint.getAvg() ),
+    theMin( aDataPoint.getMin() ),
+    theMax( aDataPoint.getMax() )
     {
-        ; // do nothing
+      ; // do nothing
     }
-
     
     ~LongDataPoint()
     {
-        ; // do nothing
+      ; // do nothing
     }
-
     
     const Real getTime() const
     {
-        return theTime;
+      return theTime;
     }
-
     
     const Real getValue() const
     {
-        return theValue;
+      return theValue;
     }
-
     
     const Real getAvg() const
     {
-        return theAvg;
+      return theAvg;
     }
-
     
     const Real getMin() const
     {
-        return theMin;
+      return theMin;
     }
-
 
     const Real getMax() const
     {
-        return theMax;
+      return theMax;
     }
 
 
     void setTime( RealParam aReal )
     {
-        theTime = aReal;
+      theTime = aReal;
     }
-
 
     void setValue( RealParam aReal )
     {
-        theValue = aReal;
+      theValue = aReal;
     }
-
 
     void setAvg( RealParam aReal )
     {
-        theAvg = aReal;
+      theAvg = aReal;
     }
-
 
     void setMin( RealParam aReal )
     {
-        theMin = aReal;
+      theMin = aReal;
     }
-
 
     void setMax( RealParam aReal )
-    {
-        theMax = aReal;
-    }
 
+    {
+      theMax = aReal;
+    }
 
     static const size_t getElementSize()
     {
-        return sizeof( Real );
+      return sizeof( Real );
     }
-
 
     static const int getElementNumber()
     {
-        return 5;
+      return 5;
     }
 
-protected:
+  protected:
+
     Real theAvg;
     Real theMin;
     Real theMax;
-};
+
+  };
 
 
-inline DataPoint& DataPoint::operator=( LongDataPoint const& aLongDataPoint )
-{
-    setTime( aLongDataPoint.getTime() );
-    setValue( aLongDataPoint.getValue() );
-    return *this;
-}
-
-
-class DataPointAggregator
-{
-public:
+  class DataPointAggregator
+  {
+    
+  public:
     
     DataPointAggregator();
     
@@ -309,7 +325,7 @@ public:
     
     LongDataPoint getLastPoint();
     
-private:
+  private:
     void store( LongDataPointCref );
     
     bool stockpile( LongDataPointRef, LongDataPointCref );
@@ -319,8 +335,13 @@ private:
     LongDataPoint theAccumulator;
     LongDataPoint theCollector;
     LongDataPoint thePreviousPoint;
-};
-
+    
+  };
+  
+  
+  //@}
+  
 } // namespace libecs
+
 
 #endif /* __DATAPOINT_HPP */

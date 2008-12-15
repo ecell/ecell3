@@ -32,7 +32,7 @@
 #ifndef __DYNAMICPRIORITYQUEUE_HPP
 #define __DYNAMICPRIORITYQUEUE_HPP
 
-#include "libecs/Defs.hpp"
+#include "Defs.hpp"
 
 #include <functional>
 #include <vector>
@@ -51,6 +51,7 @@
 namespace libecs
 {
 
+
 class PersistentIDPolicy
 {
 
@@ -64,7 +65,8 @@ public:
 #if defined( HAVE_UNORDERED_MAP ) || defined( HAVE_TR1_UNORDERED_MAP )
 
     class IDHasher
-        : public std::unary_function<ID, std::size_t>
+        : 
+        public std::unary_function<ID, std::size_t>
     {
 
     public:

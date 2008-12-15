@@ -27,7 +27,7 @@
 #ifndef __ESSYNSPROCESS_HPP
 #define __ESSYNSPROCESS_HPP
 
-#include <boost/multi_array.hpp>
+#include <vector>
 
 #include "libecs.hpp"
 #include "Process.hpp"
@@ -68,7 +68,7 @@ LIBECS_DM_CLASS( ESSYNSProcess, Process )
       ;
     }
     
-  virtual const boost::multi_array< Real, 2 >& getESSYNSMatrix() = 0;
+  virtual const std::vector<RealVector>& getESSYNSMatrix() = 0;
 
   virtual GET_METHOD( Integer, SystemSize ) = 0;
     

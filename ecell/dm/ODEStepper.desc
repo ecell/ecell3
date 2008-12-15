@@ -1,0 +1,35 @@
+# general description of the class
+DESCRIPTION=ODEStepper
+
+# whether class allows new properties (other then the hardcoded ones) created by modeleditor
+ACCEPTNEWPROPERTY=False
+
+# propertyname, type, defaultvalue, flags 
+# flags are: (settable, gettable, loadable, saveable) 1 means True, 0 means false
+# type can be: NESTED_LIST, STRING, MULTILINE, INTEGER, FLOAT
+PROPERTYLIST
+AbsoluteEpsilon,FLOAT,0.1,1111
+AbsoluteToleranceFactor,FLOAT,1.0,1111
+CurrentTime,FLOAT,0.0,0100
+DependentStepperList,NESTED_LIST,[],0100
+DerivativeToleranceFactor,FLOAT,1.0,1111
+IsEpsilonChecked,INTEGER,0,1111
+JacobianRecalculateTheta,FLOAT,0.001,1111
+MaxErrorRatio,FLOAT,1.0,0100
+MaxStepInterval,FLOAT,1e+100,1111
+MinStepInterval,FLOAT,1e-100,1111
+NextStepInterval,FLOAT,0.001,0100
+Order,INTEGER,1,0100
+Priority ,INTEGER,0,1111
+ProcessList,NESTED_LIST,[],0100
+ReadVariableList,NESTED_LIST,[],0100
+RelativeEpsilon,FLOAT,0.1,1111
+SpectralRadius,FLOAT,0.0,0100
+StateToleranceFactor,FLOAT,1.0,1111
+StepInterval,FLOAT,0.01,1111
+SystemList,NESTED_LIST,[],0100
+TolerableStepInterval,FLOAT0.001,1111
+Tolerance ,FLOAT,1e-06,1111
+Uround,FLOAT,1e-16,1111
+WriteVariableList,NESTED_LIST,[],0100
+END

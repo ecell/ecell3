@@ -77,7 +77,6 @@ dnl AM_CONFIG_HEADER(config.h)
 dnl
 dnl Create the top-level Makefile.
 dnl
-AC_CONFIG_FILES(dmcompile, [chmod +x dmcompile])
-AC_CONFIG_FILES(Makefile)
-AC_OUTPUT
+AC_OUTPUT(Makefile dmcompile,chmod +x dmcompile)
+
 

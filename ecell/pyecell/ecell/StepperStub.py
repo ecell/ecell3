@@ -97,7 +97,11 @@ class StepperStub( ObjectStub ):
     # ---------------------------------------------------------------
 
     def exists( self ):
-        return self.theID in self.theSimulator.getStepperList()
+
+        if self.theID in self.theSimulator.getStepperList():
+            return TRUE
+        else:
+            return FALSE
 
     # end of exists
 

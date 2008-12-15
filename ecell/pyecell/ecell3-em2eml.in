@@ -40,6 +40,8 @@ Options:
 ''' % { 'appname': aProgramName }
 
 def main():
+    ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
+
     try:
         opts, args = getopt.getopt( sys.argv[1:] , 'DEho:p:',
                          ['help', 'debug', 'patch', 'outfile=',

@@ -241,7 +241,7 @@ class OsogoPluginWindow(PluginWindow):
 		aPropertyList = self.theSession.theSimulator.getEntityPropertyList( createFullIDString( aFullID ) )
 		anAttribute = self.theSession.theSimulator.getEntityPropertyAttributes( createFullPNString( aFullPN ) )
 
-		if anAttribute[ SETTABLE ]:
+		if anAttribute[SETTABLE] == TRUE:
 			self.theSession.theSimulator.setEntityProperty( createFullPNString( aFullPN ), aValue )
 
 			self.thePluginManager.updateAllPluginWindow()
@@ -355,7 +355,7 @@ class OsogoPluginWindow(PluginWindow):
 			
 				# creates loggerstub and call its create method.
 				aLoggerStub = self.theSession.createLoggerStub( aFullPNString )
-				if not aLoggerStub.exists():
+				if aLoggerStub.exists() == FALSE:
 					aLoggerStub.create()
 					aLoggerStub.setLoggerPolicy( aLogPolicy )
 

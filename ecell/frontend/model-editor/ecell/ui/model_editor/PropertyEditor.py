@@ -78,7 +78,7 @@ class PropertyEditor:
             self.theComponent = StepperChooser( self, self.win.vbox )
         elif self.thePropertyType == DM_PROPERTY_MULTILINE:
             self.theComponent = MultiLineEditor( self, self.win.vbox )
-        elif self.thePropertyType == DM_PROPERTY_POLYMORPH:
+        elif self.thePropertyType == DM_PROPERTY_NESTEDLIST:
             self.theComponent = NestedListEditor( self, self.win.vbox )
 
 

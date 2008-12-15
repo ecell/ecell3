@@ -24,36 +24,39 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-
-#include "libecs/Defs.hpp"
-#include "libecs/Process.hpp"
+#include "libecs.hpp"
+#include "Process.hpp"
 
 namespace libecs
 {
 
-LIBECS_DM_CLASS( ContinuousProcess, Process )
-{
+  LIBECS_DM_CLASS( ContinuousProcess, Process )
+  {
 
-public:
+  public:
+
     LIBECS_DM_OBJECT_ABSTRACT( ContinuousProcess )
-    {
-        INHERIT_PROPERTIES( Process );
-    }
-
+      {
+	INHERIT_PROPERTIES( Process );
+      }
+  
     ContinuousProcess()
-    {
-        ; // do nothing
-    }
-
+      {
+	; // do nothing
+      }
+  
     virtual ~ContinuousProcess()
-    {
-        ;
-    }
+      {
+	;
+      }
 
     virtual const bool isContinuous() const
     {
-        return true;
+      return true;
     }
-};
 
-} // namespace libecs
+  protected:
+  
+  };
+
+}

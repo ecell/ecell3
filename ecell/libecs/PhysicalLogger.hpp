@@ -28,30 +28,43 @@
 // written by Gabor Bereczki <gabor.bereczki@talk21.com>
 //
 
+
 #if !defined(__PHYSICALLOGGER_HPP)
 #define __PHYSICALLOGGER_HPP
 
-#include "libecs/Defs.hpp"
-#include "libecs/Exceptions.hpp"
-#include "libecs/DataPoint.hpp"
-#include "libecs/DataPointVector.hpp"
+#include "libecs.hpp"
+#include "Exceptions.hpp"
+#include "DataPoint.hpp"
+#include "DataPointVector.hpp"
 
 template <typename T> class vvector;
 
 namespace libecs
 {
 
-class LIBECS_API PhysicalLogger
-{
-    typedef vvector< DataPoint > Vector;
+  /** @addtogroup logging
+   *@{
+   */
 
-public:
+  /** @file */
+
+
+  class LIBECS_API PhysicalLogger
+  {
+
+    //    DECLARE_TYPE( _DATAPOINT, DATAPOINT );
+    //    typedef vvector<DATAPOINT> Vector;
+
+    typedef vvector<DataPoint> Vector;
+    
+  public:
+
     DECLARE_TYPE( size_t, VectorIterator );
     DECLARE_TYPE( size_t, size_type );
 
     PhysicalLogger();
     virtual ~PhysicalLogger();
-            
+	
     void push( DataPointCref aDataPoint );
 
     void setEndPolicy( Integer anEndPolicy );
@@ -63,41 +76,41 @@ public:
 
     size_type getMaxSize() const
     {
-        return theMaxSize;
+      return theMaxSize;
     }
 
     size_type lower_bound( const size_type start,
-                           const size_type end,
-                           const Real time ) const;
+			   const size_type end,
+			   const Real time ) const;
 
     size_type upper_bound( const size_type start,
-                           const size_type end,
-                           const Real time ) const;
+			   const size_type end,
+			   const Real time ) const;
 
     size_type lower_bound_linear( const size_type start,
-                                  const size_type end,
-                                  const Real time ) const;
+				  const size_type end,
+				  const Real time ) const;
 
     size_type upper_bound_linear( const size_type start,
-                                  const size_type end,
-                                  const Real time ) const;
+				  const size_type end,
+				  const Real time ) const;
 
     size_type lower_bound_linear_backwards( const size_type start,
-                                            const size_type end,
-                                            const Real time ) const;
+					    const size_type end,
+					    const Real time ) const;
 
     size_type lower_bound_linear_estimate( const size_type start,
-                                           const size_type end,
-                                           const Real time,
-                                           const Real time_per_step ) const;
+					   const size_type end,
+					   const Real time,
+					   const Real time_per_step ) const;
 
     size_type upper_bound_linear_estimate( const size_type start,
-                                           const size_type end,
-                                           const Real time,
-                                           const Real time_per_step ) const;
+					   const size_type end,
+					   const Real time,
+					   const Real time_per_step ) const;
     
     DataPointVectorSharedPtr getVector( const size_type start,
-                                        const size_type end ) const;
+					const size_type end ) const;
 
     size_type size() const;
 
@@ -108,54 +121,58 @@ public:
 
     size_type begin() const
     {
-        return 0;
+      return 0;
     }
     
     
     size_type end() const
     {
-        if ( size() > 0 )
-        {
-            return size() - 1;
-        }
-        else
-        {
-            return 0;
-        }
+      if ( size() > 0 )
+	{
+	  return size() - 1;
+	}
+      else
+	{
+	  return 0;
+	}
     }
 
 
     LongDataPoint front() const
     {
-        if ( empty() )
-        {
-            return DataPoint();
-        }
-
-        return at( begin() );
+      if ( empty() )
+	{
+	  return DataPoint();
+	}
+      
+      return at( begin() );
     }
     
     LongDataPoint back() const
     {
-        if ( empty() )
-        {
-            return DataPoint();
-        }
-
-        return at( end() );
+      if ( empty() )
+	{
+	  return DataPoint();
+	}
+      
+      return at( end() );
     }
-
+  
     Real getAverageInterval() const;
 
-private:
+  private:
 
     // this mutable can be removed if vvector supports const operations
-    Vector                 *theVector;
+    Vector         *theVector;
 
-    size_type            theMaxSize;
+    size_type      theMaxSize;
 
-};
+  };
+
+
+  //@}
 
 } // namespace libecs
+
 
 #endif /* __PHYSICALLOGGER_HPP */

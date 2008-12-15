@@ -79,7 +79,10 @@ class LoggerStub( ObjectStub ):
         """
         # When the FullPN of this instance exists in 
         # the FullPN list, returns TRUE
-        return self.theFullPNString in self.theSimulator.getLoggerList()
+        if self.theFullPNString in self.theSimulator.getLoggerList():
+            return True
+        else:
+            return False
 
     def getData( self, aStartTime=None, anEndTime=None, anInterval=None ):
         """
@@ -116,6 +119,18 @@ class LoggerStub( ObjectStub ):
 
     def getSize( self ):
         return self.theSimulator.getLoggerSize( self.theFullPNString )
+
+    def setMinimumInterval( self, anInterval ):
+        warnings.warn( "Use setLoggerPolicy instead", DeprecationWarning )
+        return self.theSimulator.setLoggerMinimumInterval( self.theFullPNString, anInterval )
+
+    def getMinimumInterval( self ):
+        """
+        Returns the minimum interval
+        This method can throw exceptions.
+        """
+        warnings.warn( "Use getLoggerPolicy() instead", DeprecationWarning )
+        return self.theSimulator.getLoggerMinimumInterval( self.theFullPNString )
 
     def getLoggerPolicy( self ):
         """

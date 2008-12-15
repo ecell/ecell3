@@ -366,7 +366,7 @@ class LoggerWindow(OsogoWindow):
 	# ---------------------------------------------------------------
 	def update( self ):
 
-		if not self.exists():
+		if self.exists() == FALSE:
 			return None
 
 		self.theFullPNList = self.theSession.getLoggerList()

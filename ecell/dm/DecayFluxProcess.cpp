@@ -44,7 +44,10 @@ LIBECS_DM_CLASS( DecayFluxProcess, ContinuousProcess )
 
   LIBECS_DM_OBJECT( DecayFluxProcess, Process )
     {
-      CLASS_DESCRIPTION(
+      /*
+      CLASS_INFO( BriefDescription, "A continuous decay process." );
+
+      CLASS_INFO( Description, 
 		  "DecayFluxProcess is a FluxProcess which calculates "
 		  "mass-action decay process with a half-time T.\n\n"
 		  "This is a mass-action reaction with a single reactant"
@@ -63,9 +66,26 @@ LIBECS_DM_CLASS( DecayFluxProcess, ContinuousProcess )
 		  "coefficients, as defined in the FluxProcess base class.\n"
 		  "Zero or negative half time is not allowed.\n" );
 
+      CLASS_INFO( IsArbitraryPropertyAccepted,        "false" );
+
+      CLASS_INFO( VariableReference__S0__Description,
+		  "A Variable that decays." );
+      CLASS_INFO( VariableReference__S0__Required,    "true" );
+      */
+
       INHERIT_PROPERTIES( ContinuousProcess );
 
       PROPERTYSLOT_SET_GET( Real, T );
+
+      /*
+      CLASS_INFO( PropertySlot__T__BriefDescription, "half-time" );
+      CLASS_INFO( PropertySlot__T__Description, 
+		  "A positive, non-zero half-time in second." );
+      CLASS_INFO( PropertySlot__T__Unit,        "sec" );
+      CLASS_INFO( PropertySlot__T__Default,     "1.0" );
+      CLASS_INFO( PropertySlot__T__IsRequired,  "false" );
+      */
+
     }  
 
   DecayFluxProcess()

@@ -28,7 +28,6 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
-
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -40,21 +39,57 @@
 namespace libecs
 {
 
-const String VariableReference::ELLIPSIS_PREFIX( "___" );
-const String VariableReference::DEFAULT_NAME( "_" );
+  const String VariableReference::ELLIPSIS_PREFIX( "___" );
+  const String VariableReference::DEFAULT_NAME( "_" );
 
-const Integer VariableReference::getEllipsisNumber() const
-{
-    if( isEllipsisName() )
-    {
-        return stringCast<Integer>( theName.substr( 3 ) );
-    }
+  const bool VariableReference::isEllipsisNameString( StringCref aName )
+  {
+    if( aName.size() > 3 
+	&& ELLIPSIS_PREFIX == aName.substr( 0, 3 ) 
+	&& isdigit( aName[4] ) )
+      {
+	return true;
+      }
     else
-    {
-        THROW_EXCEPTION( ValueError,
-                         "VariableReference [" + theName
-                         + "] is not an Ellipsis (which starts from '___')." );
-    }
+      {
+	return false;
+      }
+  }
+  
+  const Integer VariableReference::getEllipsisNumber() const
+  {
+    if( isEllipsisName() )
+      {
+	return stringCast<Integer>( theName.substr( 3 ) );
+      }
+    else
+      {
+	THROW_EXCEPTION( ValueError, "VariableReference [" + theName
+			 + "] is not an Ellipsis (which starts from '___')." );
+      }
+  }
+  
+  const bool VariableReference::isDefaultNameString( StringCref aName )
+  {
+    if( aName == DEFAULT_NAME )
+      {
+	return true;
+      }
+    else
+      {
+	return false;
+      }
+  }
+  
+  
+  
 }
 
-} // namespace libecs
+
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/

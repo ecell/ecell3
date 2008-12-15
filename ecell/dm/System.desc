@@ -1,0 +1,13 @@
+# general description of the class
+DESCRIPTION=System
+# whether class allows new properties (other then the hardcoded ones) created by modeleditor
+ACCEPTNEWPROPERTY=False
+
+# propertyname, type, defaultvalue, flags 
+# flags are: (settable, gettable, loadable, saveable) 1 means True, 0 means false
+# type can be: NESTED_LIST, STRING, MULTILINE, INTEGER, FLOAT
+PROPERTYLIST
+StepperID, STRING,"" , 1111
+Name, STRING,"", 1111
+Size, FLOAT, 0.0, 0100
+END

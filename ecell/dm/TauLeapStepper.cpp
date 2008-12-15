@@ -32,7 +32,7 @@
 #include <gsl/gsl_randist.h>
 
 #include "TauLeapStepper.hpp"
-
+ 
 LIBECS_DM_INIT( TauLeapStepper, Stepper );
 
 void TauLeapStepper::initialize()
@@ -50,7 +50,7 @@ void TauLeapStepper::initialize()
   catch( const libecs::TypeError& )
     {
       THROW_EXCEPTION( InitializationFailed,
-		       getClassName() +
+		       getClassNameString() +
 		       ": Only GillespieProcesses are allowed to exist "
 		       "in this Stepper." );
     }

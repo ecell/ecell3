@@ -171,7 +171,7 @@ class StepperWindow(OsogoWindow):
 		"""
 
 		# When window is not created, does nothing.
-		if not self.exists():
+		if self.exists() == FALSE:
 			return None
 
 		# --------------------------------------------------
@@ -204,8 +204,8 @@ class StepperWindow(OsogoWindow):
 		self.thePropertyMap[ 'ClassName'] = str( aClassName )
 
 		# gettable and settable
-		aList.append( decodeAttribute( True ) )   # gettable is '+'
-		aList.append( decodeAttribute( False ) )  # settable is '-'
+		aList.append( decodeAttribute( TRUE ) )   # gettable is '+'
+		aList.append( decodeAttribute( FALSE ) )  # settable is '-'
 
 		# sets this list to TreeModel
 		iter = aPropertyModel.append()
@@ -246,7 +246,7 @@ class StepperWindow(OsogoWindow):
 
 		self.update()
 
-		if self.theSelectedPath.has_key(aStepperID):
+		if self.theSelectedPath.has_key(aStepperID) == TRUE:
 			aPath = self.theSelectedPath[aStepperID]
 			self['property_list'].get_selection().select_path(aPath)
 		else:
@@ -286,7 +286,7 @@ class StepperWindow(OsogoWindow):
 		"""
 
 		# If Window is closed, do nothing.
-		if not self.exists():
+		if self.exists() == FALSE:
 			return None
 
 		# --------------------------------------------------
@@ -325,12 +325,12 @@ class StepperWindow(OsogoWindow):
 		# when the selected property is settable, set sensitive value_entry
 		# when not, set unsensitive value_entry
 		# --------------------------------------------------
-		if self['property_list'].get_model().get_value( iter, SET_INDEX ) == decodeAttribute( True ):
-			self['value_entry'].set_sensitive( True )
-			self['update_button'].set_sensitive( True )
+		if self['property_list'].get_model().get_value( iter, SET_INDEX ) == decodeAttribute(TRUE):
+			self['value_entry'].set_sensitive( TRUE )
+			self['update_button'].set_sensitive( TRUE )
 		else:
-			self['value_entry'].set_sensitive( False )
-			self['update_button'].set_sensitive( False )
+			self['value_entry'].set_sensitive( FALSE )
+			self['update_button'].set_sensitive( FALSE )
 
 	# ==========================================================================
 	def updateProperty(self, aValue):
@@ -347,7 +347,7 @@ class StepperWindow(OsogoWindow):
 		"""
 
 		# If Window is closed, do nothing.
-		if not self.exists():
+		if self.exists() == FALSE:
 			return None
 
 		# --------------------------------------------------
@@ -484,7 +484,7 @@ class StepperWindow(OsogoWindow):
 		"""
 
 		# When this window does not created, does nothing
-		if not self.exists():
+		if self.exists() == FALSE:
 			return None
 
 		# clears message on statusbar.
@@ -498,7 +498,7 @@ class StepperWindow(OsogoWindow):
 		iter = self.theFirstPropertyIter[aStepperID]
 
 		# updates all value of self['property_list']
-		while( True ):
+		while(TRUE):
 			iter = self['property_list'].get_model().iter_next(iter)
 			if iter == None:
 				break

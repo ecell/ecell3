@@ -34,23 +34,33 @@
 
 #include <functional>
 
-#include "libecs/Defs.hpp"
-#include "libecs/Util.hpp"
-#include "libecs/PropertySlot.hpp"
-#include "libecs/convertTo.hpp"
-#include "libecs/Polymorph.hpp"
+#include "libecs.hpp"
+#include "Util.hpp"
+#include "PropertySlot.hpp"
+#include "convertTo.hpp"
+#include "Polymorph.hpp"
 
 namespace libecs
 {
 
-class LIBECS_API PropertySlotProxy
-{
 
-public:
+  /** @addtogroup property
+      
+  @ingroup libecs
+  @{
+  */
+
+  /** @file */
+
+
+  class LIBECS_API PropertySlotProxy
+  {
+
+  public:
 
     PropertySlotProxy()
     {
-        ; // do nothing
+      ; // do nothing
     }
     
     virtual ~PropertySlotProxy();
@@ -72,96 +82,114 @@ public:
 
     template < typename Type >
     inline void set( typename Param<Type>::type aValue );
+    //    {
+    //      DefaultSpecializationInhibited();
+    //    }
 
     template < typename Type >
     inline const Type get() const;
+    //    {
+    //      DefaultSpecializationInhibited();
+    //    }
 
-protected:
-};
+
+  protected:
+
+  };
 
 
-template <>
-inline void 
-PropertySlotProxy::set<Polymorph>( Param<Polymorph>::type aValue )
-{
+
+  template <>
+  inline void 
+  PropertySlotProxy::set<Polymorph>( Param<Polymorph>::type aValue )
+  {
     setPolymorph( aValue );
-}
+  }
 
-template <>
-inline void PropertySlotProxy::set<Real>( Param<Real>::type aValue )
-{
+  template <>
+  inline void PropertySlotProxy::set<Real>( Param<Real>::type aValue )
+  {
     setReal( aValue );
-}
+  }
 
-template <>
-inline void PropertySlotProxy::set<Integer>( Param<Integer>::type aValue )
-{
+  template <>
+  inline void PropertySlotProxy::set<Integer>( Param<Integer>::type aValue )
+  {
     setInteger( aValue );
-}
+  }
 
-template <>
-inline void PropertySlotProxy::set<String>( Param<String>::type aValue )
-{
+  template <>
+  inline void PropertySlotProxy::set<String>( Param<String>::type aValue )
+  {
     setString( aValue );
-}
+  }
 
-template <>
-inline const Polymorph PropertySlotProxy::get() const
-{
+  template <>
+  inline const Polymorph PropertySlotProxy::get() const
+  {
     return getPolymorph();
-}
+  }
 
-template <>
-inline const String PropertySlotProxy::get() const
-{
+  template <>
+  inline const String PropertySlotProxy::get() const
+  {
     return getString();
-}
+  }
 
-template <>
-inline const Real PropertySlotProxy::get() const
-{
+  template <>
+  inline const Real PropertySlotProxy::get() const
+  {
     return getReal();
-}
+  }
 
 
-template <>
-inline const Integer PropertySlotProxy::get() const
-{
+  template <>
+  inline const Integer PropertySlotProxy::get() const
+  {
     return getInteger();
-}
+  }
 
 
-template< class T >
-class ConcretePropertySlotProxy: public PropertySlotProxy
-{
-public:
+
+  template
+  < 
+    class T
+  >
+  class ConcretePropertySlotProxy
+    :
+    public PropertySlotProxy
+  {
+
+  public:
+
     typedef PropertySlot<T> PropertySlot_;
     DECLARE_TYPE( PropertySlot_, PropertySlot );
 
     DM_IF ConcretePropertySlotProxy( T& anObject, 
-                                     PropertySlotCref aPropertySlot )
-        : theObject( anObject ),
-          thePropertySlot( aPropertySlot )
+			       PropertySlotRef aPropertySlot )
+      :
+      theObject( anObject ),
+      thePropertySlot( aPropertySlot )
     {
-        ; // do nothing
+      ; // do nothing
     }
 
     DM_IF virtual ~ConcretePropertySlotProxy()
     {
-        ; // do nothing
+      ; // do nothing
     }
 
 
 #define _PROPERTYSLOT_SETMETHOD( TYPE )\
     virtual SET_METHOD( TYPE, TYPE )\
     {\
-        thePropertySlot.set ## TYPE( theObject, value );\
+      thePropertySlot.set ## TYPE( theObject, value );\
     }
 
 #define _PROPERTYSLOT_GETMETHOD( TYPE )\
     virtual GET_METHOD( TYPE, TYPE )\
     {\
-        return thePropertySlot.get ## TYPE( theObject );\
+      return thePropertySlot.get ## TYPE( theObject );\
     }
 
     _PROPERTYSLOT_SETMETHOD( Polymorph );
@@ -182,22 +210,25 @@ public:
 
     DM_IF virtual const bool isSetable() const
     {
-        return thePropertySlot.isSetable();
+      return thePropertySlot.isSetable();
     }
 
     DM_IF virtual const bool isGetable() const
     {
-        return thePropertySlot.isGetable();
+      return thePropertySlot.isGetable();
     }
 
-private:
+  private:
 
     DM_IF ConcretePropertySlotProxy();
 
-    T&                             theObject;
-    PropertySlotCref    thePropertySlot;
-};
+    T&               theObject;
+    PropertySlotRef  thePropertySlot;
 
-} // namespace libecs
+  };
+
+  /** @}*/
+}
+
 
 #endif /* __PROPERTYSLOT_HPP */

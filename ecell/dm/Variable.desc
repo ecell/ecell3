@@ -1,0 +1,18 @@
+# general description of the class
+DESCRIPTION=Variable
+
+# whether class allows new properties (other then the hardcoded ones) created by modeleditor
+ACCEPTNEWPROPERTY=False
+
+# propertyname, type, defaultvalue, flags 
+# flags are: (settable, gettable, loadable, saveable) 1 means True, 0 means false
+# type can be: NESTED_LIST, STRING, MULTILINE, INTEGER, FLOAT
+PROPERTYLIST
+Fixed, INTEGER, 0, 1111
+MolarConc, FLOAT, 0.0, 1100
+Name, STRING, "", 1111
+NumberConc, FLOAT, 0.0, 1100
+TotalVelocity, FLOAT, 0.0, 0100
+Value, FLOAT, 0.0, 1111
+Velocity, FLOAT, 0.0, 0100
+END

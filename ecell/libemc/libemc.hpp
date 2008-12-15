@@ -62,49 +62,65 @@
 namespace libemc
 {
 
-DECLARE_CLASS( EventChecker );
-DECLARE_CLASS( EventHandler );
+  /** @addtogroup libemc_module The E-Cell Micro Core Interface (libemc)
+   * EMC module.
+   * @{ 
+   */ 
+  
+  /** @file */
 
-DECLARE_CLASS( Simulator );
-DECLARE_CLASS( SimulatorImplementation );
+  DECLARE_CLASS( EventChecker );
+  DECLARE_CLASS( EventHandler );
 
-DECLARE_SHAREDPTR( EventChecker );
-DECLARE_SHAREDPTR( EventHandler );
+  DECLARE_CLASS( Simulator );
+  DECLARE_CLASS( SimulatorImplementation );
 
-class LIBEMC_API EventHandler
-    : public std::unary_function< void, void >
-{
-public:
+
+
+  DECLARE_SHAREDPTR( EventChecker );
+  DECLARE_SHAREDPTR( EventHandler );
+
+  class LIBEMC_API EventHandler
+    :
+    public std::unary_function<void,void> 
+  {
+  public:
     EventHandler() {}
     virtual ~EventHandler() {}
 
     virtual void operator()( void ) const = 0;
-};
+  };
 
-class LIBEMC_API EventChecker
-    : public std::unary_function< bool, void >
-{
-public:
+  class LIBEMC_API EventChecker
+    :
+    public std::unary_function<bool,void>
+  {
+  public:
     EventChecker() {}
     virtual ~EventChecker() {}
 
     virtual bool operator()( void ) const = 0;
-};
+  };
 
-class LIBEMC_API DefaultEventChecker
+  class LIBEMC_API DefaultEventChecker
     :
     public EventChecker
-{
-public:
+  {
+  public:
     DefaultEventChecker() {}
-    //        virtual ~DefaultEventChecker() {}
+    //    virtual ~DefaultEventChecker() {}
 
     virtual bool operator()( void ) const
     {
-        return false;
+      return false;
     }
-};
+  };
+
+
+
+
+  /** @} */ //end of libemc_module 
 
 } // namespace libemc
 
-#endif /* __LIBEMC_HPP */
+#endif   /* __LIBEMC_HPP */

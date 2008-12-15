@@ -32,178 +32,207 @@
 #ifndef __ENTITY_HPP
 #define __ENTITY_HPP
 
-#include "libecs/Defs.hpp"
-#include "libecs/EntityType.hpp"
-#include "libecs/EcsObject.hpp"
-#include "libecs/PropertyInterface.hpp"
-#include "libecs/LoggerBroker.hpp"
+#include "libecs.hpp"
+#include "EntityType.hpp"
+#include "PropertiedClass.hpp"
+#include "PropertyInterface.hpp"
+
 
 namespace libecs
 {
-    DECLARE_VECTOR( EntityPtr, EntityVector );
 
-    
+  /** @addtogroup entities The Entities.
+      Entities.
+      
+      @ingroup libecs
+
+   
+      @{ 
+   */ 
+
+  /** @file */
+
+  DECLARE_VECTOR( EntityPtr, EntityVector );
+
+  
+  /**
+     Entity class is a base class for all components in the cell model.
+
+  */
+
+
+  LIBECS_DM_CLASS( Entity, PropertiedClass )
+  {
+
+  public:
+
+    LIBECS_DM_OBJECT_ABSTRACT( Entity ) 
+      {
+	INHERIT_PROPERTIES( PropertiedClass );
+
+	PROPERTYSLOT_SET_GET( String, Name );
+
+	//	PROPERTYSLOT_NO_LOAD_SAVE( String, FullID,
+	//				   NULLPTR, &Entity::getFullIDString );
+      }
+
+    Entity(); 
+    virtual ~Entity();
+
     /**
-       Entity class is a base class for all components in the cell model.
+       Get a System to which this Entity belongs.
+
+       @return a borrowed pointer to the super system.
     */
-    LIBECS_DM_CLASS( Entity, EcsObject )
+
+    SystemPtr getSuperSystem() const 
     {
-        friend class LoggerBroker;
-    public:
-
-        LIBECS_DM_OBJECT_ABSTRACT( Entity ) 
-        {
-            INHERIT_PROPERTIES( EcsObject );
-            PROPERTYSLOT_SET_GET( String, Name );
-        }
-
-        Entity(); 
-        virtual ~Entity();
-
-        /**
-           Get a System to which this Entity belongs.
-
-           @return a borrowed pointer to the super system.
-        */
-        SystemPtr getSuperSystem() const 
-        {
-            return theSuperSystem;
-        }
-
-        /**
-           Get a FullID of this Entity.
-
-           @return a FullID of this Entity.
-        */
-        const FullID getFullID() const;
-
-        /**
-           Get EntityType of this Entity.
-
-           This method is overridden in Variable, Process and System classes.
-
-           @return EntityType of this Entity object.
-           @see EntityType
-        */
-        virtual const EntityType getEntityType() const
-        {
-            return EntityType( EntityType::ENTITY );
-        }
-
-        /**
-           Get a SystemPath of this Entity.
-
-           @note The SystemPath doesn't include ID of this Entity even if 
-           this Entity is a System.
-
-           @return a SystemPath of this Entity.
-        */
-        virtual const SystemPath getSystemPath() const;
+      return theSuperSystem;
+    }
 
 
-        /**
-           @name Properties
-           @{
-         */
+    /**
+       Get a FullID of this Entity.
 
-        /**
-           Set an identifier of this Entity.
+       @return a FullID of this Entity.
+    */
 
-           @param anID an id of this Entry.
-        */
-        SET_METHOD( String, ID )
-        {
-            theID = value;
-        }
+    const FullID getFullID() const;
 
 
-        /**
-           Get an id string of this Entity.
+    /**
+       Get EntityType of this Entity.
 
-           @return an id of this Entity.
-        */
-        GET_METHOD( String, ID )
-        {
-            return theID;
-        }
+       This method is overridden in Variable, Process and System classes.
 
+       @return EntityType of this Entity object.
+       @see EntityType
+    */
 
-        /**
-           Set name of this Entity.
-
-           @param aName a name of this Entity.
-        */
-        SET_METHOD( String, Name )
-        {
-            theName = value;
-        }
+    virtual const EntityType getEntityType() const
+    {
+      return EntityType( EntityType::ENTITY );
+    }
 
 
-        /**
-           Get a name of this Entity.
-
-           @return a name of this Entity.
-        */
-        GET_METHOD( String, Name )
-        { 
-            return theName; 
-        }
 
 
-        /**
-           Get a FullID of this Entity as String.
+    /**
+       Get a SystemPath of this Entity.
 
-           @note Property name for this method is 'getFullID', not
-           'getFullIDString.'
+       @note The SystemPath doesn't include ID of this Entity even if 
+       this Entity is a System.
 
-           @return a FullID string of this Entity.
-        */
+       @return a SystemPath of this Entity.
+    */
 
-        const String getFullIDString() const;
-
-        /** @} */
+    virtual const SystemPath getSystemPath() const;
 
 
-        /**
-           Get loggers associated to this Entity
-         */
-        LoggerBroker::LoggersPerFullID getLoggers() const;
+    /// \name Properties
+    //@{
 
-        /**
-           @internal
+    /**
+       Set an identifier of this Entity.
 
-           Set a supersystem of this Entity.    
+       @param anID an id of this Entry.
+    */
 
-           Usually no need to set this manually because a System object does
-           this when an Entity is added to the System.
+    SET_METHOD( String, ID )
+    {
+      theID = value;
+    }
 
-           @param supersystem a pointer to a System to which this object belongs.
-        */
-        void setSuperSystem( SystemPtr const supersystem ) 
-        { 
-            theSuperSystem = supersystem; 
-        }
+    /**
+       Get an id string of this Entity.
 
-    protected:
-    
-        void setLoggerMap( LoggerBroker::PerFullIDMap* anLoggerMap )
-        {
-            theLoggerMap = anLoggerMap;
-        }
+       @return an id of this Entity.
+    */
 
-    private:
+    GET_METHOD( String, ID )
+    {
+      return theID;
+    }
 
-        // hide them
-        Entity( EntityRef );
-        EntityRef operator=( EntityRef );
+    /**
+       Set name of this Entity.
 
-    private:
-        SystemPtr                      theSuperSystem;
-        LoggerBroker::PerFullIDMap*    theLoggerMap;
-        String                         theID;
-        String                         theName;
-    };
+       @param aName a name of this Entity.
+    */
+
+    SET_METHOD( String, Name )
+    {
+      theName = value;
+    }
+
+    /**
+       Get a name of this Entity.
+
+       @return a name of this Entity.
+    */
+
+    GET_METHOD( String, Name )
+    { 
+      return theName; 
+    }
+
+    /**
+       Get a FullID of this Entity as String.
+
+       @note Property name for this method is 'getFullID', not
+       'getFullIDString.'
+
+       @return a FullID string of this Entity.
+    */
+
+    const String getFullIDString() const;
+
+    //@}
+
+
+    /**
+       @internal
+
+       Set a supersystem of this Entity.  
+
+       Usually no need to set this manually because a System object does
+       this when an Entity is added to the System.
+
+       @param supersystem a pointer to a System to which this object belongs.
+    */
+
+    void setSuperSystem( SystemPtr const supersystem ) 
+    { 
+      theSuperSystem = supersystem; 
+    }
+
+  private:
+
+    // hide them
+    Entity( EntityRef );
+    EntityRef operator=( EntityRef );
+
+  private:
+
+    SystemPtr theSuperSystem;
+
+
+    String    theID;
+    String    theName;
+  };
+
+
+
+  /*@}*/
 
 } // namespace libecs
 
-#endif /* __ENTITY_HPP */
+#endif /*  __ENTITY_HPP */
+
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/

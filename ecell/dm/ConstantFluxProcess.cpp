@@ -38,7 +38,7 @@ LIBECS_DM_CLASS( ConstantFluxProcess, ContinuousProcess )
   LIBECS_DM_OBJECT( ConstantFluxProcess, Process )
     {
       INHERIT_PROPERTIES( ContinuousProcess );
-      CLASS_DESCRIPTION("ConstantFluxProcess");
+
       PROPERTYSLOT_SET_GET( Real, k);
     }
 
