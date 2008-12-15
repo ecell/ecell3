@@ -289,8 +289,7 @@ namespace libecs
   };
 
   template
-  < 
-    class T,
+  < class T,
     typename SlotType_
   >
   class LoadSaveConcretePropertySlot
@@ -302,20 +301,20 @@ namespace libecs
 
     DECLARE_TYPE( SlotType_, SlotType );
 
-    typedef ConcretePropertySlot<T,SlotType> ConcretePropertySlot;
+    typedef ConcretePropertySlot<T,SlotType> ConcretePropertySlotType;
 
-    typedef typename ConcretePropertySlot::SetType SetType;
-    typedef typename ConcretePropertySlot::GetType GetType;
+    typedef typename ConcretePropertySlotType::SetType SetType;
+    typedef typename ConcretePropertySlotType::GetType GetType;
 
-    typedef typename ConcretePropertySlot::SetMethodPtr SetMethodPtr;
-    typedef typename ConcretePropertySlot::GetMethodPtr GetMethodPtr;
+    typedef typename ConcretePropertySlotType::SetMethodPtr SetMethodPtr;
+    typedef typename ConcretePropertySlotType::GetMethodPtr GetMethodPtr;
 
     DM_IF LoadSaveConcretePropertySlot( const SetMethodPtr aSetMethodPtr,
 				  const GetMethodPtr aGetMethodPtr,
 				  const SetMethodPtr aLoadMethodPtr,
 				  const GetMethodPtr aSaveMethodPtr )
       :
-      ConcretePropertySlot( aSetMethodPtr, aGetMethodPtr ),
+      ConcretePropertySlotType( aSetMethodPtr, aGetMethodPtr ),
       theLoadMethodPtr( SetMethod( aLoadMethodPtr ) ),
       theSaveMethodPtr( GetMethod( aSaveMethodPtr ) )
     {

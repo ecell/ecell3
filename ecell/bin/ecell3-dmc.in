@@ -1,4 +1,4 @@
-#!/usr/bin/env @prefix@/bin/ecell3-python
+#!/usr/bin/env python
 #
 # ecell3-dmc  - a program to compile and/or docify dynamic module in 
 #               E-Cell Simulation Environment Version 3
@@ -11,25 +11,27 @@
 
 import sys
 import os
-import glob
 import getopt
-import string
+import operator
+from glob import glob
+from distutils.util import split_quoted
+    
+DMCOMPILE = 'dmcompile'
+CLASS_NAME_MACRO_NAME = '_ECELL3_DM_CLASSNAME'
+
+progname = os.path.basename( sys.argv[ 0 ] )
 
 def usage():
-    ext = os.path.basename( sys.argv[0] )
-    aProgramName, ext = os.path.splitext( ext )
     print '''
 %s -- Compile dynamic modules for E-Cell Simulation Environment Version 3.
 
 Usage:
     %s [options] [sourcefile(s)]
     %s [-h] or [--help]
-    '''% ( aProgramName, aProgramName, aProgramName )
+    ''' % dict( progname = progname )
 
 def help():
     usage()
-    ext = os.path.basename( sys.argv[0] )
-    aProgramName, ext = os.path.splitext( ext )
     print '''
 %s options:
     --no-stdinclude          Don't set standard include file path.
@@ -47,29 +49,28 @@ This program is part of E-Cell Simulation Environment Version 3.
 Written by:
     Tomoya Kitayama <tomo@e-cell.org>
     Satya Arjunan <satya@ttck.keio.ac.jp>
-    '''% ( aProgramName )
+    ''' % dict( progname = progname )
 
 def msg( outstr ):
-    print "E-Cell3 ecell3-dmc: " + outstr
+    global progname
+    print "%s: %s" % ( progname, outstr )
 
 def main():
 
     # -------------------------------------
     # initialize file names
     # -------------------------------------
-    prefix = os.environ['ECELL3_PREFIX']
-    ecell3dir = os.environ['ECELL_DIRNAME']
-    BOOST_LIBRARIES = os.environ['BOOST_LIBRARIES']
+    prefix = r'''@PREFIX@'''
+    ecell3dir = r'''@ECELL_DIRNAME@'''
+    BOOST_LIBRARIES = r'''-lboost_python'''
     exec_prefix = prefix
     BINDIR = exec_prefix + os.sep + 'bin'
-    STDLIBDIR = '-L\"' + exec_prefix + os.sep + 'lib\"'
+    STDLIBDIRS = [ '-L' + exec_prefix + os.sep + 'lib' ]
     ECELL_INCLUDE = prefix + os.sep + 'include' + os.sep + ecell3dir
     LIBECS_INCLUDE = ECELL_INCLUDE + os.sep + 'libecs'
-    STDINCLUDE = [ '\"-I' + prefix + os.sep + 'include\"',
-                   '\"-I' + ECELL_INCLUDE + '\"',
-                   '\"-I' + LIBECS_INCLUDE + '\"',
-                   os.environ['PYTHON_INCLUDES'] ]
-    DMCOMPILE = os.path.abspath( BINDIR + os.sep + 'dmcompile' )
+    STDINCLUDE = [ '-I' + prefix + os.sep + 'include',
+                   '-I' + ECELL_INCLUDE,
+                   '-I' + LIBECS_INCLUDE ]
     SRC = None
 
 
@@ -88,11 +89,11 @@ def main():
     NO_STDINCLUDE = False
     NO_STDLIBDIR = False
     NO_DEFINE_CXXFLAGS = False
-    LDFLAGS = ''
+    LDFLAGS = []
     CXXFLAGS = []
     CXXCOMPILEFLAGS = []
-    PYTHON = None
     cmdList = []
+    dmcompile = DMCOMPILE
 
     # -------------------------------------
     # check argument
@@ -102,7 +103,7 @@ def main():
         # print help message
         if anOption in ( "-h", '--help' ):
             help()
-            sys.exit( -1 )
+            return 255
       
         # be verbose
         if anOption in ( "-v", '--verbose'):
@@ -118,85 +119,72 @@ def main():
 
         # set ldflags
         if anOption == "--ldflags":
-            LDFLAGS = LDFLAGS + ' ' + anArg
+            LDFLAGS.extend( split_quoted( anArg ) )
 
         # set no-define-cxxflags
         if anOption == "--no-define-cxxflags":
             NO_DEFINE_CXXFLAGS = True
-            CXXFLAGS = anArg.split()
+            CXXFLAGS.extend( split_quoted( anArg ) )
 
         # set cxxflags
         if anOption == "--cxxflags":
-            CXXCOMPILEFLAGS.extend( CXXFLAGS )
-            CXXCOMPILEFLAGS.extend( anArg.split() )
+            CXXFLAGS.extend( split_quoted( anArg ) )
 
         # set cxxflags
         if anOption == "--dmcompile":
-            DMCOMPILE = os.path.abspath( anArg + os.sep + 'dmcompile' )
+            if os.path.isdir( anArg ):
+                dmcompile = os.path.join( anArg, DMCOMPILE )
+            else:
+                dmcompile = anArg
 
     # check if source file is given
     if len( args ) < 1:
         help()
-        msg( "Error: source file was not given." )
-        sys.exit( 1 )
+        msg( "no source file is given." )
+        return 1
 
-    if os.name == 'nt':
-        PYTHON_WIN_VERSION = ( '%d%d' )%( sys.version_info[:2] )
-        ADDFLAGS = ' -Wl,--enable-runtime-pseudo-reloc -Wl,-s -lpython' + \
-                   PYTHON_WIN_VERSION
-    elif sys.platform == 'darwin':
-        ADDFLAGS = ' -Wl,-undefined,dynamic_lookup'
-    else:
-        ADDFLAGS = ''
-        cmdList.append( sys.executable )
-
-    cmdList.append( DMCOMPILE )
+    cmdList.append( dmcompile )
 
     if VERBOSE:
         cmdList.append( '-v' )
 
     # on MS-Windows, command line doesn't expand *.cpp automatically
-    FILELIST = []
-    for arg in args:
-        FILELIST.extend( glob.glob( arg ) )
+    srcs = reduce( operator.add, map( glob, args ) )
 
     # check if source file is valid
-    if len( FILELIST ) < 1:
-        msg( "Error: source file "+ args[0] + " was not found." )
-        sys.exit( 1 )    
+    if len( srcs ) < 1:
+        msg( "source file "+ args[0] + " was not found." )
+        return 1
 
     if NO_STDINCLUDE:
         STDINCLUDE = []
 
     if not NO_STDLIBDIR:
-        LDFLAGS = LDFLAGS + ' ' + STDLIBDIR
-        
-    LDFLAGS = LDFLAGS + ADDFLAGS + ' -lecs -lgsl ' + BOOST_LIBRARIES
-    os.environ['LDFLAGS'] = LDFLAGS
+        LDFLAGS.extend( STDLIBDIRS )
+  
+    LDFLAGS.append( '-lecs' )
+    LDFLAGS.append( '-lgsl' )
+    LDFLAGS.extend( split_quoted( BOOST_LIBRARIES ) )
 
-    if NO_DEFINE_CXXFLAGS:
-        os.environ['CXXFLAGS'] = CXXFLAGS.join()
+    cmdList.extend( STDINCLUDE )
+    cmdList.extend( CXXFLAGS )
+    cmdList.extend( LDFLAGS )
 
-    for SRC in FILELIST:
-        ext = os.path.basename(SRC)
-        CLASSNAME, ext = os.path.splitext(ext)
-        CLASSNAMEDEFINE = '-D_ECELL3_DM_CLASSNAME=' + CLASSNAME
-        argList = []
-        argList.append( cmdList[0] )
-        argList.extend( cmdList[1:] )
-        argList.extend( [ SRC, CLASSNAMEDEFINE ] )
-        argList.extend( STDINCLUDE )
-        argList.extend( CXXCOMPILEFLAGS )
+    for src in srcs:
+        ext = os.path.basename( src )
+        classname, ext = os.path.splitext( ext )
+        argList = cmdList + [ '-D%s=%s' % ( CLASS_NAME_MACRO_NAME, classname ), src ]
 
         if VERBOSE:
-            print string.join( argList[0:] )
+            print ' '.join( argList[0:] )
             
         # Need to us os.spawnv because of problems in MS-Windows with os.sytem
         # when the dmcompile path contains whitespaces even if we force quotes
-        ret = os.spawnv( os.P_WAIT, cmdList[0], argList )
-        if not ret == 0:
-            sys.exit( 1 )
+        ret = os.spawnvp( os.P_WAIT, cmdList[0], argList )
+        if ret != 0:
+            msg( '%s returned error status: %d' % ( cmdList[0], ret ) )
+            return 1
+    return 0
 
 if __name__ == '__main__':
-    main()
-    sys.exit( 0 )
+    sys.exit( main() )

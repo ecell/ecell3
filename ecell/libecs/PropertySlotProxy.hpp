@@ -162,11 +162,10 @@ namespace libecs
 
   public:
 
-    typedef PropertySlot<T> PropertySlot_;
-    DECLARE_TYPE( PropertySlot_, PropertySlot );
+    DECLARE_TYPE( PropertySlot<T>, PropertySlotType );
 
     DM_IF ConcretePropertySlotProxy( T& anObject, 
-			       PropertySlotRef aPropertySlot )
+			       PropertySlotTypeRef aPropertySlot )
       :
       theObject( anObject ),
       thePropertySlot( aPropertySlot )
@@ -223,7 +222,7 @@ namespace libecs
     DM_IF ConcretePropertySlotProxy();
 
     T&               theObject;
-    PropertySlotRef  thePropertySlot;
+    PropertySlotTypeRef  thePropertySlot;
 
   };
 

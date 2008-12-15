@@ -5,7 +5,7 @@
 
 import os
 
-setEnvironment('Globus2')  
+setEnvironment('Globus4')
 
 setTmpDirRemovable(False)  # not delete tmp directory
 
@@ -15,14 +15,8 @@ setConcurrency(2) # set concurrency
 # set up SystemProxy's properties
 
 aSystemProxy = getSystemProxy()
-
-aSystemProxy.setPassword('your_passwd')  # password for globus gate-keeper
-aSystemProxy.gridProxyInit()      # initialize gate-keeper
-
-# create a list of hosts on which jobs are conducted.
-aHostList = ['host1.domain',
-             'host2.domain']
-aSystemProxy.setHosts(aHostList) # set the host list
+aSystemProxy.setLocalHostName( 'myhost.example.com' )
+aSystemProxy.setFactoryEndpoint( 'https://endpoint.example.com:8443/wsrf/services/ManagedJobFactoryService' )
 
 # -------------------------------
 

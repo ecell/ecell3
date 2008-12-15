@@ -88,11 +88,10 @@ namespace libecs
 
   public:
 
-    typedef PropertySlot<T> PropertySlot_;
-    DECLARE_TYPE( PropertySlot_, PropertySlot );
+    DECLARE_TYPE( PropertySlot<T>, PropertySlotType );
 
-    DECLARE_ASSOCVECTOR_TEMPLATE( String, PropertySlotPtr,
-				  std::less<const String>, PropertySlotMap );
+    DECLARE_ASSOCVECTOR_TEMPLATE( String, PropertySlotTypePtr,
+				  std::less<const String>, PropertySlotTypeMap );
 
     DECLARE_ASSOCVECTOR_TEMPLATE( String, Polymorph,
 				  std::less<const String>, PolymorphAssocVector);
@@ -184,9 +183,9 @@ namespace libecs
        @return a borrowed pointer to the PropertySlot with that name.
     */
 
-    static PropertySlotPtr getPropertySlot( StringCref aPropertyName )
+    static PropertySlotTypePtr getPropertySlot( StringCref aPropertyName )
     {
-      PropertySlotMapConstIterator i( findPropertySlot( aPropertyName ) );
+      PropertySlotTypeMapConstIterator i( findPropertySlot( aPropertyName ) );
 
       if( i == thePropertySlotMap.end() )
 	{
@@ -202,7 +201,7 @@ namespace libecs
     {
       try
 	{
-	  PropertySlotPtr aPropertySlot( getPropertySlot( aPropertyName ) );
+	  PropertySlotTypePtr aPropertySlot( getPropertySlot( aPropertyName ) );
 	  return new ConcretePropertySlotProxy<T>( anObject, *aPropertySlot );
 	}
       catch( NoSlotCref )
@@ -227,7 +226,7 @@ namespace libecs
     static void setProperty( T& anObject, StringCref aPropertyName, 
 			     PolymorphCref aValue )
     {
-      PropertySlotMapConstIterator 
+      PropertySlotTypeMapConstIterator 
 	aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
       
       if( aPropertySlotMapIterator != thePropertySlotMap.end() )
@@ -255,7 +254,7 @@ namespace libecs
     static const Polymorph getProperty( const T& anObject,
 					StringCref aPropertyName )
     {
-      PropertySlotMapConstIterator 
+      PropertySlotTypeMapConstIterator 
 	aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
       
       if( aPropertySlotMapIterator != thePropertySlotMap.end() )
@@ -272,12 +271,12 @@ namespace libecs
     static void loadProperty( T& anObject, StringCref aPropertyName, 
 			      PolymorphCref aValue )
     {
-      PropertySlotMapConstIterator 
+      PropertySlotTypeMapConstIterator 
 	aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
 
       if( aPropertySlotMapIterator != thePropertySlotMap.end() )
 	{
-	  PropertySlotPtr aPropertySlotPtr( aPropertySlotMapIterator->second );
+	  PropertySlotTypePtr aPropertySlotPtr( aPropertySlotMapIterator->second );
 
 	  if( aPropertySlotPtr->isLoadable() )
 	    {
@@ -298,12 +297,12 @@ namespace libecs
     static const Polymorph
     saveProperty( const T& anObject, StringCref aPropertyName )
     {
-      PropertySlotMapConstIterator 
+      PropertySlotTypeMapConstIterator 
 	aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
 
       if( aPropertySlotMapIterator != thePropertySlotMap.end() )
 	{
-	  PropertySlotPtr aPropertySlotPtr( aPropertySlotMapIterator->second );
+	  PropertySlotTypePtr aPropertySlotPtr( aPropertySlotMapIterator->second );
 	  if( aPropertySlotPtr->isSavable() )
 	    {
 	      return aPropertySlotPtr->savePolymorph( anObject );
@@ -325,7 +324,7 @@ namespace libecs
       PolymorphVector aVector1, aVector2;
       // aVector.reserve( thePropertySlotMap.size() );
       
-      for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
+      for( PropertySlotTypeMapConstIterator i( thePropertySlotMap.begin() ); 
 	   i != thePropertySlotMap.end() ; ++i )
 	{
 	  aVector1.push_back( i->first );
@@ -347,7 +346,7 @@ namespace libecs
 
     
     static void 
-    registerPropertySlot( StringCref aName, PropertySlotPtr aPropertySlotPtr )
+    registerPropertySlot( StringCref aName, PropertySlotTypePtr aPropertySlotPtr )
     {
       if( findPropertySlot( aName ) != thePropertySlotMap.end() )
 	{
@@ -364,7 +363,7 @@ namespace libecs
     static const Polymorph
     getPropertyAttributes( const T& anObject, StringCref aPropertyName )
     {
-      PropertySlotMapConstIterator i( findPropertySlot( aPropertyName ) );
+      PropertySlotTypeMapConstIterator i( findPropertySlot( aPropertyName ) );
 
       if( i != thePropertySlotMap.end() )
 	{
@@ -413,7 +412,7 @@ namespace libecs
     }
     */
 
-    static PropertySlotMapCref getPropertySlotMap()
+    static PropertySlotTypeMapCref getPropertySlotMap()
     {
       return thePropertySlotMap;
     }
@@ -465,7 +464,7 @@ namespace libecs
 
   private:
 
-    static PropertySlotMapConstIterator 
+    static PropertySlotTypeMapConstIterator 
     findPropertySlot( StringCref aPropertyName )
     {
       return thePropertySlotMap.find( aPropertyName );
@@ -473,7 +472,7 @@ namespace libecs
 
   private:
 
-    static PropertySlotMap  thePropertySlotMap;
+    static PropertySlotTypeMap  thePropertySlotMap;
 
     static PolymorphAssocVector theInfoMap;
   };
@@ -482,7 +481,7 @@ namespace libecs
   // This is necessary for the static data member of 
   // the PropertyInterface template class to be instantiated
   // when the class is specialized (in LIBECS_DM_INIT_STATIC()).
-  template< class T > typename libecs::PropertyInterface< T>::PropertySlotMap
+  template< class T > typename libecs::PropertyInterface< T>::PropertySlotTypeMap
     libecs::PropertyInterface< T>::thePropertySlotMap;
   template< class T > typename libecs::PropertyInterface< T>::PolymorphAssocVector
     libecs::PropertyInterface< T>::theInfoMap;

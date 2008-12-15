@@ -26,7 +26,5 @@ run()
 
 for aJobID in aJobIDList: 
 
-	print " --- job id = %s ---" %aJobID
+	print " --- job id = %s ---" % aJobID
 	print getStdout( aJobID )  # Print the output of each job. 
-
-
