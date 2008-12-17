@@ -5,6 +5,7 @@
 //       Copyright (C) 1996-2008 Keio University
 //       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
+//
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
 //
@@ -104,9 +105,11 @@ public:
         typedef iterator_base base_type;
  
         template< typename Trange_ > 
-        iterator_base( iterator_pair const& aPair, Trange_& anOuterRange )
+        iterator_base( iterator_pair const& aPair, Trange_& anOuterRange,
+                       inner_iterator_type const& aNullInnerIterator )
             : thePair( aPair ), theOuterRange( boost::begin( anOuterRange ),
-                                               boost::end( anOuterRange )) {}
+                                               boost::end( anOuterRange )),
+              theNullInnerIterator( aNullInnerIterator ) {}
 
         Tderived_& operator++()
         {
@@ -157,14 +160,16 @@ public:
             return retval;
         }
 
-        bool operator==(Tderived_ const& rhs) const
+        template< typename T_ >
+        bool operator==(T_ const& rhs) const
         {
             return thePair.first == rhs.thePair.first &&
                     ( thePair.first == theOuterRange.end()
                       || thePair.second == rhs.thePair.second );
         }
 
-        bool operator!=(Tderived_ const& rhs) const
+        template< typename T_ >
+        bool operator!=(T_ const& rhs) const
         {
             return !operator==(rhs);
         }
@@ -179,6 +184,7 @@ public:
     public:
         iterator_pair thePair;
         boost::iterator_range< outer_iterator_type > theOuterRange;
+        inner_iterator_type theNullInnerIterator;
     };
 
     struct iterator
@@ -187,8 +193,9 @@ public:
         iterator( base_type const& that ): base_type( that ) {}
 
         template< typename Trange_ >
-        iterator( iterator_pair const& aPair, Trange_& anOuterRange )
-            : base_type( aPair, anOuterRange ) {}
+        iterator( iterator_pair const& aPair, Trange_& anOuterRange,
+                  inner_iterator_type const& aNullInnerIterator )
+            : base_type( aPair, anOuterRange, aNullInnerIterator ) {}
     };
 
     struct const_iterator
@@ -196,10 +203,15 @@ public:
     {
         const_iterator( base_type const& that ): base_type( that ) {}
 
+        const_iterator( iterator const& that )
+            : base_type( that.thePair, that.theOuterRange,
+                         that.theNullInnerIterator ) {}
+
         template< typename Trange_ >
         const_iterator( iterator_pair const& aPair,
-                        Trange_ const& anOuterRange )
-            : base_type( aPair, anOuterRange ) {}
+                        Trange_ const& anOuterRange,
+                        inner_iterator_type const& aNullInnerIterator )
+            : base_type( aPair, anOuterRange, aNullInnerIterator ) {}
     };
 
     typedef boost::transform_iterator<
@@ -262,9 +274,9 @@ public:
             iterator::iterator_pair(
                 theLoggerMap.begin(),
                 theLoggerMap.begin() == theLoggerMap.end() ?
-                    iterator::inner_iterator_type():
+                    theEmptyPerFullIDMap.begin():
                     theLoggerMap.begin()->second.begin() ),
-            theLoggerMap );
+            theLoggerMap, theEmptyPerFullIDMap.begin() );
     }
 
     iterator end()
@@ -273,9 +285,9 @@ public:
             iterator::iterator_pair(
                 theLoggerMap.end(),
                 theLoggerMap.begin() == theLoggerMap.end() ?
-                    iterator::inner_iterator_type():
+                    theEmptyPerFullIDMap.begin():
                     theLoggerMap.begin()->second.end() ),
-            theLoggerMap );
+            theLoggerMap, theEmptyPerFullIDMap.begin() );
     }
 
     const_iterator begin() const
@@ -284,9 +296,9 @@ public:
             const_iterator::iterator_pair(
                 theLoggerMap.begin(),
                 theLoggerMap.begin() == theLoggerMap.end() ?
-                    iterator::inner_iterator_type():
+                    theEmptyPerFullIDMap.begin():
                     theLoggerMap.begin()->second.begin() ),
-            theLoggerMap );
+            theLoggerMap, theEmptyPerFullIDMap.begin() );
     }
 
     const_iterator end() const
@@ -295,9 +307,9 @@ public:
             const_iterator::iterator_pair(
                 theLoggerMap.end(),
                 theLoggerMap.begin() == theLoggerMap.end() ?
-                    iterator::inner_iterator_type():
+                    theEmptyPerFullIDMap.begin():
                     theLoggerMap.begin()->second.end() ),
-            theLoggerMap );
+            theLoggerMap, theEmptyPerFullIDMap.begin() );
     }
 
     LoggersPerFullID getLoggersByFullID( FullID const& aFullID );

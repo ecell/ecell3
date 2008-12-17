@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(testNonExistent)
         NotFound );
 }
 
-BOOST_AUTO_TEST_CASE(testValid)
+BOOST_AUTO_TEST_CASE(testIteration)
 {
     using namespace libecs;
 
@@ -95,4 +95,66 @@ BOOST_AUTO_TEST_CASE(testValid)
     BOOST_CHECK( DataPoint( 1.0, 0.0 ) == vec->asShort( 1 ) );
     BOOST_CHECK( DataPoint( 2.0, 0.0 ) == vec->asShort( 2 ) );
     BOOST_CHECK( DataPoint( 3.0, 0.0 ) == vec->asShort( 3 ) );
+}
+
+BOOST_AUTO_TEST_CASE(testValid)
+{
+    using namespace libecs;
+
+    ModuleMaker< EcsObject > mmaker;
+
+    Model model( mmaker );
+
+    model.createEntity( "Variable", FullID( "Variable:/:test" ) );
+    Entity* var( model.getEntity( FullID( "Variable:/:test" ) ) );
+    Logger* valueLogger( model.getLoggerBroker().createLogger(
+            FullPN( "Variable:/:test:Value" ),
+            Logger::Policy() ) );
+    Logger* velocityLogger( model.getLoggerBroker().createLogger(
+            FullPN( "Variable:/:test:Velocity" ),
+            Logger::Policy() ) );
+
+    {
+        LoggerBroker::const_iterator i(
+            std::find( model.getLoggerBroker().begin(),
+                       model.getLoggerBroker().end(),
+                       LoggerBroker::iterator::value_type(
+                            FullPN( "Variable:/:test:Value" ),
+                            valueLogger ) ) );
+
+        BOOST_CHECK( i != model.getLoggerBroker().end() );
+    }
+
+    {
+        LoggerBroker::const_iterator i(
+            std::find( model.getLoggerBroker().begin(),
+                       model.getLoggerBroker().end(),
+                       LoggerBroker::iterator::value_type(
+                            FullPN( "Variable:/:test:Velocity" ),
+                            valueLogger ) ) );
+
+        BOOST_CHECK( i == model.getLoggerBroker().end() );
+    }
+
+    {
+        LoggerBroker::const_iterator i(
+            std::find( model.getLoggerBroker().begin(),
+                       model.getLoggerBroker().end(),
+                       LoggerBroker::iterator::value_type(
+                            FullPN( "Variable:/:test:Value" ),
+                            velocityLogger ) ) );
+
+        BOOST_CHECK( i == model.getLoggerBroker().end() );
+    }
+
+    {
+        LoggerBroker::const_iterator i(
+            std::find( model.getLoggerBroker().begin(),
+                       model.getLoggerBroker().end(),
+                       LoggerBroker::iterator::value_type(
+                            FullPN( "Variable:/:test:Velocity" ),
+                            velocityLogger ) ) );
+
+        BOOST_CHECK( i != model.getLoggerBroker().end() );
+    }
 }
