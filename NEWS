@@ -125,6 +125,12 @@ ecell-3.2: ?-Nov-2008
      - TRUE
      - FALSE
 
+   - getLoggerData() now returns ecell._ecs.DataPointSharedVector instead of
+     numpy.core.multiarray.array(). The object can be safely fed to numpy
+     functions as if it was of numpy arrays thanks to numpy's flexible array
+     interface.  This enables zero-copy retrieval of logger data from libecs
+     and significantly enhances the speed.
+
 ecell-3.1.106: 5-Feb-2008
 
 
