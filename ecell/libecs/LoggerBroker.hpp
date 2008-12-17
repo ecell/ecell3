@@ -126,13 +126,13 @@ public:
                 ++thePair.second;
                 if ( thePair.first->second.end() == thePair.second )
                 {
+                    ++thePair.first;
                     if ( theOuterRange.end() == thePair.first )
                     {
                         thePair.second = theNullInnerIterator;
                     }
                     else
                     {
-                        ++thePair.first;
                         thePair.second = thePair.first->second.begin();
                     }
                 }
