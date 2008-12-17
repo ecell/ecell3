@@ -31,8 +31,10 @@ __all__ = (
     'getLibECSVersionInfo',
     'getLibECSVersion',
     'VariableReference',
-    'Process',
+    'Entity',
     'System',
+    'Process',
+    'Variable',
     'VariableReferenceVector',
     'Simulator'
     )
