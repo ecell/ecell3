@@ -113,17 +113,28 @@ public:
 
         Tderived_& operator++()
         {
-            ++thePair.second;
-            if ( thePair.first->second.end() == thePair.second )
+            if ( theNullInnerIterator == thePair.second )
             {
-                if ( theOuterRange.end() == thePair.first )
+                if ( theOuterRange.begin() == thePair.first &&
+                     theOuterRange.begin() != theOuterRange.end() )
                 {
-                    thePair.second = theOuterRange.begin()->second.begin();
-                }
-                else
-                {
-                    ++thePair.first;
                     thePair.second = thePair.first->second.begin();
+                }
+            }
+            else
+            {
+                ++thePair.second;
+                if ( thePair.first->second.end() == thePair.second )
+                {
+                    if ( theOuterRange.end() == thePair.first )
+                    {
+                        thePair.second = theNullInnerIterator;
+                    }
+                    else
+                    {
+                        ++thePair.first;
+                        thePair.second = thePair.first->second.begin();
+                    }
                 }
             }
 
@@ -146,9 +157,17 @@ public:
                 {
                     --thePair.first;
                     thePair.second = thePair.first->second.end();
+                    --thePair.second;
+                }
+                else
+                {
+                    thePair.second = theNullInnerIterator;
                 }
             }
-            --thePair.second;
+            else
+            {
+                --thePair.second;
+            }
 
             return *static_cast< Tderived_* >( this );
         }

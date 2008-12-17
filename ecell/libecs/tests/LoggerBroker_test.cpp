@@ -158,3 +158,98 @@ BOOST_AUTO_TEST_CASE(testValid)
         BOOST_CHECK( i != model.getLoggerBroker().end() );
     }
 }
+
+BOOST_AUTO_TEST_CASE(testPastTheEnd)
+{
+    using namespace libecs;
+
+    ModuleMaker< EcsObject > mmaker;
+
+    Model model( mmaker );
+
+    BOOST_CHECK( model.getLoggerBroker().begin() ==
+                 model.getLoggerBroker().end() );
+
+    {
+        LoggerBroker::const_iterator i( model.getLoggerBroker().begin() );
+        ++i;
+        BOOST_CHECK( i == model.getLoggerBroker().begin() );
+        BOOST_CHECK( i == model.getLoggerBroker().end() );
+    }
+
+    {
+        LoggerBroker::const_iterator i( model.getLoggerBroker().begin() );
+        --i;
+        BOOST_CHECK( i == model.getLoggerBroker().begin() );
+        BOOST_CHECK( i == model.getLoggerBroker().end() );
+    }
+
+    {
+        LoggerBroker::const_iterator i( model.getLoggerBroker().end() );
+        ++i;
+        BOOST_CHECK( i == model.getLoggerBroker().begin() );
+        BOOST_CHECK( i == model.getLoggerBroker().end() );
+    }
+
+    {
+        LoggerBroker::const_iterator i( model.getLoggerBroker().end() );
+        --i;
+        BOOST_CHECK( i == model.getLoggerBroker().begin() );
+        BOOST_CHECK( i == model.getLoggerBroker().end() );
+    }
+
+    model.createEntity( "Variable", FullID( "Variable:/:test" ) );
+    Entity* var( model.getEntity( FullID( "Variable:/:test" ) ) );
+    Logger* valueLogger( model.getLoggerBroker().createLogger(
+            FullPN( "Variable:/:test:Value" ),
+            Logger::Policy() ) );
+
+    {
+        LoggerBroker::const_iterator i( model.getLoggerBroker().begin() );
+        BOOST_CHECK( i == model.getLoggerBroker().begin() );
+        BOOST_CHECK( i != model.getLoggerBroker().end() );
+        ++i;
+        BOOST_CHECK( i != model.getLoggerBroker().begin() );
+        BOOST_CHECK( i == model.getLoggerBroker().end() );
+        --i;
+        BOOST_CHECK( i == model.getLoggerBroker().begin() );
+        BOOST_CHECK( i != model.getLoggerBroker().end() );
+    }
+
+    {
+        LoggerBroker::const_iterator i( model.getLoggerBroker().begin() );
+        --i;
+        BOOST_CHECK( i != model.getLoggerBroker().begin() );
+        BOOST_CHECK( i != model.getLoggerBroker().end() );
+        ++i;
+        BOOST_CHECK( i == model.getLoggerBroker().begin() );
+        BOOST_CHECK( i != model.getLoggerBroker().end() );
+        ++i;
+        BOOST_CHECK( i != model.getLoggerBroker().begin() );
+        BOOST_CHECK( i == model.getLoggerBroker().end() );
+    }
+
+    {
+        LoggerBroker::const_iterator i( model.getLoggerBroker().end() );
+        ++i;
+        BOOST_CHECK( i != model.getLoggerBroker().begin() );
+        BOOST_CHECK( i == model.getLoggerBroker().end() );
+        --i;
+        BOOST_CHECK( i == model.getLoggerBroker().begin() );
+        BOOST_CHECK( i != model.getLoggerBroker().end() );
+        --i;
+        BOOST_CHECK( i != model.getLoggerBroker().begin() );
+        BOOST_CHECK( i != model.getLoggerBroker().end() );
+    }
+
+    {
+        LoggerBroker::const_iterator i( model.getLoggerBroker().end() );
+        --i;
+        BOOST_CHECK( i == model.getLoggerBroker().begin() );
+        BOOST_CHECK( i != model.getLoggerBroker().end() );
+        ++i;
+        BOOST_CHECK( i != model.getLoggerBroker().begin() );
+        BOOST_CHECK( i == model.getLoggerBroker().end() );
+    }
+    
+}
