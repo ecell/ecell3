@@ -720,11 +720,11 @@ public:
 
     static PyObject* toPyObject( DataPoint const* dp )
     {
-        static const int dims[] = { theNumOfElemsPerEntry };
+        static const npy_intp dims[] = { theNumOfElemsPerEntry };
         PyArrayObject* arr( reinterpret_cast< PyArrayObject* >(
             PyArray_NewFromDescr( &PyArray_Type,
                 PyArray_DescrFromType( NPY_DOUBLE ),
-                1, const_cast< int* >( dims ), NULL, 0, NPY_CONTIGUOUS, NULL )
+                1, const_cast< npy_intp* >( dims ), NULL, 0, NPY_CONTIGUOUS, NULL )
             ) );
         std::memcpy( PyArray_DATA( arr ), const_cast< DataPoint* >( dp ), sizeof( double ) * theNumOfElemsPerEntry );
         return reinterpret_cast< PyObject * >( arr );
