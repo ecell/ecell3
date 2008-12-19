@@ -23,17 +23,17 @@ progname = os.path.basename( sys.argv[ 0 ] )
 
 def usage():
     print '''
-%s -- Compile dynamic modules for E-Cell Simulation Environment Version 3.
+%(progname)s -- Compile dynamic modules for E-Cell Simulation Environment Version 3.
 
 Usage:
-    %s [options] [sourcefile(s)]
-    %s [-h] or [--help]
+    %(progname)s [options] [sourcefile(s)]
+    %(progname)s [-h] or [--help]
     ''' % dict( progname = progname )
 
 def help():
     usage()
     print '''
-%s options:
+%(progname)s options:
     --no-stdinclude          Don't set standard include file path.
     --no-stdlibdir           Don't set standard library directory path.
     --ldflags=[ldflags]      Specify options to the linker.
