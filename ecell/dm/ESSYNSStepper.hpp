@@ -1,9 +1,9 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-//       This file is part of the E-Cell System
+//             This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//             Copyright (C) 1996-2008 Keio University
+//             Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -43,54 +43,50 @@ LIBECS_DM_CLASS( ESSYNSStepper, AdaptiveDifferentialStepper )
 
 public:
 
-  LIBECS_DM_OBJECT( ESSYNSStepper, Stepper )
+    LIBECS_DM_OBJECT( ESSYNSStepper, Stepper )
     {
-      INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
-      PROPERTYSLOT_SET_GET( Integer, TaylorOrder );
+        INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
+        PROPERTYSLOT_SET_GET( Integer, TaylorOrder );
     }
 
-  GET_METHOD( Integer, TaylorOrder )
+    GET_METHOD( Integer, TaylorOrder )
     {
-      return theTaylorOrder;
+        return theTaylorOrder;
     }
 
-  SET_METHOD( Integer, TaylorOrder )
+    SET_METHOD( Integer, TaylorOrder )
     {
-      theTaylorOrder = value;
+        theTaylorOrder = value;
     }
 
-  ESSYNSStepper()
-    :
-    theESSYNSProcessPtr( NULLPTR ),
-    theTaylorOrder( 1 )
+    ESSYNSStepper()
+        : theESSYNSProcessPtr( NULLPTR ), theTaylorOrder( 1 )
     {
-      ; 
+        ; 
     }
-	    
-  virtual ~ESSYNSStepper()
+	        
+    virtual ~ESSYNSStepper()
     {
-      ;
+        ;
     }
 
-  virtual void initialize();
-  virtual bool calculate();
-    
-  virtual GET_METHOD( Integer, Order )
+    virtual void initialize();
+    virtual bool calculate();
+        
+    virtual GET_METHOD( Integer, Order )
     {
-      return theTaylorOrder;
+        return theTaylorOrder;
     }
 
-  virtual GET_METHOD( Integer, Stage ) { return 1; }
+    virtual GET_METHOD( Integer, Stage ) { return 1; }
 
 protected:
 
-  Integer theSystemSize;
-  Integer theTaylorOrder;
-  ESSYNSProcessPtr   theESSYNSProcessPtr;
-  boost::multi_array< Real, 2 > theESSYNSMatrix;
-  std::vector<VariableVector::size_type> theIndexVector;
-
-  //  RealVector theK1;
+    Integer theSystemSize;
+    Integer theTaylorOrder;
+    ESSYNSProcessPtr     theESSYNSProcessPtr;
+    boost::multi_array< Real, 2 > theESSYNSMatrix;
+    std::vector<VariableVector::size_type> theIndexVector;
 };
 
 #endif /* __ESSYNSSTEPPER_HPP */

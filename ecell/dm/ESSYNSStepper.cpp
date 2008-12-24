@@ -41,74 +41,73 @@ LIBECS_DM_INIT( ESSYNSStepper, Stepper );
 
 void ESSYNSStepper::initialize()
 {
-  AdaptiveDifferentialStepper::initialize();
+    AdaptiveDifferentialStepper::initialize();
  
-  // initialize()
+    // initialize()
 
-  if( theProcessVector.size() == 1 )
+    if( theProcessVector.size() == 1 )
     {
-      theESSYNSProcessPtr = DynamicCaster<ESSYNSProcessPtr,ProcessPtr>()( theProcessVector[ 0 ]);
+        theESSYNSProcessPtr = DynamicCaster<ESSYNSProcessPtr,ProcessPtr>()( theProcessVector[ 0 ]);
 	
-      theSystemSize = theESSYNSProcessPtr->getSystemSize();
+        theSystemSize = theESSYNSProcessPtr->getSystemSize();
     }
-  else
+    else
     {
-      THROW_EXCEPTION( InitializationFailed, 
+        THROW_EXCEPTION( InitializationFailed, 
 		       "Error:in ESYYNSStepper::initialize() " );
     }
 
-  theTaylorOrder = getOrder();
+    theTaylorOrder = getOrder();
 
-  theESSYNSMatrix.resize( boost::extents[ theSystemSize + 1 ][ theTaylorOrder + 1 ] );
+    theESSYNSMatrix.resize( boost::extents[ theSystemSize + 1 ][ theTaylorOrder + 1 ] );
 
-  theIndexVector.resize( theSystemSize );
-  VariableReferenceVectorCref aVariableReferenceVectorCref
-    ( theESSYNSProcessPtr->getVariableReferenceVector() );
+    theIndexVector.resize( theSystemSize );
+    VariableReferenceVectorCref aVariableReferenceVectorCref(
+        theESSYNSProcessPtr->getVariableReferenceVector() );
 
-  for ( VariableReferenceVector::size_type c( theESSYNSProcessPtr->getPositiveVariableReferenceOffset() ); c < theSystemSize; c++  )
+    for ( VariableReferenceVector::size_type c( theESSYNSProcessPtr->getPositiveVariableReferenceOffset() ); c < theSystemSize; c++  )
     {
-      VariableReferenceCref aVariableReferenceCref( aVariableReferenceVectorCref[ c ] );
-      const VariablePtr aVariablePtr( aVariableReferenceCref.getVariable() );
+        VariableReferenceCref aVariableReferenceCref( aVariableReferenceVectorCref[ c ] );
+        const VariablePtr aVariablePtr( aVariableReferenceCref.getVariable() );
 
-      theIndexVector[ c ] = getVariableIndex( aVariablePtr );
+        theIndexVector[ c ] = getVariableIndex( aVariablePtr );
     }
 }
 
 bool ESSYNSStepper::calculate()
 {
-  const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
-  Real aCurrentTime( getCurrentTime() );
-  Real aStepInterval( getStepInterval() );
+    Real aCurrentTime( getCurrentTime() );
+    Real aStepInterval( getStepInterval() );
 
-  // write step() function
-  
-  theESSYNSMatrix = theESSYNSProcessPtr->getESSYNSMatrix();
+    // write step() function
+    theESSYNSMatrix = theESSYNSProcessPtr->getESSYNSMatrix();
 
-  //integrate
-  for( int i( 1 ); i < theSystemSize+1; i++ )
+    //integrate
+    for( int i( 1 ); i < theSystemSize + 1; i++ )
     {
-      Real aY( 0.0 ); //reset aY 
-      for( int m( 1 ); m <= theTaylorOrder; m++ )
-	{
-	  aY += ((theESSYNSMatrix[i-1])[m] *
-		 gsl_sf_pow_int( aStepInterval, m ) / gsl_sf_fact( m ));
-	}
-      (theESSYNSMatrix[i-1])[0] += aY;
-      //std::cout<< (theESSYNSMatrix[i-1])[0] <<std::endl;
+        Real aY( 0.0 ); //reset aY 
+        for( int m( 1 ); m <= theTaylorOrder; m++ )
+	    {
+	        aY += ((theESSYNSMatrix[i-1])[m] *
+	    	gsl_sf_pow_int( aStepInterval, m ) / gsl_sf_fact( m ));
+	    }
+        (theESSYNSMatrix[i-1])[0] += aY;
+        //std::cout<< (theESSYNSMatrix[i-1])[0] <<std::endl;
     }
     
-  //set value
-  for( int c( 0 ); c < aSize; ++c )
+    //set value
+    for( int c( 0 ); c < aSize; ++c )
     {
-      const VariableVector::size_type anIndex( theIndexVector[ c ] );
-      VariablePtr const aVariable( theVariableVector[ anIndex ] );
+        const VariableVector::size_type anIndex( theIndexVector[ c ] );
+        VariablePtr const aVariable( theVariableVector[ anIndex ] );
 	
-      const Real aVelocity( ( exp( (theESSYNSMatrix[c])[0] ) - ( aVariable->getValue() ) ) / aStepInterval );
+        const Real aVelocity( ( exp( (theESSYNSMatrix[c])[0] ) - ( aVariable->getValue() ) ) / aStepInterval );
 		     
-      theTaylorSeries[ 0 ][ anIndex ] = aVelocity;
+        theTaylorSeries[ 0 ][ anIndex ] = aVelocity;
     }
 
-  return true;
+    return true;
 }
  
