@@ -31,7 +31,8 @@
 
 #include "ModuleMaker.hpp"
 #include "SharedDynamicModule.hpp"
-#include "ltdl.h"
+#include <ltdl.h>
+#include <fstream>
 
 class SharedModuleMakerBase
 {
@@ -167,8 +168,18 @@ protected:
             for ( StringSet::const_iterator i( this->theSearchPath.begin() );
                   i != this->theSearchPath.end(); ++i )
             {
+#ifdef LTDL_SHLIB_EXT
+                filename = (*i) + '/' + aClassname + LTDL_SHLIB_EXT;
+                if ( !std::ifstream( filename.c_str() ).is_open() )
+                {
+                    continue;
+                }
+
+                handle = lt_dlopen( filename.c_str() );
+#else
                 filename = (*i) + '/' + aClassname;
                 handle = lt_dlopenext( filename.c_str() );
+#endif /* LTDL_SHLIB_EXT */
                 if ( handle ) 
                 {
                     break;
@@ -176,6 +187,10 @@ protected:
                 if ( error.empty() )
                 {
                     error = lt_dlerror();
+                    if ( error.empty() )
+                    {
+                        error = "unknown reasons";
+                    }
                 }
                 else
                 {
@@ -188,8 +203,17 @@ protected:
 
             if ( !handle )
             {
-                throw DMException( "Failed to find or load a DM ["
-                                   + aClassname + "]: " + error );
+                if ( error.empty() )
+                {
+                    throw DMException( "Failed to find DM ["
+                                       + aClassname + "]" );
+                }
+                else
+                {
+                    throw DMException( "Failed to load DM ["
+                                       + aClassname + "]: "
+                                       + error );
+                }
             }
         }
 
@@ -199,6 +223,11 @@ protected:
         if ( !desc )
         {
             throw DMException( "[" + filename + "] is not a valid DM file." );
+        }
+
+        if ( aClassname != desc->moduleName )
+        {
+            throw DMException( "[" + filename + "] is compiled as the module [" + desc->moduleName + "]." );
         }
 
         addClass( new SharedModule( *desc, filename, handle ) );
