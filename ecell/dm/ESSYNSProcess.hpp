@@ -30,49 +30,47 @@
 #include <boost/multi_array.hpp>
 
 #include "libecs.hpp"
-#include "Process.hpp"
+#include "ContinuousProcess.hpp"
 
 USE_LIBECS;
 
 
-LIBECS_DM_CLASS( ESSYNSProcess, Process )
+LIBECS_DM_CLASS( ESSYNSProcess, ContinuousProcess )
 {
-  
- public:
 
-  DECLARE_VECTOR( libecs::Real, RealVector );
+    DECLARE_VECTOR( libecs::Real, RealVector );
 
 
-  LIBECS_DM_OBJECT_ABSTRACT( ESSYNSProcess )
+    LIBECS_DM_OBJECT_ABSTRACT( ESSYNSProcess )
     {
-      INHERIT_PROPERTIES( Process );  
+        INHERIT_PROPERTIES( ContinuousProcess );  
     }
   
-  ESSYNSProcess()
+    ESSYNSProcess()
     {
       ;
     }
 
-  virtual ~ESSYNSProcess()
+    virtual ~ESSYNSProcess()
     {
       ;
     }
 
-  virtual void initialize()
+    virtual void initialize()
     {
-      Process::initialize();
+        Process::initialize();
     }
     
-  virtual void fire()
+    virtual void fire()
     {
       ;
     }
     
-  virtual const boost::multi_array< Real, 2 >& getESSYNSMatrix() = 0;
+    virtual const boost::multi_array< Real, 2 >& getESSYNSMatrix() = 0;
 
-  virtual GET_METHOD( Integer, SystemSize ) = 0;
+    virtual GET_METHOD( Integer, SystemSize ) = 0;
     
- protected:
+protected:
 
 };
 
