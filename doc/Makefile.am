@@ -6,7 +6,7 @@ EXTRA_DIST = \
 
 if BUILD_API_REF_html
 _htmldir = $(htmldir)/api
-_html_DATA = api/*
+_html_DATA = $(wildcard api/*)
 
 api/index.html: ecell3.doxy
 	doxygen ecell3.doxy
