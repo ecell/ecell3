@@ -43,7 +43,7 @@ USE_LIBECS;
 LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
 {
 
- public:
+public:
 
     LIBECS_DM_OBJECT( GMAProcess, Process )
     {
@@ -103,7 +103,7 @@ LIBECS_DM_CLASS( GMAProcess, ESSYNSProcess )
         Process::initialize();
     }  
     
- protected:
+protected:
 
     Integer Order;
     Integer theSystemSize;
@@ -176,22 +176,23 @@ void GMAProcess::setGMASystemMatrix( PolymorphCref aValue )
     }
 
     // set Alpha, Beta, G, H 
-    for ( Integer i( 0 ); i < theSystemSize ; i++ ) {
-
-        for ( Integer j( 0 ); j < theSystemSize; j++ ) {
+    for ( Integer i( 0 ); i < theSystemSize ; i++ )
+    {
+        for ( Integer j( 0 ); j < theSystemSize; j++ )
+        {
             theAlpha[i+1][j+1] = (aValueVector[i].as<PolymorphVector>())[j].as<Real>() ;          
-            //std::cout <<'A'<< theAlpha[i+1][j+1]<<std::endl;
-            for (Integer k( 0 ); k < theSystemSize; k++) {
-                if ( i == k ) {
+            for (Integer k( 0 ); k < theSystemSize; k++)
+            {
+                if ( i == k )
+                {
                     
                     (theG[i+1])[j+1][k+1] = ((aValueVector[i].as<PolymorphVector>())[theSystemSize + j ].as<PolymorphVector>())[k].as<Real>() -1;  
-                    //std::cout <<"  G"<<theG[i+1][j+1][k+1];
-                } else {
+                }
+                else
+                {
                     
                     (theG[i+1])[j+1][k+1] = ((aValueVector[i].as<PolymorphVector>())[theSystemSize + j ].as<PolymorphVector>())[k].as<Real>();
-                    //std::cout <<"  G"<<theG[i+1][j+1][k+1];
                 }              
-                // std::cout <<std::endl;
             }
             
         }
@@ -203,10 +204,12 @@ const boost::multi_array< Real, 2 >& GMAProcess::getESSYNSMatrix()
     // get theY
     Integer anIndex( 0 );
     
-    for( VariableReferenceVectorConstIterator
+    for ( VariableReferenceVectorConstIterator
            i ( thePositiveVariableReferenceIterator );
-         i != theVariableReferenceVector.end(); ++i ) {
-        if( (*i).getVariable()->getValue() <= 0 ) {
+         i != theVariableReferenceVector.end(); ++i )
+    {
+        if ( (*i).getVariable()->getValue() <= 0 )
+        {
             THROW_EXCEPTION( ValueError, 
                              "Error:in GMAProcess::getESSYNSMatrix().log() in 0." );
         }
@@ -222,9 +225,11 @@ const boost::multi_array< Real, 2 >& GMAProcess::getESSYNSMatrix()
     for ( Integer i( 1 ); i < theLawSize; i++ )
     {     
         (theY[i-1])[1] = 0;//reset theY
-        for ( Integer j( 1 ) ; j < theLawSize; j++ ) {
+        for ( Integer j( 1 ) ; j < theLawSize; j++ )
+        {
             aGt = 0.0;//reset aGt
-            for ( Integer k( 1 ) ; k < theLawSize ; k++ ) {
+            for ( Integer k( 1 ) ; k < theLawSize ; k++ )
+            {
                 aGt += ( (theG[i])[j][k] * (theY[k-1])[0] );
             }
             
@@ -237,22 +242,27 @@ const boost::multi_array< Real, 2 >& GMAProcess::getESSYNSMatrix()
     }
 
     // differentiate second and/or more order
-    for( Integer m( 2 ); m <= Order; m++ ) {
-        for( Integer i( 1 ) ; i < theLawSize; i++ ) {  
-           for( Integer j( 1 ); j < theLawSize; j++ ) {
-               (theGBuffer[i])[j][m] = 0; //reset GBuffer        
-               (theAlphaBuffer[i])[j][m] = 0; //reset ABuffer
-               
-               for( Integer k( 1 ); k < theLawSize; k++ ) {
-                   (theGBuffer[i])[j][m-1] += 
-                     ( (theG[i])[j][k] * (theY[k-1])[m-1] ); 
-               }
-               for( Integer q( 1 );  q <= m-1; q++) {
-                   (theAlphaBuffer[i])[j][m] +=  
-                     ( (theFBuffer[m])[q]*
-                       (theAlphaBuffer[i])[j][m-q]* 
-                       (theGBuffer[i])[j][q] );
-               }
+    for ( Integer m( 2 ); m <= Order; m++ )
+    {
+        for ( Integer i( 1 ) ; i < theLawSize; i++ )
+        {
+            for ( Integer j( 1 ); j < theLawSize; j++ )
+            {
+                (theGBuffer[i])[j][m] = 0; //reset GBuffer        
+                (theAlphaBuffer[i])[j][m] = 0; //reset ABuffer
+                
+                for( Integer k( 1 ); k < theLawSize; k++ )
+                {
+                    (theGBuffer[i])[j][m-1] += 
+                      ( (theG[i])[j][k] * (theY[k-1])[m-1] ); 
+                }
+                for( Integer q( 1 );  q <= m-1; q++)
+                {
+                    (theAlphaBuffer[i])[j][m] +=  
+                      ( (theFBuffer[m])[q]*
+                        (theAlphaBuffer[i])[j][m-q]* 
+                        (theGBuffer[i])[j][q] );
+                }
                
                 (theY[i-1])[m] = (theAlphaBuffer[i])[j][m] / (m-1);
             }
