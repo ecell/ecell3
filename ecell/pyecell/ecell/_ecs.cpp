@@ -419,16 +419,15 @@ class PythonCallable
 {
 public:
     PythonCallable( PyObject* aPyObjectPtr )
-        : thePyObject( py::handle<>( aPyObjectPtr ) )
+        : thePyObject( py::incref( aPyObjectPtr ) )
     {
         // this check isn't needed actually, because BPL does this automatically
-        if ( !PyCallable_Check( thePyObject.ptr() ) )
+        if ( !PyCallable_Check( thePyObject.get() ) )
         {
             PyErr_SetString( PyExc_TypeError,
                              "the argument is not a callable object" );
             py::throw_error_already_set();
         }
-        py::incref( thePyObject.ptr() );
     }
 
     ~PythonCallable()
@@ -437,7 +436,7 @@ public:
     }
 
 protected:
-    py::object thePyObject;
+    py::handle<> thePyObject;
 };
 
 
@@ -454,7 +453,7 @@ public:
 
     bool operator()( void ) const
     {
-        PyObject* aPyObjectPtr( PyObject_CallFunction( thePyObject.ptr(), NULL ) );
+        PyObject* aPyObjectPtr( PyObject_CallFunction( thePyObject.get(), NULL  ) );
         const bool aResult( PyObject_IsTrue( aPyObjectPtr ) );
         Py_XDECREF( aPyObjectPtr );
 
@@ -1178,41 +1177,46 @@ public:
         return anEntityPtr->getClassName();
     }
 
-    void createLogger( String const& aFullPNString )
+    Logger* createLogger( String const& aFullPNString )
     {
-        PolymorphVector aVector;
-        createLogger( aFullPNString, boost::make_tuple( 1l, 0.0, 0l, 0l ) );
+        return createLogger( aFullPNString, Logger::Policy() );
     }
 
-    void createLogger( String const& aFullPNString,
-                               Polymorph aParamList )
+    Logger* createLogger( String const& aFullPNString,
+                          Logger::Policy const& aParamList )
     {
-        typedef PolymorphValue::Tuple Tuple;
-
         if( theRunningFlag )
         {
             THROW_EXCEPTION( Exception, 
                              "Cannot create a Logger during simulation." );
         }
 
-        if ( aParamList.getType() != PolymorphValue::TUPLE
-             || aParamList.as< Tuple const& >().size() != 4 )
+        clearDirty();
+
+        Logger* retval( getModel().getLoggerBroker().createLogger(
+            FullPN( aFullPNString ), aParamList ) );
+
+        setDirty();
+
+        return retval;
+    }
+
+    Logger* createLogger( String const& aFullPNString,
+                          py::object aParamList )
+    {
+        if ( !PySequence_Check( aParamList.ptr() )
+             || PySequence_Size( aParamList.ptr() ) != 4 )
         {
             THROW_EXCEPTION( Exception,
                              "second argument must be a tuple of 4 items.");
         }
 
-        clearDirty();
-
-        getModel().getLoggerBroker().createLogger(
-            FullPN( aFullPNString ),
-            Logger::Policy(
-                aParamList.as< Tuple const& >()[ 0 ].as< Integer >(),
-                aParamList.as< Tuple const& >()[ 1 ].as< Real >(),
-                aParamList.as< Tuple const& >()[ 2 ].as< Integer >(),
-                aParamList.as< Tuple const& >()[ 3 ].as< Integer >() ) );
-
-        setDirty();
+        return createLogger( aFullPNString,
+                Logger::Policy(
+                    PyInt_AsLong( static_cast< py::object >( aParamList[ 0 ] ).ptr() ),
+                    PyFloat_AsDouble( static_cast< py::object >( aParamList[ 1 ] ).ptr() ),
+                    PyInt_AsLong( static_cast< py::object >( aParamList[ 2 ] ).ptr() ),
+                    PyInt_AsLong( static_cast< py::object >( aParamList[ 3 ] ).ptr() ) ) );
     }
 
     const Polymorph getLoggerList() const
@@ -1266,25 +1270,29 @@ public:
 
 
     void setLoggerPolicy( String const& aFullPNString, 
-                          Polymorph aParamList )
+                          Logger::Policy const& pol )
     {
         typedef PolymorphValue::Tuple Tuple;
+        getLogger( aFullPNString )->setLoggerPolicy( pol );
+    }
 
-        if( aParamList.getType() != PolymorphValue::TUPLE
-            || aParamList.as< Tuple const& >().size() != 4 )
+    void setLoggerPolicy( String const& aFullPNString,
+                          py::object aParamList )
+    {
+        if ( !PySequence_Check( aParamList.ptr() )
+            || PySequence_Size( aParamList.ptr() ) != 4 )
         {
             THROW_EXCEPTION( Exception,
                              "second parameter must be a tuple of 4 items.");
         }
 
-        getLogger( aFullPNString )->setLoggerPolicy(
-            Logger::Policy(
-                aParamList.as< Tuple const& >()[ 0 ].as< Integer >(),
-                aParamList.as< Tuple const& >()[ 1 ].as< Real >(),
-                aParamList.as< Tuple const& >()[ 2 ].as< Integer >(),
-                aParamList.as< Tuple const& >()[ 3 ].as< Integer >() ) );
+        return setLoggerPolicy( aFullPNString,
+                Logger::Policy(
+                    PyInt_AsLong( static_cast< py::object >( aParamList[ 0 ] ).ptr() ),
+                    PyFloat_AsDouble( static_cast< py::object >( aParamList[ 1 ] ).ptr() ),
+                    PyInt_AsLong( static_cast< py::object >( aParamList[ 2 ] ).ptr() ),
+                    PyInt_AsLong( static_cast< py::object >( aParamList[ 3 ] ).ptr() ) ) );
     }
-
 
     Logger::Policy
     getLoggerPolicy( String const& aFullPNString ) const
@@ -1468,7 +1476,7 @@ public:
         return aVector;
     }
 
-    PropertyInterfaceBase::PropertySlotMap
+    PropertyInterfaceBase::PropertySlotMap const&
     getPropertyInfo( String const& aClassname ) const
     {
         return getModel().getPropertyInterface( aClassname ).getPropertySlotMap();
@@ -1745,6 +1753,10 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "StartTime", &Logger::getStartTime )
         .add_property( "EndTime", &Logger::getEndTime )
         .add_property( "Size", &Logger::getSize )
+        .add_property( "Policy",
+            py::make_function(
+                &Logger::getLoggerPolicy,
+                py::return_value_policy< py::copy_const_reference >() ) )
         .def( "getData", 
               ( DataPointVectorSharedPtr( Logger::* )( void ) const )
               &Logger::getData )
@@ -1813,13 +1825,19 @@ BOOST_PYTHON_MODULE( _ecs )
         .def( "getLoggerList",
                     &SimulatorImpl::getLoggerList )    
         .def( "createLogger",
-              ( void ( SimulatorImpl::* )( String const& ) )
-                    &SimulatorImpl::createLogger )    
-        .def( "createLogger",                                 
-              ( void ( SimulatorImpl::* )( String const&, Polymorph ) )
-                    &SimulatorImpl::createLogger )    
-        .def( "getLogger", &SimulatorImpl::getLogger,
+              ( Logger* ( SimulatorImpl::* )( String const& ) )
+                    &SimulatorImpl::createLogger,
               py::return_internal_reference<> () )
+        .def( "createLogger",                                 
+              ( Logger* ( SimulatorImpl::* )( String const&, Logger::Policy const& ) )
+              &SimulatorImpl::createLogger,
+              py::return_internal_reference<>() )
+        .def( "createLogger",                                 
+              ( Logger* ( SimulatorImpl::* )( String const&, py::object ) )
+                    &SimulatorImpl::createLogger,
+              py::return_internal_reference<> () )
+        .def( "getLogger", &SimulatorImpl::getLogger,
+              py::return_internal_reference<>() )
         .def( "getLoggerData", 
               ( DataPointVectorSharedPtr( SimulatorImpl::* )(
                     String const& ) const )
@@ -1840,6 +1858,13 @@ BOOST_PYTHON_MODULE( _ecs )
         .def( "getLoggerPolicy",
               &SimulatorImpl::getLoggerPolicy )
         .def( "setLoggerPolicy",
+              ( void (SimulatorImpl::*)(
+                    String const&, Logger::Policy const& ) )
+              &SimulatorImpl::setLoggerPolicy )
+        .def( "setLoggerPolicy",
+              ( void (SimulatorImpl::*)(
+                    String const& aFullPNString,
+                    py::object aParamList ) )
               &SimulatorImpl::setLoggerPolicy )
         .def( "getLoggerSize",
               &SimulatorImpl::getLoggerSize )
@@ -1864,7 +1889,8 @@ BOOST_PYTHON_MODULE( _ecs )
               ( void ( SimulatorImpl::* )( const Real ) ) 
               &SimulatorImpl::run )
         .def( "getPropertyInfo",
-              &SimulatorImpl::getPropertyInfo )
+              &SimulatorImpl::getPropertyInfo,
+              py::return_value_policy< py::copy_const_reference >() )
         .def( "getDMInfo",
               &SimulatorImpl::getDMInfo )
         .def( "setEventHandler",
