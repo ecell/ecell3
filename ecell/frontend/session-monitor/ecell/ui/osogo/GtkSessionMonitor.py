@@ -135,8 +135,8 @@ class GtkSessionMonitor(Session):
         # -------------------------------------
         # initializes for run method 
         # -------------------------------------
-        self.theSimulator.setEventChecker( gtk.events_pending )
-        self.theSimulator.setEventHandler( gtk.main_iteration  )        
+        self.theSimulator.setEventHandler( lambda:
+            gtk.events_pending() and gtk.main_iteration()  )
 
         # -------------------------------------
         # creates MainWindow

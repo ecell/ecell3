@@ -1,11 +1,11 @@
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::
 //
 //             This file is part of the E-Cell System
 //
 //             Copyright (C) 1996-2008 Keio University
 //             Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::
 // //
 // E-Cell System is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
@@ -31,6 +31,7 @@
 
 #include <cstring>
 #include <cstdlib>
+#include <utility>
 
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
@@ -41,33 +42,32 @@
 #include <boost/format.hpp>
 #include <boost/format/group.hpp>
 #include <boost/python.hpp>
+#include <boost/python/tuple.hpp>
+#include <boost/python/object.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 #include <numpy/arrayobject.h>
 #include <stringobject.h>
 
+#include "libecs/Model.hpp"
 #include "libecs/libecs.hpp"
 #include "libecs/Process.hpp"
 #include "libecs/Exceptions.hpp"
 #include "libecs/Polymorph.hpp"
 #include "libecs/DataPointVector.hpp"
 #include "libecs/VariableReference.hpp"
-#include "libemc/libemc.hpp"
-#include "libemc/Simulator.hpp"
 
 using namespace libecs;
-using namespace libemc;
 namespace py = boost::python;
 
-class PolymorphToPythonConverter
+struct PolymorphToPythonConverter
 {
-public:
     static void addToRegistry()
     {
         py::to_python_converter< Polymorph, PolymorphToPythonConverter >();
     }
 
-    static PyObject* convert( PolymorphCref aPolymorph )
+    static PyObject* convert( Polymorph const& aPolymorph )
     {
         switch( aPolymorph.getType() )
         {
@@ -280,45 +280,129 @@ PolymorphRetriever::PySeqSTLIterator::operator*()
             PySequence_GetItem( theSeq, theIdx ) );
 }
 
-class PolymorphMapToPythonConverter
+
+struct PropertySlotMapToPythonConverter
 {
-public:
+    typedef PropertyInterfaceBase::PropertySlotMap argument_type;
 
     static void addToRegistry()
     {
-        py::to_python_converter< PolymorphMap, PolymorphMapToPythonConverter>();
+        py::to_python_converter< argument_type, PropertySlotMapToPythonConverter >();
     }
 
-    static PyObject* convert(const PolymorphMap& aPolymorphMapCref )
+    static PyObject* convert( argument_type const& map )
     {
-        //PolymorphToPythonConverter aPolymorphConverter;
-        PyObject * aPyDict(PyDict_New());
-        PolymorphMap aPolymorphMap( aPolymorphMapCref );
-        for ( PolymorphMap::iterator i( aPolymorphMap.begin() );
-              i != aPolymorphMap.end(); ++i )
+        PyObject* aPyDict( PyDict_New() );
+        for ( argument_type::const_iterator i( map.begin() );
+              i != map.end(); ++i )
         {
             PyDict_SetItem( aPyDict, PyString_FromStringAndSize(
                 i->first.data(), i->first.size() ),
-                PolymorphToPythonConverter::convert( i->second ) );
+                py::incref( py::object( PropertyAttributes( *i->second ) ).ptr() ) );
                                             
         }
         return aPyDict;
     }
 };
 
+template< typename Ttcell_ >
+inline void buildPythonTupleFromTuple(PyObject* pyt, const Ttcell_& cell,
+        Py_ssize_t idx = 0)
+{
+    PyTuple_SetItem( pyt, idx,
+        py::incref(
+            py::object( cell.get_head()).ptr() ) );
+
+    buildPythonTupleFromTuple(pyt, cell.get_tail(), idx + 1);
+}
+
+template<>
+inline void buildPythonTupleFromTuple<boost::tuples::null_type>(
+        PyObject*, const boost::tuples::null_type&, Py_ssize_t) {}
+
+template< typename Ttuple_ >
+struct TupleToPythonConverter
+{
+    typedef Ttuple_ argument_value_type;
+    typedef const argument_value_type& argument_type;
+    static PyObject* convert(argument_type val)
+    {
+        PyObject* retval(
+            PyTuple_New( boost::tuples::length<Ttuple_>::value ) );
+        buildPythonTupleFromTuple(retval, val);
+        return retval;
+    }
+};
+
+template< typename Tfirst_, typename Tsecond_ >
+struct TupleToPythonConverter<std::pair<Tfirst_, Tsecond_> >
+{
+    typedef std::pair<Tfirst_, Tsecond_> argument_value_type;
+    typedef const argument_value_type& argument_type;
+
+    static PyObject* convert( argument_type val )
+    {
+        return py::incref(
+                py::make_tuple(
+                    val.first, val.second).ptr());
+    }
+};
+
+template< typename Ttuple_ >
+struct TupleToPythonConverter<boost::shared_ptr<Ttuple_> >
+{
+    typedef Ttuple_ argument_value_type;
+    typedef boost::shared_ptr< argument_value_type > argument_type;
+    static PyObject* convert( argument_type val )
+    {
+        return TupleToPythonConverter< argument_value_type >::convert( *val );
+    }
+};
+
+template< typename Ttuple_ >
+void registerTupleConverters()
+{
+    py::to_python_converter<
+        Ttuple_, TupleToPythonConverter<Ttuple_> >();
+    py::to_python_converter<
+        boost::shared_ptr<Ttuple_>,
+        TupleToPythonConverter<boost::shared_ptr<Ttuple_> > >();
+}
+
+template< typename T_ >
+struct StringKeyedMapToPythonConverter
+{
+    static void addToRegistry()
+    {
+        py::to_python_converter< T_, StringKeyedMapToPythonConverter>();
+    }
+
+    static PyObject* convert( T_ const& aStringKeyedMap )
+    {
+        PyObject* aPyDict( PyDict_New() );
+        for ( typename T_::const_iterator i( aStringKeyedMap.begin() );
+              i != aStringKeyedMap.end(); ++i )
+        {
+            PyDict_SetItem( aPyDict, PyString_FromStringAndSize(
+                i->first.data(), i->first.size() ),
+                py::incref( py::object( i->second ).ptr() ) );
+                                            
+        }
+        return aPyDict;
+    }
+};
 
 // exception translators
 
-//void translateException( ExceptionCref anException )
-//{
-//    PyErr_SetString( PyExc_RuntimeError, anException.what() );
-//}
-
-void translateException( const std::exception& anException )
+static void translateException( const std::exception& anException )
 {
     PyErr_SetString( PyExc_RuntimeError, anException.what() );
 }
 
+static void translateRangeError( const std::range_error& anException )
+{
+    PyErr_SetString( PyExc_KeyError, anException.what() );
+}
 
 static PyObject* getLibECSVersionInfo()
 {
@@ -344,6 +428,7 @@ public:
                              "the argument is not a callable object" );
             py::throw_error_already_set();
         }
+        py::incref( thePyObject.ptr() );
     }
 
     ~PythonCallable()
@@ -356,37 +441,7 @@ protected:
 };
 
 
-class PythonEventChecker
-    : public PythonCallable, public EventChecker
-{
-public:
-
-    PythonEventChecker( PyObject* aPyObjectPtr )
-        : PythonCallable( aPyObjectPtr )
-    {
-        ; // do nothing
-    }
-        
-    virtual ~PythonEventChecker() {}
-
-    virtual bool operator()( void ) const
-    {
-        // check signal
-        //        PyErr_CheckSignals();
-
-        // check event.
-        // this is faster than just 'return thePyObject()', unfortunately..
-        PyObject* aPyObjectPtr( PyObject_CallFunction( thePyObject.ptr(), NULL ) );
-        const bool aResult( PyObject_IsTrue( aPyObjectPtr ) );
-        Py_XDECREF( aPyObjectPtr );
-
-        return aResult;
-    }
-
-};
-
-class PythonEventHandler
-    : public PythonCallable, public EventHandler
+class PythonEventHandler: public PythonCallable
 {
 public:
     PythonEventHandler( PyObject* aPyObjectPtr )
@@ -395,24 +450,32 @@ public:
         ; // do nothing
     }
         
-    virtual ~PythonEventHandler() {}
+    ~PythonEventHandler() {}
 
-    virtual void operator()( void ) const
+    bool operator()( void ) const
     {
-        PyObject_CallFunction( thePyObject.ptr(), NULL );
+        PyObject* aPyObjectPtr( PyObject_CallFunction( thePyObject.ptr(), NULL ) );
+        const bool aResult( PyObject_IsTrue( aPyObjectPtr ) );
+        Py_XDECREF( aPyObjectPtr );
+
+        return aResult;
     }
 };
 
 
-struct EventCheckerSharedPtrRetriever
+template< typename Tcallable_ >
+struct CallableSharedPtrRetriever
 {
+public:
+    typedef Tcallable_ Callable;
+
 public:
 
     static void addToRegistry()
     {
         py::converter::registry::insert(
                 &convertible, &construct,
-                py::type_id<EventCheckerSharedPtr>() );
+                py::type_id< boost::shared_ptr< Callable > >() );
     }
 
     static void* convertible( PyObject* aPyObjectPtr )
@@ -432,50 +495,15 @@ public:
                py::converter::rvalue_from_python_stage1_data* data )
     {
         void* storage( reinterpret_cast<
-            py::converter::rvalue_from_python_storage<EventCheckerSharedPtr>* >(
+            py::converter::rvalue_from_python_storage<boost::shared_ptr< Callable > >* >(
                 data )->storage.bytes );
 
-        data->convertible = new (storage) EventCheckerSharedPtr(
-            new PythonEventChecker( aPyObjectPtr ) );
+        data->convertible = new (storage) boost::shared_ptr< Callable >(
+            new Callable( aPyObjectPtr ) );
     }
 
 };
 
-
-class EventHandlerSharedPtrRetriever
-{
-public:
-
-    static void addToRegistry() 
-    {
-        py::converter::registry::insert(
-                &convertible, &construct,
-                py::type_id<EventHandlerSharedPtr>() );
-    }
-
-    static void* convertible( PyObject* aPyObjectPtr )
-    {
-        if( PyCallable_Check( aPyObjectPtr ) )
-            {
-                return aPyObjectPtr;
-            }
-        else
-            {
-                return 0;
-            }
-    }
-
-    static void construct( PyObject* aPyObjectPtr,
-                           py::converter::rvalue_from_python_stage1_data* data )
-    {
-        void* storage( reinterpret_cast<
-            py::converter::rvalue_from_python_storage<EventHandlerSharedPtr>* >(
-                 data )->storage.bytes );
-
-        data->convertible = new (storage) EventHandlerSharedPtr(
-            new PythonEventHandler( aPyObjectPtr ) );
-    }
-};
 
 static class PyEcsModule
 {
@@ -876,8 +904,706 @@ public:
     }
 };
 
+template< typename TeventHander_ >
+class Simulator
+{
+public:
+    typedef TeventHander_ EventHandler;
+
+public:
+    Simulator()
+        : theRunningFlag( false ),
+          theDirtyFlag( true ),
+          theEventCheckInterval( 20 ),
+          theEventHandler(),
+          thePropertiedObjectMaker( createDefaultModuleMaker() ),
+          theModel( *thePropertiedObjectMaker )
+    {
+    }
+
+    ~Simulator()
+    {
+        delete thePropertiedObjectMaker;
+    }
+
+    void createStepper( String const& aClassname,
+                        String const& anId )
+    {
+        if( theRunningFlag )
+        {
+            THROW_EXCEPTION( Exception, 
+                             "Cannot create a Stepper during simulation." );
+        }
+
+        setDirty();
+        getModel().createStepper( aClassname, anId );
+    }
+
+    void deleteStepper( String const& anID )
+    {
+        THROW_EXCEPTION( NotImplemented,
+                         "deleteStepper() method is not supported yet." );
+        setDirty();
+    }
+
+    const Polymorph getStepperList() const
+    {
+        Model::StepperMap const& aStepperMap( getModel().getStepperMap() );
+
+        PolymorphVector aPolymorphVector; 
+        aPolymorphVector.reserve( aStepperMap.size() );
+        
+        for( Model::StepperMap::const_iterator i( aStepperMap.begin() );
+             i != aStepperMap.end(); ++i )
+        {
+            aPolymorphVector.push_back( (*i).first );
+        }
+
+        return aPolymorphVector;
+    }
+
+    const Polymorph 
+    getStepperPropertyList( String const& aStepperID ) const
+    {
+        StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+        
+        return aStepperPtr->getPropertyList();
+    }
+
+    PropertyAttributes
+    getStepperPropertyAttributes( String const& aStepperID, 
+                                  String const& aPropertyName ) const
+    {
+        StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+        return aStepperPtr->getPropertyAttributes( aPropertyName );
+    }
+
+    void setStepperProperty( String const& aStepperID,
+                             String const& aPropertyName,
+                             Polymorph const& aValue )
+    {
+        StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+        
+        setDirty();
+        aStepperPtr->setProperty( aPropertyName, aValue );
+    }
+
+    const Polymorph
+    getStepperProperty( String const& aStepperID,
+                        String const& aPropertyName ) const
+    {
+        Stepper const * aStepperPtr( getModel().getStepper( aStepperID ) );
+
+        return aStepperPtr->getProperty( aPropertyName );
+    }
+
+    void loadStepperProperty( String const& aStepperID,
+                              String const& aPropertyName,
+                              Polymorph const& aValue )
+    {
+        StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+        
+        setDirty();
+        aStepperPtr->loadProperty( aPropertyName, aValue );
+    }
+
+    const Polymorph
+    saveStepperProperty( String const& aStepperID,
+                         String const& aPropertyName ) const
+    {
+        Stepper const * aStepperPtr( getModel().getStepper( aStepperID ) );
+
+        clearDirty();
+
+        return aStepperPtr->saveProperty( aPropertyName );
+    }
+
+    const String
+    getStepperClassName( String const& aStepperID ) const
+    {
+        Stepper const * aStepperPtr( getModel().getStepper( aStepperID ) );
+
+        return aStepperPtr->getClassName();
+    }
+
+    const PolymorphMap getClassInfo( String const& aClassname ) const
+    {
+        libecs::PolymorphMap aBuiltInfoMap;
+        for ( DynamicModuleInfo::EntryIterator* anInfo(
+              getModel().getPropertyInterface( aClassname ).getInfoFields() );
+              anInfo->next(); )
+        {
+            aBuiltInfoMap.insert( std::make_pair( anInfo->current().first,
+                                  *reinterpret_cast< const libecs::Polymorph* >(
+                                    anInfo->current().second ) ) );
+        }
+        return aBuiltInfoMap;
+    }
+
+    
+    void createEntity( String const& aClassname, 
+                       String const& aFullIDString )
+    {
+        if( theRunningFlag )
+        {
+            THROW_EXCEPTION( Exception, 
+                             "Cannot create an Entity during simulation." );
+        }
+
+        setDirty();
+        getModel().createEntity( aClassname, FullID( aFullIDString ) );
+    }
+
+    void deleteEntity( String const& aFullIDString )
+    {
+        THROW_EXCEPTION( NotImplemented,
+                         "deleteEntity() method is not supported yet." );
+
+        setDirty();
+    }
+
+    const Polymorph 
+    getEntityList( String const& anEntityTypeString,
+                   String const& aSystemPathString ) const
+    {
+        const EntityType anEntityType( anEntityTypeString );
+        const SystemPath aSystemPath( aSystemPathString );
+
+        if( aSystemPath.size() == 0 )
+        {
+            PolymorphVector aVector;
+            if( anEntityType == EntityType::SYSTEM )
+            {
+                aVector.push_back( Polymorph( "/" ) );
+            }
+            return aVector;
+        }
+
+        System const* aSystemPtr( getModel().getSystem( aSystemPath ) );
+
+        switch( anEntityType )
+        {
+        case EntityType::VARIABLE:
+            return aSystemPtr->getVariableList();
+        case EntityType::PROCESS:
+            return aSystemPtr->getProcessList();
+        case EntityType::SYSTEM:
+            return aSystemPtr->getSystemList();
+        default:
+            break;
+        }
+
+        NEVER_GET_HERE;
+    }
+
+    const Polymorph 
+    getEntityPropertyList( String const& aFullIDString ) const
+    {
+        Entity const * anEntityPtr( getModel().getEntity( FullID( aFullIDString ) ) );
+
+        return anEntityPtr->getPropertyList();
+    }
+
+    const bool entityExists( String const& aFullIDString ) const
+    {
+        try
+        {
+            IGNORE_RETURN getModel().getEntity( FullID( aFullIDString ) );
+        }
+        catch( const NotFound& )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    void setEntityProperty( String const& aFullPNString,
+                                    Polymorph const& aValue )
+    {
+        FullPN aFullPN( aFullPNString );
+        EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+
+        setDirty();
+        anEntityPtr->setProperty( aFullPN.getPropertyName(), aValue );
+    }
+
+    const Polymorph
+    getEntityProperty( String const& aFullPNString ) const
+    {
+        FullPN aFullPN( aFullPNString );
+        Entity const * anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+                
+        clearDirty();
+
+        return anEntityPtr->getProperty( aFullPN.getPropertyName() );
+    }
+
+    void loadEntityProperty( String const& aFullPNString,
+                             Polymorph const& aValue )
+    {
+        FullPN aFullPN( aFullPNString );
+        EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+
+        setDirty();
+        anEntityPtr->loadProperty( aFullPN.getPropertyName(), aValue );
+    }
+
+    const Polymorph
+    saveEntityProperty( String const& aFullPNString ) const
+    {
+        FullPN aFullPN( aFullPNString );
+        Entity const * anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+
+        clearDirty();
+
+        return anEntityPtr->saveProperty( aFullPN.getPropertyName() );
+    }
+
+    PropertyAttributes
+    getEntityPropertyAttributes( String const& aFullPNString ) const
+    {
+        FullPN aFullPN( aFullPNString );
+        Entity const * anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+
+        return anEntityPtr->getPropertyAttributes( aFullPN.getPropertyName() );
+    }
+
+    const String
+    getEntityClassName( String const& aFullIDString ) const
+    {
+        FullID aFullID( aFullIDString );
+        Entity const * anEntityPtr( getModel().getEntity( aFullID ) );
+
+        return anEntityPtr->getClassName();
+    }
+
+    void createLogger( String const& aFullPNString )
+    {
+        PolymorphVector aVector;
+        createLogger( aFullPNString, boost::make_tuple( 1l, 0.0, 0l, 0l ) );
+    }
+
+    void createLogger( String const& aFullPNString,
+                               Polymorph aParamList )
+    {
+        typedef PolymorphValue::Tuple Tuple;
+
+        if( theRunningFlag )
+        {
+            THROW_EXCEPTION( Exception, 
+                             "Cannot create a Logger during simulation." );
+        }
+
+        if ( aParamList.getType() != PolymorphValue::TUPLE
+             || aParamList.as< Tuple const& >().size() != 4 )
+        {
+            THROW_EXCEPTION( Exception,
+                             "second argument must be a tuple of 4 items.");
+        }
+
+        clearDirty();
+
+        getModel().getLoggerBroker().createLogger(
+            FullPN( aFullPNString ),
+            Logger::Policy(
+                aParamList.as< Tuple const& >()[ 0 ].as< Integer >(),
+                aParamList.as< Tuple const& >()[ 1 ].as< Real >(),
+                aParamList.as< Tuple const& >()[ 2 ].as< Integer >(),
+                aParamList.as< Tuple const& >()[ 3 ].as< Integer >() ) );
+
+        setDirty();
+    }
+
+    const Polymorph getLoggerList() const
+    {
+        PolymorphVector aLoggerList;
+
+        LoggerBroker const& aLoggerBroker( getModel().getLoggerBroker() );
+
+        for( LoggerBroker::const_iterator
+                i( aLoggerBroker.begin() ), end( aLoggerBroker.end() );
+             i != end; ++i )
+        {
+            aLoggerList.push_back( (*i).first.getString() );
+        }
+
+        return aLoggerList;
+    }
+
+    DataPointVectorSharedPtr 
+    getLoggerData( String const& aFullPNString ) const
+    {
+        return getLogger( aFullPNString )->getData();
+    }
+
+    DataPointVectorSharedPtr
+    getLoggerData( String const& aFullPNString, 
+                   Real const& startTime, Real const& endTime ) const
+    {
+        return getLogger( aFullPNString )->getData( startTime, endTime );
+    }
+
+    DataPointVectorSharedPtr
+    getLoggerData( String const& aFullPNString,
+                   Real const& start, Real const& end, 
+                   Real const& interval ) const
+    {
+        return getLogger( aFullPNString )->getData( start, end, interval );
+    }
+
+    const Real 
+    getLoggerStartTime( String const& aFullPNString ) const
+    {
+        return getLogger( aFullPNString )->getStartTime();
+    }
+
+    const Real 
+    getLoggerEndTime( String const& aFullPNString ) const
+    {
+        return getLogger( aFullPNString )->getEndTime();
+    }
+
+
+    void setLoggerPolicy( String const& aFullPNString, 
+                          Polymorph aParamList )
+    {
+        typedef PolymorphValue::Tuple Tuple;
+
+        if( aParamList.getType() != PolymorphValue::TUPLE
+            || aParamList.as< Tuple const& >().size() != 4 )
+        {
+            THROW_EXCEPTION( Exception,
+                             "second parameter must be a tuple of 4 items.");
+        }
+
+        getLogger( aFullPNString )->setLoggerPolicy(
+            Logger::Policy(
+                aParamList.as< Tuple const& >()[ 0 ].as< Integer >(),
+                aParamList.as< Tuple const& >()[ 1 ].as< Real >(),
+                aParamList.as< Tuple const& >()[ 2 ].as< Integer >(),
+                aParamList.as< Tuple const& >()[ 3 ].as< Integer >() ) );
+    }
+
+
+    Logger::Policy
+    getLoggerPolicy( String const& aFullPNString ) const
+    {
+        return getLogger( aFullPNString )->getLoggerPolicy();
+    }
+
+    const Logger::size_type 
+    getLoggerSize( String const& aFullPNString ) const
+    {
+        return getLogger( aFullPNString )->getSize();
+    }
+
+    const std::pair< Real, String > getNextEvent() const
+    {
+        StepperEvent const& aNextEvent( getModel().getTopEvent() );
+
+        return std::make_pair(
+            static_cast< Real >( aNextEvent.getTime() ),
+            aNextEvent.getStepper()->getID() );
+    }
+
+    void step( const Integer aNumSteps )
+    {
+        if( aNumSteps <= 0 )
+        {
+            THROW_EXCEPTION( Exception,
+                             "step( n ): n must be 1 or greater. ("
+                             + stringCast( aNumSteps ) + " given.)" );
+        }
+
+        start();
+
+        Integer aCounter( aNumSteps );
+        do
+        {
+            getModel().step();
+            
+            --aCounter;
+            
+            if( aCounter == 0 )
+            {
+                stop();
+                break;
+            }
+
+            if( aCounter % theEventCheckInterval == 0 )
+            {
+                handleEvent();
+
+                if( ! theRunningFlag )
+                {
+                    break;
+                }
+            }
+        }
+        while( 1 );
+
+    }
+
+    const Real getCurrentTime() const
+    {
+        return getModel().getCurrentTime();
+    }
+
+    void run()
+    {
+        start();
+
+        do
+        {
+            unsigned int aCounter( theEventCheckInterval );
+            do
+            {
+                getModel().step();
+                --aCounter;
+            }
+            while( aCounter != 0 );
+            
+            handleEvent();
+
+        }
+        while( theRunningFlag );
+    }
+
+    void run( const Real aDuration )
+    {
+        if( aDuration <= 0.0 )
+        {
+            THROW_EXCEPTION( Exception,
+                             "duration must be greater than 0. ("
+                             + stringCast( aDuration ) + " given.)" );
+        }
+
+        start();
+
+        const Real aStopTime( getModel().getCurrentTime() + aDuration );
+
+        // setup SystemStepper to step at aStopTime
+
+        //FIXME: dirty, ugly!
+        Stepper* aSystemStepper( getModel().getSystemStepper() );
+        aSystemStepper->setCurrentTime( aStopTime );
+        aSystemStepper->setStepInterval( 0.0 );
+
+        getModel().getScheduler().updateEvent( 0, aStopTime );
+
+
+        if ( theEventHandler )
+        {
+            while ( theRunningFlag )
+            {
+                unsigned int aCounter( theEventCheckInterval );
+                do 
+                {
+                    if( getModel().getTopEvent().getStepper() == aSystemStepper )
+                    {
+                        getModel().step();
+                        stop();
+                        break;
+                    }
+                    
+                    getModel().step();
+
+                    --aCounter;
+                }
+                while( aCounter != 0 );
+
+                handleEvent();
+            }
+        }
+        else
+        {
+            while ( theRunningFlag )
+            {
+                if( getModel().getTopEvent().getStepper() == aSystemStepper )
+                {
+                    getModel().step();
+                    stop();
+                    break;
+                }
+
+                getModel().step();
+            }
+        }
+
+    }
+
+    void stop()
+    {
+        theRunningFlag = false;
+
+        getModel().flushLoggers();
+    }
+
+    void setEventHandler( boost::shared_ptr< EventHandler > const& anEventHandler )
+    {
+        theEventHandler = anEventHandler;
+    }
+
+    const PolymorphVector getDMInfo() const
+    {
+        typedef ModuleMaker< EcsObject >::ModuleMap ModuleMap;
+        PolymorphVector aVector;
+        const ModuleMap& modules( thePropertiedObjectMaker->getModuleMap() );
+
+        for( ModuleMap::const_iterator i( modules.begin() );
+                    i != modules.end(); ++i )
+        {
+            PolymorphVector anInnerVector;
+            const PropertyInterfaceBase* info(
+                reinterpret_cast< const PropertyInterfaceBase *>(
+                    i->second->getInfo() ) );
+            const char* aFilename( i->second->getFileName() );
+
+            aVector.push_back( boost::make_tuple(
+                info->getTypeName(), i->second->getModuleName(),
+                String( aFilename ? aFilename: "" ) ) );
+        }
+
+        return aVector;
+    }
+
+    PropertyInterfaceBase::PropertySlotMap
+    getPropertyInfo( String const& aClassname ) const
+    {
+        return getModel().getPropertyInterface( aClassname ).getPropertySlotMap();
+    }
+
+    const char getDMSearchPathSeparator() const
+    {
+        return Model::PATH_SEPARATOR;
+    }
+
+    const std::string getDMSearchPath() const
+    {
+        return theModel.getDMSearchPath();
+    }
+
+    void setDMSearchPath( const std::string& aDMSearchPath )
+    {
+        theModel.setDMSearchPath( aDMSearchPath );
+    }
+
+    Logger* getLogger( String const& aFullPNString ) const
+    {
+        return getModel().getLoggerBroker().getLogger( aFullPNString );
+    }
+
+protected:
+
+    ModelRef getModel() 
+    { 
+        return theModel; 
+    }
+
+    Model const& getModel() const 
+    { 
+        return theModel; 
+    }
+
+    void initialize()
+    {
+        getModel().initialize();
+    }
+
+
+    void setDirty()
+    {
+        theDirtyFlag = true;
+    }
+
+    const bool isDirty() const
+    {
+        return theDirtyFlag;
+    }
+
+    inline void handleEvent()
+    {
+        if ( theEventHandler )
+        { 
+            while ( ( *theEventHandler )() );
+        }
+
+        clearDirty();
+    }
+
+    void clearDirty() const
+    {
+        if ( isDirty() )
+        {
+            const_cast< Simulator* >( this )->initialize();
+
+            theDirtyFlag = false;
+        }
+    }
+
+    void start()
+    {
+        clearDirty();
+        theRunningFlag = true;
+    }
+
+private:
+
+    bool                    theRunningFlag;
+
+    mutable bool            theDirtyFlag;
+
+    Integer         theEventCheckInterval;
+
+    boost::shared_ptr< EventHandler >   theEventHandler;
+
+    ModuleMaker< EcsObject >* thePropertiedObjectMaker;
+    Model           theModel;
+};
+
+static int PropertyAttributes_GetItem( PropertyAttributes const* self, int idx )
+{
+    switch ( idx )
+    {
+    case 0:
+        return self->isSetable();
+    case 1:
+        return self->isGetable();
+    case 2:
+        return self->isLoadable();
+    case 3:
+        return self->isSavable();
+    case 4:
+        return self->isDynamic();
+    case 5:
+        return self->getType();
+    }
+
+    throw std::range_error("Index out of bounds");
+}
+
+static py::object LoggerPolicy_GetItem( Logger::Policy const* self, int idx )
+{
+    switch ( idx )
+    {
+    case 0:
+        return py::object( self->getMinimumStep() );
+    case 1:
+        return py::object( self->getMinimumTimeInterval() );
+    case 2:
+        return py::object( self->doesContinueOnError() );
+    case 3:
+        return py::object( self->getMaxSpace() );
+    }
+
+    throw std::range_error("Index out of bounds");
+}
+
 BOOST_PYTHON_MODULE( _ecs )
 {
+    typedef Simulator< PythonEventHandler > SimulatorImpl;
+
     if (!initialize())
     {
         throw std::runtime_error( "Failed to initialize libecs" );
@@ -889,23 +1615,52 @@ BOOST_PYTHON_MODULE( _ecs )
     // without this it crashes when Logger::getData() is called. why?
     import_array();
 
+    registerTupleConverters< std::pair< Real, String > >();
     PolymorphToPythonConverter::addToRegistry();
-    PolymorphMapToPythonConverter::addToRegistry();
+    StringKeyedMapToPythonConverter< PolymorphMap >::addToRegistry();
+    PropertySlotMapToPythonConverter::addToRegistry();
     DataPointVectorSharedPtrConverter::addToRegistry();
 
     PolymorphRetriever::addToRegistry();
-    EventCheckerSharedPtrRetriever::addToRegistry();
-    EventHandlerSharedPtrRetriever::addToRegistry();
+    CallableSharedPtrRetriever< PythonEventHandler >::addToRegistry();
 
     // functions
     py::register_exception_translator< Exception >( &translateException );
     py::register_exception_translator< std::exception >( &translateException );
+    py::register_exception_translator< std::range_error >( &translateRangeError );
 
     py::def( "getLibECSVersionInfo", &getLibECSVersionInfo );
     py::def( "getLibECSVersion",         &getVersion );
 
     typedef py::return_value_policy< py::reference_existing_object >
             return_existing_object;
+
+
+    py::class_< PropertyAttributes >( "PropertyAttributes",
+        py::init< enum PropertySlotBase::Type, bool, bool, bool, bool, bool >() )
+        .add_property( "Type", &PropertyAttributes::getType )
+        .add_property( "Setable", &PropertyAttributes::isSetable )
+        .add_property( "Getable", &PropertyAttributes::isGetable )
+        .add_property( "Loadable", &PropertyAttributes::isLoadable )
+        .add_property( "Savable", &PropertyAttributes::isSavable )
+        .add_property( "Dynamic", &PropertyAttributes::isDynamic )
+        .def( "__getitem__", &PropertyAttributes_GetItem )
+        ;
+
+    py::class_< Logger::Policy >( "LoggerPolicy", py::init<>() )
+        .add_property( "MinimumStep", &Logger::Policy::getMinimumStep,
+                                      &Logger::Policy::setMinimumStep )
+        .add_property( "MinimumTimeInterval",
+                       &Logger::Policy::getMinimumTimeInterval,
+                       &Logger::Policy::setMinimumTimeInterval )
+        .add_property( "ContinueOnError",
+                       &Logger::Policy::doesContinueOnError,
+                       &Logger::Policy::setContinueOnError )
+        .add_property( "MaxSpace",
+                       &Logger::Policy::getMaxSpace,
+                       &Logger::Policy::setMaxSpace )
+        .def( "__getitem__", &LoggerPolicy_GetItem )
+        ;
 
     py::class_< VariableReference >( "VariableReference", py::no_init )
         // properties
@@ -986,123 +1741,138 @@ BOOST_PYTHON_MODULE( _ecs )
         .def( py::vector_indexing_suite< VariableReferenceVector >() )
         ;
 
+    py::class_< Logger, py::bases<>, Logger, boost::noncopyable >( "Logger", py::no_init )
+        .add_property( "StartTime", &Logger::getStartTime )
+        .add_property( "EndTime", &Logger::getEndTime )
+        .add_property( "Size", &Logger::getSize )
+        .def( "getData", 
+              ( DataPointVectorSharedPtr( Logger::* )( void ) const )
+              &Logger::getData )
+        .def( "getData", 
+              ( DataPointVectorSharedPtr( Logger::* )(
+                Real const&, Real const& ) const )
+              &Logger::getData )
+        .def( "getData",
+              ( DataPointVectorSharedPtr( Logger::* )(
+                     Real const&, Real const&, Real const& ) const )
+              &Logger::getData )
+        ;
+
     // Simulator class
-    py::class_< Simulator >( "Simulator" )
+    py::class_< SimulatorImpl, py::bases<>, boost::shared_ptr< SimulatorImpl >, boost::noncopyable >( "Simulator" )
         .def( py::init<>() )
         .def( "getClassInfo",
-              &Simulator::getClassInfo )
+              &SimulatorImpl::getClassInfo )
         // Stepper-related methods
         .def( "createStepper",
-              &Simulator::createStepper )
+              &SimulatorImpl::createStepper )
         .def( "deleteStepper",
-              &Simulator::deleteStepper )
+              &SimulatorImpl::deleteStepper )
         .def( "getStepperList",
-              &Simulator::getStepperList )
+              &SimulatorImpl::getStepperList )
         .def( "getStepperPropertyList",
-              &Simulator::getStepperPropertyList )
+              &SimulatorImpl::getStepperPropertyList )
         .def( "getStepperPropertyAttributes", 
-              &Simulator::getStepperPropertyAttributes )
+              &SimulatorImpl::getStepperPropertyAttributes )
         .def( "setStepperProperty",
-              &Simulator::setStepperProperty )
+              &SimulatorImpl::setStepperProperty )
         .def( "getStepperProperty",
-              &Simulator::getStepperProperty )
+              &SimulatorImpl::getStepperProperty )
         .def( "loadStepperProperty",
-              &Simulator::loadStepperProperty )
+              &SimulatorImpl::loadStepperProperty )
         .def( "saveStepperProperty",
-              &Simulator::saveStepperProperty )
+              &SimulatorImpl::saveStepperProperty )
         .def( "getStepperClassName",
-              &Simulator::getStepperClassName )
+              &SimulatorImpl::getStepperClassName )
 
         // Entity-related methods
         .def( "createEntity",
-              &Simulator::createEntity )
+              &SimulatorImpl::createEntity )
         .def( "deleteEntity",
-              &Simulator::deleteEntity )
+              &SimulatorImpl::deleteEntity )
         .def( "getEntityList",
-              &Simulator::getEntityList )
+              &SimulatorImpl::getEntityList )
         .def( "entityExists",
-              &Simulator::entityExists )
+              &SimulatorImpl::entityExists )
         .def( "getEntityPropertyList",
-              &Simulator::getEntityPropertyList )
+              &SimulatorImpl::getEntityPropertyList )
         .def( "setEntityProperty",
-              &Simulator::setEntityProperty )
+              &SimulatorImpl::setEntityProperty )
         .def( "getEntityProperty",
-              &Simulator::getEntityProperty )
+              &SimulatorImpl::getEntityProperty )
         .def( "loadEntityProperty",
-              &Simulator::loadEntityProperty )
+              &SimulatorImpl::loadEntityProperty )
         .def( "saveEntityProperty",
-              &Simulator::saveEntityProperty )
+              &SimulatorImpl::saveEntityProperty )
         .def( "getEntityPropertyAttributes", 
-              &Simulator::getEntityPropertyAttributes )
+              &SimulatorImpl::getEntityPropertyAttributes )
         .def( "getEntityClassName",
-              &Simulator::getEntityClassName )
+              &SimulatorImpl::getEntityClassName )
 
         // Logger-related methods
         .def( "getLoggerList",
-                    &Simulator::getLoggerList )    
+                    &SimulatorImpl::getLoggerList )    
         .def( "createLogger",
-              ( void ( Simulator::* )( StringCref ) )
-                    &Simulator::createLogger )    
+              ( void ( SimulatorImpl::* )( String const& ) )
+                    &SimulatorImpl::createLogger )    
         .def( "createLogger",                                 
-              ( void ( Simulator::* )( StringCref, Polymorph ) )
-                    &Simulator::createLogger )    
+              ( void ( SimulatorImpl::* )( String const&, Polymorph ) )
+                    &SimulatorImpl::createLogger )    
+        .def( "getLogger", &SimulatorImpl::getLogger,
+              py::return_internal_reference<> () )
         .def( "getLoggerData", 
-              ( const DataPointVectorSharedPtr( Simulator::* )(
-                    StringCref ) const )
-              &Simulator::getLoggerData )
+              ( DataPointVectorSharedPtr( SimulatorImpl::* )(
+                    String const& ) const )
+              &SimulatorImpl::getLoggerData )
         .def( "getLoggerData", 
-              ( const DataPointVectorSharedPtr( Simulator::* )(
-                    StringCref, RealCref,
-                    RealCref ) const )
-              &Simulator::getLoggerData )
+              ( DataPointVectorSharedPtr( SimulatorImpl::* )(
+                    String const&, Real const&, Real const& ) const )
+              &SimulatorImpl::getLoggerData )
         .def( "getLoggerData",
-              ( const DataPointVectorSharedPtr( Simulator::* )(
-                     StringCref, RealCref, 
-                     RealCref, RealCref ) const )
-              &Simulator::getLoggerData )
+              ( DataPointVectorSharedPtr( SimulatorImpl::* )(
+                     String const&, Real const&, 
+                     Real const&, Real const& ) const )
+              &SimulatorImpl::getLoggerData )
         .def( "getLoggerStartTime",
-              &Simulator::getLoggerStartTime )    
+              &SimulatorImpl::getLoggerStartTime )    
         .def( "getLoggerEndTime",
-              &Simulator::getLoggerEndTime )        
+              &SimulatorImpl::getLoggerEndTime )        
         .def( "getLoggerPolicy",
-              &Simulator::getLoggerPolicy )
+              &SimulatorImpl::getLoggerPolicy )
         .def( "setLoggerPolicy",
-              &Simulator::setLoggerPolicy )
+              &SimulatorImpl::setLoggerPolicy )
         .def( "getLoggerSize",
-              &Simulator::getLoggerSize )
+              &SimulatorImpl::getLoggerSize )
 
         // Simulation-related methods
         .def( "getCurrentTime",
-              &Simulator::getCurrentTime )
+              &SimulatorImpl::getCurrentTime )
         .def( "getNextEvent",
-              &Simulator::getNextEvent )
+              &SimulatorImpl::getNextEvent )
         .def( "stop",
-              &Simulator::stop )
+              &SimulatorImpl::stop )
         .def( "step",
-              ( void ( Simulator::* )( void ) )
-              &Simulator::step )
+              ( void ( SimulatorImpl::* )( void ) )
+              &SimulatorImpl::step )
         .def( "step",
-              ( void ( Simulator::* )( const Integer ) )
-              &Simulator::step )
+              ( void ( SimulatorImpl::* )( const Integer ) )
+              &SimulatorImpl::step )
         .def( "run",
-              ( void ( Simulator::* )() )
-              &Simulator::run )
+              ( void ( SimulatorImpl::* )() )
+              &SimulatorImpl::run )
         .def( "run",
-              ( void ( Simulator::* )( const Real ) ) 
-              &Simulator::run )
+              ( void ( SimulatorImpl::* )( const Real ) ) 
+              &SimulatorImpl::run )
         .def( "getPropertyInfo",
-              &Simulator::getPropertyInfo )
+              &SimulatorImpl::getPropertyInfo )
         .def( "getDMInfo",
-              &Simulator::getDMInfo )
-        .def( "setEventChecker",
-              &Simulator::setEventChecker )
+              &SimulatorImpl::getDMInfo )
         .def( "setEventHandler",
-              &Simulator::setEventHandler )
+              &SimulatorImpl::setEventHandler )
         .add_property( "DMSearchPathSeparator",
-                       &Simulator::getDMSearchPathSeparator )
-        .def( "setDMSearchPath", &Simulator::setDMSearchPath )
-        .def( "getDMSearchPath", &Simulator::getDMSearchPath )
+                       &SimulatorImpl::getDMSearchPathSeparator )
+        .def( "setDMSearchPath", &SimulatorImpl::setDMSearchPath )
+        .def( "getDMSearchPath", &SimulatorImpl::getDMSearchPath )
 
-        ;    
-
+        ;
 }
