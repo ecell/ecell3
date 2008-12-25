@@ -183,7 +183,7 @@ public:
     getClassInfo( libecs::StringCref aClassname ) const = 0;
 
     virtual const libecs::PolymorphMap
-    getPropertyInfo( libecs::StringCref aClassName ) const = 0; 
+    getPropertyInfo( libecs::StringCref aClassname ) const = 0; 
 
     virtual const libecs::PolymorphVector getDMInfo() const = 0;
 

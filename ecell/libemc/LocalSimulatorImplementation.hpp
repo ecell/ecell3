@@ -184,7 +184,7 @@ public:
     virtual const libecs::PolymorphVector getDMInfo() const;
 
     virtual const libecs::PolymorphMap
-    getPropertyInfo( libecs::StringCref aClassName ) const;
+    getPropertyInfo( libecs::StringCref aClassname ) const;
 
     virtual const char getDMSearchPathSeparator() const;
 
