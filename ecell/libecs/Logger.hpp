@@ -212,7 +212,7 @@ public:
     */
 
     DataPointVectorSharedPtr getData( RealParam aStartTime,
-                                                                        RealParam anEndTime ) const;
+                                      RealParam anEndTime ) const;
 
     /**
          Returns a summary of the data from aStartTime to anEndTime with
@@ -220,8 +220,8 @@ public:
     */
 
     DataPointVectorSharedPtr getData( RealParam aStartTime,
-                                                                        RealParam anEndTime, 
-                                                                        RealParam anInterval ) const;
+                                      RealParam anEndTime, 
+                                      RealParam anInterval ) const;
     
 
 
