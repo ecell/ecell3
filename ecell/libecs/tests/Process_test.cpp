@@ -29,7 +29,7 @@
 // modified by Moriyoshi Koizumi
 //
 
-#define BOOST_TEST_MODULE "MockProcess"
+#define BOOST_TEST_MODULE "Process"
 
 #include <boost/mpl/list.hpp>
 #include <boost/test/unit_test.hpp>
@@ -48,24 +48,7 @@
 #include <iostream>
 
 using namespace libecs;
-
-LIBECS_DM_CLASS( MockProcess, Process )
-{
-public:
-    LIBECS_DM_OBJECT( MockProcess, Process )
-    {
-        INHERIT_PROPERTIES( Process );
-    }
-
-    virtual void fire() {}
-
-    virtual void initialize()
-    {
-        Process::initialize();
-    }    
-};
-
-LIBECS_DM_INIT_STATIC( MockProcess, Process );
+#include "MockProcess.cpp"
 
 BOOST_AUTO_TEST_CASE(testInstantiation)
 {
@@ -75,12 +58,11 @@ BOOST_AUTO_TEST_CASE(testInstantiation)
     MockProcess* proc = reinterpret_cast< MockProcess * >( mmaker.getModule( "MockProcess" ).getAllocator()() );
     BOOST_CHECK(proc);
     BOOST_CHECK_EQUAL("MockProcess", proc->getPropertyInterface().getClassName());
+    delete proc;
 }
 
 BOOST_AUTO_TEST_CASE(testGetMolarActivity)
 {
-    using namespace libecs;
-
     ModuleMaker< EcsObject > mmaker;
     DM_NEW_STATIC( &mmaker, EcsObject, MockProcess );
     DM_NEW_STATIC( &mmaker, EcsObject, Variable );
@@ -91,22 +73,28 @@ BOOST_AUTO_TEST_CASE(testGetMolarActivity)
     MockProcess* proc = reinterpret_cast< MockProcess * >( mmaker.getModule( "MockProcess" ).getAllocator()() );
     proc->setActivity( N_A );
     BOOST_CHECK_EQUAL( N_A, proc->getActivity() );
-    sys->registerProcess( proc );
+    sys->registerEntity( proc );
     BOOST_CHECK_THROW( proc->getMolarActivity(), IllegalOperation );
 
     Variable* var = reinterpret_cast< Variable * >( mmaker.getModule( "Variable" ).getAllocator()() );
     var->setValue( 1.0 );
     var->setID( "SIZE" );
-    sys->registerVariable( var );
+    sys->registerEntity( var );
     sys->configureSizeVariable();
 
     BOOST_CHECK_EQUAL( 1.0, proc->getMolarActivity() );
+
+    var->dispose();
+    proc->dispose();
+    sys->dispose();
+
+    delete var;
+    delete proc;
+    delete sys;
 };
 
 BOOST_AUTO_TEST_CASE(testGetStepper)
 {
-    using namespace libecs;
-
     ModuleMaker< EcsObject > mmaker;
     DM_NEW_STATIC( &mmaker, EcsObject, MockProcess );
     DM_NEW_STATIC( &mmaker, EcsObject, PassiveStepper );
@@ -119,5 +107,8 @@ BOOST_AUTO_TEST_CASE(testGetStepper)
     proc->setStepper( stepper );
 
     BOOST_CHECK_EQUAL( "STEPPER", proc->getStepperID() );
+
+    delete stepper;
+    delete proc;
 };
 

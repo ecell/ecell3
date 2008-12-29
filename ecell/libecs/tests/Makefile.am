@@ -41,4 +41,7 @@ Process_test_SOURCES = Process_test.cpp
 check_PROGRAMS += LoggerBroker_test
 LoggerBroker_test_SOURCES = LoggerBroker_test.cpp
 
+check_PROGRAMS += Model_test
+Model_test_SOURCES = Model_test.cpp
+
 TESTS=$(check_PROGRAMS)

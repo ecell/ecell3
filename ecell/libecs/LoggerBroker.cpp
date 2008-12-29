@@ -80,7 +80,7 @@ LoggerPtr LoggerBroker::getLogger( FullPNCref aFullPN ) const
 
     if( anOuterIter == theLoggerMap.end() )
     {
-        THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.getString() 
+        THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.asString() 
                                    + "] not found." );
     }
 
@@ -89,7 +89,7 @@ LoggerPtr LoggerBroker::getLogger( FullPNCref aFullPN ) const
 
     if( anInnerIter == anOuterIter->second.end() )
     {
-        THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.getString() 
+        THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.asString() 
                                    + "] not found." );
     }
 
@@ -109,7 +109,7 @@ LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,
 
         if( anInnerIter != anOuterIter->second.end() )
         {
-            THROW_EXCEPTION( AlreadyExist, "Logger [" + aFullPN.getString()
+            THROW_EXCEPTION( AlreadyExist, "Logger [" + aFullPN.asString()
                                            + "] already exist." );
         }
     }
@@ -161,7 +161,7 @@ void LoggerBroker::removeLogger( FullPNCref aFullPN )
 
     if( anOuterIter == theLoggerMap.end() )
     {
-        THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.getString() 
+        THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.asString() 
                                    + "] not found." );
     }
 
@@ -170,7 +170,7 @@ void LoggerBroker::removeLogger( FullPNCref aFullPN )
 
     if( anInnerIter == anOuterIter->second.end() )
     {
-        THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.getString() 
+        THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.asString() 
                                    + "] not found." );
     }
 

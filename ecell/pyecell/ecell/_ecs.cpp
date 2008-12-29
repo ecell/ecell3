@@ -1,12 +1,12 @@
-//::::::::::::::::::::::::::::::::::::::
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
-//             This file is part of the E-Cell System
+//       This file is part of the E-Cell System
 //
-//             Copyright (C) 1996-2008 Keio University
-//             Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
-//::::::::::::::::::::::::::::::::::::::
-// //
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
 // E-Cell System is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
@@ -32,7 +32,10 @@
 #include <cstring>
 #include <cstdlib>
 #include <utility>
+#include <cctype>
+#include <functional>
 
+#include <boost/bind.hpp>
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
 #include <boost/range/size.hpp>
@@ -784,7 +787,7 @@ struct DataPointVectorWrapper< LongDataPoint >::GetItemFunc
 
 template< typename Tdp_ >
 PyTypeObject DataPointVectorWrapper< Tdp_ >::Iterator::__class__ = {
-	PyObject_HEAD_INIT(&PyType_Type)
+	PyObject_HEAD_INIT( &PyType_Type )
 	0,					/* ob_size */
 	"ecell._ecs.DataPointVectorWrapper.Iterator", /* tp_name */
 	sizeof( typename DataPointVectorWrapper::Iterator ), /* tp_basicsize */
@@ -819,7 +822,7 @@ PyTypeObject DataPointVectorWrapper< Tdp_ >::Iterator::__class__ = {
 
 template< typename Tdp_ >
 PyTypeObject DataPointVectorWrapper< Tdp_ >::__class__ = {
-	PyObject_HEAD_INIT(&PyType_Type)
+	PyObject_HEAD_INIT( &PyType_Type )
 	0,
 	"ecell._ecs.DataPointVector",
 	sizeof(DataPointVectorWrapper),
@@ -881,6 +884,235 @@ PyGetSetDef DataPointVectorWrapper< Tdp_ >::__getset__[] = {
     { NULL }
 };
 
+
+template< typename Titer_ >
+class STLIteratorWrapper
+{
+protected:
+    PyObject_VAR_HEAD
+    Titer_ theIdx;
+    Titer_ theEnd; 
+
+public:
+    static PyTypeObject __class__;
+
+public:
+    void* operator new( size_t )
+    {
+        return PyObject_New( STLIteratorWrapper, &__class__ );
+    }
+
+    template< typename Trange_ >
+    STLIteratorWrapper( Trange_ const& range )
+        : theIdx( boost::begin( range ) ), theEnd( boost::end( range ) )
+    {
+    }
+
+    ~STLIteratorWrapper()
+    {
+    }
+
+public:
+    static PyTypeObject* __class_init__()
+    {
+        PyType_Ready( &__class__ );
+        return &__class__;
+    }
+
+    template< typename Trange_ >
+    static STLIteratorWrapper* create( Trange_ const& range )
+    {
+        return new STLIteratorWrapper( range );
+    }
+
+    static void __dealloc__( STLIteratorWrapper* self )
+    {
+        self->~STLIteratorWrapper();
+    }
+
+    static PyObject* __next__( STLIteratorWrapper* self )
+    {
+        if ( self->theIdx == self->theEnd )
+            return NULL;
+
+        return py::incref( py::object( *self->theIdx ).ptr() );
+    }
+};
+
+template< typename Titer_ >
+PyTypeObject STLIteratorWrapper< Titer_ >::__class__ = {
+	PyObject_HEAD_INIT( &PyType_Type )
+	0,					/* ob_size */
+	"ecell._ecs.STLIteratorWrapper", /* tp_name */
+	sizeof( STLIteratorWrapper ), /* tp_basicsize */
+	0,					/* tp_itemsize */
+	/* methods */
+	(destructor)&STLIteratorWrapper::__dealloc__, /* tp_dealloc */
+	0,					/* tp_print */
+	0,					/* tp_getattr */
+	0,					/* tp_setattr */
+	0,					/* tp_compare */
+	0,					/* tp_repr */
+	0,					/* tp_as_number */
+	0,					/* tp_as_sequence */
+	0,					/* tp_as_mapping */
+	0,					/* tp_hash */
+	0,					/* tp_call */
+	0,					/* tp_str */
+	PyObject_GenericGetAttr,		/* tp_getattro */
+	0,					/* tp_setattro */
+	0,					/* tp_as_buffer */
+	Py_TPFLAGS_HAVE_CLASS | Py_TPFLAGS_HAVE_WEAKREFS | Py_TPFLAGS_HAVE_ITER,/* tp_flags */
+	0,					/* tp_doc */
+	0,	/* tp_traverse */
+	0,					/* tp_clear */
+	0,					/* tp_richcompare */
+	0,					/* tp_weaklistoffset */
+	PyObject_SelfIter,  /* tp_iter */
+	(iternextfunc)&STLIteratorWrapper::__next__,		/* tp_iternext */
+	0,		        	/* tp_methods */
+	0					/* tp_members */
+};
+
+
+static std::string VariableReference___repr__( VariableReference const* self )
+{
+    return std::string( "[" ) + self->getName() + ": "
+            + "coefficient=" + stringCast( self->getCoefficient() ) + ", "
+            + "variable=" + self->getVariable()->getFullID().asString() + ", "
+            + "accessor=" + ( self->isAccessor() ? "true": "false" ) + "]";
+}
+
+
+class VariableReferences
+{
+public:
+    VariableReferences( Process* proc ): theProc( proc ) {}
+
+    void add( String const& name, String const& fullID, Integer const& coef,
+              bool isAccessor )
+    {
+        theProc->registerVariableReference( name, FullID( fullID ),
+                                            coef, isAccessor );
+    }
+
+    void add( String const& name, String const& fullID, Integer const& coef )
+    {
+        theProc->registerVariableReference( name, FullID( fullID ),
+                                            coef, false );
+    }
+
+
+    void remove( String const& name )
+    {
+        theProc->removeVariableReference( name );
+    }
+
+    VariableReference const& __getitem__( py::object name )
+    {
+        if ( PyInt_Check( name.ptr() ) )
+        {
+            long idx( PyInt_AS_LONG( name.ptr() ) );
+            VariableReferenceVector const& refs(
+                    theProc->getVariableReferenceVector() );
+            if ( idx < 0
+                 || static_cast< VariableReferenceVector::size_type >( idx )
+                    >= refs.size() )
+            {
+                throw std::range_error( "Index out of bounds");
+            }
+            return refs[ idx ];
+        }
+        else if ( PyString_Check( name.ptr() ) )
+        {
+            std::string nameStr( PyString_AS_STRING( name.ptr() ),
+                                 PyString_GET_SIZE( name.ptr() ) );
+            return theProc->getVariableReference( nameStr );
+        }
+        PyErr_SetString( PyExc_TypeError,
+                         "The argument is neither an integer nor a string" );
+        py::throw_error_already_set();
+        throw std::exception();
+    }
+
+    Py_ssize_t __len__()
+    {
+        return theProc->getVariableReferenceVector().size();
+    }
+
+    py::list getPositivesReferences()
+    {
+        VariableReferenceVector const& refs(
+                theProc->getVariableReferenceVector() );
+
+        py::list retval;
+        std::for_each(
+            refs.begin() + theProc->getPositiveVariableReferenceOffset(),
+            refs.end(), boost::bind(
+                &py::list::append< VariableReference >, &retval,
+                _1 ) );
+        return retval;
+    }
+
+    py::list getNegativeReferences()
+    {
+        VariableReferenceVector const& refs(
+                theProc->getVariableReferenceVector() );
+
+        py::list retval;
+        std::for_each(
+            refs.begin(),
+            refs.begin() + theProc->getZeroVariableReferenceOffset(),
+            boost::bind( &py::list::append< VariableReference >, &retval,
+                         _1 ) );
+        return retval;
+    }
+
+    py::list getZeroReferences()
+    {
+        VariableReferenceVector const& refs(
+                theProc->getVariableReferenceVector() );
+
+        py::list retval;
+        std::for_each(
+            refs.begin() + theProc->getZeroVariableReferenceOffset(),
+            refs.begin() + theProc->getPositiveVariableReferenceOffset(),
+            boost::bind( &py::list::append< VariableReference >, &retval,
+                         _1 ) );
+        return retval;
+    }
+
+    py::object __iter__()
+    {
+        return py::object( STLIteratorWrapper< VariableReferenceVector::const_iterator >( theProc->getVariableReferenceVector() ) );
+    }
+
+    std::string __repr__()
+    {
+        VariableReferenceVector const& refs(
+                theProc->getVariableReferenceVector() );
+
+        std::string retval;
+
+        retval += '[';
+        for ( VariableReferenceVector::const_iterator b( refs.begin() ),
+                                                      i( b ),
+                                                      e( refs.end() );
+                i != e; ++i )
+        {
+            if ( i != b )
+                retval += ", ";
+            retval += VariableReference___repr__( &*i );
+            retval += ']';
+        }
+
+        return retval;
+    } 
+
+private:
+    Process* theProc;
+};
+
 class DataPointVectorSharedPtrConverter
 {
 public:
@@ -902,6 +1134,12 @@ public:
                         aVectorSharedPtr ) );
     }
 };
+
+template< typename T_ >
+inline PyObject* to_python_indirect_fun( T_ arg )
+{
+    return py::to_python_indirect< T_, py::detail::make_reference_holder >()( arg );
+}
 
 template< typename TeventHander_ >
 class Simulator
@@ -925,8 +1163,8 @@ public:
         delete thePropertiedObjectMaker;
     }
 
-    void createStepper( String const& aClassname,
-                        String const& anId )
+    Stepper* createStepper( String const& aClassname,
+                            String const& anId )
     {
         if( theRunningFlag )
         {
@@ -934,15 +1172,17 @@ public:
                              "Cannot create a Stepper during simulation." );
         }
 
-        setDirty();
-        getModel().createStepper( aClassname, anId );
+        return getModel().createStepper( aClassname, anId );
+    }
+
+    Stepper* getStepper( String const& anId )
+    {
+        return getModel().getStepper( anId );
     }
 
     void deleteStepper( String const& anID )
     {
-        THROW_EXCEPTION( NotImplemented,
-                         "deleteStepper() method is not supported yet." );
-        setDirty();
+        getModel().deleteStepper( anID );
     }
 
     const Polymorph getStepperList() const
@@ -983,7 +1223,6 @@ public:
     {
         StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
         
-        setDirty();
         aStepperPtr->setProperty( aPropertyName, aValue );
     }
 
@@ -1002,7 +1241,6 @@ public:
     {
         StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
         
-        setDirty();
         aStepperPtr->loadProperty( aPropertyName, aValue );
     }
 
@@ -1011,8 +1249,6 @@ public:
                          String const& aPropertyName ) const
     {
         Stepper const * aStepperPtr( getModel().getStepper( aStepperID ) );
-
-        clearDirty();
 
         return aStepperPtr->saveProperty( aPropertyName );
     }
@@ -1040,8 +1276,8 @@ public:
     }
 
     
-    void createEntity( String const& aClassname, 
-                       String const& aFullIDString )
+    PyObject* createEntity( String const& aClassname, 
+                          String const& aFullIDString )
     {
         if( theRunningFlag )
         {
@@ -1049,16 +1285,54 @@ public:
                              "Cannot create an Entity during simulation." );
         }
 
-        setDirty();
-        getModel().createEntity( aClassname, FullID( aFullIDString ) );
+        PyObject* retval( 0 );
+        Entity* ent( getModel().createEntity( aClassname, FullID( aFullIDString ) ) );
+
+        switch ( static_cast< enum EntityType::Type >( ent->getEntityType() ) )
+        {
+        case EntityType::VARIABLE:
+            retval = to_python_indirect_fun( static_cast< Variable* >( ent ) );
+            break;
+        case EntityType::PROCESS:
+            retval = to_python_indirect_fun( static_cast< Process* >( ent ) );
+            break;
+        case EntityType::SYSTEM:
+            retval = to_python_indirect_fun( static_cast< System* >( ent ) );
+            break;
+        default:
+            retval = py::incref( Py_None );
+        }
+
+        return retval;
     }
+
+    PyObject* getEntity( String const& aFullIDString )
+    {
+        PyObject* retval( 0 );
+        Entity* ent( getModel().getEntity( FullID( aFullIDString ) ) );
+        switch ( static_cast< enum EntityType::Type >( ent->getEntityType() ) )
+        {
+        case EntityType::VARIABLE:
+            retval = to_python_indirect_fun( static_cast< Variable* >( ent ) );
+            break;
+        case EntityType::PROCESS:
+            retval = to_python_indirect_fun( static_cast< Process* >( ent ) );
+            break;
+        case EntityType::SYSTEM:
+            retval = to_python_indirect_fun( static_cast< System* >( ent ) );
+            break;
+        default:
+            return py::incref( Py_None );
+        }
+
+        return retval;
+    }
+
 
     void deleteEntity( String const& aFullIDString )
     {
         THROW_EXCEPTION( NotImplemented,
                          "deleteEntity() method is not supported yet." );
-
-        setDirty();
     }
 
     const Polymorph 
@@ -1123,7 +1397,6 @@ public:
         FullPN aFullPN( aFullPNString );
         EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
-        setDirty();
         anEntityPtr->setProperty( aFullPN.getPropertyName(), aValue );
     }
 
@@ -1133,8 +1406,6 @@ public:
         FullPN aFullPN( aFullPNString );
         Entity const * anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
                 
-        clearDirty();
-
         return anEntityPtr->getProperty( aFullPN.getPropertyName() );
     }
 
@@ -1144,7 +1415,6 @@ public:
         FullPN aFullPN( aFullPNString );
         EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
-        setDirty();
         anEntityPtr->loadProperty( aFullPN.getPropertyName(), aValue );
     }
 
@@ -1153,8 +1423,6 @@ public:
     {
         FullPN aFullPN( aFullPNString );
         Entity const * anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
-
-        clearDirty();
 
         return anEntityPtr->saveProperty( aFullPN.getPropertyName() );
     }
@@ -1191,12 +1459,8 @@ public:
                              "Cannot create a Logger during simulation." );
         }
 
-        clearDirty();
-
         Logger* retval( getModel().getLoggerBroker().createLogger(
             FullPN( aFullPNString ), aParamList ) );
-
-        setDirty();
 
         return retval;
     }
@@ -1229,7 +1493,7 @@ public:
                 i( aLoggerBroker.begin() ), end( aLoggerBroker.end() );
              i != end; ++i )
         {
-            aLoggerList.push_back( (*i).first.getString() );
+            aLoggerList.push_back( (*i).first.asString() );
         }
 
         return aLoggerList;
@@ -1514,45 +1778,16 @@ protected:
         return theModel; 
     }
 
-    void initialize()
-    {
-        getModel().initialize();
-    }
-
-
-    void setDirty()
-    {
-        theDirtyFlag = true;
-    }
-
-    const bool isDirty() const
-    {
-        return theDirtyFlag;
-    }
-
     inline void handleEvent()
     {
         if ( theEventHandler )
         { 
             while ( ( *theEventHandler )() );
         }
-
-        clearDirty();
-    }
-
-    void clearDirty() const
-    {
-        if ( isDirty() )
-        {
-            const_cast< Simulator* >( this )->initialize();
-
-            theDirtyFlag = false;
-        }
     }
 
     void start()
     {
-        clearDirty();
         theRunningFlag = true;
     }
 
@@ -1608,17 +1843,39 @@ static py::object LoggerPolicy_GetItem( Logger::Policy const* self, int idx )
     throw std::range_error("Index out of bounds");
 }
 
+static py::object Process_get_variableReferences( Process* self )
+{
+    return py::object( VariableReferences( self ) );
+}
+
+static Polymorph Entity___getattr__( Entity* self, std::string key )
+{
+    if ( key.size() > 0 )
+        key[ 0 ] = std::toupper( key[ 0 ] );
+    return self->getProperty( key );
+}
+
+static void Entity___setattr__( Entity* self, std::string key, Polymorph value )
+{
+    if ( key.size() > 0 )
+        key[ 0 ] = std::toupper( key[ 0 ] );
+    self->setProperty( key, value );
+}
+
+template< typename T_ >
+static PyObject* writeOnly( T_* )
+{
+    PyErr_SetString( PyExc_AttributeError, "Write-only attributes." );
+    return py::incref( Py_None );
+}
+
 BOOST_PYTHON_MODULE( _ecs )
 {
     typedef Simulator< PythonEventHandler > SimulatorImpl;
 
-    if (!initialize())
-    {
-        throw std::runtime_error( "Failed to initialize libecs" );
-    }
-
     DataPointVectorWrapper< DataPoint >::__class_init__();
     DataPointVectorWrapper< LongDataPoint >::__class_init__();
+    STLIteratorWrapper< VariableReferenceVector::const_iterator >::__class_init__();
 
     // without this it crashes when Logger::getData() is called. why?
     import_array();
@@ -1642,111 +1899,130 @@ BOOST_PYTHON_MODULE( _ecs )
 
     typedef py::return_value_policy< py::reference_existing_object >
             return_existing_object;
-
+    typedef py::return_value_policy< py::copy_const_reference >
+            return_copy_const_reference;
 
     py::class_< PropertyAttributes >( "PropertyAttributes",
         py::init< enum PropertySlotBase::Type, bool, bool, bool, bool, bool >() )
-        .add_property( "Type", &PropertyAttributes::getType )
-        .add_property( "Setable", &PropertyAttributes::isSetable )
-        .add_property( "Getable", &PropertyAttributes::isGetable )
-        .add_property( "Loadable", &PropertyAttributes::isLoadable )
-        .add_property( "Savable", &PropertyAttributes::isSavable )
-        .add_property( "Dynamic", &PropertyAttributes::isDynamic )
+        .add_property( "type", &PropertyAttributes::getType )
+        .add_property( "setable", &PropertyAttributes::isSetable )
+        .add_property( "getable", &PropertyAttributes::isGetable )
+        .add_property( "loadable", &PropertyAttributes::isLoadable )
+        .add_property( "savable", &PropertyAttributes::isSavable )
+        .add_property( "dynamic", &PropertyAttributes::isDynamic )
         .def( "__getitem__", &PropertyAttributes_GetItem )
         ;
 
     py::class_< Logger::Policy >( "LoggerPolicy", py::init<>() )
-        .add_property( "MinimumStep", &Logger::Policy::getMinimumStep,
+        .add_property( "minimumStep", &Logger::Policy::getMinimumStep,
                                       &Logger::Policy::setMinimumStep )
-        .add_property( "MinimumTimeInterval",
+        .add_property( "minimumTimeInterval",
                        &Logger::Policy::getMinimumTimeInterval,
                        &Logger::Policy::setMinimumTimeInterval )
-        .add_property( "ContinueOnError",
+        .add_property( "continueOnError",
                        &Logger::Policy::doesContinueOnError,
                        &Logger::Policy::setContinueOnError )
-        .add_property( "MaxSpace",
+        .add_property( "maxSpace",
                        &Logger::Policy::getMaxSpace,
                        &Logger::Policy::setMaxSpace )
         .def( "__getitem__", &LoggerPolicy_GetItem )
         ;
 
+    py::class_< VariableReferences >( "VariableReferences", py::no_init )
+        .add_property( "positiveReferences",
+                       &VariableReferences::getPositivesReferences )
+        .add_property( "zeroReferences",
+                       &VariableReferences::getZeroReferences )
+        .add_property( "negativeReferences",
+                       &VariableReferences::getNegativeReferences )
+        .def( "add",
+              ( void ( VariableReferences::* )( String const&, String const&, Integer const&, bool ) )
+              &VariableReferences::add )
+        .def( "add",
+              ( void ( VariableReferences::* )( String const&, String const&, Integer const& ) )
+              &VariableReferences::add )
+        .def( "remove", &VariableReferences::remove )
+        .def( "__getitem__", &VariableReferences::__getitem__,
+              return_copy_const_reference() )
+        .def( "__len__", &VariableReferences::__len__ )
+        .def( "__iter__", &VariableReferences::__iter__ )
+        .def( "__repr__", &VariableReferences::__repr__ )
+        .def( "__str__", &VariableReferences::__repr__ )
+        ;
+
     py::class_< VariableReference >( "VariableReference", py::no_init )
         // properties
-        .add_property( "SuperSystem",
+        .add_property( "superSystem",
             py::make_function(
                 &VariableReference::getSuperSystem,
-                return_existing_object() ) )
-        .add_property( "Coefficient", &VariableReference::getCoefficient )
-        .add_property( "MolarConc",   &VariableReference::getMolarConc )
-        .add_property( "Name",        &VariableReference::getName )
-        .add_property( "NumberConc",  &VariableReference::getNumberConc )
-        .add_property( "IsFixed",     &VariableReference::isFixed )
-        .add_property( "IsAccessor",  &VariableReference::isAccessor )
-        .add_property( "Value",       &VariableReference::getValue, 
-                                      &VariableReference::setValue )
-        .add_property( "Velocity", &VariableReference::getVelocity )
+                py::return_internal_reference<> () ) )
+        .add_property( "coefficient", &VariableReference::getCoefficient )
+        .add_property( "name",        &VariableReference::getName )
+        .add_property( "isAccessor",  &VariableReference::isAccessor )
+        .add_property( "variable",
+                py::make_function(
+                    &VariableReference::getVariable,
+                    py::return_internal_reference<>() ) )
+        .def( "__str__", &VariableReference___repr__ )
+        .def( "__repr__", &VariableReference___repr__ )
+        ;
 
-        // methods
-        .def( "addValue",        &VariableReference::addValue )
-        .def( "getSuperSystem",    // this should be a property, but not supported
-              &VariableReference::getSuperSystem,
-              return_existing_object() )
+    py::class_< Stepper, py::bases<>, Stepper, boost::noncopyable >
+        ( "Stepper", py::no_init )
+        .add_property( "priority",
+                       &Stepper::getPriority,
+                       &Stepper::setPriority )
+        .add_property( "stepInterval",
+                       &Stepper::getStepInterval, 
+                       &Stepper::setStepInterval )
+        .add_property( "maxStepInterval",
+                       &Stepper::getMaxStepInterval,
+                       &Stepper::setMaxStepInterval )
+        .add_property( "minStepInterval",
+                       &Stepper::getMinStepInterval,
+                       &Stepper::setMinStepInterval )
+        .add_property( "rngSeed", &writeOnly<Stepper>, &Stepper::setRngSeed )
         ;
 
     py::class_< Entity, py::bases<>, Entity, boost::noncopyable >
         ( "Entity", py::no_init )
         // properties
-        .add_property( "SuperSystem",
-            py::make_function(
-                &Entity::getSuperSystem,
-                return_existing_object() ) )
-        .def( "getSuperSystem",     // this can be a property, but not supported
-              &Entity::getSuperSystem,
-              return_existing_object() )
+        .add_property( "superSystem",
+            py::make_function( &Entity::getSuperSystem,
+            py::return_internal_reference<> () ) )
+        .def( "__setattr__", &Entity___setattr__ )
+        .def( "__getattr__", &Entity___getattr__ )
         ;
 
     py::class_< System, py::bases< Entity >, System, boost::noncopyable>
         ( "System", py::no_init )
         // properties
-        .add_property( "Size",        &System::getSize )
-        .add_property( "SizeN_A",     &System::getSizeN_A )
-        .add_property( "StepperID",   &System::getStepperID )
+        .add_property( "size",        &System::getSize )
+        .add_property( "sizeN_A",     &System::getSizeN_A )
+        .add_property( "stepperID",   &System::getStepperID )
         ;
 
     py::class_< Process, py::bases< Entity >, Process, boost::noncopyable >
         ( "Process", py::no_init )
-        .add_property( "Activity",  &Process::getActivity,
+        .add_property( "activity",  &Process::getActivity,
                                     &Process::setActivity )
-        .add_property( "Priority",  &Process::getPriority )
-        .add_property( "StepperID", &Process::getStepperID )
-
+        .add_property( "priority",  &Process::getPriority )
+        .add_property( "stepperID", &Process::getStepperID )
+        .add_property( "variableReferences",
+              py::make_function( &Process_get_variableReferences ) )
         // methods
         .def( "addValue",        &Process::addValue )
-        .def( "getPositiveVariableReferenceOffset",         
-              &Process::getPositiveVariableReferenceOffset )
-        .def( "getVariableReference",             // this should be a property
-              &Process::getVariableReference,
-              py::return_internal_reference<>() )
-        .def( "getVariableReferenceVector",             // this should be a property
-              &Process::getVariableReferenceVector,
-              return_existing_object() )
-        .def( "getZeroVariableReferenceOffset",         
-              &Process::getZeroVariableReferenceOffset )
         .def( "setFlux",         &Process::setFlux )
         ;
 
     py::class_< Variable, py::bases< Entity >, Variable, boost::noncopyable >
         ( "Variable", py::no_init )
-        .add_property( "Value",  &Variable::getValue,
+        .add_property( "value",  &Variable::getValue,
                                  &Variable::setValue )
-        .add_property( "MolarConc",  &Variable::getMolarConc,
+        .add_property( "molarConc",  &Variable::getMolarConc,
                                      &Variable::setMolarConc  )
-        .add_property( "NumberConc", &Variable::getNumberConc,
+        .add_property( "numberConc", &Variable::getNumberConc,
                                      &Variable::setNumberConc )
-        ;
-
-    py::class_< VariableReferenceVector >( "VariableReferenceVector" ) //, bases<>, VariableReferenceVector>
-        .def( py::vector_indexing_suite< VariableReferenceVector >() )
         ;
 
     py::class_< Logger, py::bases<>, Logger, boost::noncopyable >( "Logger", py::no_init )
@@ -1756,7 +2032,7 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "Policy",
             py::make_function(
                 &Logger::getLoggerPolicy,
-                py::return_value_policy< py::copy_const_reference >() ) )
+                return_copy_const_reference() ) )
         .def( "getData", 
               ( DataPointVectorSharedPtr( Logger::* )( void ) const )
               &Logger::getData )
@@ -1777,7 +2053,11 @@ BOOST_PYTHON_MODULE( _ecs )
               &SimulatorImpl::getClassInfo )
         // Stepper-related methods
         .def( "createStepper",
-              &SimulatorImpl::createStepper )
+              &SimulatorImpl::createStepper,
+              py::return_internal_reference<>() )
+        .def( "getStepper",
+              &SimulatorImpl::getStepper,
+              py::return_internal_reference<>() )
         .def( "deleteStepper",
               &SimulatorImpl::deleteStepper )
         .def( "getStepperList",
@@ -1800,6 +2080,8 @@ BOOST_PYTHON_MODULE( _ecs )
         // Entity-related methods
         .def( "createEntity",
               &SimulatorImpl::createEntity )
+        .def( "geteEntity",
+              &SimulatorImpl::getEntity )
         .def( "deleteEntity",
               &SimulatorImpl::deleteEntity )
         .def( "getEntityList",
@@ -1890,7 +2172,7 @@ BOOST_PYTHON_MODULE( _ecs )
               &SimulatorImpl::run )
         .def( "getPropertyInfo",
               &SimulatorImpl::getPropertyInfo,
-              py::return_value_policy< py::copy_const_reference >() )
+              return_copy_const_reference() )
         .def( "getDMInfo",
               &SimulatorImpl::getDMInfo )
         .def( "setEventHandler",
@@ -1899,6 +2181,5 @@ BOOST_PYTHON_MODULE( _ecs )
                        &SimulatorImpl::getDMSearchPathSeparator )
         .def( "setDMSearchPath", &SimulatorImpl::setDMSearchPath )
         .def( "getDMSearchPath", &SimulatorImpl::getDMSearchPath )
-
         ;
 }

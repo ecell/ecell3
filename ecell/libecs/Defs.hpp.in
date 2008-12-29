@@ -36,8 +36,8 @@
 #define WIN32 __CYGWIN__
 #endif /* __CYGWIN __ */
 
-#if defined( WIN32 )
-#if defined(_MSC_VER)
+#if defined(  WIN32  )
+#if defined( _MSC_VER )
 #define _USE_MATH_DEFINES
 #if _MANAGED
 /* suppress __fastcall warnings */
@@ -121,6 +121,14 @@
 #endif /* defined( USE_COMPILER_EXTENSIONS ) && defined( __GNUC__ ) */
 
 
+#if defined( __GNUC__ )
+#define DEPRECATED __attribute__((deprecated))
+#elif defined( _MSC_VER )
+#define DEPRECATED __declspec(deprecated)
+#else
+#define DEPRECATED
+#endif
+
 namespace libecs
 {
 
@@ -184,7 +192,7 @@ typedef const mytype & mytype ## Cref;
   // Define the NULLPTR
   // *******************************************
 
-#define  NULLPTR  0
+#define  NULLPTR  stafic_cast< void* >( 0 )
    
   /**
      STL list template. This macro generates all

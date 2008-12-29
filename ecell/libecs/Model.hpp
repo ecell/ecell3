@@ -55,7 +55,7 @@ namespace libecs
 class LIBECS_API Model
 {
 public:
-    DECLARE_ASSOCVECTOR( String, StepperPtr, std::less< const String >,
+    DECLARE_ASSOCVECTOR( String, Stepper*, std::less< const String >,
                          StepperMap ); 
 protected:
     typedef EventScheduler< StepperEvent > StepperEventScheduler;
@@ -64,6 +64,8 @@ protected:
     typedef EcsObjectMaker< System > SystemMaker;
     typedef EcsObjectMaker< Variable > VariableMaker;
     typedef EcsObjectMaker< Process > ProcessMaker;
+    typedef std::map< Handle, EcsObject* > HandleToObjectMap;
+
 public:
     Model( ModuleMaker< EcsObject >& maker );
     ~Model();
@@ -116,7 +118,7 @@ public:
     }
 
 
-    const StepperPtr getLastStepper() const
+    const Stepper* getLastStepper() const
     {
         return theLastStepper;
     }
@@ -128,7 +130,45 @@ public:
        @param aClassname
     */
     const PropertyInterfaceBase& getPropertyInterface(
-            StringCref aClassname ) const;
+            String const& aClassname ) const;
+
+    /**
+       Retrieves an object by the handle.
+
+       @param handle the handle of the requested object.
+       @return A borrowed pointer to the object.
+    */
+    EcsObject* getObject( Handle const& handle ) const;
+
+
+    /**
+       Creates a new, unbound variable object. 
+       One should register the object to an appropriate system to use it in
+       the model.
+
+       @param aClassname the class name of the variable.
+     */
+    Variable* createVariable( String const& aClassname );
+
+
+    /**
+       Creates a new, unbound procss object. 
+       One should register the object to an appropriate system to use it in
+       the model.
+
+       @param aClassname the class name of the variable.
+     */
+    Process* createProcess( String const& aClassname );
+
+
+    /**
+       Creates a new, unbound system object. 
+       One should register the object to an appropriate system to use it in
+       the model.
+
+       @param aClassname the class name of the variable.
+     */
+    System* createSystem( String const& aClassname );
 
 
     /**
@@ -139,34 +179,39 @@ public:
        @param aFullID
        @param aName
     */
-    void createEntity( StringCref aClassname, FullIDCref aFullID );
+    Entity* createEntity( String const& aClassname, FullIDCref aFullID );
 
 
     /**
        Retrieves an Entity object pointed by the FullID.
 
        @param aFullID a FullID of the requested Entity.
-       @return A borrowed pointer to an Entity specified by the FullID.
+       @return A borrowed pointer to the Entity specified by the FullID.
     */
     Entity* getEntity( FullIDCref aFullID ) const;
 
 
     /**
-       Retrieves an Entity object by the handle.
-
-       @param handle the handle of the requested Entity.
-       @return A borrowed pointer to an Entity specified by the FullID.
-    */
-    Entity* getEntity( int handle ) const;
-
-    /**
        Retrieves a System object pointed by the SystemPath.    
 
        @param aSystemPath a SystemPath of the requested System.
-       @return A borrowed pointer to a System.
+       @return A borrowed pointer to the System.
     */
-    System* getSystem( SystemPath const& aSystemPath ) const;;
+    System* getSystem( SystemPath const& aSystemPath ) const;
 
+    /**
+       Create a new, unbound stepper of aClassname.
+       One should register the object to use it in the model.
+
+       @param aClassname  a classname of the Stepper to create.    
+    */
+    Stepper* createStepper( String const& aClassname );
+
+
+    /**
+       Register a stepper to the model
+     */
+    void registerStepper( Stepper* aStepper );
 
     /**
        Create a stepper with an ID and a classname. 
@@ -174,8 +219,17 @@ public:
        @param aClassname  a classname of the Stepper to create.    
        @param anID        a Stepper ID string of the Stepper to create.    
     */
-    void createStepper( StringCref aClassname, StringCref anID );
+    Stepper* createStepper( String const& aClassname, String const& anID );
 
+
+    /**
+       Delete a stepper with anID.
+       Removal of a stepper connected to any Entity is not allowed
+       and such an attempt causes exception.
+
+       @param anID        a Stepper ID string of the Stepper to delete.
+     */
+    void deleteStepper( String const& aClassname );
 
     /**
        Get a stepper by an ID.
@@ -183,8 +237,7 @@ public:
        @param anID a Stepper ID string of the Stepper to get.
        @return a borrowed pointer to the Stepper.
     */
-    StepperPtr getStepper( StringCref anID ) const;
-
+    Stepper* getStepper( String const& anID ) const;
 
     /**
        Get the StepperMap of this Model.
@@ -212,13 +265,13 @@ public:
 
        @return a borrowed pointer to the RootSystem.
     */
-    SystemPtr getRootSystem() const
+    System* getRootSystem() const
     {
-        return theRootSystemPtr;
+        return theRootSystem;
     }
 
 
-    SystemStepperPtr getSystemStepper()
+    SystemStepper* getSystemStepper()
     {
         return &theSystemStepper;
     }
@@ -255,8 +308,11 @@ public:
 
     const String getDMSearchPath() const;
 
-private:
     /// @internal
+    void markDirty();
+
+private:
+    /** @internal */
     void registerBuiltinModules();
 
     /**
@@ -273,7 +329,7 @@ private:
 
     Handle generateNextHandle();
 
-    static void initializeSystems( SystemPtr const aSystem );
+    static void initializeSystems( System* const aSystem );
 
 public:
     static const char PATH_SEPARATOR;
@@ -287,10 +343,10 @@ private:
 
     LoggerBroker                    theLoggerBroker;
 
-    std::map< Handle, EcsObject* >  theObjectMap;
+    HandleToObjectMap               theObjectMap;
     unsigned int                    theNextHandleVal;
 
-    System*                         theRootSystemPtr;
+    System*                         theRootSystem;
 
     std::vector< Entity* >          theDeletionQueue;
 
@@ -303,6 +359,7 @@ private:
     SystemMaker                     theSystemMaker;
     VariableMaker                   theVariableMaker;
     ProcessMaker                    theProcessMaker;
+    bool                            isDirty;
 };
 
 } // namespace libecs

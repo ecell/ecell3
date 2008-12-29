@@ -34,6 +34,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <algorithm>
+#include <boost/bind.hpp>
 
 #include "Process.hpp"
 #include "Model.hpp"
@@ -68,6 +69,7 @@ GET_METHOD_DEF( Polymorph, SystemList, System )
     return aVector;
 }
 
+
 GET_METHOD_DEF( Polymorph, VariableList, System )
 {
     PolymorphVector aVector;
@@ -81,6 +83,7 @@ GET_METHOD_DEF( Polymorph, VariableList, System )
 
     return aVector;
 }
+
 
 GET_METHOD_DEF( Polymorph, ProcessList, System )
 {
@@ -96,51 +99,71 @@ GET_METHOD_DEF( Polymorph, ProcessList, System )
     return aVector;
 }
 
+
 SET_METHOD_DEF( String, StepperID, System )
 {
-    theStepper = getModel()->getStepper( value );
-    theStepper->registerSystem( this );
+    theStepperID = value;
+    theStepper = NULLPTR;
 }
+
 
 GET_METHOD_DEF( String, StepperID, System )
 {
-    return getStepper()->getID();
+    return theStepperID;
 }
+
 
 System::System()
     : theStepper( NULLPTR ),
-      theSizeVariable( NULLPTR ),
-      theEntityListChanged( false )
+      theSizeVariable( NULLPTR )
 {
     ; // do nothing
 }
 
+
 System::~System()
 {
-    if( getStepper() != NULLPTR )
-    {
-        getStepper()->removeSystem( this );
-    }
-
-    std::for_each( theProcessMap.begin(), theProcessMap.end(),
-            ComposeUnary( DeletePtr< Process >(),
-                          SelectSecond< ProcessMap::value_type >() ) );
-    std::for_each( theVariableMap.begin(), theVariableMap.end(),
-            ComposeUnary( DeletePtr< Variable >(),
-                          SelectSecond< VariableMap::value_type >() ) );
-    std::for_each( theSystemMap.begin(), theSystemMap.end(),
-            ComposeUnary( DeletePtr< System >(),
-                          SelectSecond< SystemMap::value_type >() ) );
 }
 
+void System::dispose()
+{
+    if ( !disposed_ )
+    {
+        if( getStepper() )
+        {
+            getStepper()->unregisterSystem( this );
+        }
 
-VariableCptr const System::findSizeVariable() const
+        std::for_each( theProcessMap.begin(), theProcessMap.end(),
+                ComposeUnary(
+                    boost::bind( &Process::setSuperSystem, _1,
+                                 static_cast< System* >( NULLPTR ) ),
+                    SelectSecond< ProcessMap::value_type >() ) );
+        theProcessMap.clear();
+        std::for_each( theVariableMap.begin(), theVariableMap.end(),
+                ComposeUnary(
+                    boost::bind( &Variable::setSuperSystem, _1,
+                                 static_cast< System* >( NULLPTR ) ),
+                    SelectSecond< VariableMap::value_type >() ) );
+        theVariableMap.clear();
+        std::for_each( theSystemMap.begin(), theSystemMap.end(),
+                ComposeUnary(
+                    boost::bind( &System::setSuperSystem, _1,
+                                 static_cast< System* >( NULLPTR ) ),
+                    SelectSecond< SystemMap::value_type >() ) );
+        theSystemMap.clear();
+    }
+
+    Entity::dispose();
+}
+
+Variable const* System::findSizeVariable() const
 {
     try
     {
         return getVariable( "SIZE" );
     }
-    catch( NotFoundCref )
+    catch( NotFound const& )
     {
         SystemCptr const aSuperSystem( getSuperSystem() );
 
@@ -169,12 +192,17 @@ void System::configureSizeVariable()
 void System::initialize()
 {
     // no need to call subsystems' initialize() -- the Model does this
+    if ( !theStepper )
+    {
+        theStepper = getModel()->getStepper( theStepperID );
+        theStepper->registerSystem( this );
+    }
 
     //
     // Variable::initialize()
     //
-    for( VariableMapConstIterator i( getVariableMap().begin() );
-         i != getVariableMap().end() ; ++i )
+    for ( VariableMapConstIterator i( getVariableMap().begin() );
+          i != getVariableMap().end() ; ++i )
     {
         i->second->initialize();
     }
@@ -183,31 +211,31 @@ void System::initialize()
     // Set Process::theStepper.
     // Process::initialize() is called in Stepper::initialize()
     // 
-    for( ProcessMapConstIterator i( getProcessMap().begin() );
-         i != getProcessMap().end() ; ++i )
+    for ( ProcessMapConstIterator i( getProcessMap().begin() );
+          i != getProcessMap().end() ; ++i )
     {
-        ProcessPtr aProcessPtr( i->second );
+        Process* aProcess( i->second );
 
-        if( aProcessPtr->getStepper() == NULLPTR )
+        if( aProcess->getStepper() == NULLPTR )
         {
-            aProcessPtr->setStepper( getStepper() );
+            aProcess->setStepper( getStepper() );
         }
     }
 
     configureSizeVariable();
 }
 
+
 Process*
-System::getProcess( StringCref anID ) const
+System::getProcess( String const& anID ) const
 {
     ProcessMapConstIterator i( getProcessMap().find( anID ) );
 
-    if( i == getProcessMap().end() )
+    if ( i == getProcessMap().end() )
     {
         THROW_EXCEPTION( NotFound, 
-                         "[" + getFullID().getString() + 
-                         "]: Process [" + anID + 
-                         "] not found in this System." );
+                         asString() + ": Process [" + anID
+                         + "] not found in this System." );
     }
 
     return i->second;
@@ -215,33 +243,30 @@ System::getProcess( StringCref anID ) const
 
 
 Variable*
-System::getVariable( StringCref anID ) const
+System::getVariable( String const& anID ) const
 {
     VariableMapConstIterator i( getVariableMap().find( anID ) );
 
-    if( i == getVariableMap().end() )
+    if ( i == getVariableMap().end() )
     {
         THROW_EXCEPTION( NotFound,
-                         "[" + getFullID().getString() + 
-                         "]: Variable [" + anID + 
-                         "] not found in this System.");
+                         asString() + ": Variable [" + anID
+                         + "] not found in this System.");
     }
 
     return i->second;
 }
 
 
-void System::registerSystem( SystemPtr aSystem )
+void System::registerEntity( System* aSystem )
 {
     const String anID( aSystem->getID() );
 
-    if( getSystemMap().find( anID ) != getSystemMap().end() )
+    if ( getSystemMap().find( anID ) != getSystemMap().end() )
     {
-        delete aSystem;
-
         THROW_EXCEPTION( AlreadyExist, 
-                         "[" + getFullID().getString() + 
-                         "]: System [" + anID + "] already exists." );
+                         asString() + ": System " + aSystem->asString()
+                         + " is already associated." );
     }
 
     theSystemMap[ anID ] = aSystem;
@@ -250,15 +275,53 @@ void System::registerSystem( SystemPtr aSystem )
     notifyChangeOfEntityList();
 }
 
-System*
-System::getSystem( SystemPathCref aSystemPath ) const
+
+void System::unregisterEntity( System* aSystem )
 {
-    if( aSystemPath.empty() )
+    System const* aSuperSystem( aSystem->getSuperSystem() );
+
+    if ( !aSuperSystem )
+    {
+        THROW_EXCEPTION( NotFound, 
+                         asString() + ": System " + aSystem->asString()
+                         + " is not associated t0 any System." );
+    }
+    else if ( aSuperSystem != this )
+    {
+        THROW_EXCEPTION( NotFound, 
+                         asString() + ": System " + aSystem->asString()
+                         + " is associated to another system." );
+    }
+
+    SystemMap::iterator i( theSystemMap.find( aSystem->getID() ) );
+    if ( i == theSystemMap.end() || (*i).second != aSystem )
+    {
+        THROW_EXCEPTION( NotFound, 
+                         asString() + ": System " + aSystem->asString()
+                         + " is not associated." );
+    }
+
+    unregisterEntity( i );
+}
+
+
+void System::unregisterEntity( SystemMap::iterator const& i )
+{
+    (*i).second->setSuperSystem( NULLPTR );
+    theSystemMap.erase( i ); 
+    notifyChangeOfEntityList();    
+}
+
+
+System*
+System::getSystem( SystemPath const& aSystemPath ) const
+{
+    if ( aSystemPath.empty() )
     {
         return const_cast<SystemPtr>( this );
     }
     
-    if( aSystemPath.isAbsolute() )
+    if ( aSystemPath.isAbsolute() )
     {
         return getModel()->getSystem( aSystemPath );
     }
@@ -273,80 +336,73 @@ System::getSystem( SystemPathCref aSystemPath ) const
     
 
 System*
-System::getSystem( StringCref anID ) const
+System::getSystem( String const& anID ) const
 {
-    if( anID[0] == '.' )
+    if ( anID[0] == '.' )
     {
         const String::size_type anIDSize( anID.size() );
 
-        if( anIDSize == 1 ) // == "."
+        if ( anIDSize == 1 ) // == "."
         {
             return const_cast<SystemPtr>( this );
         }
-        else if( anID[1] == '.' && anIDSize == 2 ) // == ".."
+        else if ( anID[1] == '.' && anIDSize == 2 ) // == ".."
         {
-            if( isRootSystem() )
+            if ( isRootSystem() )
             {
                 THROW_EXCEPTION( NotFound,
-                                 "[" + getFullID().getString() + 
-                                 "]: cannot get a super system ('" + anID +
-                                 "') from a root system." );
+                                 asString() + ": the root system has no super "
+                                 "systems" );
             }
             return getSuperSystem();
         }
     }
 
     SystemMapConstIterator i( getSystemMap().find( anID ) );
-    if( i == getSystemMap().end() )
+    if ( i == getSystemMap().end() )
     {
         THROW_EXCEPTION( NotFound,
-                         "[" + getFullID().getString() + 
-                         "]: System [" + anID + 
+                         asString() + ": System [" + anID + 
                          "] not found in this System." );
     }
 
     return i->second;
 }
 
+
 void System::notifyChangeOfEntityList()
 {
+    if ( getModel() )
+        getModel()->markDirty();
 }
 
-Variable const* const System::getSizeVariable() const
+
+Variable const* System::getSizeVariable() const
 {
     if ( !theSizeVariable )
     {
         THROW_EXCEPTION( IllegalOperation,
-                         "SIZE variable is not associated to "
-                         + getFullID().getString() );
+                         asString() + ": SIZE variable is not associated" );
     }
     return theSizeVariable;
 }
 
+
 const SystemPath System::getSystemPath() const
 {
-    if( isRootSystem() )
-    {
-        return SystemPath();
-    }
-    else
-    {
-        return Entity::getSystemPath();
-    }
+    return isRootSystem() ? SystemPath(): Entity::getSystemPath();
 }
 
 
-void System::registerProcess( ProcessPtr aProcess )
+void System::registerEntity( Process* aProcess )
 {
     const String anID( aProcess->getID() );
 
-    if( getProcessMap().find( anID ) != getProcessMap().end() )
+    if ( getProcessMap().find( anID ) != getProcessMap().end() )
     {
-        delete aProcess;
-
         THROW_EXCEPTION( AlreadyExist, 
-                         "[" + getFullID().getString() + 
-                         "]: Process [" + anID + "] already exists." );
+                         asString() + ": Process [" + anID
+                         + "] is already associated." );
     }
 
     theProcessMap[ anID ] = aProcess;
@@ -356,17 +412,53 @@ void System::registerProcess( ProcessPtr aProcess )
 }
 
 
-void System::registerVariable( VariablePtr aVariable )
+void System::unregisterEntity( Process* aProcess )
+{
+    System const* aSuperSystem( aProcess->getSuperSystem() );
+
+    if ( !aSuperSystem )
+    {
+        THROW_EXCEPTION( NotFound, 
+                         asString() + ": Process [" + aProcess->asString()
+                         + "] is not associated t0 any System." );
+    }
+    if ( aSuperSystem != this )
+    {
+        THROW_EXCEPTION( NotFound, 
+                         asString() + ": Process ["
+                         + aProcess->asString()
+                         + "] is associated to another system." );
+    }
+
+    ProcessMap::iterator i( theProcessMap.find( aProcess->getID() ) );
+    if ( i == theProcessMap.end() || (*i).second != aProcess )
+    {
+        THROW_EXCEPTION( NotFound, 
+                         asString() + ": Process ["
+                         + aProcess->asString() + "] is not associated." );
+    }
+
+    unregisterEntity( i );
+}
+
+
+void System::unregisterEntity( ProcessMap::iterator const& i )
+{
+    (*i).second->setSuperSystem( NULLPTR );
+    theProcessMap.erase( i ); 
+    notifyChangeOfEntityList();    
+}
+
+
+void System::registerEntity( Variable* aVariable )
 {
     const String anID( aVariable->getID() );
 
-    if( getVariableMap().find( anID ) != getVariableMap().end() )
+    if ( getVariableMap().find( anID ) != getVariableMap().end() )
     {
-        delete aVariable;
-
         THROW_EXCEPTION( AlreadyExist, 
-                         "[" + getFullID().getString() + 
-                         "]: Variable [" + anID + "] already exists." );
+                         asString() + ": Variable [" + anID
+                         + "] is already associated." );
     }
 
     theVariableMap[ anID ] = aVariable;
@@ -375,5 +467,105 @@ void System::registerVariable( VariablePtr aVariable )
     notifyChangeOfEntityList();
 }
 
+
+void System::unregisterEntity( Variable* aVariable )
+{
+    System const* aSuperSystem( aVariable->getSuperSystem() );
+
+    if ( !aSuperSystem )
+    {
+        THROW_EXCEPTION( NotFound, 
+                         asString() + ": Variable [" + aVariable->asString()
+                         + "] is not associated t0 any System." );
+    }
+    if ( aSuperSystem != this )
+    {
+        THROW_EXCEPTION( NotFound, 
+                        asString() + ": Variable [" + aVariable->asString()
+                        + "] is associated to another system." );
+    }
+
+    VariableMap::iterator i( theVariableMap.find( aVariable->getID() ) );
+    if ( i == theVariableMap.end() || (*i).second != aVariable )
+    {
+        THROW_EXCEPTION( NotFound, 
+                         asString() + ": Variable [" + aVariable->asString()
+                         + "] is not associated." );
+    }
+
+    unregisterEntity( i );
+}
+
+
+void System::unregisterEntity( VariableMap::iterator const& i )
+{
+    (*i).second->setSuperSystem( NULLPTR );
+    theVariableMap.erase( i ); 
+    notifyChangeOfEntityList();    
+}
+
+
+void registerEntity( Entity* anEntity )
+{
+    switch ( anEntity->getEntityType() )
+    {
+    case EntityType::VARIABLE:
+        registerEntity( static_cast< Variable* >( anEntity ) );
+        break;
+    case EntityType::PROCESS:
+        registerEntity( static_cast< Process* >( anEntity ) );
+        break;
+    case EntityType::SYSTEM:
+        registerEntity( static_cast< System* >( anEntity ) );
+        break;
+    }
+
+    THROW_EXCEPTION( InvalidEntityType, "Invalid EntityType specified." );
+}
+
+
+void System::unregisterEntity( EntityType const& anEntityType, String const& anID )
+{
+    switch ( anEntityType )
+    {
+    case EntityType::VARIABLE:
+        {
+            VariableMap::iterator i( theVariableMap.find( anID ) );
+            if ( i == theVariableMap.end() )
+            {
+                THROW_EXCEPTION( NotFound, 
+                                 asString() + ": Variable [" + anID
+                                 + "] is not associated." );
+            }
+            unregisterEntity( i );
+        }
+        break;
+
+    case EntityType::PROCESS:
+        {
+            ProcessMap::iterator i( theProcessMap.find( anID ) );
+            if ( i == theProcessMap.end() )
+            {
+                THROW_EXCEPTION( NotFound, 
+                                 asString() + ": Process [" + anID
+                                 + "] is not associated." );
+            }
+            unregisterEntity( i );
+        }
+        break;
+    case EntityType::SYSTEM:
+        {
+            SystemMap::iterator i( theSystemMap.find( anID ) );
+            if ( i == theSystemMap.end() )
+            {
+                THROW_EXCEPTION( NotFound, 
+                                 asString() + ": System [" + anID
+                                 + "] is not associated." );
+            }
+            unregisterEntity( i );
+        }
+        break;
+    }
+}
 
 } // namespace libecs

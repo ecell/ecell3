@@ -84,7 +84,7 @@ void SystemPath::parse( StringCref systempathstring )
 
 }
 
-const String SystemPath::getString() const
+String SystemPath::asString() const
 {
     StringList::const_iterator i = begin();
     String aString;
@@ -177,10 +177,10 @@ void FullID::parse( StringCref fullidstring )
     theID = aString.substr( aFieldStart, aFieldEnd - aFieldStart );
 }        
 
-const String FullID::getString() const
+String FullID::asString() const
 {
-    return theEntityType.getString() + FullID::DELIMITER 
-        + theSystemPath.getString() + FullID::DELIMITER + theID;
+    return theEntityType.asString() + FullID::DELIMITER 
+        + theSystemPath.asString() + FullID::DELIMITER + theID;
 }
 
 bool FullID::isValid() const
@@ -217,9 +217,9 @@ FullPN::FullPN( StringCref fullpropertynamestring )
     eraseWhiteSpaces( thePropertyName );
 }
 
-const String FullPN::getString() const
+String FullPN::asString() const
 {
-    return theFullID.getString() + FullID::DELIMITER + thePropertyName;
+    return theFullID.asString() + FullID::DELIMITER + thePropertyName;
 }
 
 bool FullPN::isValid() const

@@ -249,12 +249,16 @@ public:
     /**
        Remove a System from this Stepper.
 
-       @note This method is not currently supported.    Calling this method
-       causes undefined behavior.
+       @param aSystemPtr a pointer to a System object
+    */
+    void unregisterSystem( SystemPtr aSystemPtr );
+
+    /**
+       Remove all the associated System from this Stepper.
 
        @param aSystemPtr a pointer to a System object
     */
-    void removeSystem( SystemPtr aSystemPtr );
+    void unregisterAllSystem();
 
     /**
          Register a Process to this Stepper.
@@ -270,7 +274,7 @@ public:
 
        @param aProcessPtr a pointer to a Process object
     */
-    void removeProcess( ProcessPtr aProcessPtr );
+    void unregisterProcess( ProcessPtr aProcessPtr );
 
 
     void loadStepInterval( RealParam aStepInterval )
@@ -315,7 +319,7 @@ public:
         return thePriority;
     }
 
-    SystemVectorCref getSystemVector() const
+    SystemVector const& getSystemVector() const
     {
         return theSystemVector;
     }
@@ -336,7 +340,7 @@ public:
        of Processes.
 
     */
-    ProcessVectorCref getProcessVector() const
+    ProcessVector const& getProcessVector() const
     {
         return theProcessVector;
     }
@@ -363,7 +367,7 @@ public:
        Use getReadOnlyVariableOffset() method to get the index of the first
        Read-Only Variable in the VariableVector.
     */
-    VariableVectorCref getVariableVector() const
+    VariableVector const& getVariableVector() const
     {
         return theVariableVector;
     }
@@ -385,13 +389,13 @@ public:
     }
 
 
-    RealVectorCref getValueBuffer() const
+    RealVector const& getValueBuffer() const
     {
         return theValueBuffer;
     }
 
 
-    const VariableIndex getVariableIndex( VariableCptr const aVariable );
+    const VariableIndex getVariableIndex( Variable const* aVariable );
 
     virtual void interrupt( TimeParam aTime ) = 0;
 
@@ -408,7 +412,7 @@ public:
 
        @see Process, VariableReference
     */
-    const bool isDependentOn( const StepperCptr aStepper );
+    const bool isDependentOn( Stepper const* aStepper );
 
     /** 
        This method updates theIntegratedVariableVector.
@@ -423,9 +427,9 @@ public:
     void updateIntegratedVariableVector();
 
 
-    virtual InterpolantPtr createInterpolant( VariablePtr aVariablePtr )
+    virtual InterpolantPtr createInterpolant( Variable* aVariable )
     {
-        return new Interpolant( aVariablePtr );
+        return new Interpolant( aVariable );
     }
 
     const gsl_rng* getRng() const
@@ -433,7 +437,7 @@ public:
         return theRng;
     }
 
-    bool operator<( StepperCref rhs )
+    bool operator<( Stepper const& rhs )
     {
         return getCurrentTime() < rhs.getCurrentTime();
     }

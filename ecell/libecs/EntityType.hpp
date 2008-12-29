@@ -52,7 +52,7 @@ public:
     };
 
 
-    EntityType( StringCref typestring );
+    EntityType( String const& typestring );
 
 
     EntityType( const int number );
@@ -79,11 +79,17 @@ public:
     }
 
         
-    StringCref getString() const;
+    String const& asString() const;
 
-    operator StringCref() const
+    /** @deprecated use asString() instead. */
+    DEPRECATED String const& getString()
     {
-        return getString();
+        return asString();
+    }
+
+    operator String const&() const
+    {
+        return asString();
     }
 
     const Type& getType() const
@@ -95,11 +101,6 @@ public:
     {
         return getType();
     }
-
-    //        operator const int&() const
-    //        {
-    //            return static_cast<const int&>( getType() ); 
-    //        }
 
     bool operator<( EntityTypeCref rhs ) const
     {

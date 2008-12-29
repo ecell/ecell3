@@ -83,7 +83,7 @@ EntityType::EntityType( StringCref aTypeString )
     }
 }
 
-StringCref EntityType::getString() const
+StringCref EntityType::asString() const
 {
     switch( theType )
     {

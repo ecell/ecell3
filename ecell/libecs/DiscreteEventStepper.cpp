@@ -59,7 +59,7 @@ GET_METHOD_DEF( String, LastProcess, DiscreteEventStepper )
         const ProcessCptr aLastProcess(
                 theScheduler.getEvent( theLastEventID ).getProcess() );
         
-        return aLastProcess->getFullID().getString();
+        return aLastProcess->getFullID().asString();
     }
     else
     {

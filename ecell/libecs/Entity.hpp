@@ -151,16 +151,11 @@ namespace libecs
 
 
         /**
-           Get a FullID of this Entity as String.
+           Get a string representation of this Entity as String.
 
-           @note Property name for this method is 'getFullID', not
-           'getFullIDString.'
-
-           @return a FullID string of this Entity.
+           @return a description string of this Entity.
         */
-
-        const String getFullIDString() const;
-
+        String asString() const;
         /** @} */
 
 

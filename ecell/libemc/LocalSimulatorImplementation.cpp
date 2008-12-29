@@ -117,8 +117,7 @@ inline libecs::Polymorph LocalSimulatorImplementation::buildPolymorph( const lib
 
 void LocalSimulatorImplementation::deleteStepper( libecs::StringCref anID )
 {
-    THROW_EXCEPTION( libecs::NotImplemented,
-                     "deleteStepper() method is not supported yet." );
+    getModel().deleteStepper( anID );
     setDirty();
 }
 
@@ -402,7 +401,7 @@ const libecs::Polymorph LocalSimulatorImplementation::getLoggerList() const
             i( aLoggerBroker.begin() ), end( aLoggerBroker.end() );
          i != end; ++i )
     {
-        aLoggerList.push_back( (*i).first.getString() );
+        aLoggerList.push_back( (*i).first.asString() );
     }
 
     return aLoggerList;

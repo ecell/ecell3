@@ -57,7 +57,13 @@ public:
 
     ~SystemPath() {}
 
-    const String getString() const;
+    String asString() const;
+
+    /** @deprecated use asString() instead. */
+    DEPRECATED String getString() const
+    {
+        return asString();
+    }
 
     bool isAbsolute() const
     {
@@ -68,6 +74,11 @@ public:
     {
         // FIXME: check '..'s and '.'s etc..
         return true;
+    }
+
+    operator String() const
+    {
+        return asString();
     }
 
 protected:
@@ -176,7 +187,13 @@ public:
 
     bool isValid() const;
 
-    LIBECS_API const String getString() const;
+    LIBECS_API String asString() const;
+
+    /** @deprecated use asString() instead. */
+    DEPRECATED String getString() const
+    {
+        return asString();
+    }
 
     bool operator<( FullIDCref rhs ) const
     {
@@ -218,6 +235,11 @@ public:
     bool operator!=( FullIDCref rhs ) const
     {
         return ! operator==( rhs );
+    }
+
+    operator String() const
+    {
+        return asString();
     }
 
 protected:
@@ -315,7 +337,13 @@ public:
         thePropertyName = propertyname;
     }
 
-    LIBECS_API const String getString() const;
+    LIBECS_API String asString() const;
+
+    /** @deprecated use asString() instead. */
+    DEPRECATED String getString() const
+    {
+        return asString();
+    }
 
     bool isValid() const;
 
@@ -343,6 +371,11 @@ public:
     bool operator!=( FullPNCref rhs ) const
     {
         return ! operator==( rhs );
+    }
+
+    operator String() const
+    {
+        return asString();
     }
 
 private:

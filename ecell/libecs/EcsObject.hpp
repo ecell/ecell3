@@ -571,18 +571,23 @@ public:
     }
 
 
-    EcsObject()
+    EcsObject(): disposed_( false )
     {
         ; // do nothing
     }
 
     virtual ~EcsObject()
     {
-        ; // do nothing
+        dispose();
+    }
+
+    virtual void dispose()
+    {
+        disposed_ = true;
     }
 
     /**
-       Get a Model object to which this System belongs.
+       Get a Model object to which this object belongs.
 
        @return a borrowed pointer to the Model.
     */
@@ -591,17 +596,54 @@ public:
         return theModel;
     }
 
+    /**
+       Associate a Model object with this object.
+
+       @internal
+       @param aModel the Model object to associate with this object.
+     */
     void setModel( Model* const aModel )
     {
         theModel = aModel;
     }
 
+    /**
+       Return true if the object is already disposed.
+       @return true if the object is disposed, false otherwise.
+     */
+    bool isDisposed() const
+    {
+        return disposed_;
+    }
+
+    /**
+       Return the PropertySlot for aPropertyName
+
+       @param aPropertyName the name of the property.
+       @return the pointer to the PropertySlot.
+     */
     virtual PropertySlotBaseCptr 
     getPropertySlot( StringCref aPropertyName ) const = 0;
 
+
+    /**
+       Set the value of the property specified by aPropertyName
+       to aValue.
+
+       @param aPropertyName the name of the property.
+       @param aValue the value to set the property to.
+       @return the value of the property.
+     */
     virtual void 
     setProperty( StringCref aPropertyName, PolymorphCref aValue ) = 0;
 
+
+    /**
+       Return the Polymorph'ed value for aPropertyName
+
+       @param aPropertyName the name of the property.
+       @return the value of the property.
+     */
     virtual const Polymorph 
     getProperty( StringCref aPropertyName ) const = 0;
 
@@ -616,15 +658,12 @@ public:
     virtual const PropertyAttributes
     getPropertyAttributes( StringCref aPropertyName ) const = 0;
 
-    virtual const PropertyInterfaceBase& getPropertyInterface() const = 0;
-
+    virtual const PropertyInterfaceBase& getPropertyInterface() const = 0; 
     virtual void defaultSetProperty( StringCref aPropertyName, 
                                      PolymorphCref aValue );
     
     virtual const Polymorph 
-    defaultGetProperty( StringCref aPorpertyName ) const;
-    
-    virtual const StringVector& defaultGetPropertyList() const;
+    defaultGetProperty( StringCref aPorpertyName ) const; virtual const StringVector& defaultGetPropertyList() const;
     
     virtual const PropertyAttributes
     defaultGetPropertyAttributes( StringCref aPropertyName ) const;
@@ -664,6 +703,7 @@ private:
 protected:
     Model*   theModel;
     Handle   theHandle;
+    bool     disposed_;
 };
 
 // these specializations of nullSet/nullGet are here to avoid spreading

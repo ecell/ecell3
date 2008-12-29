@@ -54,25 +54,25 @@ BOOST_AUTO_TEST_CASE(testConstruction)
 {
     {
         SystemPath aSystemPath( "/A/B/C/" );
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "/A/B/C/" );
     }
     {
         SystemPath aSystemPath( "." );
-        BOOST_CHECK_EQUAL( aSystemPath.getString(), "." );
+        BOOST_CHECK_EQUAL( aSystemPath.asString(), "." );
     }
     {
         SystemPath aSystemPath( ".." );
-        BOOST_CHECK_EQUAL( aSystemPath.getString(), ".." );
+        BOOST_CHECK_EQUAL( aSystemPath.asString(), ".." );
     }
     {
         SystemPath aSystemPath( "" );
-        BOOST_CHECK_EQUAL( aSystemPath.getString(), "" );
+        BOOST_CHECK_EQUAL( aSystemPath.asString(), "" );
     }
     {
         SystemPath aSystemPath(
             "   \t  /A/BB/CCC/../DDDD/EEEEEE    \t \n  " );
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "/A/BB/CCC/../DDDD/EEEEEE" );
     }
 }
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(testCopyConstruction)
 {
     SystemPath aSystemPath( "   \t  /A/BB/CCC/../DDDD/EEEEEE    \t \n  " );
     SystemPath aSystemPath2( aSystemPath );
-    BOOST_CHECK_EQUAL( aSystemPath2.getString(),
+    BOOST_CHECK_EQUAL( aSystemPath2.asString(),
                        "/A/BB/CCC/../DDDD/EEEEEE" );
 }
 
@@ -90,32 +90,32 @@ BOOST_AUTO_TEST_CASE(testPopFront)
     {
         SystemPath aSystemPath( "/A/BB/CCC/../DDDD/EEEEEE" );
         aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "A/BB/CCC/../DDDD/EEEEEE" );
         aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "BB/CCC/../DDDD/EEEEEE" );
         aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "CCC/../DDDD/EEEEEE" );
         aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "../DDDD/EEEEEE" );
         aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "DDDD/EEEEEE" );
         aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "EEEEEE" );
         aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "" );
     }
 
     {
         SystemPath aSystemPath( "/" );
         aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(), "" );
+        BOOST_CHECK_EQUAL( aSystemPath.asString(), "" );
     }
 }
 
@@ -124,26 +124,26 @@ BOOST_AUTO_TEST_CASE(testPopBack)
     {
         SystemPath aSystemPath( "/A/BB/CCC/../DDDD/EEEEEE" );
         aSystemPath.pop_back();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "/A/BB/CCC/../DDDD" );
         aSystemPath.pop_back();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "/A/BB/CCC/.." );
         aSystemPath.pop_back();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "/A/BB/CCC" );
         aSystemPath.pop_back();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "/A/BB" );
         aSystemPath.pop_back();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "/A" );
     }
 
     {
         SystemPath aSystemPath( "/" );
         aSystemPath.pop_back();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(), "" );
+        BOOST_CHECK_EQUAL( aSystemPath.asString(), "" );
     }
 }
 
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE(testFullID)
 {
     { 
         FullID aFullID( "       \t  \n  Variable:/A/B:S   \t   \n" );
-        BOOST_CHECK_EQUAL( aFullID.getString(), "Variable:/A/B:S" );
+        BOOST_CHECK_EQUAL( aFullID.asString(), "Variable:/A/B:S" );
         BOOST_CHECK_EQUAL( aFullID.getEntityType(), EntityType::VARIABLE ); 
         BOOST_CHECK( aFullID.getSystemPath() == SystemPath( "/A/B" ) ); 
         BOOST_CHECK_EQUAL( aFullID.getID(), "S" ); 
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE(testFullID)
     BOOST_CHECK_THROW( FullID( "UNKNOWN:/UNKNOWN:" ), InvalidEntityType );
     { 
         FullID aFullID( "Process::/" );
-        BOOST_CHECK_EQUAL( aFullID.getString(), "Process::/" );
+        BOOST_CHECK_EQUAL( aFullID.asString(), "Process::/" );
         BOOST_CHECK_EQUAL( aFullID.getEntityType(), EntityType::PROCESS ); 
         BOOST_CHECK( aFullID.getSystemPath() == SystemPath( "" ) ); 
         BOOST_CHECK_EQUAL( aFullID.getID(), "/" ); 
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE(testFullIDAssignment)
     FullID anAssignee( EntityType::NONE, "", "" );
 
     anAssignee = aFullID;
-    BOOST_CHECK_EQUAL( anAssignee.getString(), "Variable:/test:TEST" );
+    BOOST_CHECK_EQUAL( anAssignee.asString(), "Variable:/test:TEST" );
     BOOST_CHECK_EQUAL( anAssignee.getEntityType(), EntityType::VARIABLE ); 
     BOOST_CHECK( anAssignee.getSystemPath() == SystemPath( "/test" ) ); 
     BOOST_CHECK_EQUAL( anAssignee.getID(), "TEST" ); 
@@ -196,36 +196,3 @@ BOOST_AUTO_TEST_CASE(testFullIDAssignment)
     BOOST_CHECK_EQUAL( aFullID.getEntityType(), EntityType::VARIABLE );
     BOOST_CHECK_EQUAL( aFullID.getID(), "TEST" );
 }
-/*
-void test()
-{
-     FullID aFullID( "       \t  \n  Variable:/A/B:S   \t   \n" );
-
-     FullID aFullID2( aFullID
-     std::cout << aFullID2.getString() << std::endl;
-
-     FullID aFullID3( "Process:/:R"
-     std::cout << aFullID3.getString() << std::endl;
-     aFullID3 = aFullID2;
-     std::cout << aFullID3.getString() << std::endl;
-
-     std::cout << "\n::::::::::" << std::endl;
-     //      FullPN aFullPN( 1,aFullID.getSystemPath(),"/", "PNAME"
-
-     FullPN aFullPN( "       \t  \n  Variable:/A/B:S:PNAME   \t   \n"
-     std::cout << aFullPN.getString() << std::endl;
-     std::cout << aFullPN.getEntityType() << std::endl;
-     std::cout << aFullPN.getSystemPath().getString() << std::endl;
-     std::cout << aFullPN.getID() << std::endl;
-     std::cout << aFullPN.getPropertyName() << std::endl;
-     std::cout << aFullPN.isValid() << std::endl;
-
-     FullPN aFullPN2( aFullPN
-     std::cout << aFullPN2.getString() << std::endl;
-
-     FullPN aFullPN3( "Process:/:R:P"
-     std::cout << aFullPN3.getString() << std::endl;
-     aFullPN3 = aFullPN2;
-     std::cout << aFullPN3.getString() << std::endl;
-}
-*/

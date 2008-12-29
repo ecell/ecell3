@@ -96,7 +96,7 @@ void Stepper::initialize()
 void Stepper::updateProcessVector()
 {
     // lighter implementation of this method is 
-    // to merge this into registerProcess() and removeProcess() and
+    // to merge this into registerProcess() and unregisterProcess() and
     // find a position to insert/remove each time.
 
     // sort by memory address. this is an optimization.
@@ -125,7 +125,7 @@ void Stepper::updateVariableVector()
     for( ProcessVectorConstIterator i( theProcessVector.begin());
          i != theProcessVector.end() ; ++i )
     {
-        VariableReferenceVectorCref aVariableReferenceVector(
+        VariableReferenceVector const& aVariableReferenceVector(
             (*i)->getVariableReferenceVector() );
 
         // for all the VariableReferences
@@ -133,7 +133,7 @@ void Stepper::updateVariableVector()
                 aVariableReferenceVector.begin() );
              j != aVariableReferenceVector.end(); ++j )
         {
-            VariableReferenceCref aNewVariableReference( *j );
+            VariableReference const& aNewVariableReference( *j );
             VariablePtr aVariablePtr( aNewVariableReference.getVariable() );
 
             PtrVariableReferenceMapIterator 
@@ -244,7 +244,7 @@ void Stepper::createInterpolants()
 }
 
 
-const bool Stepper::isDependentOn( const StepperCptr aStepper )
+const bool Stepper::isDependentOn( Stepper const* aStepper )
 {
     // Every Stepper depends on the SystemStepper.
     // FIXME: UGLY -- reimplement SystemStepper in a different way
@@ -253,7 +253,7 @@ const bool Stepper::isDependentOn( const StepperCptr aStepper )
         return true;
     }
 
-    VariableVectorCref aTargetVector( aStepper->getVariableVector() );
+    VariableVector const& aTargetVector( aStepper->getVariableVector() );
     
     VariableVectorConstIterator aReadOnlyTargetVariableIterator(
         aTargetVector.begin() +
@@ -295,18 +295,14 @@ GET_METHOD_DEF( Polymorph, SystemList, Stepper )
     for( SystemVectorConstIterator i( getSystemVector().begin() );
          i != getSystemVector().end() ; ++i )
     {
-        SystemCptr aSystemPtr( *i );
-        FullIDCref aFullID( aSystemPtr->getFullID() );
-        const String aFullIDString( aFullID.getString() );
-
-        aVector.push_back( aFullIDString );
+        aVector.push_back( ( *i )->getFullID().asString() );
     }
 
     return aVector;
 }
 
 
-void Stepper::registerSystem( SystemPtr aSystemPtr )
+void Stepper::registerSystem( System* aSystemPtr )
 { 
     if( std::find( theSystemVector.begin(), theSystemVector.end(), aSystemPtr )
             == theSystemVector.end() )
@@ -315,7 +311,7 @@ void Stepper::registerSystem( SystemPtr aSystemPtr )
     }
 }
 
-void Stepper::removeSystem( SystemPtr aSystemPtr )
+void Stepper::unregisterSystem( System* aSystemPtr )
 { 
     SystemVectorIterator i( find( theSystemVector.begin(), 
                                   theSystemVector.end(),
@@ -324,9 +320,9 @@ void Stepper::removeSystem( SystemPtr aSystemPtr )
     if( i == theSystemVector.end() )
     {
         THROW_EXCEPTION( NotFound,
-                         getClassName() + String( ": " ) 
-                         + getID() + ": " 
-                         + aSystemPtr->getFullID().getString() 
+                         getClassName() + String( "[" ) 
+                         + getID() + "]: " 
+                         + aSystemPtr->asString()
                          + " not found in this stepper. Can't remove." );
     }
 
@@ -334,31 +330,93 @@ void Stepper::removeSystem( SystemPtr aSystemPtr )
 }
 
 
-void Stepper::registerProcess( ProcessPtr aProcessPtr )
+void Stepper::unregisterAllSystem()
+{
+    theSystemVector.clear();
+}
+
+void Stepper::registerProcess( Process* aProcess )
 { 
     if( std::find( theProcessVector.begin(), theProcessVector.end(), 
-                   aProcessPtr ) == theProcessVector.end() )
+                   aProcess ) == theProcessVector.end() )
     {
-        theProcessVector.push_back( aProcessPtr );
+        theProcessVector.push_back( aProcess );
     }
 
     updateProcessVector();
 }
 
-void Stepper::removeProcess( ProcessPtr aProcessPtr )
+void Stepper::unregisterProcess( ProcessPtr aProcess )
 { 
     ProcessVectorIterator i( find( theProcessVector.begin(), 
                                    theProcessVector.end(),
-                                   aProcessPtr ) );
+                                   aProcess ) );
     
     if( i == theProcessVector.end() )
     {
         THROW_EXCEPTION( NotFound,
-                         getClassName() + String( ": " ) 
-                         + getID() + ": " 
-                         + aProcessPtr->getFullID().getString() 
+                         getClassName() + String( "[" ) 
+                         + getID() + "]: " 
+                         + aProcess->asString()
                          + " not found in this stepper. Can't remove." );
     }
+
+    typedef std::set< Variable* > VariableSet;
+    VariableSet aVarSet;
+    VariableReferenceVector const& aVarRefVector(
+        aProcess->getVariableReferenceVector() );
+    std::transform( aVarRefVector.begin(), aVarRefVector.end(),
+                    inserter( aVarSet, aVarSet.begin() ),
+                    boost::bind( &VariableReference::getVariable, _1 ) );
+
+    VariableVector aNewVector;
+    VariableVector::size_type aReadWriteVariableOffset,
+                             aReadOnlyVariableOffset;
+
+    for( VariableVector::iterator i( theVariableVector.begin() ),
+                                  e( theVariableVector.begin()
+                                     + theReadWriteVariableOffset );
+         i != e; ++i )
+    {
+        VariableSet::iterator j( aVarSet.find( *i ) );
+        if ( j != aVarSet.end() )
+            aVarSet.erase( j );
+        else
+            aNewVector.push_back( *i );
+    }
+
+    aReadWriteVariableOffset = aNewVector.size();
+
+    for( VariableVector::iterator i( theVariableVector.begin()
+                                     + theReadWriteVariableOffset ),
+                                  e( theVariableVector.begin()
+                                     + theReadOnlyVariableOffset );
+         i != e; ++i )
+    {
+        VariableSet::iterator j( aVarSet.find( *i ) );
+        if ( j != aVarSet.end() )
+            aVarSet.erase( j );
+        else
+            aNewVector.push_back( *i );
+    }
+
+    aReadOnlyVariableOffset = aNewVector.size();
+
+    for( VariableVector::iterator i( theVariableVector.begin()
+                                     + theReadOnlyVariableOffset ),
+                                  e( theVariableVector.end() );
+         i != e; ++i )
+    {
+        VariableSet::iterator j( aVarSet.find( *i ) );
+        if ( j != aVarSet.end() )
+            aVarSet.erase( j );
+        else
+            aNewVector.push_back( *i );
+    }
+
+    theVariableVector.swap( aNewVector );
+    theReadWriteVariableOffset = aReadWriteVariableOffset;
+    theReadOnlyVariableOffset = aReadOnlyVariableOffset;
 
     theProcessVector.erase( i );
 }
@@ -403,7 +461,7 @@ GET_METHOD_DEF( Polymorph, WriteVariableList, Stepper )
     for( VariableVector::size_type c( 0 ); 
          c != theReadOnlyVariableOffset; ++c )
     {
-        aVector.push_back( theVariableVector[c]->getFullID().getString() );
+        aVector.push_back( theVariableVector[c]->getFullID().asString() );
     }
     
     return aVector;
@@ -418,7 +476,7 @@ GET_METHOD_DEF( Polymorph, ReadVariableList, Stepper )
     for( VariableVector::size_type c( theReadWriteVariableOffset ); 
          c != theVariableVector.size(); ++c )
     {
-        aVector.push_back( theVariableVector[c]->getFullID().getString() );
+        aVector.push_back( theVariableVector[c]->getFullID().asString() );
     }
     
     return aVector;
@@ -432,14 +490,14 @@ GET_METHOD_DEF( Polymorph, ProcessList, Stepper )
     for( ProcessVectorConstIterator i( theProcessVector.begin() );
          i != theProcessVector.end() ; ++i )
     {
-        aVector.push_back( (*i)->getFullID().getString() );
+        aVector.push_back( (*i)->getFullID().asString() );
     }
     
     return aVector;
 }
 
 const Stepper::VariableVector::size_type 
-Stepper::getVariableIndex( VariableCptr const aVariable )
+Stepper::getVariableIndex( Variable const* aVariable )
 {
     VariableVectorConstIterator
         anIterator( std::find( theVariableVector.begin(), 

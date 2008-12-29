@@ -33,6 +33,8 @@
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <boost/bind.hpp>
+
 #include "dmtool/SharedModuleMaker.hpp"
 
 #include "Util.hpp"
@@ -58,25 +60,24 @@ Model::Model( ModuleMaker< EcsObject >& maker )
     : theCurrentTime( 0.0 ),
       theNextHandleVal( 0 ),
       theLoggerBroker( *this ),
-      theRootSystemPtr(0),
+      theRootSystem( 0 ),
       theSystemStepper(),
       theEcsObjectMaker( maker ),
       theStepperMaker( theEcsObjectMaker ),
       theSystemMaker( theEcsObjectMaker ),
       theVariableMaker( theEcsObjectMaker ),
-      theProcessMaker( theEcsObjectMaker )
+      theProcessMaker( theEcsObjectMaker ),
+      isDirty( false )
 {
     registerBuiltinModules();
 
     // initialize theRootSystem
-    theRootSystemPtr = theSystemMaker.make( "System" );
-    theRootSystemPtr->setModel( this );
-    theRootSystemPtr->setID( "/" );
-    theRootSystemPtr->setName( "The Root System" );
+    theRootSystem = createSystem( "System" );
+    theRootSystem->setID( "/" );
+    theRootSystem->setName( "The Root System" );
     // super system of the root system is itself.
-    theRootSystemPtr->setSuperSystem( theRootSystemPtr );
+    theRootSystem->setSuperSystem( theRootSystem );
 
- 
     // initialize theSystemStepper
     theSystemStepper.setModel( this );
     theSystemStepper.setID( "___SYSTEM" );
@@ -87,14 +88,16 @@ Model::Model( ModuleMaker< EcsObject >& maker )
     theLastStepper = &theSystemStepper;
 }
 
+
 Model::~Model()
 {
-    delete theRootSystemPtr;
-    for ( StepperMapConstIterator i( theStepperMap.begin() );
-          i != theStepperMap.end(); ++i )
-    {
-        delete i->second;
-    }
+    std::for_each( theObjectMap.begin(), theObjectMap.end(),
+            ComposeUnary( boost::bind( &EcsObject::dispose, _1 ),
+                    SelectSecond< HandleToObjectMap::value_type >() ) );
+
+    std::for_each( theObjectMap.begin(), theObjectMap.end(),
+            ComposeUnary( DeletePtr< EcsObject >(),
+                    SelectSecond< HandleToObjectMap::value_type >() ) );
 }
 
 
@@ -105,62 +108,87 @@ void Model::flushLoggers()
 
 
 const PropertyInterfaceBase&
-Model::getPropertyInterface( StringCref aClassname ) const
+Model::getPropertyInterface( String const& aClassname ) const
 {
     return *(reinterpret_cast<const PropertyInterfaceBase*>(
         theEcsObjectMaker.getModule( aClassname ).getInfo() ) );
 }
 
 
-void Model::createEntity( StringCref aClassname, FullIDCref aFullID )
+Variable* Model::createVariable( String const& aClassname )
+{
+    Variable* retval( theVariableMaker.make( aClassname ) );
+    retval->setModel( this );
+    Handle nextHandle( generateNextHandle() );
+    theObjectMap.insert( std::make_pair( nextHandle, retval ) );
+    retval->setHandle( nextHandle );
+    return retval;
+}
+
+Process* Model::createProcess( String const& aClassname )
+{
+    Process* retval( theProcessMaker.make( aClassname ) );
+    retval->setModel( this );
+    Handle nextHandle( generateNextHandle() );
+    theObjectMap.insert( std::make_pair( nextHandle, retval ) );
+    retval->setHandle( nextHandle );
+    return retval;
+}
+
+System* Model::createSystem( String const& aClassname )
+{
+    System* retval( theSystemMaker.make( aClassname ) );
+    retval->setModel( this );
+    Handle nextHandle( generateNextHandle() );
+    theObjectMap.insert( std::make_pair( nextHandle, retval ) );
+    retval->setHandle( nextHandle );
+    return retval;
+}
+
+Entity* Model::createEntity( String const& aClassname, FullIDCref aFullID )
 {
     if( aFullID.getSystemPath().empty() )
     {
         THROW_EXCEPTION( BadSystemPath, "Empty SystemPath." );
     }
 
-    SystemPtr aContainerSystemPtr( getSystem( aFullID.getSystemPath() ) );
-
+    System* aContainerSystemPtr( getSystem( aFullID.getSystemPath() ) );
+    Entity* retval( 0 );
+    
     switch( aFullID.getEntityType() )
     {
     case EntityType::VARIABLE:
         {
-            Variable* aVariablePtr( theVariableMaker.make( aClassname ) );
-            aVariablePtr->setID( aFullID.getID() );
-            aVariablePtr->setModel( this );
-            Handle nextHandle( generateNextHandle() );
-            theObjectMap.insert( std::make_pair( nextHandle, aVariablePtr ) );
-            aVariablePtr->setHandle( nextHandle );
-            aContainerSystemPtr->registerVariable( aVariablePtr );
-            return;
+            retval = createVariable( aClassname );
+            retval->setID( aFullID.getID() );
+            aContainerSystemPtr->registerEntity(
+                    static_cast< Variable* >( retval ) );
         }
+        break;
 
     case EntityType::PROCESS:
         {
-            Process* aProcessPtr( theProcessMaker.make( aClassname ) );
-            aProcessPtr->setID( aFullID.getID() );
-            aProcessPtr->setModel( this );
-            Handle nextHandle( generateNextHandle() );
-            theObjectMap.insert( std::make_pair( nextHandle, aProcessPtr ) );
-            aProcessPtr->setHandle( nextHandle );
-            aContainerSystemPtr->registerProcess( aProcessPtr );
-            return;
+            retval = createProcess( aClassname );
+            retval->setID( aFullID.getID() );
+            aContainerSystemPtr->registerEntity(
+                    static_cast< Process* >( retval ) );
         }
+        break;
 
     case EntityType::SYSTEM:
         {
-            System* aSystemPtr( theSystemMaker.make( aClassname ) );
-            aSystemPtr->setID( aFullID.getID() );
-            aSystemPtr->setModel( this );
-            Handle nextHandle( generateNextHandle() );
-            theObjectMap.insert( std::make_pair( nextHandle, aSystemPtr ) );
-            aSystemPtr->setHandle( nextHandle );
-            aContainerSystemPtr->registerSystem( aSystemPtr );
-            return;
+            retval = createSystem( aClassname );
+            retval->setID( aFullID.getID() );
+            aContainerSystemPtr->registerEntity(
+                    static_cast< System* >( retval ) );
         }
+        break;
+
+    default:
+        THROW_EXCEPTION( InvalidEntityType, "Invalid EntityType specified." );
     }
 
-    THROW_EXCEPTION( InvalidEntityType, "Invalid EntityType specified." );
+    return retval;
 }
 
 
@@ -173,7 +201,7 @@ SystemPtr Model::getSystem( SystemPathCref aSystemPath ) const
     if( ( ! aSystemPathCopy.isAbsolute() ) || aSystemPathCopy.empty() )
     {
         THROW_EXCEPTION( BadSystemPath, 
-                         "[" + aSystemPath.getString() +
+                         "[" + aSystemPath.asString() +
                          "] is not an absolute SystemPath." );
     }
 
@@ -183,11 +211,11 @@ SystemPtr Model::getSystem( SystemPathCref aSystemPath ) const
 }
 
 
-EntityPtr Model::getEntity( FullIDCref aFullID ) const
+Entity* Model::getEntity( FullIDCref aFullID ) const
 {
-    EntityPtr anEntity( NULL );
+    Entity* anEntity( NULL );
     SystemPathCref aSystemPath( aFullID.getSystemPath() );
-    StringCref         anID( aFullID.getID() );
+    String const&         anID( aFullID.getID() );
 
     if( aSystemPath.empty() )
     {
@@ -198,7 +226,7 @@ EntityPtr Model::getEntity( FullIDCref aFullID ) const
         else
         {
             THROW_EXCEPTION( BadID, 
-                             "[" + aFullID.getString()
+                             "[" + aFullID.asString()
                              + "] is an invalid FullID" );
         }
     }
@@ -224,7 +252,21 @@ EntityPtr Model::getEntity( FullIDCref aFullID ) const
 }
 
 
-StepperPtr Model::getStepper( StringCref anID ) const
+EcsObject* Model::getObject( Handle const& handle ) const
+{
+    HandleToObjectMap::const_iterator i( theObjectMap.find( handle ) );
+
+    if ( i == theObjectMap.end() )
+    {
+        THROW_EXCEPTION( NotFound, "Entity not found");
+    }
+
+    return i->second;
+}
+
+
+
+Stepper* Model::getStepper( String const& anID ) const
 {
     StepperMapConstIterator i( theStepperMap.find( anID ) );
 
@@ -238,17 +280,48 @@ StepperPtr Model::getStepper( StringCref anID ) const
 }
 
 
-void Model::createStepper( StringCref aClassName, StringCref anID )
+Stepper* Model::createStepper( String const& aClassName )
 {
-    StepperPtr aStepper( theStepperMaker.make( aClassName ) );
-    aStepper->setModel( this );
-    aStepper->setID( anID );
+    Stepper* retval( theStepperMaker.make( aClassName ) );
+    retval->setModel( this );
+    Handle nextHandle( generateNextHandle() );
+    theObjectMap.insert( std::make_pair( nextHandle, retval ) );
+    retval->setHandle( nextHandle );
+    return retval;
+}
 
-    theStepperMap.insert( std::make_pair( anID, aStepper ) );
+Stepper* Model::createStepper( String const& aClassName, String const& anID )
+{
+    Stepper* aStepper( createStepper( aClassName ) );
+    aStepper->setID( anID );
+    registerStepper( aStepper );
+    return aStepper;
+}
+
+void Model::registerStepper( Stepper* aStepper )
+{
+    theStepperMap.insert( std::make_pair( aStepper->getID(), aStepper ) );
 
     theScheduler.addEvent(
         StepperEvent( getCurrentTime() + aStepper->getStepInterval(),
                       aStepper ) );
+
+    markDirty();
+}
+
+void Model::deleteStepper( String const& anID )
+{
+    Stepper* aStepper( getStepper( anID ) );
+
+    if ( !aStepper->getProcessVector().empty() )
+    {
+        THROW_EXCEPTION( IllegalOperation,
+                "Stepper [" + anID + "] is relied on by one or more processes" );
+    }
+
+    aStepper->unregisterAllSystem(); 
+    theStepperMap.erase( anID );
+    markDirty();
 }
 
 
@@ -258,7 +331,7 @@ void Model::checkStepper( System const* const aSystem ) const
     {
         THROW_EXCEPTION( InitializationFailed,
                          "No stepper is connected with [" +
-                         aSystem->getFullID().getString() + "]." );
+                         aSystem->getFullID().asString() + "]." );
     }
 
     for( System::SystemMapConstIterator i( aSystem->getSystemMap().begin() ) ;
@@ -284,18 +357,15 @@ void Model::initializeSystems( System* const aSystem )
 
 void Model::checkSizeVariable( System const* const aSystem )
 {
-    FullID aRootSizeFullID( "Variable:/:SIZE" );
-
     try
     {
-        IGNORE_RETURN getEntity( aRootSizeFullID );
+        getRootSystem()->getSystem( "/" )->getVariable( "SIZE" );
     }
-    catch( NotFoundCref )
+    catch( NotFound const& )
     {
-        createEntity( "Variable", aRootSizeFullID );
-        EntityPtr aRootSizeVariable( getEntity( aRootSizeFullID ) );
-
-        aRootSizeVariable->setProperty( "Value", Polymorph( 1.0 ) );
+        Variable& v( *reinterpret_cast< Variable* >(
+                createEntity( "Variable", FullID( "Variable:/:SIZE" ) ) ) );
+        v.setValue( 1.0 );
     }
 }
 
@@ -330,6 +400,8 @@ void Model::initialize()
     {
         theScheduler.getEvent(c).reschedule();
     }
+
+    isDirty = false;
 }
 
 void Model::setDMSearchPath( const std::string& path )
@@ -369,11 +441,22 @@ void Model::registerBuiltinModules()
 
 void Model::step()
 {
+    if ( isDirty )
+    {
+        flushLoggers();
+        initialize();
+    }
+
     StepperEventCref aNextEvent( theScheduler.getTopEvent() );
     theCurrentTime = aNextEvent.getTime();
     theLastStepper = aNextEvent.getStepper();
 
     theScheduler.step();
+}
+
+void Model::markDirty()
+{
+    isDirty = true;
 }
 
 Handle Model::generateNextHandle()

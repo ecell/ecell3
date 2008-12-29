@@ -120,6 +120,7 @@ public:
     Process();
 
     virtual ~Process();
+    virtual void dispose();
 
     virtual const EntityType getEntityType() const
     {

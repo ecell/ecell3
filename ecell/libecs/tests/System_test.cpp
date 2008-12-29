@@ -55,6 +55,8 @@ BOOST_AUTO_TEST_CASE(testInstantiation)
     System* sys = reinterpret_cast< System * >( mmaker.getModule( "System" ).getAllocator()() );
     BOOST_CHECK(sys);
     BOOST_CHECK_EQUAL("System", sys->getPropertyInterface().getClassName());
+
+    delete sys;
 }
 
 BOOST_AUTO_TEST_CASE(testGetSizeVariable)
@@ -71,9 +73,12 @@ BOOST_AUTO_TEST_CASE(testGetSizeVariable)
     Variable* var = reinterpret_cast< Variable * >( mmaker.getModule( "Variable" ).getAllocator()() );
     var->setValue( 123.0 );
     var->setID( "SIZE" );
-    sys->registerVariable( var );
+    sys->registerEntity( var );
     sys->configureSizeVariable();
 
     BOOST_CHECK( sys->getSizeVariable() );
     BOOST_CHECK_EQUAL( 123.0, sys->getSize() );
+
+    delete sys;
+    delete var;
 };

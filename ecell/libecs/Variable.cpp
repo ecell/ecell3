@@ -60,9 +60,12 @@ Variable::Variable()
 
 Variable::~Variable()
 {
-    clearInterpolantVector();
 }
 
+void Variable::dispose()
+{
+    clearInterpolantVector();
+}
 
 void Variable::initialize()
 {

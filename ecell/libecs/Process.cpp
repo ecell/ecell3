@@ -96,7 +96,7 @@ GET_METHOD_DEF( Polymorph, VariableReferenceList, Process )
 
         aVector.push_back( boost::tuple< String, String, Integer, Integer >(
             aVariableReference.getName(),
-            aFullID.getString(),
+            aFullID.asString(),
             aVariableReference.getCoefficient(),
             aVariableReference.isAccessor() ) );
     }
@@ -140,7 +140,7 @@ SAVE_METHOD_DEF( Polymorph, VariableReferenceList, Process )
         {
             aVector.push_back( boost::tuple< String, String, Integer, Integer >(
                 aReferenceName,
-                aFullID.getString(),
+                aFullID.asString(),
                 aCoefficient,
                 static_cast<Integer>( anIsAccessorFlag ) ) );
         }
@@ -152,14 +152,14 @@ SAVE_METHOD_DEF( Polymorph, VariableReferenceList, Process )
             {
                 aVector.push_back( boost::tuple< String, String, Integer >(
                     aReferenceName,
-                    aFullID.getString(),
+                    aFullID.asString(),
                     aCoefficient ) );
             }
             else
             {
                 aVector.push_back( boost::tuple< String, String >(
                     aReferenceName,
-                    aFullID.getString() ) );
+                    aFullID.asString() ) );
             }
         }
     }
@@ -179,12 +179,22 @@ Process::Process()
 }
 
 
+void Process::dispose()
+{
+    if ( !disposed_ )
+    {
+        if( getStepper() )
+        {
+            getStepper()->unregisterProcess( this );
+        }
+    }
+
+    Entity::dispose();
+}
+
+
 Process::~Process()
 {
-    if( getStepper() != NULLPTR )
-    {
-        getStepper()->removeProcess( this );
-    }
 }
 
 
@@ -212,7 +222,7 @@ void Process::setStepper( StepperPtr const aStepper )
         }
         else
         {
-            theStepper->removeProcess( this );
+            theStepper->unregisterProcess( this );
         }
 
         theStepper = aStepper;
@@ -232,9 +242,9 @@ Process::getVariableReference( StringCref aVariableReferenceName )
     else
     {
         THROW_EXCEPTION( NotFound,
-                         "[" + getFullID().getString() + 
-                         "]: VariableReference [" + aVariableReferenceName + 
-                         "] not found in this Process." );
+                         asString() + ": VariableReference ["
+                         + aVariableReferenceName
+                         + "] not found in this Process." );
     }
 }
 
@@ -290,9 +300,9 @@ void Process::setVariableReference( VariableReference aVarRef )
     if( findVariableReference( aVarRef.getName() ) != theVariableReferenceVector.end() )
     {
         THROW_EXCEPTION( AlreadyExist,
-                         "[" + getFullID().getString() + 
-                         "]: VariableReference [" + aVarRef.getName() + 
-                         "] already exists in this Process." );
+                         asString() + ": VariableReference ["
+                         + aVarRef.getName()
+                         + "] already exists in this Process." );
     }
 
     theVariableReferenceVector.push_back( aVarRef );

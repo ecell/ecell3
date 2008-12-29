@@ -85,6 +85,8 @@ public:
     Variable();
     virtual ~Variable();
 
+    virtual void dispose();
+
     virtual const EntityType getEntityType() const
     {
         return EntityType( EntityType::VARIABLE );

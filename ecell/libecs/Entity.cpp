@@ -63,22 +63,22 @@ const FullID Entity::getFullID() const
     return FullID( getEntityType(), getSystemPath(), getID() );
 }
 
-const String Entity::getFullIDString() const
-{
-    return getFullID().getString();
-}
-
 const SystemPath Entity::getSystemPath() const
 {
-    SystemPtr aSystemPtr( getSuperSystem() );
+    System* aSystem( getSuperSystem() );
 
-    if( aSystemPtr == NULLPTR )
+    if ( !aSystem )
+    {
+        THROW_EXCEPTION( IllegalOperation, "No system is associated" );
+    }
+
+    if ( aSystem == this )
     {
         return SystemPath();
     }
 
-    SystemPath aSystemPath( aSystemPtr->getSystemPath() );
-    aSystemPath.push_back( aSystemPtr->getID() );
+    SystemPath aSystemPath( aSystem->getSystemPath() );
+    aSystemPath.push_back( aSystem->getID() );
     return aSystemPath;
 }
 
@@ -97,6 +97,17 @@ Entity::getLoggers() const
             SelectSecond< LoggerBroker::PerFullIDMap::value_type >() )
     );
     // return getModel()->getLoggerBroker().getLoggersByFullID( getFullID() );
+}
+
+
+String Entity::asString() const
+{
+    if ( !theSuperSystem )
+    {
+        return "<unbound " + getEntityType().asString() + " [" + getID() + "]>";
+    }
+
+    return getFullID().asString();
 }
 
 

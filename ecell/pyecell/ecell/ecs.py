@@ -35,7 +35,10 @@ __all__ = (
     'System',
     'Process',
     'Variable',
-    'VariableReferenceVector',
+    'PropertyAttributes',
+    'LoggerPolicy',
+    'VariableReference',
+    'VariableReferences',
     'Simulator'
     )
 

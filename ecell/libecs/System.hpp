@@ -59,6 +59,8 @@ public:
     System();
     virtual ~System();
 
+    virtual void dispose();
+
     virtual const EntityType getEntityType() const
     {
         return EntityType( EntityType::SYSTEM );
@@ -116,12 +118,12 @@ public:
         return theVariableMap;
     }
 
-    ProcessMapCref    getProcessMap() const
+    ProcessMapCref getProcessMap() const
     {
         return theProcessMap;
     }
 
-    SystemMapCref        getSystemMap() const
+    SystemMapCref getSystemMap() const
     {
         return theSystemMap;
     }
@@ -134,7 +136,7 @@ public:
 
        @return a borrowed pointer to a Process object in this System named @a id.
     */
-    Process* getProcess( StringCref anID ) const;
+    Process* getProcess( String const& anID ) const;
 
 
     /**
@@ -144,7 +146,7 @@ public:
 
        @return a borrowed pointer to a Variable object in this System named @a id.
     */
-    Variable* getVariable( StringCref anID ) const;
+    Variable* getVariable( String const& anID ) const;
 
     /**
        Find a System pointed by the given SystemPath relative to
@@ -177,38 +179,69 @@ public:
        @return a borrowed pointer to a System object in this System
        whose ID is anID.
     */
-    System* getSystem( StringCref id ) const;
+    System* getSystem( String const& id ) const;
 
 
     /**
-       Register a Process object in this System.
+       Register a Process object to this System.
 
-       This method steals ownership of the given pointer, and deletes
-       it if there is an error.
+       This method steals ownership of the given pointer.
     */
-    void registerProcess( Process* aProcess );
+    void registerEntity( Process* aProcess );
 
 
     /**
-       Register a Variable object in this System.
+       Unregister the specified Process object from this System.
+     */
+    void unregisterEntity( Process* aProcess );
 
-       This method steals ownership of the given pointer, and deletes
-       it if there is an error.
+    /**
+       Register a Variable object to this System.
+
+       This method steals ownership of the given pointer.
     */
-    void registerVariable( Variable* aVariable );
+    void registerEntity( Variable* aVariable );
 
 
     /**
-       Register a System object in this System.
+       Unregister the specified Process object from this System.
+     */
+    void unregisterEntity( Variable* aProcess );
 
-       This method steals ownership of the given pointer, and deletes
-       it if there is an error.
+
+    /**
+       Register a System object to this System.
+
+       This method steals ownership of the given pointer.
     */
-    void registerSystem( System* aSystem );
+    void registerEntity( System* aSystem );
+
+
+    /**
+       Unregister the specified System object from this System.
+     */
+    void unregisterEntity( System* aProcess );
+
+
+    /**
+       Register an Entity object to this System.
+
+       This method steals ownership of the given pointer.
+     */
+    void registerEntity( Entity* anEntity );
+
+
+    /**
+       Unregister the Entity specified by anEntityType and anID
+       from this System.
+       @param anEntityType The type of the entity,
+       @param anID         The ID of the entity.
+     */
+    void unregisterEntity( EntityType const& anEntityType, String const& anID  );
+
 
     /**
        Check if this is a root System.
-
 
        @return true if this is a Root System, false otherwise.
     */
@@ -222,11 +255,11 @@ public:
     */
     virtual const SystemPath getSystemPath() const;
 
-    Variable const* const getSizeVariable() const;
+    Variable const* getSizeVariable() const;
 
     void notifyChangeOfEntityList();
 
-    Variable const* const findSizeVariable() const;
+    Variable const* findSizeVariable() const;
 
     void configureSizeVariable();
 
@@ -235,7 +268,15 @@ public: // property slots
     GET_METHOD( Polymorph, VariableList );
     GET_METHOD( Polymorph, ProcessList );
 
+private:
+    void unregisterEntity( SystemMap::iterator const& );
+
+    void unregisterEntity( ProcessMap::iterator const& );
+
+    void unregisterEntity( VariableMap::iterator const& );
+
 protected:
+    String          theStepperID;
     Stepper*        theStepper;
 
 private:
@@ -244,8 +285,6 @@ private:
     SystemMap       theSystemMap;
 
     Variable const* theSizeVariable;
-
-    bool            theEntityListChanged;
 };
 
 
