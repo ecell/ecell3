@@ -366,13 +366,13 @@ public:
     {
         NEW aNew( dynamic_cast<NEW>( aPtr ) );
         if( aNew != NULLPTR )
-            {
-                return aNew;
-            }
+        {
+            return aNew;
+        }
         else
-            {
-                THROW_EXCEPTION( TypeError, "dynamic cast failed." );
-            }
+        {
+            THROW_EXCEPTION( TypeError, "dynamic cast failed." );
+        }
     }
 };
 

@@ -192,7 +192,7 @@ typedef const mytype & mytype ## Cref;
   // Define the NULLPTR
   // *******************************************
 
-#define  NULLPTR  stafic_cast< void* >( 0 )
+#define  NULLPTR  0
    
   /**
      STL list template. This macro generates all
