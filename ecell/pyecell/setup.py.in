@@ -9,7 +9,6 @@ include_dirs = [
     os.environ['INCLTDL'][2:],
     r'@top_srcdir@',
     r'@top_srcdir@/libecs',
-    r'@top_srcdir@/libemc',
     ]
 
 common_libraries = [
@@ -37,7 +36,7 @@ setup(
             'ecell._ecs',
             include_dirs = include_dirs,
             library_dirs = [ ecell_staging_home + os.environ['libdir'] ],
-            libraries = common_libraries + [ 'ecs', 'emc' ],
+            libraries = common_libraries + [ 'ecs' ],
             define_macros = sys.platform == 'win32' and
 				[ ('BOOST_ALL_NO_LIB', '1'), ('WIN32','1'), ('_WIN32','1'), ('__STDC__', 1), ('_WIN32_WINNT', 0x500), ('_SECURE_SCL', '0') ],
             sources = [ 'ecell/_ecs.cpp' ] ),
