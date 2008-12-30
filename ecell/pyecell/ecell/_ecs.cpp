@@ -422,7 +422,7 @@ class PythonCallable
 {
 public:
     PythonCallable( PyObject* aPyObjectPtr )
-        : thePyObject( py::incref( aPyObjectPtr ) )
+        : thePyObject( py::borrowed( aPyObjectPtr ) )
     {
         // this check isn't needed actually, because BPL does this automatically
         if ( !PyCallable_Check( thePyObject.get() ) )
