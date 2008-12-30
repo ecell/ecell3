@@ -310,22 +310,6 @@ LIBECS_API void throwSequenceSizeError( const size_t aSize, const size_t aMin );
 for( SEQCLASS ::const_iterator i( (SEQ) .begin() ) ;\
         i != (SEQ) .end() ; ++i )
 
-/**
-   For each 'second' member of element in a sequence, call a given method.
-
-   @note This will be deprecated.    Use select2nd instead.
-
-   @arg SEQCLASS the classname of the STL sequence. 
-   @arg SEQ the STL sequence.
-   @arg METHOD the name of the method.
-   
-   @see FOR_ALL
-*/
-#define FOR_ALL_SECOND( SEQCLASS, SEQ, METHOD )\
-FOR_ALL( SEQCLASS, SEQ )\
-    { (*i).second-> METHOD (); }
-
-
 template< typename T >
 inline const T nullValue()
 {

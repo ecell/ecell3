@@ -520,15 +520,6 @@ void Stepper::clearVariables()
 
 }
 
-void Stepper::initializeProcesses()
-{
-    FOR_ALL( ProcessVector, theProcessVector )
-    {
-        (*i)->initialize();
-    }
-}
-
-
 void Stepper::fireProcesses()
 {
     FOR_ALL( ProcessVector, theProcessVector )

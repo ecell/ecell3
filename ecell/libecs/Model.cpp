@@ -346,20 +346,32 @@ void Model::checkStepper( System const* const aSystem ) const
 void Model::initializeSystems( System* const aSystem )
 {
     aSystem->initialize();
-
-    for( System::SystemMapConstIterator i( aSystem->getSystemMap().begin() );
-         i != aSystem->getSystemMap().end() ; ++i )
-    {
-        // initialize recursively
-        initializeSystems( i->second );
-    }
+    System::SystemMap const& systemMap( aSystem->getSystemMap() );
+    std::for_each( systemMap.begin(), systemMap.end(),
+            ComposeUnary( boost::bind( &Model::initializeSystems, _1 ),
+                          SelectSecond< System::SystemMap::value_type >() ) );
 }
+
+
+void Model::initializeProcesses( System* const aSystem )
+{
+    System::ProcessMap const& processMap( aSystem->getProcessMap() );
+    std::for_each( processMap.begin(), processMap.end(),
+            ComposeUnary( boost::bind( &Process::initialize, _1 ),
+                          SelectSecond< System::ProcessMap::value_type >() ) );
+
+    System::SystemMap const& systemMap( aSystem->getSystemMap() );
+    std::for_each( systemMap.begin(), systemMap.end(),
+            ComposeUnary( boost::bind( &Model::initializeProcesses, _1 ),
+                          SelectSecond< System::SystemMap::value_type >() ) );
+}
+
 
 void Model::checkSizeVariable( System const* const aSystem )
 {
     try
     {
-        getRootSystem()->getSystem( "/" )->getVariable( "SIZE" );
+        getRootSystem()->getVariable( "SIZE" );
     }
     catch( NotFound const& )
     {
@@ -386,13 +398,15 @@ void Model::initialize()
     // (4) post-initialize() procedures:
     //         - construct stepper dependency graph and
     //         - fill theIntegratedVariableVector.
-
-    FOR_ALL_SECOND( StepperMap, theStepperMap, initializeProcesses );
-    FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
+    initializeProcesses( aRootSystem );
+    std::for_each( theStepperMap.begin(), theStepperMap.end(),
+        ComposeUnary( boost::bind( &Stepper::initialize, _1 ),
+                      SelectSecond< StepperMap::value_type >() ) );
     theSystemStepper.initialize();
 
-    FOR_ALL_SECOND( StepperMap, theStepperMap, 
-                    updateIntegratedVariableVector );
+    std::for_each( theStepperMap.begin(), theStepperMap.end(),
+        ComposeUnary( boost::bind( &Stepper::updateIntegratedVariableVector, _1 ),
+                      SelectSecond< StepperMap::value_type >() ) );
 
     theScheduler.updateEventDependency();
 

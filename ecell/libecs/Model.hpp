@@ -331,6 +331,8 @@ private:
 
     static void initializeSystems( System* const aSystem );
 
+    static void initializeProcesses( System* const aSystem );
+
 public:
     static const char PATH_SEPARATOR;
 

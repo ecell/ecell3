@@ -70,14 +70,32 @@ ecell-3.2: ?-Nov-2008
 
    - Removed setAvg() / setMin() / setMax() from DataPoint.
 
-   - Addec Logger::Policy class and remove methods that accept polymorph tuples
-     that contain the policy information.
+   - Removed getFullIDString() from Entity.
+
+   - Added asString() to Entity.
+
+   - Added deleteStepper() to Model.
+
+   - SystemPath::getString(), FullID::getString(), FullPN::getString() and
+     EntityType::getString() are deprecated. Use SystemPath::asString(),
+     FullID::asString(), FullPN::asString(), EntityType::asString() instead.
 
    - Made Process::setVariableReference() only accept VariableReference
      instead of scatterd arguments for consistency with getVariableReference().
 
    - Process::registerVariableReference() was changed to have the same
      signature as the previous version of Process::setVariableReference().
+
+   - System's registerProcess(), registerVariable() and registerSystem() were
+     renamed into a single overloaded function System::registerEntity(). 
+
+   - Added unregisterEntity() to System.
+
+   - Renamed Stepper's removeSystem() and removeProcess() to
+     unregisterSystem() and unregisterProcess() respectively.
+
+   - Added Logger::Policy class and remove methods that accept polymorph tuples
+     that contain the policy information.
 
    - Remove LoggerBroker::setModel() in favor of dependency injection in
      initialization.

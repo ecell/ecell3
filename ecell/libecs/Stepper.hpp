@@ -218,9 +218,6 @@ public:
 
     virtual void initialize();
 
-    void initializeProcesses();
-
-
     /**             
        Each subclass of Stepper defines this.
 

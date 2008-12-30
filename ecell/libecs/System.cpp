@@ -58,10 +58,10 @@ LIBECS_DM_INIT_STATIC( System, System );
 GET_METHOD_DEF( Polymorph, SystemList, System )
 {
     PolymorphVector aVector;
-    aVector.reserve( getSystemMap().size() );
+    aVector.reserve( theSystemMap.size() );
 
-    for( SystemMapConstIterator i = getSystemMap().begin() ;
-         i != getSystemMap().end() ; ++i )
+    for( SystemMapConstIterator i = theSystemMap.begin() ;
+         i != theSystemMap.end() ; ++i )
     {
         aVector.push_back( i->second->getID() );
     }
@@ -73,10 +73,10 @@ GET_METHOD_DEF( Polymorph, SystemList, System )
 GET_METHOD_DEF( Polymorph, VariableList, System )
 {
     PolymorphVector aVector;
-    aVector.reserve( getVariableMap().size() );
+    aVector.reserve( theVariableMap.size() );
 
-    for( VariableMapConstIterator i( getVariableMap().begin() );
-         i != getVariableMap().end() ; ++i )
+    for( VariableMapConstIterator i( theVariableMap.begin() );
+         i != theVariableMap.end() ; ++i )
     {
         aVector.push_back( i->second->getID() );
     }
@@ -88,10 +88,10 @@ GET_METHOD_DEF( Polymorph, VariableList, System )
 GET_METHOD_DEF( Polymorph, ProcessList, System )
 {
     PolymorphVector aVector;
-    aVector.reserve( getProcessMap().size() );
+    aVector.reserve( theProcessMap.size() );
 
-    for( ProcessMapConstIterator i( getProcessMap().begin() );
-         i != getProcessMap().end() ; ++i )
+    for( ProcessMapConstIterator i( theProcessMap.begin() );
+         i != theProcessMap.end() ; ++i )
     {
         aVector.push_back( i->second->getID() );
     }
@@ -194,25 +194,24 @@ void System::initialize()
     // no need to call subsystems' initialize() -- the Model does this
     if ( !theStepper )
     {
-        theStepper = getModel()->getStepper( theStepperID );
+        theStepper = theModel->getStepper( theStepperID );
         theStepper->registerSystem( this );
     }
 
     //
     // Variable::initialize()
     //
-    for ( VariableMapConstIterator i( getVariableMap().begin() );
-          i != getVariableMap().end() ; ++i )
+    for ( VariableMapConstIterator i( theVariableMap.begin() );
+          i != theVariableMap.end() ; ++i )
     {
         i->second->initialize();
     }
 
     //
     // Set Process::theStepper.
-    // Process::initialize() is called in Stepper::initialize()
     // 
-    for ( ProcessMapConstIterator i( getProcessMap().begin() );
-          i != getProcessMap().end() ; ++i )
+    for ( ProcessMapConstIterator i( theProcessMap.begin() );
+          i != theProcessMap.end() ; ++i )
     {
         Process* aProcess( i->second );
 
@@ -229,9 +228,9 @@ void System::initialize()
 Process*
 System::getProcess( String const& anID ) const
 {
-    ProcessMapConstIterator i( getProcessMap().find( anID ) );
+    ProcessMapConstIterator i( theProcessMap.find( anID ) );
 
-    if ( i == getProcessMap().end() )
+    if ( i == theProcessMap.end() )
     {
         THROW_EXCEPTION( NotFound, 
                          asString() + ": Process [" + anID
@@ -245,9 +244,9 @@ System::getProcess( String const& anID ) const
 Variable*
 System::getVariable( String const& anID ) const
 {
-    VariableMapConstIterator i( getVariableMap().find( anID ) );
+    VariableMapConstIterator i( theVariableMap.find( anID ) );
 
-    if ( i == getVariableMap().end() )
+    if ( i == theVariableMap.end() )
     {
         THROW_EXCEPTION( NotFound,
                          asString() + ": Variable [" + anID
@@ -262,7 +261,7 @@ void System::registerEntity( System* aSystem )
 {
     const String anID( aSystem->getID() );
 
-    if ( getSystemMap().find( anID ) != getSystemMap().end() )
+    if ( theSystemMap.find( anID ) != theSystemMap.end() )
     {
         THROW_EXCEPTION( AlreadyExist, 
                          asString() + ": System " + aSystem->asString()
@@ -323,7 +322,7 @@ System::getSystem( SystemPath const& aSystemPath ) const
     
     if ( aSystemPath.isAbsolute() )
     {
-        return getModel()->getSystem( aSystemPath );
+        return theModel->getSystem( aSystemPath );
     }
 
     SystemPtr const aNextSystem( getSystem( aSystemPath.front() ) );
@@ -358,8 +357,8 @@ System::getSystem( String const& anID ) const
         }
     }
 
-    SystemMapConstIterator i( getSystemMap().find( anID ) );
-    if ( i == getSystemMap().end() )
+    SystemMapConstIterator i( theSystemMap.find( anID ) );
+    if ( i == theSystemMap.end() )
     {
         THROW_EXCEPTION( NotFound,
                          asString() + ": System [" + anID + 
@@ -372,8 +371,8 @@ System::getSystem( String const& anID ) const
 
 void System::notifyChangeOfEntityList()
 {
-    if ( getModel() )
-        getModel()->markDirty();
+    if ( theModel )
+        theModel->markDirty();
 }
 
 
@@ -398,7 +397,7 @@ void System::registerEntity( Process* aProcess )
 {
     const String anID( aProcess->getID() );
 
-    if ( getProcessMap().find( anID ) != getProcessMap().end() )
+    if ( theProcessMap.find( anID ) != theProcessMap.end() )
     {
         THROW_EXCEPTION( AlreadyExist, 
                          asString() + ": Process [" + anID
@@ -454,7 +453,7 @@ void System::registerEntity( Variable* aVariable )
 {
     const String anID( aVariable->getID() );
 
-    if ( getVariableMap().find( anID ) != getVariableMap().end() )
+    if ( theVariableMap.find( anID ) != theVariableMap.end() )
     {
         THROW_EXCEPTION( AlreadyExist, 
                          asString() + ": Variable [" + anID
