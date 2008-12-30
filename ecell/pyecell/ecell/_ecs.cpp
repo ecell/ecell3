@@ -1163,6 +1163,11 @@ public:
         delete thePropertiedObjectMaker;
     }
 
+    void initialize()
+    {
+        theModel.initialize();
+    }
+
     Stepper* createStepper( String const& aClassname,
                             String const& anId )
     {
@@ -1172,22 +1177,22 @@ public:
                              "Cannot create a Stepper during simulation." );
         }
 
-        return getModel().createStepper( aClassname, anId );
+        return theModel.createStepper( aClassname, anId );
     }
 
     Stepper* getStepper( String const& anId )
     {
-        return getModel().getStepper( anId );
+        return theModel.getStepper( anId );
     }
 
     void deleteStepper( String const& anID )
     {
-        getModel().deleteStepper( anID );
+        theModel.deleteStepper( anID );
     }
 
     const Polymorph getStepperList() const
     {
-        Model::StepperMap const& aStepperMap( getModel().getStepperMap() );
+        Model::StepperMap const& aStepperMap( theModel.getStepperMap() );
 
         PolymorphVector aPolymorphVector; 
         aPolymorphVector.reserve( aStepperMap.size() );
@@ -1204,7 +1209,7 @@ public:
     const Polymorph 
     getStepperPropertyList( String const& aStepperID ) const
     {
-        StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+        StepperPtr aStepperPtr( theModel.getStepper( aStepperID ) );
         
         return aStepperPtr->getPropertyList();
     }
@@ -1213,7 +1218,7 @@ public:
     getStepperPropertyAttributes( String const& aStepperID, 
                                   String const& aPropertyName ) const
     {
-        StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+        StepperPtr aStepperPtr( theModel.getStepper( aStepperID ) );
         return aStepperPtr->getPropertyAttributes( aPropertyName );
     }
 
@@ -1221,7 +1226,7 @@ public:
                              String const& aPropertyName,
                              Polymorph const& aValue )
     {
-        StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+        StepperPtr aStepperPtr( theModel.getStepper( aStepperID ) );
         
         aStepperPtr->setProperty( aPropertyName, aValue );
     }
@@ -1230,7 +1235,7 @@ public:
     getStepperProperty( String const& aStepperID,
                         String const& aPropertyName ) const
     {
-        Stepper const * aStepperPtr( getModel().getStepper( aStepperID ) );
+        Stepper const * aStepperPtr( theModel.getStepper( aStepperID ) );
 
         return aStepperPtr->getProperty( aPropertyName );
     }
@@ -1239,7 +1244,7 @@ public:
                               String const& aPropertyName,
                               Polymorph const& aValue )
     {
-        StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+        StepperPtr aStepperPtr( theModel.getStepper( aStepperID ) );
         
         aStepperPtr->loadProperty( aPropertyName, aValue );
     }
@@ -1248,7 +1253,7 @@ public:
     saveStepperProperty( String const& aStepperID,
                          String const& aPropertyName ) const
     {
-        Stepper const * aStepperPtr( getModel().getStepper( aStepperID ) );
+        Stepper const * aStepperPtr( theModel.getStepper( aStepperID ) );
 
         return aStepperPtr->saveProperty( aPropertyName );
     }
@@ -1256,7 +1261,7 @@ public:
     const String
     getStepperClassName( String const& aStepperID ) const
     {
-        Stepper const * aStepperPtr( getModel().getStepper( aStepperID ) );
+        Stepper const * aStepperPtr( theModel.getStepper( aStepperID ) );
 
         return aStepperPtr->getClassName();
     }
@@ -1265,7 +1270,7 @@ public:
     {
         libecs::PolymorphMap aBuiltInfoMap;
         for ( DynamicModuleInfo::EntryIterator* anInfo(
-              getModel().getPropertyInterface( aClassname ).getInfoFields() );
+              theModel.getPropertyInterface( aClassname ).getInfoFields() );
               anInfo->next(); )
         {
             aBuiltInfoMap.insert( std::make_pair( anInfo->current().first,
@@ -1286,7 +1291,7 @@ public:
         }
 
         PyObject* retval( 0 );
-        Entity* ent( getModel().createEntity( aClassname, FullID( aFullIDString ) ) );
+        Entity* ent( theModel.createEntity( aClassname, FullID( aFullIDString ) ) );
 
         switch ( static_cast< enum EntityType::Type >( ent->getEntityType() ) )
         {
@@ -1309,7 +1314,7 @@ public:
     PyObject* getEntity( String const& aFullIDString )
     {
         PyObject* retval( 0 );
-        Entity* ent( getModel().getEntity( FullID( aFullIDString ) ) );
+        Entity* ent( theModel.getEntity( FullID( aFullIDString ) ) );
         switch ( static_cast< enum EntityType::Type >( ent->getEntityType() ) )
         {
         case EntityType::VARIABLE:
@@ -1352,7 +1357,7 @@ public:
             return aVector;
         }
 
-        System const* aSystemPtr( getModel().getSystem( aSystemPath ) );
+        System const* aSystemPtr( theModel.getSystem( aSystemPath ) );
 
         switch( anEntityType )
         {
@@ -1372,7 +1377,7 @@ public:
     const Polymorph 
     getEntityPropertyList( String const& aFullIDString ) const
     {
-        Entity const * anEntityPtr( getModel().getEntity( FullID( aFullIDString ) ) );
+        Entity const * anEntityPtr( theModel.getEntity( FullID( aFullIDString ) ) );
 
         return anEntityPtr->getPropertyList();
     }
@@ -1381,7 +1386,7 @@ public:
     {
         try
         {
-            IGNORE_RETURN getModel().getEntity( FullID( aFullIDString ) );
+            IGNORE_RETURN theModel.getEntity( FullID( aFullIDString ) );
         }
         catch( const NotFound& )
         {
@@ -1395,7 +1400,7 @@ public:
                                     Polymorph const& aValue )
     {
         FullPN aFullPN( aFullPNString );
-        EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+        EntityPtr anEntityPtr( theModel.getEntity( aFullPN.getFullID() ) );
 
         anEntityPtr->setProperty( aFullPN.getPropertyName(), aValue );
     }
@@ -1404,7 +1409,7 @@ public:
     getEntityProperty( String const& aFullPNString ) const
     {
         FullPN aFullPN( aFullPNString );
-        Entity const * anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+        Entity const * anEntityPtr( theModel.getEntity( aFullPN.getFullID() ) );
                 
         return anEntityPtr->getProperty( aFullPN.getPropertyName() );
     }
@@ -1413,7 +1418,7 @@ public:
                              Polymorph const& aValue )
     {
         FullPN aFullPN( aFullPNString );
-        EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+        EntityPtr anEntityPtr( theModel.getEntity( aFullPN.getFullID() ) );
 
         anEntityPtr->loadProperty( aFullPN.getPropertyName(), aValue );
     }
@@ -1422,7 +1427,7 @@ public:
     saveEntityProperty( String const& aFullPNString ) const
     {
         FullPN aFullPN( aFullPNString );
-        Entity const * anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+        Entity const * anEntityPtr( theModel.getEntity( aFullPN.getFullID() ) );
 
         return anEntityPtr->saveProperty( aFullPN.getPropertyName() );
     }
@@ -1431,7 +1436,7 @@ public:
     getEntityPropertyAttributes( String const& aFullPNString ) const
     {
         FullPN aFullPN( aFullPNString );
-        Entity const * anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+        Entity const * anEntityPtr( theModel.getEntity( aFullPN.getFullID() ) );
 
         return anEntityPtr->getPropertyAttributes( aFullPN.getPropertyName() );
     }
@@ -1440,7 +1445,7 @@ public:
     getEntityClassName( String const& aFullIDString ) const
     {
         FullID aFullID( aFullIDString );
-        Entity const * anEntityPtr( getModel().getEntity( aFullID ) );
+        Entity const * anEntityPtr( theModel.getEntity( aFullID ) );
 
         return anEntityPtr->getClassName();
     }
@@ -1459,7 +1464,7 @@ public:
                              "Cannot create a Logger during simulation." );
         }
 
-        Logger* retval( getModel().getLoggerBroker().createLogger(
+        Logger* retval( theModel.getLoggerBroker().createLogger(
             FullPN( aFullPNString ), aParamList ) );
 
         return retval;
@@ -1487,7 +1492,7 @@ public:
     {
         PolymorphVector aLoggerList;
 
-        LoggerBroker const& aLoggerBroker( getModel().getLoggerBroker() );
+        LoggerBroker const& aLoggerBroker( theModel.getLoggerBroker() );
 
         for( LoggerBroker::const_iterator
                 i( aLoggerBroker.begin() ), end( aLoggerBroker.end() );
@@ -1572,7 +1577,7 @@ public:
 
     const std::pair< Real, String > getNextEvent() const
     {
-        StepperEvent const& aNextEvent( getModel().getTopEvent() );
+        StepperEvent const& aNextEvent( theModel.getTopEvent() );
 
         return std::make_pair(
             static_cast< Real >( aNextEvent.getTime() ),
@@ -1593,7 +1598,7 @@ public:
         Integer aCounter( aNumSteps );
         do
         {
-            getModel().step();
+            theModel.step();
             
             --aCounter;
             
@@ -1619,7 +1624,7 @@ public:
 
     const Real getCurrentTime() const
     {
-        return getModel().getCurrentTime();
+        return theModel.getCurrentTime();
     }
 
     void run()
@@ -1631,7 +1636,7 @@ public:
             unsigned int aCounter( theEventCheckInterval );
             do
             {
-                getModel().step();
+                theModel.step();
                 --aCounter;
             }
             while( aCounter != 0 );
@@ -1653,16 +1658,16 @@ public:
 
         start();
 
-        const Real aStopTime( getModel().getCurrentTime() + aDuration );
+        const Real aStopTime( theModel.getCurrentTime() + aDuration );
 
         // setup SystemStepper to step at aStopTime
 
         //FIXME: dirty, ugly!
-        Stepper* aSystemStepper( getModel().getSystemStepper() );
+        Stepper* aSystemStepper( theModel.getSystemStepper() );
         aSystemStepper->setCurrentTime( aStopTime );
         aSystemStepper->setStepInterval( 0.0 );
 
-        getModel().getScheduler().updateEvent( 0, aStopTime );
+        theModel.getScheduler().updateEvent( 0, aStopTime );
 
 
         if ( theEventHandler )
@@ -1672,14 +1677,14 @@ public:
                 unsigned int aCounter( theEventCheckInterval );
                 do 
                 {
-                    if( getModel().getTopEvent().getStepper() == aSystemStepper )
+                    if( theModel.getTopEvent().getStepper() == aSystemStepper )
                     {
-                        getModel().step();
+                        theModel.step();
                         stop();
                         break;
                     }
                     
-                    getModel().step();
+                    theModel.step();
 
                     --aCounter;
                 }
@@ -1692,14 +1697,14 @@ public:
         {
             while ( theRunningFlag )
             {
-                if( getModel().getTopEvent().getStepper() == aSystemStepper )
+                if( theModel.getTopEvent().getStepper() == aSystemStepper )
                 {
-                    getModel().step();
+                    theModel.step();
                     stop();
                     break;
                 }
 
-                getModel().step();
+                theModel.step();
             }
         }
 
@@ -1709,7 +1714,7 @@ public:
     {
         theRunningFlag = false;
 
-        getModel().flushLoggers();
+        theModel.flushLoggers();
     }
 
     void setEventHandler( boost::shared_ptr< EventHandler > const& anEventHandler )
@@ -1743,7 +1748,7 @@ public:
     PropertyInterfaceBase::PropertySlotMap const&
     getPropertyInfo( String const& aClassname ) const
     {
-        return getModel().getPropertyInterface( aClassname ).getPropertySlotMap();
+        return theModel.getPropertyInterface( aClassname ).getPropertySlotMap();
     }
 
     const char getDMSearchPathSeparator() const
@@ -1763,7 +1768,7 @@ public:
 
     Logger* getLogger( String const& aFullPNString ) const
     {
-        return getModel().getLoggerBroker().getLogger( aFullPNString );
+        return theModel.getLoggerBroker().getLogger( aFullPNString );
     }
 
 protected:
@@ -2152,6 +2157,8 @@ BOOST_PYTHON_MODULE( _ecs )
               &SimulatorImpl::getLoggerSize )
 
         // Simulation-related methods
+        .def( "initialize",
+              &SimulatorImpl::initialize )
         .def( "getCurrentTime",
               &SimulatorImpl::getCurrentTime )
         .def( "getNextEvent",

@@ -101,6 +101,7 @@ class Session:
         self.__loadStepper( anEml )
         self.__loadEntity( anEml )
         self.__loadAllProperty( anEml )
+        self.theSimulator.initialize()
 
         # saves ModelName 
         self.theModelName = aModelName
