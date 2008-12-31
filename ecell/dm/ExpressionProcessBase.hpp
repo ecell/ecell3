@@ -136,8 +136,7 @@ private:
         virtual void error( const libecs::String& type,
                 const libecs::String& _msg ) const
         {
-            libecs::String msg = _msg + " in "
-                    + outer_.getClassName() + " [" + outer_.getID() + "]";
+            libecs::String msg = outer_.asString() + ": " +  _msg;
             if ( type == "NoSlot" )
                 THROW_EXCEPTION( libecs::NoSlot, msg );
             else if ( type == "NotFound" )
@@ -186,7 +185,7 @@ public:
     void defaultSetProperty( libecs::String const& aPropertyName,
                              libecs::PolymorphCref aValue )
     {
-        thePropertyMap[ aPropertyName ] = aValue.asReal();
+        thePropertyMap[ aPropertyName ] = aValue.as< libecs::Real >();
     }
 
     const libecs::Polymorph defaultGetProperty( libecs::String const& aPropertyName ) const
@@ -199,7 +198,7 @@ public:
         } else {
             THROW_EXCEPTION( libecs::NoSlot, asString() +
                              ": property [" + aPropertyName +
-                             "] is not defined" );
+                             "] is not defined." );
         }
     }
 
@@ -232,7 +231,7 @@ public:
                 aVarRefResolver );
 
         delete theCompiledCode;
-        // it is possible that compileExpression throws an expression and
+        // it is possible that compileExpression throws an exception and
         // "theCompiledCode" remains uninitialized
         theCompiledCode = 0;
 
