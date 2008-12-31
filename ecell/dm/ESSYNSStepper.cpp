@@ -31,9 +31,9 @@
 
 #include <gsl/gsl_sf.h>
 
-#include "libecs/Variable.hpp"
-#include "libecs/Process.hpp"
-#include "libecs/PropertyInterface.hpp"
+#include <libecs/Variable.hpp>
+#include <libecs/Process.hpp>
+#include <libecs/PropertyInterface.hpp>
 
 #include "ESSYNSStepper.hpp"
 

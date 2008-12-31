@@ -122,11 +122,11 @@
 
 
 #if defined( __GNUC__ )
-#define DEPRECATED __attribute__((deprecated))
-#elif defined( _MSC_VER )
-#define DEPRECATED __declspec(deprecated)
+#define LIBECS_DEPRECATED __attribute__((deprecated))
+#elif defined( _MSC_VER ) && _MSC_VER >= 1300
+#define LIBECS_DEPRECATED __declspec(deprecated)
 #else
-#define DEPRECATED
+#define LIBECS_DEPRECATED
 #endif
 
 namespace libecs

@@ -155,7 +155,7 @@ namespace libecs
 
            @return a description string of this Entity.
         */
-        String asString() const;
+        virtual String asString() const;
         /** @} */
 
 

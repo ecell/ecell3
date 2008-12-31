@@ -66,6 +66,11 @@ public:
 #endif /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
     }
 
+    inline bool operator==( MethodProxy const& that ) const
+    {
+        return that.theInvoker == theInvoker;
+    }
+
 private:
     MethodProxy()
         : theInvoker( 0 )
@@ -113,6 +118,11 @@ public:
 #else    /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
         return ObjectMethodProxy( invoke<T,TMethod>, anObject );
 #endif /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
+    }
+
+    inline bool operator==( ObjectMethodProxy const& that ) const
+    {
+        return that.theInvoker == theInvoker;
     }
 
 private:

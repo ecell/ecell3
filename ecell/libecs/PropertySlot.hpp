@@ -61,6 +61,11 @@ public:
         STRING    = 3
     };
 
+    template< typename T_ >
+    struct TypeToTypeCode
+    {
+    };
+
 public:
     PropertySlotBase()
     {
@@ -82,6 +87,30 @@ public:
     virtual const bool isSavable()    const;
 };
 
+template<>
+struct PropertySlotBase::TypeToTypeCode< Polymorph >
+{
+    static const enum PropertySlotBase::Type value = PropertySlotBase::POLYMORPH;
+};
+
+template<>
+struct PropertySlotBase::TypeToTypeCode< Real >
+{
+    static const enum PropertySlotBase::Type value = PropertySlotBase::REAL;
+};
+
+template<>
+struct PropertySlotBase::TypeToTypeCode< Integer >
+{
+    static const enum PropertySlotBase::Type value = PropertySlotBase::INTEGER;
+};
+
+
+template<>
+struct PropertySlotBase::TypeToTypeCode< String >
+{
+    static const enum PropertySlotBase::Type value = PropertySlotBase::STRING;
+};
 
 template< class T >
 class PropertySlot: public PropertySlotBase
@@ -156,11 +185,11 @@ public:
     typedef void ( T::* SetMethodPtr )( SetType );
     typedef GetType ( T::* GetMethodPtr )() const;
 
-    ConcretePropertySlot( StringCref aName, enum PropertySlotBase::Type aType,
+    ConcretePropertySlot( StringCref aName,
                           const SetMethodPtr aSetMethodPtr,
                           const GetMethodPtr aGetMethodPtr )
         : theName( aName ),
-          theType( aType ),
+          theType( PropertySlotBase::TypeToTypeCode< SlotType_ >::value ),
           theSetMethodPtr( SetMethod( aSetMethodPtr ) ),
           theGetMethodPtr( GetMethod( aGetMethodPtr ) )
     {
@@ -281,12 +310,11 @@ public:
     typedef typename ConcretePropertySlot::GetMethodPtr GetMethodPtr;
 
     DM_IF LoadSaveConcretePropertySlot( StringCref aName,
-                                        enum PropertySlotBase::Type aType,
                                         const SetMethodPtr aSetMethodPtr,
                                         const GetMethodPtr aGetMethodPtr,
                                         const SetMethodPtr aLoadMethodPtr,
                                         const GetMethodPtr aSaveMethodPtr )
-        : ConcretePropertySlot( aName, aType, aSetMethodPtr, aGetMethodPtr ),
+        : ConcretePropertySlot( aName, aSetMethodPtr, aGetMethodPtr ),
           theLoadMethodPtr( SetMethod( aLoadMethodPtr ) ),
           theSaveMethodPtr( GetMethod( aSaveMethodPtr ) )
     {

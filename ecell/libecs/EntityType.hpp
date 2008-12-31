@@ -82,7 +82,7 @@ public:
     String const& asString() const;
 
     /** @deprecated use asString() instead. */
-    DEPRECATED String const& getString()
+    LIBECS_DEPRECATED String const& getString()
     {
         return asString();
     }

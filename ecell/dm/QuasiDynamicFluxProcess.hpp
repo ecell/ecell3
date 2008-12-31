@@ -24,16 +24,18 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-#include "libecs.hpp"
-#include "ContinuousProcess.hpp"
-#include "Util.hpp"
-#include "FullID.hpp"
-#include "PropertyInterface.hpp"
+//
 
-#include "System.hpp"
-#include "Stepper.hpp"
-#include "Variable.hpp"
-#include "Interpolant.hpp"
+#include <libecs/libecs.hpp>
+#include <libecs/ContinuousProcess.hpp>
+#include <libecs/Util.hpp>
+#include <libecs/FullID.hpp>
+#include <libecs/PropertyInterface.hpp>
+
+#include <libecs/System.hpp>
+#include <libecs/Stepper.hpp>
+#include <libecs/Variable.hpp>
+#include <libecs/Interpolant.hpp>
 
 USE_LIBECS;
 
@@ -86,7 +88,7 @@ LIBECS_DM_CLASS( QuasiDynamicFluxProcess, ContinuousProcess )
 	   i != theFluxDistributionVector.end() ; ++i )
 	{
 	  FullID aFullID( (*i).getVariable()->getFullID() );
-	  aVector.push_back( aFullID.getString() );
+	  aVector.push_back( aFullID.asString() );
 	}
 
       return aVector;

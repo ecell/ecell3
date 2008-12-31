@@ -60,6 +60,12 @@ ecell-3.2: ?-Nov-2008
      - Added PropertyInterface::getPropertyAttributes() that can be used in
        place of PropertyInterface::getInfoMap().
 
+     - Changed the signature of EcsObject::defaultGetPropertyList() so that it
+       returns a StringList by value, not by reference.
+
+     - Added the virtual EcsObject::asString() that provides the description of
+       the instance. 
+
      - Virtual function definitions are move from LIBECS_DM_OBJECT to
        LIBECS_DM_INIT_STATIC. This means the vtables and typeinfo entries for
        the base classes of a DM class are no longer instantiated within the
@@ -68,14 +74,6 @@ ecell-3.2: ?-Nov-2008
        resulting DM to the objects of the bases, or you have LIBECS_DM_INIT
        defined for the bases.
 
-   - Removed setAvg() / setMin() / setMax() from DataPoint.
-
-   - Removed getFullIDString() from Entity.
-
-   - Added asString() to Entity.
-
-   - Added deleteStepper() to Model.
-
    - SystemPath::getString(), FullID::getString(), FullPN::getString() and
      EntityType::getString() are deprecated. Use SystemPath::asString(),
      FullID::asString(), FullPN::asString(), EntityType::asString() instead.
@@ -83,22 +81,42 @@ ecell-3.2: ?-Nov-2008
    - Made Process::setVariableReference() only accept VariableReference
      instead of scatterd arguments for consistency with getVariableReference().
 
-   - Process::registerVariableReference() was changed to have the same
-     signature as the previous version of Process::setVariableReference().
+   - ExpressionCompiler was moved from ecell/dm to ecell/libecs/scripting.
 
-   - System's registerProcess(), registerVariable() and registerSystem() were
-     renamed into a single overloaded function System::registerEntity(). 
+   - Added deleteStepper() to Model.
 
-   - Added unregisterEntity() to System.
+   - Entiy:
 
-   - Renamed Stepper's removeSystem() and removeProcess() to
-     unregisterSystem() and unregisterProcess() respectively.
+     - Removed getFullIDString() from Entity.
 
-   - Added Logger::Policy class and remove methods that accept polymorph tuples
-     that contain the policy information.
+     - Added asString() to Entity.
 
-   - Remove LoggerBroker::setModel() in favor of dependency injection in
-     initialization.
+   - Procss:
+
+     - Process::registerVariableReference() was changed to have the same
+       signature as the previous version of Process::setVariableReference().
+
+   - System:
+
+     - System's registerProcess(), registerVariable() and registerSystem() were
+       renamed into a single overloaded function System::registerEntity(). 
+
+     - Added unregisterEntity() to System.
+
+   - Stepper:
+
+     - Renamed Stepper's removeSystem() and removeProcess() to
+       unregisterSystem() and unregisterProcess() respectively.
+
+   - Logger:
+
+     - Removed setAvg() / setMin() / setMax() from DataPoint.
+
+     - Added Logger::Policy class and remove methods that accept polymorph
+       tuples that contain the policy information.
+
+     - Remove LoggerBroker::setModel() in favor of dependency injection in
+       initialization.
 
    - DM search paths are now model specific. Remove setDMSearchPath() and
      getDMSearchpath() and introduce Model::setDMSearchPath() and
@@ -118,9 +136,9 @@ ecell-3.2: ?-Nov-2008
        any longer due to introduction of Tuple and RawString types that are
        internally used in PolymorphValue.
 
-   - Removed obsolute CompartmentSystem and FluxProcess.
+     - Deprecated Polymorph::asTYPE().
 
-   - Deprecated Polymorph::asTYPE().
+   - Removed obsolute CompartmentSystem and FluxProcess.
 
  * libemc changes.
 

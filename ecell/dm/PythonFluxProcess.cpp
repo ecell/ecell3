@@ -40,26 +40,25 @@ USE_LIBECS;
 
 LIBECS_DM_INIT( PythonFluxProcess, Process );
 
-  
+    
 void PythonFluxProcess::fire()
 {
-  python::handle<> 
-    aHandle( PyEval_EvalCode( reinterpret_cast<PyCodeObject*>
-			      ( theCompiledExpression.ptr() ),
-			      theGlobalNamespace.ptr(), 
-			      theLocalNamespace.ptr() ) );
+    boost::python::handle<> aHandle(
+        PyEval_EvalCode(
+            reinterpret_cast< PyCodeObject* >( theCompiledExpression.get() ),
+            theGlobalNamespace.ptr(), theLocalNamespace.ptr() ) );
 
-  python::object aResultObject( aHandle );
-  
-  // do not use extract<double> for efficiency
-  if( ! PyFloat_Check( aResultObject.ptr() ) )
+    boost::python::object aResultObject( aHandle );
+    
+    // do not use extract<double> for efficiency
+    if( ! PyFloat_Check( aResultObject.ptr() ) )
     {
-      THROW_EXCEPTION( SimulationError, 
-		       "[" + getFullID().getString() + 
-		       "]: The expression gave a non-float object." );
+        THROW_EXCEPTION( SimulationError, 
+                         asString() + ": "
+                         "The expression gave a non-float object." );
     }
 
-  const Real aFlux( PyFloat_AS_DOUBLE( aResultObject.ptr() ) );
+    const Real aFlux( PyFloat_AS_DOUBLE( aResultObject.ptr() ) );
 
-  setFlux( aFlux );
+    setFlux( aFlux );
 }

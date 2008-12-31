@@ -469,6 +469,14 @@ protected:
     */
     void createInterpolants();
 
+
+    /**
+       Get a string representation of this Entity as String.
+
+       @return a description string of this Entity.
+    */
+    virtual String asString() const;
+
 protected:
     SystemVector              theSystemVector;
 

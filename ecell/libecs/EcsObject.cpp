@@ -36,6 +36,9 @@
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <boost/format.hpp>
+#include <boost/format/group.hpp>
+
 #include "PropertyInterface.hpp"
 #include "Exceptions.hpp"
 
@@ -50,24 +53,21 @@ const PropertyAttributes EcsObject::
 defaultGetPropertyAttributes( StringCref aPropertyName ) const
 {
     THROW_EXCEPTION( NoSlot, 
-                     getClassName() + 
-                     String( ": No property slot [" )
+                     asString() + ": No property slot ["
                      + aPropertyName + "].    Get property attributes failed." );
 }
 
-const StringVector&
+const StringVector
 EcsObject::defaultGetPropertyList() const
 {
-    static StringVector emptyVector;
-    return emptyVector;
+    return StringVector();
 }
 
 void EcsObject::defaultSetProperty( StringCref aPropertyName, 
                                                                                     PolymorphCref aValue )
 {
     THROW_EXCEPTION( NoSlot,
-                     getClassName() + 
-                     ( ": No property slot [" )
+                     asString() + ": No property slot ["
                      + aPropertyName + "].    Set property failed." );
 }
 
@@ -75,8 +75,7 @@ const Polymorph
 EcsObject::defaultGetProperty( StringCref aPropertyName ) const
 {
     THROW_EXCEPTION( NoSlot, 
-                     getClassName() + 
-                     String( ": No property slot [" )
+                     asString() + ": No property slot ["
                      + aPropertyName + "].    Get property failed." );
 }
 
@@ -95,7 +94,13 @@ void EcsObject::throwNotGetable()
 
 StringCref EcsObject::getClassName() const
 {
-     return getPropertyInterface().getClassName();
+    return getPropertyInterface().getClassName();
+}
+
+String EcsObject::asString() const
+{
+    return ( boost::format( "%s[#%p]" ) % boost::io::group(
+            getPropertyInterface().getClassName(), this ) ).str();
 }
 
 #define NULLGETSET_SPECIALIZATION_DEF( TYPE )\

@@ -29,8 +29,8 @@
 
 #include <boost/multi_array.hpp>
 
-#include "libecs.hpp"
-#include "ContinuousProcess.hpp"
+#include <libecs/libecs.hpp>
+#include <libecs/ContinuousProcess.hpp>
 
 USE_LIBECS;
 

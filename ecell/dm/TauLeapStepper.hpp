@@ -37,8 +37,8 @@
 #define NOMINMAX
 #endif /* WIN32 */
 
-#include "libecs/DifferentialStepper.hpp"
-#include "libecs/libecs.hpp"
+#include <libecs/DifferentialStepper.hpp>
+#include <libecs/libecs.hpp>
 
 #define DM_IMPORTS
 #include "GillespieProcess.hpp"

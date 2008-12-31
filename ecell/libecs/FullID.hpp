@@ -60,7 +60,7 @@ public:
     String asString() const;
 
     /** @deprecated use asString() instead. */
-    DEPRECATED String getString() const
+    LIBECS_DEPRECATED String getString() const
     {
         return asString();
     }
@@ -190,7 +190,7 @@ public:
     LIBECS_API String asString() const;
 
     /** @deprecated use asString() instead. */
-    DEPRECATED String getString() const
+    LIBECS_DEPRECATED String getString() const
     {
         return asString();
     }
@@ -340,7 +340,7 @@ public:
     LIBECS_API String asString() const;
 
     /** @deprecated use asString() instead. */
-    DEPRECATED String getString() const
+    LIBECS_DEPRECATED String getString() const
     {
         return asString();
     }

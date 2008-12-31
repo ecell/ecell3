@@ -33,7 +33,7 @@
 #define __FIXEDODE1STEPPER_HPP
 
 
-#include "libecs/DifferentialStepper.hpp"
+#include <libecs/DifferentialStepper.hpp>
 
 USE_LIBECS;
 

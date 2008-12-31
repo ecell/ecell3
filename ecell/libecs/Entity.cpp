@@ -102,12 +102,9 @@ Entity::getLoggers() const
 
 String Entity::asString() const
 {
-    if ( !theSuperSystem )
-    {
-        return "<unbound " + getEntityType().asString() + " [" + getID() + "]>";
-    }
-
-    return getFullID().asString();
+    return getPropertyInterface().getClassName() + "["
+            + ( theSuperSystem ? getFullID().asString():
+                                 "unbound: " + getID() ) + "]";
 }
 
 

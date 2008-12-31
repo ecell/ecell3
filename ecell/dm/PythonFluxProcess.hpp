@@ -43,55 +43,53 @@ LIBECS_DM_CLASS( PythonFluxProcess, PythonProcessBase )
 {
 
 public:
-  
-  LIBECS_DM_OBJECT( PythonFluxProcess, Process )
+    
+    LIBECS_DM_OBJECT( PythonFluxProcess, Process )
     {
-      INHERIT_PROPERTIES( Process );
+        INHERIT_PROPERTIES( Process );
 
-      PROPERTYSLOT_SET_GET( String, Expression );
+        PROPERTYSLOT_SET_GET( String, Expression );
     }
 
 
-  PythonFluxProcess()
-  {
-    //FIXME: additional properties:
-    // Unidirectional   -> call declareUnidirectional() in initialize()
-    //                     if this is set
-  }
-
-  virtual ~PythonFluxProcess()
-  {
-    ; // do nothing
-  }
-
-  virtual const bool isContinuous() const
+    PythonFluxProcess()
     {
-      return true;
+        //FIXME: additional properties:
+        // Unidirectional     -> call declareUnidirectional() in initialize()
+        //                                         if this is set
     }
 
-  SET_METHOD( String, Expression )
-  {
-    theExpression = value;
+    virtual ~PythonFluxProcess()
+    {
+        ; // do nothing
+    }
 
-    theCompiledExpression = compilePythonCode( theExpression,
-					       getFullID().getString() +
-					       ":Expression",
-					       Py_eval_input );
-  }
+    virtual const bool isContinuous() const
+    {
+        return true;
+    }
 
-  GET_METHOD( String, Expression )
-  {
-    return theExpression;
-  }
+    SET_METHOD( String, Expression )
+    {
+        theExpression = value;
 
-  virtual void fire();
+        theCompiledExpression = compilePythonCode(
+                theExpression, asString() + ":Expression",
+                Py_eval_input );
+    }
+
+    GET_METHOD( String, Expression )
+    {
+        return theExpression;
+    }
+
+    virtual void fire();
 
 protected:
 
-  String    theExpression;
+    String        theExpression;
 
-  python::object theCompiledExpression;
-
+    boost::python::handle<> theCompiledExpression;
 };
 
 

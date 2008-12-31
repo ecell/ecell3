@@ -58,7 +58,7 @@ namespace libecs
    @internal
  */
 #define LIBECS_DM_DEFINE_PROPERTIES()\
-    static void initializePropertyInterface( PropertyInterfaceBase* aPropertyInterface )
+    static void initializePropertyInterface( libecs::PropertyInterfaceBase* aPropertyInterface )
 
 
 /**
@@ -116,12 +116,12 @@ namespace libecs
                     (Process, Variable, System, Stepper)
  */
 #define LIBECS_DM_INIT_STATIC( CLASSNAME, DMTYPE ) \
-    template class PropertyInterface<CLASSNAME>;\
-    char CLASSNAME::thePropertyInterface[sizeof(libecs::PropertyInterface<CLASSNAME>)]; \
+    template class libecs::PropertyInterface< CLASSNAME >;\
+    char CLASSNAME::thePropertyInterface[ sizeof( libecs::PropertyInterface<CLASSNAME> ) ]; \
     char CLASSNAME::theDMTypeName[] = #DMTYPE; \
-    libecs::PropertyInterface<CLASSNAME>& CLASSNAME::_getPropertyInterface() \
+    libecs::PropertyInterface< CLASSNAME >& CLASSNAME::_getPropertyInterface() \
     { \
-        return *reinterpret_cast< libecs::PropertyInterface<CLASSNAME>* >( thePropertyInterface ); \
+        return *reinterpret_cast< libecs::PropertyInterface< CLASSNAME >* >( thePropertyInterface ); \
     } \
     void CLASSNAME::initializeModule() \
     { \
@@ -131,7 +131,7 @@ namespace libecs
     { \
         reinterpret_cast< libecs::PropertyInterface<CLASSNAME>* >( thePropertyInterface )->~PropertyInterface<CLASSNAME>(); \
     } \
-    PropertySlotBaseCptr CLASSNAME::getPropertySlot( libecs::StringCref aPropertyName ) const \
+    libecs::PropertySlotBase const* CLASSNAME::getPropertySlot( libecs::StringCref aPropertyName ) const \
     { \
         return _getPropertyInterface().getPropertySlot( aPropertyName ); \
     } \
@@ -164,11 +164,11 @@ namespace libecs
     { \
         return _getPropertyInterface().getPropertyAttributes( *this, aPropertyName ); \
     } \
-    const libecs::PropertyInterfaceBase& CLASSNAME::getPropertyInterface() const \
+    libecs::PropertyInterfaceBase const& CLASSNAME::getPropertyInterface() const \
     {\
         return _getPropertyInterface(); \
     } \
-    const DynamicModuleInfo* CLASSNAME::getClassInfoPtr()\
+    DynamicModuleInfo const* CLASSNAME::getClassInfoPtr()\
     {\
         return static_cast<const DynamicModuleInfo*>( &_getPropertyInterface() );\
     }
@@ -203,8 +203,8 @@ private:\
 public:\
     static void initializeModule(); \
     static void finalizeModule(); \
-    static const DynamicModuleInfo* getClassInfoPtr(); \
-    virtual PropertySlotBaseCptr getPropertySlot( libecs::StringCref aPropertyName ) const; \
+    static DynamicModuleInfo const* getClassInfoPtr(); \
+    virtual libecs::PropertySlotBase const* getPropertySlot( libecs::StringCref aPropertyName ) const; \
     virtual void setProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ); \
     virtual const libecs::Polymorph getProperty( libecs::StringCref aPropertyName ) const; \
     virtual void loadProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ); \
@@ -212,7 +212,7 @@ public:\
     virtual const libecs::StringVector getPropertyList() const; \
     virtual libecs::PropertySlotProxyPtr createPropertySlotProxy( libecs::StringCref aPropertyName ); \
     virtual const libecs::PropertyAttributes getPropertyAttributes( libecs::StringCref aPropertyName ) const; \
-    virtual const libecs::PropertyInterfaceBase& getPropertyInterface() const;
+    virtual libecs::PropertyInterfaceBase const& getPropertyInterface() const;
 
 /**
    Used within a property definition block to inherit the properties of the
@@ -265,7 +265,7 @@ public:\
    @param PTR  the pointer to the function.
 */
 #define PROPERTYSLOT_GET_METHOD_PTR( TYPE, PTR ) \
-    static_cast< typename ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::GetMethodPtr>( PTR )
+    static_cast< typename libecs::ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::GetMethodPtr>( PTR )
 
 
 /** 
@@ -274,7 +274,7 @@ public:\
    @param PTR  the pointer to the function.
 */
 #define PROPERTYSLOT_SET_METHOD_PTR( TYPE, PTR ) \
-    static_cast< typename ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::SetMethodPtr>( PTR )
+    static_cast< typename libecs::ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::SetMethodPtr>( PTR )
 
 
 /** 
@@ -283,7 +283,7 @@ public:\
    @param PTR  the pointer to the function.
 */
 #define PROPERTYSLOT_SAVE_METHOD_PTR( TYPE, PTR ) \
-    static_cast< typename ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::GetMethodPtr>( PTR )
+    static_cast< typename libecs::ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::GetMethodPtr>( PTR )
 
 
 /** 
@@ -292,7 +292,7 @@ public:\
    @param PTR  the pointer to the function.
 */
 #define PROPERTYSLOT_LOAD_METHOD_PTR( TYPE, PTR ) \
-    static_cast< typename ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::SetMethodPtr>( PTR )
+    static_cast< typename libecs::ConcretePropertySlot< _LIBECS_CLASS_, TYPE >::SetMethodPtr>( PTR )
 
 
 /**
@@ -305,8 +305,8 @@ public:\
  */
 #define PROPERTYSLOT( TYPE, NAME, SETMETHOD, GETMETHOD )\
     aPropertyInterface->registerPropertySlot( \
-        new ConcretePropertySlot< _LIBECS_CLASS_ ,TYPE >( \
-            #NAME, PropertySlotBase::TYPE, SETMETHOD, GETMETHOD ) );
+        new libecs::ConcretePropertySlot< _LIBECS_CLASS_ ,TYPE >( \
+            #NAME, SETMETHOD, GETMETHOD ) );
 
 /**
    Define a property slot.
@@ -322,8 +322,7 @@ public:\
                                 LOADMETHOD, SAVEMETHOD ) \
     aPropertyInterface->registerPropertySlot( \
          new LoadSaveConcretePropertySlot< _LIBECS_CLASS_, TYPE >( \
-            #NAME, PropertySlotBase::TYPE, \
-            SETMETHOD, GETMETHOD, LOADMETHOD, SAVEMETHOD ) );
+            #NAME, SETMETHOD, GETMETHOD, LOADMETHOD, SAVEMETHOD ) );
 
 
 /**
@@ -622,7 +621,7 @@ public:
        @param aPropertyName the name of the property.
        @return the pointer to the PropertySlot.
      */
-    virtual PropertySlotBaseCptr 
+    virtual PropertySlotBase const* 
     getPropertySlot( StringCref aPropertyName ) const = 0;
 
 
@@ -663,12 +662,16 @@ public:
                                      PolymorphCref aValue );
     
     virtual const Polymorph 
-    defaultGetProperty( StringCref aPorpertyName ) const; virtual const StringVector& defaultGetPropertyList() const;
-    
+    defaultGetProperty( StringCref aPorpertyName ) const;
+
+    virtual const StringVector defaultGetPropertyList() const;
+
     virtual const PropertyAttributes
     defaultGetPropertyAttributes( StringCref aPropertyName ) const;
 
-    StringCref getClassName() const;
+    LIBECS_DEPRECATED StringCref getClassName() const;
+
+    virtual String asString() const;
 
     Handle const& getHandle() const
     {

@@ -32,8 +32,8 @@
 #ifndef __ODE45_HPP
 #define __ODE45_HPP
 
-#include "libecs/Interpolant.hpp"
-#include "libecs/AdaptiveDifferentialStepper.hpp"
+#include <libecs/Interpolant.hpp>
+#include <libecs/AdaptiveDifferentialStepper.hpp>
 
 USE_LIBECS;
 

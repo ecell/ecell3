@@ -40,18 +40,18 @@
 
 #include <map>
 
-#include "libecs.hpp"
-#include "Process.hpp"
-#include "Util.hpp"
-#include "FullID.hpp"
-#include "PropertyInterface.hpp"
+#include <libecs/libecs.hpp>
+#include <libecs/Process.hpp>
+#include <libecs/Util.hpp>
+#include <libecs/FullID.hpp>
+#include <libecs/PropertyInterface.hpp>
 
-#include "System.hpp"
-#include "Stepper.hpp"
-#include "Variable.hpp"
-#include "Interpolant.hpp"
-#include "libecs/Stepper.hpp"
-#include "libecs/DifferentialStepper.hpp"
+#include <libecs/System.hpp>
+#include <libecs/Stepper.hpp>
+#include <libecs/Variable.hpp>
+#include <libecs/Interpolant.hpp>
+#include <libecs/Stepper.hpp>
+#include <libecs/DifferentialStepper.hpp>
 
 #define DM_IMPORTS
 #include "QuasiDynamicFluxProcess.hpp"

@@ -31,41 +31,39 @@
 // E-Cell Project.
 //
 
-
 #include "ExpressionProcessBase.hpp"
 
 USE_LIBECS;
 
 LIBECS_DM_CLASS( ExpressionFluxProcess, ExpressionProcessBase )
 {
- public:
-  
-  LIBECS_DM_OBJECT( ExpressionFluxProcess, Process )
+public:
+    LIBECS_DM_OBJECT( ExpressionFluxProcess, Process )
     {
-      INHERIT_PROPERTIES( ExpressionProcessBase );
-      CLASS_DESCRIPTION("ExpressionFluxProcess is designed for easy and efficient representations of continuous flux rate equations.  \"Expression\" property accepts a plain text rate expression.  The expression must be evaluated to give a flux rate in number per second, not concentration per second.");
+        INHERIT_PROPERTIES( ExpressionProcessBase );
+        CLASS_DESCRIPTION("ExpressionFluxProcess is designed for easy and efficient representations of continuous flux rate equations.    \"Expression\" property accepts a plain text rate expression.    The expression must be evaluated to give a flux rate in number per second, not concentration per second.");
     }
 
-  ExpressionFluxProcess()
-  {
-    //FIXME: additional properties:
-    // Unidirectional   -> call declareUnidirectional() in initialize()
-    //                     if this is set
-  }
+    ExpressionFluxProcess()
+    {
+        //FIXME: additional properties:
+        // Unidirectional     -> call declareUnidirectional() in initialize()
+        //                                         if this is set
+    }
 
-  virtual ~ExpressionFluxProcess()
-  {
-    ; // do nothing
-  }
-  
-  virtual void fire()
+    virtual ~ExpressionFluxProcess()
+    {
+        ; // do nothing
+    }
+    
+    virtual void fire()
     { 
-      setFlux( theVirtualMachine.execute( theCompiledCode ) );
+        setFlux( theVirtualMachine.execute( *theCompiledCode ) );
     }
 
-  virtual const bool isContinuous() const
+    virtual const bool isContinuous() const
     {
-      return true;
+        return true;
     }
 };
 

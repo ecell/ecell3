@@ -29,392 +29,373 @@
 // E-Cell Project.
 //
 
-#include "Variable.hpp"
-#include "Process.hpp"
+#include <libecs/Variable.hpp>
+#include <libecs/Process.hpp>
 
 #include "FixedDAE1Stepper.hpp"
 
 LIBECS_DM_INIT( FixedDAE1Stepper, Stepper );
 
 FixedDAE1Stepper::FixedDAE1Stepper()
-  :
-  theJacobianMatrix( NULLPTR ),
-  theVelocityVector( NULLPTR ),
-  theSolutionVector( NULLPTR ),
-  thePermutation( NULLPTR ),
-  theSystemSize( 0 ),
-  theTolerance( 1e-10 ),
-  thePerturbationRate( 1e-9 ),
-  theDependentProcessVector( NULLPTR ),
-  theContinuousVariableVector( NULLPTR ),
-  theActivityBuffer( NULLPTR )
+    : theJacobianMatrix( NULLPTR ),
+      theVelocityVector( NULLPTR ),
+      theSolutionVector( NULLPTR ),
+      thePermutation( NULLPTR ),
+      theSystemSize( 0 ),
+      theTolerance( 1e-10 ),
+      thePerturbationRate( 1e-9 ),
+      theDependentProcessVector( NULLPTR ),
+      theContinuousVariableVector( NULLPTR ),
+      theActivityBuffer( NULLPTR )
 {
-  ; // do nothing
+    ; // do nothing
 }
-	    
+                        
 FixedDAE1Stepper::~FixedDAE1Stepper()
 {
-  // free an allocated matrix
-  gsl_matrix_free( theJacobianMatrix );
-  gsl_vector_free( theVelocityVector );
-  gsl_vector_free( theSolutionVector );
-  gsl_permutation_free( thePermutation );
+    // free an allocated matrix
+    gsl_matrix_free( theJacobianMatrix );
+    gsl_vector_free( theVelocityVector );
+    gsl_vector_free( theSolutionVector );
+    gsl_permutation_free( thePermutation );
 }
 
 void FixedDAE1Stepper::initialize()
 {
-  DifferentialStepper::initialize();
-    
-  const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
-  if ( theSystemSize != aSize )
+    DifferentialStepper::initialize();
+        
+    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+    if ( theSystemSize != aSize )
     {
-      checkDependency();
+        checkDependency();
 
-      theSystemSize = theContinuousVariableVector.size()
-	+ theProcessVector.size() - getDiscreteProcessOffset();
-      if ( aSize != theSystemSize )
-	{
-	  THROW_EXCEPTION( InitializationFailed,
-			   "definitions are required, are given." );
-	}
+        theSystemSize = theContinuousVariableVector.size()
+                + theProcessVector.size() - getDiscreteProcessOffset();
+        if ( aSize != theSystemSize )
+        {
+            THROW_EXCEPTION( InitializationFailed,
+                             "definitions are required, are given." );
+        }
 
-      // allocate a matrix and set all elements to zero
-      if ( theJacobianMatrix )
-	gsl_matrix_free( theJacobianMatrix );
-      theJacobianMatrix = gsl_matrix_calloc( theSystemSize, theSystemSize );
+        // allocate a matrix and set all elements to zero
+        if ( theJacobianMatrix )
+            gsl_matrix_free( theJacobianMatrix );
+        theJacobianMatrix = gsl_matrix_calloc( theSystemSize, theSystemSize );
 
-      if ( theVelocityVector )
-	gsl_vector_free( theVelocityVector );
-      theVelocityVector = gsl_vector_calloc( theSystemSize );
+        if ( theVelocityVector )
+            gsl_vector_free( theVelocityVector );
+        theVelocityVector = gsl_vector_calloc( theSystemSize );
 
-      if ( theSolutionVector )
-	gsl_vector_free( theSolutionVector );
-      theSolutionVector = gsl_vector_alloc( theSystemSize );
+        if ( theSolutionVector )
+            gsl_vector_free( theSolutionVector );
+        theSolutionVector = gsl_vector_alloc( theSystemSize );
 
-      if ( thePermutation )
-	gsl_permutation_free( thePermutation );
-      thePermutation = gsl_permutation_alloc( theSystemSize );
+        if ( thePermutation )
+            gsl_permutation_free( thePermutation );
+        thePermutation = gsl_permutation_alloc( theSystemSize );
     }
-
-  //    printJacobianMatrix();
 }
 
 void FixedDAE1Stepper::checkDependency()
 {
-  const VariableVector::size_type 
-    aReadOnlyVariableOffset( getReadOnlyVariableOffset() );
+    const VariableVector::size_type aReadOnlyVariableOffset(
+            getReadOnlyVariableOffset() );
 
-  theDependentProcessVector.clear();
-  theDependentProcessVector.resize( aReadOnlyVariableOffset );
-  theDependentVariableVector.clear();
-  theDependentVariableVector.resize( aReadOnlyVariableOffset );
+    theDependentProcessVector.clear();
+    theDependentProcessVector.resize( aReadOnlyVariableOffset );
+    theDependentVariableVector.clear();
+    theDependentVariableVector.resize( aReadOnlyVariableOffset );
 
-  theContinuousVariableVector.clear();
+    theContinuousVariableVector.clear();
 
-  IntVector anIndexVector;
-  IntVectorConstIterator aWriteVariableIterator;
+    IntVector anIndexVector;
+    IntVectorConstIterator aWriteVariableIterator;
 
-  ProcessVectorConstIterator anIterator( theProcessVector.begin() );
-  for( ProcessVector::size_type c( 0 ); c < theProcessVector.size(); c++ )
+    ProcessVectorConstIterator anIterator( theProcessVector.begin() );
+    for( ProcessVector::size_type c( 0 ); c < theProcessVector.size(); ++c )
     {
-      VariableReferenceVectorCref aVariableReferenceVector
-	( (*anIterator)->getVariableReferenceVector() );
+        VariableReferenceVectorCref aVariableReferenceVector(
+                (*anIterator)->getVariableReferenceVector() );
 
-      const VariableReferenceVector::size_type aZeroVariableReferenceOffset
-	( (*anIterator)->getZeroVariableReferenceOffset() );
-      const VariableReferenceVector::size_type
-	aPositiveVariableReferenceOffset
-	( (*anIterator)->getPositiveVariableReferenceOffset() );
+        const VariableReferenceVector::size_type aZeroVariableReferenceOffset(
+                (*anIterator)->getZeroVariableReferenceOffset() );
+        const VariableReferenceVector::size_type
+            aPositiveVariableReferenceOffset(
+                (*anIterator)->getPositiveVariableReferenceOffset() );
 
-      anIndexVector.clear();
-      for ( VariableReferenceVector::size_type 
-	      i( aZeroVariableReferenceOffset );
-	    i != aPositiveVariableReferenceOffset; i++ )
-	{
-	  VariablePtr const aVariable
-	    ( aVariableReferenceVector[ i ].getVariable() );
+        anIndexVector.clear();
+        for ( VariableReferenceVector::size_type i(
+                aZeroVariableReferenceOffset );
+              i != aPositiveVariableReferenceOffset; ++i )
+        {
+            VariablePtr const aVariable(
+                aVariableReferenceVector[ i ].getVariable() );
 
-	  const VariableVector::size_type 
-	    anIndex( getVariableIndex( aVariable ) );
+            const VariableVector::size_type anIndex(
+                getVariableIndex( aVariable ) );
 
-	  // std::binary_search?
-	  if ( std::find( theDependentProcessVector[ anIndex ].begin(),
-			  theDependentProcessVector[ anIndex ].end(), c )
-	       == theDependentProcessVector[ anIndex ].end() )
-	    {
-	      theDependentProcessVector[ anIndex ].push_back( c );
-	      anIndexVector.push_back( anIndex );
-	    }
-	}
+            // std::binary_search?
+            if ( std::find( theDependentProcessVector[ anIndex ].begin(),
+                            theDependentProcessVector[ anIndex ].end(), c ) ==
+                 theDependentProcessVector[ anIndex ].end() )
+            {
+                theDependentProcessVector[ anIndex ].push_back( c );
+                anIndexVector.push_back( anIndex );
+            }
+        }
 
-      const IntVector::size_type aNonZeroOffset( anIndexVector.size() );
-      const bool aContinuity( (*anIterator)->isContinuous() );
+        const IntVector::size_type aNonZeroOffset( anIndexVector.size() );
+        const bool aContinuity( (*anIterator)->isContinuous() );
 
-      for( VariableReferenceVector::size_type i( 0 ); 
-	   i < aVariableReferenceVector.size(); i++ )
-	{
-	  if ( i == aZeroVariableReferenceOffset )
-	    {
-	      if ( aPositiveVariableReferenceOffset
-		   == aVariableReferenceVector.size() )
-		break;
-	      else
-		i = aPositiveVariableReferenceOffset;
-	    }
+        for( VariableReferenceVector::size_type i( 0 ); 
+                 i < aVariableReferenceVector.size(); ++i )
+        {
+            if ( i == aZeroVariableReferenceOffset )
+            {
+                if ( aPositiveVariableReferenceOffset ==
+                        aVariableReferenceVector.size() )
+                    break;
 
-	  VariablePtr const aVariable
-	    ( aVariableReferenceVector[ i ].getVariable() );
+                i = aPositiveVariableReferenceOffset;
+            }
 
-	  const VariableVector::size_type 
-	    anIndex( getVariableIndex( aVariable ) );
+            VariablePtr const aVariable(
+                    aVariableReferenceVector[ i ].getVariable() );
 
-	  if ( aContinuity )
-	    {
-	      if ( std::find( theContinuousVariableVector.begin(),
-			      theContinuousVariableVector.end(), anIndex )
-		   == theContinuousVariableVector.end() )
-		{
-		  theContinuousVariableVector.push_back( anIndex );
-		}
-	    }
+            const VariableVector::size_type anIndex(
+                    getVariableIndex( aVariable ) );
 
-	  // std::binary_search?
-	  if ( std::find( theDependentProcessVector[ anIndex ].begin(),
-			  theDependentProcessVector[ anIndex ].end(), c )
-	       == theDependentProcessVector[ anIndex ].end() )
-	    {
-	      theDependentProcessVector[ anIndex ].push_back( c );
-	      anIndexVector.push_back( anIndex );
-	    }
-	}
+            if ( aContinuity )
+            {
+                if ( std::find( theContinuousVariableVector.begin(),
+                                theContinuousVariableVector.end(), anIndex ) ==
+                     theContinuousVariableVector.end() )
+                {
+                    theContinuousVariableVector.push_back( anIndex );
+                }
+            }
 
-      FOR_ALL( IntVector, anIndexVector )
-	{
-	  for( IntVector::size_type j( aNonZeroOffset );
-	       j != anIndexVector.size(); ++j )
-	    {
-	      const int anIndex( anIndexVector[ j ] );
-	      if ( std::find( theDependentVariableVector[ (*i) ].begin(),
-			      theDependentVariableVector[ (*i) ].end(),
-			      anIndex )
-		   == theDependentVariableVector[ (*i) ].end() )
-		{
-		  theDependentVariableVector[ (*i) ].push_back( anIndex );
-		}
-	    }
-	    
-	  // stable_sort?
-	  std::sort( theDependentVariableVector[ (*i) ].begin(),
-		     theDependentVariableVector[ (*i) ].end() );
-	}
-	
-      anIterator++;
+            // std::binary_search?
+            if ( std::find( theDependentProcessVector[ anIndex ].begin(),
+                            theDependentProcessVector[ anIndex ].end(), c ) ==
+                 theDependentProcessVector[ anIndex ].end() )
+            {
+                theDependentProcessVector[ anIndex ].push_back( c );
+                anIndexVector.push_back( anIndex );
+            }
+        }
+
+        FOR_ALL( IntVector, anIndexVector )
+        {
+            for( IntVector::size_type j( aNonZeroOffset );
+                 j != anIndexVector.size(); ++j )
+            {
+                const int anIndex( anIndexVector[ j ] );
+                if ( std::find( theDependentVariableVector[ (*i) ].begin(),
+                                theDependentVariableVector[ (*i) ].end(),
+                                anIndex ) == 
+                     theDependentVariableVector[ (*i) ].end() )
+                {
+                    theDependentVariableVector[ (*i) ].push_back( anIndex );
+                }
+            }
+                
+            // stable_sort?
+            std::sort( theDependentVariableVector[ (*i) ].begin(),
+                       theDependentVariableVector[ (*i) ].end() );
+        }
+            
+        anIterator++;
     }
 
-  std::sort( theContinuousVariableVector.begin(),
-	     theContinuousVariableVector.end() );
+    std::sort( theContinuousVariableVector.begin(),
+               theContinuousVariableVector.end() );
 
-  theActivityBuffer.clear();
-  theActivityBuffer.resize( theProcessVector.size() );
+    theActivityBuffer.clear();
+    theActivityBuffer.resize( theProcessVector.size() );
 }
 
 void FixedDAE1Stepper::calculateVelocityVector()
 {
-  const Real aCurrentTime( getCurrentTime() );
-  const Real aStepInterval( getStepInterval() );
+    const Real aCurrentTime( getCurrentTime() );
+    const Real aStepInterval( getStepInterval() );
 
-  const ProcessVector::size_type 
-    aDiscreteProcessOffset( getDiscreteProcessOffset() );
+    const ProcessVector::size_type aDiscreteProcessOffset(
+            getDiscreteProcessOffset() );
 
-  gsl_vector_set_zero( theVelocityVector );
+    gsl_vector_set_zero( theVelocityVector );
 
-  setCurrentTime( aCurrentTime + aStepInterval );
+    setCurrentTime( aCurrentTime + aStepInterval );
 
-  // almost equal to call fire()
+    // almost equal to call fire()
 
-  fireProcesses();
-  setVariableVelocity( theTaylorSeries[ 0 ] );
+    fireProcesses();
+    setVariableVelocity( theTaylorSeries[ 0 ] );
 
-  for( ProcessVector::size_type c( 0 ); c < theProcessVector.size(); c++ )
+    for( ProcessVector::size_type c( 0 ); c < theProcessVector.size(); ++c )
     {
-      theActivityBuffer[ c ] = theProcessVector[ c ]->getActivity();
-    }
-  
-  /**
-      for ( std::vector< Integer >::const_iterator
-	      anIterator( theVariableReferenceListVector[ c ].begin() );
-	    anIterator < theVariableReferenceListVector[ c ].end(); )
-	{
-	  const VariableVector::size_type anIndex( *anIterator );
-	  ++anIterator;
-	  const Real aVelocity( (*anIterator) * anActivity );
-	  ++anIterator;
-
-	  theEachVelocityBuffer[ c ][ anIndex ] = aVelocity
-	  theTaylorSeries[ 0 ][ anIndex ] += aVelocity
-	}
-  */
-
-  for( IntVector::size_type i( 0 ); 
-       i < theContinuousVariableVector.size(); ++i )
-    {
-      const int anIndex( theContinuousVariableVector[ i ] );
-      const Real aVelocity( theTaylorSeries[ 0 ][ anIndex ] * aStepInterval
-			    + theValueBuffer[ anIndex ]
-			    - theVariableVector[ anIndex ]->getValue() );
-
-      gsl_vector_set( theVelocityVector, i, aVelocity );
-
-      theTaylorSeries[ 0 ][ anIndex ] = 0.0;
+        theActivityBuffer[ c ] = theProcessVector[ c ]->getActivity();
     }
 
-  for( ProcessVector::size_type c( aDiscreteProcessOffset );
-       c < theProcessVector.size(); c++ )
+    for( IntVector::size_type i( 0 ); 
+             i < theContinuousVariableVector.size(); ++i )
     {
-      const Real anActivity( theProcessVector[ c ]->getActivity() );
+        const int anIndex( theContinuousVariableVector[ i ] );
+        const Real aVelocity( theTaylorSeries[ 0 ][ anIndex ] * aStepInterval
+                              + theValueBuffer[ anIndex ]
+                              - theVariableVector[ anIndex ]->getValue() );
 
-      gsl_vector_set( theVelocityVector,
-		      theContinuousVariableVector.size() + c
-		      - aDiscreteProcessOffset,
-		      -theActivityBuffer[ c ] );
+        gsl_vector_set( theVelocityVector, i, aVelocity );
+
+        theTaylorSeries[ 0 ][ anIndex ] = 0.0;
     }
 
-  setCurrentTime( aCurrentTime );
+    for( ProcessVector::size_type c( aDiscreteProcessOffset );
+             c < theProcessVector.size(); ++c )
+    {
+        const Real anActivity( theProcessVector[ c ]->getActivity() );
+
+        gsl_vector_set( theVelocityVector,
+                        theContinuousVariableVector.size() + c
+                            - aDiscreteProcessOffset,
+                            -theActivityBuffer[ c ] );
+    }
+
+    setCurrentTime( aCurrentTime );
 }
-  
+    
 void FixedDAE1Stepper::calculateJacobian()
 {
-  const Real aCurrentTime( getCurrentTime() );
-  const Real aStepInterval( getStepInterval() );
-  const Real aPerturbation( thePerturbationRate * aStepInterval );
-  const VariableVector::size_type 
-    aReadOnlyVariableOffset( getReadOnlyVariableOffset() );
-  const ProcessVector::size_type
-    aDiscreteProcessOffset( getDiscreteProcessOffset() );
+    const Real aCurrentTime( getCurrentTime() );
+    const Real aStepInterval( getStepInterval() );
+    const Real aPerturbation( thePerturbationRate * aStepInterval );
+    const VariableVector::size_type aReadOnlyVariableOffset(
+            getReadOnlyVariableOffset() );
+    const ProcessVector::size_type aDiscreteProcessOffset(
+            getDiscreteProcessOffset() );
 
-  gsl_matrix_set_zero( theJacobianMatrix );
+    gsl_matrix_set_zero( theJacobianMatrix );
 
-  setCurrentTime( aCurrentTime + aStepInterval );
+    setCurrentTime( aCurrentTime + aStepInterval );
 
-  for( VariableVector::size_type c( 0 ); c < aReadOnlyVariableOffset; ++c )
+    for( VariableVector::size_type c( 0 ); c < aReadOnlyVariableOffset; ++c )
     {
-      VariablePtr const aVariable( theVariableVector[ c ] );
-      const Real aValue( aVariable->getValue() );
+        VariablePtr const aVariable( theVariableVector[ c ] );
+        const Real aValue( aVariable->getValue() );
 
-      aVariable->loadValue( aValue + aPerturbation );
+        aVariable->loadValue( aValue + aPerturbation );
 
-      FOR_ALL( IntVector, theDependentProcessVector[ c ] )
-	{
-	  const Integer anIndex( *i );
+        FOR_ALL( IntVector, theDependentProcessVector[ c ] )
+        {
+            const Integer anIndex( *i );
 
-	  theProcessVector[ anIndex ]->fire();
-	  const Real aDifference( theProcessVector[ anIndex ]->getActivity() - theActivityBuffer[ anIndex ] );
+            theProcessVector[ anIndex ]->fire();
+            const Real aDifference( theProcessVector[ anIndex ]->getActivity() - theActivityBuffer[ anIndex ] );
 
-	  if ( aDiscreteProcessOffset > anIndex )
-	    {
-	      for ( VariableReferenceList::const_iterator anIterator
-		      ( theVariableReferenceListVector[ anIndex ].begin() );
-		    anIterator < theVariableReferenceListVector[ anIndex ].end(); )
-		{
-		  ExprComponent const& aComponent( *anIterator );
-		  const RealMatrix::index anIndex(
-		      static_cast< RealMatrix::index >( aComponent.first ) );
-		  theTaylorSeries[ 0 ][ anIndex ] +=
-		      aComponent.second * aDifference;
-		}
-	    }
-	  else
-	    {
-	      gsl_matrix_set( theJacobianMatrix,
-			      theContinuousVariableVector.size() + anIndex
-			      - aDiscreteProcessOffset, c,
-			      aDifference / aPerturbation );
-	    }
-	}
+            if ( aDiscreteProcessOffset > anIndex )
+                {
+                    for ( VariableReferenceList::const_iterator anIterator
+                                    ( theVariableReferenceListVector[ anIndex ].begin() );
+                                anIterator < theVariableReferenceListVector[ anIndex ].end(); )
+                        {
+                            ExprComponent const& aComponent( *anIterator );
+                            const RealMatrix::index anIndex(
+                                    static_cast< RealMatrix::index >( aComponent.first ) );
+                            theTaylorSeries[ 0 ][ anIndex ] +=
+                                    aComponent.second * aDifference;
+                        }
+                }
+            else
+                {
+                    gsl_matrix_set( theJacobianMatrix,
+                                                    theContinuousVariableVector.size() + anIndex
+                                                    - aDiscreteProcessOffset, c,
+                                                    aDifference / aPerturbation );
+                }
+        }
 
-      for( IntVector::size_type i( 0 ); 
-	   i < theContinuousVariableVector.size(); ++i )
-	{
-	  // this calculation already includes negative factor
-	  const int anIndex( theContinuousVariableVector[ i ] );
-	  const Real aDerivative
-	    ( theTaylorSeries[ 0 ][ anIndex ] / aPerturbation );
+        for( IntVector::size_type i( 0 ); 
+                 i < theContinuousVariableVector.size(); ++i )
+        {
+            // this calculation already includes negative factor
+            const int anIndex( theContinuousVariableVector[ i ] );
+            const Real aDerivative(
+                    theTaylorSeries[ 0 ][ anIndex ] / aPerturbation );
 
-	  gsl_matrix_set( theJacobianMatrix, i, c,
-			  -1.0 * aDerivative * getStepInterval() );
+            gsl_matrix_set( theJacobianMatrix, i, c,
+                            -1.0 * aDerivative * getStepInterval() );
 
-	  theTaylorSeries[ 0 ][ anIndex ] = 0.0;
-	}
+            theTaylorSeries[ 0 ][ anIndex ] = 0.0;
+        }
 
-      aVariable->loadValue( aValue );
+        aVariable->loadValue( aValue );
     }
 
-  for ( IntVector::size_type c( 0 ); 
-	c < theContinuousVariableVector.size(); c++ )
+    for ( IntVector::size_type c( 0 ); 
+                c < theContinuousVariableVector.size(); c++ )
     {
-      const int anIndex( theContinuousVariableVector[ c ] );
-      const Real aDerivative( gsl_matrix_get( theJacobianMatrix, c, anIndex ) );
-      gsl_matrix_set( theJacobianMatrix, c, anIndex, 1.0 + aDerivative );
+        const int anIndex( theContinuousVariableVector[ c ] );
+        const Real aDerivative( gsl_matrix_get( theJacobianMatrix, c, anIndex ) );
+        gsl_matrix_set( theJacobianMatrix, c, anIndex, 1.0 + aDerivative );
     }
 
-  setCurrentTime( aCurrentTime );
+    setCurrentTime( aCurrentTime );
 }
 
 const Real FixedDAE1Stepper::solve()
 {
-  const VariableVector::size_type 
-    aReadOnlyVariableOffset( getReadOnlyVariableOffset() );
+    const VariableVector::size_type aReadOnlyVariableOffset(
+            getReadOnlyVariableOffset() );
 
-  int aSignNum;
-  gsl_linalg_LU_decomp( theJacobianMatrix, thePermutation, &aSignNum );
-  gsl_linalg_LU_solve( theJacobianMatrix, thePermutation,
-		       theVelocityVector, theSolutionVector );
+    int aSignNum;
+    gsl_linalg_LU_decomp( theJacobianMatrix, thePermutation, &aSignNum );
+    gsl_linalg_LU_solve( theJacobianMatrix, thePermutation,
+                         theVelocityVector, theSolutionVector );
 
-  Real anError( 0.0 );
-  Real aTotalVelocity( 0.0 );
-  for( VariableVector::size_type c( 0 ); c < aReadOnlyVariableOffset; ++c )
+    Real anError( 0.0 );
+    Real aTotalVelocity( 0.0 );
+    for( VariableVector::size_type c( 0 ); c < aReadOnlyVariableOffset; ++c )
     {
-      VariablePtr const aVariable( theVariableVector[ c ] );
+        VariablePtr const aVariable( theVariableVector[ c ] );
 
-      const Real aDifference( gsl_vector_get( theSolutionVector, c ) );
-      aVariable->addValue( aDifference );
-      anError += aDifference;
-      
-      const Real aVelocity( aVariable->getValue() - theValueBuffer[ c ] );
-      aTotalVelocity += aVelocity;
-      
-      theTaylorSeries[ 0 ][ c ] = aVelocity / getStepInterval();
+        const Real aDifference( gsl_vector_get( theSolutionVector, c ) );
+        aVariable->addValue( aDifference );
+        anError += aDifference;
+        
+        const Real aVelocity( aVariable->getValue() - theValueBuffer[ c ] );
+        aTotalVelocity += aVelocity;
+        
+        theTaylorSeries[ 0 ][ c ] = aVelocity / getStepInterval();
     }
 
-  return fabs( anError / aTotalVelocity );
+    return fabs( anError / aTotalVelocity );
 }
 
 void FixedDAE1Stepper::step()
 {
-  theStateFlag = false;
+    theStateFlag = false;
 
-  clearVariables();
+    clearVariables();
 
-  // Newton iteration
-  int anIterator( 0 );
-  while ( anIterator < 5 )
+    // Newton iteration
+    int anIterator( 0 );
+    while ( anIterator < 5 )
     {
-      calculateVelocityVector();
-      calculateJacobian();
+        calculateVelocityVector();
+        calculateJacobian();
 
-      const Real anError( solve() );
+        const Real anError( solve() );
 
-      if ( anError < getTolerance() )
-	{
-	  break;
-	}
+        if ( anError < getTolerance() )
+        {
+            break;
+        }
 
-      anIterator++;
+        anIterator++;
     }
 
-  resetAll();
+    resetAll();
 
-  //    interIntegrate();
-  theStateFlag = true;
+    theStateFlag = true;
 }
 

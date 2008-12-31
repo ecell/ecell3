@@ -34,29 +34,27 @@
 
 #include "PythonProcess.hpp"
 
-
 USE_LIBECS;
 
 LIBECS_DM_INIT( PythonProcess, Process );
 
-
 void PythonProcess::initialize()
 { 
-  PythonProcessBase::initialize();
+    PythonProcessBase::initialize();
 
-  python::handle<> a( PyEval_EvalCode( (PyCodeObject*)
-  				       theCompiledInitializeMethod.ptr(),
-  				       theGlobalNamespace.ptr(), 
-  				       theLocalNamespace.ptr() ) );
+    boost::python::handle<> a(
+        PyEval_EvalCode(
+            reinterpret_cast< PyCodeObject* >(
+                theCompiledInitializeMethod.get() ),
+            theGlobalNamespace.ptr(), 
+            theLocalNamespace.ptr() ) );
 }
 
 void PythonProcess::fire()
 {
-  python::handle<> a( PyEval_EvalCode( (PyCodeObject*)
-				       theCompiledFireMethod.ptr(),
-				       theGlobalNamespace.ptr(), 
-				       theLocalNamespace.ptr() ) );
+    boost::python::handle<> a(
+        PyEval_EvalCode(
+            reinterpret_cast< PyCodeObject* >( theCompiledFireMethod.get() ),
+            theGlobalNamespace.ptr(), 
+            theLocalNamespace.ptr() ) );
 }
-
-
-

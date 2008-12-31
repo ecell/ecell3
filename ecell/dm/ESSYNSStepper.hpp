@@ -33,7 +33,7 @@
 #define __ESSYNSSTEPPER_HPP
 
 #include <boost/multi_array.hpp>
-#include "libecs/AdaptiveDifferentialStepper.hpp"
+#include <libecs/AdaptiveDifferentialStepper.hpp>
 #include "ESSYNSProcess.hpp"
 
 USE_LIBECS;

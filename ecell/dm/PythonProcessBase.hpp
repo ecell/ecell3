@@ -41,156 +41,151 @@
 #include <eval.h>
 #include <frameobject.h>
 
-#include "boost/python.hpp"
+#include <boost/python.hpp>
 
-#include "libecs.hpp"
+#include <libecs/libecs.hpp>
+#include <libecs/FullID.hpp>
+#include <libecs/Process.hpp>
 
-#include "FullID.hpp"
-
-#include "Process.hpp"
-
-
-USE_LIBECS;
-
-namespace python = boost::python;
-
-LIBECS_DM_CLASS( PythonProcessBase, Process )
+LIBECS_DM_CLASS( PythonProcessBase, libecs::Process )
 {
-
-DECLARE_ASSOCVECTOR
-  ( String, Polymorph, std::less<const String>, PropertyMap );
+    DECLARE_ASSOCVECTOR(
+        libecs::String,
+        libecs::Polymorph,
+        std::less< const libecs::String >,
+        PropertyMap
+    );
 
 public:
 
-  LIBECS_DM_OBJECT_ABSTRACT( PythonProcessBase )
+    LIBECS_DM_OBJECT_ABSTRACT( PythonProcessBase )
     {
-      INHERIT_PROPERTIES( Process );
+        INHERIT_PROPERTIES( libecs::Process );
     }
 
 
-  PythonProcessBase()
-  {
-    if( ! Py_IsInitialized() )
-      {
-        Py_Initialize();
-      }
-  }
-
-  virtual ~PythonProcessBase()
-  {
-    // ; do nothing
-  }
-
-
-  python::object compilePythonCode( StringCref aPythonCode, 
-				    StringCref aFilename,
-				    int start )
-  {
-    return python::object( python::handle<>
-			   ( Py_CompileString( const_cast<char*>
-					       ( aPythonCode.c_str() ),
-					       const_cast<char*>
-					       ( aFilename.c_str() ),
-					       start ) ) );
-  }
-
-  void defaultSetProperty( StringCref aPropertyName,
-			   PolymorphCref aValue )
+    PythonProcessBase()
     {
-      PropertyMapIterator i( thePropertyMap.find( aPropertyName ) );
-      if ( i == thePropertyMap.end() )
-	{
-	  thePropertyList.push_back( aPropertyName );
-	  thePropertyMap.insert( std::make_pair( aPropertyName, aValue ) );
-	}
-      else
-	{
-	  i->second = aValue;
-	}
-      theLocalNamespace[ aPropertyName ] =
-	python::object( python::handle<>( PyFloat_FromDouble( aValue.as< Real >() ) ) );
+        if( ! Py_IsInitialized() )
+        {
+            Py_Initialize();
+        }
     }
 
-  const Polymorph defaultGetProperty( StringCref aPropertyName ) const
+    virtual ~PythonProcessBase()
     {
-      PropertyMapConstIterator
-	aPropertyMapIterator( thePropertyMap.find( aPropertyName ) );
-
-      if( aPropertyMapIterator != thePropertyMap.end() )
-	{
-	  return aPropertyMapIterator->second;
-	}
-      else
-	{
-	  THROW_EXCEPTION( NoSlot, getClassName() + " : Property [" +
-			   aPropertyName + "] is not defined" );
-	}
+        // ; do nothing
     }
 
-  const StringVector& defaultGetPropertyList() const
+
+    boost::python::handle<> compilePythonCode( libecs::String const& aPythonCode, 
+                                               libecs::String const& aFilename,
+                                               int start )
     {
-      return thePropertyList;
+        return boost::python::handle<>(
+            Py_CompileString(
+                const_cast< char* >( aPythonCode.c_str() ),
+                const_cast< char* >( aFilename.c_str() ), start ) );
     }
 
-  const PropertyAttributes
-    defaultGetPropertyAttributes( StringCref aPropertyName ) const
+    void defaultSetProperty( libecs::String const& aPropertyName,
+                             libecs::Polymorph const& aValue )
     {
-      return PropertyAttributes( PropertySlotBase::POLYMORPH,
-				 true, true, true, true, true );
+        PropertyMapIterator i( thePropertyMap.find( aPropertyName ) );
+        if ( i == thePropertyMap.end() )
+        {
+            thePropertyMap.insert( std::make_pair( aPropertyName, aValue ) );
+        }
+        else
+        {
+            i->second = aValue;
+        }
+
+        theLocalNamespace[ aPropertyName ] = boost::python::object(
+                boost::python::borrowed(
+                    PyFloat_FromDouble( aValue.as< libecs::Real >() ) ) );
     }
 
-  virtual void initialize();
+    const libecs::Polymorph defaultGetProperty( libecs::String const& aPropertyName ) const
+    {
+        PropertyMapConstIterator aPropertyMapIterator(
+                thePropertyMap.find( aPropertyName ) );
+
+        if( aPropertyMapIterator != thePropertyMap.end() )
+        {
+            return aPropertyMapIterator->second;
+        }
+        else
+        {
+            THROW_EXCEPTION( libecs::NoSlot, asString() + ": property [" +
+                             aPropertyName + "] is not defined" );
+        }
+    }
+
+    const libecs::StringVector defaultGetPropertyList() const
+    {
+        libecs::StringVector aVector;
+
+        std::transform( thePropertyMap.begin(), thePropertyMap.end(),
+                std::back_inserter( aVector ),
+                libecs::SelectFirst< PropertyMap::value_type >() );
+
+        return aVector;
+    }
+
+    const libecs::PropertyAttributes
+    defaultGetPropertyAttributes( libecs::String const& aPropertyName ) const
+    {
+        return libecs::PropertyAttributes(
+                libecs::PropertySlotBase::POLYMORPH,
+                true, true, true, true, true );
+    }
+
+    virtual void initialize();
 
 protected:
 
-  python::dict   theGlobalNamespace;
-  python::dict   theLocalNamespace;
+    boost::python::dict     theGlobalNamespace;
+    boost::python::dict     theLocalNamespace;
 
-  PropertyMap    thePropertyMap;
-
-  StringVector   thePropertyList;
+    PropertyMap        thePropertyMap;
 };
 
 
 void PythonProcessBase::initialize()
 {
-  Process::initialize();
-  
-  theGlobalNamespace.clear();
+    Process::initialize();
+    
+    theGlobalNamespace.clear();
 
-  for( VariableReferenceVectorConstIterator 
-	 i( getVariableReferenceVector().begin() );
-       i != getVariableReferenceVector().end(); ++i )
+    for( libecs::VariableReferenceVectorConstIterator i(
+                getVariableReferenceVector().begin() );
+         i != getVariableReferenceVector().end(); ++i )
     {
-      VariableReferenceCref aVariableReference( *i );
+        libecs::VariableReferenceCref aVariableReference( *i );
 
-      theGlobalNamespace[ aVariableReference.getName() ] = 
-      	python::object( boost::ref( aVariableReference ) );
+        theGlobalNamespace[ aVariableReference.getName() ] = 
+                boost::python::object( boost::ref( aVariableReference ) );
     }
 
-  // extract 'this' Process's methods and attributes
-  python::object 
-    aPySelfProcess( python::ptr( static_cast<Process*>( this ) ) );
-  //  python::dict aSelfDict( aPySelfProcess.attr("__dict__") );
+    // extract 'this' Process's methods and attributes
+    boost::python::object aPySelfProcess(
+        boost::python::ptr( static_cast< Process* >( this ) ) );
 
-  theGlobalNamespace[ "self" ] = aPySelfProcess;
-  //  theGlobalNamespace.update( aSelfDict );
+    theGlobalNamespace[ "self" ] = aPySelfProcess;
 
-  python::handle<> 
-    aMainModule( python::borrowed( PyImport_AddModule( "__main__" ) ) );
-  python::handle<> 
-    aMathModule( python::borrowed( PyImport_AddModule( "math" ) ) );
+    boost::python::handle<> aMainModule(
+            boost::python::borrowed( PyImport_AddModule( "__main__" ) ) );
+    boost::python::handle<> aMathModule(
+            boost::python::borrowed( PyImport_AddModule( "math" ) ) );
 
-  python::handle<> 
-    aMainNamespace( python::borrowed
-		    ( PyModule_GetDict( aMainModule.get() ) ) );
-  python::handle<> 
-    aMathNamespace( python::borrowed
-  		    ( PyModule_GetDict( aMathModule.get() ) ) );
+    boost::python::handle<> aMainNamespace( boost::python::borrowed(
+            PyModule_GetDict( aMainModule.get() ) ) );
+    boost::python::handle<> aMathNamespace( boost::python::borrowed(
+            PyModule_GetDict( aMathModule.get() ) ) );
 
-  theGlobalNamespace.update( aMainNamespace );
-  theGlobalNamespace.update( aMathNamespace );
-
+    theGlobalNamespace.update( aMainNamespace );
+    theGlobalNamespace.update( aMathNamespace );
 }
 
 LIBECS_DM_INIT_STATIC( PythonProcessBase, Process );

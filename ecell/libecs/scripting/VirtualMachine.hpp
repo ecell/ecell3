@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2007 Keio University
+//       Copyright (C) 2005-2007 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -26,40 +26,35 @@
 //END_HEADER
 //
 // authors:
-// Tatsuya Ishida
+//   Koichi Takahashi
+//   Tatsuya Ishida
 //
 // E-Cell Project.
 //
 
-#include "ExpressionProcessBase.hpp"
+#ifndef __VIRTUALMACHNE_HPP
+#define __VIRTUALMACHNE_HPP
 
-USE_LIBECS;
+#include "libecs/libecs.hpp"
+#include "libecs/scripting/ExpressionCompiler.hpp"
 
-LIBECS_DM_CLASS( ExpressionAlgebraicProcess, ExpressionProcessBase )
+namespace libecs { namespace scripting
+{
+
+class VirtualMachine
 {
 public:
-    
-    LIBECS_DM_OBJECT( ExpressionAlgebraicProcess, Process )
+  
+    VirtualMachine()
     {
-        INHERIT_PROPERTIES( ExpressionProcessBase );
+      // ; do nothing
     }
-
-    ExpressionAlgebraicProcess()
-    {
-        //FIXME: additional properties:
-        // Unidirectional     -> call declareUnidirectional() in initialize()
-        //                                         if this is set
-    }
-
-    virtual ~ExpressionAlgebraicProcess()
-    {
-        ; // do nothing
-    }
-
-    virtual void fire()
-    { 
-        setActivity( theVirtualMachine.execute( *theCompiledCode ) );
-    }
+  
+    ~VirtualMachine() {}
+  
+    const libecs::Real execute( CodeCref aCode );
 };
 
-LIBECS_DM_INIT( ExpressionAlgebraicProcess, Process );
+} } // namespace libecs::scripting
+
+#endif /* __VIRTUALMACHNE_HPP */

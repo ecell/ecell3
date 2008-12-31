@@ -29,72 +29,69 @@
 // E-Cell Project.
 //
 
-#include "libecs.hpp"
-#include "Util.hpp"
-#include "PropertyInterface.hpp"
+#include <libecs/libecs.hpp>
+#include <libecs/Util.hpp>
+#include <libecs/PropertyInterface.hpp>
 
-#include "System.hpp"
+#include <libecs/System.hpp>
 
-#include "ContinuousProcess.hpp"
+#include <libecs/ContinuousProcess.hpp>
 
 USE_LIBECS;
 
 LIBECS_DM_CLASS( MassActionFluxProcess, ContinuousProcess )
 {
+public:
 
- public:
-
-  LIBECS_DM_OBJECT( MassActionFluxProcess, Process )
+    LIBECS_DM_OBJECT( MassActionFluxProcess, Process )
     {
-      INHERIT_PROPERTIES( Process );
+        INHERIT_PROPERTIES( Process );
 
-      CLASS_DESCRIPTION("MassActionFluxProcess denotes a simple mass-action. This class calculates a flux rate according to the irreversible mass-action.  Use the property \"k\" to specify the rate constant.");
+        CLASS_DESCRIPTION("MassActionFluxProcess denotes a simple mass-action. This class calculates a flux rate according to the irreversible mass-action.    Use the property \"k\" to specify the rate constant.");
 
-      PROPERTYSLOT_SET_GET( Real, k );
+        PROPERTYSLOT_SET_GET( Real, k );
     }
 
-  MassActionFluxProcess()
-    :
-    k( 0.0 )
+    MassActionFluxProcess()
+        : k( 0.0 )
     {
-      ; // do nothing
+        ; // do nothing
     }
-  
-  SIMPLE_SET_GET_METHOD( Real, k );
-  
-  virtual void fire()
-  {
-    
-    Real velocity( k * N_A );
-    velocity *= getSuperSystem()->getSize();
 
-    for( VariableReferenceVectorConstIterator 
-	   s( theVariableReferenceVector.begin() );
-	 s != theZeroVariableReferenceIterator; ++s )
-      {
-	VariableReference aVariableReference( *s );
-	Integer aCoefficient( aVariableReference.getCoefficient() );
-	do {
-	  ++aCoefficient;
-	  velocity *= aVariableReference.getMolarConc();
-	} while( aCoefficient != 0 );
-	
-      }
-    
-    setFlux(velocity);
-    
-  }
-  
-  virtual void initialize()
-  {
-    Process::initialize();
-    declareUnidirectional();
-  }  
+    SIMPLE_SET_GET_METHOD( Real, k );
 
- protected:
-  
-  Real k;
-    
+    virtual void fire()
+    {
+
+        Real velocity( k * N_A );
+        velocity *= getSuperSystem()->getSize();
+
+        for( VariableReferenceVectorConstIterator s(
+                theVariableReferenceVector.begin() );
+             s != theZeroVariableReferenceIterator; ++s )
+        {
+            VariableReference aVariableReference( *s );
+            Integer aCoefficient( aVariableReference.getCoefficient() );
+            do
+            {
+                ++aCoefficient;
+                velocity *= aVariableReference.getMolarConc();
+            }
+            while( aCoefficient != 0 );
+        }
+
+        setFlux(velocity);
+    }
+
+    virtual void initialize()
+    {
+        Process::initialize();
+        declareUnidirectional();
+    }
+
+protected:
+
+    Real k;
 };
 
 LIBECS_DM_INIT( MassActionFluxProcess, Process );

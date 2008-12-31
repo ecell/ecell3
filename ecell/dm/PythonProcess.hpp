@@ -44,89 +44,87 @@ LIBECS_DM_CLASS( PythonProcess, PythonProcessBase )
 
 public:
 
-  LIBECS_DM_OBJECT( PythonProcess, Process )
+    LIBECS_DM_OBJECT( PythonProcess, Process )
     {
-      INHERIT_PROPERTIES( PythonProcessBase );
+        INHERIT_PROPERTIES( PythonProcessBase );
 
-      PROPERTYSLOT_SET_GET( Integer, IsContinuous );
-      PROPERTYSLOT_SET_GET( String, FireMethod );
-      PROPERTYSLOT_SET_GET( String, InitializeMethod );
+        PROPERTYSLOT_SET_GET( Integer, IsContinuous );
+        PROPERTYSLOT_SET_GET( String, FireMethod );
+        PROPERTYSLOT_SET_GET( String, InitializeMethod );
     }
 
-  PythonProcess()
-    :
-    theIsContinuous( false )
-  {
+    PythonProcess()
+        : theIsContinuous( false )
+    {
+        setInitializeMethod( "" );
+        setFireMethod( "" );
 
-    setInitializeMethod( "" );
-    setFireMethod( "" );
+        //FIXME: additional properties:
+        // Unidirectional     -> call declareUnidirectional() in initialize()
+        //                                         if this is set
+    }
 
-    //FIXME: additional properties:
-    // Unidirectional   -> call declareUnidirectional() in initialize()
-    //                     if this is set
-  }
+    virtual ~PythonProcess()
+    {
+        ; // do nothing
+    }
 
-  virtual ~PythonProcess()
-  {
-    ; // do nothing
-  }
+    virtual const bool isContinuous() const
+    {
+        return theIsContinuous;
+    }
 
-  virtual const bool isContinuous() const
-  {
-    return theIsContinuous;
-  }
+    SET_METHOD( Integer, IsContinuous )
+    {
+        theIsContinuous = value;
+    }
 
-  SET_METHOD( Integer, IsContinuous )
-  {
-    theIsContinuous = value;
-  }
+    SET_METHOD( String, FireMethod )
+    {
+        theFireMethod = value;
 
-  SET_METHOD( String, FireMethod )
-  {
-    theFireMethod = value;
+        theCompiledFireMethod = compilePythonCode(
+                theFireMethod,
+                asString() + ":FireMethod",
+                Py_file_input );
 
-    theCompiledFireMethod = compilePythonCode( theFireMethod,
-						  getFullID().getString() +
-						  ":FireMethod",
-						  Py_file_input );
+        // error check
+    }
 
-    // error check
-  }
-
-  GET_METHOD( String, FireMethod )
-  {
-    return theFireMethod;
-  }
+    GET_METHOD( String, FireMethod )
+    {
+        return theFireMethod;
+    }
 
 
-  SET_METHOD( String, InitializeMethod )
-  {
-    theInitializeMethod = value;
+    SET_METHOD( String, InitializeMethod )
+    {
+        theInitializeMethod = value;
 
-    theCompiledInitializeMethod = compilePythonCode( theInitializeMethod,
-						     getFullID().getString() +
-						     ":InitializeMethod",
-						     Py_file_input );
-  }
+        theCompiledInitializeMethod = compilePythonCode(
+                theInitializeMethod,
+                asString() + ":InitializeMethod",
+                Py_file_input );
+    }
 
-  GET_METHOD( String, InitializeMethod )
-  {
-    return theInitializeMethod;
-  }
+    GET_METHOD( String, InitializeMethod )
+    {
+        return theInitializeMethod;
+    }
 
-  virtual void initialize();
-  virtual void fire();
+    virtual void initialize();
+    virtual void fire();
 
 
 protected:
 
-  String    theFireMethod;
-  String    theInitializeMethod;
+    String        theFireMethod;
+    String        theInitializeMethod;
 
-  python::object theCompiledFireMethod;
-  python::object theCompiledInitializeMethod;
+    boost::python::handle<> theCompiledFireMethod;
+    boost::python::handle<> theCompiledInitializeMethod;
 
-  bool theIsContinuous;
+    bool theIsContinuous;
 };
 
 

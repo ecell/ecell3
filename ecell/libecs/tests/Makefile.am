@@ -44,4 +44,10 @@ LoggerBroker_test_SOURCES = LoggerBroker_test.cpp
 check_PROGRAMS += Model_test
 Model_test_SOURCES = Model_test.cpp
 
+check_PROGRAMS += ExpressionCompiler_test
+ExpressionCompiler_test_SOURCES = ExpressionCompiler_test.cpp
+
+check_PROGRAMS += VirtualMachine_test
+VirtualMachine_test_SOURCES = VirtualMachine_test.cpp
+
 TESTS=$(check_PROGRAMS)

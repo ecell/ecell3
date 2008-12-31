@@ -37,37 +37,37 @@ LIBECS_DM_INIT( TauLeapStepper, Stepper );
 
 void TauLeapStepper::initialize()
 {
-  DifferentialStepper::initialize();
-      
-  theGillespieProcessVector.clear();
+    DifferentialStepper::initialize();
 
-  try
+    theGillespieProcessVector.clear();
+
+    try
     {
-      std::transform( theProcessVector.begin(), theProcessVector.end(),
-		      std::back_inserter( theGillespieProcessVector ),
-		      DynamicCaster<GillespieProcessPtr,ProcessPtr>() );
+        std::transform( theProcessVector.begin(), theProcessVector.end(),
+                        std::back_inserter( theGillespieProcessVector ),
+                        DynamicCaster<GillespieProcessPtr,ProcessPtr>() );
     }
-  catch( const libecs::TypeError& )
+    catch( const libecs::TypeError& )
     {
-      THROW_EXCEPTION( InitializationFailed,
-		       getClassName() +
-		       ": Only GillespieProcesses are allowed to exist "
-		       "in this Stepper." );
+        THROW_EXCEPTION( InitializationFailed,
+                         asString() + ": "
+                         "only GillespieProcesses can be associated with "
+                         "this Stepper." );
     }
 }
 
 void TauLeapStepper::step()
-{      
-  clearVariables();
-      
-  calculateTau();
+{
+    clearVariables();
 
-  initializeStepInterval( getTau() );
-  
-  FOR_ALL( GillespieProcessVector, theGillespieProcessVector )
+    calculateTau();
+
+    initializeStepInterval( getTau() );
+
+    FOR_ALL( GillespieProcessVector, theGillespieProcessVector )
     {
-      (*i)->setActivity( gsl_ran_poisson( getRng(), (*i)->getPropensity() ) );
+        (*i)->setActivity( gsl_ran_poisson( getRng(), (*i)->getPropensity() ) );
     }
 
-  setVariableVelocity( theTaylorSeries[ 0 ] );
+    setVariableVelocity( theTaylorSeries[ 0 ] );
 }

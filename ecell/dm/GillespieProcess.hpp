@@ -161,9 +161,7 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
     if( ! ( getOrder() == 1 || getOrder() == 2 ) )
       {
 	THROW_EXCEPTION( ValueError, 
-			 String( getClassName() ) + 
-			 "[" + getFullID().getString() + 
-			 "]: Only first or second order scheme is allowed." );
+			 asString() + ": Only first or second order scheme is allowed." );
       }
   }
 
@@ -360,8 +358,7 @@ inline void GillespieProcess::calculateOrder()
       if( aCoefficient == 0 )
 	{
 	  THROW_EXCEPTION( InitializationFailed,
-			   "[" + getFullID().getString() + 
-			   "]: Zero stoichiometry is not allowed." );
+			   asString() + ": Zero stoichiometry is not allowed." );
 	}
 
       if( aCoefficient < 0 )

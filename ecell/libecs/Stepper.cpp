@@ -320,9 +320,7 @@ void Stepper::unregisterSystem( System* aSystemPtr )
     if( i == theSystemVector.end() )
     {
         THROW_EXCEPTION( NotFound,
-                         getClassName() + String( "[" ) 
-                         + getID() + "]: " 
-                         + aSystemPtr->asString()
+                         asString() + ": " + aSystemPtr->asString()
                          + " not found in this stepper. Can't remove." );
     }
 
@@ -355,9 +353,7 @@ void Stepper::unregisterProcess( ProcessPtr aProcess )
     if( i == theProcessVector.end() )
     {
         THROW_EXCEPTION( NotFound,
-                         getClassName() + String( "[" ) 
-                         + getID() + "]: " 
-                         + aProcess->asString()
+                         asString() + ": " + aProcess->asString()
                          + " not found in this stepper. Can't remove." );
     }
 
@@ -587,5 +583,10 @@ GET_METHOD_DEF( String, RngType, Stepper )
     return gsl_rng_name( getRng() );
 }
 
+
+String Stepper::asString() const
+{
+    return getPropertyInterface().getClassName() + "[" + getID() + "]";
+}
 
 } // namespace libecs

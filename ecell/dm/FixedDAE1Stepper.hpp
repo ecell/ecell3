@@ -34,7 +34,7 @@
 
 #include <gsl/gsl_linalg.h>
 
-#include "libecs/DifferentialStepper.hpp"
+#include <libecs/DifferentialStepper.hpp>
 
 USE_LIBECS;
 

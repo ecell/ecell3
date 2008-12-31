@@ -96,9 +96,7 @@ LIBECS_DM_CLASS( TauLeapProcess, ContinuousProcess )
       if( ! ( getOrder() == 1 || getOrder() == 2 ) )
 	{
 	  THROW_EXCEPTION( ValueError, 
-			   String( getClassName() ) + 
-			   "[" + getFullID().getString() + 
-			   "]: Only first or second order scheme is allowed." );
+			   asString() + ": Only first or second order scheme is allowed." );
 	}
     }  
 

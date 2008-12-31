@@ -32,7 +32,7 @@
 #ifndef __DAE_HPP
 #define __DAE_HPP
 
-#include "libecs/DifferentialStepper.hpp"
+#include <libecs/DifferentialStepper.hpp>
 
 USE_LIBECS;
 

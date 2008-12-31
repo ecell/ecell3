@@ -45,8 +45,8 @@ void PropertyInterfaceBase::throwNoSlot( StringCref aPropertyName ) const
 {
     THROW_EXCEPTION( NoSlot,
                      getClassName() + 
-                     String( " has no [" ) +
-                     aPropertyName + String( "] property.\n" ) );                    
+                     String( " has no such property [" ) +
+                     aPropertyName + String( "].\n" ) );                    
 }
 
 
