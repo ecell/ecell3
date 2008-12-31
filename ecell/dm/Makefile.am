@@ -45,22 +45,10 @@ ExpressionAssignmentProcess.cpp
 
 DMH =  \
 	ESSYNSProcess.hpp \
-	PythonFluxProcess.hpp \
-	PythonProcess.hpp \
 	PythonProcessBase.hpp \
 	ExpressionProcessBase.hpp \
-	FixedODE1Stepper.hpp \
-	FixedDAE1Stepper.hpp \
 	GillespieProcess.hpp \
-	ESSYNSStepper.hpp \
-	ODE23Stepper.hpp \
-	ODEStepper.hpp \
-	DAEStepper.hpp \
-	FluxDistributionStepper.hpp \
-	QuasiDynamicFluxProcess.hpp \
-	TauLeapProcess.hpp \
-	TauLeapStepper.hpp \
-	ODE45Stepper.hpp
+	QuasiDynamicFluxProcess.hpp
 
 SOS = \
 	MassActionFluxProcess$(LTDL_SHLIB_EXT) \

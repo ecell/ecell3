@@ -31,16 +31,19 @@
 // E-Cell Project.
 //
 
+#include <libecs/ContinuousProcess.hpp>
 #include "ExpressionProcessBase.hpp"
 
 USE_LIBECS;
 
-LIBECS_DM_CLASS( ExpressionFluxProcess, ExpressionProcessBase )
+LIBECS_DM_CLASS_MIXIN( ExpressionFluxProcess, ContinuousProcess,
+                       ExpressionProcessBase )
 {
 public:
     LIBECS_DM_OBJECT( ExpressionFluxProcess, Process )
     {
-        INHERIT_PROPERTIES( ExpressionProcessBase );
+        INHERIT_PROPERTIES( ContinuousProcess );
+        INHERIT_PROPERTIES( _LIBECS_MIXIN_CLASS_ );
         CLASS_DESCRIPTION("ExpressionFluxProcess is designed for easy and efficient representations of continuous flux rate equations.    \"Expression\" property accepts a plain text rate expression.    The expression must be evaluated to give a flux rate in number per second, not concentration per second.");
     }
 
@@ -55,15 +58,38 @@ public:
     {
         ; // do nothing
     }
-    
+
+    virtual void initialize()
+    {
+        _LIBECS_MIXIN_CLASS_::initialize();
+        ContinuousProcess::initialize();
+    }
+
+    virtual void defaultSetProperty( libecs::String const& aPropertyName,
+                             libecs::PolymorphCref aValue )
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultSetProperty( aPropertyName, aValue );
+    }
+
+    virtual const libecs::Polymorph defaultGetProperty( libecs::String const& aPropertyName ) const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetProperty( aPropertyName );
+    }
+
+    virtual const libecs::StringVector defaultGetPropertyList() const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetPropertyList();
+    }
+
+    virtual const libecs::PropertyAttributes
+    defaultGetPropertyAttributes( libecs::String const& aPropertyName ) const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetPropertyAttributes( aPropertyName );
+    }
+
     virtual void fire()
     { 
         setFlux( theVirtualMachine.execute( *theCompiledCode ) );
-    }
-
-    virtual const bool isContinuous() const
-    {
-        return true;
     }
 };
 

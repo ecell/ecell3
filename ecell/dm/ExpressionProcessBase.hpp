@@ -44,7 +44,8 @@
 #include <libecs/scripting/ExpressionCompiler.hpp>
 #include <libecs/scripting/VirtualMachine.hpp>
 
-LIBECS_DM_CLASS( ExpressionProcessBase, libecs::Process )
+template< typename Tmixin_ >
+class ExpressionProcessBase
 {
 protected:
     DECLARE_ASSOCVECTOR(
@@ -59,7 +60,7 @@ private:
           : public libecs::scripting::PropertyAccess
     {
     public:
-        PropertyAccess( ExpressionProcessBase& outer )
+        PropertyAccess( Tmixin_& outer )
             : outer_( outer )
         {
         }
@@ -71,7 +72,7 @@ private:
         }
 
     private:
-        ExpressionProcessBase& outer_;
+        Tmixin_& outer_;
     };
     friend class PropertyAccess;
 
@@ -79,7 +80,7 @@ private:
           : public libecs::scripting::EntityResolver
     {
     public:
-        EntityResolver( ExpressionProcessBase& outer )
+        EntityResolver( Tmixin_& outer )
             : outer_( outer )
         {
         }
@@ -96,7 +97,7 @@ private:
         }
 
     private:
-        ExpressionProcessBase& outer_;
+        Tmixin_& outer_;
     };
     friend class EntityResolver;
 
@@ -104,7 +105,7 @@ private:
           : public libecs::scripting::VariableReferenceResolver
     {
     public:
-        VariableReferenceResolver( ExpressionProcessBase& outer )
+        VariableReferenceResolver( Tmixin_& outer )
             : outer_( outer )
         {
         }
@@ -120,7 +121,7 @@ private:
         }
 
     private:
-        ExpressionProcessBase& outer_;
+        Tmixin_& outer_;
     };
     friend class VariableReferenceResolver;
 
@@ -128,7 +129,7 @@ private:
           : public libecs::scripting::ErrorReporter
     {
     public:
-        ErrorReporter( ExpressionProcessBase& outer )
+        ErrorReporter( Tmixin_& outer )
             : outer_( outer )
         {
         }
@@ -146,16 +147,14 @@ private:
         }
 
     private:
-        ExpressionProcessBase& outer_;
+        Tmixin_& outer_;
     };
     friend class ErrorReporter;
 
 public:
 
-    LIBECS_DM_OBJECT_ABSTRACT( ExpressionProcessBase )
+    LIBECS_DM_OBJECT_MIXIN( ExpressionProcessBase, Tmixin_ )
     {
-        INHERIT_PROPERTIES( libecs::Process );
-
         PROPERTYSLOT_SET_GET( libecs::String, Expression );
     }
 
@@ -166,7 +165,7 @@ public:
         // ; do nothing
     }
 
-    virtual ~ExpressionProcessBase()
+    ~ExpressionProcessBase()
     {
         delete theCompiledCode;
     }
@@ -196,7 +195,8 @@ public:
         if ( aPropertyMapIterator != thePropertyMap.end() ) {
             return aPropertyMapIterator->second;
         } else {
-            THROW_EXCEPTION( libecs::NoSlot, asString() +
+            THROW_EXCEPTION( libecs::NoSlot,
+                             static_cast< Tmixin_ const* >( this )->asString() +
                              ": property [" + aPropertyName +
                              "] is not defined." );
         }
@@ -222,10 +222,10 @@ public:
 
     void compileExpression()
     {
-        ErrorReporter anErrorReporter( *this );
-        PropertyAccess aPropertyAccess( *this );
-        EntityResolver anEntityResolver( *this );
-        VariableReferenceResolver aVarRefResolver( *this );
+        ErrorReporter anErrorReporter( *static_cast< Tmixin_* >( this ) );
+        PropertyAccess aPropertyAccess( *static_cast< Tmixin_* >( this ) );
+        EntityResolver anEntityResolver( *static_cast< Tmixin_* >( this ) );
+        VariableReferenceResolver aVarRefResolver( *static_cast< Tmixin_*>( this ) );
         libecs::scripting::ExpressionCompiler theCompiler(
                 anErrorReporter, aPropertyAccess, anEntityResolver,
                 aVarRefResolver );
@@ -243,10 +243,8 @@ public:
         return thePropertyMap;
     }
 
-    virtual void initialize()
+    void initialize()
     {
-        libecs::Process::initialize();
-
         if ( theRecompileFlag ) {
             compileExpression();
             theRecompileFlag = false;
@@ -260,7 +258,6 @@ protected:
         return thePropertyMap;
     }
 
-
 protected:
     libecs::String    theExpression;
 
@@ -271,9 +268,6 @@ protected:
 
     PropertyMap thePropertyMap;
 };
-
-
-LIBECS_DM_INIT_STATIC( ExpressionProcessBase, Process );
 
 #endif /* __EXPRESSIONPROCESSBASE_HPP */
 

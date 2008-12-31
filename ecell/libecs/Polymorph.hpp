@@ -535,25 +535,25 @@ public:
     }
 
     /** @deprecated */
-    const String asString() const
+    LIBECS_DEPRECATED const String asString() const
     { 
         return as<String>(); 
     }
 
     /** @deprecated */
-    const Real   asReal() const
+    LIBECS_DEPRECATED const Real   asReal() const
     { 
         return as<Real>(); 
     }
   
     /** @deprecated */
-    const Integer asInteger() const
+    LIBECS_DEPRECATED const Integer asInteger() const
     { 
         return as<Integer>();
     }
 
     /** @deprecated */
-    const PolymorphVector asPolymorphVector() const
+    LIBECS_DEPRECATED const PolymorphVector asPolymorphVector() const
     { 
         return as<PolymorphVector>();
     }

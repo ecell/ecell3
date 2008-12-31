@@ -31,30 +31,46 @@
 
 #include <libecs/Variable.hpp>
 
-#include "FixedODE1Stepper.hpp"
+#include <libecs/DifferentialStepper.hpp>
+
+USE_LIBECS;
+
+LIBECS_DM_CLASS( FixedODE1Stepper, DifferentialStepper )
+{
+
+public:
+
+    LIBECS_DM_OBJECT( FixedODE1Stepper, Stepper )
+    {
+        INHERIT_PROPERTIES( DifferentialStepper );
+    }
+
+    FixedODE1Stepper()
+    {
+        ; // do nothing
+    }
+
+    virtual ~FixedODE1Stepper()
+    {
+        ; // do nothing
+    }
+
+    virtual void step()
+    {
+        const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+
+        clearVariables();
+
+        setStepInterval( getNextStepInterval() );
+
+        fireProcesses();
+        setVariableVelocity( theTaylorSeries[ 0 ] );
+        setNextStepInterval( getTolerableStepInterval() );
+    }
+
+
+protected:
+
+};
 
 LIBECS_DM_INIT( FixedODE1Stepper, Stepper );
-
-FixedODE1Stepper::FixedODE1Stepper()
-{
-    ; // do nothing
-}
-                        
-FixedODE1Stepper::~FixedODE1Stepper()
-{
-    ; // do nothing
-}
-
-void FixedODE1Stepper::step()
-{
-    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
-
-    clearVariables();
-
-    setStepInterval( getNextStepInterval() );
-
-    fireProcesses();
-    setVariableVelocity( theTaylorSeries[ 0 ] );
-    setNextStepInterval( getTolerableStepInterval() );
-}
-

@@ -46,8 +46,10 @@
 #include <libecs/libecs.hpp>
 #include <libecs/FullID.hpp>
 #include <libecs/Process.hpp>
+#include <libecs/AssocVector.h>
 
-LIBECS_DM_CLASS( PythonProcessBase, libecs::Process )
+template< typename Tmixin_ >
+class PythonProcessBase
 {
     DECLARE_ASSOCVECTOR(
         libecs::String,
@@ -57,12 +59,9 @@ LIBECS_DM_CLASS( PythonProcessBase, libecs::Process )
     );
 
 public:
-
-    LIBECS_DM_OBJECT_ABSTRACT( PythonProcessBase )
+    LIBECS_DM_OBJECT_MIXIN( PythonProcessBase, Tmixin_ )
     {
-        INHERIT_PROPERTIES( libecs::Process );
     }
-
 
     PythonProcessBase()
     {
@@ -72,11 +71,10 @@ public:
         }
     }
 
-    virtual ~PythonProcessBase()
+    ~PythonProcessBase()
     {
         // ; do nothing
     }
-
 
     boost::python::handle<> compilePythonCode( libecs::String const& aPythonCode, 
                                                libecs::String const& aFilename,
@@ -117,8 +115,10 @@ public:
         }
         else
         {
-            THROW_EXCEPTION( libecs::NoSlot, asString() + ": property [" +
-                             aPropertyName + "] is not defined" );
+            THROW_EXCEPTION( libecs::NoSlot,
+                             static_cast< Tmixin_ const* >( this )->asString()
+                             + ": property [" + aPropertyName
+                             + "] is not defined" );
         }
     }
 
@@ -141,7 +141,41 @@ public:
                 true, true, true, true, true );
     }
 
-    virtual void initialize();
+    void initialize()
+    {
+        theGlobalNamespace.clear();
+        libecs::VariableReferenceVector const& varRefVector(
+            static_cast< Tmixin_* >( this )->getVariableReferenceVector() );
+        for( libecs::VariableReferenceVectorConstIterator i(
+                    varRefVector.begin() );
+             i != varRefVector.end(); ++i )
+        {
+            libecs::VariableReferenceCref aVariableReference( *i );
+
+            theGlobalNamespace[ aVariableReference.getName() ] = 
+                    boost::python::object( boost::ref( aVariableReference ) );
+        }
+
+        // extract 'this' Process's methods and attributes
+        boost::python::object aPySelfProcess(
+            boost::python::ptr( reinterpret_cast< libecs::Process* >( this ) ) );
+
+        theGlobalNamespace[ "self" ] = aPySelfProcess;
+
+        boost::python::handle<> aMainModule(
+                boost::python::borrowed( PyImport_AddModule( "__main__" ) ) );
+        boost::python::handle<> aMathModule(
+                boost::python::borrowed( PyImport_AddModule( "math" ) ) );
+
+        boost::python::handle<> aMainNamespace( boost::python::borrowed(
+                PyModule_GetDict( aMainModule.get() ) ) );
+        boost::python::handle<> aMathNamespace( boost::python::borrowed(
+                PyModule_GetDict( aMathModule.get() ) ) );
+
+        theGlobalNamespace.update( aMainNamespace );
+        theGlobalNamespace.update( aMathNamespace );
+    }
+
 
 protected:
 
@@ -150,44 +184,5 @@ protected:
 
     PropertyMap        thePropertyMap;
 };
-
-
-void PythonProcessBase::initialize()
-{
-    Process::initialize();
-    
-    theGlobalNamespace.clear();
-
-    for( libecs::VariableReferenceVectorConstIterator i(
-                getVariableReferenceVector().begin() );
-         i != getVariableReferenceVector().end(); ++i )
-    {
-        libecs::VariableReferenceCref aVariableReference( *i );
-
-        theGlobalNamespace[ aVariableReference.getName() ] = 
-                boost::python::object( boost::ref( aVariableReference ) );
-    }
-
-    // extract 'this' Process's methods and attributes
-    boost::python::object aPySelfProcess(
-        boost::python::ptr( static_cast< Process* >( this ) ) );
-
-    theGlobalNamespace[ "self" ] = aPySelfProcess;
-
-    boost::python::handle<> aMainModule(
-            boost::python::borrowed( PyImport_AddModule( "__main__" ) ) );
-    boost::python::handle<> aMathModule(
-            boost::python::borrowed( PyImport_AddModule( "math" ) ) );
-
-    boost::python::handle<> aMainNamespace( boost::python::borrowed(
-            PyModule_GetDict( aMainModule.get() ) ) );
-    boost::python::handle<> aMathNamespace( boost::python::borrowed(
-            PyModule_GetDict( aMathModule.get() ) ) );
-
-    theGlobalNamespace.update( aMainNamespace );
-    theGlobalNamespace.update( aMathNamespace );
-}
-
-LIBECS_DM_INIT_STATIC( PythonProcessBase, Process );
 
 #endif /* __PYTHONPROCESSBASE_HPP */

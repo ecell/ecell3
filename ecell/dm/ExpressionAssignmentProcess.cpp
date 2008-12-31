@@ -35,12 +35,13 @@
 
 USE_LIBECS;
 
-LIBECS_DM_CLASS( ExpressionAssignmentProcess, ExpressionProcessBase )
+LIBECS_DM_CLASS_MIXIN( ExpressionAssignmentProcess, Process,
+                       ExpressionProcessBase )
 {
 public:
     LIBECS_DM_OBJECT( ExpressionAssignmentProcess, Process )
     {
-        INHERIT_PROPERTIES( ExpressionProcessBase );
+        INHERIT_PROPERTIES( _LIBECS_MIXIN_CLASS_ );
 
         PROPERTYSLOT_SET_GET( String, Variable );
     }
@@ -67,9 +68,31 @@ public:
         return theVariable;
     }
 
+    virtual void defaultSetProperty( libecs::String const& aPropertyName,
+                             libecs::PolymorphCref aValue )
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultSetProperty( aPropertyName, aValue );
+    }
+
+    virtual const libecs::Polymorph defaultGetProperty( libecs::String const& aPropertyName ) const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetProperty( aPropertyName );
+    }
+
+    virtual const libecs::StringVector defaultGetPropertyList() const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetPropertyList();
+    }
+
+    virtual const libecs::PropertyAttributes
+    defaultGetPropertyAttributes( libecs::String const& aPropertyName ) const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetPropertyAttributes( aPropertyName );
+    }
+
     virtual void initialize()
     {
-        ExpressionProcessBase::initialize();
+        _LIBECS_MIXIN_CLASS_::initialize();
             
         for( VariableReferenceVectorConstIterator i(
                     getVariableReferenceVector().begin() );

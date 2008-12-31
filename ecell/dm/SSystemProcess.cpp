@@ -40,9 +40,7 @@ DECLARE_VECTOR( Real, RealVector );
 
 LIBECS_DM_CLASS( SSystemProcess, ESSYNSProcess )
 {
-
 public:
-
     LIBECS_DM_OBJECT( SSystemProcess, Process )
     {
         INHERIT_PROPERTIES( ESSYNSProcess );

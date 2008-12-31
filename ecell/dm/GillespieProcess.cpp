@@ -27,5 +27,6 @@
 
 #include "GillespieProcess.hpp"
 
+USE_LIBECS;
 
 LIBECS_DM_INIT( GillespieProcess, Process );

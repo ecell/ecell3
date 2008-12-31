@@ -47,18 +47,38 @@ namespace libecs
 /**
    Define a EcsObject
    @param CLASSNAME the name of the class to declare.
-   @param DMTYPE    the root class of the class to declare.
-                    (Process, Variable, System, Stepper)
+   @param BASE      the base class
  */
-#define LIBECS_DM_CLASS( CLASSNAME, DMTYPE )\
+#define LIBECS_DM_CLASS( CLASSNAME, BASE )\
     DECLARE_CLASS( CLASSNAME );\
-    class DM_IF CLASSNAME: public DMTYPE
+    class DM_IF CLASSNAME: public BASE
+/**
+   Define a EcsObject with a mix-in class
+   @param CLASSNAME the name of the class to declare.
+   @param BASE      the base class
+   @param MIXIN     the class mixed-in to CLASSNAME
+ */
+#define LIBECS_DM_CLASS_MIXIN( CLASSNAME, BASE, MIXIN )\
+    DECLARE_CLASS( CLASSNAME );\
+    template class libecs::PropertyInterface< MIXIN< CLASSNAME > >; \
+    class DM_IF CLASSNAME: public BASE, public MIXIN< CLASSNAME >
+
 
 /**
    @internal
  */
-#define LIBECS_DM_DEFINE_PROPERTIES()\
+#define LIBECS_DM_INIT_PROP_INTERFACE()\
     static void initializePropertyInterface( libecs::PropertyInterfaceBase* aPropertyInterface )
+
+/**
+   Defines the property interface initializer that should be previously
+   declared in LIBECS_DM_OBJECT macro.
+
+   @param CLASSNAME
+ */
+#define LIBECS_DM_INIT_PROP_INTERFACE_DEF( CLASSNAME )\
+    void CLASSNAME::initializePropertyInterface( libecs::PropertyInterfaceBase* aPropertyInterface )
+
 
 
 /**
@@ -68,7 +88,18 @@ namespace libecs
 #define LIBECS_DM_OBJECT_ABSTRACT( CLASSNAME )\
     LIBECS_DM_OBJECT_DEF_ABSTRACT( CLASSNAME );\
     LIBECS_DM_EXPOSE_PROPERTYINTERFACE( CLASSNAME );\
-    LIBECS_DM_DEFINE_PROPERTIES()
+    LIBECS_DM_INIT_PROP_INTERFACE()
+
+
+/**
+   Put in front of the property definition block of a mix-in for an EcsObject
+   @param TEMPLATENAME the name of the template to be mixed in.
+   @param BASE the name of the EcsObject class for the template to mix in.
+ */
+#define LIBECS_DM_OBJECT_MIXIN( TEMPLATENAME, BASE )\
+    LIBECS_DM_OBJECT_DEF_ABSTRACT( BASE );\
+    typedef TEMPLATENAME _LIBECS_MIXIN_CLASS_; \
+    LIBECS_DM_INIT_PROP_INTERFACE()
 
 
 /**
@@ -79,7 +110,7 @@ namespace libecs
     DM_OBJECT( CLASSNAME );\
     LIBECS_DM_OBJECT_DEF( CLASSNAME, DMTYPE );\
     LIBECS_DM_EXPOSE_PROPERTYINTERFACE( CLASSNAME );\
-    LIBECS_DM_DEFINE_PROPERTIES()
+    LIBECS_DM_INIT_PROP_INTERFACE()
 
 
 /**
@@ -564,7 +595,7 @@ class LIBECS_API EcsObject
 {
 public:
 
-    LIBECS_DM_DEFINE_PROPERTIES()
+    LIBECS_DM_INIT_PROP_INTERFACE()
     {
         ; // empty, but this must be here.
     }
