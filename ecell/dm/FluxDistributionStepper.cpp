@@ -57,10 +57,26 @@
 
 USE_LIBECS;
 
+template< typename Tnew_, typename Tgiven_ >
+struct Caster: public std::unary_function< Tgiven_, std::pair< Tnew_, Tgiven_ > >
+{
+    Caster(): dc_() {}
+
+    std::pair< Tnew_, Tgiven_ > operator()( Tgiven_ const& ptr )
+    {
+        return std::make_pair( dc_( ptr ), ptr );
+    }
+
+private:
+    DynamicCaster< Tnew_, Tgiven_ > dc_;
+};
+
+typedef Caster< QuasiDynamicFluxProcess*, Process* > QDFPCaster;
+
+DECLARE_VECTOR( QDFPCaster::result_type, QuasiDynamicFluxProcessVector );
+    
 LIBECS_DM_CLASS( FluxDistributionStepper, DifferentialStepper )
 {    
-    DECLARE_VECTOR( QuasiDynamicFluxProcessPtr, QuasiDynamicFluxProcessVector );
-    
 public:
     
     LIBECS_DM_OBJECT( FluxDistributionStepper, DifferentialStepper )
@@ -134,8 +150,8 @@ public:
         try
         {
             std::transform( theProcessVector.begin(), theProcessVector.end(),
-                                            std::back_inserter( theQuasiDynamicFluxProcessVector ),
-                                            DynamicCaster<QuasiDynamicFluxProcessPtr,ProcessPtr>() );
+                            std::back_inserter( theQuasiDynamicFluxProcessVector ),
+                            QDFPCaster() );
         }
         catch( const libecs::TypeError& )
         {
@@ -146,11 +162,14 @@ public:
 
         QuasiDynamicFluxProcessVector::size_type aProcessVectorSize( theQuasiDynamicFluxProcessVector.size() );    
 
-        for( QuasiDynamicFluxProcessVector::size_type i( 0 ); i < aProcessVectorSize; ++i )
+        for( QuasiDynamicFluxProcessVector::size_type i( 0 );
+             i < aProcessVectorSize; ++i )
         {        
-            VariableReferenceVector aVariableReferenceVector( theQuasiDynamicFluxProcessVector[i]->getFluxDistributionVector() );        
+            VariableReferenceVector aVariableReferenceVector(
+                theQuasiDynamicFluxProcessVector[ i ].first->getFluxDistributionVector() );        
 
-            VariableReferenceVector::size_type aVariableReferenceVectorSize( aVariableReferenceVector.size() );    
+            VariableReferenceVector::size_type aVariableReferenceVectorSize(
+                    aVariableReferenceVector.size() );    
             for( VariableReferenceVector::size_type j( 0 ); j < aVariableReferenceVectorSize; ++j )
             {
                 gsl_matrix_set( theUnknownMatrix,
@@ -167,15 +186,16 @@ public:
         theIrreversibleProcessVector.clear();
         theVmaxProcessVector.clear();
 
-        for( QuasiDynamicFluxProcessVector::size_type i( 0 ); i < aProcessVectorSize; i++ )
+        for( QuasiDynamicFluxProcessVector::size_type i( 0 );
+             i < aProcessVectorSize; i++ )
         {
-            if( theQuasiDynamicFluxProcessVector[i]->getIrreversible() )
+            if( theQuasiDynamicFluxProcessVector[i].first->getIrreversible() )
             {
                 theIrreversibleFlag = true;
                 theIrreversibleProcessVector.push_back( theQuasiDynamicFluxProcessVector[i] );
             }
 
-            if( theQuasiDynamicFluxProcessVector[i]->getVmax() != 0 )
+            if( theQuasiDynamicFluxProcessVector[i].first->getVmax() != 0 )
             {
                 theVmaxProcessVector.push_back( theQuasiDynamicFluxProcessVector[i] );
             }
@@ -245,7 +265,7 @@ public:
                             if ( gsl_vector_get( theFluxVector, i ) < 0 )
                             {
                                 aFlag = true;
-                                VariableReferenceVector aVariableReferenceVector( theQuasiDynamicFluxProcessVector[i]->getFluxDistributionVector() );
+                                VariableReferenceVector aVariableReferenceVector( theQuasiDynamicFluxProcessVector[i].first->getFluxDistributionVector() );
                                 VariableReferenceVector::size_type aVariableReferenceVectorSize( aVariableReferenceVector.size() );    
                                 for ( VariableReferenceVector::size_type k( 0 ); k < aVariableReferenceVectorSize; ++k )
                                 {
@@ -277,7 +297,7 @@ public:
         QuasiDynamicFluxProcessVector::size_type aSize( theQuasiDynamicFluxProcessVector.size() );
         for ( QuasiDynamicFluxProcessVector::size_type i( 0 ); i < aSize; ++i )
         {
-            theQuasiDynamicFluxProcessVector[i]->setActivity( gsl_vector_get( theFluxVector, i ) );    
+            theQuasiDynamicFluxProcessVector[i].second->setActivity( gsl_vector_get( theFluxVector, i ) );    
         }
 
         setVariableVelocity( theTaylorSeries[ 0 ] );

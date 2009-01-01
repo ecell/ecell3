@@ -360,6 +360,12 @@ public:
     }
 };
 
+template< typename NEW, typename GIVEN >
+inline NEW SafeDynamicCast( const GIVEN& aPtr )
+{
+    return DynamicCaster< NEW, GIVEN >()( aPtr );
+}
+
 template< class NEW, class GIVEN >
 class LexicalCaster: std::unary_function< GIVEN, NEW >
 {

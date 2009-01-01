@@ -61,7 +61,7 @@ public:
     }
 
     ESSYNSStepper()
-        : theESSYNSProcessPtr( NULLPTR ), theTaylorOrder( 1 )
+        : theESSYNSProcessPtr( NULLPTR, NULLPTR ), theTaylorOrder( 1 )
     {
         ; 
     }
@@ -79,9 +79,10 @@ public:
 
         if( theProcessVector.size() == 1 )
         {
-            theESSYNSProcessPtr = DynamicCaster<ESSYNSProcessPtr,ProcessPtr>()( theProcessVector[ 0 ]);
-        
-            theSystemSize = theESSYNSProcessPtr->getSystemSize();
+            theESSYNSProcessPtr = std::make_pair(
+                SafeDynamicCast< ESSYNSProcessInterface* >( theProcessVector[ 0 ] ),
+                theProcessVector[ 0 ] );
+            theSystemSize = theESSYNSProcessPtr.first->getSystemSize();
         }
         else
         {
@@ -95,10 +96,10 @@ public:
 
         theIndexVector.resize( theSystemSize );
         VariableReferenceVectorCref aVariableReferenceVectorCref(
-            theESSYNSProcessPtr->getVariableReferenceVector() );
+            theESSYNSProcessPtr.second->getVariableReferenceVector() );
 
         for ( VariableReferenceVector::size_type c(
-                theESSYNSProcessPtr->getPositiveVariableReferenceOffset() );
+                theESSYNSProcessPtr.second->getPositiveVariableReferenceOffset() );
               c < theSystemSize; ++c )
         {
             VariableReferenceCref aVariableReferenceCref( aVariableReferenceVectorCref[ c ] );
@@ -116,7 +117,7 @@ public:
         Real aStepInterval( getStepInterval() );
 
         // write step() function
-        theESSYNSMatrix = theESSYNSProcessPtr->getESSYNSMatrix();
+        theESSYNSMatrix = theESSYNSProcessPtr.first->getESSYNSMatrix();
 
         //integrate
         for( int i( 1 ); i < theSystemSize + 1; i++ )
@@ -158,7 +159,7 @@ protected:
 
     Integer theSystemSize;
     Integer theTaylorOrder;
-    ESSYNSProcessPtr     theESSYNSProcessPtr;
+    std::pair< ESSYNSProcessInterface*, Process* > theESSYNSProcessPtr;
     boost::multi_array< Real, 2 > theESSYNSMatrix;
     std::vector<VariableVector::size_type> theIndexVector;
 };

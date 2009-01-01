@@ -37,28 +37,37 @@
 #include <libecs/FullID.hpp>
 #include <libecs/MethodProxy.hpp>
 
-LIBECS_DM_CLASS( GillespieProcess, libecs::Process )
+struct GillespieProcessInterface
+{
+    virtual GET_METHOD( libecs::Real, Propensity ) = 0;
+
+    virtual const libecs::Real getPD( libecs::Variable* aVariable ) const = 0;
+};
+
+LIBECS_DM_CLASS_EXTRA_1( GillespieProcess, libecs::Process,
+                         GillespieProcessInterface )
 {
     typedef libecs::MethodProxy< GillespieProcess, libecs::Real > RealMethodProxy;
     typedef const libecs::Real( GillespieProcess::* PDMethodPtr )( libecs::Variable* ) const; 
     
 public:
-    
     LIBECS_DM_OBJECT( GillespieProcess, Process );
     
-    GillespieProcess() ;
+    GillespieProcess();
 
     virtual ~GillespieProcess();
 
     // c means stochastic reaction constant
-    SIMPLE_SET_GET_METHOD( libecs::Real, k );
-    SIMPLE_SET_GET_METHOD( libecs::Real, c );
+    SET_METHOD( libecs::Real, k );
+    GET_METHOD( libecs::Real, k );
+    SET_METHOD( libecs::Real, c );
+    GET_METHOD( libecs::Real, c );
     
-    GET_METHOD( libecs::Real, Propensity );
+    virtual GET_METHOD( libecs::Real, Propensity );
 
     GET_METHOD( libecs::Real, Propensity_R );
 
-    const libecs::Real getPD( libecs::Variable* aVariable ) const;
+    virtual const libecs::Real getPD( libecs::Variable* aVariable ) const;
 
     virtual const bool isContinuous() const;
 
@@ -66,7 +75,6 @@ public:
 
     GET_METHOD( libecs::Integer, Order );
 
-    //    virtual void updateStepInterval()
     virtual GET_METHOD( libecs::Real, StepInterval );
 
     void calculateOrder();
@@ -120,101 +128,5 @@ protected:
     PDMethodPtr     theGetPDMethodPtr; // this should be MethodProxy
 
 };
-
-
-inline void GillespieProcess::calculateOrder()
-{
-    theOrder = 0;
-        
-    for( libecs::VariableReferenceVectorConstIterator i(
-            theVariableReferenceVector.begin() );
-         i != theVariableReferenceVector.end() ; ++i )
-    {
-        libecs::VariableReference const& aVariableReference( *i );
-        const libecs::Integer aCoefficient( aVariableReference.getCoefficient() );
-            
-        // here assume aCoefficient != 0
-        if( aCoefficient == 0 )
-        {
-            THROW_EXCEPTION( libecs::InitializationFailed,
-                             asString() + ": Zero stoichiometry is not allowed." );
-        }
-
-        if( aCoefficient < 0 )
-        {
-            // sum the coefficient to get the order of this reaction.
-            theOrder -= aCoefficient; 
-        }
-    }
-
-    // set theGetPropensityMethodPtr and theGetMinValueMethodPtr
-
-    if( getOrder() == 0 )     // no substrate
-    {
-        theGetPropensityMethodPtr =
-                    RealMethodProxy::create<&GillespieProcess::getZero>();
-        theGetMinValueMethodPtr   =
-                    RealMethodProxy::create<&GillespieProcess::getZero>();
-        theGetPDMethodPtr         = &GillespieProcess::getPD_Zero;
-    }
-    else if( getOrder() == 1 )     // one substrate, first order.
-    {
-        theGetPropensityMethodPtr =
-                    RealMethodProxy::create<&GillespieProcess::getPropensity_FirstOrder>();
-        theGetMinValueMethodPtr   =
-                    RealMethodProxy::create<&GillespieProcess::getMinValue_FirstOrder>();
-        theGetPDMethodPtr         = &GillespieProcess::getPD_FirstOrder;
-    }
-    else if( getOrder() == 2 )
-    {
-        if( getZeroVariableReferenceOffset() == 2 ) // 2 substrates, 2nd order
-        {    
-            theGetPropensityMethodPtr   = RealMethodProxy::create<
-                    &GillespieProcess::getPropensity_SecondOrder_TwoSubstrates > ();
-            theGetMinValueMethodPtr     = RealMethodProxy::create<
-                    &GillespieProcess::getMinValue_SecondOrder_TwoSubstrates >();
-            theGetPDMethodPtr           =
-                    &GillespieProcess::getPD_SecondOrder_TwoSubstrates;
-        }
-        else // one substrate, second order (coeff == -2)
-        {
-            theGetPropensityMethodPtr = RealMethodProxy::create<
-                    &GillespieProcess::getPropensity_SecondOrder_OneSubstrate>();
-            theGetMinValueMethodPtr   = RealMethodProxy::create<
-                    &GillespieProcess::getMinValue_SecondOrder_OneSubstrate>();
-            theGetPDMethodPtr         =
-                    &GillespieProcess::getPD_SecondOrder_OneSubstrate;
-        }
-    }
-    else
-    {
-        //FIXME: generic functions should come here.
-        theGetPropensityMethodPtr = RealMethodProxy::create<
-                &GillespieProcess::getZero>();
-        theGetPropensityMethodPtr = RealMethodProxy::create<
-                &GillespieProcess::getZero>();
-        theGetPDMethodPtr         = &GillespieProcess::getPD_Zero;
-    }
-
-
-
-    //
-    if ( theOrder == 1 ) 
-    {
-        c = k;
-    }
-    else if ( theOrder == 2 && getZeroVariableReferenceOffset() == 1 )
-    {
-        c = k * 2.0 / ( libecs::N_A * getSuperSystem()->getSize() );
-    }
-    else if ( theOrder == 2 && getZeroVariableReferenceOffset() == 2 )
-    {
-        c = k / ( libecs::N_A * getSuperSystem()->getSize() );
-    }
-    else
-    {
-        NEVER_GET_HERE;
-    } 
-}
 
 #endif /* __GILLESPIEPROCESS_HPP */

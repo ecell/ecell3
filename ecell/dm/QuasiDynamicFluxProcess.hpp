@@ -40,7 +40,18 @@
 #include <libecs/Variable.hpp>
 #include <libecs/Interpolant.hpp>
 
-LIBECS_DM_CLASS( QuasiDynamicFluxProcess, libecs::ContinuousProcess )
+struct QuasiDynamicFluxProcessInteface
+{
+    virtual libecs::VariableReferenceVector getFluxDistributionVector() = 0;
+
+    virtual GET_METHOD( libecs::Integer, Irreversible ) = 0;
+
+    virtual GET_METHOD( libecs::Real, Vmax ) = 0;
+
+};
+
+LIBECS_DM_CLASS_EXTRA_1( QuasiDynamicFluxProcess, libecs::ContinuousProcess,
+                         QuasiDynamicFluxProcessInteface )
 {
 public:
 
@@ -60,21 +71,21 @@ public:
 
     SET_METHOD( libecs::Integer, Irreversible );
 
-    GET_METHOD( libecs::Integer, Irreversible );
+    virtual GET_METHOD( libecs::Integer, Irreversible );
 
     SET_METHOD( libecs::Real, Vmax );
 
-    GET_METHOD( libecs::Real, Vmax );
+    virtual GET_METHOD( libecs::Real, Vmax );
 
     SET_METHOD( libecs::Polymorph, FluxDistributionList );
 
     GET_METHOD( libecs::Polymorph, FluxDistributionList );
 
-    libecs::VariableReferenceVector getFluxDistributionVector();
-
     virtual void initialize();
 
     virtual void fire();
+
+    virtual libecs::VariableReferenceVector getFluxDistributionVector();
 
 protected:
 

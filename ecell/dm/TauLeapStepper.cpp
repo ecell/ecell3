@@ -29,6 +29,7 @@
 // E-Cell Project.
 //
 
+#include <utility>
 #include <gsl/gsl_randist.h>
 
 #include <libecs/DifferentialStepper.hpp>
@@ -40,8 +41,23 @@
 
 USE_LIBECS;
 
-DECLARE_CLASS( GillespieProcess );
-DECLARE_VECTOR( GillespieProcessPtr, GillespieProcessVector );
+template< typename Tnew_, typename Tgiven_ >
+struct Caster: public std::unary_function< Tgiven_, std::pair< Tnew_, Tgiven_ > >
+{
+    Caster(): dc_() {}
+
+    std::pair< Tnew_, Tgiven_ > operator()( Tgiven_ const& ptr )
+    {
+        return std::make_pair( dc_( ptr ), ptr );
+    }
+
+private:
+    DynamicCaster< Tnew_, Tgiven_ > dc_;
+};
+
+typedef Caster< GillespieProcessInterface*, Process* > GPCaster;
+
+DECLARE_VECTOR( GPCaster::result_type, GillespieProcessVector );
 
 LIBECS_DM_CLASS( TauLeapStepper, DifferentialStepper )
 {    
@@ -76,7 +92,7 @@ public:
         {
             std::transform( theProcessVector.begin(), theProcessVector.end(),
                             std::back_inserter( theGillespieProcessVector ),
-                            DynamicCaster<GillespieProcessPtr,ProcessPtr>() );
+                            GPCaster() );
         }
         catch( const libecs::TypeError& )
         {
@@ -97,7 +113,8 @@ public:
 
         FOR_ALL( GillespieProcessVector, theGillespieProcessVector )
         {
-            (*i)->setActivity( gsl_ran_poisson( getRng(), (*i)->getPropensity() ) );
+            (*i).second->setActivity( gsl_ran_poisson( getRng(),
+                                      (*i).first->getPropensity() ) );
         }
 
         setVariableVelocity( theTaylorSeries[ 0 ] );
@@ -125,7 +142,7 @@ protected:
         Real totalPropensity( 0.0 );
         FOR_ALL( GillespieProcessVector, theGillespieProcessVector )
         {
-            totalPropensity += (*i)->getPropensity();
+            totalPropensity += (*i).first->getPropensity();
         }
 
         return totalPropensity;
@@ -147,9 +164,9 @@ protected:
             for( GillespieProcessVector::size_type j( 0 ); j < aSize; ++j )
             {
                 const Real aPropensity(
-                    theGillespieProcessVector[ j ]->getPropensity() );
+                    theGillespieProcessVector[ j ].first->getPropensity() );
                 VariableReferenceVectorCref aVariableReferenceVector(
-                    theGillespieProcessVector[ j ]->getVariableReferenceVector() );
+                    theGillespieProcessVector[ j ].second->getVariableReferenceVector() );
                 
                 // future works : theDependentProcessVector
                 Real expectedChange( 0.0 );
@@ -157,7 +174,7 @@ protected:
                              k( aVariableReferenceVector.begin() ); 
                      k != aVariableReferenceVector.end(); ++k )
                 {
-                    expectedChange += theGillespieProcessVector[ i ]->getPD( (*k).getVariable() ) * (*k).getCoefficient();
+                    expectedChange += theGillespieProcessVector[ i ].first->getPD( (*k).getVariable() ) * (*k).getCoefficient();
                 }
                 
                 aMean += expectedChange * aPropensity;

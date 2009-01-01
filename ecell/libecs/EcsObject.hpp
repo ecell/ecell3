@@ -52,6 +52,16 @@ namespace libecs
 #define LIBECS_DM_CLASS( CLASSNAME, BASE )\
     DECLARE_CLASS( CLASSNAME );\
     class DM_IF CLASSNAME: public BASE
+
+/**
+   Define a EcsObject with one extra interface
+   @param CLASSNAME the name of the class to declare.
+   @param BASE      the base class
+ */
+#define LIBECS_DM_CLASS_EXTRA_1( CLASSNAME, BASE, IF1 )\
+    DECLARE_CLASS( CLASSNAME );\
+    class DM_IF CLASSNAME: public BASE, public IF1
+
 /**
    Define a EcsObject with a mix-in class
    @param CLASSNAME the name of the class to declare.

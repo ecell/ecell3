@@ -36,9 +36,12 @@
 #include <libecs/Stepper.hpp>
 #include <libecs/FullID.hpp>
 
+#include "GillespieProcess.hpp"
+
 USE_LIBECS;
 
-LIBECS_DM_CLASS( TauLeapProcess, ContinuousProcess )
+LIBECS_DM_CLASS_EXTRA_1( TauLeapProcess, ContinuousProcess,
+                         GillespieProcessInterface )
 {
     typedef const Real (TauLeapProcess::* getPropensityMethodPtr)( ) const;
     typedef const Real (TauLeapProcess::* getPDMethodPtr)( VariablePtr ) const;
@@ -74,12 +77,12 @@ public:
         return theOrder;
     }
  
-    GET_METHOD( Real, Propensity )
+    virtual GET_METHOD( Real, Propensity )
     {
         return ( this->*theGetPropensityMethodPtr )();
     }
 
-    const Real getPD( VariablePtr value )const
+    virtual const Real getPD( VariablePtr value )const
     {
         return ( this->*theGetPDMethodPtr )( value );
     }
