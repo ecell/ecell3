@@ -205,7 +205,7 @@ const libecs::String LocalSimulatorImplementation::getStepperClassName(
 {
     libecs::StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
 
-    return aStepperPtr->getClassName();
+    return aStepperPtr->getPropertyInterface().getClassName();
 }
 
 
@@ -347,7 +347,7 @@ getEntityClassName( libecs::StringCref aFullIDString ) const
     libecs::FullID aFullID( aFullIDString );
     libecs::EntityCptr anEntityPtr( getModel().getEntity( aFullID ) );
 
-    return anEntityPtr->getClassName();
+    return anEntityPtr->getPropertyInterface().getClassName();
 }
 
 

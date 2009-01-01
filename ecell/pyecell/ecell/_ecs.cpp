@@ -1263,7 +1263,7 @@ public:
     {
         Stepper const * aStepperPtr( theModel.getStepper( aStepperID ) );
 
-        return aStepperPtr->getClassName();
+        return aStepperPtr->getPropertyInterface().getClassName();
     }
 
     const PolymorphMap getClassInfo( String const& aClassname ) const
@@ -1447,7 +1447,7 @@ public:
         FullID aFullID( aFullIDString );
         Entity const * anEntityPtr( theModel.getEntity( aFullID ) );
 
-        return anEntityPtr->getClassName();
+        return anEntityPtr->getPropertyInterface().getClassName();
     }
 
     Logger* createLogger( String const& aFullPNString )
