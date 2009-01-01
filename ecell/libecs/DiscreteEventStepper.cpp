@@ -74,7 +74,7 @@ void DiscreteEventStepper::initialize()
     if ( theProcessVector.empty() )
     {
         THROW_EXCEPTION( InitializationFailed,
-                         getClassName() + 
+                         asString() + 
                          ": at least one Process "
                          "must be defined in this Stepper." );
     }
