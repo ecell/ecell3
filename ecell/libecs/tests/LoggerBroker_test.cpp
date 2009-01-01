@@ -2,7 +2,7 @@
 //
 //       This file is part of the E-Cell LoggerBroker
 //
-//       Copyright (C) 1996-2008 Keio University
+//       Copyright (C) 1996-2009 Keio University
 //       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
