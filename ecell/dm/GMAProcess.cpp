@@ -38,7 +38,7 @@
 
 #include <libecs/ContinuousProcess.hpp>
 
-#include "ESSYNSProcess.hpp"
+#include "ESSYNSProcessInterface.hpp"
 
 USE_LIBECS;
 
@@ -120,12 +120,12 @@ public:
         }
 
         // set Alpha, Beta, G, H 
-        for ( Integer i( 0 ); i < theSystemSize ; i++ )
+        for ( std::size_t i( 0 ); i < theSystemSize ; i++ )
         {
-            for ( Integer j( 0 ); j < theSystemSize; j++ )
+            for ( std::size_t j( 0 ); j < theSystemSize; j++ )
             {
                 theAlpha[i+1][j+1] = (aValueVector[i].as<PolymorphVector>())[j].as<Real>() ;          
-                for (Integer k( 0 ); k < theSystemSize; k++)
+                for ( std::size_t k( 0 ); k < theSystemSize; k++ )
                 {
                     if ( i == k )
                     {
@@ -176,13 +176,13 @@ public:
         // differentiate first order
         Real aGt( 0.0 );  
         Real aAlpha( 0.0 );         
-        for ( Integer i( 1 ); i < theLawSize; i++ )
-        {     
+        for ( std::size_t i( 1 ); i < theLawSize; i++ )
+        {
             (theY[i-1])[1] = 0;//reset theY
-            for ( Integer j( 1 ) ; j < theLawSize; j++ )
+            for ( std::size_t j( 1 ) ; j < theLawSize; j++ )
             {
                 aGt = 0.0;//reset aGt
-                for ( Integer k( 1 ) ; k < theLawSize ; k++ )
+                for ( std::size_t k( 1 ) ; k < theLawSize ; k++ )
                 {
                     aGt += ( (theG[i])[j][k] * (theY[k-1])[0] );
                 }
@@ -198,19 +198,19 @@ public:
         // differentiate second and/or more order
         for ( Integer m( 2 ); m <= Order; m++ )
         {
-            for ( Integer i( 1 ) ; i < theLawSize; i++ )
+            for ( std::size_t i( 1 ) ; i < theLawSize; i++ )
             {
-                for ( Integer j( 1 ); j < theLawSize; j++ )
+                for ( std::size_t j( 1 ); j < theLawSize; j++ )
                 {
                     (theGBuffer[i])[j][m] = 0; //reset GBuffer        
                     (theAlphaBuffer[i])[j][m] = 0; //reset ABuffer
                     
-                    for( Integer k( 1 ); k < theLawSize; k++ )
+                    for( std::size_t k( 1 ); k < theLawSize; k++ )
                     {
-                        (theGBuffer[i])[j][m-1] += 
-                          ( (theG[i])[j][k] * (theY[k-1])[m-1] ); 
+                        (theGBuffer[i])[j][m - 1] += 
+                          ( (theG[i])[j][k] * (theY[k - 1])[m - 1] ); 
                     }
-                    for( Integer q( 1 );  q <= m-1; q++)
+                    for( Integer q( 1 );  q <= m - 1; q++)
                     {
                         (theAlphaBuffer[i])[j][m] +=  
                           ( (theFBuffer[m])[q]*
@@ -228,7 +228,7 @@ public:
 
     virtual Integer getSystemSize() const
     {
-        return theSystemSize;
+        return static_cast< Integer >( theSystemSize );
     }
 
     void initialize()
@@ -239,8 +239,8 @@ public:
 protected:
 
     Integer Order;
-    Integer theSystemSize;
-    Integer theLawSize;
+    std::size_t theSystemSize;
+    std::size_t theLawSize;
 
     Polymorph GMASystemMatrix;
  

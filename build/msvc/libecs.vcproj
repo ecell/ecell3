@@ -501,6 +501,22 @@
 				RelativePath="..\..\ecell\libecs\VVector.cpp"
 				>
 			</File>
+			<Filter
+				Name="scripting"
+				>
+				<File
+					RelativePath="..\..\ecell\libecs\scripting\Assembler.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ecell\libecs\scripting\ExpressionCompiler.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ecell\libecs\scripting\VirtualMachine.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -664,6 +680,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ecell\libecs\RealMath.hpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ecell\libecs\Stepper.hpp"
 				>
 			</File>
@@ -707,6 +727,26 @@
 				RelativePath="..\..\ecell\libecs\VVector.h"
 				>
 			</File>
+			<Filter
+				Name="scripting"
+				>
+				<File
+					RelativePath="..\..\ecell\libecs\scripting\Assembler.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ecell\libecs\scripting\ExpressionCompiler.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ecell\libecs\scripting\Instruction.hpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ecell\libecs\scripting\VirtualMachine.hpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"

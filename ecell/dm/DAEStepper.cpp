@@ -315,7 +315,7 @@ public:
         Real aNorm;
         Real theta( fabs( theJacobianRecalculateTheta ) );
 
-        UnsignedInteger anIterator( 0 );
+        Integer anIterator( 0 );
 
         if ( !isInterrupted )
         {
@@ -679,7 +679,7 @@ public:
         for ( IntVector::size_type c( 0 );
                     c < theContinuousVariableVector.size(); c++ )
             {
-                const int anIndex( theContinuousVariableVector[ c ] );
+                const std::size_t anIndex( theContinuousVariableVector[ c ] );
 
                 gsl_vector_set( theVelocityVector1, c,
                                                 theTaylorSeries[ 3 ][ anIndex ]
@@ -727,7 +727,7 @@ public:
             for ( IntVector::size_type c( 0 );
                         c < theContinuousVariableVector.size(); c++ )
             {
-                const int anIndex( theContinuousVariableVector[ c ] );
+                const std::size_t anIndex( theContinuousVariableVector[ c ] );
 
                 gsl_vector_set( theVelocityVector1, c,
                                 theTaylorSeries[ 4 ][ anIndex ]
@@ -759,7 +759,7 @@ public:
 
     void calculateJacobian()
     {
-        UnsignedInteger aSize( getReadOnlyVariableOffset() );
+        VariableVector::size_type aSize( getReadOnlyVariableOffset() );
         Real aPerturbation;
 
         for ( VariableVector::size_type i( 0 ); i < aSize; ++i )
@@ -792,7 +792,7 @@ public:
                   j < theContinuousVariableVector.size(); ++j )
             {
                 // int as VariableVector::size_type
-                const int anIndex( theContinuousVariableVector[ j ] );
+                const std::size_t anIndex( theContinuousVariableVector[ j ] );
                 theJacobian[ j ][ i ] = - ( theTaylorSeries[ 4 ][ anIndex ] - theTaylorSeries[ 3 ][ anIndex ] ) / aPerturbation;
             }
 
@@ -826,7 +826,7 @@ public:
         for ( IntVector::size_type c( 0 );
                     c < theContinuousVariableVector.size(); c++ )
         {
-            const int anIndex( theContinuousVariableVector[ c ] );
+            const std::size_t anIndex( theContinuousVariableVector[ c ] );
 
             const Real aPartialDerivative(
                     gsl_matrix_get( theJacobianMatrix1, c, anIndex ) );
@@ -900,7 +900,7 @@ public:
         for ( IntVector::size_type c( 0 );
                c < theContinuousVariableVector.size(); c++ )
         {
-            const int anIndex( theContinuousVariableVector[ c ] );
+            const std::size_t anIndex( theContinuousVariableVector[ c ] );
 
             aTIF[ c ] = theTaylorSeries[ 4 ][ anIndex ] * 4.3255798900631553510;
             aTIF[ c + aSize ] = theTaylorSeries[ 4 ][ anIndex ] * -4.1787185915519047273;
@@ -937,7 +937,7 @@ public:
         for ( IntVector::size_type c( 0 );
                     c < theContinuousVariableVector.size(); c++ )
         {
-            const int anIndex( theContinuousVariableVector[ c ] );
+            const std::size_t anIndex( theContinuousVariableVector[ c ] );
 
             aTIF[ c ] += theTaylorSeries[ 4 ][ anIndex ] * 0.33919925181580986954;
             aTIF[ c + aSize ] -= theTaylorSeries[ 4 ][ anIndex ] * 0.32768282076106238708;
@@ -978,7 +978,7 @@ public:
         for ( IntVector::size_type c( 0 );
                 c < theContinuousVariableVector.size(); c++ )
         {
-            const int anIndex( theContinuousVariableVector[ c ] );
+            const std::size_t anIndex( theContinuousVariableVector[ c ] );
 
             aTIF[ c ] += theTaylorSeries[ 4 ][ anIndex ] * 0.54177053993587487119;
             aTIF[ c + aSize ] += theTaylorSeries[ 4 ][ anIndex ] * 0.47662355450055045196;
@@ -1056,8 +1056,7 @@ protected:
 
     VariableVector::size_type     theSystemSize;
 
-    // IntVector as std::vector<VariableVector::size_type>
-    IntVector  theContinuousVariableVector;
+    std::vector< std::size_t >  theContinuousVariableVector;
     RealVector theDiscreteActivityBuffer;
 
     std::vector<RealVector>    theJacobian;

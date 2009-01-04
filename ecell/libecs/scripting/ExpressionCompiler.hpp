@@ -98,7 +98,7 @@ public:
     }
 };
 
-class ExpressionCompiler
+class LIBECS_API ExpressionCompiler
 {
 private:
 public:

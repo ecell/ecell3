@@ -38,12 +38,7 @@
 #include <libecs/FullID.hpp>
 #include <libecs/MethodProxy.hpp>
 
-struct GillespieProcessInterface
-{
-    virtual GET_METHOD( libecs::Real, Propensity ) = 0;
-
-    virtual const libecs::Real getPD( libecs::Variable* aVariable ) const = 0;
-};
+#include "GillespieProcessInterface.hpp"
 
 LIBECS_DM_CLASS_EXTRA_1( GillespieProcess, libecs::Process,
                          GillespieProcessInterface )

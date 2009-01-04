@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2009 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -24,37 +24,17 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
-//
-// authors:
-//   Koichi Takahashi
-//   Tatsuya Ishida
-//
-// E-Cell Project.
-//
 
-#ifndef __VIRTUALMACHNE_HPP
-#define __VIRTUALMACHNE_HPP
+#ifndef __GILLESPIEPROCESSINTERFACE_HPP
+#define __GILLESPIEPROCESSINTERFACE_HPP
 
-#include "libecs/libecs.hpp"
-#include "libecs/scripting/ExpressionCompiler.hpp"
+#include <libecs/libecs.hpp>
 
-namespace libecs { namespace scripting
+struct GillespieProcessInterface
 {
+    virtual GET_METHOD( libecs::Real, Propensity ) = 0;
 
-class LIBECS_API VirtualMachine
-{
-public:
-  
-    VirtualMachine()
-    {
-      // ; do nothing
-    }
-  
-    ~VirtualMachine() {}
-  
-    const libecs::Real execute( CodeCref aCode );
+    virtual const libecs::Real getPD( libecs::Variable* aVariable ) const = 0;
 };
 
-} } // namespace libecs::scripting
-
-#endif /* __VIRTUALMACHNE_HPP */
+#endif /* __GILLESPIEPROCESSINTERFACE_HPP */

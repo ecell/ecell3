@@ -42,7 +42,7 @@
 
 namespace libecs { namespace scripting {
 
-class Assembler
+class LIBECS_API Assembler
 {
 public:
     Assembler( Code* code )

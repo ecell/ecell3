@@ -20,7 +20,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -84,7 +84,7 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory="$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -150,7 +150,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -214,7 +214,7 @@
 		<Configuration
 			Name="Release|x64"
 			OutputDirectory="$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="1"
 			>
 			<Tool

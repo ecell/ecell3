@@ -40,15 +40,7 @@
 #include <libecs/Variable.hpp>
 #include <libecs/Interpolant.hpp>
 
-struct QuasiDynamicFluxProcessInteface
-{
-    virtual libecs::VariableReferenceVector getFluxDistributionVector() = 0;
-
-    virtual GET_METHOD( libecs::Integer, Irreversible ) = 0;
-
-    virtual GET_METHOD( libecs::Real, Vmax ) = 0;
-
-};
+#include "QuasiDynamicFluxProcessInterface.hpp"
 
 LIBECS_DM_CLASS_EXTRA_1( QuasiDynamicFluxProcess, libecs::ContinuousProcess,
                          QuasiDynamicFluxProcessInteface )

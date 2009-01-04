@@ -31,7 +31,7 @@
 #include <libecs/libecs.hpp>
 #include <libecs/ContinuousProcess.hpp>
 
-#include "ESSYNSProcess.hpp"
+#include "ESSYNSProcessInterface.hpp"
 
 USE_LIBECS;
 

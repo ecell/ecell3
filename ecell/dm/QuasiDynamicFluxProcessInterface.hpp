@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2009 Keio University
+//       Copyright (C) 2005-2008 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -25,36 +25,20 @@
 // 
 //END_HEADER
 //
-// authors:
-//   Koichi Takahashi
-//   Tatsuya Ishida
-//
-// E-Cell Project.
-//
 
-#ifndef __VIRTUALMACHNE_HPP
-#define __VIRTUALMACHNE_HPP
+#ifndef __QUASIDYNAMICFLUXPROCESSINTERFACE_HPP
+#define __QUASIDYNAMICFLUXPROCESSINTERFACE_HPP
 
-#include "libecs/libecs.hpp"
-#include "libecs/scripting/ExpressionCompiler.hpp"
+#include <libecs/libecs.hpp>
 
-namespace libecs { namespace scripting
+struct QuasiDynamicFluxProcessInteface
 {
+    virtual libecs::VariableReferenceVector getFluxDistributionVector() = 0;
 
-class LIBECS_API VirtualMachine
-{
-public:
-  
-    VirtualMachine()
-    {
-      // ; do nothing
-    }
-  
-    ~VirtualMachine() {}
-  
-    const libecs::Real execute( CodeCref aCode );
+    virtual GET_METHOD( libecs::Integer, Irreversible ) = 0;
+
+    virtual GET_METHOD( libecs::Real, Vmax ) = 0;
+
 };
 
-} } // namespace libecs::scripting
-
-#endif /* __VIRTUALMACHNE_HPP */
+#endif /* __QUASIDYNAMICFLUXPROCESSINTERFACE_HPP */

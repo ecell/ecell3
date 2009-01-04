@@ -36,7 +36,7 @@
 #include <libecs/Stepper.hpp>
 #include <libecs/FullID.hpp>
 
-#include "GillespieProcess.hpp"
+#include "GillespieProcessInterface.hpp"
 
 USE_LIBECS;
 

@@ -37,7 +37,7 @@
 #include <libecs/PropertyInterface.hpp>
 #include <libecs/AdaptiveDifferentialStepper.hpp>
 
-#include "ESSYNSProcess.hpp"
+#include "ESSYNSProcessInterface.hpp"
 
 USE_LIBECS;
 

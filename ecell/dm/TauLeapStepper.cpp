@@ -34,10 +34,9 @@
 
 #include <libecs/DifferentialStepper.hpp>
 #include <libecs/libecs.hpp>
+#include <libecs/Process.hpp>
 
-#define DM_IMPORTS
-#include "GillespieProcess.hpp"
-#undef DM_IMPORTS
+#include "GillespieProcessInterface.hpp"
 
 USE_LIBECS;
 

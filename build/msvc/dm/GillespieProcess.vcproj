@@ -359,6 +359,10 @@
 				RelativePath="..\..\..\ecell\dm\GillespieProcess.hpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\ecell\dm\GillespieProcessInterface.hpp"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

@@ -114,7 +114,7 @@ public:
         VariableVector::size_type aVariableVectorSize( theVariableVector.size() );    
         for( VariableVector::size_type i( 0 ); i < aVariableVectorSize; i++ )
         { 
-            theVariableMap.insert( std::pair< VariablePtr, Integer >( theVariableVector[i], i ) );
+            theVariableMap.insert( std::make_pair( theVariableVector[i], i ) );
         }
         
         //
@@ -314,7 +314,7 @@ public:
 protected:
 
     gsl_matrix* generateInverse( gsl_matrix *m_unknown, 
-                                 Integer matrix_size )
+                                 std::size_t matrix_size )
     {
         gsl_matrix *m_tmp1, *m_tmp2, *m_tmp3;
         gsl_matrix *inv;
@@ -335,7 +335,7 @@ protected:
                 
         //generate Singular Value Matrix
         
-        for( int i( 0 ); i < matrix_size; ++i )
+        for( std::size_t i( 0 ); i < matrix_size; ++i )
         {
             Real singular_value = gsl_vector_get( S, i );
             if ( singular_value > Epsilon )
@@ -373,8 +373,8 @@ protected:
 
     Real Epsilon;
     
-    std::map< VariablePtr, Integer > theVariableMap;
-    Integer theMatrixSize;
+    std::map< VariablePtr, VariableVector::size_type > theVariableMap;
+    std::size_t theMatrixSize;
     bool theIrreversibleFlag;
 
 };
