@@ -44,11 +44,13 @@ ExpressionAlgebraicProcess.cpp \
 ExpressionAssignmentProcess.cpp
 
 DMH =  \
-	ESSYNSProcess.hpp \
+	ESSYNSProcessInterface.hpp \
 	PythonProcessBase.hpp \
 	ExpressionProcessBase.hpp \
 	GillespieProcess.hpp \
+	GillespieProcessInterface.hpp \
 	QuasiDynamicFluxProcess.hpp
+	QuasiDynamicFluxProcessInterface.hpp
 
 SOS = \
 	MassActionFluxProcess$(LTDL_SHLIB_EXT) \
