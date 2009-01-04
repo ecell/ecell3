@@ -291,6 +291,7 @@ AC_CONFIG_FILES([
     dm/Makefile
     libecs/Defs.hpp  
     libecs/Makefile
+    libecs/scripting/Makefile
     libecs/tests/Makefile
     libemc/Makefile
     pyecell/Makefile
