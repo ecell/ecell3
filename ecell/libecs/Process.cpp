@@ -76,8 +76,8 @@ SET_METHOD_DEF( Polymorph, VariableReferenceList, Process )
             anElem[ 0 ].as< String >(),
             FullID( anElem[ 1 ].as< String >() ),
             anElem.size() > 2 ? anElem[ 2 ].as< Integer >(): 0l,
-            static_cast< bool >( anElem.size() > 3 ?
-                anElem[ 3 ].as< Integer >(): 1l ) );
+            ( anElem.size() > 3 ?
+                anElem[ 3 ].as< Integer >(): 1l ) != 0 ? true: false );
     }
 }
 

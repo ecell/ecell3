@@ -303,7 +303,7 @@ private:
 
     LoggerAdapterPtr              theLoggerAdapter;
 
-    PhysicalLogger::size_type     theStepCounter;
+    Integer                       theStepCounter;
     Real                          theLastTime;
 
     Policy                        thePolicy;

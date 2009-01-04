@@ -346,11 +346,11 @@ void Stepper::registerProcess( Process* aProcess )
 
 void Stepper::unregisterProcess( ProcessPtr aProcess )
 { 
-    ProcessVectorIterator i( find( theProcessVector.begin(), 
-                                   theProcessVector.end(),
-                                   aProcess ) );
+    ProcessVectorIterator ip( find( theProcessVector.begin(), 
+                                    theProcessVector.end(),
+                                    aProcess ) );
     
-    if( i == theProcessVector.end() )
+    if( ip == theProcessVector.end() )
     {
         THROW_EXCEPTION( NotFound,
                          asString() + ": " + aProcess->asString()
@@ -414,7 +414,7 @@ void Stepper::unregisterProcess( ProcessPtr aProcess )
     theReadWriteVariableOffset = aReadWriteVariableOffset;
     theReadOnlyVariableOffset = aReadOnlyVariableOffset;
 
-    theProcessVector.erase( i );
+    theProcessVector.erase( ip );
 }
 
 
