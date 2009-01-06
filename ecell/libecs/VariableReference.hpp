@@ -155,7 +155,7 @@ public:
 
 public:
     VariableReference()
-        : theVariablePtr( NULLPTR ),
+        : theVariable( NULLPTR ),
           theCoefficient( 0 ),
           theIsAccessor( true )
     {
@@ -163,11 +163,11 @@ public:
     }
 
     VariableReference( StringCref aName, 
-                       VariablePtr aVariablePtr, 
+                       Variable* aVariable, 
                        IntegerParam aCoefficient,
                        const bool anIsAccessor = true )    
         : theName( aName ),
-          theVariablePtr( aVariablePtr ), 
+          theVariable( aVariable ), 
           theCoefficient( aCoefficient ),
           theIsAccessor( anIsAccessor )
     {
@@ -187,14 +187,14 @@ public:
         return theName; 
     }
 
-    void setVariable( VariablePtr const aVariablePtr )
+    void setVariable( Variable* aVariable )
     {
-        theVariablePtr = aVariablePtr;
+        theVariable = aVariable;
     }
 
-    const VariablePtr getVariable() const 
+    Variable* getVariable() const 
     { 
-        return theVariablePtr; 
+        return theVariable; 
     }
 
     void setCoefficient( IntegerParam aCoefficient )
@@ -224,12 +224,12 @@ public:
 
     void setValue( RealParam aValue ) const
     {
-        theVariablePtr->setValue( aValue );
+        theVariable->setValue( aValue );
     }
 
     const Real getValue() const
     {
-        return theVariablePtr->getValue();
+        return theVariable->getValue();
     }
 
     /**
@@ -242,37 +242,37 @@ public:
     */
     void addValue( RealParam aValue ) const
     {
-        theVariablePtr->addValue( aValue * theCoefficient );
+        theVariable->addValue( aValue * theCoefficient );
     }
 
     const Real getMolarConc() const
     {
-        return theVariablePtr->getMolarConc();
+        return theVariable->getMolarConc();
     }
 
     const Real getNumberConc() const
     {
-        return theVariablePtr->getNumberConc();
+        return theVariable->getNumberConc();
     }
 
     const Real getVelocity() const
     {
-        return theVariablePtr->getVelocity();
+        return theVariable->getVelocity();
     }
 
     const bool isFixed() const
     {
-        return theVariablePtr->isFixed();
+        return theVariable->isFixed();
     }
 
     void setFixed( const bool aValue ) const
     {
-        theVariablePtr->setFixed( aValue );
+        theVariable->setFixed( aValue );
     }
 
     SystemPtr getSuperSystem() const
     {
-        return theVariablePtr->getSuperSystem();
+        return theVariable->getSuperSystem();
     }
 
     const bool isEllipsisName() const
@@ -290,7 +290,7 @@ public:
     bool operator==( VariableReferenceCref rhs ) const
     {
         if( theName        == rhs.theName && 
-            theVariablePtr == rhs.theVariablePtr &&
+            theVariable == rhs.theVariable &&
             theCoefficient == rhs.theCoefficient &&
             theIsAccessor  == rhs.theIsAccessor )
         {
@@ -320,9 +320,9 @@ public:
 
 private:
     String            theName;
-    VariablePtr theVariablePtr;
-    Integer         theCoefficient;
-    bool                theIsAccessor;
+    Variable*         theVariable;
+    Integer           theCoefficient;
+    bool              theIsAccessor;
 };
 
 } // namespace libecs
