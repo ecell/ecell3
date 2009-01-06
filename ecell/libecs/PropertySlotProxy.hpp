@@ -55,17 +55,17 @@ public:
     
     virtual ~PropertySlotProxy();
 
-    virtual SET_METHOD( Polymorph, Polymorph ) = 0;
-    virtual GET_METHOD( Polymorph, Polymorph ) = 0;
+    virtual void setPolymorph( Polymorph ) = 0;
+    virtual Polymorph getPolymorph() const = 0;
 
-    virtual SET_METHOD( Real, Real ) = 0;
-    virtual GET_METHOD( Real, Real ) = 0;
+    virtual void setReal( Real ) = 0;
+    virtual Real getReal() const = 0;
 
-    virtual SET_METHOD( Integer, Integer ) = 0;
-    virtual GET_METHOD( Integer, Integer ) = 0;
+    virtual void setInteger( Integer ) = 0;
+    virtual Integer getInteger() const = 0;
 
-    virtual SET_METHOD( String, String ) = 0;
-    virtual GET_METHOD( String, String ) = 0;
+    virtual void setString( String ) = 0;
+    virtual String getString() const = 0;
     
     virtual const bool isSetable() const = 0;
     virtual const bool isGetable() const = 0;
@@ -75,8 +75,6 @@ public:
 
     template < typename Type >
     inline const Type get() const;
-
-protected:
 };
 
 
@@ -153,13 +151,13 @@ public:
 
 
 #define _PROPERTYSLOT_SETMETHOD( TYPE )\
-    virtual SET_METHOD( TYPE, TYPE )\
+    virtual void set ## TYPE( TYPE value )\
     {\
         thePropertySlot.set ## TYPE( theObject, value );\
     }
 
 #define _PROPERTYSLOT_GETMETHOD( TYPE )\
-    virtual GET_METHOD( TYPE, TYPE )\
+    virtual TYPE get ## TYPE() const\
     {\
         return thePropertySlot.get ## TYPE( theObject );\
     }
@@ -192,9 +190,9 @@ public:
 
 private:
 
-    DM_IF ConcretePropertySlotProxy();
+    ConcretePropertySlotProxy() {}
 
-    T&                             theObject;
+    T&                  theObject;
     PropertySlotCref    thePropertySlot;
 };
 
