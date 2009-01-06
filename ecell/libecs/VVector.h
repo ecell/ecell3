@@ -290,8 +290,10 @@ template<class T> class vvector : public vvectorbase {
   // other public methods
  public:
   void push_back(const value_type & x);
-  value_type const & operator [] (size_type i);
-  value_type const & at(size_type i);
+  value_type const & operator [] (size_type i) const;
+  value_type& operator [] (size_type i);
+  value_type const & at(size_type i) const;
+  value_type & at(size_type i);
   size_type size() const { return _size; };
   void clear();
   static void setDiskFullCB(void(*)());
@@ -381,13 +383,13 @@ template<class T> void vvector<T>::push_back(const T & x)
       // first try to append
       if (!size_fixed)
 	{
-	#ifdef OPEN_WHEN_ACCESS
+#ifdef OPEN_WHEN_ACCESS
 	   my_open_to_append();
-	#endif /*OPEN_WHEN_ACCESS*/
+#endif /*OPEN_WHEN_ACCESS*/
 	  red_bytes = write( _fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
-	#ifdef OPEN_WHEN_ACCESS
+#ifdef OPEN_WHEN_ACCESS
 	  my_close_write();
-    #endif /*OPEN_WHEN_ACCESS*/
+#endif /*OPEN_WHEN_ACCESS*/
 
 	  write_successful = ( red_bytes == sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
 	  if ( (!write_successful )  || ( _size == max_size ) )
@@ -449,13 +451,17 @@ template<class T> void vvector<T>::push_back(const T & x)
 }
 
 
-template<class T>  T const & vvector<T>::operator [] (size_type i)
+template<class T>  T const & vvector<T>::operator [] (size_type i) const
 {
   return at(i);
 }
 
+template<class T>  T& vvector<T>::operator [] (size_type i)
+{
+  return at(i);
+}
 
-template<class T>  T const & vvector<T>::at(size_type i)
+template<class T>  T& vvector<T>::at(size_type i)
 {
 
   assert(i < _size);
@@ -508,13 +514,13 @@ template<class T>  T const & vvector<T>::at(size_type i)
   else{
     phys_read_start=i2;
   }
-   #ifdef OPEN_WHEN_ACCESS
-     my_open_to_read( off_t( phys_read_start * sizeof(T) ));
-    #endif /*OPEN_WHEN_ACCESS*/
+#ifdef OPEN_WHEN_ACCESS
+   my_open_to_read( off_t( phys_read_start * sizeof(T) ));
+#endif /*OPEN_WHEN_ACCESS*/
   num_red = read(_fdr, _cacheRV, num_to_read * sizeof(T));
-   #ifdef OPEN_WHEN_ACCESS
+#ifdef OPEN_WHEN_ACCESS
   my_close_read();
-    #endif /*OPEN_WHEN_ACCESS*/
+#endif /*OPEN_WHEN_ACCESS*/
   if (num_red < 0) {
     throw vvector_read_error();
 
@@ -527,6 +533,10 @@ template<class T>  T const & vvector<T>::at(size_type i)
   return _buf;
 }
 
+template<class T>  T const& vvector<T>::at(size_type i) const
+{
+  return const_cast<vvector*>( this )->at(i);
+}
 
 template<class T> void vvector<T>::clear()
 {
@@ -535,4 +545,4 @@ template<class T> void vvector<T>::clear()
 
 } // namespace libecs
 
-#endif	/* __VVECTOR_H__ */
+#endif /* __VVECTOR_H__ */
