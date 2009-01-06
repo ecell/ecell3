@@ -386,7 +386,7 @@ void LocalSimulatorImplementation::createLogger(
             aParamList.as< Tuple const& >()[ 0 ].as< libecs::Integer >(),
             aParamList.as< Tuple const& >()[ 1 ].as< libecs::Real >(),
             aParamList.as< Tuple const& >()[ 2 ].as< libecs::Integer >(),
-            aParamList.as< Tuple const& >()[ 3 ].as< libecs::Integer >() ) );
+            aParamList.as< Tuple const& >()[ 3 ].as< libecs::Integer >() != 0 ? true: false ) );
 
     setDirty();
 }
@@ -466,7 +466,7 @@ void LocalSimulatorImplementation::setLoggerPolicy(
             aParamList.as< Tuple const& >()[ 0 ].as< libecs::Integer >(),
             aParamList.as< Tuple const& >()[ 1 ].as< libecs::Real >(),
             aParamList.as< Tuple const& >()[ 2 ].as< libecs::Integer >(),
-            aParamList.as< Tuple const& >()[ 3 ].as< libecs::Integer >() ) );
+            aParamList.as< Tuple const& >()[ 3 ].as< libecs::Integer >() != 0 ? true: false ) );
 }
 
 
