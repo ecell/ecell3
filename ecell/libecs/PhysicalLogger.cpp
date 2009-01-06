@@ -110,7 +110,7 @@ PhysicalLogger::lower_bound( const size_type start,
     
     if ( at( i_end ).getTime() == time )
     {
-        i_start=i_end;
+        i_start = i_end;
     }
     
     return i_start;
@@ -168,8 +168,8 @@ PhysicalLogger::lower_bound_linear_estimate( const size_type start,
     Real theStartTime( at( start ).getTime() );
     size_type iterator;
 
-    iterator = static_cast<size_type>( (time - theStartTime ) 
-                                       / time_per_step ) + start;
+    iterator = static_cast< size_type >( (time - theStartTime ) 
+                                         / time_per_step ) + start;
     if ( iterator > end ) { iterator = end;}
     if ( at (iterator).getTime() < time )
     {
@@ -251,7 +251,7 @@ PhysicalLogger::upper_bound_linear( const size_type start,
     return result;
 }
 
-DataPointVectorSharedPtr 
+boost::shared_ptr< DataPointVector > 
 PhysicalLogger::getVector( const size_type start,
                            const size_type end ) const
 {
@@ -284,7 +284,7 @@ PhysicalLogger::getVector( const size_type start,
         while ( counter <= end );
     }
     
-    return DataPointVectorSharedPtr( aVector );
+    return boost::shared_ptr< DataPointVector >( aVector );
 }
     
 

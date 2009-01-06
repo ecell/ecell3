@@ -96,8 +96,8 @@ public:
                                            const Real time,
                                            const Real time_per_step ) const;
     
-    DataPointVectorSharedPtr getVector( const size_type start,
-                                        const size_type end ) const;
+    boost::shared_ptr< DataPointVector > getVector( const size_type start,
+                                                    const size_type end ) const;
 
     size_type size() const;
 

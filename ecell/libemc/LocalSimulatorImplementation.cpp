@@ -408,14 +408,14 @@ const libecs::Polymorph LocalSimulatorImplementation::getLoggerList() const
 }
 
 
-const libecs::DataPointVectorSharedPtr
+const boost::shared_ptr< libecs::DataPointVector >
 LocalSimulatorImplementation::getLoggerData(
         libecs::StringCref aFullPNString ) const
 {
     return getLogger( aFullPNString )->getData();
 }
 
-const libecs::DataPointVectorSharedPtr
+const boost::shared_ptr< libecs::DataPointVector >
 LocalSimulatorImplementation::getLoggerData(
         libecs::StringCref aFullPNString, 
         libecs::RealCref aStartTime, 
@@ -425,7 +425,7 @@ LocalSimulatorImplementation::getLoggerData(
 }
 
 
-const libecs::DataPointVectorSharedPtr
+const boost::shared_ptr< libecs::DataPointVector >
 LocalSimulatorImplementation::getLoggerData(
         libecs::StringCref aFullPNString, 
         libecs::RealCref aStartTime, 

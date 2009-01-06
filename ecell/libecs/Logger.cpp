@@ -71,7 +71,7 @@ Logger::Policy const& Logger::getLoggerPolicy( void )
 }
 
 
-DataPointVectorSharedPtr Logger::getData( void ) const
+boost::shared_ptr< DataPointVector > Logger::getData( void ) const
 {
     if( thePhysicalLogger.empty() )
     {
@@ -83,8 +83,8 @@ DataPointVectorSharedPtr Logger::getData( void ) const
 
 
 
-DataPointVectorSharedPtr Logger::getData( RealParam aStartTime,
-                                          RealParam anEndTime ) const
+boost::shared_ptr< DataPointVector > Logger::getData( RealParam aStartTime,
+                                                      RealParam anEndTime ) const
 {
     if( thePhysicalLogger.empty() )
     {
@@ -107,9 +107,9 @@ DataPointVectorSharedPtr Logger::getData( RealParam aStartTime,
 }
 
 
-DataPointVectorSharedPtr Logger::createEmptyVector()
+boost::shared_ptr< DataPointVector > Logger::createEmptyVector()
 {
-    DataPointVectorSharedPtr aDataPointVector( new DataPointVector ( 0, 2 ) );
+    boost::shared_ptr< DataPointVector > aDataPointVector( new DataPointVector ( 0, 2 ) );
 
     return aDataPointVector;
 }
@@ -142,8 +142,8 @@ const Real Logger::getEndTime( void ) const
     return thePhysicalLogger.back().getTime();
 }
 
-DataPointVectorSharedPtr Logger::getData( RealParam aStartTime,
-                                          RealParam anEndTime,
+boost::shared_ptr< DataPointVector > Logger::getData( RealParam aStartTime,
+                                                      RealParam anEndTime,
                                           RealParam anInterval ) const
 {
     if ( thePhysicalLogger.empty() )
@@ -165,7 +165,7 @@ DataPointVectorSharedPtr Logger::getData( RealParam aStartTime,
         DataPointVectorPtr 
             aDataPointVector( new DataPointVector( 1, 5 ) );
         aDataPointVector->asLong( 0 ) = aLongDataPoint;
-        return DataPointVectorSharedPtr( aDataPointVector ); 
+        return boost::shared_ptr< DataPointVector >( aDataPointVector ); 
     }
 
     // set up output vector
@@ -237,7 +237,7 @@ DataPointVectorSharedPtr Logger::getData( RealParam aStartTime,
         aTargetTime += anInterval;
     }
     
-    return DataPointVectorSharedPtr( aDataPointVector ); 
+    return boost::shared_ptr< DataPointVector >( aDataPointVector ); 
 }
 
 

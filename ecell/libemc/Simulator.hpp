@@ -429,13 +429,13 @@ public:
         return theSimulatorImplementation->getLoggerList();
     }
 
-    const libecs::DataPointVectorSharedPtr 
+    const boost::shared_ptr< libecs::DataPointVector > 
     getLoggerData( libecs::StringCref aFullPNString ) const
     {
         return theSimulatorImplementation->getLoggerData( aFullPNString );
     }
 
-    const libecs::DataPointVectorSharedPtr
+    const boost::shared_ptr< libecs::DataPointVector >
     getLoggerData( libecs::StringCref aFullPNString, 
                    libecs::RealCref aStartTime, 
                    libecs::RealCref anEndTime ) const 
@@ -444,7 +444,7 @@ public:
                                                           aStartTime, anEndTime );
     }
 
-    const libecs::DataPointVectorSharedPtr
+    const boost::shared_ptr< libecs::DataPointVector >
     getLoggerData( libecs::StringCref aFullPNString,
                    libecs::RealCref aStartTime, libecs::RealCref anEndTime,
                    libecs::RealCref anInterval ) const

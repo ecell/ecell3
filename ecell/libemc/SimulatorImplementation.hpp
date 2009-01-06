@@ -134,15 +134,15 @@ public:
 
     virtual const libecs::Polymorph getLoggerList() const = 0;
 
-    virtual const libecs::DataPointVectorSharedPtr 
+    virtual const boost::shared_ptr< libecs::DataPointVector > 
     getLoggerData( libecs::StringCref aFullPNString ) const = 0;
 
-    virtual const libecs::DataPointVectorSharedPtr
+    virtual const boost::shared_ptr< libecs::DataPointVector >
     getLoggerData( libecs::StringCref aFullPNString, 
                    libecs::RealCref aStartTime, 
                    libecs::RealCref anEndTime ) const = 0;
 
-    virtual const libecs::DataPointVectorSharedPtr
+    virtual const boost::shared_ptr< libecs::DataPointVector >
     getLoggerData( libecs::StringCref aFullPNString,
                    libecs::RealCref aStartTime, libecs::RealCref anEndTime, 
                    libecs::RealCref interval ) const = 0;

@@ -204,14 +204,14 @@ public:
 
     */
 
-    DataPointVectorSharedPtr getData( void ) const;
+    boost::shared_ptr< DataPointVector > getData( void ) const;
 
     /**
          Returns a slice of the data from aStartTime to anEndTime.
 
     */
 
-    DataPointVectorSharedPtr getData( RealParam aStartTime,
+    boost::shared_ptr< DataPointVector > getData( RealParam aStartTime,
                                       RealParam anEndTime ) const;
 
     /**
@@ -219,7 +219,7 @@ public:
          intervals anInterval between data elements.
     */
 
-    DataPointVectorSharedPtr getData( RealParam aStartTime,
+    boost::shared_ptr< DataPointVector > getData( RealParam aStartTime,
                                       RealParam anEndTime, 
                                       RealParam anInterval ) const;
     
@@ -284,7 +284,7 @@ protected:
         thePhysicalLogger.push( DataPoint( aTime, aValue ) );
     }
 
-    static DataPointVectorSharedPtr createEmptyVector();
+    static boost::shared_ptr< DataPointVector > createEmptyVector();
 
 private:
 

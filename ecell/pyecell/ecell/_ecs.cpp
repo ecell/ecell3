@@ -594,7 +594,7 @@ public:
 
 protected:
     PyObject_VAR_HEAD
-    DataPointVectorSharedPtr theVector;
+    boost::shared_ptr< DataPointVector > theVector;
 
 public:
     static PyTypeObject __class__;
@@ -608,7 +608,7 @@ private:
         return PyObject_New( DataPointVectorWrapper, &__class__);
     }
 
-    DataPointVectorWrapper( DataPointVectorSharedPtr const& aVector )
+    DataPointVectorWrapper( boost::shared_ptr< DataPointVector > const& aVector )
         : theVector( aVector ) {}
 
     ~DataPointVectorWrapper()
@@ -634,7 +634,7 @@ public:
         return &__class__;
     }
 
-    static DataPointVectorWrapper* create( DataPointVectorSharedPtr const& aVector )
+    static DataPointVectorWrapper* create( boost::shared_ptr< DataPointVector > const& aVector )
     {
         return new DataPointVectorWrapper( aVector ); 
     }
@@ -1118,12 +1118,12 @@ class DataPointVectorSharedPtrConverter
 public:
     static void addToRegistry()
     {
-        py::to_python_converter< DataPointVectorSharedPtr,
+        py::to_python_converter< boost::shared_ptr< DataPointVector >,
                                  DataPointVectorSharedPtrConverter >();
     }
 
     static PyObject* 
-    convert( DataPointVectorSharedPtr const& aVectorSharedPtr )
+    convert( boost::shared_ptr< DataPointVector > const& aVectorSharedPtr )
     {
         return aVectorSharedPtr->getElementSize() == sizeof( DataPoint ) ?
                 reinterpret_cast< PyObject* >(
@@ -1504,20 +1504,20 @@ public:
         return aLoggerList;
     }
 
-    DataPointVectorSharedPtr 
+    boost::shared_ptr< DataPointVector > 
     getLoggerData( String const& aFullPNString ) const
     {
         return getLogger( aFullPNString )->getData();
     }
 
-    DataPointVectorSharedPtr
+    boost::shared_ptr< DataPointVector >
     getLoggerData( String const& aFullPNString, 
                    Real const& startTime, Real const& endTime ) const
     {
         return getLogger( aFullPNString )->getData( startTime, endTime );
     }
 
-    DataPointVectorSharedPtr
+    boost::shared_ptr< DataPointVector >
     getLoggerData( String const& aFullPNString,
                    Real const& start, Real const& end, 
                    Real const& interval ) const
@@ -2039,14 +2039,14 @@ BOOST_PYTHON_MODULE( _ecs )
                 &Logger::getLoggerPolicy,
                 return_copy_const_reference() ) )
         .def( "getData", 
-              ( DataPointVectorSharedPtr( Logger::* )( void ) const )
+              ( boost::shared_ptr< DataPointVector >( Logger::* )( void ) const )
               &Logger::getData )
         .def( "getData", 
-              ( DataPointVectorSharedPtr( Logger::* )(
+              ( boost::shared_ptr< DataPointVector >( Logger::* )(
                 Real const&, Real const& ) const )
               &Logger::getData )
         .def( "getData",
-              ( DataPointVectorSharedPtr( Logger::* )(
+              ( boost::shared_ptr< DataPointVector >( Logger::* )(
                      Real const&, Real const&, Real const& ) const )
               &Logger::getData )
         ;
@@ -2126,15 +2126,15 @@ BOOST_PYTHON_MODULE( _ecs )
         .def( "getLogger", &SimulatorImpl::getLogger,
               py::return_internal_reference<>() )
         .def( "getLoggerData", 
-              ( DataPointVectorSharedPtr( SimulatorImpl::* )(
+              ( boost::shared_ptr< DataPointVector >( SimulatorImpl::* )(
                     String const& ) const )
               &SimulatorImpl::getLoggerData )
         .def( "getLoggerData", 
-              ( DataPointVectorSharedPtr( SimulatorImpl::* )(
+              ( boost::shared_ptr< DataPointVector >( SimulatorImpl::* )(
                     String const&, Real const&, Real const& ) const )
               &SimulatorImpl::getLoggerData )
         .def( "getLoggerData",
-              ( DataPointVectorSharedPtr( SimulatorImpl::* )(
+              ( boost::shared_ptr< DataPointVector >( SimulatorImpl::* )(
                      String const&, Real const&, 
                      Real const&, Real const& ) const )
               &SimulatorImpl::getLoggerData )
