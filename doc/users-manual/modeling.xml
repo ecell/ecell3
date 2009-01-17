@@ -2153,7 +2153,7 @@ a * A + B = 10,  a = 1.5
 	  <programlisting>
 Stepper DAEStepper( DAE1 ) {}
 
-Process ExpressionFluxProcess( P )
+Process ExpressionAlgebraicProcess( P )
 {
     StepperID DAE1;
 
