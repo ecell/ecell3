@@ -84,10 +84,13 @@ class LIBECS_API CLASSNAME : public BASECLASS\
 public:\
     CLASSNAME( StringCref method, StringCref message = "" )\
         : BASECLASS( method, message ) {}\
-    virtual ~CLASSNAME() throw() {}\
-    virtual StringLiteral getClassName() const { return #CLASSNAME ; }\
-};\
+    virtual ~CLASSNAME() throw(); \
+    virtual StringLiteral getClassName() const; \
+};
 
+#define DEFINE_EXCEPTION_METHOD_BODIES( CLASSNAME ) \
+    CLASSNAME::~CLASSNAME() throw() {}\
+    StringLiteral CLASSNAME::getClassName() const { return #CLASSNAME ; }
 
 // system errors
 DEFINE_EXCEPTION( UnexpectedError,                Exception );
