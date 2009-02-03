@@ -110,6 +110,8 @@ def main():
     ldflags = split_quoted( ORIG_LDFLAGS ) + \
         split_quoted( LDFLAGS )
 
+    shlflags = split_quoted( get_config_var('CCSHARED') )
+
     compiler = new_compiler( verbose = verbose )
     if verbose:
         old_spawn = compiler.spawn
@@ -124,7 +126,7 @@ def main():
 
     objects = None
     try:
-        objects = compiler.compile( args, extra_preargs = cxxflags + cppflags )
+        objects = compiler.compile( args, extra_preargs = shlflags + cxxflags + cppflags )
     except CompileError, e:
         msg( "failed to compile the specified source files: " + repr( e ) )
         return 1 
