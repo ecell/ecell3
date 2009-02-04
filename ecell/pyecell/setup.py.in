@@ -30,7 +30,7 @@ setup(
         Extension( 'ecell._tableio',
 			sources = [ 'ecell/_tableio.c' ],
             define_macros = sys.platform == 'win32' and
-				[ ('WIN32','1'), ('_WIN32','1') ]
+				[ ('WIN32','1'), ('_WIN32','1'), ('_SECURE_SCL', '0') ]
 			),
         Extension(
             'ecell._ecs',
