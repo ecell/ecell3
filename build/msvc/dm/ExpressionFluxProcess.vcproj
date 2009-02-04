@@ -220,13 +220,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ecs.lib gsl.lib"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -356,20 +354,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\ecell\dm\ExpressionCompiler.hpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\ecell\dm\ExpressionProcessBase.hpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Descriptor Files"
-			>
-			<File
-				RelativePath="..\..\..\ecell\dm\ExpressionFluxProcess.desc"
-				DeploymentContent="true"
 				>
 			</File>
 		</Filter>

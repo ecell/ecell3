@@ -66,7 +66,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="ecs.lib gsl.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(SolutionDir)$(PlatformName)\$(ConfigurationName)\dm;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -220,13 +220,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ecs.lib gsl.lib"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(SolutionDir)$(PlatformName)\$(ConfigurationName)\dm;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -300,7 +298,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="ecs.lib gsl.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(SolutionDir)$(PlatformName)\$(ConfigurationName)\dm;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -356,16 +354,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\ecell\dm\FluxDistributionStepper.hpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Descriptor Files"
-			>
-			<File
-				RelativePath="..\..\..\ecell\dm\FluxDistributionStepper.desc"
-				DeploymentContent="true"
+				RelativePath="..\..\..\ecell\dm\QuasiDynamicFluxProcessInterface.hpp"
 				>
 			</File>
 		</Filter>

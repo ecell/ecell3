@@ -22,6 +22,7 @@
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="1"
+			DeleteExtensionsOnClean="*;$(TargetPath)"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -86,8 +87,9 @@
 		<Configuration
 			Name="Debug|x64"
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="1"
+			DeleteExtensionsOnClean="*;$(TargetPath)"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -156,6 +158,7 @@
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
 			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="1"
+			DeleteExtensionsOnClean="*;$(TargetPath)"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -220,8 +223,9 @@
 		<Configuration
 			Name="Release|x64"
 			OutputDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)$(PlatformName)\$(ConfigurationName)\$(ProjectName).build"
 			ConfigurationType="1"
+			DeleteExtensionsOnClean="*;$(TargetPath)"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -298,6 +302,18 @@
 				UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 				>
 				<File
+					RelativePath="..\..\ecell\pyecell\ecell\_ecs.cpp"
+					>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="true"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath="..\..\ecell\pyecell\ecell\_tableio.c"
 					>
 					<FileConfiguration
@@ -352,6 +368,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\ecell\pyecell\ecell\config.py"
+					>
+				</File>
+				<File
 					RelativePath="..\..\ecell\pyecell\ecell\convertEML2SBML.py"
 					>
 				</File>
@@ -376,7 +396,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\ecell\pyecell\ecell\ecs.py"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ecell\pyecell\ecell\ecs_constants.py"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ecell\pyecell\ecell\ecssupport.py"
+					>
+				</File>
+				<File
 					RelativePath="..\..\ecell\pyecell\ecell\em.py"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ecell\pyecell\ecell\emc.py"
 					>
 				</File>
 				<File
@@ -625,7 +661,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)config.py"
 					/>
 				</FileConfiguration>
@@ -635,7 +671,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)config.py"
 					/>
 				</FileConfiguration>
@@ -645,7 +681,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)config.py"
 					/>
 				</FileConfiguration>
@@ -669,7 +705,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-em2eml"
 					/>
 				</FileConfiguration>
@@ -679,7 +715,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-em2eml"
 					/>
 				</FileConfiguration>
@@ -689,7 +725,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-em2eml"
 					/>
 				</FileConfiguration>
@@ -713,7 +749,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-eml2em"
 					/>
 				</FileConfiguration>
@@ -723,7 +759,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-eml2em"
 					/>
 				</FileConfiguration>
@@ -733,7 +769,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-eml2em"
 					/>
 				</FileConfiguration>
@@ -743,7 +779,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-eml2em"
 					/>
 				</FileConfiguration>
@@ -757,7 +793,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-eml2sbml"
 					/>
 				</FileConfiguration>
@@ -767,7 +803,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-eml2sbml"
 					/>
 				</FileConfiguration>
@@ -777,7 +813,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-eml2sbml"
 					/>
 				</FileConfiguration>
@@ -787,7 +823,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-eml2sbml"
 					/>
 				</FileConfiguration>
@@ -801,7 +837,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-sbml2eml"
 					/>
 				</FileConfiguration>
@@ -811,7 +847,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-sbml2eml"
 					/>
 				</FileConfiguration>
@@ -821,7 +857,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-sbml2eml"
 					/>
 				</FileConfiguration>
@@ -831,7 +867,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-sbml2eml"
 					/>
 				</FileConfiguration>
@@ -845,7 +881,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-session-manager"
 					/>
 				</FileConfiguration>
@@ -855,7 +891,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-session-manager"
 					/>
 				</FileConfiguration>
@@ -865,7 +901,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-session-manager"
 					/>
 				</FileConfiguration>
@@ -875,7 +911,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-session-manager"
 					/>
 				</FileConfiguration>
@@ -889,7 +925,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-session"
 					/>
 				</FileConfiguration>
@@ -899,7 +935,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-session"
 					/>
 				</FileConfiguration>
@@ -909,7 +945,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-session"
 					/>
 				</FileConfiguration>
@@ -919,7 +955,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Generating $(InputFileName)..."
-						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;"
+						CommandLine="cscript &quot;$(ProjectDir)\gen_file.wsf&quot; &quot;$(OutDir)&quot; &quot;$(ProjectDir)\..\..&quot; &quot;$(InputDir)$(InputName)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputDir)ecell3-session"
 					/>
 				</FileConfiguration>
