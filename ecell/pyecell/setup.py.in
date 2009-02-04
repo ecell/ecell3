@@ -31,7 +31,7 @@ setup(
         Extension( 'ecell._tableio',
 			sources = [ 'ecell/_tableio.c' ],
             define_macros = sys.platform == 'win32' and
-				[ ('WIN32','1'), ('_WIN32','1') ]
+				[ ('WIN32','1'), ('_WIN32','1'), ('_SECURE_SCL', '0') ]
 			),
         Extension(
             'ecell._ecs',
@@ -39,7 +39,7 @@ setup(
             library_dirs = [ ecell_staging_home + os.environ['libdir'] ],
             libraries = common_libraries + [ 'ecs', 'emc' ],
             define_macros = sys.platform == 'win32' and
-				[ ('BOOST_ALL_NO_LIB', '1'), ('WIN32','1'), ('_WIN32','1'), ('__STDC__', 1), ('_WIN32_WINNT', 0x500) ],
+				[ ('BOOST_ALL_NO_LIB', '1'), ('WIN32','1'), ('_WIN32','1'), ('__STDC__', 1), ('_WIN32_WINNT', 0x500), ('_SECURE_SCL', '0') ],
             sources = [ 'ecell/_ecs.cpp' ] ),
         ]
     )
