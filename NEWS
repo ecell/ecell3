@@ -1,10 +1,81 @@
-ecell-3.1.106: 5-Feb-2007
+ecell-3.1.107RC1: 5-Feb-2009
+
+ * Reorganized the source tree structure.
+
+   - Integrated pyecs into pyecell.
+
+   - Merged ecell.emc into ecell.ecs to avoid static initializer weirdness in
+     some platform (including Mac OS X).
+
+   - Two GUI frontends (session-monitor and model-editor) were renewed to be
+     two packages of python modules, ecell.ui.osogo and ecell.ui.model_editor.
+
+ * pyecell changes
+
+   - Moved GtkSessionMonitor to ecell.ui.osogo.GtkSessionMonitor that resides
+     in ecell/frontend/session_manager
+
+   - Renamed ecell.SessionManager to ecell.session_manager.
+
+   - Removed the following constants from ecell.ecs_constants.
+
+     - TRUE
+     - FALSE
+
+
+ecell-3.1.106: 5-Feb-2008
+
+  * class PropertySlotProxyLoggerAdapter was decoupled from PropertySlot.hpp
+    to the separate file, PropertySlotProxyLoggerAdapter.hpp in order not to
+    incorporate various concerns in a single file.
+
+  * A number of leaks were plugged. Note that a few other leaks involved in
+    property interfaces are still active in this release on purpose to
+    maintain binary compatibility with older releases. The fix was already
+    established and will be in the next release.
+
+  * Visual Studio build files (build/msvc/*.vcproj) were updated so it can
+    cross-build 64-bit binaries.
+
+  * PythonProcess and PythonFluxProcess now don't require that python
+    interpreter be already initialized.
+
+  * model-editor no longer depends on Python for Windows Extension.
+    Now the win32 / win64 native builds require Python 2.4 or later.
 
 
 ecell-3.1.106RC2: 24-Dec-2007
 
+  * Avoided resetting LD_LIBRARY_PATH in ecell-python for the sake of
+    inter-platform operability. This was also problematic in combination within
+    multiple ldconfig paths.
+
+  * Fixed sample installation rule so that samples would get installed in
+    sample-per-directory manner.
+
+  * Fixed configure scripts for dmtool and dynamic modules so that modules they
+    produce would have right extensions that follows the libltdl's convention.
+
 
 ecell-3.1.106RC1: 14-Dec-2007
+
+  * Updated bundled libtool script for better compatibility with MacOSX and
+    similar systems.
+
+  * The users manual is now bundled in the distribution.
+
+  * Improved dynamic priority queue.
+
+  * Support for the newest NumPy release in ecell.Analysis.
+
+  * Numerous minor bugfixes.
+
+  * Added two new functions, libecs::initialize() and libecs::finalize().
+    Those functions need to be called before using the simulation kernel or
+    after finished up with it respectively. Users don't have to take care of
+    this change as long as they are using E-Cell through the Python frontends
+    as these functions are automatically called on start-up and clean-up
+    of pyecs module.
 
 
 ecell-3.1.105: 19-Sep-2005
