@@ -30,10 +30,6 @@
 #
 
 
-# boolean constants
-TRUE  = 1
-FALSE = 0
-
 # FullPN field numbers
 TYPE       = 0
 SYSTEMPATH = 1
