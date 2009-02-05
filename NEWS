@@ -1,5 +1,7 @@
 ecell-3.1.107RC1: 5-Feb-2009
 
+ * Fixed compilation problem on newer GCC (>= 4.3).
+
  * Reorganized the source tree structure.
 
    - Integrated pyecs into pyecell.
