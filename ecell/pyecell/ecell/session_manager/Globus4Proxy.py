@@ -2,7 +2,7 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2008 Keio University
+#       Copyright (C) 1996-2009 Keio University
 #       Copyright (C) 2005-2008 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -44,9 +44,9 @@ import xml.sax.handler as saxhandler
 from urlparse import urlunsplit
 
 # imports ecell modules
-from ecell.SessionManager.Util import *
-from ecell.SessionManager.SessionManager import *
-from ecell.SessionManager.Constants import *
+from ecell.session_manager.Util import *
+from ecell.session_manager.SessionManager import *
+from ecell.session_manager.Constants import *
 
 GLOBUSRUN_WS = 'globusrun-ws'
 GLOBUS_URL_COPY='globus-url-copy'
@@ -571,7 +571,8 @@ class SessionProxy( AbstractSessionProxy ):
         job.directory = absJobDirectory
         job.environment.update( self.getEnvironmentVariables() )
         job.executable = self.getInterpreter()
-        job.arguments = ( self.getScriptFileName(), )
+        job.arguments = [ self.getScriptFileName() ]
+        job.arguments += self.getArguments()
 
         tmpfile = None
         tmpfile = mkstemp()
@@ -635,7 +636,7 @@ class SessionProxy( AbstractSessionProxy ):
         self.setStatus( ERROR )
 
 class SystemProxy( AbstractSystemProxy ):
-    '''Globus2SystemProxy'''
+    '''Globus4SystemProxy'''
     def __init__( self, sessionManager ):
         '''Constructor
         sessionManager -- the reference to SessionManager

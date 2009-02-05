@@ -2,7 +2,7 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2008 Keio University
+#       Copyright (C) 1996-2009 Keio University
 #       Copyright (C) 2005-2008 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -36,9 +36,9 @@ import sys
 import time
 from itertools import ifilter
 
-from ecell.SessionManager.Util import *
-from ecell.SessionManager.SessionManager import *
-from ecell.SessionManager.Constants import *
+from ecell.session_manager.Util import *
+from ecell.session_manager.SessionManager import *
+from ecell.session_manager.Constants import *
 
 QSUB = 'qsub'
 QSTAT = 'qstat'

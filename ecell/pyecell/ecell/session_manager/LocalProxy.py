@@ -2,7 +2,7 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2008 Keio University
+#       Copyright (C) 1996-2009 Keio University
 #       Copyright (C) 2005-2008 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -53,8 +53,9 @@ except:
         def wait( self ):
             return os.WEXITSTATUS( os.waitpid( self.pid, 0 )[ 1 ] )
 
-from ecell.SessionManager.SessionManager import *
-from ecell.SessionManager.Util import *
+from ecell.session_manager.SessionManager import *
+from ecell.session_manager.Constants import *
+from ecell.session_manager.Util import *
 
 class SessionProxy( AbstractSessionProxy ):
     '''LocalSessionProxy class

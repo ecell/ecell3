@@ -2,7 +2,7 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2008 Keio University
+#       Copyright (C) 1996-2009 Keio University
 #       Copyright (C) 2005-2008 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -28,14 +28,36 @@
 # Designed by Koichi Takahashi <shafi@e-cell.org>
 # Programmed by Masahiro Sugimoto <msugi@sfc.keio.ac.jp>
 
-__all__ = [
-    'SessionManager'
-    'SessionManager',
-    'SessionProxy',
-    'SystemProxy',
-    'Util',
-    ]
+ECELL3_PYTHON = 'ecell3-python'
+ECELL3_SESSION = 'ecell3-session'
 
-from SessionManager import *
-from Util import * 
-from Constants import *
+DEFAULT_STDOUT = 'stdout'
+DEFAULT_STDERR = 'stderr'
+
+SYSTEM_PROXY = 'SystemProxy'
+SESSION_PROXY = 'SessionProxy'
+
+DEFAULT_TMP_DIRECTORY = 'tmp'
+DEFAULT_ENVIRONMENT = 'Local'
+
+# job status
+QUEUED       = 0
+RUN          = 1
+FINISHED     = 2
+ERROR        = 3
+
+STATUS = {
+    QUEUED:   'QUEUED',
+    RUN:      'RUN',
+    FINISHED: 'FINISHED',
+    ERROR:    'ERROR',
+    }
+
+INTERESTING_ENV_VARS = (
+    'ECELL3_PREFIX',
+    'ECELL3_DM_PATH',
+    'LTDL_LIBRARY_PATH',
+    'LD_LIBRARY_PATH',
+    'PYTHONPATH',
+    'PATH', # XXX: better not include this one?
+    )
