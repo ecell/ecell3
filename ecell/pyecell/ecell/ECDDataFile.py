@@ -33,7 +33,7 @@
 import numpy
 
 from ecell.DataFile import *
-import ecell.TableIO
+import ecell.TableIO as TableIO
 
 # extension
 ECD_EXTENSION='ecd'
