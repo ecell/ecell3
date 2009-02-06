@@ -273,10 +273,10 @@ class Session:
             # to   [Variable_CELL_CYTOPLASM_E_Value]
              # -------------------------------------------------
 
-            aRootIndex=find( aFullPNString, ':/' )
-            aFileName=aFullPNString[:aRootIndex]+aFullPNString[aRootIndex+1:]
-            aFileName=replace( aFileName, ':', '_' )
-            aFileName=replace( aFileName, '/', '_' )
+            aRootIndex = aFullPNString.find( ':/' )
+            aFileName = aFullPNString[:aRootIndex]+aFullPNString[aRootIndex+1:]
+            aFileName = aFileName.replace( ':', '_' )
+            aFileName = aFileName.replace( '/', '_' )
             
             aECDDataFile = ECDDataFile()
             aECDDataFile.setFileName( aFileName )
