@@ -120,7 +120,7 @@ class OsogoPluginManager(PluginManager):
             instance.openWindow()
 
             #try:
-            if TRUE:
+            if True:
                 if parent.__class__.__name__ == 'EntityListWindow':
                     self.thePropertyWindowOnEntityListWindows[ instance ] = None
                 else:

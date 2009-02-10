@@ -54,9 +54,9 @@ class VariableWindow( OsogoPluginWindow ):
         self.theStub = self.theSession.createEntityStub( self.theFullIDString )
 
         # initializes flags for validation of Property
-        aValueFlag = FALSE
-        aMolarConcFlag = FALSE
-        aFixedFlag = FALSE
+        aValueFlag = False
+        aMolarConcFlag = False
+        aFixedFlag = False
 
         # --------------------------------------------------------------------
         # [1] Checks this entity have Value, MolarConc, Fixed property.
@@ -65,29 +65,29 @@ class VariableWindow( OsogoPluginWindow ):
         for aProperty in self.theStub.getPropertyList(): # for(1)
         
             if aProperty == 'Value':
-                aValueFlag = TRUE
+                aValueFlag = True
             elif aProperty == 'MolarConc':
-                aMolarConcFlag = TRUE
+                aMolarConcFlag = True
             elif aProperty == 'Fixed':
-                aFixedFlag = TRUE
+                aFixedFlag = True
         # end of for(1)
 
         # If this entity does not have 'Value', does not create instance 
-        if aValueFlag == FALSE:
+        if not aValueFlag:
             aMessage = "Error: %s does not have \"Value\" property" %self.theFullIDString
             #self.thePluginManager.printMessage( aMessage )
             aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
             raise TypeError( aMessage )
 
         # If this entity does not have 'MolarConc', does not create instance 
-        if aMolarConcFlag == FALSE:
+        if not aMolarConcFlag:
             aMessage = "Error: %s does not have \"MolarConc\" property" %self.theFullIDString
             #self.thePluginManager.printMessage( aMessage )
             aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
             raise TypeError( aMessage )
 
         # If this entity does not have 'Fixed', does not create instance 
-        if aFixedFlag == FALSE:
+        if not aFixedFlag:
             aMessage = "Error: %s does not have \"Fixed\" property" %self.theFullIDString
             #self.thePluginManager.printMessage( aMessage )
             aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')

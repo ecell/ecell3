@@ -191,7 +191,7 @@ class GtkSessionMonitor(Session):
             message ( "Model has not yet been loaded. Can't open windows." )
             return None
         # When the WindowName does not match, create nothing.
-        if self.theFundamentalWindows.has_key( aWindowName ) == TRUE:
+        if self.theFundamentalWindows.has_key( aWindowName ):
             if rootWidget == None:
                 self.theFundamentalWindows[ aWindowName ].openWindow()
             else:
@@ -238,7 +238,7 @@ class GtkSessionMonitor(Session):
         """
 
         # When the WindowName does not match, creates nothing.
-        if self.theFundamentalWindows.has_key( aWindowName ) == FALSE:
+        if not self.theFundamentalWindows.has_key( aWindowName ):
             message ( "No such WindowType (%s) " %aWindowName )
             return None
 
@@ -591,7 +591,7 @@ class GtkSessionMonitor(Session):
 
         try:
             self.theRunningFlag = True
-            self.theTimer = gobject.timeout_add(self.theUpdateInterval, self.__updateByTimeOut, FALSE)
+            self.theTimer = gobject.timeout_add(self.theUpdateInterval, self.__updateByTimeOut, False)
 
             aCurrentTime = self.getCurrentTime()
             self.message("%15s"%aCurrentTime + ":Start\n" )

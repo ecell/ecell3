@@ -208,7 +208,7 @@ class EntityListWindow(OsogoWindow):
         self['PluginInstanceSelection'].hide_all()
 
         # set 'delete_event' uneffective
-        return TRUE
+        return True
 
 
     def __initializeSystemTree( self ):
@@ -483,7 +483,7 @@ class EntityListWindow(OsogoWindow):
                     aMessage = 'No entity is selected.'
                     aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
                     self.thePropertyWindow.showMessageOnStatusBar(aMessage)
-                    return FALSE
+                    return False
 
             #self.theQueue.pushFullPNList( aSelectedRawFullPNList )
             self.thePluginManager.createInstance( aPluginWindowType, self.thePropertyWindow.theFullPNList() )
@@ -494,9 +494,9 @@ class EntityListWindow(OsogoWindow):
         if anEvent.type == gtk.gdk.BUTTON_PRESS and anEvent.button == 3:
 
             if self.theSession.getWindow('BoardWindow').exists():
-                self.theBoardMenu.set_sensitive(TRUE)
+                self.theBoardMenu.set_sensitive(True)
             else:
-                self.theBoardMenu.set_sensitive(FALSE)
+                self.theBoardMenu.set_sensitive(False)
 
             # removes previous sub menu
             # When PopupMenu was displayed last time without PluginWindows'
@@ -510,7 +510,7 @@ class EntityListWindow(OsogoWindow):
                 aSubMenu = gtk.Menu()
 
                 # creaets menus of PluginWindow instances
-                aMenuItemFlag = FALSE
+                aMenuItemFlag = False
                 for aPluginInstance in self.thePluginManager.theInstanceList: 
 
                     if aPluginInstance.theViewType == MULTIPLE:
@@ -519,9 +519,9 @@ class EntityListWindow(OsogoWindow):
                         aMenuItem.connect('activate', self.appendData )
                         aMenuItem.set_name( aTitle )
                         aSubMenu.append( aMenuItem )
-                        aMenuItemFlag = TRUE
+                        aMenuItemFlag = True
 
-                if aMenuItemFlag == TRUE:
+                if aMenuItemFlag:
                     # creates parent MenuItem attached created submenu.
                     aMenuString = "Append data to"
                     aMenuItem = gtk.MenuItem( aMenuString )
@@ -1023,7 +1023,7 @@ class EntityListWindow(OsogoWindow):
             return None
 
         aPluginWindowType = self.DEFAULT_PLUGIN
-        aSetFlag = FALSE
+        aSetFlag = False
 
         # When this method is cadef doSeleclled by popup menu
         if type( obj[0] ) == gtk.MenuItem:
@@ -1044,7 +1044,7 @@ class EntityListWindow(OsogoWindow):
             aMessage = 'No entity is selected.'
             aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
             self.thePropertyWindow.showMessageOnStatusBar(aMessage)
-            return FALSE
+            return False
 
         #self.theQueue.pushFullPNList( aSelectedRawFullPNList )
         self.thePluginManager.createInstance( aPluginWindowType, self.thePropertyWindow.theFullPNList() )
@@ -1068,7 +1068,7 @@ class EntityListWindow(OsogoWindow):
         # When this method is called by popup menu
         # ----------------------------------------------------
         if type( obj[0] ) == gtk.MenuItem:
-            aSetFlag = TRUE
+            aSetFlag = True
             aPluginWindowTitle = obj[0].get_name()
 
             for anInstance in self.thePluginManager.theInstanceList:
@@ -1077,7 +1077,7 @@ class EntityListWindow(OsogoWindow):
                     try:
                         anInstance.appendRawFullPNList( self.__getSelectedRawFullPNList() )
                     except TypeError:
-                        anErrorFlag = TRUE
+                        anErrorFlag = True
                         aMessage = "Can't append data to %s" %str(anInstance.getTitle())
                         self.thePropertyWindow.showMessageOnStatusBar(aMessage)
                     else:
@@ -1085,7 +1085,7 @@ class EntityListWindow(OsogoWindow):
                         self.thePropertyWindow.showMessageOnStatusBar(aMessage)
                     break
 
-            return TRUE
+            return True
 
         # ----------------------------------------------------
         # When this method is called by PluginInstanceWindow
@@ -1102,7 +1102,7 @@ class EntityListWindow(OsogoWindow):
                 aMessage = 'No entity is selected.'
                 aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
                 self.thePropertyWindow.showMessageOnStatusBar(aMessage)
-                return FALSE
+                return False
 
             # When no plugin instance is selected, displays error message.
             if len(self.theSelectedPluginInstanceList) == 0:
@@ -1110,12 +1110,12 @@ class EntityListWindow(OsogoWindow):
                 aMessage = 'No Plugin Instance is selected.'
                 aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
                 self.thePropertyWindow.showMessageOnStatusBar(aMessage)
-                return FALSE
+                return False
 
             # buffer of appended instance's title
             anAppendedTitle = []
 
-            anErrorFlag = FALSE
+            anErrorFlag = False
 
             # appneds data
             for aPluginWindowTitle in self.theSelectedPluginInstanceList:
@@ -1124,7 +1124,7 @@ class EntityListWindow(OsogoWindow):
                         try:
                             anInstance.appendRawFullPNList( self.__getSelectedRawFullPNList() )
                         except TypeError:
-                            anErrorFlag = TRUE
+                            anErrorFlag = True
                             aMessage = "Can't append data to %s" %str(anInstance.getTitle())
                             self.thePropertyWindow.showMessageOnStatusBar(aMessage)
                         else:
@@ -1132,7 +1132,7 @@ class EntityListWindow(OsogoWindow):
                         break
 
             # When at least one instance is appended
-            if len(anAppendedTitle) > 0 and anErrorFlag == FALSE:
+            if len(anAppendedTitle) > 0 and not anErrorFlag:
                 # displays message
                 aMessage = "Selected Data are added to %s" %str(anAppendedTitle)
                 self.theSession.message(aMessage)
@@ -1141,7 +1141,7 @@ class EntityListWindow(OsogoWindow):
                 # closes PluginInstanceSelectionWindow
                 #self.__closePluginInstanceSelectionWindow()
                 self.closePluginInstanceSelectionWindow()
-                return TRUE
+                return True
 
             # When no instance is appended
             else:
@@ -1201,7 +1201,7 @@ class EntityListWindow(OsogoWindow):
             return None
 
         aPluginWindowType = self.DEFAULT_PLUGIN
-        aSetFlag = FALSE
+        aSetFlag = False
 
         # When this method is called by popup menu
         if type( arg[0] ) == gtk.MenuItem:
@@ -1222,7 +1222,7 @@ class EntityListWindow(OsogoWindow):
             aMessage = 'No entity is selected.'
             aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
             self.thePropertyWindow.showMessageOnStatusBar(aMessage)
-            return FALSE
+            return False
 
         self.theSession.getWindow('BoardWindow').addPluginWindows( aPluginWindowType, \
         self.__getSelectedRawFullPNList() )

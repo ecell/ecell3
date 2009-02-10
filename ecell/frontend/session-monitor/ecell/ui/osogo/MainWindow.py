@@ -281,7 +281,7 @@ class MainWindow(OsogoWindow):
             os.path.join( config.GLADEFILE_PATH, "ecell32.png" ) )
                 
 
-        self.__setMenuAndButtonsStatus( FALSE )
+        self.__setMenuAndButtonsStatus( False )
         #self.theSession.updateFundamentalWindows()
 
 
@@ -537,8 +537,8 @@ class MainWindow(OsogoWindow):
         except:
                         # expants message window, when it is folded.
             if self.exists():
-                if ( self['message_togglebutton'].get_child() ).get_active() == FALSE:
-                    ( self['message_togglebutton'].get_child() ).set_active(TRUE)
+                if not self['message_togglebutton'].get_child().get_active():
+                    self['message_togglebutton'].get_child().set_active( True )
 
             # displays confirm window
             aMessage = 'Can\'t load [%s]\nSee MessageWindow for details.' %aFileName
@@ -581,8 +581,8 @@ class MainWindow(OsogoWindow):
         except:
 
             # expants message window, when it is folded.
-            if ( self['message_togglebutton'].get_child() ).get_active() == FALSE:
-                ( self['message_togglebutton'].get_child() ).set_active(TRUE)
+            if not self['message_togglebutton'].get_child().get_active():
+                self['message_togglebutton'].get_child().set_active(True)
 
 
             # displays confirm window
@@ -630,8 +630,8 @@ class MainWindow(OsogoWindow):
         except:
 
             # expants message window, when it is folded.
-            if ( self['message_togglebutton'].get_child() ).get_active() == FALSE:
-                ( self['message_togglebutton'].get_child() ).set_active(TRUE)
+            if not self['message_togglebutton'].get_child().get_active():
+                self['message_togglebutton'].get_child().set_active(True)
 
             # displays confirm window
             aMessage = 'Can\'t save [%s]\nSee MessageWindow for details.' %aFileName
@@ -823,7 +823,7 @@ class MainWindow(OsogoWindow):
                 aMessage += "Input positive number.\n"
                             
             # when 'step' is selected.
-            if self['step_radiobutton'].get_active() == TRUE:
+            if self['step_radiobutton'].get_active():
 
                 # step must be integer 
                 if int(aNewValue) != aNewValue:
@@ -877,7 +877,7 @@ class MainWindow(OsogoWindow):
         # when Model is already loaded.
         if len(self.theSession.theModelName) > 0:
             # updates status of menu and button 
-            self.__setMenuAndButtonsStatus( TRUE )
+            self.__setMenuAndButtonsStatus( True )
             self.updateButtons()
 
     def getCurrentTime( self, aTime ):
@@ -1089,7 +1089,7 @@ class MainWindow(OsogoWindow):
             anObject = arg[0]
 
         # show
-        if anObject.get_active() == TRUE:
+        if anObject.get_active():
             self.theMessageWindowVisible = True
             self.showMessageWindow() 
             self.__resizeVertically( self.theMessageWindow.getActualSize()[1] )
@@ -1106,7 +1106,7 @@ class MainWindow(OsogoWindow):
         self.updateButtons()
 
     def __toggleEntityListWindow( self, *arg ):
-        if arg[0].get_active() == TRUE:
+        if arg[0].get_active():
             self.theEntityListWindowVisible = True
             self['entitylistarea'].show()
             self.__resizeVertically( self['entitylistarea'].get_allocation()[3] )

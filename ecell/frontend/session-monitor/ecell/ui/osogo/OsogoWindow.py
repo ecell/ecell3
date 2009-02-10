@@ -164,7 +164,7 @@ class OsogoWindow(Window):
 		self.close()
 
 		# does not widgets
-		return TRUE
+		return True
 
 
 

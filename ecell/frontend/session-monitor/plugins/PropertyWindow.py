@@ -561,7 +561,7 @@ class PropertyWindow(OsogoPluginWindow):
         # ------------------------------------
         # checks the type of inputted value 
         # ------------------------------------
-        if aGetable == TRUE:
+        if aGetable:
             aPreValue = self.theListStore.get_value( anIter, aColumn )
 
             # ------------------------------------
@@ -670,7 +670,7 @@ class PropertyWindow(OsogoPluginWindow):
 
         anIter = self['theTreeView'].get_selection().get_selected()[1]
         if anIter == None:
-			self.theSelectedFullPN = ''
+            self.theSelectedFullPN = ''
         else:
             aSelectedProperty = self.theListStore.get_value( anIter,
                                                             PROPERTY_COL )

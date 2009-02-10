@@ -123,7 +123,7 @@ class InterfaceWindow( OsogoWindow ):
 			aFullPN = createFullPNString( anInstance.theFullPN() )
 			#aList = ( aTitle , aClass , aFullPN )
 
-			if self.exists() == TRUE:
+			if self.exists():
 
 				anIter = aModel.append()
 				aModel.set( anIter,  \
