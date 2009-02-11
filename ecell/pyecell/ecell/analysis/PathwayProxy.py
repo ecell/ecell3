@@ -43,7 +43,6 @@ from ecell.ecssupport import *
 from ecell.analysis.util import createVariableReferenceFullID
 
 import copy
-import string
 
 import numpy
 
@@ -314,7 +313,7 @@ class PathwayProxy:
 
                 if mode:
                     if len( aVariableReference ) > 2:
-                        coeff = string.atoi( aVariableReference[ 2 ] )
+                        coeff = int( aVariableReference[ 2 ] )
                         if coeff != 0:
                             incidentMatrix[ i ][ j ] = 1
                 else:
@@ -354,7 +353,7 @@ class PathwayProxy:
                     continue
 
                 if len( aVariableReference ) > 2:
-                    coeff = string.atoi( aVariableReference[ 2 ] )
+                    coeff = int( aVariableReference[ 2 ] )
                     if coeff != 0:
                         stoichiometryMatrix[ i ][ j ] += coeff
 
@@ -377,7 +376,7 @@ class PathwayProxy:
 
             if propertyList.count( 'isReversible' ) != 0:
                 # isReversible is handled as float
-                isReversible = string.atof( ecell.Eml.getEntityProperty( self.theEmlSupport, processFullID + ':isReversible' )[ 0 ] )
+                isReversible = float( ecell.Eml.getEntityProperty( self.theEmlSupport, processFullID + ':isReversible' )[ 0 ] )
                 reversibilityList.append( int( isReversible ) )
                 
             else:

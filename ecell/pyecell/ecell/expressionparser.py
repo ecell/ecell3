@@ -152,7 +152,7 @@ def p_expression_system_function(t):
 
         if ( t[1] == 'self' ):
 
-            aLastSlash = string.rindex( aReactionPath, '/' )
+            aLastSlash = aReactionPath.rindex( '/' )
             aCompartmentID = aReactionPath[aLastSlash+1:]
 
             if ( t[5] == 'Size' ):
@@ -172,14 +172,14 @@ def p_expression_system_function(t):
 
                 if ( aVariableReference[0] == t[1] ):
 
-                    aFastColon = string.index( aVariableReference[1], ':' )
-                    aLastColon = string.rindex( aVariableReference[1], ':' )
+                    aFastColon = aVariableReference[1].index( ':' )
+                    aLastColon = aVariableReference[1].rindex( ':' )
                     
                     aSystemPath = aVariableReference[1][aFastColon+1:aLastColon]
 
                     if ( aSystemPath == '.' ):
 
-                        aLastSlash = string.rindex( aReactionPath, '/' )
+                        aLastSlash = aReactionPath.rindex( '/' )
                         aCompartmentID = aReactionPath[aLastSlash+1:]
 
                         if ( t[5] == 'Size' ):
@@ -195,7 +195,7 @@ def p_expression_system_function(t):
 
                     else:
 
-                        aLastSlash = string.rindex( aSystemPath, '/' )
+                        aLastSlash = aSystemPath.rindex( '/' )
                         aCompartmentID = aSystemPath[aLastSlash+1:]
 
                         if ( t[5] == 'Size' ):
@@ -233,8 +233,8 @@ def p_expression_variablereference(t):
 
         if( aVariableReference[0] == t[1] ):
 
-            aFastColon = string.index( aVariableReference[1], ':' )
-            aLastColon = string.rindex( aVariableReference[1], ':' )
+            aFastColon = aVariableReference[1].index( ':' )
+            aLastColon = aVariableReference[1].rindex( ':' )
             
             aSystemPath = aVariableReference[1][aFastColon+1:aLastColon]
             aVariable = aVariableReference[1][aLastColon+1:]            
@@ -330,7 +330,7 @@ def getVariableID( aVariableID, aPath, aType ):
     if( aPath.count('/') == 0 ):
         aSystem = aPath
     else:
-        aLastSlash = string.rindex( aPath, '/' )
+        aLastSlash = aPath.rindex( '/' )
         aSystem = aPath[aLastSlash+1:]
 
     # in case of Compartment
@@ -341,9 +341,9 @@ def getVariableID( aVariableID, aPath, aType ):
 
         else: # other system
             if( isID_Namespace( 'default__' +\
-                                string.replace( aPath, '/', '__' ) ) ):
+                                aPath.replace( '/', '__' ) ) ):
 
-                return 'default__' + string.replace( aPath, '/', '__' )
+                return 'default__' + aPath.replace( '/', '__' )
             else:                                    
                 return aSystem
 
@@ -358,10 +358,10 @@ def getVariableID( aVariableID, aPath, aType ):
             aSystem = 'default'
             
         else: # other system
-            if( isID_Namespace( string.replace( aPath, '/', '__' ) + '__' +\
+            if( isID_Namespace( aPath.replace( '/', '__' ) + '__' +\
                                 aVariableID ) ):
                 
-                aVariableID = string.replace( aPath, '/', '__' ) + '__' +\
+                aVariableID = aPath.replace( '/', '__' ) + '__' +\
                               aVariableID
 
 

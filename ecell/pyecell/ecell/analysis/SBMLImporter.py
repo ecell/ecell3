@@ -36,7 +36,6 @@ __copyright__ = ''
 __license__ = ''
 
 
-import string
 import copy
 
 import libsbml
@@ -639,7 +638,7 @@ class RuleImporter( SBaseImporter ):
 ##                            and not stoichiometry == 0:
 ##                         raise SBMLConvertError, 'Unable to overwrite the stoichiometry for Variable [%s]' % ( fullID )
 
-                    coeff = string.atoi( aVariableReference[ 2 ] )
+                    coeff = int( aVariableReference[ 2 ] )
                     self.theVariableReferenceList[ i ][ 2 ] = str( stoichiometry + coeff )
                     return aVariableReference[ 0 ]
 
@@ -902,7 +901,7 @@ class ReactionImporter( SBaseImporter ):
 ##                            and not stoichiometry == 0:
 ##                         raise SBMLConvertError, 'Unable to overwrite the stoichiometry for Variable [%s]' % ( fullID )
 
-                    coeff = string.atoi( aVariableReference[ 2 ] )
+                    coeff = int( aVariableReference[ 2 ] )
                     self.theVariableReferenceList[ i ][ 2 ] = str( stoichiometry + coeff )
                     return aVariableReference[ 0 ]
 

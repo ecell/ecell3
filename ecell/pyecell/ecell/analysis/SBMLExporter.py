@@ -36,7 +36,6 @@ __copyright__ = ''
 __license__ = ''
 
 
-import string
 import re
 from xml.dom import minidom
 
@@ -74,7 +73,7 @@ class ExpressionParser:
         expressionList = regexpr.split( expressionString )
         for c in range( 1, len( expressionList ), 2 ):
             ( bunshiName, bunboName ) \
-              = string.split( stripexpr.sub( '', expressionList[ c ] ), '/' )
+              = stripexpr.sub( '', expressionList[ c ] ).split( '/' )
 
             if self.namespaceDict.has_key( bunshiName ) \
                    and self.namespaceDict.has_key( bunboName ):
@@ -92,7 +91,7 @@ class ExpressionParser:
         regexpr = re.compile( '([a-zA-Z_][a-zA-Z0-9_]*.Value)' )
         expressionList = regexpr.split( formulaString )
         for c in range( 1, len( expressionList ), 2 ):
-            referenceName = string.replace( expressionList[ c ], '.Value', '' )
+            referenceName = expressionList[ c ].replace( '.Value', '' )
             if self.namespaceDict.has_key( referenceName ):
                 ( sbmlId, coeff ) = self.namespaceDict[ referenceName ]
                 if type( sbmlId ) == str:
@@ -108,7 +107,7 @@ class ExpressionParser:
         regexpr = re.compile( '([a-zA-Z_][a-zA-Z0-9_]*.MolarConc)' )
         expressionList = regexpr.split( formulaString )
         for c in range( 1, len( expressionList ), 2 ):
-            referenceName = string.replace( expressionList[ c ], '.MolarConc', '' )
+            referenceName = expressionList[ c ].replace( '.MolarConc', '' )
             if self.namespaceDict.has_key( referenceName ):
                 ( sbmlId, coeff ) = self.namespaceDict[ referenceName ]
                 if type( sbmlId ) == str:
@@ -122,7 +121,7 @@ class ExpressionParser:
                         self.modifierList.append( sbmlId[ 0 ] )         
 
         formulaString = ''.join( expressionList )
-        formulaString = string.replace( formulaString, 'self.getSuperSystem().SizeN_A', '( %s * %e )' % ( self.compartment, AVOGADRO_CONSTANT ) )
+        formulaString = formulaString.replace( 'self.getSuperSystem().SizeN_A', '( %s * %e )' % ( self.compartment, AVOGADRO_CONSTANT ) )
 
         regexpr = re.compile( '([a-zA-Z_][a-zA-Z0-9_]*.Value\s*\/\s*[a-zA-Z_][a-zA-Z0-9_]*.Value)' )
 
@@ -478,7 +477,7 @@ class CompartmentExporter( SBaseExporter ):
 ##                 raise SBMLConvertError, \
 ##                       'Variable [%s] has no value' % ( sizeFullIDString )
 
-                systemSize = string.atof( systemSize[ 0 ] )
+                systemSize = float( systemSize[ 0 ] )
 
         else:
             systemFullID = ecell.ecssupport.createFullID( self.fullID )
@@ -498,7 +497,7 @@ class CompartmentExporter( SBaseExporter ):
 ##                               'Variable [%s] has no value' \
 ##                               % ( outsideSizeFullIDString )
 
-                    outsideSize = string.atof( outsideSize[ 0 ] )
+                    outsideSize = float( outsideSize[ 0 ] )
                     systemSize = outsideSize
                     break
 
@@ -594,7 +593,7 @@ class SpeciesExporter( SBaseExporter ):
                           'The format of property [%s:Value] is invalid' \
                           % ( self.fullID )
 
-                value = string.atof( value[ 0 ] )
+                value = float( value[ 0 ] )
                 aSpecies.setInitialAmount( value )
 
             elif pn == 'Fixed':
@@ -679,7 +678,7 @@ class ParameterExporter( SBaseExporter ):
                           'The format of property [%s:Value] is invalid' \
                           % ( self.fullID )
 
-                value = string.atof( value[ 0 ] )
+                value = float( value[ 0 ] )
                 aParameter.setValue( value )
 
 
@@ -690,7 +689,7 @@ class ParameterExporter( SBaseExporter ):
                           'The format of property [%s:Fixed] is invalid' \
                           % ( self.fullID )
 
-                value = string.atoi( value[ 0 ] )
+                value = int( value[ 0 ] )
                 if value == 1:
                     raise SBMLConvertError, 'Property [%s:Fixed] is set as True. It cannot be converted' % ( self.fullID )
                 
@@ -843,7 +842,7 @@ class ReactionExporter( SBaseExporter ):
                           'The type of Parameter [%s:Priority] is invalid' \
                           % ( self.fullID )
 
-                value = string.atoi( value[ 0 ] )
+                value = int( value[ 0 ] )
                 if value != 0:
                     raise SBMLConvertError, 'The Parameter [%s:Priority] is not equal to 0. It cannnot be converted' % ( self.fullID )
 
@@ -853,7 +852,7 @@ class ReactionExporter( SBaseExporter ):
                     raise SBMLConvertError, \
                           'The type of Parameter [%s] is invalid' % ( pn )
 
-                value = string.atof( value[ 0 ] )
+                value = float( value[ 0 ] )
 
                 if parameterList.count( pn ) == 0:
                     aParameter = libsbml.Parameter( pn, value )
@@ -885,7 +884,7 @@ class ReactionExporter( SBaseExporter ):
 
             coeff = 0
             if len( aVariableReference ) > 2:
-                coeff = string.atoi( aVariableReference[ 2 ] )
+                coeff = int( aVariableReference[ 2 ] )
 
             ( id, sbmlType ) \
               = self.theSBMLExporter.searchIdFromFullID( fullIDString )
@@ -1018,7 +1017,7 @@ class RuleExporter( SBaseExporter ):
                           'The type of Parameter [%s:Priority] is invalid' \
                           % ( self.fullID )
 
-                value = string.atoi( value[ 0 ] )
+                value = int( value[ 0 ] )
                 if value != 0:
                     raise SBMLConvertError, 'The Parameter [%s:Priority] is not equal to 0. It cannnot be converted' % ( self.fullID )
 
@@ -1050,7 +1049,7 @@ class RuleExporter( SBaseExporter ):
 
             coeff = 0
             if len( aVariableReference ) > 2:
-                coeff = string.atoi( aVariableReference[ 2 ] )
+                coeff = int( aVariableReference[ 2 ] )
 
             ( id, sbmlType ) \
               = self.theSBMLExporter.searchIdFromFullID( fullIDString )

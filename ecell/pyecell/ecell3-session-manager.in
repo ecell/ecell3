@@ -30,7 +30,6 @@
 # Programmed by Masahiro Sugimoto <msugi@sfc.keio.ac.jp>
 
 import sys
-import string
 import getopt
 import os
 import re
@@ -184,7 +183,7 @@ def main( argv ):
             anEsmFile = anArg
         elif anOption == '-D':
             # set session-manager parameters            
-            aSplitArgList = string.split( anArg, '=' )
+            aSplitArgList = anArg.split( '=' )
             if not aSplitArgList[ 1 ]:
                 aSplitArgList[ 1 ] = 1
             try:

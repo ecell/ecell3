@@ -40,8 +40,6 @@ __license__ = ''
 
 import ecell.ECDDataFile
 
-import string
-
 import numpy.fft
 import numpy
 
@@ -128,9 +126,9 @@ class EcdSupport( ecell.ECDDataFile ):
             elif ( line[ 0 ] == '#' ):
                 continue
             else:
-                aData = string.split( line, '\t' )
-                aPreviousTime = string.atof( aData[ 0 ] )
-                aPreviousValue = string.atof( aData[ 1 ] )
+                aData = line.split( '\t' )
+                aPreviousTime = float( aData[ 0 ] )
+                aPreviousValue = float( aData[ 1 ] )
                 break
 
         if not aStartTime:
@@ -144,9 +142,9 @@ class EcdSupport( ecell.ECDDataFile ):
             if not line:
                 break
             
-            aData = string.split( line, '\t' )
-            aTime = string.atof( aData[ 0 ] )
-            aValue = string.atof( aData[ 1 ] )
+            aData = line.split( '\t' )
+            aTime = float( aData[ 0 ] )
+            aValue = float( aData[ 1 ] )
 
             if ( aTime > aPreviousTime ):
                 k = ( aValue - aPreviousValue ) / ( aTime - aPreviousTime )
@@ -192,17 +190,17 @@ class EcdSupport( ecell.ECDDataFile ):
             elif ( line[ 0 ] == '#' ):
                 continue
             else:
-                aData = string.split( line, '\t' )
+                aData = line.split( '\t' )
 
-                aTime = string.atof( aData[ 0 ] )
-                aValue = string.atof( aData[ 1 ] )
+                aTime = float( aData[ 0 ] )
+                aValue = float( aData[ 1 ] )
 
                 line = aFile.readline()
                 if not line:
                     break
-                aData = string.split( line, '\t' )
-                aPreviousTime = string.atof( aData[ 0 ] )
-                aPreviousValue = string.atof( aData[ 1 ] )
+                aData = line.split( '\t' )
+                aPreviousTime = float( aData[ 0 ] )
+                aPreviousValue = float( aData[ 1 ] )
 
                 # reverse
                 aPreviousTrend = checkTrend( aValue, aPreviousValue )
@@ -215,10 +213,10 @@ class EcdSupport( ecell.ECDDataFile ):
             if not line:
                 break
             
-            aData = string.split( line, '\t' )
+            aData = line.split( '\t' )
 
-            aTime = string.atof( aData[ 0 ] )
-            aValue = string.atof( aData[ 1 ] )
+            aTime = float( aData[ 0 ] )
+            aValue = float( aData[ 1 ] )
 
             aTrend = checkTrend( aPreviousValue, aValue )
 

@@ -15,7 +15,6 @@ __license__ = 'GPL'
 
 
 import sys
-import string
 import os
 import time
 import getopt
@@ -74,7 +73,7 @@ def expandValueList( aValue, aLevel=0 ):
 def createObjectDef( aType, aClass, anArgList, aPropertyList, anOptional='' ):
 
     # declaration line
-    anArgListString = string.join( anArgList, ',' ) 
+    anArgListString = ','.join( anArgList ) 
     aBuffer = '%s %s( %s )\n{\n' % ( aType, aClass, anArgListString )
 
     # properties
@@ -91,7 +90,7 @@ def createObjectDef( aType, aClass, anArgList, aPropertyList, anOptional='' ):
     # optional field
     if anOptional != '':
         aBuffer += '\n\t'
-        aBuffer += string.replace( anOptional, '\n', '\n\t' )
+        aBuffer += anOptional.replace( '\n', '\n\t' )
         aBuffer += '\n'
 
     aBuffer += '}\n'
@@ -163,7 +162,7 @@ def createSystemList( anEml, aSystemPath='/' ):
     if aSystemPath == '':
         aFullID = ( SYSTEM, '', '/' )
     else:
-        aLastSlash = string.rindex( aSystemPath, '/' )
+        aLastSlash = aSystemPath.rindex( '/' )
         aPath = aSystemPath[:aLastSlash+1]
         anID = aSystemPath[aLastSlash+1:]
         aFullID = ( SYSTEM, aPath, anID )

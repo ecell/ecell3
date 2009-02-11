@@ -1,7 +1,6 @@
 #!/usr/bin/env @prefix@/bin/ecell3-python
 
 import sys
-import string
 import getopt
 import code
 import os
@@ -173,7 +172,7 @@ def main():
 
         # set session parameters            
         if anOption == "-D":
-            aSplitArgList = string.split( anArg, '=' )
+            aSplitArgList = anArg.split( '=' )
 
             if not aSplitArgList[1]:
                 aSplitArgList[1] = 1

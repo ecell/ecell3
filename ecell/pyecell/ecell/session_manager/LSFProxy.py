@@ -34,7 +34,6 @@ import time
 import signal
 import re
 import popen2
-from string import *
 
 # imports ecell modules
 from ecell.session_manager.Util import *
