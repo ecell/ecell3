@@ -38,8 +38,6 @@ __copyright__ = ''
 __license__ = ''
 
 
-import string
-
 from util import RELATIVE_PERTURBATION, ABSOLUTE_PERTURBATION, allzero, createIndependentGroupList
 
 import numpy
@@ -175,7 +173,7 @@ def convertToScaled( pathwayProxy, fullPN, elasticityArray ):
 
     aSession = pathwayProxy.theEmlSupport.createSession()
     try:
-        value = string.atof( pathwayProxy.theEmlSupport.getEntityProperty( fullPN )[ -1 ] )
+        value = float( pathwayProxy.theEmlSupport.getEntityProperty( fullPN )[ -1 ] )
     except:
         value = aSession.theSimulator.getEntityProperty( fullPN )
 

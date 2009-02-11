@@ -3,7 +3,6 @@
 # Eml to Sbml converter
 
 import sys
-import string
 import os
 import types
 import getopt

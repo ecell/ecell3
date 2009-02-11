@@ -37,7 +37,6 @@ __license__ = ''
 
 
 import re
-import string
 import exceptions
 import xml.dom.minidom
 

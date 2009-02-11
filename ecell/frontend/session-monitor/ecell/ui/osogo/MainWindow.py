@@ -36,7 +36,6 @@
 
 import os
 import sys
-import string
 import traceback
 import math
 import time

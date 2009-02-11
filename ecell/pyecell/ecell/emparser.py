@@ -28,8 +28,6 @@
 
 import sys
 import os
-import string 
-import getopt
 import tempfile
 
 import ecell.eml

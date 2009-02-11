@@ -44,7 +44,6 @@ import ecell.emc
 import ecell.Session
 
 import os
-import string
 
 import numpy
 
@@ -230,7 +229,7 @@ class EmlSupport( ecell.eml.Eml ):
         '''
         '''
 
-        fullID = string.split( fullIDString, ':' )
+        fullID = fullIDString.split( ':' )
         if ( len( fullID ) == 4 ):
             self.deleteEntityProperty( fullID[ 0 ] + ':' + fullID[ 1 ] + ':' + fullID[ 2 ], fullID[ 3 ] )
             self.setEntityProperty( fullID[ 0 ] + ':'+ fullID[ 1 ] + ':' + fullID[ 2 ], fullID[ 3 ], [ '%.8e' % value ] )
