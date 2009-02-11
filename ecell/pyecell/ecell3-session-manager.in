@@ -261,7 +261,7 @@ def main( argv ):
     aSessionManager.setOptionList( optionList )
     aConsole = Console( aSessionManager,
         '''ecell3-session-manager [ E-Cell SE Version %s, on Python Version %d.%d.%d ]
-Copyright (C) 2001-2008 Keio University.
+Copyright (C) 2001-2009 Keio University.
 Copyright (C) 2005-2008 The Molecular Sciences Institute.''' % (
         ecell.ecs.getLibECSVersion(),
         sys.version_info[0], sys.version_info[1], sys.version_info[2] )
