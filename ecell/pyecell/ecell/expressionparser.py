@@ -36,7 +36,7 @@
 
 __program__ = 'expressionparser'
 __author__ = 'Tatsuya Ishida'
-__copyright__ = 'Copyright (C) 2002-2004 Keio University'
+__copyright__ = 'Copyright (C) 2002-2009 Keio University'
 __license__ = 'GPL'
 
 

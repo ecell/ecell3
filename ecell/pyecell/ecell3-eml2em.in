@@ -9,7 +9,7 @@ This program is part of E-Cell Simulation Environment Version 3.
 __program__ = 'ecell3-eml2em'
 __version__ = '0.1'
 __author__ = 'Kentarou Takahashi and Koichi Takahashi <shafi@e-cell.org>'
-__copyright__ = 'Copyright (C) 2002-2008 Keio University'
+__copyright__ = 'Copyright (C) 2002-2009 Keio University'
 __license__ = 'GPL'
 
 
