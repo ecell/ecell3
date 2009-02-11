@@ -1,3 +1,8 @@
+ecell-3.1.107RC3: 6-Feb-2009
+
+ * Eliminate usage of string module.
+
+
 ecell-3.1.107RC2: 6-Feb-2009
 
  * Fixed a bug in ecell.Session.saveLoggerData().
