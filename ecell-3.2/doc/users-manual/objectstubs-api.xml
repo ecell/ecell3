@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+
+<table pgwide='1' tocentry='1' frame='bottom' rowsep='0'>
+  <title><classname>ObjectStub</classname> classes method list</title>
+  
+  <tgroup cols="2">
+    <colspec colwidth='3*' colnum='1' colname='c1'/>
+    <colspec colnum='2' colname='c2'/>
+    <thead>
+      <row rowsep='1'>
+	<entry namest="c1" nameend='c1'><emphasis>Methods of <classname>ObjectStub</classname> classes.</emphasis></entry>
+      </row>
+
+      <row>
+	<entry>Synopsis</entry>
+	<entry>Return</entry>
+      </row>
+      <row>
+	<entry namest='c1' nameend='c2' align='left' rowsep='1'>Description</entry>	  </row>
+    </thead>
+    
+    <tbody>
+      
+      <!-- ============== Common Methods ==================== -->
+      <row>
+	<entry namest='c1' nameend='c2' align='center' rowsep='1'>Common methods of <classname>EntityStub</classname>, <classname>StepperStub</classname>, and <classname>LoggerStub</classname></entry>
+      </row>
+
+
+
+      <!-- create -->
+
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>create</methodname>()
+</synopsis></entry>
+
+	<entry><constant>None</constant></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>Create the object.  For example, if this is a
+<classname>StepperStub</classname>, it attempts to create a
+<classname>Stepper</classname> object with the name specified when this
+<classname>ObjectStub</classname> is created.</para>
+            </entry>
+      </row>
+
+      <!-- exists -->
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>exists</methodname>()
+</synopsis></entry>
+
+	<entry><type>boolean</type></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>This method returns true if the object this
+<classname>ObjectStub</classname> points to exists, or false otherwise.</para>
+            </entry>
+      </row>
+
+
+
+      <!-- getName -->
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getName</methodname>()
+</synopsis></entry>
+
+	<entry>The name as a <type>string</type></entry>
+      </row>
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>This method returns the name of the object this
+<classname>ObjectStub</classname> points to.  The name is typically a
+string identifier used inside the simulator.
+<classname>EntityStub</classname> returns a
+<emphasis>FullID</emphasis>, <classname>StepperStub</classname>
+returns a <emphasis>StepperID</emphasis>, and
+<classname>LoggerStub</classname> returns a
+<emphasis>FullPN</emphasis> the <classname>Logger</classname> is
+recording.</para>
+
+</entry>
+      </row>
+
+
+      <!-- ============ EntityStub and StepperStub Methods ============== -->
+
+      <row>
+	<entry namest='c1' nameend='c2' align='center' rowsep='1'>
+<emphasis>Methods common to <classname>EntityStub</classname> and <classname>StepperStub</classname></emphasis></entry>
+      </row>
+
+      <!-- getClassname -->
+
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getClassName</methodname>()
+</synopsis></entry>
+
+	<entry>The classname as a string</entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>This method can be used to get the classname of the
+<classname>Entity</classname> or the <classname>Stepper</classname>.</para>
+            </entry>
+      </row>
+
+      <!-- getProperty -->
+
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getProperty</methodname>( <parameter>propertyname</parameter> )
+</synopsis></entry>
+
+	<entry>A property value as one of <type>int</type>, <type>float</type>, <type>string</type>, or a Python <type>tuple</type> of these types mixed.</entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>This method returns a value of the <classname>Entity</classname> or the <classname>Stepper</classname>
+object's property of name <parameter>propertyname</parameter>.</para>
+
+<para>The value can be either an <type>int</type>, a
+<type>float</type>, a <type>string</type>, or a <type>tuple</type> of
+these types mixed.  The <type>tuple</type> can be nested.</para>
+
+
+<para>This method is also available via <methodname>__getitem__</methodname> special method, which means that;
+
+	      <programlisting>value = stub.getProperty( propertyname )</programlisting>
+and
+	      <programlisting>value = stub[ propertyname ]</programlisting>
+
+have the same consequence.
+</para>
+
+
+</entry>
+      </row>
+
+      <!-- getPropertyAttributes -->
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getPropertyAttributes</methodname>( <parameter>propertyname</parameter> )
+</synopsis>
+            </entry>
+
+	<entry>Attributes as a Python tuple.</entry>
+
+      </row>
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>This method returns property attributes of the property named
+<parameter>propertyname</parameter> as a Python <type>tuple</type>.
+Currently the contents of the <type>tuple</type> is a pair of boolean
+values which mean ( <emphasis>setable</emphasis>,
+<emphasis>getable</emphasis> ).  For example, if you get a tuple (
+<emphasis>false</emphasis>, <emphasis>true</emphasis> ), the property
+is read-only.</para>
+
+<para>Attempts to set a value to a read-only propertiy and to
+get a value from a write-only property raise exceptions.</para>
+</entry>
+
+      </row>
+
+      <!-- getPropertyList -->
+
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getPropertyList</methodname>()
+</synopsis></entry>
+
+	<entry>Names of properties of the
+	<classname>Entity</classname> or the
+	<classname>Stepper</classname> as a Python tuple.</entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+This method is used to get the list of all the properties of the
+<classname>Entity</classname> or the <classname>Stepper</classname> object.
+</entry>
+      </row>
+
+
+
+      <!-- setProperty -->
+
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>setProperty</methodname>( <parameter>propertyname</parameter>, <parameter>value</parameter> )
+</synopsis></entry>
+
+	<entry><constant>None</constant></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>Set the property <parameter>propertyname</parameter> of the
+<classname>Entity</classname> or <classname>Stepper</classname> object
+to <parameter>value</parameter>.  </para>
+
+<para>The <parameter>value</parameter> can be an object of one of
+<type>int</type>, <type>float</type>, <type>string</type>, a
+Python <type>tuple</type>, or a Python <type>list</type>.  
+These types can be mixed in the sequence types.</para>
+
+<para>This method can be used via <methodname>__setitem__</methodname>
+special method.  That is;
+
+	      <programlisting>stub.setProperty( propertyname, value )</programlisting>
+and
+	      <programlisting>stub[ propertyname ] = value</programlisting>
+
+are equivalent.
+
+</para>
+
+            </entry>
+      </row>
+
+      <!-- ============ LoggerStub Methods ============== -->
+
+      <row>
+	<entry namest='c1' nameend='c2' align='center' rowsep='1'>
+<emphasis>Methods available only in <classname>LoggerStub</classname></emphasis></entry>
+      </row>
+
+      <!-- getData -->
+
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getData</methodname>( <optional><parameter>starttime</parameter></optional>, <optional><parameter>endtime</parameter></optional>, <optional><parameter>interval</parameter></optional>  )
+</synopsis></entry>
+
+	<entry>A Numeric <classname>array</classname></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>This method is used get the data of the
+<classname>Logger</classname>.  Returned data is a rank-2
+<classname>array</classname> object of Numeric Python.  Each row of
+the data can be either a 5-tuple or a 2-tuple.  A row of the data
+represents a logged data point or a logged time inteval.
+The 5-tuple format has the following form: (
+<emphasis>time</emphasis>, <emphasis>value</emphasis>,
+<emphasis>average</emphasis>, <emphasis>min</emphasis>,
+<emphasis>max</emphasis> ), and the 2-tuple format has the form of:
+( <emphasis>time</emphasis>, <emphasis>value</emphasis> ).
+<emphasis>time</emphasis> is the
+time when the last data point is logged,
+<emphasis>value</emphasis> is the value of the last data logged
+in this data interval, <emphasis>average</emphasis> is an
+weighted average of the value of this data interval ignoring
+zero-intervals, and <emphasis>min</emphasis> and
+<emphasis>max</emphasis> are the minimum and the maximum values in this data
+interval.  The data interval is either an aggregation of data points
+or a data point. (see <methodname>setMinimumInterval</methodname>()
+for data point aggregation.)  If the data aggregation is disabled,
+<emphasis>average</emphasis>, <emphasis>min</emphasis>, and
+<emphasis>max</emphasis> have the same value as
+<emphasis>value</emphasis> in the 5-tuple data format.</para>
+
+<para>If this method is called without an argument,
+(i.e. <literal>getData()</literal> ), it returns whole data stored in the
+<classname>Logger</classname>.</para>
+
+<para>If this method is called only with
+<parameter>starttime</parameter>, (i.e. <literal>getData(
+starttime )</literal> ), it returns a slice of the data at and after
+<parameter>starttime</parameter>.</para>
+
+<para>If this method is called with <parameter>starttime</parameter>
+and <parameter>endtime</parameter>, (i.e. <literal>getData(
+starttime, endtime )</literal> ), it returns a slice of the data
+in an interval [ <parameter>starttime</parameter>,
+<parameter>endtime</parameter> ].</para>
+
+<para>If this method is called with all the optional parameters
+<parameter>starttime</parameter>, <parameter>endtime</parameter> and
+<parameter>interval</parameter>, (i.e. <literal>getData( starttime,
+endtime, interval )</literal> ), it returns a slice of the data in an
+interval [ <parameter>starttime</parameter>,
+<parameter>endtime</parameter> ].  It omits a data interval
+<literal>d(n)</literal> if <literal>|d(n-1)-d(n+1)| >
+<parameter>interval</parameter></literal>.  Be careful about using
+this feature because the returned data can differ even with the same
+<parameter>interval</parameter>, if <parameter>starttime</parameter> is
+different.  Therefore this is not suitable for
+scientific data analysis, but can be useful for real-time GUI
+frontends.</para>
+
+            </entry>
+      </row>
+
+
+      <!-- getStartTime -->
+
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getStartTime</methodname>()
+</synopsis></entry>
+
+	<entry>A <type>float</type></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>This method returns the time when the
+<classname>Logger</classname> is created, or the time the first data
+is logged by the <classname>Logger</classname>, either one later.
+Usually these two times are the same.</para>
+
+            </entry>
+      </row>
+
+
+      <!-- getEndTime -->
+
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getStartTime</methodname>()
+</synopsis></entry>
+
+	<entry>A <type>float</type></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>This method returns the last time when data is appended to the
+<classname>Logger</classname>.</para>
+            </entry>
+      </row>
+
+
+
+      <!-- getSize -->
+
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getSize</methodname>()
+</synopsis></entry>
+
+	<entry>A <type>float</type></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>This method is used to get the number of data points this
+<classname>Logger</classname>.</para>
+            </entry>
+      </row>
+
+
+      <!-- getMinimumInterval -->
+
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>getMinimumInterval</methodname>()
+</synopsis></entry>
+
+	<entry>A <type>float</type></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>Get the current minimum logging interval of the
+<classname>Logger</classname> object.</para>
+
+<para>See <methodname>setMinimumInterval</methodname>.</para>
+            </entry>
+      </row>
+
+
+      <!-- setMinimumInterval -->
+
+      <row>
+	<entry namest='c1' nameend='c1' align='left'>
+<synopsis><methodname>setMinimumInterval</methodname>( <parameter>interval</parameter> )
+</synopsis></entry>
+
+	<entry><constant>None</constant></entry>
+      </row>
+
+      <row>
+	<entry namest="c1" nameend='c2' rowsep='1'>
+<para>
+
+</para>
+
+<para>The <parameter>interval</parameter> must be a zero or positive
+real number.</para>
+
+<para>If zero is set, the <classname>Logger</classname> logs data at
+every simulation step.  In this case data point aggregation is
+disabled.</para>
+
+<para>If a positive number is set, the <classname>Logger</classname>
+can perform datapoint aggregation logging interval is shorter than the
+specified <parameter>interval</parameter>. (FIXME: need to explain
+more about datapoint aggregation.)</para>
+
+            </entry>
+      </row>
+
+
+
+
+    </tbody>
+
+  </tgroup>
+</table>
+
+
+<!--
+Local Variables:
+mode: sgml
+sgml-parent-document: ("writing-ecs.xml" "sect2" "table")
+End:
+-->

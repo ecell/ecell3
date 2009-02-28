@@ -1,0 +1,83 @@
+AC_REVISION([$Id$])
+dnl
+AC_INIT(dmcompile.in)
+dnl AC_CONFIG_AUX_DIR()
+dnl
+dnl dummy
+AC_CONFIG_HEADER( config.h )
+dnl
+dnl 
+AC_CANONICAL_SYSTEM
+AM_INIT_AUTOMAKE(dmtool,0.1)
+AC_PROG_MAKE_SET
+AC_CHECK_PROGS(BASENAME,basename)
+if test -z $BASENAME ; then
+  AC_MSG_ERROR([basename command not found.])
+fi
+dnl
+AC_PROG_CXX
+
+dnl
+dnl AM_PATH_PYTHON(2.2)
+dnl AC_SUBST(PYTHON)
+#AM_CHECK_PYTHON_HEADERS()
+dnl
+ 
+dnl
+AC_PROG_LIBTOOL
+dnl
+dnl
+dnl Read the libtool configuration
+rm -f conftest
+./libtool --config > conftest
+. ./conftest
+rm -f conftest
+dnl
+dnl compatibility for libtool 1.5.6
+LTDL_SHLIB_EXT=""
+if test -n "$shrext_cmds"; then
+    module=yes eval LTDL_SHLIB_EXT=\"$shrext_cmds\"
+    AC_SUBST(LTDL_SHLIB_EXT)
+dnl compatibility for libtool 1.5.0
+elif test -n "$shrext"; then
+    LTDL_SHLIB_EXT=$shrext
+    AC_SUBST(LTDL_SHLIB_EXT)
+dnl compatibility for libtool 1.4.x
+else
+  AC_CACHE_CHECK([which extension is used for shared libraries],
+    libltdl_cv_shlibext, [dnl
+  (
+    last=
+    for spec in $library_names_spec; do
+      last="$spec"
+    done
+  changequote(, )
+    echo "$last" | sed 's/\[.*\]//;s/^[^.]*//;s/\$.*$//;s/\.$//' > conftest
+  changequote([, ])
+  )
+  libltdl_cv_shlibext=`cat conftest`
+  rm -f conftest
+  ])
+  if test -n "$libltdl_cv_shlibext"; then
+    case ${host_os} in
+      *cygwin* | *mingw* | *win32*)
+      LTDL_SHLIB_EXT=".dll"
+      ;;
+    *)
+      LTDL_SHLIB_EXT=$libltdl_cv_shlibext
+      ;;
+    esac    
+    AC_SUBST(LTDL_SHLIB_EXT)
+  fi
+fi
+dnl
+dnl
+dnl
+dnl AM_CONFIG_HEADER(config.h)
+dnl
+dnl Create the top-level Makefile.
+dnl
+AC_CONFIG_FILES(dmcompile, [chmod +x dmcompile])
+AC_CONFIG_FILES(Makefile)
+AC_OUTPUT
+

@@ -1,0 +1,68 @@
+AC_REVISION([$Id$])
+AC_INIT([ecell], [@ECELL_VERSION_NUMBER@])
+AC_CONFIG_SRCDIR([autogen.sh])
+
+AC_CANONICAL_TARGET([])
+AM_INIT_AUTOMAKE([filename-length-max=255 tar-ustar dist-bzip2])
+AC_PROG_MAKE_SET
+
+AC_LIBLTDL_CONVENIENCE
+AC_SUBST(INCLTDL)
+AC_SUBST(LIBLTDL)
+AC_LIBTOOL_DLOPEN
+AC_PROG_LIBTOOL
+
+AC_CONFIG_SUBDIRS([libltdl dmtool ecell])
+
+AC_ARG_ENABLE([gui],
+  AC_HELP_STRING([--disable-gui],
+                 [build ecell without gui frontends.]), [],
+  [enable_gui=yes]
+)
+AC_ARG_WITH([numpy-includes],
+  AC_HELP_STRING([--with-numpy-includes=DIR],
+                 [specify the numpy header location]),,)
+
+AC_ARG_ENABLE([compiler-extensions],
+  AC_HELP_STRING([--disable-compiler-extensions],
+                 [Don't exploit the compiler's special language syntax and optimizations that are not part of the standard (such as ISO C++).]))
+
+AM_CONFIG_HEADER(ecell3_config.h)
+
+AC_CHECK_TOOL([DB2HTML], [db2html])
+AC_CHECK_TOOL([DB2PDF], [db2pdf])
+AC_CHECK_TOOL([DB2PS], [db2ps])
+AC_CHECK_TOOL([DB2DVI], [db2dvi])
+AC_CHECK_TOOL([DOXYGEN], [doxygen])
+AC_CHECK_TOOL([DOT], [dot])
+
+HAVE_DOT="no"
+if test ! -z "$DOT"; then
+    HAVE_DOT="yes"
+fi
+AC_SUBST([HAVE_DOT])
+
+AM_CONDITIONAL([BUILD_USERS_MANUAL_html], [test ! -z "$DB2HTML"])
+AM_CONDITIONAL([BUILD_USERS_MANUAL_pdf], [test ! -z "$DB2PDF"])
+AM_CONDITIONAL([BUILD_USERS_MANUAL_ps], [test ! -z "$DB2PS"])
+AM_CONDITIONAL([BUILD_USERS_MANUAL_dvi], [test ! -z "$DB2DVI"])
+AM_CONDITIONAL([BUILD_API_REF_html], [test ! -z "$DOXYGEN"])
+
+dnl
+dnl Create the top-level Makefile.
+dnl
+AC_CONFIG_FILES([
+Makefile
+doc/Makefile
+doc/samples/Makefile
+doc/users-manual/Makefile
+osdep/Makefile
+osdep/win32/Makefile
+build/Makefile
+build/msvc/Makefile
+build/msvc/dm/Makefile
+doc/ecell3.doxy
+doc/users-manual/info.ent
+])
+dnl
+AC_OUTPUT

@@ -1,0 +1,335 @@
+ecell-3.2: ?-Nov-2008
+ 
+ * A few cosmetic changes
+   - Fixed indent / coding style.
+
+   - Fixe doxygen comments.
+
+   - Removed $...$ placeholders as they may contain localized characters
+     which are troublesome in VC++.
+
+ * dmtool changes
+
+   - ModuleMaker class is removed and StaticModuleMaker<> template class is
+     renamed to ModuleMaker<>.
+
+   - Added SharedModuleMakerBase class that is the base class of
+     SharedModuleMaker<> template classes.  Initialization and finalization
+     static methods are moved from ModuleMaker to it.
+
+   - SharedModuleMakerBase provides a couple of instance methods,
+     setSearchPath() and getSearchPath() which sets or gets the path used when.
+     looking up for a shared module.
+
+   - Purged SharedDynamicModule and SharedModuleMaker into
+     SharedDynamicModule.hpp and SharedModuleMaker.hpp respectively, in order
+     to remove unwanted dependencies on libltdl.
+
+ * libecs changes
+
+   - Thoroughly overhauled DM/PropertiedClass ABI. Backwards binary
+     compatibility was lost.
+
+     - Added DynamicModuleDescriptor class that is defined per one dynamic
+       module, and retains the information and a few set of fucntion pointers
+       that are required to instantiate the module.
+
+     - Added DynamicModuleInfo interface by which the meta-information
+       regarding the dynamic module can be retrieved.
+
+     - <AnyDMObject>::getClassInfo() now returns the PropertyInterface instead
+       of synthesized Polymorph map.
+
+     - PropertyInterface class is now a subclass of DynamicModuleInfo.
+
+     - PropertyInterface objects are now initialized from within the associated
+       ModuleMaker's rather than by the static initializers.
+
+     - Removed PropertyInterface::getPropertyList().
+
+     - Added PropertyInterface::getPropertyAttributes() that can be used in
+       place of PropertyInterface::getInfoMap().
+
+     - Renamed PropertySlotProxy to Accesor and ConcretePropertySlotProxy to
+       PropertySlotAccessor. PropertyInterface::createPropertySlotProxy()
+       is renamed to createAccessor() accordingly.
+
+     - Changed the signature of EcsObject::defaultGetPropertyList() so that it
+       returns a StringList by value, not by reference.
+
+     - Added the virtual EcsObject::asString() that provides the description of
+       the instance. 
+
+     - Virtual function definitions are move from LIBECS_DM_OBJECT to
+       LIBECS_DM_INIT_STATIC. This means the vtables and typeinfo entries for
+       the base classes of a DM class are no longer instantiated within the
+       compilation unit of that class, and this may lead to module load failure
+       because of unresolved symbols unless you have explicity linked the
+       resulting DM to the objects of the bases, or you have LIBECS_DM_INIT
+       defined for the bases.
+
+   - SystemPath::getString(), FullID::getString(), FullPN::getString() and
+     EntityType::getString() are deprecated. Use SystemPath::asString(),
+     FullID::asString(), FullPN::asString(), EntityType::asString() instead.
+
+   - Made Process::setVariableReference() only accept VariableReference
+     instead of scatterd arguments for consistency with getVariableReference().
+
+   - ExpressionCompiler was moved from ecell/dm to ecell/libecs/scripting.
+
+   - Added deleteStepper() to Model.
+
+   - Entiy:
+
+     - Removed getFullIDString() from Entity.
+
+     - Added asString() to Entity.
+
+   - Procss:
+
+     - Process::registerVariableReference() was changed to have the same
+       signature as the previous version of Process::setVariableReference().
+
+   - System:
+
+     - System's registerProcess(), registerVariable() and registerSystem() were
+       renamed into a single overloaded function System::registerEntity(). 
+
+     - Added unregisterEntity() to System.
+
+   - Stepper:
+
+     - Renamed Stepper's removeSystem() and removeProcess() to
+       unregisterSystem() and unregisterProcess() respectively.
+
+   - Logger:
+
+     - Removed setAvg() / setMin() / setMax() from DataPoint.
+
+     - Added Logger::Policy class and remove methods that accept polymorph
+       tuples that contain the policy information.
+
+     - Remove LoggerBroker::setModel() in favor of dependency injection in
+       initialization.
+
+   - DM search paths are now model specific. Remove setDMSearchPath() and
+     getDMSearchpath() and introduce Model::setDMSearchPath() and
+     Model::getDMSearchPath() respectively.
+
+   - Polymorph
+
+     - Polymorph got de-virtualated (TM) and refcounted for the sake of
+       efficiency. Removed ConcretePolymorphValue and PolymorphNoneValue
+       accordingly.
+
+     - Polymorph was modified to accept boost::tuple<> and const char *.
+
+     - enum Polymorph::Type was moved to PolymorphValue.
+
+     - Neither PolymorphVector nor String is a containment type of Polymorph
+       any longer due to introduction of Tuple and RawString types that are
+       internally used in PolymorphValue.
+
+     - Deprecated Polymorph::asTYPE().
+
+   - Removed obsolute CompartmentSystem and FluxProcess.
+
+ * libemc changes.
+
+   - Rename Simulator::isEntityExist() to Simulator::entityExists().
+
+   - Remove Simulator::getLoggerMinimumInterval() and
+
+   - Simulator::setLoggerMinimumInterval() in favor of setLoggerPolicy().
+
+
+ * pyecell changes
+
+   - ecell._ecs.Simulator.getLoggerData() now returns
+     ecell._ecs.DataPointSharedVector instead of
+     numpy.core.multiarray.array(). The object can be safely fed to numpy
+     functions as if it was of numpy arrays thanks to numpy's flexible array
+     interface.  This enables zero-copy retrieval of logger data from libecs
+     and significantly enhances the speed.
+
+   - New classes:
+     - ecell._ecs.Logger
+     - ecell._ecs.LoggerPolicy
+     - ecell._ecs.PropertyAttributes
+
+   - ecell._ecs.Simulator.setEventChecker() was removed as per the dismissal of
+     the concept of event checker.  Instead, an event handler must return a
+     boolean value that indicates if more events have to be handled.
+
+   - ecell._ecs.Simulator.DMSearchPathSeparator was renamed to
+     DM_SEARCH_PATH_SEPARATOR and changed to be a class property.
+
+   - Added two class constants ELLIPSIS and ELLIPSIS_PREFIX to
+     ecell._ecs.Simulator.
+
+
+ecell-3.1.107RC1: 5-Feb-2009
+
+ * Reorganized the source tree structure.
+
+   - Integrated pyecs into pyecell.
+
+   - Merged ecell.emc into ecell.ecs to avoid static initializer weirdness in
+     some platform (including Mac OS X).
+
+   - Two GUI frontends (session-monitor and model-editor) were renewed to be
+     two packages of python modules, ecell.ui.osogo and ecell.ui.model_editor.
+
+ * pyecell changes
+
+   - Moved GtkSessionMonitor to ecell.ui.osogo.GtkSessionMonitor that resides
+     in ecell/frontend/session_manager
+
+   - Renamed ecell.SessionManager to ecell.session_manager.
+
+   - Removed the following constants from ecell.ecs_constants.
+
+     - TRUE
+     - FALSE
+
+
+ecell-3.1.106: 5-Feb-2008
+
+  * class PropertySlotProxyLoggerAdapter was decoupled from PropertySlot.hpp
+    to the separate file, PropertySlotProxyLoggerAdapter.hpp in order not to
+    incorporate various concerns in a single file.
+
+  * A number of leaks were plugged. Note that a few other leaks involved in
+    property interfaces are still active in this release on purpose to
+    maintain binary compatibility with older releases. The fix was already
+    established and will be in the next release.
+
+  * Visual Studio build files (build/msvc/*.vcproj) were updated so it can
+    cross-build 64-bit binaries.
+
+  * PythonProcess and PythonFluxProcess now don't require that python
+    interpreter be already initialized.
+
+  * model-editor no longer depends on Python for Windows Extension.
+    Now the win32 / win64 native builds require Python 2.4 or later.
+
+
+ecell-3.1.106RC2: 24-Dec-2007
+
+  * Avoided resetting LD_LIBRARY_PATH in ecell-python for the sake of
+    inter-platform operability. This was also problematic in combination within
+    multiple ldconfig paths.
+
+  * Fixed sample installation rule so that samples would get installed in
+    sample-per-directory manner.
+
+  * Fixed configure scripts for dmtool and dynamic modules so that modules they
+    produce would have right extensions that follows the libltdl's convention.
+
+
+ecell-3.1.106RC1: 14-Dec-2007
+
+  * Updated bundled libtool script for better compatibility with MacOSX and
+    similar systems.
+
+  * The users manual is now bundled in the distribution.
+
+  * Improved dynamic priority queue.
+
+  * Support for the newest NumPy release in ecell.Analysis.
+
+  * Numerous minor bugfixes.
+
+  * Added two new functions, libecs::initialize() and libecs::finalize().
+    Those functions need to be called before using the simulation kernel or
+    after finished up with it respectively. Users don't have to take care of
+    this change as long as they are using E-Cell through the Python frontends
+    as these functions are automatically called on start-up and clean-up
+    of pyecs module.
+
+
+ecell-3.1.105: 19-Sep-2005
+
+
+ecell-3.1.103: 17-Jan-2005
+
+
+ecell-3.1.102: 27-May-2004
+
+
+ecell-3.1.101: 10-Apr-2004
+
+
+ecell-3.1.100: 31-Dec-2003
+
+
+ecell-3.1.99: 10-Oct-2003
+
+
+ecell-3.1.98: 5-Sep-2003
+
+
+ecell-3.1.97: 17-Aug-2003 
+
+
+ecell-3.1.96: 15-Jul-2003
+
+
+ecell-3.1.94: 14-Apr-2003
+
+
+ecell-3.1.93: 31-Mar-2003
+
+
+ecell-3.1.92: 16-Mar-2003
+
+
+ecell-3.1.91: 9-Mar-2003
+
+
+ecell-3.1.90: 3-Mar-2003
+
+
+ecell-3.1.6:  22-Feb-2003
+
+
+ecell-3.1.5:  8-Feb-2003
+
+
+ecell-3.1.4:  31-Jan-2003
+
+
+ecell-3.1.3:  26-Jan-2003
+
+
+ecell-3.1.2:  26-Dec-2002
+
+
+ecell-3.1.1:  10-Dec-2002
+
+
+ecell-3.1.0:  18-Oct-2002
+
+
+ecell-3.0.4:  25-Jun-2002
+
+
+ecell-3.0.3:  2-Jun-2002
+
+
+ecell-3.0.2:  14-May-2002
+
+
+ecell-3.0.1:  30-Apr-2002
+
+
+ecell-3.0.0:  16-Apr-2002
+
+
+ecell-3.0.0a2:  31-Jan-2002
+
+       - second snapshot release
+
+ecell-3.0a1:  28-Sep-2001
+
+       - first snapshot release

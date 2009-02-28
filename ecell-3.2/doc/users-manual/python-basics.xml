@@ -1,0 +1,43 @@
+<!-- ============== Python Basics for E-Cell Users ============ -->
+<appendix id="python-basics">
+    <title>Python Basics for E-Cell Users</title>
+    
+     <para>In Python, setting values of variables is a very simple job
+        as in most other languages.  For example, to set a string to a
+        variable, use single quotes:
+
+<informalexample>
+	  <programlisting>CLASSNAME = 'NuclearFusionProcess'</programlisting>
+	</informalexample>
+      </para>
+
+      <para>Numbers doesn't need the quotation:
+
+      <informalexample>
+	  <programlisting>FOOVAR = 3.11</programlisting>
+	</informalexample>
+</para>
+      <para>
+      To set a multiple line string, use triple quotes:
+
+
+      <informalexample>
+	  <programlisting>
+DESCRIPTION = ''' 
+some
+multi-line
+description.
+'''</programlisting>
+	</informalexample>
+
+        </para>
+
+
+</appendix>
+
+<!--
+Local Variables:
+mode: sgml
+sgml-parent-document: ("users-manual.xml" "book" "appendix")
+End:
+-->

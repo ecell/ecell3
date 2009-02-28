@@ -1,0 +1,15 @@
+#!/usr/bin/env ecell3-python
+
+import os
+import sys
+import string
+
+import ecell.ecs
+import ecell.config
+
+import ecell.ui.osogo.opengui as opengui
+try:
+    opengui.main()
+except KeyboardInterrupt:
+    sys.exit(1)
+
