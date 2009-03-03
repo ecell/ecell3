@@ -84,12 +84,12 @@ class GtkSessionMonitor(Session):
         theDefaultIniFileName = os.path.join( conf_dir, 'osogo.ini' )
         if not os.path.isfile( self.theIniFileName ):
             # get from default
-               self.theConfigDB.read( theDefaultIniFileName )
+            self.theConfigDB.read( theDefaultIniFileName )
             # try to write into home dir
-               self.saveParameters()
+            self.saveParameters()
         else:
             # read from default
-               self.theConfigDB.read(self.theIniFileName)
+            self.theConfigDB.read(self.theIniFileName)
 
 
         self.theUpdateInterval = 150
