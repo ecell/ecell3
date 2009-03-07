@@ -94,15 +94,38 @@ ODEStepper::ODEStepper()
 
 ODEStepper::~ODEStepper()
 {
-  gsl_matrix_free( theJacobianMatrix1 );
-  gsl_permutation_free( thePermutation1 );
-  gsl_vector_free( theVelocityVector1 );
-  gsl_vector_free( theSolutionVector1 );
-  
-  gsl_matrix_complex_free( theJacobianMatrix2 );
-  gsl_permutation_free( thePermutation2 );
-  gsl_vector_complex_free( theVelocityVector2 );
-  gsl_vector_complex_free( theSolutionVector2 );
+  if ( theJacobianMatrix1 )
+  {
+    gsl_matrix_free( theJacobianMatrix1 );
+  }
+  if ( thePermutation1 )
+  {
+    gsl_permutation_free( thePermutation1 );
+  }
+  if ( theVelocityVector1 )
+  {
+    gsl_vector_free( theVelocityVector1 );
+  }
+  if ( theSolutionVector1 )
+  {
+    gsl_vector_free( theSolutionVector1 );
+  }
+  if ( theJacobianMatrix2 )
+  {
+    gsl_matrix_complex_free( theJacobianMatrix2 );
+  }
+  if ( thePermutation2 )
+  {
+    gsl_permutation_free( thePermutation2 );
+  }
+  if ( theVelocityVector2 ) 
+  {
+    gsl_vector_complex_free( theVelocityVector2 );
+  }
+  if ( theSolutionVector2 )
+  {
+    gsl_vector_complex_free( theSolutionVector2 );
+  }
 }
 
 void ODEStepper::initialize()
