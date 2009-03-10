@@ -31,6 +31,7 @@ import re
 import numpy as nu
 import gtk
 import gtk.gdk
+import pango
 import gobject
 
 from ecell.ecssupport import *
@@ -146,7 +147,7 @@ class Axis:
         if self.theOrientation == PLOT_HORIZONTAL_AXIS:
             self.theLength = self.theParent.thePlotArea[2]
             self.theBoundingBox =  [ 0, self.theParent.theOrigo[1] + 1, self.theParent.thePlotWidth, 
-                                    10 + self.theParent.theAscent + self.theParent.theDescent ]
+                                    10 + self.theParent.theFontHeight ]
             self.theMaxTicks = int( self.theParent.thePlotWidth / 100 )
             self.theMeasureLabelPosition = [ self.theParent.thePlotAreaBox[2] , self.theBoundingBox[1] + self.theBoundingBox[3]-3 ]
         else:
@@ -171,13 +172,19 @@ class Axis:
             text = num_to_sci(num)
             x = self.convertNumToCoord( num )
             y = self.theParent.theOrigo[1] + 10
-            self.theParent.drawText( PEN_COLOR, x - self.theParent.theFont.string_width( str(text) ) / 2, y, text )
+            layout = pango.Layout( self.theParent.theWidget.get_pango_context() )
+            layout.set_text( text )
+            width, height = layout.get_pixel_size()
+            self.theParent.drawText( PEN_COLOR, x - width / 2, y, text )
             self.theParent.drawLine( PEN_COLOR, x, self.theParent.theOrigo[1], x, self.theParent.theOrigo[1] + 5 )
         else:
             text = num_to_sci(num)
-            x = self.theParent.theOrigo[0] - 5 - self.theParent.theFont.string_width(text)
+            layout = pango.Layout( self.theParent.theWidget.get_pango_context() )
+            layout.set_text( text )
+            width, height = layout.get_pixel_size()
+            x = self.theParent.theOrigo[0] - 5 - width
             y = self.convertNumToCoord( num )
-            self.theParent.drawText( PEN_COLOR, x, y-7, text )
+            self.theParent.drawText( PEN_COLOR, x, y - 7, text )
             self.theParent.drawLine( PEN_COLOR, self.theParent.theOrigo[0] - 5, y, self.theParent.theOrigo[0], y )
 
 
@@ -440,7 +447,10 @@ class Axis:
 
         # delete x area
         if self.theOrientation == PLOT_HORIZONTAL_AXIS:
-            textLength = self.theParent.theFont.string_width( self.theMeasureLabel )
+            layout = pango.Layout( self.theParent.theWidget.get_pango_context() )
+            layout.set_text( self.theMeasureLabel )
+            textLength, height = layout.get_pixel_size()
+
             self.theParent.drawBox(BACKGROUND_COLOR, self.theMeasureLabelPosition[0] - 200, 
                 self.theMeasureLabelPosition[1], 200, 20)
 
@@ -806,9 +816,10 @@ class Plot:
         self.theGCColorMap[ PLOTAREA_COLOR ] = self.getGC( PLOTAREA_COLOR )
 
         self.theStyle=self.theWidget.get_style()
-        self.theFont=gtk.gdk.font_from_description(self.theStyle.font_desc)
-        self.theAscent=self.theFont.ascent
-        self.theDescent=self.theFont.descent
+        pctx = self.theWidget.get_pango_context()
+        self.theFont = pctx.load_font( self.theStyle.font_desc )
+        metrics = self.theFont.get_metrics()
+        self.theFontHeight = pango.PIXELS( metrics.get_ascent() + metrics.get_descent() )
         self.thePixmapBuffer=gtk.gdk.Pixmap(self.theRoot.window,self.thePlotWidth,self.thePlotHeight,-1)
         self.theSecondaryBuffer=gtk.gdk.Pixmap(self.theRoot.window,self.thePlotWidth,self.thePlotHeight,-1)
 
@@ -1063,10 +1074,12 @@ class Plot:
         self.thePlotAreaBox=[self.thePlotArea[0],self.thePlotArea[1],\
             self.thePlotArea[2]+self.thePlotArea[0],\
             self.thePlotArea[3]+self.thePlotArea[1]]
-        fontHeight = self.theAscent + self.theDescent
-        self.persistentCoordArea = [200, 5, self.thePlotWidth / 2 - 100, fontHeight ]
-        self.temporaryCoordArea = [ 100 + self.thePlotWidth / 2 , 5, self.thePlotWidth / 2 -100, fontHeight ]
-        self.historyArea = [ 5, self.thePlotHeight - fontHeight, self.theFont.string_width( MODE_HISTORY ), fontHeight ]
+        self.persistentCoordArea = [200, 5, self.thePlotWidth / 2 - 100, self.theFontHeight ]
+        self.temporaryCoordArea = [ 100 + self.thePlotWidth / 2 , 5, self.thePlotWidth / 2 -100, self.theFontHeight ]
+        layout = pango.Layout( self.theWidget.get_pango_context() )
+        layout.set_text( MODE_HISTORY )
+        width, height = layout.get_pixel_size()
+        self.historyArea = [ 5, self.thePlotHeight - self.theFontHeight, width, self.theFontHeight ]
         self.theXAxis.recalculateSize()
         self.theYAxis.recalculateSize()
 
@@ -1147,10 +1160,14 @@ class Plot:
         self.theWidget.queue_draw_area(int(x0),int(y0),int(x1),int(y1))
 
     def drawText(self,aColor,x0,y0,text):
-            t=str(text)
-            self.thePixmapBuffer.draw_text(self.theFont,self.theGCColorMap[aColor],int(x0),int(y0+self.theAscent),t)
-            self.theWidget.queue_draw_area(int(x0),int(y0),self.theFont.string_width(t),self.theAscent+self.theDescent)
-
+        layout = pango.Layout( self.theWidget.get_pango_context() )
+        layout.set_text( text )
+        self.thePixmapBuffer.draw_layout(
+            self.theGCColorMap[aColor], int( x0 ), int( y0 ), layout
+            )
+        width, height = layout.get_pixel_size()
+        self.theWidget.queue_draw_area(
+            int( x0 ), int( y0 ), width, height )
 
     def shiftPlot( self ):
         halfPoint =  self.theRanges[3] - int( self.theStripInterval / 2 ) 
@@ -1407,7 +1424,7 @@ class Plot:
         #FIXME goes to 2ndary layer
         if self.isControlShown:
             return
-        textShift = self.theAscent + self.theDescent + 5
+        textShift = self.theFontHeight
         seriesCount = self.getSeriesCount()
         if seriesCount == 0:
             return
