@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Run this to generate all the initial makefiles, etc.
 # This was lifted from the Gimp, and adapted slightly by
 # Raph Levien .
@@ -43,7 +43,11 @@ esac
 
 for dir in . libltdl dmtool ecell
   do 
-  top_srcdir=`echo $dir | sed -e 's#\([^./][^/]*\|\.[^/][^/]*\)\(/\|$\)#..\2#g'`
+  if echo | sed -E 2>/dev/null; then
+    top_srcdir=`echo $dir | sed -E -e 's#([^./][^/]*|.[^/][^/]*)(/|$)#..\2#g'`
+  else
+    top_srcdir=`echo $dir | sed -e 's#\([^./][^/]*\|\.[^/][^/]*\)\(/\|$\)#..\2#g'`
+  fi
   echo -n "Running autotools for $dir ... "
   (cd $dir; \
   { if [ -r configure.ac.in ]; then echo -n 'configure.ac ' && sed -e "s/@ECELL_VERSION_NUMBER@/$ECELL_VERSION_NUMBER/g" configure.ac.in > configure.ac; fi } && \
