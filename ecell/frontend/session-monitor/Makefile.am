@@ -52,4 +52,4 @@ mostlyclean-local:
 	rm -rf build
 
 install-exec-local:
-	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) $(if $(DESTDIR),--root $(DESTDIR), )
+	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) --install-scripts=$(bindir) $(if $(DESTDIR),--root $(DESTDIR), )
