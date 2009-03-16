@@ -3,7 +3,7 @@ ecell-3.2: ?-Nov-2008
  * A few cosmetic changes
    - Fixed indent / coding style.
 
-   - Fixe doxygen comments.
+   - Fixed doxygen comments.
 
    - Removed $...$ placeholders as they may contain localized characters
      which are troublesome in VC++.
@@ -168,7 +168,31 @@ ecell-3.2: ?-Nov-2008
      ecell._ecs.Simulator.
 
 
+ecell-3.1.107RC3: 11-Mar-2009
+
+ * Remove deprecate API calls in session-monitor. This enables it to run
+   on Mac OS X with the native GTK+.
+
+ * Fixed bugs in DM compiler tools.
+
+ * Fixed weird behavior of the expression compiler that is used in
+   Expression*Process'es.
+
+ * Eliminate usage of string module.
+
+ * Fixed win32 build.
+
+
+ecell-3.1.107RC2: 6-Feb-2009
+
+ * Fixed a bug in ecell.Session.saveLoggerData().
+
+ * Fixed a bug in ecell.ECDDataFile.
+
+
 ecell-3.1.107RC1: 5-Feb-2009
+
+ * Fixed compilation problem on newer GCC (>= 4.3).
 
  * Reorganized the source tree structure.
 
