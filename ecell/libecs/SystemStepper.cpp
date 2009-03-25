@@ -76,7 +76,7 @@ void SystemStepper::integrate( RealParam aTime )
 void SystemStepper::integrateVariablesRecursively( System* aSystem,
                                                    RealParam aTime )
 {
-    FOR_ALL( System::VariableMap, aSystem->getVariableMap() )
+    FOR_ALL( System::Variables, aSystem->getVariables() )
     {
         Variable* aVariable( i->second );
         
@@ -86,7 +86,7 @@ void SystemStepper::integrateVariablesRecursively( System* aSystem,
         }
     }
 
-    FOR_ALL( System::SystemMap, aSystem->getSystemMap() )
+    FOR_ALL( System::Systems, aSystem->getSystems() )
     {
         System* aSubSystem( i->second );
         integrateVariablesRecursively( aSubSystem, aTime );

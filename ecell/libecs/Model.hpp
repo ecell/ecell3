@@ -315,6 +315,10 @@ private:
     /** @internal */
     void registerBuiltinModules();
 
+    void checkSizeVariable( SystemCptr const aSystem );
+
+    Handle generateNextHandle();
+
     /**
        This method checks recursively if all systems have Steppers
        connected.
@@ -323,15 +327,11 @@ private:
        
        @throw InitializationFailed if the check is failed.
     */
-    void checkStepper( SystemCptr const aSystem ) const;
+    static void checkStepper( System const* aSystem );
 
-    void checkSizeVariable( SystemCptr const aSystem );
+    static void initializeSystems( System* aSystem );
 
-    Handle generateNextHandle();
-
-    static void initializeSystems( System* const aSystem );
-
-    static void initializeProcesses( System* const aSystem );
+    static void initializeProcesses( System* aSystem );
 
 public:
     static const char PATH_SEPARATOR;

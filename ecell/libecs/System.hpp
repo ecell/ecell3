@@ -32,6 +32,8 @@
 #ifndef __SYSTEM_HPP
 #define __SYSTEM_HPP
 
+#include <boost/range/iterator_range.hpp>
+
 #include "libecs/Defs.hpp"
 #include "libecs/Entity.hpp"
 
@@ -45,6 +47,10 @@ public:
     DECLARE_MAP( const String, Variable*, std::less<const String>, VariableMap );
     DECLARE_MAP( const String, Process*, std::less<const String>, ProcessMap );
     DECLARE_MAP( const String, System*, std::less<const String>, SystemMap );
+
+    typedef boost::iterator_range< VariableMap::iterator > Variables;
+    typedef boost::iterator_range< ProcessMap::iterator > Processes;
+    typedef boost::iterator_range< SystemMap::iterator > Systems;
 
 public:
     LIBECS_DM_BASECLASS( System );
@@ -111,23 +117,28 @@ public:
     }
 
     template <class T_>
-    const std::map<const String, T_*, std::less<const String> >& getMap() const;
+    boost::iterator_range< typename std::map< const String, T_*, std::less<const String> >::iterator > getEntities() const;
 
-    VariableMapCref getVariableMap() const
+    Variables getVariables() const
     {
-        return theVariableMap;
+        return Variables(
+            const_cast< System* >( this )->theVariableMap.begin(),
+            const_cast< System* >( this )->theVariableMap.end() );
     }
 
-    ProcessMapCref getProcessMap() const
+    Processes getProcesses() const
     {
-        return theProcessMap;
+        return Processes(
+            const_cast< System* >( this )->theProcessMap.begin(),
+            const_cast< System* >( this )->theProcessMap.end() );
     }
 
-    SystemMapCref getSystemMap() const
+    Systems getSystems() const
     {
-        return theSystemMap;
+        return Systems(
+            const_cast< System* >( this )->theSystemMap.begin(),
+            const_cast< System* >( this )->theSystemMap.end() );
     }
-
 
     /**
        Find a Process with given id in this System.    
@@ -289,21 +300,21 @@ private:
 
 
 template <>
-inline System::VariableMapCref System::getMap() const
+inline typename System::Variables System::getEntities< Variable >() const
 {
-    return getVariableMap();
+    return getVariables();
 }
 
 template <>
-inline System::ProcessMapCref  System::getMap() const
+inline typename System::Processes System::getEntities< Process >() const
 {
-    return getProcessMap();
+    return getProcesses();
 }
 
 template <>
-inline System::SystemMapCref   System::getMap() const
+inline typename System::Systems   System::getEntities< System >() const
 {
-    return getSystemMap();
+    return getSystems();
 }
 
 } // namespace libecs

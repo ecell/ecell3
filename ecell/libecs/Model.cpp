@@ -34,6 +34,9 @@
 #endif /* HAVE_CONFIG_H */
 
 #include <boost/bind.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
+#include <boost/range/value_type.hpp>
 
 #include "dmtool/SharedModuleMaker.hpp"
 
@@ -325,7 +328,7 @@ void Model::deleteStepper( String const& anID )
 }
 
 
-void Model::checkStepper( System const* const aSystem ) const
+void Model::checkStepper( System const* const aSystem )
 {
     if( aSystem->getStepper() == NULLPTR )
     {
@@ -334,36 +337,36 @@ void Model::checkStepper( System const* const aSystem ) const
                          aSystem->getFullID().asString() + "]." );
     }
 
-    for( System::SystemMapConstIterator i( aSystem->getSystemMap().begin() ) ;
-         i != aSystem->getSystemMap().end() ; ++i )
-    {
-        // check it recursively
-        checkStepper( i->second );
-    }
+    System::Systems systems( aSystem->getSystems() );
+
+    std::for_each( boost::begin( systems ), boost::end( systems ),
+            ComposeUnary( boost::bind( &Model::checkStepper, _1 ),
+                          SelectSecond< boost::range_value< System::Systems >::type >() ) );
+
 }
 
 
-void Model::initializeSystems( System* const aSystem )
+void Model::initializeSystems( System* aSystem )
 {
     aSystem->initialize();
-    System::SystemMap const& systemMap( aSystem->getSystemMap() );
-    std::for_each( systemMap.begin(), systemMap.end(),
+    System::Systems systems( aSystem->getSystems() );
+    std::for_each( boost::begin( systems ), boost::end( systems ),
             ComposeUnary( boost::bind( &Model::initializeSystems, _1 ),
-                          SelectSecond< System::SystemMap::value_type >() ) );
+                          SelectSecond< boost::range_value< System::Systems >::type >() ) );
 }
 
 
 void Model::initializeProcesses( System* const aSystem )
 {
-    System::ProcessMap const& processMap( aSystem->getProcessMap() );
-    std::for_each( processMap.begin(), processMap.end(),
+    System::Processes processes( aSystem->getProcesses() );
+    std::for_each( boost::begin( processes ), boost::end( processes ),
             ComposeUnary( boost::bind( &Process::initialize, _1 ),
-                          SelectSecond< System::ProcessMap::value_type >() ) );
+                          SelectSecond< boost::range_value< System::Processes >::type >() ) );
 
-    System::SystemMap const& systemMap( aSystem->getSystemMap() );
-    std::for_each( systemMap.begin(), systemMap.end(),
+    System::Systems systems( aSystem->getSystems() );
+    std::for_each( boost::begin( systems ), boost::end( systems ),
             ComposeUnary( boost::bind( &Model::initializeProcesses, _1 ),
-                          SelectSecond< System::SystemMap::value_type >() ) );
+                          SelectSecond< boost::range_value< System::Systems >::type >() ) );
 }
 
 
