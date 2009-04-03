@@ -1,4 +1,4 @@
-EXTRA_DISTS =\
+EXTRA_DIST =\
 	AboutModelEditor.glade\
 	AutosaveWindow.glade\
 	ClassEditor.glade\
@@ -22,7 +22,7 @@ EXTRA_DISTS =\
 	ValidateWindow.glade\
 	VariableReferenceEditorComponent.glade
 
-EXTRA_DISTS +=\
+EXTRA_DIST +=\
 	icon_custom.png\
 	icon_entity.png\
 	icon_layoutmanager.png\
