@@ -1,4 +1,4 @@
-EXTRA_DISTS =\
+EXTRA_DIST =\
 	AboutSessionMonitor.glade \
 	BoardWindow.glade \
 	EntityListWindow.glade \
@@ -13,7 +13,7 @@ EXTRA_DISTS =\
 	StepperWindow.glade \
 	board.glade
 
-EXTRA_DISTS +=\
+EXTRA_DIST +=\
 	ecell.png \
 	ecell32-1.png \
 	ecell32-2.png \
@@ -26,7 +26,7 @@ EXTRA_DISTS +=\
 	ecell32.png \
 	ecell_large.png
 
-EXTRA_DISTS +=\
+EXTRA_DIST +=\
 	icon_board.png \
 	icon_ecell.png \
 	icon_entity.png \
