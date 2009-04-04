@@ -571,8 +571,7 @@ class SessionProxy( AbstractSessionProxy ):
         job.directory = absJobDirectory
         job.environment.update( self.getEnvironmentVariables() )
         job.executable = self.getInterpreter()
-        job.arguments = [ self.getScriptFileName() ]
-        job.arguments += self.getArguments()
+        job.arguments = self.getScriptFileNameArguments() + self.getArguments()
 
         tmpfile = None
         tmpfile = mkstemp()

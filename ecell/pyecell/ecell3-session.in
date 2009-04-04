@@ -139,7 +139,7 @@ def main():
     # gets options
     # -------------------------------------
     try:
-        opts, args = getopt.getopt(
+        opts, args = getopt.gnu_getopt(
             sys.argv[ 1: ] , 'he:f:D:',
             [ "parameters=", "help", "exec=", "file=" ] )
     except:
