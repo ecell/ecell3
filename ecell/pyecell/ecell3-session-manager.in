@@ -61,11 +61,12 @@ class Console:
 
         # flatten class methods and object properties so that
         # 'self.' isn't needed for each method calls in __the script
-        aKeyList = list ( self.session.__dict__.keys() +\
-                          self.session.__class__.__dict__.keys() )
+        aKeyList = list( self.session.__dict__.keys() +\
+                         self.session.__class__.__dict__.keys() )
         aDict = {}
         for aKey in aKeyList:
-            aDict[ aKey ] = getattr( self.session, aKey )
+            if not aKey.startswith('__'):
+                aDict[ aKey ] = getattr( self.session, aKey )
 
         aContext.update( aDict )
 
