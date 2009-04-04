@@ -94,7 +94,7 @@ class SessionProxy( AbstractSessionProxy ):
                 pollForOutputs( popen2.Popen3( args, True ) )
                 )
             m = re.match(
-                r'Your job (\d+) \("(?:[^"]|\\")*"\) has been submitted', msg
+                r'Job <(\d+)> is submitted to \w+ <\w+>\.', msg
                 )
             if m == None:
                 raise RuntimeError, '%s returned unexpected result: %s' % (
