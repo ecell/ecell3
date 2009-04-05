@@ -1,3 +1,15 @@
+ecell-3.1.107RC4: 5-Apr-2009
+
+ * Resource files required by the frontends (session monitor and model editor)
+   were completely missing in the tarballs due to the errors in Makefile.
+   Notified by 김한조.  Thanks.
+
+ * Console class in the ecell3-session-manager script insensibly imports
+   the attributes of a SessionManager instance into the global scope, which
+   turned out to obstruct the definition of classes in the user script.
+   Notified by Giuseppe Aprea.  Thanks.
+
+
 ecell-3.1.107RC3: 11-Mar-2009
 
  * Remove deprecate API calls in session-monitor. This enables it to run
