@@ -2043,11 +2043,11 @@ BOOST_PYTHON_MODULE( _ecs )
               &Logger::getData )
         .def( "getData", 
               ( boost::shared_ptr< DataPointVector >( Logger::* )(
-                Real const&, Real const& ) const )
+                RealParam, RealParam ) const )
               &Logger::getData )
         .def( "getData",
               ( boost::shared_ptr< DataPointVector >( Logger::* )(
-                     Real const&, Real const&, Real const& ) const )
+                     RealParam, RealParam, RealParam ) const )
               &Logger::getData )
         ;
 
