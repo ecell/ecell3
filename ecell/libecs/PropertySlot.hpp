@@ -301,20 +301,20 @@ class LoadSaveConcretePropertySlot: public ConcretePropertySlot<T,SlotType_>
 public:
     DECLARE_TYPE( SlotType_, SlotType );
 
-    typedef ConcretePropertySlot<T,SlotType> ConcretePropertySlot;
+    typedef ConcretePropertySlot<T,SlotType> BaseType;
 
-    typedef typename ConcretePropertySlot::SetType SetType;
-    typedef typename ConcretePropertySlot::GetType GetType;
+    typedef typename BaseType::SetType SetType;
+    typedef typename BaseType::GetType GetType;
 
-    typedef typename ConcretePropertySlot::SetMethodPtr SetMethodPtr;
-    typedef typename ConcretePropertySlot::GetMethodPtr GetMethodPtr;
+    typedef typename BaseType::SetMethodPtr SetMethodPtr;
+    typedef typename BaseType::GetMethodPtr GetMethodPtr;
 
     DM_IF LoadSaveConcretePropertySlot( StringCref aName,
                                         const SetMethodPtr aSetMethodPtr,
                                         const GetMethodPtr aGetMethodPtr,
                                         const SetMethodPtr aLoadMethodPtr,
                                         const GetMethodPtr aSaveMethodPtr )
-        : ConcretePropertySlot( aName, aSetMethodPtr, aGetMethodPtr ),
+        : BaseType( aName, aSetMethodPtr, aGetMethodPtr ),
           theLoadMethodPtr( SetMethod( aLoadMethodPtr ) ),
           theSaveMethodPtr( GetMethod( aSaveMethodPtr ) )
     {

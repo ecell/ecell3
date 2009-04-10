@@ -300,19 +300,19 @@ private:
 
 
 template <>
-inline typename System::Variables System::getEntities< Variable >() const
+inline System::Variables System::getEntities< Variable >() const
 {
     return getVariables();
 }
 
 template <>
-inline typename System::Processes System::getEntities< Process >() const
+inline System::Processes System::getEntities< Process >() const
 {
     return getProcesses();
 }
 
 template <>
-inline typename System::Systems   System::getEntities< System >() const
+inline System::Systems   System::getEntities< System >() const
 {
     return getSystems();
 }

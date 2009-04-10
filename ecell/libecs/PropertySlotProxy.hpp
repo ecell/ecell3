@@ -134,10 +134,9 @@ class ConcretePropertySlotProxy: public PropertySlotProxy
 {
 public:
     typedef PropertySlot<T> PropertySlot_;
-    DECLARE_TYPE( PropertySlot_, PropertySlot );
 
     DM_IF ConcretePropertySlotProxy( T& anObject, 
-                                     PropertySlotCref aPropertySlot )
+                                     PropertySlot_ const& aPropertySlot )
         : theObject( anObject ),
           thePropertySlot( aPropertySlot )
     {
@@ -192,8 +191,8 @@ private:
 
     ConcretePropertySlotProxy() {}
 
-    T&                  theObject;
-    PropertySlotCref    thePropertySlot;
+    T&                   theObject;
+    PropertySlot_ const& thePropertySlot;
 };
 
 } // namespace libecs
