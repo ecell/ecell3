@@ -42,7 +42,7 @@ public:
     LIBECS_DM_OBJECT( ExpressionAssignmentProcess, Process )
     {
         INHERIT_PROPERTIES( _LIBECS_MIXIN_CLASS_ );
-
+        INHERIT_PROPERTIES( Process );
         PROPERTYSLOT_SET_GET( String, Variable );
     }
 
