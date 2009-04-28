@@ -70,7 +70,6 @@ namespace libecs
  */
 #define LIBECS_DM_CLASS_MIXIN( CLASSNAME, BASE, MIXIN )\
     DECLARE_CLASS( CLASSNAME );\
-    template class libecs::PropertyInterface< MIXIN< CLASSNAME > >; \
     class DM_IF CLASSNAME: public BASE, public MIXIN< CLASSNAME >
 
 
@@ -741,8 +740,8 @@ public:
 
 private:
 
-    static void throwNotSetable();
-    static void throwNotGetable();
+    void throwNotSetable() const;
+    void throwNotGetable() const;
 
 protected:
     Model*   theModel;

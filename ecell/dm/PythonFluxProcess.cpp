@@ -116,7 +116,7 @@ public:
         // do not use extract<double> for efficiency
         if( ! PyFloat_Check( aResultObject.ptr() ) )
         {
-            THROW_EXCEPTION( SimulationError, 
+            THROW_EXCEPTION_INSIDE( SimulationError, 
                              asString() + ": "
                              "The expression gave a non-float object." );
         }

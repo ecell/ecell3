@@ -53,8 +53,9 @@ void DiscreteTimeStepper::initialize()
 
     if( getDiscreteProcessOffset() != 0 && ! getProcessVector().empty() )
     {
-        THROW_EXCEPTION( InitializationFailed,
-                         asString() + ": only discrete processes are supported." );
+        THROW_EXCEPTION_INSIDE( InitializationFailed,
+                                asString() +
+                                ": only discrete processes are supported" );
     }
 }
 

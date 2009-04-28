@@ -319,9 +319,10 @@ void Stepper::unregisterSystem( System* aSystemPtr )
     
     if( i == theSystemVector.end() )
     {
-        THROW_EXCEPTION( NotFound,
-                         asString() + ": " + aSystemPtr->asString()
-                         + " not found in this stepper. Can't remove." );
+        THROW_EXCEPTION_INSIDE( NotFound,
+                                asString() + ": Failed to dissociate [" +
+                                aSystemPtr->asString() + "] (no such System is "
+                                "associated to this stepper)" );
     }
 
     theSystemVector.erase( i );
@@ -352,9 +353,10 @@ void Stepper::unregisterProcess( ProcessPtr aProcess )
     
     if( ip == theProcessVector.end() )
     {
-        THROW_EXCEPTION( NotFound,
-                         asString() + ": " + aProcess->asString()
-                         + " not found in this stepper. Can't remove." );
+        THROW_EXCEPTION_INSIDE( NotFound,
+                                asString() + ": Failed to dissociate [" +
+                                aProcess->asString() + "] (no such Process is "
+                                "associated to this stepper)" );
     }
 
     typedef std::set< Variable* > VariableSet;

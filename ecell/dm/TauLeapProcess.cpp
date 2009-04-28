@@ -95,8 +95,10 @@ public:
         
         if( ! ( getOrder() == 1 || getOrder() == 2 ) )
         {
-            THROW_EXCEPTION( ValueError, 
-                             asString() + ": Only first or second order scheme is allowed." );
+            THROW_EXCEPTION_INSIDE( ValueError, 
+                                   asString() +
+                                   ": Only first or second order scheme is "
+                                   "allowed" );
         }
     }    
 
@@ -121,8 +123,9 @@ protected:
             // here assume aCoefficient != 0
             if( aCoefficient == 0 )
             {
-                THROW_EXCEPTION( InitializationFailed,
-                                 asString() + ": Zero stoichiometry is not allowed." );
+                THROW_EXCEPTION_INSIDE( InitializationFailed,
+                                       asString() + ": Zero stoichiometry is "
+                                       "not allowed" );
             }
 
             if( aCoefficient < 0 )
@@ -169,11 +172,12 @@ protected:
         }
     }
     
-    static void checkNonNegative( const Real aValue )
+    void checkNonNegative( const Real aValue ) const
     {
         if( aValue < 0.0 )
         {
-            THROW_EXCEPTION( SimulationError, "Variable value <= -1.0" );
+            THROW_EXCEPTION_INSIDE( SimulationError,
+                                   asString() + ": Variable value <= -1.0" );
         }
     }
 

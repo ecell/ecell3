@@ -74,7 +74,7 @@ GET_METHOD_DEF( Real, Propensity, GillespieProcess )
 
     if ( aPropensity < 0.0 )
     {
-        THROW_EXCEPTION( SimulationError, "Variable value <= -1.0" );
+        THROW_EXCEPTION_INSIDE( SimulationError, "Variable value <= -1.0" );
         return 0.0;
     }
     else
@@ -129,8 +129,8 @@ void GillespieProcess::initialize()
 
     if( ! ( getOrder() == 1 || getOrder() == 2 ) )
     {
-        THROW_EXCEPTION( ValueError,
-                         asString() + ": Only first or second order "
+        THROW_EXCEPTION_INSIDE( ValueError,
+                               asString() + ": Only first or second order "
                          "scheme is allowed." );
     }
 }
@@ -302,8 +302,8 @@ void GillespieProcess::calculateOrder()
         // here assume aCoefficient != 0
         if( aCoefficient == 0 )
         {
-            THROW_EXCEPTION( libecs::InitializationFailed,
-                             asString() + ": Zero stoichiometry is not allowed." );
+            THROW_EXCEPTION_INSIDE( libecs::InitializationFailed,
+                                   asString() + ": Zero stoichiometry is not allowed." );
         }
 
         if( aCoefficient < 0 )

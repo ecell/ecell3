@@ -170,7 +170,7 @@ Variable const* System::findSizeVariable() const
         // Prevent infinite looping.    But this shouldn't happen.
         if( aSuperSystem == this )
         {
-            THROW_EXCEPTION( UnexpectedError, 
+            THROW_EXCEPTION_INSIDE( UnexpectedError, 
                              "While trying get a SIZE variable,"
                              " supersystem == this. Probably a bug." );
         }
@@ -232,7 +232,7 @@ System::getProcess( String const& anID ) const
 
     if ( i == theProcessMap.end() )
     {
-        THROW_EXCEPTION( NotFound, 
+        THROW_EXCEPTION_INSIDE( NotFound, 
                          asString() + ": Process [" + anID
                          + "] not found in this System." );
     }
@@ -248,7 +248,7 @@ System::getVariable( String const& anID ) const
 
     if ( i == theVariableMap.end() )
     {
-        THROW_EXCEPTION( NotFound,
+        THROW_EXCEPTION_INSIDE( NotFound,
                          asString() + ": Variable [" + anID
                          + "] not found in this System.");
     }
@@ -263,7 +263,7 @@ void System::registerEntity( System* aSystem )
 
     if ( theSystemMap.find( anID ) != theSystemMap.end() )
     {
-        THROW_EXCEPTION( AlreadyExist, 
+        THROW_EXCEPTION_INSIDE( AlreadyExist, 
                          asString() + ": System " + aSystem->asString()
                          + " is already associated." );
     }
@@ -281,23 +281,22 @@ void System::unregisterEntity( System* aSystem )
 
     if ( !aSuperSystem )
     {
-        THROW_EXCEPTION( NotFound, 
-                         asString() + ": System " + aSystem->asString()
-                         + " is not associated t0 any System." );
+        THROW_EXCEPTION_INSIDE( NotFound, 
+                        asString() + ": System is not associated to "
+                        "any System." );
     }
     else if ( aSuperSystem != this )
     {
-        THROW_EXCEPTION( NotFound, 
-                         asString() + ": System " + aSystem->asString()
-                         + " is associated to another system." );
+        THROW_EXCEPTION_INSIDE( NotFound, 
+                        asString() + ": System is already associated to "
+                        "another system." );
     }
 
     SystemMap::iterator i( theSystemMap.find( aSystem->getID() ) );
     if ( i == theSystemMap.end() || (*i).second != aSystem )
     {
-        THROW_EXCEPTION( NotFound, 
-                         asString() + ": System " + aSystem->asString()
-                         + " is not associated." );
+        THROW_EXCEPTION_INSIDE( NotFound, 
+                         asString() + ": System is not associated." );
     }
 
     unregisterEntity( i );
@@ -349,7 +348,7 @@ System::getSystem( String const& anID ) const
         {
             if ( isRootSystem() )
             {
-                THROW_EXCEPTION( NotFound,
+                THROW_EXCEPTION_INSIDE( NotFound,
                                  asString() + ": the root system has no super "
                                  "systems" );
             }
@@ -360,7 +359,7 @@ System::getSystem( String const& anID ) const
     SystemMapConstIterator i( theSystemMap.find( anID ) );
     if ( i == theSystemMap.end() )
     {
-        THROW_EXCEPTION( NotFound,
+        THROW_EXCEPTION_INSIDE( NotFound,
                          asString() + ": System [" + anID + 
                          "] not found in this System." );
     }
@@ -380,7 +379,7 @@ Variable const* System::getSizeVariable() const
 {
     if ( !theSizeVariable )
     {
-        THROW_EXCEPTION( IllegalOperation,
+        THROW_EXCEPTION_INSIDE( IllegalOperation,
                          asString() + ": SIZE variable is not associated" );
     }
     return theSizeVariable;
@@ -399,7 +398,7 @@ void System::registerEntity( Process* aProcess )
 
     if ( theProcessMap.find( anID ) != theProcessMap.end() )
     {
-        THROW_EXCEPTION( AlreadyExist, 
+        THROW_EXCEPTION_INSIDE( AlreadyExist, 
                          asString() + ": Process [" + anID
                          + "] is already associated." );
     }
@@ -417,13 +416,13 @@ void System::unregisterEntity( Process* aProcess )
 
     if ( !aSuperSystem )
     {
-        THROW_EXCEPTION( NotFound, 
+        THROW_EXCEPTION_INSIDE( NotFound, 
                          asString() + ": Process [" + aProcess->asString()
                          + "] is not associated t0 any System." );
     }
     if ( aSuperSystem != this )
     {
-        THROW_EXCEPTION( NotFound, 
+        THROW_EXCEPTION_INSIDE( NotFound, 
                          asString() + ": Process ["
                          + aProcess->asString()
                          + "] is associated to another system." );
@@ -432,7 +431,7 @@ void System::unregisterEntity( Process* aProcess )
     ProcessMap::iterator i( theProcessMap.find( aProcess->getID() ) );
     if ( i == theProcessMap.end() || (*i).second != aProcess )
     {
-        THROW_EXCEPTION( NotFound, 
+        THROW_EXCEPTION_INSIDE( NotFound, 
                          asString() + ": Process ["
                          + aProcess->asString() + "] is not associated." );
     }
@@ -455,7 +454,7 @@ void System::registerEntity( Variable* aVariable )
 
     if ( theVariableMap.find( anID ) != theVariableMap.end() )
     {
-        THROW_EXCEPTION( AlreadyExist, 
+        THROW_EXCEPTION_INSIDE( AlreadyExist, 
                          asString() + ": Variable [" + anID
                          + "] is already associated." );
     }
@@ -473,13 +472,13 @@ void System::unregisterEntity( Variable* aVariable )
 
     if ( !aSuperSystem )
     {
-        THROW_EXCEPTION( NotFound, 
+        THROW_EXCEPTION_INSIDE( NotFound, 
                          asString() + ": Variable [" + aVariable->asString()
                          + "] is not associated t0 any System." );
     }
     if ( aSuperSystem != this )
     {
-        THROW_EXCEPTION( NotFound, 
+        THROW_EXCEPTION_INSIDE( NotFound, 
                         asString() + ": Variable [" + aVariable->asString()
                         + "] is associated to another system." );
     }
@@ -487,7 +486,7 @@ void System::unregisterEntity( Variable* aVariable )
     VariableMap::iterator i( theVariableMap.find( aVariable->getID() ) );
     if ( i == theVariableMap.end() || (*i).second != aVariable )
     {
-        THROW_EXCEPTION( NotFound, 
+        THROW_EXCEPTION_INSIDE( NotFound, 
                          asString() + ": Variable [" + aVariable->asString()
                          + "] is not associated." );
     }
@@ -504,7 +503,7 @@ void System::unregisterEntity( VariableMap::iterator const& i )
 }
 
 
-void registerEntity( Entity* anEntity )
+void System::registerEntity( Entity* anEntity )
 {
     switch ( anEntity->getEntityType() )
     {
@@ -519,7 +518,7 @@ void registerEntity( Entity* anEntity )
         break;
     }
 
-    THROW_EXCEPTION( InvalidEntityType, "Invalid EntityType specified." );
+    THROW_EXCEPTION_INSIDE( InvalidEntityType, "Invalid EntityType specified." );
 }
 
 
@@ -532,7 +531,7 @@ void System::unregisterEntity( EntityType const& anEntityType, String const& anI
             VariableMap::iterator i( theVariableMap.find( anID ) );
             if ( i == theVariableMap.end() )
             {
-                THROW_EXCEPTION( NotFound, 
+                THROW_EXCEPTION_INSIDE( NotFound, 
                                  asString() + ": Variable [" + anID
                                  + "] is not associated." );
             }
@@ -545,7 +544,7 @@ void System::unregisterEntity( EntityType const& anEntityType, String const& anI
             ProcessMap::iterator i( theProcessMap.find( anID ) );
             if ( i == theProcessMap.end() )
             {
-                THROW_EXCEPTION( NotFound, 
+                THROW_EXCEPTION_INSIDE( NotFound, 
                                  asString() + ": Process [" + anID
                                  + "] is not associated." );
             }
@@ -557,7 +556,7 @@ void System::unregisterEntity( EntityType const& anEntityType, String const& anI
             SystemMap::iterator i( theSystemMap.find( anID ) );
             if ( i == theSystemMap.end() )
             {
-                THROW_EXCEPTION( NotFound, 
+                THROW_EXCEPTION_INSIDE( NotFound, 
                                  asString() + ": System [" + anID
                                  + "] is not associated." );
             }

@@ -139,11 +139,11 @@ private:
         {
             libecs::String msg = outer_.asString() + ": " +  _msg;
             if ( type == "NoSlot" )
-                THROW_EXCEPTION( libecs::NoSlot, msg );
+                THROW_EXCEPTION_ECSOBJECT( libecs::NoSlot, msg, &outer_ );
             else if ( type == "NotFound" )
-                THROW_EXCEPTION( libecs::NotFound, msg );
+                THROW_EXCEPTION_ECSOBJECT( libecs::NotFound, msg, &outer_ );
             else
-                THROW_EXCEPTION( libecs::UnexpectedError, msg );
+                THROW_EXCEPTION_ECSOBJECT( libecs::UnexpectedError, msg, &outer_ );
         }
 
     private:
@@ -195,10 +195,11 @@ public:
         if ( aPropertyMapIterator != thePropertyMap.end() ) {
             return aPropertyMapIterator->second;
         } else {
-            THROW_EXCEPTION( libecs::NoSlot,
+            THROW_EXCEPTION_ECSOBJECT( libecs::NoSlot,
                              static_cast< Tmixin_ const* >( this )->asString() +
                              ": property [" + aPropertyName +
-                             "] is not defined." );
+                             "] is not defined.",
+                             static_cast< Tmixin_ const* >( this ) );
         }
     }
 

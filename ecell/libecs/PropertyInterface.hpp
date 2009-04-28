@@ -205,9 +205,10 @@ public:
         return theTypeName;
     }
 
-    void throwNoSlot( StringCref aPropertyName ) const;
-    void throwNotLoadable( StringCref aPropertyName ) const;
-    void throwNotSavable( StringCref aPropertyName ) const;
+    void throwNoSlot( String const& aPropertyName ) const;
+    void throwNoSlot( EcsObject const& obj, String const& aPropertyName ) const;
+    void throwNotLoadable( EcsObject const& obj, String const& aPropertyName ) const;
+    void throwNotSavable( EcsObject const& obj, String const& aPropertyName ) const;
 
 protected:
 
@@ -296,7 +297,7 @@ public:
         }
         catch( NoSlotCref )
         {
-            throwNoSlot( aPropertyName );
+            throwNoSlot( anObject, aPropertyName );
         }
         return 0; // never get here
     }
@@ -372,7 +373,7 @@ public:
             }
             else
             {
-                throwNotLoadable( aPropertyName );
+                throwNotLoadable( anObject, aPropertyName );
             }
         }
         else
@@ -397,7 +398,7 @@ public:
             }
             else
             {
-                throwNotSavable( aPropertyName );
+                throwNotSavable( anObject, aPropertyName );
             }
         }
         else

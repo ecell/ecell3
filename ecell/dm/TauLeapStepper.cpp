@@ -95,10 +95,10 @@ public:
         }
         catch( const libecs::TypeError& )
         {
-            THROW_EXCEPTION( InitializationFailed,
-                             asString() + ": "
-                             "only GillespieProcesses can be associated with "
-                             "this Stepper." );
+            THROW_EXCEPTION_INSIDE( InitializationFailed,
+                                   asString() + ": "
+                                   "only GillespieProcesses can be associated "
+                                   "with this Stepper." );
         }
     }
 

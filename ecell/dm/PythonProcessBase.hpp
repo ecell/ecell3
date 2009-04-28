@@ -115,10 +115,11 @@ public:
         }
         else
         {
-            THROW_EXCEPTION( libecs::NoSlot,
-                             static_cast< Tmixin_ const* >( this )->asString()
-                             + ": property [" + aPropertyName
-                             + "] is not defined" );
+            THROW_EXCEPTION_ECSOBJECT( libecs::NoSlot,
+                                   static_cast< Tmixin_ const* >( this )->asString()
+                                   + ": property [" + aPropertyName
+                                   + "] is not defined",
+                                   static_cast< Tmixin_ const* >( this ) );
         }
     }
 

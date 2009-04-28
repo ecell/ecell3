@@ -38,40 +38,80 @@
 
 namespace libecs
 {
+class EcsObject;
+
+/**
+   A macro to throw an exception with the method name and the causal
+   @param CLASS   the exception class.
+   @param MESSAGE the message attached to the exception.
+   @param OBJ     the ECSObject instance where the exception occurred.
+ */
+#define THROW_EXCEPTION_ECSOBJECT( CLASS, MESSAGE, OBJ )\
+    throw CLASS( __PRETTY_FUNCTION__, MESSAGE, OBJ )
+
+/**
+   A macro to throw an exception with the method name. The causal is "this".
+   @param CLASS the exception class.
+   @param MESSAGE the message attached to the exception.
+ */
+#define THROW_EXCEPTION_INSIDE( CLASS, MESSAGE )\
+    THROW_EXCEPTION_ECSOBJECT( CLASS, MESSAGE, this )
+
 /**
    A macro to throw an exception, with method name
    @param CLASS the exception class.
    @param MESSAGE the message attached to the exception.
  */
 #define THROW_EXCEPTION( CLASS, MESSAGE )\
-    throw CLASS( __PRETTY_FUNCTION__, MESSAGE )
+    THROW_EXCEPTION_ECSOBJECT( CLASS, MESSAGE, NULLPTR )
 
 /// Base exception class
 class LIBECS_API Exception: public std::exception 
 {
 public:
-    Exception( StringCref method, StringCref message = "" )
+    /**
+       Constructor.
+       @param method the name of the method from where the exception is thrown.
+       @param message the description of the exception.
+       @param entity the entity where the exception occurred.
+     */
+    Exception( String const& method, String const& message = "", EcsObject const* object = 0 )
         : theMethod( method ), 
           theMessage( message ),
-          theWhatMsg()
+          theWhatMsg(),
+          theEcsObject( object )
     {
         ; // do nothing
     }
 
     virtual ~Exception() throw();
 
-    virtual const String& message() const;
+    const String& message() const throw()
+    {
+        return theMessage;
+    }
 
     virtual const char* what() const throw();
 
-    virtual const char* const getClassName() const
+    virtual const char* getClassName() const throw()
     {
         return "Exception";
+    }
+
+    virtual String const& getMethod() const throw()
+    {
+        return theMethod;
+    }
+
+    EcsObject const* getEcsObject() const throw()
+    {
+        return theEcsObject;
     }
 
 protected:
     const String theMethod;
     const String theMessage;
+    EcsObject const* const theEcsObject;
     mutable String theWhatMsg;
 };
 
@@ -82,15 +122,17 @@ protected:
 class LIBECS_API CLASSNAME : public BASECLASS\
 {\
 public:\
-    CLASSNAME( StringCref method, StringCref message = "" )\
-        : BASECLASS( method, message ) {}\
+    CLASSNAME( String const& method, String const& message = "", EcsObject const* object = 0 )\
+        : BASECLASS( method, message, object ) {}\
+    CLASSNAME( libecs::Exception const& orig, EcsObject const* object ) \
+        : BASECLASS( orig.getMethod(), orig.message(), object ) {}\
     virtual ~CLASSNAME() throw(); \
-    virtual StringLiteral getClassName() const; \
+    virtual char const* getClassName() const throw(); \
 };
 
 #define DEFINE_EXCEPTION_METHOD_BODIES( CLASSNAME ) \
     CLASSNAME::~CLASSNAME() throw() {}\
-    StringLiteral CLASSNAME::getClassName() const { return #CLASSNAME ; }
+    char const* CLASSNAME::getClassName() const throw() { return #CLASSNAME ; }
 
 // system errors
 DEFINE_EXCEPTION( UnexpectedError,                Exception );

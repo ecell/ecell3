@@ -86,8 +86,8 @@ public:
         }
         else
         {
-            THROW_EXCEPTION( InitializationFailed, 
-                   "Error:in ESYYNSStepper::initialize() " );
+            THROW_EXCEPTION_INSIDE( InitializationFailed, 
+                                   asString() + ": Initialization failure" );
         }
 
         theTaylorOrder = getOrder();

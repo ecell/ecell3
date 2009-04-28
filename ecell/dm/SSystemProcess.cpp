@@ -170,10 +170,10 @@ public:
         {
             if( (*i).getVariable()->getValue() <= 0 )
             {
-                THROW_EXCEPTION( ValueError,
-                                 asString() + ": the value of "
-                                 + (*i).getVariable()->asString()
-                                 + " gets equal or less than 0");
+                THROW_EXCEPTION_INSIDE( ValueError,
+                                        asString() + ": the value of "
+                                        + (*i).getVariable()->asString()
+                                        + " is equal to or less than 0" );
             }
             (theY[anIndex])[0] = gsl_sf_log( (*i).getVariable()->getValue() ) ;
             anIndex++;

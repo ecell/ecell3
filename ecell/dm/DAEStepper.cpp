@@ -194,8 +194,9 @@ public:
 
             if ( aSize != theSystemSize )
             {
-                THROW_EXCEPTION( InitializationFailed,
-                                 "definitions are required, are given." );
+                THROW_EXCEPTION_INSIDE( InitializationFailed,
+                                       asString() +
+                                       ": Definitions are required" );
             }
 
             theJacobian.resize( aSize );

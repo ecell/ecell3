@@ -54,7 +54,7 @@ SET_METHOD_DEF( Polymorph, VariableReferenceList, Process )
 {
     if ( value.getType() != PolymorphValue::TUPLE )
     {
-        THROW_EXCEPTION( ValueError, "Argument must be a tuple" );
+        THROW_EXCEPTION_INSIDE( ValueError, "Argument must be a tuple" );
     }
 
     typedef boost::range_const_iterator< PolymorphValue::Tuple >::type const_iterator;
@@ -65,12 +65,12 @@ SET_METHOD_DEF( Polymorph, VariableReferenceList, Process )
     {
         if ( (*i).getType() != PolymorphValue::TUPLE )
         {
-            THROW_EXCEPTION( ValueError, "Every element of the tuple must also be a tuple" );
+            THROW_EXCEPTION_INSIDE( ValueError, "Every element of the tuple must also be a tuple" );
         }
         PolymorphValue::Tuple const& anElem( (*i).as< PolymorphValue::Tuple const & >() );
         if ( anElem.size() < 2 )
         {
-            THROW_EXCEPTION( ValueError, "Each element of the tuple must have at least 4 elements" );
+            THROW_EXCEPTION_INSIDE( ValueError, "Each element of the tuple must have at least 4 elements" );
         }
         registerVariableReference(
             anElem[ 0 ].as< String >(),
@@ -241,10 +241,10 @@ Process::getVariableReference( StringCref aVariableReferenceName )
     }
     else
     {
-        THROW_EXCEPTION( NotFound,
-                         asString() + ": VariableReference ["
-                         + aVariableReferenceName
-                         + "] not found in this Process." );
+        THROW_EXCEPTION_INSIDE( NotFound,
+                                asString() + ": VariableReference ["
+                                + aVariableReferenceName
+                                + "] not found in this Process." );
     }
 }
 
@@ -299,10 +299,10 @@ void Process::setVariableReference( VariableReference aVarRef )
 
     if( findVariableReference( aVarRef.getName() ) != theVariableReferenceVector.end() )
     {
-        THROW_EXCEPTION( AlreadyExist,
-                         asString() + ": VariableReference ["
-                         + aVarRef.getName()
-                         + "] already exists in this Process." );
+        THROW_EXCEPTION_INSIDE( AlreadyExist,
+                                asString() + ": VariableReference ["
+                                + aVarRef.getName()
+                                + "] already exists in this Process." );
     }
 
     theVariableReferenceVector.push_back( aVarRef );

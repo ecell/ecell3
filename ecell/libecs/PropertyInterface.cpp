@@ -41,30 +41,40 @@
 namespace libecs
 {
 
-void PropertyInterfaceBase::throwNoSlot( StringCref aPropertyName ) const
+void PropertyInterfaceBase::throwNoSlot( String const& aPropertyName ) const
 {
     THROW_EXCEPTION( NoSlot,
                      getClassName() + 
                      String( " has no such property [" ) +
-                     aPropertyName + String( "].\n" ) );                    
+                     aPropertyName + String( "].\n" ) );
+}
+
+void PropertyInterfaceBase::throwNoSlot( EcsObject const& obj, String const& aPropertyName ) const
+{
+    THROW_EXCEPTION_ECSOBJECT( NoSlot,
+                     getClassName() + 
+                     String( " has no such property [" ) +
+                     aPropertyName + String( "].\n" ),
+                     &obj );
+}
+
+void PropertyInterfaceBase::throwNotLoadable( EcsObject const& obj, String const& aPropertyName ) const
+{
+    THROW_EXCEPTION_ECSOBJECT( NoSlot,
+                    getClassName() + 
+                    String( ": property [" ) +
+                    aPropertyName + String( "] is not loadable.\n" ),
+                    &obj );
 }
 
 
-void PropertyInterfaceBase::throwNotLoadable( StringCref aPropertyName ) const
+void PropertyInterfaceBase::throwNotSavable( EcsObject const& obj, String const& aPropertyName ) const
 {
-    THROW_EXCEPTION( NoSlot,
-                                     getClassName() + 
-                                     String( ": property [" ) +
-                                     aPropertyName + String( "] is not loadable.\n" ) );
-}
-
-
-void PropertyInterfaceBase::throwNotSavable( StringCref aPropertyName ) const
-{
-    THROW_EXCEPTION( NoSlot,
-                                     getClassName() + 
-                                     String( ": property [" ) +
-                                     aPropertyName + String( "] is not savable.\n" ) );
+    THROW_EXCEPTION_ECSOBJECT( NoSlot,
+                     getClassName() + 
+                     String( ": property [" ) +
+                     aPropertyName + String( "] is not savable.\n" ),
+                     &obj );
 }
 
 } // namespace libecs

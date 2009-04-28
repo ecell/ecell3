@@ -73,10 +73,10 @@ void DiscreteEventStepper::initialize()
 
     if ( theProcessVector.empty() )
     {
-        THROW_EXCEPTION( InitializationFailed,
-                         asString() + 
-                         ": at least one Process "
-                         "must be defined in this Stepper." );
+        THROW_EXCEPTION_INSIDE( InitializationFailed,
+                                asString() + 
+                                ": at least one Process "
+                                "must be defined in this Stepper." );
     }
 
     const Real aCurrentTime( getCurrentTime() );

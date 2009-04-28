@@ -109,8 +109,8 @@ public:
                     + theProcessVector.size() - getDiscreteProcessOffset();
             if ( aSize != theSystemSize )
             {
-                THROW_EXCEPTION( InitializationFailed,
-                                 "definitions are required, are given." );
+                THROW_EXCEPTION_INSIDE( InitializationFailed,
+                                 asString() + ": Definitions are required." );
             }
 
             // allocate a matrix and set all elements to zero

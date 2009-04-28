@@ -34,6 +34,7 @@
 #endif /* HAVE_CONFIG_H */
 
 #include "Exceptions.hpp"
+#include "EcsObject.hpp"
 
 namespace libecs
 {
@@ -41,21 +42,19 @@ Exception::~Exception() throw()
 {
     ; // do nothing
 }
-
-const String& Exception::message() const
-{
-    return theMessage;
-}
-
 const char* Exception::what() const throw()
 {
     if (theWhatMsg.empty())
     {
-#ifdef DEBUG
-        theWhatMsg = theMethod + ":\n" + String( getClassName() ) + ": " + theMessage + "\n";
-#else
-        theWhatMsg = String( getClassName() ) + ": " + theMessage + "\n";
-#endif /* DEBUG */
+        String whatMsg( getClassName() );
+        whatMsg += ": " + theMessage;
+        if ( theEcsObject )
+        {
+            whatMsg += " (";
+            whatMsg += theEcsObject->asString();
+            whatMsg += ")";
+        }
+        theWhatMsg = whatMsg;
     }
     return theWhatMsg.c_str();
 }

@@ -52,9 +52,9 @@ namespace libecs
 const PropertyAttributes EcsObject::
 defaultGetPropertyAttributes( StringCref aPropertyName ) const
 {
-    THROW_EXCEPTION( NoSlot, 
-                     asString() + ": No property slot ["
-                     + aPropertyName + "].    Get property attributes failed." );
+    THROW_EXCEPTION_INSIDE( NoSlot, 
+                    asString() + ": Failed to retrieve property attributes "
+                    "for [" + aPropertyName + "] (no such slot)." );
 }
 
 const StringVector
@@ -66,29 +66,29 @@ EcsObject::defaultGetPropertyList() const
 void EcsObject::defaultSetProperty( StringCref aPropertyName, 
                                                                                     PolymorphCref aValue )
 {
-    THROW_EXCEPTION( NoSlot,
-                     asString() + ": No property slot ["
-                     + aPropertyName + "].    Set property failed." );
+    THROW_EXCEPTION_INSIDE( NoSlot,
+                     asString() + ": Failed to set property ["
+                     + aPropertyName + "] (no such slot)." );
 }
 
 const Polymorph 
 EcsObject::defaultGetProperty( StringCref aPropertyName ) const
 {
-    THROW_EXCEPTION( NoSlot, 
-                     asString() + ": No property slot ["
-                     + aPropertyName + "].    Get property failed." );
+    THROW_EXCEPTION_INSIDE( NoSlot, 
+                     asString() + ": Failed to get property ["
+                     + aPropertyName + "] (no such slot)." );
 }
 
 
-void EcsObject::throwNotSetable()
+void EcsObject::throwNotSetable() const
 {
-    THROW_EXCEPTION( AttributeError, "Not setable." );
+    THROW_EXCEPTION_INSIDE( AttributeError, "Not settable." );
 }
 
 
-void EcsObject::throwNotGetable()
+void EcsObject::throwNotGetable() const
 {
-    THROW_EXCEPTION( AttributeError, "Not getable." );
+    THROW_EXCEPTION_INSIDE( AttributeError, "Not gettable." );
 }
 
 
