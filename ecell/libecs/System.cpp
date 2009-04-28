@@ -171,8 +171,9 @@ Variable const* System::findSizeVariable() const
         if( aSuperSystem == this )
         {
             THROW_EXCEPTION_INSIDE( UnexpectedError, 
-                             "While trying get a SIZE variable,"
-                             " supersystem == this. Probably a bug." );
+                                    asString() + ": while trying get a SIZE "
+                                    "variable, supersystem == this. "
+                                    "Probably a bug." );
         }
 
         return aSuperSystem->findSizeVariable();
@@ -234,7 +235,7 @@ System::getProcess( String const& anID ) const
     {
         THROW_EXCEPTION_INSIDE( NotFound, 
                          asString() + ": Process [" + anID
-                         + "] not found in this System." );
+                         + "] not found in this System" );
     }
 
     return i->second;
@@ -250,7 +251,7 @@ System::getVariable( String const& anID ) const
     {
         THROW_EXCEPTION_INSIDE( NotFound,
                          asString() + ": Variable [" + anID
-                         + "] not found in this System.");
+                         + "] not found in this System");
     }
 
     return i->second;
@@ -265,7 +266,7 @@ void System::registerEntity( System* aSystem )
     {
         THROW_EXCEPTION_INSIDE( AlreadyExist, 
                          asString() + ": System " + aSystem->asString()
-                         + " is already associated." );
+                         + " is already associated" );
     }
 
     theSystemMap[ anID ] = aSystem;
@@ -283,20 +284,20 @@ void System::unregisterEntity( System* aSystem )
     {
         THROW_EXCEPTION_INSIDE( NotFound, 
                         asString() + ": System is not associated to "
-                        "any System." );
+                        "any System" );
     }
     else if ( aSuperSystem != this )
     {
         THROW_EXCEPTION_INSIDE( NotFound, 
                         asString() + ": System is already associated to "
-                        "another system." );
+                        "another system" );
     }
 
     SystemMap::iterator i( theSystemMap.find( aSystem->getID() ) );
     if ( i == theSystemMap.end() || (*i).second != aSystem )
     {
         THROW_EXCEPTION_INSIDE( NotFound, 
-                         asString() + ": System is not associated." );
+                         asString() + ": System is not associated" );
     }
 
     unregisterEntity( i );
@@ -361,7 +362,7 @@ System::getSystem( String const& anID ) const
     {
         THROW_EXCEPTION_INSIDE( NotFound,
                          asString() + ": System [" + anID + 
-                         "] not found in this System." );
+                         "] not found in this System" );
     }
 
     return i->second;
@@ -400,7 +401,7 @@ void System::registerEntity( Process* aProcess )
     {
         THROW_EXCEPTION_INSIDE( AlreadyExist, 
                          asString() + ": Process [" + anID
-                         + "] is already associated." );
+                         + "] is already associated" );
     }
 
     theProcessMap[ anID ] = aProcess;
@@ -418,14 +419,14 @@ void System::unregisterEntity( Process* aProcess )
     {
         THROW_EXCEPTION_INSIDE( NotFound, 
                          asString() + ": Process [" + aProcess->asString()
-                         + "] is not associated t0 any System." );
+                         + "] is not associated t0 any System" );
     }
     if ( aSuperSystem != this )
     {
         THROW_EXCEPTION_INSIDE( NotFound, 
                          asString() + ": Process ["
                          + aProcess->asString()
-                         + "] is associated to another system." );
+                         + "] is associated to another system" );
     }
 
     ProcessMap::iterator i( theProcessMap.find( aProcess->getID() ) );
@@ -433,7 +434,7 @@ void System::unregisterEntity( Process* aProcess )
     {
         THROW_EXCEPTION_INSIDE( NotFound, 
                          asString() + ": Process ["
-                         + aProcess->asString() + "] is not associated." );
+                         + aProcess->asString() + "] is not associated" );
     }
 
     unregisterEntity( i );
@@ -456,7 +457,7 @@ void System::registerEntity( Variable* aVariable )
     {
         THROW_EXCEPTION_INSIDE( AlreadyExist, 
                          asString() + ": Variable [" + anID
-                         + "] is already associated." );
+                         + "] is already associated" );
     }
 
     theVariableMap[ anID ] = aVariable;
@@ -474,13 +475,13 @@ void System::unregisterEntity( Variable* aVariable )
     {
         THROW_EXCEPTION_INSIDE( NotFound, 
                          asString() + ": Variable [" + aVariable->asString()
-                         + "] is not associated t0 any System." );
+                         + "] is not associated to any System" );
     }
     if ( aSuperSystem != this )
     {
         THROW_EXCEPTION_INSIDE( NotFound, 
                         asString() + ": Variable [" + aVariable->asString()
-                        + "] is associated to another system." );
+                        + "] is associated to another system" );
     }
 
     VariableMap::iterator i( theVariableMap.find( aVariable->getID() ) );
@@ -488,7 +489,7 @@ void System::unregisterEntity( Variable* aVariable )
     {
         THROW_EXCEPTION_INSIDE( NotFound, 
                          asString() + ": Variable [" + aVariable->asString()
-                         + "] is not associated." );
+                         + "] is not associated" );
     }
 
     unregisterEntity( i );
@@ -518,7 +519,7 @@ void System::registerEntity( Entity* anEntity )
         break;
     }
 
-    THROW_EXCEPTION_INSIDE( InvalidEntityType, "Invalid EntityType specified." );
+    THROW_EXCEPTION_INSIDE( InvalidEntityType, "invalid EntityType specified" );
 }
 
 

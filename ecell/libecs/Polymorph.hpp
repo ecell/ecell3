@@ -1288,7 +1288,7 @@ template <>
 inline PolymorphValue::RawString const& PolymorphValue::as() const
 {
     if ( theType != STRING )
-        THROW_EXCEPTION( TypeError, "Conversion not feasible" );
+        THROW_EXCEPTION( TypeError, "conversion not feasible" );
 
     return theStringValue;
 }
@@ -1298,7 +1298,7 @@ template <>
 inline PolymorphValue::Tuple const& PolymorphValue::as() const
 {
     if ( theType != TUPLE )
-        THROW_EXCEPTION( TypeError, "Conversion not feasible" );
+        THROW_EXCEPTION( TypeError, "conversion not feasible" );
 
     return theTupleValue;
 }

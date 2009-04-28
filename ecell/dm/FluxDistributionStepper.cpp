@@ -156,8 +156,9 @@ public:
         catch( const libecs::TypeError& )
         {
             THROW_EXCEPTION_INSIDE( InitializationFailed,
-                                   asString() + ": Only QuasiDynamicFluxProcesses "
-                                   "can be associated with this Stepper" );
+                                    asString()
+                                    + ": only QuasiDynamicFluxProcesses "
+                                    "can be associated with this Stepper" );
         }
 
         QuasiDynamicFluxProcessVector::size_type aProcessVectorSize( theQuasiDynamicFluxProcessVector.size() );    

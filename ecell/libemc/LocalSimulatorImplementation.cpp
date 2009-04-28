@@ -84,7 +84,7 @@ void LocalSimulatorImplementation::createStepper(
     if( theRunningFlag )
     {
         THROW_EXCEPTION( libecs::Exception, 
-                         "Cannot create a Stepper during simulation." );
+                         "cannot create a Stepper during simulation" );
     }
 
     setDirty();
@@ -215,7 +215,7 @@ void LocalSimulatorImplementation::createEntity(
     if( theRunningFlag )
     {
         THROW_EXCEPTION( libecs::Exception, 
-                         "Cannot create an Entity during simulation." );
+                         "cannot create an Entity during simulation" );
     }
 
     setDirty();
@@ -226,7 +226,7 @@ void LocalSimulatorImplementation::deleteEntity(
         libecs::StringCref aFullIDString )
 {
     THROW_EXCEPTION( libecs::NotImplemented,
-                     "deleteEntity() method is not supported yet." );
+                     "deleteEntity() method is not supported yet" );
 
     setDirty();
 }
@@ -368,14 +368,14 @@ void LocalSimulatorImplementation::createLogger(
     if( theRunningFlag )
     {
         THROW_EXCEPTION( libecs::Exception, 
-                         "Cannot create a Logger during simulation." );
+                         "cannot create a Logger during simulation" );
     }
 
     if ( aParamList.getType() != libecs::PolymorphValue::TUPLE
          || aParamList.as< Tuple const& >().size() != 4 )
     {
         THROW_EXCEPTION( libecs::Exception,
-                         "second argument must be a tuple of 4 items.");
+                         "second argument must be a tuple of 4 items");
     }
 
     clearDirty();
@@ -458,7 +458,7 @@ void LocalSimulatorImplementation::setLoggerPolicy(
         || aParamList.as< Tuple const& >().size() != 4 )
     {
         THROW_EXCEPTION( libecs::Exception,
-                         "second parameter must be a tuple of 4 items.");
+                         "second parameter must be a tuple of 4 items");
     }
 
     getLogger( aFullPNString )->setLoggerPolicy(
@@ -516,8 +516,8 @@ void LocalSimulatorImplementation::step( const libecs::Integer aNumSteps )
     if( aNumSteps <= 0 )
     {
         THROW_EXCEPTION( libecs::Exception,
-                         "step( n ): n must be 1 or greater. ("
-                         + libecs::stringCast( aNumSteps ) + " given.)" );
+                         "step( n ): n must be 1 or greater ("
+                         + libecs::stringCast( aNumSteps ) + " given)" );
     }
 
     start();
@@ -556,8 +556,8 @@ void LocalSimulatorImplementation::run()
             theEventHandler.get() != NULLPTR ) )
     {
         THROW_EXCEPTION( libecs::Exception,
-                         "Both EventChecker and EventHandler must be "
-                         "set before run without duration." ) ;
+                         "both EventChecker and EventHandler must be "
+                         "set before run without duration" ) ;
     }
 
     start();
@@ -583,8 +583,8 @@ void LocalSimulatorImplementation::run( const libecs::Real aDuration )
     if( aDuration <= 0.0 )
     {
         THROW_EXCEPTION( libecs::Exception,
-                         "duration must be greater than 0. ("
-                         + libecs::stringCast( aDuration ) + " given.)" );
+                         "duration must be greater than 0 ("
+                         + libecs::stringCast( aDuration ) + " given)" );
     }
 
     start();

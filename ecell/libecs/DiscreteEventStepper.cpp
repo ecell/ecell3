@@ -76,7 +76,7 @@ void DiscreteEventStepper::initialize()
         THROW_EXCEPTION_INSIDE( InitializationFailed,
                                 asString() + 
                                 ": at least one Process "
-                                "must be defined in this Stepper." );
+                                "must be defined in this Stepper" );
     }
 
     const Real aCurrentTime( getCurrentTime() );

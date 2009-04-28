@@ -256,7 +256,8 @@ const Real VirtualMachine::execute( CodeCref aCode )
             return aStack.peek< 0 >().theReal;
 
         default:
-            THROW_EXCEPTION( UnexpectedError, "Invalid instruction." );
+            THROW_EXCEPTION( UnexpectedError,
+                             ": invalid instruction" );
 
         }
     }

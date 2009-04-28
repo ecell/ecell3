@@ -87,7 +87,7 @@ public:
         else
         {
             THROW_EXCEPTION_INSIDE( InitializationFailed, 
-                                   asString() + ": Initialization failure" );
+                                    asString() + ": initialization failure" );
         }
 
         theTaylorOrder = getOrder();

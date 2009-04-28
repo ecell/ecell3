@@ -96,9 +96,9 @@ public:
         catch( const libecs::TypeError& )
         {
             THROW_EXCEPTION_INSIDE( InitializationFailed,
-                                   asString() + ": "
-                                   "only GillespieProcesses can be associated "
-                                   "with this Stepper." );
+                                    asString() + ": "
+                                    "only GillespieProcesses can be associated "
+                                    "with this Stepper" );
         }
     }
 

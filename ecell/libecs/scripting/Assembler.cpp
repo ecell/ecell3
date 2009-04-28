@@ -72,11 +72,9 @@ Assembler::appendVariableReferenceMethodInstruction(
         APPEND_OBJECT_METHOD_INTEGER( aVariableReference, VariableReference,
                                       getCoefficient );
     } else {
-        THROW_EXCEPTION(
-            NotFound, 
-            String( "No such VariableReference attribute: " )
-            + aMethodName
-        );
+        THROW_EXCEPTION( NotFound, 
+                         String( "no such VariableReference attribute [" )
+                         + aMethodName + "]" );
     }
 }
 
@@ -89,10 +87,8 @@ Assembler::appendSystemMethodInstruction(
     } else if ( aMethodName == "SizeN_A" ) {
         APPEND_OBJECT_METHOD_REAL( aSystemPtr, System, getSizeN_A );
     } else {
-        THROW_EXCEPTION(
-            NotFound,
-            String( "No such property: " ) + aMethodName
-        );
+        THROW_EXCEPTION( NotFound,
+                         String( "no such property [" ) + aMethodName + "]" );
     }
 
 }

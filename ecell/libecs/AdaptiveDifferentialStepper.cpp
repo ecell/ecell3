@@ -92,7 +92,7 @@ void AdaptiveDifferentialStepper::step()
             // this must return false,
             // so theTolerableStepInterval does NOT LIMIT the error.
             THROW_EXCEPTION_INSIDE( SimulationError,
-                                    asString() + ": The error-limit step "
+                                    asString() + ": the error-limit step "
                                     " interval is too small" );
 
             calculate();

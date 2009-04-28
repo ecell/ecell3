@@ -45,16 +45,16 @@ void PropertyInterfaceBase::throwNoSlot( String const& aPropertyName ) const
 {
     THROW_EXCEPTION( NoSlot,
                      getClassName() + 
-                     String( " has no such property [" ) +
-                     aPropertyName + String( "].\n" ) );
+                     ": has no such property [" +
+                     aPropertyName + String( "]" ) );
 }
 
 void PropertyInterfaceBase::throwNoSlot( EcsObject const& obj, String const& aPropertyName ) const
 {
     THROW_EXCEPTION_ECSOBJECT( NoSlot,
                      getClassName() + 
-                     String( " has no such property [" ) +
-                     aPropertyName + String( "].\n" ),
+                     ": has no such property [" +
+                     aPropertyName + String( "]" ),
                      &obj );
 }
 
@@ -62,8 +62,8 @@ void PropertyInterfaceBase::throwNotLoadable( EcsObject const& obj, String const
 {
     THROW_EXCEPTION_ECSOBJECT( NoSlot,
                     getClassName() + 
-                    String( ": property [" ) +
-                    aPropertyName + String( "] is not loadable.\n" ),
+                    ": property [" +
+                    aPropertyName + String( "] is not loadable" ),
                     &obj );
 }
 
@@ -72,8 +72,8 @@ void PropertyInterfaceBase::throwNotSavable( EcsObject const& obj, String const&
 {
     THROW_EXCEPTION_ECSOBJECT( NoSlot,
                      getClassName() + 
-                     String( ": property [" ) +
-                     aPropertyName + String( "] is not savable.\n" ),
+                     ": property [" +
+                     aPropertyName + String( "] is not savable" ),
                      &obj );
 }
 

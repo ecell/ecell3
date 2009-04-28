@@ -120,18 +120,18 @@ void throwSequenceSizeError( const size_t aSize,
                              const size_t aMin, const size_t aMax )
 {
     THROW_EXCEPTION( RangeError,
-                     "Size of the sequence must be within [ " 
+                     "size of the sequence must be within [ " 
                      + stringCast( aMin ) + ", " + stringCast( aMax )
-                     + " ] ( " + stringCast( aSize ) + " given)." );
+                     + " ] ( " + stringCast( aSize ) + " given)" );
 }
 
 
 void throwSequenceSizeError( const size_t aSize, const size_t aMin )
 {
     THROW_EXCEPTION( RangeError,
-                     "Size of the sequence must be at least " 
+                     "size of the sequence must be at least " 
                      + stringCast( aMin ) + 
-                     + " ( " + stringCast( aSize ) + " given)." );
+                     + " ( " + stringCast( aSize ) + " given)" );
 }
 
 } // namespace libecs

@@ -1174,7 +1174,7 @@ public:
         if( theRunningFlag )
         {
             THROW_EXCEPTION( Exception, 
-                             "Cannot create a Stepper during simulation." );
+                             "cannot create a Stepper during simulation" );
         }
 
         return theModel.createStepper( aClassname, anId );
@@ -1287,7 +1287,7 @@ public:
         if( theRunningFlag )
         {
             THROW_EXCEPTION( Exception, 
-                             "Cannot create an Entity during simulation." );
+                             "cannot create an Entity during simulation" );
         }
 
         PyObject* retval( 0 );
@@ -1337,7 +1337,7 @@ public:
     void deleteEntity( String const& aFullIDString )
     {
         THROW_EXCEPTION( NotImplemented,
-                         "deleteEntity() method is not supported yet." );
+                         "deleteEntity() method is not supported yet" );
     }
 
     const Polymorph 
@@ -1461,7 +1461,7 @@ public:
         if( theRunningFlag )
         {
             THROW_EXCEPTION( Exception, 
-                             "Cannot create a Logger during simulation." );
+                             "cannot create a Logger during simulation" );
         }
 
         Logger* retval( theModel.getLoggerBroker().createLogger(
@@ -1477,7 +1477,7 @@ public:
              || PySequence_Size( aParamList.ptr() ) != 4 )
         {
             THROW_EXCEPTION( Exception,
-                             "second argument must be a tuple of 4 items.");
+                             "second argument must be a tuple of 4 items");
         }
 
         return createLogger( aFullPNString,
@@ -1552,7 +1552,7 @@ public:
             || PySequence_Size( aParamList.ptr() ) != 4 )
         {
             THROW_EXCEPTION( Exception,
-                             "second parameter must be a tuple of 4 items.");
+                             "second parameter must be a tuple of 4 items");
         }
 
         return setLoggerPolicy( aFullPNString,
@@ -1589,8 +1589,8 @@ public:
         if( aNumSteps <= 0 )
         {
             THROW_EXCEPTION( Exception,
-                             "step( n ): n must be 1 or greater. ("
-                             + stringCast( aNumSteps ) + " given.)" );
+                             "step( n ): n must be 1 or greater ("
+                             + stringCast( aNumSteps ) + " given)" );
         }
 
         start();
@@ -1652,8 +1652,8 @@ public:
         if( aDuration <= 0.0 )
         {
             THROW_EXCEPTION( Exception,
-                             "duration must be greater than 0. ("
-                             + stringCast( aDuration ) + " given.)" );
+                             "duration must be greater than 0 ("
+                             + stringCast( aDuration ) + " given)" );
         }
 
         start();

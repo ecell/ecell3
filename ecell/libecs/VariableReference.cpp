@@ -53,7 +53,7 @@ const Integer VariableReference::getEllipsisNumber() const
     {
         THROW_EXCEPTION( ValueError,
                          "VariableReference [" + theName
-                         + "] is not an Ellipsis (which starts from '___')." );
+                         + "] is not an Ellipsis (which starts from '___')" );
     }
 }
 

@@ -78,8 +78,8 @@ EntityType::EntityType( StringCref aTypeString )
     else
     {
         THROW_EXCEPTION( InvalidEntityType,
-                         "Can not convert the typestring [" + aTypeString
-                         + "] to EntityType." );
+                         "cannot convert the typestring [" + aTypeString
+                         + "] to EntityType" );
     }
 }
 
@@ -99,7 +99,7 @@ StringCref EntityType::asString() const
         return entityTypeStringOfEntity;
     default:
         THROW_EXCEPTION( InvalidEntityType,
-                         "unexpected EntityType::Type." );
+                         "unexpected EntityType::Type" );
     }
 }
 

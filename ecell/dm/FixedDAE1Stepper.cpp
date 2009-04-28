@@ -110,7 +110,9 @@ public:
             if ( aSize != theSystemSize )
             {
                 THROW_EXCEPTION_INSIDE( InitializationFailed,
-                                 asString() + ": Definitions are required." );
+                                 asString()
+                                 + ": the number of algebraic variables "
+                                 + "must be the same as the equations" );
             }
 
             // allocate a matrix and set all elements to zero

@@ -81,7 +81,7 @@ public:
         if( T <= 0.0 )
         {
             THROW_EXCEPTION_INSIDE( InitializationFailed, 
-                                    asString() + ": Zero or negative half time" );
+                                    asString() + ": zero or negative half time" );
         }
 
         k = log( 2.0 ) / T;

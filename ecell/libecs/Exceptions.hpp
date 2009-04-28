@@ -176,7 +176,7 @@ DEFINE_EXCEPTION( InvalidEntityType,              BadID);
 #define NEVER_GET_HERE\
     THROW_EXCEPTION( libecs::UnexpectedError, \
                      "never get here (" + libecs::String( __PRETTY_FUNCTION__ )\
-                     + ")." )
+                     + ")" )
 
 } // namespace libecs
 

@@ -198,7 +198,7 @@ public:
             THROW_EXCEPTION_ECSOBJECT( libecs::NoSlot,
                              static_cast< Tmixin_ const* >( this )->asString() +
                              ": property [" + aPropertyName +
-                             "] is not defined.",
+                             "] is not defined",
                              static_cast< Tmixin_ const* >( this ) );
         }
     }

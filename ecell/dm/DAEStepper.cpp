@@ -196,7 +196,8 @@ public:
             {
                 THROW_EXCEPTION_INSIDE( InitializationFailed,
                                        asString() +
-                                       ": Definitions are required" );
+                                       ": the number of algebraic variables "
+                                       "must be the same as the equations" );
             }
 
             theJacobian.resize( aSize );

@@ -70,17 +70,18 @@ public:
             if( aMinimumTimeInterval < 0 )
             {
                 THROW_EXCEPTION( ValueError,
-                                 "Negative value not allowed for minimum time interval");
+                                 "negative value not allowed for minimum time "
+                                 "interval");
             }
             if ( aMinimumStep < 0 )
             {
                 THROW_EXCEPTION( ValueError,
-                                 "Negative value not allowed for minimum step");
+                                 "negative value not allowed for minimum step");
             }
             if ( aMaxSpace < 0 )
             {
                 THROW_EXCEPTION( ValueError,
-                                 "Invalid value for max space" );
+                                 "invalid value for max space" );
             }
         }
 
@@ -94,7 +95,7 @@ public:
             if ( aMinimumStep < 0 )
             {
                 THROW_EXCEPTION( ValueError,
-                                 "Negative value not allowed for minimum step");
+                                 "negative value not allowed for minimum step");
             }
             theMinimumStep = aMinimumStep;
         }
@@ -109,7 +110,8 @@ public:
             if( aMinimumTimeInterval < 0 )
             {
                 THROW_EXCEPTION( ValueError,
-                                 "Negative value not allowed for minimum time interval");
+                                 "negative value not allowed for minimum time "
+                                 "interval");
             }
             theMinimumTimeInterval = aMinimumTimeInterval;
         }

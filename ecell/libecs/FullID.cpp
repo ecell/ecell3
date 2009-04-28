@@ -139,7 +139,7 @@ void FullID::parse( StringCref fullidstring )
     // empty FullID string is invalid
     if( fullidstring == "" )
     {
-        THROW_EXCEPTION( BadID, "Empty FullID string." );
+        THROW_EXCEPTION( BadID, "empty FullID string" );
     }
 
     String aString( fullidstring );
@@ -151,7 +151,7 @@ void FullID::parse( StringCref fullidstring )
     if( aFieldEnd == String::npos )
     {
         THROW_EXCEPTION( BadID, 
-                                         "No ':' in the FullID string [" + aString + "]." );
+                         "no ':' in the FullID string [" + aString + "]" );
     }
 
     String aTypeString( aString.substr( aFieldStart, aFieldEnd - aFieldStart ) );
@@ -161,8 +161,8 @@ void FullID::parse( StringCref fullidstring )
     aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
     if( aFieldEnd == String::npos )
         {
-            THROW_EXCEPTION( BadID, "Only one ':' in the FullID string [" 
-                                    + aString + "]." );
+            THROW_EXCEPTION( BadID, "only one ':' in the FullID string [" 
+                                    + aString + "]" );
         }
 
     theSystemPath = SystemPath( aString.substr( aFieldStart, 
@@ -207,8 +207,8 @@ FullPN::FullPN( StringCref fullpropertynamestring )
             find_first_of( FullID::DELIMITER, aPosition );
         if( aPosition == String::npos ) 
         {
-            THROW_EXCEPTION( BadID, "Not enough fields in FullPN string [" +
-                                    fullpropertynamestring + "]." );
+            THROW_EXCEPTION( BadID, "not enough fields in FullPN string [" +
+                                    fullpropertynamestring + "]" );
         }
         ++aPosition;
     }

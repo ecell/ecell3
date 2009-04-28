@@ -68,13 +68,14 @@ public:
         Backend::Module::DMAllocator anAllocator( getModule( aClassname ).getAllocator() );
         if ( !anAllocator )
         {
-            THROW_EXCEPTION( Instantiation, "Unexpected error" );
+            THROW_EXCEPTION( Instantiation, "unexpected error" );
         }
 
         DMType* anInstance( reinterpret_cast< DMType *>( anAllocator() ) );
         if ( !anInstance )
         {
-            THROW_EXCEPTION( Instantiation, "Can't instantiate [" + aClassname + "]." );
+            THROW_EXCEPTION( Instantiation,
+                             "cannot instantiate [" + aClassname + "]" );
         }
 
         return anInstance;

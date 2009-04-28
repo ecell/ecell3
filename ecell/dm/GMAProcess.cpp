@@ -165,8 +165,10 @@ public:
             if ( (*i).getVariable()->getValue() <= 0 )
             {
                 THROW_EXCEPTION_INSIDE( ValueError, 
-                                       asString() +
-                                       ": getESSYNSMatrix().log() in 0." );
+                                        asString() +
+                                        ": the value of Variable ["
+                                        + (*i).getVariable()->asString()
+                                        + " went under 0" );
             }
 
             (theY[anIndex])[0] = gsl_sf_log( (*i).getVariable()->getValue() ) ;

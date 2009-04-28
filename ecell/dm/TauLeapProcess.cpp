@@ -97,7 +97,7 @@ public:
         {
             THROW_EXCEPTION_INSIDE( ValueError, 
                                    asString() +
-                                   ": Only first or second order scheme is "
+                                   ": either first or second order scheme is "
                                    "allowed" );
         }
     }    
@@ -124,7 +124,7 @@ protected:
             if( aCoefficient == 0 )
             {
                 THROW_EXCEPTION_INSIDE( InitializationFailed,
-                                       asString() + ": Zero stoichiometry is "
+                                       asString() + ": zero stoichiometry is "
                                        "not allowed" );
             }
 
@@ -172,15 +172,6 @@ protected:
         }
     }
     
-    void checkNonNegative( const Real aValue ) const
-    {
-        if( aValue < 0.0 )
-        {
-            THROW_EXCEPTION_INSIDE( SimulationError,
-                                   asString() + ": Variable value <= -1.0" );
-        }
-    }
-
     const Real getZero( VariablePtr value ) const
     {
         return 0.0;
@@ -252,39 +243,43 @@ protected:
     
     const Real getPropensity_SecondOrder_OneSubstrate() const
     {
-        const Real aValue( theVariableReferenceVector[0].getValue() );
+        Variable const* aVariable( theVariableReferenceVector[ 0 ].getVariable() );
+        const Real aValue( aVariable->getValue() );
         
         if( aValue > 1.0 ) // there must be two or more molecules
         {
             return ( k * aValue * ( aValue - 1.0 ) ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
                 
         }
-        else
+        else if( aValue < 0.0 )
         {
-            checkNonNegative( aValue );
-            return 0;
+            THROW_EXCEPTION_INSIDE( SimulationError,
+                                    asString() + ": the value of Variable ["
+                                    + aVariable->asString()
+                                    + "] went under 0" );
         }
+        return 0.0;
     }
 
     const Real getPD_SecondOrder_OneSubstrate( VariablePtr value ) const
     {
         if( theVariableReferenceVector[0].getVariable() == value )
         {
-            const Real aValue( theVariableReferenceVector[0].getValue() );
+            Variable const* aVariable( theVariableReferenceVector[ 0 ].getVariable() );
+            const Real aValue( aVariable->getValue() );
             if( aValue > 1.0 ) // there must be two or more molecules
             {
-                return    ( ( 2 * k * aValue - k ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A ) );
+                return ( ( 2 * k * aValue - k ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A ) );
             }
-            else
+            else if( aValue < 0.0 )
             {
-                checkNonNegative( aValue );
-                return 0.0;
-            }            
+                THROW_EXCEPTION_INSIDE( SimulationError,
+                                        asString() + ": the value of Variable ["
+                                        + aVariable->asString()
+                                        + "] went under 0" );
+            }
         }
-        else
-        {
-            return 0.0;
-        }
+        return 0.0;
     }
     
 protected:

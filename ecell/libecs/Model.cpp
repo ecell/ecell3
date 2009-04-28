@@ -152,7 +152,7 @@ Entity* Model::createEntity( String const& aClassname, FullIDCref aFullID )
 {
     if( aFullID.getSystemPath().empty() )
     {
-        THROW_EXCEPTION( BadSystemPath, "Empty SystemPath." );
+        THROW_EXCEPTION( BadSystemPath, "empty SystemPath" );
     }
 
     System* aContainerSystemPtr( getSystem( aFullID.getSystemPath() ) );
@@ -188,7 +188,7 @@ Entity* Model::createEntity( String const& aClassname, FullIDCref aFullID )
         break;
 
     default:
-        THROW_EXCEPTION( InvalidEntityType, "Invalid EntityType specified." );
+        THROW_EXCEPTION( InvalidEntityType, "invalid EntityType specified" );
     }
 
     return retval;
@@ -205,7 +205,7 @@ SystemPtr Model::getSystem( SystemPathCref aSystemPath ) const
     {
         THROW_EXCEPTION( BadSystemPath, 
                          "[" + aSystemPath.asString() +
-                         "] is not an absolute SystemPath." );
+                         "] is not an absolute SystemPath" );
     }
 
     aSystemPathCopy.pop_front();
@@ -261,7 +261,7 @@ EcsObject* Model::getObject( Handle const& handle ) const
 
     if ( i == theObjectMap.end() )
     {
-        THROW_EXCEPTION( NotFound, "Entity not found");
+        THROW_EXCEPTION( NotFound, "entity not found");
     }
 
     return i->second;
@@ -428,7 +428,7 @@ void Model::setDMSearchPath( const std::string& path )
     if ( !smmbase )
     {
         THROW_EXCEPTION( IllegalOperation,
-                         "The ModuleMaker assigned to this model is not a "
+                         "the ModuleMaker assigned to this model is not a "
                          "SharedModuleMaker.");
     }
     smmbase->setSearchPath( path );
@@ -441,7 +441,7 @@ const std::string Model::getDMSearchPath() const
     if ( !smmbase )
     {
         THROW_EXCEPTION( IllegalOperation,
-                         "The ModuleMaker assigned to this model is not a "
+                         "the ModuleMaker assigned to this model is not a "
                          "SharedModuleMaker.");
     }
     return smmbase->getSearchPath();
@@ -479,7 +479,10 @@ void Model::markDirty()
 Handle Model::generateNextHandle()
 {
     if ( Handle::INVALID_HANDLE_VALUE == ++theNextHandleVal )
-        THROW_EXCEPTION( TooManyItems, "Too many entities or steppers created" );
+    {
+        THROW_EXCEPTION( TooManyItems,
+                         "too many entities or steppers created" );
+    }
     return Handle( theNextHandleVal );
 }
 

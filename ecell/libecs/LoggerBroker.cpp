@@ -80,8 +80,8 @@ LoggerPtr LoggerBroker::getLogger( FullPNCref aFullPN ) const
 
     if( anOuterIter == theLoggerMap.end() )
     {
-        THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.asString() 
-                                   + "] not found." );
+        THROW_EXCEPTION( NotFound, "logger [" + aFullPN.asString() 
+                                   + "] not found" );
     }
 
     PerFullIDMap::const_iterator anInnerIter(
@@ -89,8 +89,8 @@ LoggerPtr LoggerBroker::getLogger( FullPNCref aFullPN ) const
 
     if( anInnerIter == anOuterIter->second.end() )
     {
-        THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.asString() 
-                                   + "] not found." );
+        THROW_EXCEPTION( NotFound, "logger [" + aFullPN.asString() 
+                                   + "] not found" );
     }
 
     return anInnerIter->second;
@@ -110,7 +110,7 @@ LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,
         if( anInnerIter != anOuterIter->second.end() )
         {
             THROW_EXCEPTION( AlreadyExist, "Logger [" + aFullPN.asString()
-                                           + "] already exist." );
+                                           + "] already exists" );
         }
     }
 
@@ -162,7 +162,7 @@ void LoggerBroker::removeLogger( FullPNCref aFullPN )
     if( anOuterIter == theLoggerMap.end() )
     {
         THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.asString() 
-                                   + "] not found." );
+                                   + "] not found" );
     }
 
     PerFullIDMap::iterator anInnerIter(
@@ -171,7 +171,7 @@ void LoggerBroker::removeLogger( FullPNCref aFullPN )
     if( anInnerIter == anOuterIter->second.end() )
     {
         THROW_EXCEPTION( NotFound, "Logger [" + aFullPN.asString() 
-                                   + "] not found." );
+                                   + "] not found" );
     }
 
     anOuterIter->second.erase( anInnerIter );

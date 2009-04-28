@@ -69,7 +69,7 @@ const SystemPath Entity::getSystemPath() const
 
     if ( !aSystem )
     {
-        THROW_EXCEPTION( IllegalOperation, "No system is associated" );
+        THROW_EXCEPTION( IllegalOperation, "no system is associated" );
     }
 
     if ( aSystem == this )

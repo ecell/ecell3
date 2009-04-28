@@ -355,7 +355,7 @@ public:
         }
         else
         {
-            THROW_EXCEPTION( TypeError, "dynamic cast failed." );
+            THROW_EXCEPTION( TypeError, "dynamic cast failed" );
         }
     }
 };

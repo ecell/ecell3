@@ -186,7 +186,7 @@ public:
     {
         PolymorphAssocVector::const_iterator i( theInfoMap.find( aFieldName ) );
         if( i == theInfoMap.end() )
-            THROW_EXCEPTION( NoInfoField, "No such info field: " + aFieldName );
+            THROW_EXCEPTION( NoInfoField, "no such info field: " + aFieldName );
         return &i->second;
     }
 
