@@ -933,9 +933,10 @@ ExpressionCompiler::compileExpression( StringCref anExpression )
     CompilerHelper<CompilerConfig> helper(
             anExpression, anAssembler, theErrorReporter, thePropertyAccess,
             theEntityResolver, theVarRefResolver );
-    try {
+    try
+    {
         helper.compile();
-    } catch (const std::exception& e ) {
+    } catch ( const std::exception& e ) {
         delete code;
         throw e;
     }
