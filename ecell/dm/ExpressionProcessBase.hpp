@@ -246,8 +246,16 @@ public:
 
     void initialize()
     {
-        if ( theRecompileFlag ) {
-            compileExpression();
+        if ( theRecompileFlag )
+        {
+            try
+            {
+                compileExpression();
+            }
+            catch ( libecs::Exception const& e )
+            {
+                throw libecs::InitializationFailed( e, static_cast< Tmixin_ * >( this ) );
+            }
             theRecompileFlag = false;
         }
     }
