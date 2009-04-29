@@ -47,7 +47,7 @@ __all__ = (
 class Session:
     '''Session class'''
 
-    def __init__( self, aSimulator = None ):
+    def __init__( self, aSimulator=None, changeDirectory=False ):
         'constructor'
 
         self.theMessageMethod = self.__plainMessageMethod
@@ -55,11 +55,12 @@ class Session:
         if aSimulator is None:
             aSimulator = ecell.ecs.Simulator()
             aSimulator.setDMSearchPath(
-                aSimulator.DMSearchPathSeparator.join( config.dm_path ) )
+                aSimulator.DM_SEARCH_PATH_SEPARATOR.join( config.dm_path ) )
 
         self.theSimulator = aSimulator
 
         self.theModelName = ''
+        self.changeDirectory = changeDirectory
 
     def loadModel( self, aModel ):
         # aModel : an EML instance, a file name (string) or a file object
@@ -68,34 +69,28 @@ class Session:
 
         # checks the type of aModel
 
-        # if the type is EML instance
-        if type( aModel ) == type( eml.Eml ) or\
-               type( aModel ) == type( eml.Eml() ):
+        if isinstance( aModel, eml.Eml ):
+            # if the type is EML instance
             anEml = aModel
             aModelName = '<eml.Eml>'  # what should this be?
-
-        # if the type is string
-        elif type( aModel ) == str:
+        elif isinstance( aModel, str ) or isinstance( aModel, unicode ):
+            # if the type is string
             aFileObject = open( aModel )
             aModelName = aModel
             anEml = eml.Eml( aFileObject )
-
-        # if the type is file object
-        elif type( aModel ) == file:
+        elif isinstance( aModel, file ):
+            # change directory to file's home directory
+            if self.changeDirectory:
+               dirname = os.path.dirname( aModel )
+               if dirname != "":
+                   os.chdir( dirname )
+            # if the type is file object
             aFileObject = aModel
             aModelName = aModel.name
             anEml = eml.Eml( aFileObject )
-
-        # When the type doesn't match
         else:
+            # When the type doesn't match
             raise TypeError, " The type of aModel must be EML instance, string(file name) or file object "
-    
-        # change directory to file's home directory
-        if type( aModel ) != type( eml.Eml ) and\
-               type( aModel ) != type( eml.Eml() ):
-            dirname = os.path.dirname( aModel )
-            if dirname != "":
-                os.chdir( dirname )
     
         # calls load methods
         self.__loadStepper( anEml )
