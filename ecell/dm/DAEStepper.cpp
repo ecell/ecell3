@@ -124,8 +124,11 @@ void DAEStepper::initialize()
 	+ theProcessVector.size() - getDiscreteProcessOffset();
 
       if ( aSize != theSystemSize )
-	THROW_EXCEPTION( InitializationFailed,
-			 "definitions are required, are given." );
+	{
+	  THROW_EXCEPTION( InitializationFailed,
+			   "the number of algebraic variables must be "
+			   "the same as the equations" );
+	}
 
       theJacobian.resize( aSize );
       for ( VariableVector::size_type c( 0 ); c < aSize; c++ )

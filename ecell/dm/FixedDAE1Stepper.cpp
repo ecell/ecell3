@@ -75,7 +75,8 @@ void FixedDAE1Stepper::initialize()
       if ( aSize != theSystemSize )
 	{
 	  THROW_EXCEPTION( InitializationFailed,
-			   "definitions are required, are given." );
+			   "The number of the algebraic variables must be "
+			   "the same as the equations" );
 	}
 
       // allocate a matrix and set all elements to zero
