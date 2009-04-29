@@ -32,6 +32,8 @@
 #ifndef __LIBECS_HANDLE_HPP
 #define __LIBECS_HANDLE_HPP
 
+namespace libecs {
+
 class Handle
 {
 public:
@@ -81,5 +83,7 @@ private:
 public:
     static const unsigned int INVALID_HANDLE_VALUE = static_cast< unsigned int > ( -1 );
 };
+
+} // namespace libecs
 
 #endif /* __LIBECS_HANDLE_HPP */
