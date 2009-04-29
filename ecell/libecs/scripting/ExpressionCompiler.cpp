@@ -936,9 +936,11 @@ ExpressionCompiler::compileExpression( StringCref anExpression )
     try
     {
         helper.compile();
-    } catch ( const std::exception& e ) {
+    }
+    catch ( const std::exception& )
+    {
         delete code;
-        throw e;
+        throw;
     }
     return code;
 }
