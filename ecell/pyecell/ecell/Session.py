@@ -47,7 +47,7 @@ __all__ = (
 class Session:
     '''Session class'''
 
-    def __init__( self, aSimulator=None, changeDirectory=False ):
+    def __init__( self, aSimulator=None ):
         'constructor'
 
         self.theMessageMethod = self.__plainMessageMethod
@@ -60,7 +60,6 @@ class Session:
         self.theSimulator = aSimulator
 
         self.theModelName = ''
-        self.changeDirectory = changeDirectory
 
     def loadModel( self, aModel ):
         # aModel : an EML instance, a file name (string) or a file object
@@ -80,17 +79,13 @@ class Session:
             anEml = eml.Eml( aFileObject )
         elif isinstance( aModel, file ):
             # change directory to file's home directory
-            if self.changeDirectory:
-               dirname = os.path.dirname( aModel )
-               if dirname != "":
-                   os.chdir( dirname )
             # if the type is file object
             aFileObject = aModel
             aModelName = aModel.name
             anEml = eml.Eml( aFileObject )
         else:
             # When the type doesn't match
-            raise TypeError, " The type of aModel must be EML instance, string(file name) or file object "
+            raise TypeError, "The type of aModel must be EML instance, string(file name) or file object "
     
         # calls load methods
         self.__loadStepper( anEml )
