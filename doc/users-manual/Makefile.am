@@ -34,6 +34,7 @@ $(DOC_dvi): users-manual.xml
 endif
 
 EXTRA_DIST = \
+	users-manual \
 	cpp-basics.xml \
 	dm.xml \
 	ecddatafile-api.xml \
