@@ -20,15 +20,18 @@ EXTRA_DIST =\
 	StepperChooser.glade\
 	StepperTab.glade\
 	ValidateWindow.glade\
+	FullPNList.glade\
 	VariableReferenceEditorComponent.glade
 
 EXTRA_DIST +=\
 	icon_custom.png\
+	icon_design.png\
 	icon_entity.png\
 	icon_layoutmanager.png\
 	icon_modeleditor.png\
 	icon_pathway.png\
 	icon_process.png\
+	icon_run.png\
 	icon_selector.png\
 	icon_start.png\
 	icon_step.png\
@@ -37,6 +40,7 @@ EXTRA_DIST +=\
 	icon_system.png\
 	icon_textbox.png\
 	icon_variable.png\
+	modeleditor.ico\
 	modeleditor.png\
 	modeleditor32.png\
 	modeleditor_large.png\

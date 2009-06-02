@@ -43,6 +43,7 @@
 #include "VariableReference.hpp"
 
 #include <iostream>
+#include <cmath>
 
 using namespace libecs;
 
@@ -174,6 +175,18 @@ BOOST_AUTO_TEST_CASE(testBasic)
         CHECK_INSTRUCTION( pc, scripting::PUSH_REAL, 1e-20 );
         CHECK_INSTRUCTION( pc, scripting::MUL, scripting::NoOperand() );
         CHECK_INSTRUCTION( pc, scripting::SUB, scripting::NoOperand() );
+        CHECK_INSTRUCTION( pc, scripting::RET, scripting::NoOperand() );
+        BOOST_CHECK_EQUAL( eoc, pc );
+    }
+
+    {
+        std::auto_ptr<const scripting::Code> code(
+             ec.compileExpression("sin(0)" ) );
+
+        const unsigned char* pc = code->data();
+        const unsigned char* eoc = &*code->end();
+        CHECK_INSTRUCTION( pc, scripting::PUSH_REAL, 0. );
+        CHECK_INSTRUCTION( pc, scripting::CALL_FUNC1, &::sin );
         CHECK_INSTRUCTION( pc, scripting::RET, scripting::NoOperand() );
         BOOST_CHECK_EQUAL( eoc, pc );
     }
