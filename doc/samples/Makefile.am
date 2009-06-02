@@ -41,5 +41,7 @@ uninstall-hook:
 
 dist-hook:
 	for dir in $(SAMPLES); do \
-		$(RM) -r "$(distdir)/$$dir/.svn"; \
+		find "$(distdir)/$$dir" -name ".svn" -type d | while read file; do \
+			rm -rf "$$file"; \
+		done; \
 	done
