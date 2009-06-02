@@ -46,7 +46,7 @@ def getCompartment( aSBMLmodel ):
     theList = aSBMLmodel.getListOfCompartments()
     #if Model_getCompartment( aSBMLmodel , 0 ):
         
-    NumCompartment = theList.getNumItems()
+    NumCompartment = len( theList )
         
     for Num in range( NumCompartment ):
         ListOfCompartment = []
@@ -103,13 +103,19 @@ def getEvent( aSBMLmodel ):
             
             anId_Ev = anEvent.getId()
             aName_Ev = anEvent.getName()
-            
-            anASTNode_Ev_Tr = anEvent.getTrigger()
-            aString_Ev_Tr = sub( libsbml.formulaToString , anASTNode_Ev_Tr )
-            
-            anASTNode_Ev_De = anEvent.getDelay()
-            aString_Ev_De = sub( libsbml.formulaToString , anASTNode_Ev_Tr )
-            
+            aString_Ev_Tr = ''
+            aString_Ev_De = ''
+
+            aNode_Ev_Tr = anEvent.getTrigger()
+            if aNode_Ev_Tr is not None and aNode_Ev_Tr.isSetMath():
+                aString_Ev_Tr = sub( libsbml.formulaToString,
+                    aNode_Ev_Tr.getMath() )
+
+            aNode_Ev_De = anEvent.getDelay()
+            if aNode_Ev_De is not None and aNode_Ev_De.isSetMath():
+                aString_Ev_De = sub( libsbml.formulaToString,
+                    aNode_Ev_Tr.getMath() )
+
             aTimeUnit_Ev = anEvent.getTimeUnits()
             
             ListOfEventAssignments = []
@@ -121,10 +127,12 @@ def getEvent( aSBMLmodel ):
                     anEventAssignment = anEvent.getEventAssignment( Num_Ev_As )
                     
                     aVariable_Ev_As = anEventAssignment.getVariable()
-                    
-                    anASTNode_Ev_As = anEventAssignment.getMath()
-                    aString_Ev_As = sub( libsbml.formulaToString , anASTNode_Ev_As )
-                    
+                    aString_Ev_As = ''
+
+                    if anEventAssignment.isSetMath():
+                        aString_Ev_As = sub( libsbml.formulaToString,
+                                anEventAssignment.getMath() )
+
                     ListOfEventAssignment.append( aVariable_Ev_As )
                     ListOfEventAssignment.append( aString_Ev_As )
                     
@@ -154,9 +162,11 @@ def getFunctionDefinition( aSBMLmodel ):
 
             anId_FD = aFunctionDefinition.getId()
             aName_FD = aFunctionDefinition.getName()
+            aString_FD = ''
 
-            anASTNode_FD = aFunctionDefinition.getMath()
-            aString_FD = sub( libsbml.formulaToString , anASTNode_FD )
+            if aFunctionDefinition.isSetMath():
+                aString_FD = sub( libsbml.formulaToString,
+                    aFunctionDefinition.getMath() )
 
             ListOfFunctionDefinition.append( anId_FD )
             ListOfFunctionDefinition.append( aName_FD )
@@ -229,9 +239,9 @@ def getReaction( aSBMLmodel, aSBMLDocument ):
                         aMath.append( '' )
                     else:
                         if aKineticLaw.isSetMath():
-                            anASTNode_KL = aKineticLaw.getMath()
-                            aMath.append( libsbml.formulaToString\
-                                          ( anASTNode_KL ) )
+                            aMath.append(
+                                libsbml.formulaToString( aKineticLaw.getMath() )
+                                )
                         else:
                             aMath.append( '' )
 
@@ -290,11 +300,12 @@ def getReaction( aSBMLmodel, aSBMLDocument ):
                     aSpecies_R = aSpeciesReference.getSpecies()
                     aStoichiometry_R = aSpeciesReference.getStoichiometry()
 
+                    aString_R = []
                     if aSpeciesReference.isSetStoichiometryMath():
-                        anASTNode_R = aSpeciesReference.getStoichiometryMath()
-                        aString_R = sub( libsbml.formulaToString , anASTNode_R )
-                    else:
-                        aString_R = []
+                        aNode_R = aSpeciesReference.getStoichiometryMath()
+                        if aNode_R.isSetMath():
+                            aString_R = sub( libsbml.formulaToString,
+                                aNode_R.getMath() )
 
                     aDenominator_R = aSpeciesReference.getDenominator()
 
@@ -326,11 +337,12 @@ def getReaction( aSBMLmodel, aSBMLDocument ):
                     aSpecies_P = aSpeciesReference.getSpecies()
                     aStoichiometry_P = aSpeciesReference.getStoichiometry()
 
+                    aString_P = []
                     if aSpeciesReference.isSetStoichiometryMath():
-                        anASTNode_P = aSpeciesReference.getStoichiometryMath()
-                        aString_P = sub( libsbml.formulaToString , anASTNode_P )
-                    else:
-                        aString_P = []
+                        aNode_P = aSpeciesReference.getStoichiometryMath()
+                        if aNode_P.isSetMath():
+                            aString_P = sub( libsbml.formulaToString,
+                                    aNode_P.getMath() )
 
                     aDenominator_P = aSpeciesReference.getDenominator()
 
