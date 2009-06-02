@@ -52,7 +52,7 @@ for dir in . libltdl dmtool ecell
   (cd $dir; \
   { if [ -r configure.ac.in ]; then echo -n 'configure.ac ' && sed -e "s/@ECELL_VERSION_NUMBER@/$ECELL_VERSION_NUMBER/g" configure.ac.in > configure.ac; fi } && \
   { echo -n 'libtoolize '; $LIBTOOLIZE -c --force --automake; } && \
-  { echo -n 'aclocal '; aclocal -I$top_srcdir/m4; } && \
+  { echo -n 'aclocal '; aclocal ; } && \
   { echo -n 'autoheader '; autoheader -f ; } && \
   { echo -n 'automake ';  automake -c --add-missing --gnu $am_opt; } && \
   { echo -n 'autoconf '; autoconf; } && \
