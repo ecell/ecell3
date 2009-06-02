@@ -19,62 +19,6 @@ m4_ifdef([AC_PROVIDE_IFELSE],
 	         [m4_ifdef([AC_PROVIDE_$1],
 		           [$2], [$3])])])
 
-
-# AC_PROG_LIBTOOL
-# ---------------
-AC_DEFUN([AC_PROG_LIBTOOL],
-[AC_REQUIRE([_AC_PROG_LIBTOOL])dnl
-dnl If AC_PROG_CXX has already been expanded, run AC_LIBTOOL_CXX
-dnl immediately, otherwise, hook it in at the end of AC_PROG_CXX.
-  AC_PROVIDE_IFELSE([AC_PROG_CXX],
-    [AC_LIBTOOL_CXX],
-    [define([AC_PROG_CXX], defn([AC_PROG_CXX])[AC_LIBTOOL_CXX
-  ])])
-dnl And a similar setup for Fortran 77 support
-  AC_PROVIDE_IFELSE([AC_PROG_F77],
-    [AC_LIBTOOL_F77],
-    [define([AC_PROG_F77], defn([AC_PROG_F77])[AC_LIBTOOL_F77
-])])
-
-dnl Quote A][M_PROG_GCJ so that aclocal doesn't bring it in needlessly.
-dnl If either AC_PROG_GCJ or A][M_PROG_GCJ have already been expanded, run
-dnl AC_LIBTOOL_GCJ immediately, otherwise, hook it in at the end of both.
-  AC_PROVIDE_IFELSE([AC_PROG_GCJ],
-    [AC_LIBTOOL_GCJ],
-    [AC_PROVIDE_IFELSE([A][M_PROG_GCJ],
-      [AC_LIBTOOL_GCJ],
-      [AC_PROVIDE_IFELSE([LT_AC_PROG_GCJ],
-	[AC_LIBTOOL_GCJ],
-      [ifdef([AC_PROG_GCJ],
-	     [define([AC_PROG_GCJ], defn([AC_PROG_GCJ])[AC_LIBTOOL_GCJ])])
-       ifdef([A][M_PROG_GCJ],
-	     [define([A][M_PROG_GCJ], defn([A][M_PROG_GCJ])[AC_LIBTOOL_GCJ])])
-       ifdef([LT_AC_PROG_GCJ],
-	     [define([LT_AC_PROG_GCJ],
-		defn([LT_AC_PROG_GCJ])[AC_LIBTOOL_GCJ])])])])
-])])# AC_PROG_LIBTOOL
-
-
-# _AC_PROG_LIBTOOL
-# ----------------
-AC_DEFUN([_AC_PROG_LIBTOOL],
-[AC_REQUIRE([AC_LIBTOOL_SETUP])dnl
-AC_BEFORE([$0],[AC_LIBTOOL_CXX])dnl
-AC_BEFORE([$0],[AC_LIBTOOL_F77])dnl
-AC_BEFORE([$0],[AC_LIBTOOL_GCJ])dnl
-
-# This can be used to rebuild libtool when needed
-LIBTOOL_DEPS="$ac_aux_dir/ltmain.sh"
-
-# Always use our own libtool.
-LIBTOOL='$(SHELL) $(top_builddir)/libtool'
-AC_SUBST(LIBTOOL)dnl
-
-# Prevent multiple expansion
-define([AC_PROG_LIBTOOL], [])
-])# _AC_PROG_LIBTOOL
-
-
 # AC_LIBTOOL_SETUP
 # ----------------
 AC_DEFUN([AC_LIBTOOL_SETUP],
@@ -6395,14 +6339,6 @@ done
 SED=$lt_cv_path_SED
 AC_MSG_RESULT([$SED])
 ])
-## ltdl.m4 - Configure ltdl for the target system. -*-Autoconf-*-
-## Copyright (C) 1999-2000 Free Software Foundation, Inc.
-##
-## This file is free software; the Free Software Foundation gives
-## unlimited permission to copy and/or distribute it, with or without
-## modifications, as long as this notice is preserved.
-
-# serial 7 AC_LIB_LTDL
 
 # AC_WITH_LTDL
 # ------------
@@ -6410,7 +6346,7 @@ AC_MSG_RESULT([$SED])
 # choose between a shipped copy of the ltdl sources or a preinstalled
 # version of the library.
 AC_DEFUN([AC_WITH_LTDL],
-[AC_REQUIRE([AC_LIB_LTDL])
+[AC_REQUIRE([AC__LIB_LTDL])
 AC_SUBST([LIBLTDL])
 AC_SUBST([INCLTDL])
 
@@ -6452,11 +6388,11 @@ AC_CONFIG_SUBDIRS([libltdl])
 ])# AC_WITH_LTDL
 
 
-# AC_LIB_LTDL
+# AC__LIB_LTDL
 # -----------
 # Perform all the checks necessary for compilation of the ltdl objects
 #  -- including compiler checks and header checks.
-AC_DEFUN([AC_LIB_LTDL],
+AC_DEFUN([AC__LIB_LTDL],
 [AC_PREREQ(2.50)
 AC_REQUIRE([AC_PROG_CC])
 AC_REQUIRE([AC_C_CONST])
@@ -6485,7 +6421,7 @@ AC_CHECK_FUNCS([strrchr rindex], [break])
 AC_CHECK_FUNCS([memcpy bcopy], [break])
 AC_CHECK_FUNCS([memmove strcmp])
 AC_CHECK_FUNCS([closedir opendir readdir])
-])# AC_LIB_LTDL
+])# AC__LIB_LTDL
 
 
 # AC_LTDL_ENABLE_INSTALL
