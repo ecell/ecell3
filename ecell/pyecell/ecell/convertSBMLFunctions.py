@@ -615,41 +615,8 @@ class SBML_Rule( SBML_Model ):
 
                 return libsbml.SBML_COMPARTMENT
 
-        raise TypeError, "Variable type must be Species, Parameter, or Compartment"
+        raise TypeError, "Variable type must be Species, Parameter, or Compartment (got %s)" % aName
     
-
-##     # =========================================================
-
-##     def setMolarConcName( self, aName ):
-
-##         for aVariableReference in self.VariableReferenceList:
-##             if aVariableReference[1].split(':')[2] == aName:
-                
-##                 return aVariableReference[0] + '.MolarConc'
-                
-
-##     # =========================================================
-
-##     def setValueName( self, aName ):
-
-##         for aVariableReference in self.VariableReferenceList:
-##             if aVariableReference[1].split(':')[2] == aName:
-
-##                 return aVariableReference[0] + '.Value'
-
-
-##     # =========================================================
-
-##     def setSizeName( self, aName ):
-
-##         for aVariableReference in self.VariableReferenceList:
-##             if aVariableReference[1].split(':')[2] == 'SIZE':
-
-##                 return aVariableReference[0] + '.Value'
-
-
-##     # =========================================================
-
     def setSpeciesToVariableReference( self, aName, aStoichiometry='0' ):
 
         for aSpecies in self.Model.SpeciesList:

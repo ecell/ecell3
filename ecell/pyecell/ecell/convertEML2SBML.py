@@ -899,8 +899,7 @@ def convertToSBMLModel( anEml, aBaseName, aLevel, aVersion ):
     aSBMLLevel = aLevel
 
     aSBMLDocument = libsbml.SBMLDocument()
-    aSBMLDocument.setLevel( int( aLevel ) ) 
-    aSBMLDocument.setVersion( int( aVersion ) ) 
+    aSBMLDocument.setLevelAndVersion( int( aLevel ), int( aVersion ) )
     aSBMLModel = aSBMLDocument.createModel()
 
     aSBMLModel.setId( aBaseName )
