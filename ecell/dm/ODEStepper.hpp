@@ -134,7 +134,7 @@ public:
   Real solve();
   Real estimateLocalError();
 
-  void initializeRadauIIA();
+  void initializeRadauIIA( VariableVector::size_type );
   bool calculateRadauIIA();
   void stepRadauIIA();
 

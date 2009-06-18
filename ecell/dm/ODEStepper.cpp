@@ -46,7 +46,7 @@ LIBECS_DM_INIT( ODEStepper, Stepper );
 
 ODEStepper::ODEStepper()
   :
-  theSystemSize( 0 ),
+  theSystemSize( -1 ),
   theJacobianMatrix1( NULLPTR ),
   thePermutation1( NULLPTR ),
   theVelocityVector1( NULLPTR ),
@@ -140,19 +140,18 @@ void ODEStepper::initializeStepper()
   isStiff = true;
   theStiffnessCounter = 0;
 
-  if ( getReadOnlyVariableOffset() > 0 )
-    {
-      if ( isStiff ) initializeRadauIIA();
-      else  theSystemSize = getReadOnlyVariableOffset();
-      
-      theW.resize( boost::extents[ 6 ][ theSystemSize ] );
-    }
-}
-
-void ODEStepper::initializeRadauIIA()
-{
   const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
+  if ( isStiff ) initializeRadauIIA( aSize );
+
+  if ( aSize != theSystemSize )
+    theW.resize( boost::extents[ 6 ][ aSize ] );
+
+  theSystemSize = aSize;
+}
+
+void ODEStepper::initializeRadauIIA( VariableVector::size_type aNewSystemSize )
+{
   eta = 1.0;
   theStoppingCriterion 
     = std::max( 10.0 * Uround / rtoler, std::min( 0.03, sqrt( rtoler ) ) );
@@ -160,43 +159,73 @@ void ODEStepper::initializeRadauIIA()
   theFirstStepFlag = true;
   theJacobianCalculateFlag = true;
   
-  if ( !theJacobianMatrix1 || theSystemSize != aSize )
+  if ( aNewSystemSize != theSystemSize )
     {
-      theSystemSize = aSize;
-
-      theJacobian.resize( boost::extents[ theSystemSize ][ theSystemSize ] );
+      theJacobian.resize( boost::extents[ aNewSystemSize ][ aNewSystemSize ] );
       
       if ( theJacobianMatrix1 )
-	gsl_matrix_free( theJacobianMatrix1 );
-      theJacobianMatrix1 = gsl_matrix_calloc( theSystemSize, theSystemSize );
-      
+	{
+	  gsl_matrix_free( theJacobianMatrix1 );
+	  theJacobianMatrix1 = 0;
+	}
+      if ( aNewSystemSize > 0 )
+	theJacobianMatrix1 = gsl_matrix_calloc( aNewSystemSize, aNewSystemSize );
+
       if ( thePermutation1 )
-	gsl_permutation_free( thePermutation1 );
-      thePermutation1 = gsl_permutation_alloc( theSystemSize );
-      
+	{
+	  gsl_permutation_free( thePermutation1 );
+	  thePermutation1 = 0;
+	}
+      if ( aNewSystemSize > 0 )
+	thePermutation1 = gsl_permutation_alloc( aNewSystemSize );
+
       if ( theVelocityVector1 )
-	gsl_vector_free( theVelocityVector1 );
-      theVelocityVector1 = gsl_vector_calloc( theSystemSize );
-      
+	{
+	  gsl_vector_free( theVelocityVector1 );
+	  theVelocityVector1 = 0;
+	}
+      if ( aNewSystemSize > 0 )
+	theVelocityVector1 = gsl_vector_calloc( aNewSystemSize );
+
       if ( theSolutionVector1 )
-	gsl_vector_free( theSolutionVector1 );
-      theSolutionVector1 = gsl_vector_calloc( theSystemSize );
-      
+	{
+	  gsl_vector_free( theSolutionVector1 );
+	  theSolutionVector1 = 0;
+	}	
+      if ( aNewSystemSize > 0 )
+	theSolutionVector1 = gsl_vector_calloc( aNewSystemSize );
+
       if ( theJacobianMatrix2 )
-	gsl_matrix_complex_free( theJacobianMatrix2 );
-      theJacobianMatrix2 = gsl_matrix_complex_calloc( theSystemSize, theSystemSize );
-      
+	{
+	  gsl_matrix_complex_free( theJacobianMatrix2 );
+	  theJacobianMatrix2 = 0;
+	}
+      if ( aNewSystemSize > 0 )
+	theJacobianMatrix2 = gsl_matrix_complex_calloc( aNewSystemSize, aNewSystemSize );
+
       if ( thePermutation2 )
-	gsl_permutation_free( thePermutation2 );
-      thePermutation2 = gsl_permutation_alloc( theSystemSize );
-      
+	{
+	  gsl_permutation_free( thePermutation2 );
+	  thePermutation2 = 0;
+	}
+      if ( aNewSystemSize > 0 )
+	thePermutation2 = gsl_permutation_alloc( aNewSystemSize );
+
       if ( theVelocityVector2 )
-	gsl_vector_complex_free( theVelocityVector2 );
-      theVelocityVector2 = gsl_vector_complex_calloc( theSystemSize );
-      
+	{
+	  gsl_vector_complex_free( theVelocityVector2 );
+	  theVelocityVector2 = 0;
+	}
+      if ( aNewSystemSize > 0 )
+	theVelocityVector2 = gsl_vector_complex_calloc( aNewSystemSize );
+ 
       if ( theSolutionVector2 )
-	gsl_vector_complex_free( theSolutionVector2 );
-      theSolutionVector2 = gsl_vector_complex_calloc( theSystemSize );
+	{
+	  gsl_vector_complex_free( theSolutionVector2 );
+	  theSolutionVector2 = 0;
+	}
+      if ( aNewSystemSize > 0 )
+	theSolutionVector2 = gsl_vector_complex_calloc( aNewSystemSize );
     }
 }
 
@@ -702,6 +731,9 @@ Real ODEStepper::estimateLocalError()
 
 void ODEStepper::stepRadauIIA()
 {
+  if ( !theJacobianMatrix1 )
+    return;
+
   theStateFlag = false;
   
   thePreviousStepInterval = getStepInterval();

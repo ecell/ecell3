@@ -1,4 +1,14 @@
-ecell-3.1.107: 29-Apr-2009
+ecell-3.1.107: 19-Jun-2009
+
+ * Fixed a bug in ODEStepper that causes SIGABRT under the circumstances
+   no processes are associated to the stepper. Noticed by Sachio Nohara.
+   Thanks.
+
+ * Patched libltdl so it would not be interfered by the newer versions of
+   libtool.
+
+ * Migrated to libsbml 3.x.  SBML to EML and EML to SBML converter are now
+   officially confirmed to work with it.
 
  * Changed ecell3-session-monitor so that it would never change the current
    working directory to the one the model file is located.
@@ -24,7 +34,7 @@ ecell-3.1.107RC4: 5-Apr-2009
 
 ecell-3.1.107RC3: 11-Mar-2009
 
- * Remove deprecate API calls in session-monitor. This enables it to run
+ * Removed deprecate API calls in session-monitor. This enables it to run
    on Mac OS X with the native GTK+.
 
  * Fixed bugs in DM compiler tools.
