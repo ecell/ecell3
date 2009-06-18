@@ -172,6 +172,7 @@ protected:
     VariableVector::size_type theSystemSize;
 
     RealMatrix           theJacobian, theW;
+    RealVector           theEigenVector, theTempVector;
 
     gsl_matrix*          theJacobianMatrix1;
     gsl_permutation*     thePermutation1;
@@ -324,6 +325,8 @@ void ODEStepper::initializeRadauIIA( VariableVector::size_type aNewSystemSize )
     if ( aNewSystemSize != theSystemSize )
     {
         theJacobian.resize( boost::extents[ aNewSystemSize ][ aNewSystemSize ] );
+        theEigenVector.resize( aNewSystemSize );
+        theTempVector.resize( aNewSystemSize );
 
         if ( theJacobianMatrix1 )
         {
@@ -475,10 +478,7 @@ void ODEStepper::decompJacobianMatrix()
 
 Real ODEStepper::calculateJacobianNorm()
 {
-    Real theEigenVector[ theSystemSize ];
-    Real theTempVector[ theSystemSize ];
-
-    std::fill( theEigenVector, theEigenVector + theSystemSize,
+    std::fill( theEigenVector.begin(), theEigenVector.end(),
                sqrt( 1.0 / theSystemSize ) );
 
     Real sum, norm;
