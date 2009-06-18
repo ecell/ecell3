@@ -475,8 +475,11 @@ void ODEStepper::decompJacobianMatrix()
 
 Real ODEStepper::calculateJacobianNorm()
 {
-    RealVector theEigenVector( theSystemSize, sqrt( 1.0 / theSystemSize ) ),
-        theTempVector( theSystemSize );
+    Real theEigenVector[ theSystemSize ];
+    Real theTempVector[ theSystemSize ];
+
+    std::fill( theEigenVector, theEigenVector + theSystemSize,
+               sqrt( 1.0 / theSystemSize ) );
 
     Real sum, norm;
 
