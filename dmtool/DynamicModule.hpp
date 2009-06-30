@@ -233,8 +233,8 @@ SharedDynamicModule( const std::string& classname, DMAllocator allocator,
   :
   DynamicModuleBase<Base,DMAllocator>( classname, allocator, infoLoader,
                                        typeName ), 
-  theFileName( fileName ),
-  theHandle( handle )
+  theHandle( handle ),
+  theFileName( fileName )
 {
 }
 
