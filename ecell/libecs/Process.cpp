@@ -162,9 +162,9 @@ namespace libecs
     :
     theZeroVariableReferenceIterator( theVariableReferenceVector.end() ),
     thePositiveVariableReferenceIterator( theVariableReferenceVector.end() ),
+    theStepper( NULLPTR ),
     theActivity( 0.0 ),
-    thePriority( 0 ),
-    theStepper( NULLPTR )
+    thePriority( 0 )
   {
     ; // do nothing
   }
