@@ -375,7 +375,6 @@ SharedModuleMaker<T,DMAllocator>::loadModule( const std::string& aClassname )
       return;      
     }
     
-  SharedModule* aSharedModule( 0 );
   std::string filename( aClassname );
   lt_dlhandle handle( lt_dlopenext( filename.c_str() ) );
   if ( !handle ) 
