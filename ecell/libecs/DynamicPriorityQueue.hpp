@@ -607,7 +607,6 @@ void
 DynamicPriorityQueue< Item, IDPolicy >::moveDownPos( const Index position )
 {
     const Index index( this->heap[ position ] );
-    const Item& item( this->itemVector[ index ] );
 
     const Index size( getSize() );
     
