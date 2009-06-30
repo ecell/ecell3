@@ -55,9 +55,9 @@ namespace libecs
 
   DifferentialStepper::DifferentialStepper()
     :
+    theStateFlag( true ),
     theNextStepInterval( 0.001 ),
-    theTolerableStepInterval( 0.001 ),
-    theStateFlag( true )
+    theTolerableStepInterval( 0.001 )
   {
     ; // do nothing
   }
@@ -289,6 +289,7 @@ namespace libecs
 
   AdaptiveDifferentialStepper::AdaptiveDifferentialStepper()
     :
+    safety( 0.9 ),
     theTolerance( 1.0e-6 ),
     theAbsoluteToleranceFactor( 1.0 ),
     theStateToleranceFactor( 1.0 ),
@@ -296,7 +297,6 @@ namespace libecs
     theEpsilonChecked( 0 ),
     theAbsoluteEpsilon( 0.1 ),
     theRelativeEpsilon( 0.1 ),
-    safety( 0.9 ),
     theMaxErrorRatio( 1.0 )
   {
     // use more narrow range
