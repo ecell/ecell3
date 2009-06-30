@@ -110,8 +110,8 @@ namespace libecs
   System::System()
     :
     theStepper( NULLPTR ),
-    theSizeVariable( NULLPTR ),
     theModel( NULLPTR ),
+    theSizeVariable( NULLPTR ),
     theEntityListChanged( false )
   {
     ; // do nothing
