@@ -273,11 +273,11 @@ namespace libecs
 	//    setStepInterval( aCallerCurrentTime + ( aCallerTimeScale * 0.5 ) 
 	//		     - aCurrentTime );
       }
-    else
-      {
-	// reset step interval to the default
-	setNextStepInterval( 0.001 );
-      }
+//     else
+//       {
+//           // reset step interval to the default
+//           setNextStepInterval( 0.001 );
+//       }
       
     const Real aNewStepInterval( aCallerCurrentTime - aCurrentTime );
 
@@ -302,6 +302,7 @@ namespace libecs
     // use more narrow range
     setMinStepInterval( 1e-100 );
     setMaxStepInterval( 1e+10 );
+    setTolerableRejectedStepCount( std::numeric_limits<int>::max() );
   }
 
   AdaptiveDifferentialStepper::~AdaptiveDifferentialStepper()
@@ -328,31 +329,22 @@ namespace libecs
     setStepInterval( getNextStepInterval() );
     //    setTolerableInterval( 0.0 );
 
+    UnsignedInteger theRejectedStepCounter( 0 );
+
     while ( !calculate() )
       {
+          if ( theRejectedStepCounter++ > theTolerableRejectedStepCount )
+          {
+              THROW_EXCEPTION( SimulationError, "The times of rejections of step calculation exceeded a maximum tolerable count (TolerableRejectedStepCount)." );
+          }
+
 	const Real anExpectedStepInterval( safety * getStepInterval() 
 					   * pow( getMaxErrorRatio(),
 						  -1.0 / getOrder() ) );
 	//	const Real anExpectedStepInterval( 0.5 * getStepInterval() );
 
-	if ( anExpectedStepInterval > getMinStepInterval() )
-	  {
-	    // shrink it if the error exceeds 110%
-	    setStepInterval( anExpectedStepInterval );
-	  }
-	else
-	  {
-	    setStepInterval( getMinStepInterval() );
-
-	    // this must return false,
-	    // so theTolerableStepInterval does NOT LIMIT the error.
-	    THROW_EXCEPTION( SimulationError,
-			     "The error-limit step interval of Stepper [" + 
-			     getID() + "] is too small." );
- 
-	    calculate();
-	    break;
-	  }
+    // shrink it if the error exceeds 110%
+    setStepInterval( anExpectedStepInterval );
       }
 
     // an extra calculation for resetting the activities of processes

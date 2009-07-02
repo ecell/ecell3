@@ -172,18 +172,21 @@ namespace libecs
 
     virtual SET_METHOD( Real, StepInterval )
     {
-      Real aNewStepInterval( value );
-
-      if( aNewStepInterval > getMaxStepInterval() )
-	{
-	  aNewStepInterval = getMaxStepInterval();
-	}
-      else if ( aNewStepInterval < getMinStepInterval() )
-	{
-	  aNewStepInterval = getMinStepInterval();
-	}
-
-      loadStepInterval( aNewStepInterval );
+        if ( value < getMinStepInterval() )
+        {
+            loadStepInterval( getMinStepInterval() );
+            THROW_EXCEPTION( SimulationError,
+                             "The error-limit step interval of Stepper [" + 
+                             getID() + "] is too small." );
+        }
+//         else if ( value > getMaxStepInterval() )
+//         {
+//             value = getMaxStepInterval();
+//         }
+        else
+        {
+            loadStepInterval( value );
+        }
     }
 
 
@@ -230,7 +233,8 @@ namespace libecs
 
     SET_METHOD( Real, MaxStepInterval )
     {
-      theMaxStepInterval = value;
+        // THROW_EXCEPTION( ValueError, "Warning: MaxStepInterval doesn't work now. do nothing." );
+        theMaxStepInterval = value;
     }
 
     GET_METHOD( Real, MaxStepInterval )

@@ -191,10 +191,10 @@ protected:
   Real    theJacobianRecalculateTheta;
   Real    theSpectralRadius;
 
-  UnsignedInteger    theStiffnessCounter;
+  UnsignedInteger    theStiffnessCounter, theRejectedStepCounter;
   Integer    CheckIntervalCount, SwitchingCount;
 
-  bool    theFirstStepFlag, theJacobianCalculateFlag, theRejectedStepFlag;
+  bool    theFirstStepFlag, theJacobianCalculateFlag;
   bool    isInterrupted, isStiff;
 };
 

@@ -386,6 +386,8 @@ namespace libecs
 	PROPERTYSLOT_SET_GET( Real, RelativeEpsilon );
 
 	PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, MaxErrorRatio );
+
+    PROPERTYSLOT_SET_GET( Integer, TolerableRejectedStepCount );
       }
 
   public:
@@ -489,6 +491,16 @@ namespace libecs
       return theRelativeEpsilon;
     }
 
+    SET_METHOD( Integer, TolerableRejectedStepCount )
+    {
+      theTolerableRejectedStepCount = value;
+    }
+
+    GET_METHOD( Integer, TolerableRejectedStepCount )
+    {
+      return theTolerableRejectedStepCount;
+    }
+
     virtual void initialize();
 
     virtual void step();
@@ -513,6 +525,8 @@ namespace libecs
     Real theRelativeEpsilon;
 
     Real theMaxErrorRatio;
+
+    Integer theTolerableRejectedStepCount;
   };
 
 

@@ -60,7 +60,7 @@ ODEStepper::ODEStepper()
   Uround( 1e-10 ),
   theStoppingCriterion( 0.0 ),
   theFirstStepFlag( true ),
-  theRejectedStepFlag( false ),
+  theRejectedStepCounter( 0 ),
   theJacobianCalculateFlag( true ),
   theAcceptedError( 0.0 ),
   theAcceptedStepInterval( 0.0 ),
@@ -546,7 +546,7 @@ bool ODEStepper::calculateRadauIIA()
 	  if ( theta < 0.99 )
 	    {
 	      eta = theta / ( 1.0 - theta );
-	      const Real anIterationError( eta * aNorm * pow( theta, static_cast<int>(getMaxIterationNumber() - 2 - anIterator) ) / theStoppingCriterion );
+	      const Real anIterationError( eta * aNorm * pow( theta, static_cast<int>( getMaxIterationNumber() - 2 - anIterator) ) / theStoppingCriterion );
 	      
 	      if ( anIterationError >= 1.0 )
 		{
@@ -614,7 +614,7 @@ bool ODEStepper::calculateRadauIIA()
       theAcceptedStepInterval = aStepInterval;
       theAcceptedError = std::max( 1.0e-2, anError );
       
-      if ( theRejectedStepFlag )
+      if ( theRejectedStepCounter != 0 )
 	aNewStepInterval = std::min( aNewStepInterval, aStepInterval );
       
       theFirstStepFlag = false;
@@ -693,7 +693,7 @@ Real ODEStepper::estimateLocalError()
 
   if ( anError < 1.0 ) return anError;
   
-  if ( theFirstStepFlag || theRejectedStepFlag )
+  if ( theFirstStepFlag || theRejectedStepCounter != 0 )
     {
       fireProcesses();
       setVariableVelocity( theW[ 4 ] );
@@ -741,12 +741,12 @@ void ODEStepper::stepRadauIIA()
   clearVariables();
   //    interIntegrate();
   
-  theRejectedStepFlag = false;
+  theRejectedStepCounter = 0;
 
   fireProcesses();
   setVariableVelocity( theW[ 3 ] );
   
-  if ( theJacobianCalculateFlag )
+  if ( theJacobianCalculateFlag or isInterrupted )
     {
       calculateJacobian();
       setJacobianMatrix();
@@ -754,12 +754,15 @@ void ODEStepper::stepRadauIIA()
   else
     {
       if ( thePreviousStepInterval != getStepInterval() )
-	setJacobianMatrix();
+          setJacobianMatrix();
     }
 
   while ( !calculateRadauIIA() )
     {
-      theRejectedStepFlag = true;
+        if ( theRejectedStepCounter++ > getTolerableRejectedStepCount() )
+        {
+            THROW_EXCEPTION( SimulationError, "The times of rejections of step calculation exceeded a maximum tolerable count (TolerableRejectedStepCount)." );
+        }
 
       if ( !theJacobianCalculateFlag )
 	{
