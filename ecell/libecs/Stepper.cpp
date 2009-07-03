@@ -626,6 +626,11 @@ namespace libecs
       theMaxStepInterval = value;
   }
 
+  InterpolantPtr Stepper::createInterpolant( VariablePtr aVariablePtr )
+  {
+    return new Interpolant( aVariablePtr );
+  }
+
 } // namespace libecs
 
 

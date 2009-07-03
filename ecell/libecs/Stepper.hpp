@@ -477,10 +477,7 @@ namespace libecs
     void updateIntegratedVariableVector();
 
 
-    virtual InterpolantPtr createInterpolant( VariablePtr aVariablePtr )
-    {
-      return new Interpolant( aVariablePtr );
-    }
+    virtual InterpolantPtr createInterpolant( VariablePtr aVariablePtr );
 
     const gsl_rng* getRng() const
     {
