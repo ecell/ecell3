@@ -376,9 +376,9 @@ private:
 
 static void setWarningHandler( boost::python::handle<> const& aHandler )
 {
-    static PythonWarningHandler theHandler;
-    theHandler = aHandler;
-    libecs::setWarningHandler( &theHandler );
+  static PythonWarningHandler theHandler;
+  theHandler = aHandler;
+  libecs::setWarningHandler( &theHandler );
 }
 
 
