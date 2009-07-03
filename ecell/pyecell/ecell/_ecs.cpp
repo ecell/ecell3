@@ -271,19 +271,19 @@ public:
 
   PythonCallable( PyObject* aPyObjectPtr )
     :
-    thePyObject( aPyObjectPtr ? python::incref( aPyObjectPtr ): 0 )
+    thePyObject( python::xincref( aPyObjectPtr ) )
   {
   }
 
   PythonCallable( const PythonCallable& that )
-    : thePyObject( that.thePyObject ? python::incref( that.thePyObject ): 0 )
+    : thePyObject( python::xincref( that.thePyObject ) )
   {
   }
 
   PythonCallable& operator=( const PythonCallable& rhs )
   {
     Py_XDECREF( thePyObject );
-    thePyObject = rhs.thePyObject ? python::incref( rhs.thePyObject ): 0;
+    thePyObject = python::xincref( rhs.thePyObject );
     return *this;
   }
 
