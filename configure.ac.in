@@ -1,4 +1,5 @@
 AC_REVISION([$Id$])
+sinclude([libltdl/acinclude.m4])
 AC_INIT([ecell], [@ECELL_VERSION_NUMBER@])
 AC_CONFIG_SRCDIR([autogen.sh])
 
