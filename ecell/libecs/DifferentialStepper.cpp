@@ -292,12 +292,12 @@ namespace libecs
     theEpsilonChecked( 0 ),
     theAbsoluteEpsilon( 0.1 ),
     theRelativeEpsilon( 0.1 ),
-    theMaxErrorRatio( 1.0 )
+    theMaxErrorRatio( 1.0 ),
+    theTolerableRejectedStepCount( std::numeric_limits< Integer >::max() )
   {
     // use more narrow range
     theMinStepInterval = 1e-100;
     theMaxStepInterval = 1e+10;
-    setTolerableRejectedStepCount( std::numeric_limits<int>::max() );
   }
 
   AdaptiveDifferentialStepper::~AdaptiveDifferentialStepper()
@@ -324,22 +324,26 @@ namespace libecs
     setStepInterval( getNextStepInterval() );
     //    setTolerableInterval( 0.0 );
 
-    UnsignedInteger theRejectedStepCounter( 0 );
+    Integer theRejectedStepCounter( 0 );
 
     while ( !calculate() )
       {
-          if ( theRejectedStepCounter++ > theTolerableRejectedStepCount )
-          {
-              THROW_EXCEPTION( SimulationError, "The times of rejections of step calculation exceeded a maximum tolerable count (TolerableRejectedStepCount)." );
-          }
+	if ( ++theRejectedStepCounter >= theTolerableRejectedStepCount )
+	  {
+	    THROW_EXCEPTION( SimulationError,
+			     String( "The times of rejections of step "
+				     "calculation exceeded a maximum tolerable "
+				     "count (" )
+			     + stringCast( theTolerableRejectedStepCount )
+			     + ")." );
+	  }
 
 	const Real anExpectedStepInterval( safety * getStepInterval() 
 					   * pow( getMaxErrorRatio(),
 						  -1.0 / getOrder() ) );
-	//	const Real anExpectedStepInterval( 0.5 * getStepInterval() );
 
-    // shrink it if the error exceeds 110%
-    setStepInterval( anExpectedStepInterval );
+	// shrink it if the error exceeds 110%
+	setStepInterval( anExpectedStepInterval );
       }
 
     // an extra calculation for resetting the activities of processes

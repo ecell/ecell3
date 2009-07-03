@@ -761,7 +761,12 @@ void ODEStepper::stepRadauIIA()
     {
       if ( ++theRejectedStepCounter >= getTolerableRejectedStepCount() )
         {
-            THROW_EXCEPTION( SimulationError, "The times of rejections of step calculation exceeded a maximum tolerable count (TolerableRejectedStepCount)." );
+          THROW_EXCEPTION( SimulationError,
+			   String( "The times of rejections of step "
+				   "calculation exceeded a maximum tolerable "
+				   "count (" )
+			   + stringCast( getTolerableRejectedStepCount() )
+			   + ")." );
         }
 
       if ( !theJacobianCalculateFlag )
