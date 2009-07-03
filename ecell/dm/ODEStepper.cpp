@@ -746,7 +746,7 @@ void ODEStepper::stepRadauIIA()
   fireProcesses();
   setVariableVelocity( theW[ 3 ] );
   
-  if ( theJacobianCalculateFlag or isInterrupted )
+  if ( theJacobianCalculateFlag || isInterrupted )
     {
       calculateJacobian();
       setJacobianMatrix();
@@ -759,7 +759,7 @@ void ODEStepper::stepRadauIIA()
 
   while ( !calculateRadauIIA() )
     {
-        if ( theRejectedStepCounter++ > getTolerableRejectedStepCount() )
+      if ( ++theRejectedStepCounter >= getTolerableRejectedStepCount() )
         {
             THROW_EXCEPTION( SimulationError, "The times of rejections of step calculation exceeded a maximum tolerable count (TolerableRejectedStepCount)." );
         }
