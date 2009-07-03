@@ -273,11 +273,6 @@ namespace libecs
 	//    setStepInterval( aCallerCurrentTime + ( aCallerTimeScale * 0.5 ) 
 	//		     - aCurrentTime );
       }
-//     else
-//       {
-//           // reset step interval to the default
-//           setNextStepInterval( 0.001 );
-//       }
       
     const Real aNewStepInterval( aCallerCurrentTime - aCurrentTime );
 
