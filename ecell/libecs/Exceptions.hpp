@@ -78,8 +78,8 @@ public:
     Exception( String const& method, String const& message = "", EcsObject const* object = 0 )
         : theMethod( method ), 
           theMessage( message ),
-          theWhatMsg(),
-          theEcsObject( object )
+          theEcsObject( object ),
+          theWhatMsg()
     {
         ; // do nothing
     }
