@@ -50,6 +50,8 @@ namespace libecs
 
   static volatile bool isInitialized = false;
 
+  static WarningHandler* warningHandler = 0;
+
   bool initialize()
   {
     /* XXX: not atomic - "compare and swap" needed for concurrency */
@@ -115,5 +117,20 @@ namespace libecs
   {
     return VERSION_STRING;
   }
+
+  void issueWarning( const String& msg )
+  {
+	if ( warningHandler )
+	{
+	  (*warningHandler)( msg );
+	}
+  }
+
+  void setWarningHandler( WarningHandler* handler )
+  {
+	warningHandler = handler;
+  }
+
+  WarningHandler::~WarningHandler() {}
 
 } // namespace libecs

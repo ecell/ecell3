@@ -3,11 +3,13 @@
 import os
 import sys
 import string
+import warnings
 
 import ecell.ecs
 import ecell.config
 
 ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
+ecell.ecs.setWarningHandler( lambda msg: warnings.warn( Warning( msg ) ) )
 
 import ecell.ui.osogo.opengui as opengui
 try:

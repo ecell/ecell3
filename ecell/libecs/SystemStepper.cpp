@@ -51,7 +51,7 @@ namespace libecs
   SystemStepper::SystemStepper() 
   {
     setCurrentTime( INF );
-    setMaxStepInterval( INF );
+    theMaxStepInterval = INF;
     setStepInterval( INF );
     setPriority( (std::numeric_limits<Integer>::max)() ); 
   }

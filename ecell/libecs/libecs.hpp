@@ -33,6 +33,7 @@
 #define __LIBECS_HPP
 
 #include "Defs.hpp"
+#include <functional>
 #include <list>
 #include <vector>
 #include <map>
@@ -46,6 +47,16 @@ namespace libecs
    */ 
   
   /** @file */
+
+  class WarningHandler
+	:
+	public std::unary_function< String, void >
+  {
+  public:
+	virtual ~WarningHandler();
+
+    virtual void operator()( const String& ) const = 0;
+  };
 
 
   LIBECS_API extern int const MAJOR_VERSION;
@@ -64,6 +75,8 @@ namespace libecs
   LIBECS_API void finalize();
   LIBECS_API void setDMSearchPath( const String& path );
   LIBECS_API const String getDMSearchPath();
+  LIBECS_API void issueWarning( const String& msg );
+  LIBECS_API void setWarningHandler( WarningHandler* handler );
   // LIBECS_API const String getLoadedDMList(); // XXX: not implemented
 
   // Forward declarations.

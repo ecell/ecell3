@@ -1,4 +1,11 @@
-ecell-3.1.107: 19-Jun-2009
+ecell-3.1.107: 1-Jul-2009
+
+ * Deprecated Stepper's "MaxStepInterval" property as it doesn't make much
+   sense.
+
+ * Added a new property "TolerableRejectedStepCount" to DifferentialStepper
+   (i.e. ODEStepper and its siblings) that specifies the maximum torelable
+   count of rejected steps.
 
  * Fixed a bug in ODEStepper that causes SIGABRT under the circumstances
    no processes are associated to the stepper. Noticed by Sachio Nohara.

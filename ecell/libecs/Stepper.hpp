@@ -170,25 +170,7 @@ namespace libecs
 
     */
 
-    virtual SET_METHOD( Real, StepInterval )
-    {
-        if ( value < getMinStepInterval() )
-        {
-            loadStepInterval( getMinStepInterval() );
-            THROW_EXCEPTION( SimulationError,
-                             "The error-limit step interval of Stepper [" + 
-                             getID() + "] is too small." );
-        }
-//         else if ( value > getMaxStepInterval() )
-//         {
-//             value = getMaxStepInterval();
-//         }
-        else
-        {
-            loadStepInterval( value );
-        }
-    }
-
+    virtual SET_METHOD( Real, StepInterval );
 
     /**
        Get the step interval of this Stepper.
@@ -205,10 +187,7 @@ namespace libecs
       return theStepInterval;
     }
 
-    virtual GET_METHOD( Real, TimeScale )
-    {
-      return getStepInterval();
-    }
+    virtual GET_METHOD( Real, TimeScale );
 
     SET_METHOD( String, ID )
     {
@@ -231,11 +210,7 @@ namespace libecs
       return theMinStepInterval;
     }
 
-    SET_METHOD( Real, MaxStepInterval )
-    {
-        // THROW_EXCEPTION( ValueError, "Warning: MaxStepInterval doesn't work now. do nothing." );
-        theMaxStepInterval = value;
-    }
+    SET_METHOD( Real, MaxStepInterval );
 
     GET_METHOD( Real, MaxStepInterval )
     {
@@ -584,10 +559,6 @@ namespace libecs
     ProcessVector::size_type  theDiscreteProcessOffset;
 
     RealVector theValueBuffer;
-
-
-
-  private:
 
     Model*              theModel;
     

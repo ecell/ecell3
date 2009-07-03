@@ -271,51 +271,53 @@ public:
 
   PythonCallable( PyObject* aPyObjectPtr )
     :
-    thePyObject( python::handle<>( aPyObjectPtr ) )
+    thePyObject( aPyObjectPtr ? python::incref( aPyObjectPtr ): 0 )
   {
-    // this check isn't needed actually, because BPL does this automatically
-    if( ! PyCallable_Check( thePyObject.ptr() ) )
-      {
-	PyErr_SetString( PyExc_TypeError, "Callable object must be given" );
-	python::throw_error_already_set();
-      }
   }
 
-  virtual ~PythonCallable()
+  PythonCallable( const PythonCallable& that )
+    : thePyObject( that.thePyObject ? python::incref( that.thePyObject ): 0 )
   {
-    ; // do nothing
+  }
+
+  PythonCallable& operator=( const PythonCallable& rhs )
+  {
+    Py_XDECREF( thePyObject );
+    thePyObject = rhs.thePyObject ? python::incref( rhs.thePyObject ): 0;
+    return *this;
+  }
+
+  ~PythonCallable()
+  {
+    Py_XDECREF( thePyObject );
   }
 
 protected:
 
-  python::object thePyObject;
+  PyObject* thePyObject;
 };
 
 
 class PythonEventChecker
   : 
-  public PythonCallable,
-  public libemc::EventChecker
+  public PythonCallable
 {
 public:
 
-  PythonEventChecker( PyObject* aPyObjectPtr )
+  PythonEventChecker( PythonCallable const& that )
     :
-    PythonCallable( aPyObjectPtr )
+    PythonCallable( that )
   {
     ; // do nothing
   }
     
-  virtual ~PythonEventChecker() {}
+  ~PythonEventChecker() {}
 
-  virtual bool operator()( void ) const
+  bool operator()( void ) const
   {
-    // check signal
-    //    PyErr_CheckSignals();
-
     // check event.
     // this is faster than just 'return thePyObject()', unfortunately..
-    PyObject* aPyObjectPtr( PyObject_CallFunction( thePyObject.ptr(), NULL ) );
+    PyObject* aPyObjectPtr( PyObject_CallFunction( thePyObject, NULL ) );
     const bool aResult( PyObject_IsTrue( aPyObjectPtr ) );
     Py_DECREF( aPyObjectPtr );
 
@@ -323,6 +325,13 @@ public:
   }
 
 };
+
+
+struct NullEventChecker
+{
+  bool operator()( void ) const { return true; }
+};
+
 
 class PythonEventHandler
   : 
@@ -342,7 +351,7 @@ public:
 
   virtual void operator()( void ) const
   {
-    PyObject_CallFunction( thePyObject.ptr(), NULL );
+    PyObject_CallFunction( thePyObject, NULL );
 
     // faster than just thePyObject() ....
   }
@@ -350,15 +359,42 @@ public:
 };
 
 
-class register_EventCheckerSharedPtr_from_python
+class PythonWarningHandler
+  : 
+  public PythonCallable,
+  public libecs::WarningHandler
 {
 public:
 
-  register_EventCheckerSharedPtr_from_python()
+  PythonWarningHandler(): PythonCallable( 0 ) {}
+
+  PythonWarningHandler( PythonCallable aCallable )
+    :
+    PythonCallable( aCallable )
+  {
+    ; // do nothing
+  }
+    
+  virtual ~PythonWarningHandler() {}
+
+  virtual void operator()( String const& msg ) const
+  {
+    if ( thePyObject )
+      PyObject_CallFunctionObjArgs( thePyObject, python::object( msg ).ptr(), NULL );
+  }
+
+};
+
+
+class register_PythonCallable_from_python
+{
+public:
+
+  register_PythonCallable_from_python()
   {
     python::converter::
       registry::insert( &convertible, &construct,
-			python::type_id<libemc::EventCheckerSharedPtr>() );
+			python::type_id<PythonCallable>() );
   }
 
   static void* convertible( PyObject* aPyObjectPtr )
@@ -378,11 +414,10 @@ public:
 	     python::converter::rvalue_from_python_stage1_data* data )
   {
     void* storage( ( ( python::converter::
-		       rvalue_from_python_storage<libecs::Polymorph>*) 
+		       rvalue_from_python_storage<PythonCallable>*) 
 		     data )->storage.bytes );
 
-    new (storage) 
-      libemc::EventCheckerSharedPtr( new PythonEventChecker( aPyObjectPtr ) );
+    new (storage) PythonCallable( aPyObjectPtr );
 
     data->convertible = storage;
   }
@@ -419,7 +454,7 @@ public:
 			 rvalue_from_python_stage1_data* data )
   {
     void* storage( ( ( python::converter::
-		       rvalue_from_python_storage<libecs::Polymorph>*) 
+		       rvalue_from_python_storage<libemc::EventHandlerSharedPtr>*) 
 		     data )->storage.bytes );
 
     new (storage) 
@@ -428,6 +463,64 @@ public:
     data->convertible = storage;
   }
 };
+
+
+struct PySimulator: public libemc::Simulator
+{
+  template< typename Tec_ >
+  class WrappingEventChecker
+    : 
+    public libemc::EventChecker
+  {
+  public:
+
+    WrappingEventChecker( int aCheckingFrequency, Tec_ const& aEventChecker )
+      :
+      theEventChecker( aEventChecker ),
+      theCheckingFrequency( aCheckingFrequency ),
+      theCount( 0 )
+    {
+      ; // do nothing
+    }
+      
+    virtual ~WrappingEventChecker() {}
+
+    virtual bool operator()( void ) const
+    {
+      if ( theCount >= theCheckingFrequency )
+      {
+        theCount = 0;
+        PyErr_CheckSignals();
+      }
+      return theEventChecker();
+    }
+
+  private:
+    Tec_ theEventChecker;
+    int theCheckingFrequency;
+    mutable int theCount;
+  };
+
+
+  void setEventChecker( PythonCallable const& checker )
+  {
+    libemc::Simulator::setEventChecker( EventCheckerSharedPtr( new WrappingEventChecker< PythonEventChecker >( 100, checker ) ) ); 
+  }
+
+  PySimulator(): libemc::Simulator()
+  {
+    libemc::Simulator::setEventChecker( EventCheckerSharedPtr( new WrappingEventChecker< NullEventChecker >( 100, NullEventChecker() ) ) ); 
+  }
+};
+
+
+static void setWarningHandler( PythonCallable const& aHandler )
+{
+    static PythonWarningHandler theHandler;
+    theHandler = aHandler;
+    libecs::setWarningHandler( &theHandler );
+}
+
 
 BOOST_PYTHON_MODULE( _ecs )
 {
@@ -453,7 +546,7 @@ BOOST_PYTHON_MODULE( _ecs )
   register_exception_translator<Exception>     ( &translateException );
   register_exception_translator<std::exception>( &translateException );
 
-  register_EventCheckerSharedPtr_from_python();
+  register_PythonCallable_from_python();
   register_EventHandlerSharedPtr_from_python();
 
   def( "getLibECSVersionInfo", &getLibECSVersionInfo );
@@ -461,6 +554,7 @@ BOOST_PYTHON_MODULE( _ecs )
 
   def( "setDMSearchPath", &libecs::setDMSearchPath );
   def( "getDMSearchPath", &libecs::getDMSearchPath );
+  def( "setWarningHandler", (void(*)( PythonCallable const& )) &setWarningHandler );
 
   class_<VariableReference>( "VariableReference", no_init )
 
@@ -546,128 +640,128 @@ BOOST_PYTHON_MODULE( _ecs )
 
 
   // Simulator class
-  class_<Simulator>( "Simulator" )
+  class_<PySimulator>( "Simulator" )
     .def( init<>() )
     .def( "getClassInfo",
 	  ( const libecs::PolymorphMap
-	    ( libemc::Simulator::* )( libecs::StringCref, libecs::StringCref ) )
-	  &libemc::Simulator::getClassInfo )
+	    ( PySimulator::* )( libecs::StringCref, libecs::StringCref ) )
+	  &PySimulator::getClassInfo )
     .def( "getClassInfo",
 	  ( const libecs::PolymorphMap
-	    ( libemc::Simulator::* )( libecs::StringCref, libecs::StringCref,
+	    ( PySimulator::* )( libecs::StringCref, libecs::StringCref,
                                   const libecs::Integer ) )
-	  &libemc::Simulator::getClassInfo )
+	  &PySimulator::getClassInfo )
     // Stepper-related methods
     .def( "createStepper",
-	  &libemc::Simulator::createStepper )
+	  &PySimulator::createStepper )
     .def( "deleteStepper",
-	  &libemc::Simulator::deleteStepper )
+	  &PySimulator::deleteStepper )
     .def( "getStepperList",
-	  &libemc::Simulator::getStepperList )
+	  &PySimulator::getStepperList )
     .def( "getStepperPropertyList",
-	  &libemc::Simulator::getStepperPropertyList )
+	  &PySimulator::getStepperPropertyList )
     .def( "getStepperPropertyAttributes", 
-	  &libemc::Simulator::getStepperPropertyAttributes )
+	  &PySimulator::getStepperPropertyAttributes )
     .def( "setStepperProperty",
-	  &libemc::Simulator::setStepperProperty )
+	  &PySimulator::setStepperProperty )
     .def( "getStepperProperty",
-	  &libemc::Simulator::getStepperProperty )
+	  &PySimulator::getStepperProperty )
     .def( "loadStepperProperty",
-	  &libemc::Simulator::loadStepperProperty )
+	  &PySimulator::loadStepperProperty )
     .def( "saveStepperProperty",
-	  &libemc::Simulator::saveStepperProperty )
+	  &PySimulator::saveStepperProperty )
     .def( "getStepperClassName",
-	  &libemc::Simulator::getStepperClassName )
+	  &PySimulator::getStepperClassName )
 
     // Entity-related methods
     .def( "createEntity",
-	  &libemc::Simulator::createEntity )
+	  &PySimulator::createEntity )
     .def( "deleteEntity",
-	  &libemc::Simulator::deleteEntity )
+	  &PySimulator::deleteEntity )
     .def( "getEntityList",
-	  &libemc::Simulator::getEntityList )
+	  &PySimulator::getEntityList )
     .def( "isEntityExist",
-	  &libemc::Simulator::isEntityExist )
+	  &PySimulator::isEntityExist )
     .def( "getEntityPropertyList",
-	  &libemc::Simulator::getEntityPropertyList )
+	  &PySimulator::getEntityPropertyList )
     .def( "setEntityProperty",
-	  &libemc::Simulator::setEntityProperty )
+	  &PySimulator::setEntityProperty )
     .def( "getEntityProperty",
-	  &libemc::Simulator::getEntityProperty )
+	  &PySimulator::getEntityProperty )
     .def( "loadEntityProperty",
-	  &libemc::Simulator::loadEntityProperty )
+	  &PySimulator::loadEntityProperty )
     .def( "saveEntityProperty",
-	  &libemc::Simulator::saveEntityProperty )
+	  &PySimulator::saveEntityProperty )
     .def( "getEntityPropertyAttributes", 
-	  &libemc::Simulator::getEntityPropertyAttributes )
+	  &PySimulator::getEntityPropertyAttributes )
     .def( "getEntityClassName",
-	  &libemc::Simulator::getEntityClassName )
+	  &PySimulator::getEntityClassName )
 
     // Logger-related methods
     .def( "getLoggerList",
-	  &libemc::Simulator::getLoggerList )  
+	  &PySimulator::getLoggerList )  
     .def( "createLogger",
-	  ( void ( libemc::Simulator::* )( libecs::StringCref ) )
-	  &libemc::Simulator::createLogger )  
+	  ( void ( PySimulator::* )( libecs::StringCref ) )
+	  &PySimulator::createLogger )  
     .def( "createLogger",		 
-	  ( void ( libemc::Simulator::* )( libecs::StringCref,
+	  ( void ( PySimulator::* )( libecs::StringCref,
 					   libecs::Polymorph ) )
-	  &libemc::Simulator::createLogger )  
+	  &PySimulator::createLogger )  
     .def( "getLoggerData", 
 	  ( const libecs::DataPointVectorSharedPtr
-	    ( libemc::Simulator::* )( libecs::StringCref ) const )
-	  &libemc::Simulator::getLoggerData )
+	    ( PySimulator::* )( libecs::StringCref ) const )
+	  &PySimulator::getLoggerData )
     .def( "getLoggerData", 
 	  ( const libecs::DataPointVectorSharedPtr 
-	    ( libemc::Simulator::* )( libecs::StringCref,
+	    ( PySimulator::* )( libecs::StringCref,
 				      libecs::RealCref,
 				      libecs::RealCref ) const )
-	  &libemc::Simulator::getLoggerData )
+	  &PySimulator::getLoggerData )
     .def( "getLoggerData",
 	  ( const libecs::DataPointVectorSharedPtr
-	    ( libemc::Simulator::* )( libecs::StringCref,
+	    ( PySimulator::* )( libecs::StringCref,
 				      libecs::RealCref, 
 				      libecs::RealCref,
 				      libecs::RealCref ) const )
-	  &libemc::Simulator::getLoggerData )
+	  &PySimulator::getLoggerData )
     .def( "getLoggerStartTime",
-	  &libemc::Simulator::getLoggerStartTime )  
+	  &PySimulator::getLoggerStartTime )  
     .def( "getLoggerEndTime",
-	  &libemc::Simulator::getLoggerEndTime )    
+	  &PySimulator::getLoggerEndTime )    
     .def( "getLoggerMinimumInterval",
-          &libemc::Simulator::getLoggerMinimumInterval )
+          &PySimulator::getLoggerMinimumInterval )
     .def( "setLoggerMinimumInterval",
-          &libemc::Simulator::setLoggerMinimumInterval )
+          &PySimulator::setLoggerMinimumInterval )
     .def( "getLoggerPolicy",
-	  &libemc::Simulator::getLoggerPolicy )
+	  &PySimulator::getLoggerPolicy )
     .def( "setLoggerPolicy",
-	  &libemc::Simulator::setLoggerPolicy )
+	  &PySimulator::setLoggerPolicy )
     .def( "getLoggerSize",
-	  &libemc::Simulator::getLoggerSize )
+	  &PySimulator::getLoggerSize )
 
     // Simulation-related methods
     .def( "getCurrentTime",
-	  &libemc::Simulator::getCurrentTime )
+	  &PySimulator::getCurrentTime )
     .def( "getNextEvent",
-	  &libemc::Simulator::getNextEvent )
+	  &PySimulator::getNextEvent )
     .def( "stop",
-	  &libemc::Simulator::stop )
+	  &PySimulator::stop )
     .def( "step",
-	  ( void ( libemc::Simulator::* )( void ) )
-	  &libemc::Simulator::step )
+	  ( void ( PySimulator::* )( void ) )
+	  &PySimulator::step )
     .def( "step",
-	  ( void ( libemc::Simulator::* )( const libecs::Integer ) )
-	  &libemc::Simulator::step )
+	  ( void ( PySimulator::* )( const libecs::Integer ) )
+	  &PySimulator::step )
     .def( "run",
-	  ( void ( libemc::Simulator::* )() )
-	  &libemc::Simulator::run )
+	  ( void ( PySimulator::* )() )
+	  &PySimulator::run )
     .def( "run",
-	  ( void ( libemc::Simulator::* )( const libecs::Real ) ) 
-	  &libemc::Simulator::run )
+	  ( void ( PySimulator::* )( const libecs::Real ) ) 
+	  &PySimulator::run )
     .def( "setEventChecker",
-	  &libemc::Simulator::setEventChecker )
+	  &PySimulator::setEventChecker )
     .def( "setEventHandler",
-	  &libemc::Simulator::setEventHandler )
+	  &PySimulator::setEventHandler )
     ;  
 
 }

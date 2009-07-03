@@ -9,6 +9,7 @@ import ecell.config
 import ecell.ecs
 import ecell.emc
 from ecell.Session import Session
+import warnings
 
 class Prompt:
     def __init__( self, aSession ):
@@ -111,6 +112,7 @@ Configurations:
 
 def main():
     ecell.ecs.setDMSearchPath( os.pathsep.join( ecell.config.dm_path ) )
+    ecell.ecs.setWarningHandler( lambda msg: warnings.warn( Warning( msg ) ) )
 
     # -------------------------------------
     # initialize file names

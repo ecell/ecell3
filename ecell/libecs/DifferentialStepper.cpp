@@ -300,8 +300,8 @@ namespace libecs
     theMaxErrorRatio( 1.0 )
   {
     // use more narrow range
-    setMinStepInterval( 1e-100 );
-    setMaxStepInterval( 1e+10 );
+    theMinStepInterval = 1e-100;
+    theMaxStepInterval = 1e+10;
     setTolerableRejectedStepCount( std::numeric_limits<int>::max() );
   }
 

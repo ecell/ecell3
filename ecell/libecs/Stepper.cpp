@@ -65,8 +65,6 @@ namespace libecs
     thePriority( 0 ),
     theCurrentTime( 0.0 ),
     theStepInterval( 0.001 ),
-    //    theMinStepInterval( std::numeric_limits<Real>::min() ),
-    //    theMaxStepInterval( std::numeric_limits<Real>::max() )
     theMinStepInterval( 0.0 ),
     theMaxStepInterval( std::numeric_limits<Real>::infinity() )
   {
@@ -602,6 +600,31 @@ namespace libecs
     return gsl_rng_name( getRng() );
   }
 
+  SET_METHOD_DEF( Real, StepInterval, Stepper )
+  {
+    if ( value < getMinStepInterval() )
+    {
+      loadStepInterval( getMinStepInterval() );
+      THROW_EXCEPTION( SimulationError,
+		       "The error-limit step interval of Stepper [" + 
+		       getID() + "] is too small." );
+    }
+    else
+    {
+      loadStepInterval( value );
+    }
+  }
+
+  GET_METHOD_DEF( Real, TimeScale, Stepper ) 
+  {
+    return getStepInterval();
+  }
+
+  SET_METHOD_DEF( Real, MaxStepInterval, Stepper )
+  {
+      issueWarning( "MaxStepInterval is no longer supported." );
+      theMaxStepInterval = value;
+  }
 
 } // namespace libecs
 
