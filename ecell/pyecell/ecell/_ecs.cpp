@@ -265,112 +265,17 @@ static struct _
   }
 } _;
 
-class PythonCallable
-{
-public:
-
-  PythonCallable( PyObject* aPyObjectPtr )
-    :
-    thePyObject( python::xincref( aPyObjectPtr ) )
-  {
-  }
-
-  PythonCallable( const PythonCallable& that )
-    : thePyObject( python::xincref( that.thePyObject ) )
-  {
-  }
-
-  PythonCallable& operator=( const PythonCallable& rhs )
-  {
-    Py_XDECREF( thePyObject );
-    thePyObject = python::xincref( rhs.thePyObject );
-    return *this;
-  }
-
-  ~PythonCallable()
-  {
-    Py_XDECREF( thePyObject );
-  }
-
-protected:
-
-  PyObject* thePyObject;
-};
-
-
-class PythonEventChecker
-  : 
-  public PythonCallable
-{
-public:
-
-  PythonEventChecker( PythonCallable const& that )
-    :
-    PythonCallable( that )
-  {
-    ; // do nothing
-  }
-    
-  ~PythonEventChecker() {}
-
-  bool operator()( void ) const
-  {
-    // check event.
-    // this is faster than just 'return thePyObject()', unfortunately..
-    PyObject* aPyObjectPtr( PyObject_CallFunction( thePyObject, NULL ) );
-    const bool aResult( PyObject_IsTrue( aPyObjectPtr ) );
-    Py_DECREF( aPyObjectPtr );
-
-    return aResult;
-  }
-
-};
-
-
-struct NullEventChecker
-{
-  bool operator()( void ) const { return true; }
-};
-
-
-class PythonEventHandler
-  : 
-  public PythonCallable,
-  public libemc::EventHandler
-{
-public:
-
-  PythonEventHandler( PyObject* aPyObjectPtr )
-    :
-    PythonCallable( aPyObjectPtr )
-  {
-    ; // do nothing
-  }
-    
-  virtual ~PythonEventHandler() {}
-
-  virtual void operator()( void ) const
-  {
-    PyObject_CallFunction( thePyObject, NULL );
-
-    // faster than just thePyObject() ....
-  }
-
-};
-
 
 class PythonWarningHandler
   : 
-  public PythonCallable,
   public libecs::WarningHandler
 {
 public:
 
-  PythonWarningHandler(): PythonCallable( 0 ) {}
+  PythonWarningHandler() {}
 
-  PythonWarningHandler( PythonCallable aCallable )
-    :
-    PythonCallable( aCallable )
+  PythonWarningHandler( boost::python::handle<> aCallable )
+    : thePyObject( aCallable )
   {
     ; // do nothing
   }
@@ -380,141 +285,96 @@ public:
   virtual void operator()( String const& msg ) const
   {
     if ( thePyObject )
-      PyObject_CallFunctionObjArgs( thePyObject, python::object( msg ).ptr(), NULL );
+      PyObject_CallFunctionObjArgs( thePyObject.get(), python::object( msg ).ptr(), NULL );
   }
 
-};
-
-
-class register_PythonCallable_from_python
-{
-public:
-
-  register_PythonCallable_from_python()
-  {
-    python::converter::
-      registry::insert( &convertible, &construct,
-			python::type_id<PythonCallable>() );
-  }
-
-  static void* convertible( PyObject* aPyObjectPtr )
-  {
-    if( PyCallable_Check( aPyObjectPtr ) )
-      {
-	return aPyObjectPtr;
-      }
-    else
-      {
-	return 0;
-      }
-  }
-
-  static void 
-  construct( PyObject* aPyObjectPtr, 
-	     python::converter::rvalue_from_python_stage1_data* data )
-  {
-    void* storage( ( ( python::converter::
-		       rvalue_from_python_storage<PythonCallable>*) 
-		     data )->storage.bytes );
-
-    new (storage) PythonCallable( aPyObjectPtr );
-
-    data->convertible = storage;
-  }
-
-};
-
-
-
-class register_EventHandlerSharedPtr_from_python
-{
-public:
-
-  register_EventHandlerSharedPtr_from_python()
-  {
-    python::converter::
-      registry::insert( &convertible, &construct,
-			python::type_id<libemc::EventHandlerSharedPtr>() );
-  }
-
-  static void* convertible( PyObject* aPyObjectPtr )
-  {
-    if( PyCallable_Check( aPyObjectPtr ) )
-      {
-	return aPyObjectPtr;
-      }
-    else
-      {
-	return 0;
-      }
-  }
-
-  static void construct( PyObject* aPyObjectPtr, 
-			 python::converter::
-			 rvalue_from_python_stage1_data* data )
-  {
-    void* storage( ( ( python::converter::
-		       rvalue_from_python_storage<libemc::EventHandlerSharedPtr>*) 
-		     data )->storage.bytes );
-
-    new (storage) 
-      libemc::EventHandlerSharedPtr( new PythonEventHandler( aPyObjectPtr ) );
-
-    data->convertible = storage;
-  }
+private:
+  boost::python::handle<> thePyObject;
 };
 
 
 struct PySimulator: public libemc::Simulator
 {
-  template< typename Tec_ >
-  class WrappingEventChecker
-    : 
+  struct NullEventChecker
+    :
     public libemc::EventChecker
   {
-  public:
-
-    WrappingEventChecker( int aCheckingFrequency, Tec_ const& aEventChecker )
-      :
-      theEventChecker( aEventChecker ),
-      theCheckingFrequency( aCheckingFrequency ),
-      theCount( 0 )
+    virtual ~NullEventChecker()
     {
       ; // do nothing
     }
-      
-    virtual ~WrappingEventChecker() {}
 
     virtual bool operator()( void ) const
     {
-      if ( theCount >= theCheckingFrequency )
-      {
-        theCount = 0;
-        PyErr_CheckSignals();
-      }
-      return theEventChecker();
+      return true;
+    }
+  };
+
+  class WrappingEventHandler
+    : 
+    public libemc::EventHandler
+  {
+  public:
+    WrappingEventHandler()
+    {
+      ; // do nothing
+    }
+
+    virtual ~WrappingEventHandler() {}
+
+    virtual void operator()( void ) const
+    {
+      if ( theEventCheckerImpl && theEventHandlerImpl )
+        {
+	while( PyObject_IsTrue( boost::python::handle<>( PyObject_CallFunction( theEventCheckerImpl.get(), NULL ) ).get() ) )
+	  {
+	    PyObject_CallFunction( theEventHandlerImpl.get(), NULL );
+	  }
+	}
+    }
+
+    void setEventHandler( boost::python::handle<> aHandler )
+    {
+      theEventHandlerImpl = aHandler;
+    }
+
+    void setEventChecker( boost::python::handle<> aChecker )
+    {
+      theEventCheckerImpl = aChecker;
     }
 
   private:
-    Tec_ theEventChecker;
-    int theCheckingFrequency;
-    mutable int theCount;
+    boost::python::handle<> theEventHandlerImpl;
+    boost::python::handle<> theEventCheckerImpl;
   };
 
+  DECLARE_SHAREDPTR( WrappingEventHandler )
 
-  void setEventChecker( PythonCallable const& checker )
+  void setEventChecker( boost::python::handle<> const& checker )
   {
-    libemc::Simulator::setEventChecker( EventCheckerSharedPtr( new WrappingEventChecker< PythonEventChecker >( 100, checker ) ) ); 
+    theWrappingEventHandler->setEventChecker( checker );
   }
 
-  PySimulator(): libemc::Simulator()
+  void setEventHandler( boost::python::handle<> const& handler )
   {
-    libemc::Simulator::setEventChecker( EventCheckerSharedPtr( new WrappingEventChecker< NullEventChecker >( 100, NullEventChecker() ) ) ); 
+    theWrappingEventHandler->setEventHandler( handler );
   }
+
+  PySimulator()
+    :
+    libemc::Simulator(),
+    theWrappingEventHandler( new WrappingEventHandler() )
+  {
+    libemc::Simulator::setEventChecker( EventCheckerSharedPtr( new NullEventChecker() ) ); 
+    libemc::Simulator::setEventHandler( theWrappingEventHandler );
+  }
+
+private:
+  WrappingEventHandlerSharedPtr theWrappingEventHandler;
 };
 
 
-static void setWarningHandler( PythonCallable const& aHandler )
+static void setWarningHandler( boost::python::handle<> const& aHandler )
 {
     static PythonWarningHandler theHandler;
     theHandler = aHandler;
@@ -546,15 +406,12 @@ BOOST_PYTHON_MODULE( _ecs )
   register_exception_translator<Exception>     ( &translateException );
   register_exception_translator<std::exception>( &translateException );
 
-  register_PythonCallable_from_python();
-  register_EventHandlerSharedPtr_from_python();
-
   def( "getLibECSVersionInfo", &getLibECSVersionInfo );
   def( "getLibECSVersion",     &libecs::getVersion );
 
   def( "setDMSearchPath", &libecs::setDMSearchPath );
   def( "getDMSearchPath", &libecs::getDMSearchPath );
-  def( "setWarningHandler", (void(*)( PythonCallable const& )) &setWarningHandler );
+  def( "setWarningHandler", &::setWarningHandler );
 
   class_<VariableReference>( "VariableReference", no_init )
 
