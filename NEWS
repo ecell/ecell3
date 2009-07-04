@@ -1,5 +1,9 @@
 ecell-3.1.107: 4-Jul-2009
 
+ * Added a new API function, libecs::issueWarning() and
+   libecs::setWarningHandler() that can be used to report a warning to the
+   frontend from within a dynamic module.
+
  * Deprecated Stepper's "MaxStepInterval" property as it doesn't make much
    sense.
 
