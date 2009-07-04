@@ -47,6 +47,7 @@
 #include <boost/python.hpp>
 #include <boost/python/tuple.hpp>
 #include <boost/python/object.hpp>
+#include <boost/python/call_method.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 #include <numpy/arrayobject.h>
@@ -283,7 +284,6 @@ PolymorphRetriever::PySeqSTLIterator::operator*()
             PySequence_GetItem( theSeq, theIdx ) );
 }
 
-
 struct PropertySlotMapToPythonConverter
 {
     typedef PropertyInterfaceBase::PropertySlotMap argument_type;
@@ -418,92 +418,33 @@ static PyObject* getLibECSVersionInfo()
     return aPyTuple;
 }
 
-class PythonCallable
+class PythonEventHandler
 {
 public:
-    PythonCallable( PyObject* aPyObjectPtr )
-        : thePyObject( py::borrowed( aPyObjectPtr ) )
+    PythonEventHandler()
     {
-        // this check isn't needed actually, because BPL does this automatically
-        if ( !PyCallable_Check( thePyObject.get() ) )
-        {
-            PyErr_SetString( PyExc_TypeError,
-                             "the argument is not a callable object" );
-            py::throw_error_already_set();
-        }
     }
 
-    ~PythonCallable()
+    PythonEventHandler( py::handle<> const& aHandler )
+        : theHandler( aHandler )
     {
-        ; // do nothing
     }
 
-protected:
-    py::handle<> thePyObject;
-};
-
-
-class PythonEventHandler: public PythonCallable
-{
-public:
-    PythonEventHandler( PyObject* aPyObjectPtr )
-        : PythonCallable( aPyObjectPtr )
-    {
-        ; // do nothing
-    }
-        
     ~PythonEventHandler() {}
 
     bool operator()( void ) const
     {
-        PyObject* aPyObjectPtr( PyObject_CallFunction( thePyObject.get(), NULL  ) );
-        const bool aResult( PyObject_IsTrue( aPyObjectPtr ) );
-        Py_XDECREF( aPyObjectPtr );
-
-        return aResult;
-    }
-};
-
-
-template< typename Tcallable_ >
-struct CallableSharedPtrRetriever
-{
-public:
-    typedef Tcallable_ Callable;
-
-public:
-
-    static void addToRegistry()
-    {
-        py::converter::registry::insert(
-                &convertible, &construct,
-                py::type_id< boost::shared_ptr< Callable > >() );
-    }
-
-    static void* convertible( PyObject* aPyObjectPtr )
-    {
-        if( PyCallable_Check( aPyObjectPtr ) )
+        if ( !theHandler )
         {
-            return aPyObjectPtr;
+            return false;
         }
-        else
-        {
-            return 0;
-        }
+
+        return PyObject_IsTrue( py::handle<>(
+                PyObject_CallFunction( theHandler.get(), NULL ) ).get() );
     }
 
-    static void 
-    construct( PyObject* aPyObjectPtr, 
-               py::converter::rvalue_from_python_stage1_data* data )
-    {
-        void* storage( reinterpret_cast<
-            py::converter::rvalue_from_python_storage<boost::shared_ptr< Callable > >* >(
-                data )->storage.bytes );
-
-        data->convertible = new (storage) boost::shared_ptr< Callable >(
-            new Callable( aPyObjectPtr ) );
-    }
-
+private:
+    py::handle<> theHandler;
 };
 
 
@@ -558,6 +499,11 @@ public:
             Py_INCREF( dpvw );
         }
 
+        void operator delete(void* ptr)
+        {
+            reinterpret_cast<PyObject*>(ptr)->ob_type->tp_free(reinterpret_cast<PyObject*>(ptr));
+        }
+
         ~Iterator()
         {
             Py_XDECREF( theDPVW );
@@ -578,7 +524,7 @@ public:
 
         static void __dealloc__( Iterator* self )
         {
-            self->~Iterator();
+            delete self;
         }
 
         static PyObject* __next__( Iterator* self )
@@ -606,6 +552,11 @@ private:
     void* operator new( size_t )
     {
         return PyObject_New( DataPointVectorWrapper, &__class__);
+    }
+
+    void operator delete(void* ptr)
+    {
+        reinterpret_cast<PyObject*>(ptr)->ob_type->tp_free(reinterpret_cast<PyObject*>(ptr));
     }
 
     DataPointVectorWrapper( boost::shared_ptr< DataPointVector > const& aVector )
@@ -641,7 +592,7 @@ public:
 
     static void __dealloc__( DataPointVectorWrapper* self )
     {
-        self->~DataPointVectorWrapper();
+        delete self;
     }
 
     static PyObject* __repr__( DataPointVectorWrapper* self )
@@ -902,6 +853,11 @@ public:
         return PyObject_New( STLIteratorWrapper, &__class__ );
     }
 
+    void operator delete(void* ptr)
+    {
+        reinterpret_cast<PyObject*>(ptr)->ob_type->tp_free(reinterpret_cast<PyObject*>(ptr));
+    }
+
     template< typename Trange_ >
     STLIteratorWrapper( Trange_ const& range )
         : theIdx( boost::begin( range ) ), theEnd( boost::end( range ) )
@@ -927,7 +883,7 @@ public:
 
     static void __dealloc__( STLIteratorWrapper* self )
     {
-        self->~STLIteratorWrapper();
+        delete self;
     }
 
     static PyObject* __next__( STLIteratorWrapper* self )
@@ -1136,10 +1092,89 @@ public:
 };
 
 template< typename T_ >
+class EcsObjectHandle
+{
+public:
+    EcsObjectHandle( Model* model, Handle handle )
+        : model_( model ), handle_( handle ) {}
+
+    EcsObjectHandle( T_* const& ptr )
+        : model_( ptr->getModel() ), handle_( ptr->getHandle() )
+    {
+        BOOST_ASSERT( model_ != NULLPTR );
+    }
+
+    T_* get() const
+    {
+        return reinterpret_cast< T_* >( model_->getObject( handle_ ) );
+    }
+
+private:
+    Model* model_;
+    Handle handle_;
+};
+
+namespace boost { 
+template< typename T_ >
+T_* get_pointer( EcsObjectHandle< T_ > const& h )
+{
+    return h.get();
+}
+
+} // namespace boost
+
+using boost::get_pointer;
+
+struct EcsObjectHandleHolderMaker
+{
+    template< typename T_ >
+    static PyObject* execute( T_* p )
+    {
+        EcsObjectHandle< T_ > tmp( p );
+        return py::objects::make_ptr_instance< T_,
+                py::objects::pointer_holder<
+                    EcsObjectHandle< T_ >, T_ > >::execute( tmp );
+    }
+};
+
+struct by_ecs_object_handle
+{
+    template< typename T_ >
+    struct apply
+    {
+        typedef py::to_python_indirect< T_, EcsObjectHandleHolderMaker > type;
+    };
+};
+
+template< typename T_ >
 inline PyObject* to_python_indirect_fun( T_ arg )
 {
-    return py::to_python_indirect< T_, py::detail::make_reference_holder >()( arg );
+    return py::to_python_indirect< T_, EcsObjectHandleHolderMaker >()( arg );
 }
+
+
+class PythonWarningHandler: public libecs::WarningHandler
+{
+public:
+    PythonWarningHandler() {}
+
+    PythonWarningHandler( py::handle<> aCallable )
+        : thePyObject( aCallable )
+    {
+    }
+      
+    virtual ~PythonWarningHandler() {}
+
+    virtual void operator()( String const& msg ) const
+    {
+        if ( thePyObject )
+          PyObject_CallFunctionObjArgs( thePyObject.get(), py::object( msg ).ptr(), NULL );
+    }
+
+private:
+    py::handle<> thePyObject;
+};
+
 
 template< typename TeventHander_ >
 class Simulator
@@ -1377,9 +1412,7 @@ public:
     const Polymorph 
     getEntityPropertyList( String const& aFullIDString ) const
     {
-        Entity const * anEntityPtr( theModel.getEntity( FullID( aFullIDString ) ) );
-
-        return anEntityPtr->getPropertyList();
+        return theModel.getView().getKeyList( FullID( aFullIDString ) );
     }
 
     const bool entityExists( String const& aFullIDString ) const
@@ -1399,46 +1432,45 @@ public:
     void setEntityProperty( String const& aFullPNString,
                                     Polymorph const& aValue )
     {
-        FullPN aFullPN( aFullPNString );
-        EntityPtr anEntityPtr( theModel.getEntity( aFullPN.getFullID() ) );
-
-        anEntityPtr->setProperty( aFullPN.getPropertyName(), aValue );
+        theModel.getView().set( libecs::FullPN( aFullPNString ), aValue );
     }
 
     const Polymorph
     getEntityProperty( String const& aFullPNString ) const
     {
-        FullPN aFullPN( aFullPNString );
-        Entity const * anEntityPtr( theModel.getEntity( aFullPN.getFullID() ) );
-                
-        return anEntityPtr->getProperty( aFullPN.getPropertyName() );
+        return theModel.getView().get( libecs::FullPN( aFullPNString ) );
     }
 
     void loadEntityProperty( String const& aFullPNString,
                              Polymorph const& aValue )
     {
         FullPN aFullPN( aFullPNString );
-        EntityPtr anEntityPtr( theModel.getEntity( aFullPN.getFullID() ) );
 
-        anEntityPtr->loadProperty( aFullPN.getPropertyName(), aValue );
+        theModel.getView().set( aFullPN,
+            aFullPN.getEntityType().getType() == libecs::EntityType::PROCESS &&
+            aFullPN.getPropertyName() == "VariableReferenceList" ?
+                filterEllipses( aValue ): aValue ); 
     }
 
     const Polymorph
     saveEntityProperty( String const& aFullPNString ) const
     {
         FullPN aFullPN( aFullPNString );
-        Entity const * anEntityPtr( theModel.getEntity( aFullPN.getFullID() ) );
+        libecs::Polymorph retval( theModel.getView().get( aFullPN ) );
 
-        return anEntityPtr->saveProperty( aFullPN.getPropertyName() );
+        if ( aFullPN.getEntityType().getType() == libecs::EntityType::PROCESS &&
+             aFullPN.getPropertyName() == "VariableReferenceList" )
+        {
+            retval = restoreEllipses( retval );
+        }
+
+        return retval;
     }
 
     PropertyAttributes
     getEntityPropertyAttributes( String const& aFullPNString ) const
     {
-        FullPN aFullPN( aFullPNString );
-        Entity const * anEntityPtr( theModel.getEntity( aFullPN.getFullID() ) );
-
-        return anEntityPtr->getPropertyAttributes( aFullPN.getPropertyName() );
+        return theModel.getView().getAttributes( FullPN( aFullPNString ) );
     }
 
     const String
@@ -1669,33 +1701,10 @@ public:
 
         theModel.getScheduler().updateEvent( 0, aStopTime );
 
-
-        if ( theEventHandler )
+        while ( theRunningFlag )
         {
-            while ( theRunningFlag )
-            {
-                unsigned int aCounter( theEventCheckInterval );
-                do 
-                {
-                    if( theModel.getTopEvent().getStepper() == aSystemStepper )
-                    {
-                        theModel.step();
-                        stop();
-                        break;
-                    }
-                    
-                    theModel.step();
-
-                    --aCounter;
-                }
-                while( aCounter != 0 );
-
-                handleEvent();
-            }
-        }
-        else
-        {
-            while ( theRunningFlag )
+            unsigned int aCounter( theEventCheckInterval );
+            do 
             {
                 if( theModel.getTopEvent().getStepper() == aSystemStepper )
                 {
@@ -1703,11 +1712,15 @@ public:
                     stop();
                     break;
                 }
-
+                
                 theModel.step();
-            }
-        }
 
+                --aCounter;
+            }
+            while( aCounter != 0 );
+
+            handleEvent();
+        }
     }
 
     void stop()
@@ -1717,7 +1730,7 @@ public:
         theModel.flushLoggers();
     }
 
-    void setEventHandler( boost::shared_ptr< EventHandler > const& anEventHandler )
+    void setEventHandler( py::handle<> const& anEventHandler )
     {
         theEventHandler = anEventHandler;
     }
@@ -1751,11 +1764,6 @@ public:
         return theModel.getPropertyInterface( aClassname ).getPropertySlotMap();
     }
 
-    const char getDMSearchPathSeparator() const
-    {
-        return Model::PATH_SEPARATOR;
-    }
-
     const std::string getDMSearchPath() const
     {
         return theModel.getDMSearchPath();
@@ -1785,16 +1793,160 @@ protected:
 
     inline void handleEvent()
     {
-        if ( theEventHandler )
-        { 
-            while ( ( *theEventHandler )() );
-        }
+        do {
+            if ( PyErr_CheckSignals() )
+            {
+                stop();
+                break;
+            }
+
+            if ( PyErr_Occurred() )
+            {
+                stop();
+                py::throw_error_already_set();
+            }
+        } while ( theEventHandler() );
     }
 
     void start()
     {
         theRunningFlag = true;
     }
+
+    static const bool isEllipsisNameString( libecs::String const& aName )
+    {
+        return aName.size() > 3 && aName.compare( 0, 3, ELLIPSIS_PREFIX ) == 0
+               && std::isdigit( *reinterpret_cast< const unsigned char* >(
+                    &aName[ 4 ] ) );
+    }
+
+    static const bool isDefaultNameString( libecs::String const& aName )
+    {
+        return aName == ELLIPSIS;
+    }
+
+    static const libecs::Integer getEllipsisNumber( libecs::String const& aName )
+    {
+        if( isEllipsisNameString( aName ) )
+        {
+            return libecs::stringCast< libecs::Integer >( aName.substr( 3 ) );
+        }
+        else
+        {
+            THROW_EXCEPTION( libecs::ValueError,
+                             "VariableReference [" + aName
+                             + "] is not an Ellipsis (which starts from \""
+                             + ELLIPSIS_PREFIX + "\")." );
+        }
+    }
+
+    static libecs::Polymorph filterEllipses( libecs::Polymorph const& aValue )
+    {
+        libecs::PolymorphValue::Tuple const& refs(
+            aValue.as< libecs::PolymorphValue::Tuple const & >() );
+        libecs::PolymorphVector aVector;
+
+        aVector.reserve( boost::size( refs ) );
+        libecs::Integer anEllipsisNumber( 0 );
+
+        for( boost::range_const_iterator< libecs::PolymorphValue::Tuple >::type
+                i( boost::begin( refs ) ), e( boost::end( refs ) );
+             i != e; ++i )
+        {
+            libecs::PolymorphValue::Tuple const& v(
+                i->as< libecs::PolymorphValue::Tuple const& >() );
+            if ( boost::size( v ) < 2 )
+            {
+                THROW_EXCEPTION( libecs::ValueError,
+                                 "Invalid VariableReferenceList" );
+            }
+
+            libecs::String aRefName( v[ 0 ].as< libecs::String >() );
+
+            if( isDefaultNameString( aRefName ) )
+            {
+                aRefName = ELLIPSIS_PREFIX + 
+                    ( boost::format( "%03d" ) % anEllipsisNumber ).str();
+                ++anEllipsisNumber;
+            }
+
+            switch ( boost::size( v ) )
+            {
+            case 2:
+                aVector.push_back( boost::make_tuple( aRefName, v[ 1 ] ) );
+                break;
+            case 3:
+                aVector.push_back( boost::make_tuple( aRefName, v[ 1 ], v[ 2 ] ) );
+                break;
+            default:
+                aVector.push_back( boost::make_tuple( aRefName, v[ 1 ], v[ 2 ], v[ 3 ] ) );
+                break;
+            }
+        }
+
+        return aVector;
+    }
+
+    static libecs::Polymorph restoreEllipses( libecs::Polymorph const& aValue )
+    {
+        libecs::PolymorphValue::Tuple const& refs(
+            aValue.as< libecs::PolymorphValue::Tuple const & >() );
+        libecs::PolymorphVector aVector;
+
+        aVector.reserve( boost::size( refs ) );
+
+        for( boost::range_const_iterator< libecs::PolymorphValue::Tuple >::type
+                i( boost::begin( refs ) ), e( boost::end( refs ) );
+             i != e; ++i )
+        {
+            libecs::PolymorphValue::Tuple const& v(
+                i->as< libecs::PolymorphValue::Tuple const& >() );
+
+            if ( boost::size( v ) < 2 )
+            {
+                THROW_EXCEPTION( libecs::ValueError,
+                                 "Invalid VariableReferenceList" );
+            }
+
+            // convert back all variable reference ellipses to the default '_'.
+            libecs::String aReferenceName(
+                isEllipsisNameString( v[ 0 ].as< libecs::String >() ) ?
+                ELLIPSIS: v[ 0 ].as< libecs::String >() );
+
+            // include both if IsAccessor is non-default (not true).
+            if( boost::size( v ) >= 3 && v[ 3 ].as< libecs::Integer >() == 0 )
+            {
+                aVector.push_back( boost::make_tuple(
+                    aReferenceName, v[ 1 ], v[ 2 ], v[ 3 ] ) ); 
+            }
+            else
+            {
+                if ( boost::size( v ) < 3 )
+                {
+                    THROW_EXCEPTION( libecs::ValueError,
+                                     "Invalid VariableReferenceList" );
+                }
+
+                // output only the coefficient if IsAccessor has a 
+                // default value, and the coefficient is non-default.
+                if( v[ 2 ].as< libecs::Integer >() != 0 )
+                {
+                    aVector.push_back( boost::make_tuple(
+                        aReferenceName, v[ 1 ], v[ 2 ] ) );
+                }
+                else
+                {
+                    aVector.push_back( boost::make_tuple( aReferenceName, v[ 1 ] ) );
+                }
+            }
+        }
+
+        return aVector;
+    }
+
+public:
+    static const libecs::String ELLIPSIS_PREFIX;
+    static const libecs::String ELLIPSIS;
 
 private:
 
@@ -1804,11 +1956,17 @@ private:
 
     Integer         theEventCheckInterval;
 
-    boost::shared_ptr< EventHandler >   theEventHandler;
+    EventHandler    theEventHandler;
 
     ModuleMaker< EcsObject >* thePropertiedObjectMaker;
     Model           theModel;
 };
+
+template< typename TeventHander_ >
+const libecs::String Simulator< TeventHander_ >::ELLIPSIS_PREFIX = "___";
+
+template< typename TeventHander_ >
+const libecs::String Simulator< TeventHander_ >::ELLIPSIS = "_";
 
 static int PropertyAttributes_GetItem( PropertyAttributes const* self, int idx )
 {
@@ -1848,22 +2006,13 @@ static py::object LoggerPolicy_GetItem( Logger::Policy const* self, int idx )
     throw std::range_error("Index out of bounds");
 }
 
-static py::object Process_get_variableReferences( Process* self )
-{
-    return py::object( VariableReferences( self ) );
-}
-
 static Polymorph Entity___getattr__( Entity* self, std::string key )
 {
-    if ( key.size() > 0 )
-        key[ 0 ] = std::toupper( key[ 0 ] );
     return self->getProperty( key );
 }
 
 static void Entity___setattr__( Entity* self, std::string key, Polymorph value )
 {
-    if ( key.size() > 0 )
-        key[ 0 ] = std::toupper( key[ 0 ] );
     self->setProperty( key, value );
 }
 
@@ -1873,6 +2022,149 @@ static PyObject* writeOnly( T_* )
     PyErr_SetString( PyExc_AttributeError, "Write-only attributes." );
     return py::incref( Py_None );
 }
+
+class StepperWrapper: public Stepper
+{
+public:
+    StepperWrapper( PyObject* _pyself ): pyself( py::incref( _pyself ) ) {}
+
+    virtual ~StepperWrapper() {}
+
+    virtual void initialize()
+    {
+        py::call_method< void >( pyself.get(), "initialize" );
+    }
+
+    virtual void step()
+    {
+        py::call_method< void >( pyself.get(), "step" );
+    }
+
+    virtual void integrate( RealParam aTime )
+    {
+        py::call_method< void >( pyself.get(), "integrate", py::object( aTime ) );
+    }
+
+    virtual void interrupt( TimeParam aTime )
+    {
+        py::call_method< void >( pyself.get(), "interrupt", py::object( aTime ) );
+    }
+
+    virtual Interpolant* createInterpolant( Variable* aVariable )
+    {
+        return py::call_method< Interpolant* >( pyself.get(), "createInterpolant", py::object( aVariable ) );
+    }
+
+    void clearVariables()
+    {
+        Stepper::clearVariables();
+    }
+
+    void fireProcesses()
+    {
+        Stepper::fireProcesses();
+    }
+
+    virtual void reset()
+    {
+        py::call_method< void >( pyself.get(), "reset" );
+    }
+
+    void reset_base()
+    {
+        Stepper::reset();
+    }
+
+    void updateProcessVector()
+    {
+        Stepper::updateProcessVector();
+    }
+
+    void updateVariableVector()
+    {
+        Stepper::updateVariableVector();
+    }
+
+    void createInterpolants()
+    {
+        Stepper::createInterpolants();
+    }
+
+    virtual String asString() const
+    {
+        return py::extract< String >( py::str( pyself ) );
+    }
+
+private:
+    py::handle<> pyself;
+};
+
+class SystemWrapper: public System
+{
+public:
+    SystemWrapper( PyObject* _pyself ): pyself( py::incref( _pyself ) ) {}
+
+    virtual ~SystemWrapper() {}
+
+private:
+    py::handle<> pyself;
+};
+
+class ProcessWrapper: public Process
+{
+public:
+    ProcessWrapper( PyObject* _pyself ): pyself( py::incref( _pyself ) ) {
+        std::cout << "<init>" << std::endl;
+    }
+
+    virtual ~ProcessWrapper() {}
+
+    static VariableReferences get_variableReferences( Process* self )
+    {
+        return VariableReferences( self );
+    }
+
+    virtual void initialize()
+    {
+        py::call_method< void >( pyself.get(), "initialize" );
+    }
+
+    virtual void fire()
+    {
+        py::call_method< void >( pyself.get(), "fire" );
+    }
+
+private:
+    py::handle<> pyself;
+};
+
+
+class VariableWrapper: public Variable
+{
+public:
+    VariableWrapper( PyObject* _pyself ): pyself( py::incref( _pyself ) ) {}
+
+    virtual ~VariableWrapper() {}
+
+private:
+    py::handle<> pyself;
+};
+
+
+struct return_by_value_containing_internal_ref
+    : py::with_custodian_and_ward_postcall< 0, 1, py::default_call_policies >
+{
+    typedef py::return_by_value result_converter;
+};
+
+
+static void setWarningHandler( py::handle<> const& aHandler )
+{
+  static PythonWarningHandler theHandler;
+  theHandler = aHandler;
+  libecs::setWarningHandler( &theHandler );
+}
+
 
 BOOST_PYTHON_MODULE( _ecs )
 {
@@ -1892,7 +2184,6 @@ BOOST_PYTHON_MODULE( _ecs )
     DataPointVectorSharedPtrConverter::addToRegistry();
 
     PolymorphRetriever::addToRegistry();
-    CallableSharedPtrRetriever< PythonEventHandler >::addToRegistry();
 
     // functions
     py::register_exception_translator< Exception >( &translateException );
@@ -1901,9 +2192,12 @@ BOOST_PYTHON_MODULE( _ecs )
 
     py::def( "getLibECSVersionInfo", &getLibECSVersionInfo );
     py::def( "getLibECSVersion",         &getVersion );
+    py::def( "setWarningHandler", &::setWarningHandler );
 
-    typedef py::return_value_policy< py::reference_existing_object >
-            return_existing_object;
+    typedef py::return_internal_reference<>
+            return_internal_reference;
+    typedef py::return_value_policy< by_ecs_object_handle >
+            return_ecs_object_handle;
     typedef py::return_value_policy< py::copy_const_reference >
             return_copy_const_reference;
 
@@ -1960,19 +2254,20 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "superSystem",
             py::make_function(
                 &VariableReference::getSuperSystem,
-                py::return_internal_reference<> () ) )
+                return_ecs_object_handle() ) )
         .add_property( "coefficient", &VariableReference::getCoefficient )
         .add_property( "name",        &VariableReference::getName )
         .add_property( "isAccessor",  &VariableReference::isAccessor )
         .add_property( "variable",
                 py::make_function(
                     &VariableReference::getVariable,
-                    py::return_internal_reference<>() ) )
+                    return_ecs_object_handle() ) )
         .def( "__str__", &VariableReference___repr__ )
         .def( "__repr__", &VariableReference___repr__ )
         ;
 
-    py::class_< Stepper, py::bases<>, Stepper, boost::noncopyable >
+    py::class_< Stepper, py::bases<>, StepperWrapper,
+                boost::noncopyable >
         ( "Stepper", py::no_init )
         .add_property( "priority",
                        &Stepper::getPriority,
@@ -1987,47 +2282,59 @@ BOOST_PYTHON_MODULE( _ecs )
                        &Stepper::getMinStepInterval,
                        &Stepper::setMinStepInterval )
         .add_property( "rngSeed", &writeOnly<Stepper>, &Stepper::setRngSeed )
+        .def( "initialize", &StepperWrapper::initialize )
+        .def( "step", &StepperWrapper::step )
+        .def( "integrate", &StepperWrapper::integrate )
+        .def( "interrupt", &StepperWrapper::interrupt )
+        .def( "createInterpolants", &StepperWrapper::createInterpolants )
+        .def( "clearVariables", &StepperWrapper::clearVariables )
+        .def( "fireProcesses", &StepperWrapper::fireProcesses )
+        .def( "reset", &StepperWrapper::reset_base )
+        .def( "updateVariableVector", &StepperWrapper::updateVariableVector )
+        .def( "updateProcessVector", &StepperWrapper::updateProcessVector )
+        .def( "createInterpolants", &StepperWrapper::createInterpolants )
+        .def( "__str__", &Stepper::asString )
+        .def( "__repr__", &Stepper::asString )
         ;
 
     py::class_< Entity, py::bases<>, Entity, boost::noncopyable >
         ( "Entity", py::no_init )
         // properties
-        .add_property( "superSystem",
+        .add_property( "SuperSystem",
             py::make_function( &Entity::getSuperSystem,
-            py::return_internal_reference<> () ) )
+            return_ecs_object_handle() ) )
         .def( "__setattr__", &Entity___setattr__ )
         .def( "__getattr__", &Entity___getattr__ )
         ;
 
-    py::class_< System, py::bases< Entity >, System, boost::noncopyable>
+    py::class_< System, py::bases< Entity >, SystemWrapper, boost::noncopyable>
         ( "System", py::no_init )
         // properties
-        .add_property( "size",        &System::getSize )
-        .add_property( "sizeN_A",     &System::getSizeN_A )
-        .add_property( "stepperID",   &System::getStepperID )
+        .add_property( "StepperID",   &System::getStepperID )
         ;
 
-    py::class_< Process, py::bases< Entity >, Process, boost::noncopyable >
+    py::class_< Process, py::bases< Entity >, ProcessWrapper, boost::noncopyable >
         ( "Process", py::no_init )
-        .add_property( "activity",  &Process::getActivity,
+        .add_property( "Activity",  &Process::getActivity,
                                     &Process::setActivity )
-        .add_property( "priority",  &Process::getPriority )
-        .add_property( "stepperID", &Process::getStepperID )
-        .add_property( "variableReferences",
-              py::make_function( &Process_get_variableReferences ) )
+        .add_property( "Priority",  &Process::getPriority )
+        .add_property( "StepperID", &Process::getStepperID )
+        .add_property( "VariableReferences",
+                       py::make_function(
+                            &ProcessWrapper::get_variableReferences,
+                            return_by_value_containing_internal_ref() ) )
         // methods
         .def( "addValue",        &Process::addValue )
         .def( "setFlux",         &Process::setFlux )
+        .def( "fire",            &ProcessWrapper::fire )
+        .def( "initialize",      &ProcessWrapper::initialize )
         ;
 
-    py::class_< Variable, py::bases< Entity >, Variable, boost::noncopyable >
+    py::class_< Variable, py::bases< Entity >,
+                VariableWrapper, boost::noncopyable >
         ( "Variable", py::no_init )
-        .add_property( "value",  &Variable::getValue,
+        .add_property( "Value",  &Variable::getValue,
                                  &Variable::setValue )
-        .add_property( "molarConc",  &Variable::getMolarConc,
-                                     &Variable::setMolarConc  )
-        .add_property( "numberConc", &Variable::getNumberConc,
-                                     &Variable::setNumberConc )
         ;
 
     py::class_< Logger, py::bases<>, Logger, boost::noncopyable >( "Logger", py::no_init )
@@ -2059,10 +2366,10 @@ BOOST_PYTHON_MODULE( _ecs )
         // Stepper-related methods
         .def( "createStepper",
               &SimulatorImpl::createStepper,
-              py::return_internal_reference<>() )
+              return_ecs_object_handle() )
         .def( "getStepper",
               &SimulatorImpl::getStepper,
-              py::return_internal_reference<>() )
+              return_ecs_object_handle() )
         .def( "deleteStepper",
               &SimulatorImpl::deleteStepper )
         .def( "getStepperList",
@@ -2085,7 +2392,7 @@ BOOST_PYTHON_MODULE( _ecs )
         // Entity-related methods
         .def( "createEntity",
               &SimulatorImpl::createEntity )
-        .def( "geteEntity",
+        .def( "getEntity",
               &SimulatorImpl::getEntity )
         .def( "deleteEntity",
               &SimulatorImpl::deleteEntity )
@@ -2110,21 +2417,21 @@ BOOST_PYTHON_MODULE( _ecs )
 
         // Logger-related methods
         .def( "getLoggerList",
-                    &SimulatorImpl::getLoggerList )    
+              &SimulatorImpl::getLoggerList )    
         .def( "createLogger",
               ( Logger* ( SimulatorImpl::* )( String const& ) )
                     &SimulatorImpl::createLogger,
-              py::return_internal_reference<> () )
+              return_internal_reference() )
         .def( "createLogger",                                 
               ( Logger* ( SimulatorImpl::* )( String const&, Logger::Policy const& ) )
               &SimulatorImpl::createLogger,
-              py::return_internal_reference<>() )
+              return_internal_reference() )
         .def( "createLogger",                                 
               ( Logger* ( SimulatorImpl::* )( String const&, py::object ) )
                     &SimulatorImpl::createLogger,
-              py::return_internal_reference<> () )
+              return_internal_reference() )
         .def( "getLogger", &SimulatorImpl::getLogger,
-              py::return_internal_reference<>() )
+              return_internal_reference() )
         .def( "getLoggerData", 
               ( boost::shared_ptr< DataPointVector >( SimulatorImpl::* )(
                     String const& ) const )
@@ -2184,8 +2491,12 @@ BOOST_PYTHON_MODULE( _ecs )
               &SimulatorImpl::getDMInfo )
         .def( "setEventHandler",
               &SimulatorImpl::setEventHandler )
-        .add_property( "DMSearchPathSeparator",
-                       &SimulatorImpl::getDMSearchPathSeparator )
+        .add_static_property( "DM_SEARCH_PATH_SEPARATOR",
+                              py::make_getter( &Model::PATH_SEPARATOR ) )
+        .add_static_property( "ELLIPSIS",
+                              py::make_getter( &SimulatorImpl::ELLIPSIS ) )
+        .add_static_property( "ELLIPSIS_PREFIX",
+                              py::make_getter( &SimulatorImpl::ELLIPSIS_PREFIX ) )
         .def( "setDMSearchPath", &SimulatorImpl::setDMSearchPath )
         .def( "getDMSearchPath", &SimulatorImpl::getDMSearchPath )
         ;
