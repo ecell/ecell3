@@ -125,7 +125,7 @@ def main():
     # creates MainWindow instance
     # -------------------------------------
     aSimulator = ecell.ecs.Simulator()
-    aSimulator.setDMSearchPath( aSimulator.DMSearchPathSeparator.join( config.dm_path ) )
+    aSimulator.setDMSearchPath( aSimulator.DM_SEARCH_PATH_SEPARATOR.join( config.dm_path ) )
     aSession = GtkSessionMonitor()
 
 

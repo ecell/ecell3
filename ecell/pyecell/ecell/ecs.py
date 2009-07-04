@@ -66,5 +66,5 @@ class Simulator( ecell._ecs.Simulator ):
     def __init__( self, *args, **kwargs ):
         import ecell.config
         ecell._ecs.Simulator.__init__( self, *args, **kwargs )
-        self.setDMSearchPath( self.DMSearchPathSeparator.join( ecell.config.dm_path ) )
+        self.setDMSearchPath( self.DM_SEARCH_PATH_SEPARATOR.join( ecell.config.dm_path ) )
 

@@ -2141,7 +2141,7 @@ BOOST_PYTHON_MODULE( _ecs )
               &Simulator::getDMInfo )
         .def( "setEventHandler",
               &Simulator::setEventHandler )
-        .add_property( "DMSearchPathSeparator",
+        .add_property( "DM_SEARCH_PATH_SEPARATOR",
                        &Simulator::getDMSearchPathSeparator )
         .def( "setDMSearchPath", &Simulator::setDMSearchPath )
         .def( "getDMSearchPath", &Simulator::getDMSearchPath )

@@ -115,7 +115,7 @@ class DMInfo:
     def __init__(self ):
         self.theSimulator = ecell.ecs.Simulator()
         self.theSimulator.setDMSearchPath(
-            self.theSimulator.DMSearchPathSeparator.join( dm_path ) )
+            self.theSimulator.DM_SEARCH_PATH_SEPARATOR.join( dm_path ) )
         self.__dummiesList = {}
         self.__createDummies()
         if os.name != "nt":
