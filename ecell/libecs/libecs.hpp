@@ -41,6 +41,14 @@ namespace libecs
 
 class EcsObject;
 
+class WarningHandler: public std::unary_function< String, void >
+{
+public:
+    virtual ~WarningHandler();
+
+    virtual void operator()( const String& ) const = 0;
+};
+
 LIBECS_API extern int const MAJOR_VERSION;
 LIBECS_API extern int const MINOR_VERSION;
 LIBECS_API extern int const MICRO_VERSION;
@@ -56,6 +64,8 @@ LIBECS_API const std::string getVersion();
 LIBECS_API bool initialize();
 LIBECS_API void finalize();
 LIBECS_API ModuleMaker< EcsObject >* createDefaultModuleMaker();
+LIBECS_API void issueWarning( const String& msg );
+LIBECS_API void setWarningHandler( WarningHandler* handler );
 
 } // namespace libecs
 

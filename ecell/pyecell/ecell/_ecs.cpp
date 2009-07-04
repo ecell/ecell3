@@ -418,95 +418,6 @@ static PyObject* getLibECSVersionInfo()
     return aPyTuple;
 }
 
-class PythonCallable
-{
-public:
-    PythonCallable( PyObject* aPyObjectPtr )
-        : thePyObject( py::borrowed( aPyObjectPtr ) )
-    {
-        // this check isn't needed actually, because BPL does this automatically
-        if ( !PyCallable_Check( thePyObject.get() ) )
-        {
-            PyErr_SetString( PyExc_TypeError,
-                             "the argument is not a callable object" );
-            py::throw_error_already_set();
-        }
-    }
-
-    ~PythonCallable()
-    {
-        ; // do nothing
-    }
-
-protected:
-    py::handle<> thePyObject;
-};
-
-
-class PythonEventHandler: public PythonCallable
-{
-public:
-    PythonEventHandler( PyObject* aPyObjectPtr )
-        : PythonCallable( aPyObjectPtr )
-    {
-        ; // do nothing
-    }
-        
-    ~PythonEventHandler() {}
-
-    bool operator()( void ) const
-    {
-        PyObject* aPyObjectPtr( PyObject_CallFunction( thePyObject.get(), NULL  ) );
-        const bool aResult( PyObject_IsTrue( aPyObjectPtr ) );
-        Py_XDECREF( aPyObjectPtr );
-
-        return aResult;
-    }
-};
-
-
-template< typename Tcallable_ >
-struct CallableSharedPtrRetriever
-{
-public:
-    typedef Tcallable_ Callable;
-
-public:
-
-    static void addToRegistry()
-    {
-        py::converter::registry::insert(
-                &convertible, &construct,
-                py::type_id< boost::shared_ptr< Callable > >() );
-    }
-
-    static void* convertible( PyObject* aPyObjectPtr )
-    {
-        if( PyCallable_Check( aPyObjectPtr ) )
-        {
-            return aPyObjectPtr;
-        }
-        else
-        {
-            return 0;
-        }
-    }
-
-    static void 
-    construct( PyObject* aPyObjectPtr, 
-               py::converter::rvalue_from_python_stage1_data* data )
-    {
-        void* storage( reinterpret_cast<
-            py::converter::rvalue_from_python_storage<boost::shared_ptr< Callable > >* >(
-                data )->storage.bytes );
-
-        data->convertible = new (storage) boost::shared_ptr< Callable >(
-            new Callable( aPyObjectPtr ) );
-    }
-
-};
-
-
 static class PyEcsModule
 {
 public:
@@ -1141,12 +1052,32 @@ inline PyObject* to_python_indirect_fun( T_ arg )
     return py::to_python_indirect< T_, py::detail::make_reference_holder >()( arg );
 }
 
-template< typename TeventHander_ >
-class Simulator
+
+class PythonWarningHandler: public libecs::WarningHandler
 {
 public:
-    typedef TeventHander_ EventHandler;
+    PythonWarningHandler() {}
 
+    PythonWarningHandler( py::handle<> aCallable )
+        : thePyObject( aCallable )
+    {
+    }
+      
+    virtual ~PythonWarningHandler() {}
+
+    virtual void operator()( String const& msg ) const
+    {
+        if ( thePyObject )
+          PyObject_CallFunctionObjArgs( thePyObject.get(), py::object( msg ).ptr(), NULL );
+    }
+
+private:
+    py::handle<> thePyObject;
+};
+
+
+class Simulator
+{
 public:
     Simulator()
         : theRunningFlag( false ),
@@ -1717,7 +1648,7 @@ public:
         theModel.flushLoggers();
     }
 
-    void setEventHandler( boost::shared_ptr< EventHandler > const& anEventHandler )
+    void setEventHandler( py::handle<> const& anEventHandler )
     {
         theEventHandler = anEventHandler;
     }
@@ -1785,9 +1716,30 @@ protected:
 
     inline void handleEvent()
     {
-        if ( theEventHandler )
-        { 
-            while ( ( *theEventHandler )() );
+        for (;;)
+        {
+            if ( PyErr_CheckSignals() )
+            {
+                stop();
+                break;
+            }
+
+            if ( PyErr_Occurred() )
+            {
+                stop();
+                py::throw_error_already_set();
+            }
+
+            if ( !theEventHandler )
+            {
+                break;
+            }
+
+            if ( !PyObject_IsTrue( py::handle<>(
+                    PyObject_CallFunction( theEventHandler.get(), NULL ) ).get() ) )
+            {
+                break;
+            }
         }
     }
 
@@ -1804,7 +1756,7 @@ private:
 
     Integer         theEventCheckInterval;
 
-    boost::shared_ptr< EventHandler >   theEventHandler;
+    py::handle<>    theEventHandler;
 
     ModuleMaker< EcsObject >* thePropertiedObjectMaker;
     Model           theModel;
@@ -1874,10 +1826,15 @@ static PyObject* writeOnly( T_* )
     return py::incref( Py_None );
 }
 
+static void setWarningHandler( py::handle<> const& handler )
+{
+    static PythonWarningHandler thehandler;
+    thehandler = PythonWarningHandler( handler );
+    libecs::setWarningHandler( &thehandler );
+}
+
 BOOST_PYTHON_MODULE( _ecs )
 {
-    typedef Simulator< PythonEventHandler > SimulatorImpl;
-
     DataPointVectorWrapper< DataPoint >::__class_init__();
     DataPointVectorWrapper< LongDataPoint >::__class_init__();
     STLIteratorWrapper< VariableReferenceVector::const_iterator >::__class_init__();
@@ -1892,7 +1849,6 @@ BOOST_PYTHON_MODULE( _ecs )
     DataPointVectorSharedPtrConverter::addToRegistry();
 
     PolymorphRetriever::addToRegistry();
-    CallableSharedPtrRetriever< PythonEventHandler >::addToRegistry();
 
     // functions
     py::register_exception_translator< Exception >( &translateException );
@@ -1900,7 +1856,8 @@ BOOST_PYTHON_MODULE( _ecs )
     py::register_exception_translator< std::range_error >( &translateRangeError );
 
     py::def( "getLibECSVersionInfo", &getLibECSVersionInfo );
-    py::def( "getLibECSVersion",         &getVersion );
+    py::def( "getLibECSVersion",     &getVersion );
+    py::def( "setWarningHandler",    &::setWarningHandler );
 
     typedef py::return_value_policy< py::reference_existing_object >
             return_existing_object;
@@ -2052,141 +2009,141 @@ BOOST_PYTHON_MODULE( _ecs )
         ;
 
     // Simulator class
-    py::class_< SimulatorImpl, py::bases<>, boost::shared_ptr< SimulatorImpl >, boost::noncopyable >( "Simulator" )
+    py::class_< Simulator, py::bases<>, boost::shared_ptr< Simulator >, boost::noncopyable >( "Simulator" )
         .def( py::init<>() )
         .def( "getClassInfo",
-              &SimulatorImpl::getClassInfo )
+              &Simulator::getClassInfo )
         // Stepper-related methods
         .def( "createStepper",
-              &SimulatorImpl::createStepper,
+              &Simulator::createStepper,
               py::return_internal_reference<>() )
         .def( "getStepper",
-              &SimulatorImpl::getStepper,
+              &Simulator::getStepper,
               py::return_internal_reference<>() )
         .def( "deleteStepper",
-              &SimulatorImpl::deleteStepper )
+              &Simulator::deleteStepper )
         .def( "getStepperList",
-              &SimulatorImpl::getStepperList )
+              &Simulator::getStepperList )
         .def( "getStepperPropertyList",
-              &SimulatorImpl::getStepperPropertyList )
+              &Simulator::getStepperPropertyList )
         .def( "getStepperPropertyAttributes", 
-              &SimulatorImpl::getStepperPropertyAttributes )
+              &Simulator::getStepperPropertyAttributes )
         .def( "setStepperProperty",
-              &SimulatorImpl::setStepperProperty )
+              &Simulator::setStepperProperty )
         .def( "getStepperProperty",
-              &SimulatorImpl::getStepperProperty )
+              &Simulator::getStepperProperty )
         .def( "loadStepperProperty",
-              &SimulatorImpl::loadStepperProperty )
+              &Simulator::loadStepperProperty )
         .def( "saveStepperProperty",
-              &SimulatorImpl::saveStepperProperty )
+              &Simulator::saveStepperProperty )
         .def( "getStepperClassName",
-              &SimulatorImpl::getStepperClassName )
+              &Simulator::getStepperClassName )
 
         // Entity-related methods
         .def( "createEntity",
-              &SimulatorImpl::createEntity )
+              &Simulator::createEntity )
         .def( "geteEntity",
-              &SimulatorImpl::getEntity )
+              &Simulator::getEntity )
         .def( "deleteEntity",
-              &SimulatorImpl::deleteEntity )
+              &Simulator::deleteEntity )
         .def( "getEntityList",
-              &SimulatorImpl::getEntityList )
+              &Simulator::getEntityList )
         .def( "entityExists",
-              &SimulatorImpl::entityExists )
+              &Simulator::entityExists )
         .def( "getEntityPropertyList",
-              &SimulatorImpl::getEntityPropertyList )
+              &Simulator::getEntityPropertyList )
         .def( "setEntityProperty",
-              &SimulatorImpl::setEntityProperty )
+              &Simulator::setEntityProperty )
         .def( "getEntityProperty",
-              &SimulatorImpl::getEntityProperty )
+              &Simulator::getEntityProperty )
         .def( "loadEntityProperty",
-              &SimulatorImpl::loadEntityProperty )
+              &Simulator::loadEntityProperty )
         .def( "saveEntityProperty",
-              &SimulatorImpl::saveEntityProperty )
+              &Simulator::saveEntityProperty )
         .def( "getEntityPropertyAttributes", 
-              &SimulatorImpl::getEntityPropertyAttributes )
+              &Simulator::getEntityPropertyAttributes )
         .def( "getEntityClassName",
-              &SimulatorImpl::getEntityClassName )
+              &Simulator::getEntityClassName )
 
         // Logger-related methods
         .def( "getLoggerList",
-                    &SimulatorImpl::getLoggerList )    
+                    &Simulator::getLoggerList )    
         .def( "createLogger",
-              ( Logger* ( SimulatorImpl::* )( String const& ) )
-                    &SimulatorImpl::createLogger,
+              ( Logger* ( Simulator::* )( String const& ) )
+                    &Simulator::createLogger,
               py::return_internal_reference<> () )
         .def( "createLogger",                                 
-              ( Logger* ( SimulatorImpl::* )( String const&, Logger::Policy const& ) )
-              &SimulatorImpl::createLogger,
+              ( Logger* ( Simulator::* )( String const&, Logger::Policy const& ) )
+              &Simulator::createLogger,
               py::return_internal_reference<>() )
         .def( "createLogger",                                 
-              ( Logger* ( SimulatorImpl::* )( String const&, py::object ) )
-                    &SimulatorImpl::createLogger,
+              ( Logger* ( Simulator::* )( String const&, py::object ) )
+                    &Simulator::createLogger,
               py::return_internal_reference<> () )
-        .def( "getLogger", &SimulatorImpl::getLogger,
+        .def( "getLogger", &Simulator::getLogger,
               py::return_internal_reference<>() )
         .def( "getLoggerData", 
-              ( boost::shared_ptr< DataPointVector >( SimulatorImpl::* )(
+              ( boost::shared_ptr< DataPointVector >( Simulator::* )(
                     String const& ) const )
-              &SimulatorImpl::getLoggerData )
+              &Simulator::getLoggerData )
         .def( "getLoggerData", 
-              ( boost::shared_ptr< DataPointVector >( SimulatorImpl::* )(
+              ( boost::shared_ptr< DataPointVector >( Simulator::* )(
                     String const&, Real const&, Real const& ) const )
-              &SimulatorImpl::getLoggerData )
+              &Simulator::getLoggerData )
         .def( "getLoggerData",
-              ( boost::shared_ptr< DataPointVector >( SimulatorImpl::* )(
+              ( boost::shared_ptr< DataPointVector >( Simulator::* )(
                      String const&, Real const&, 
                      Real const&, Real const& ) const )
-              &SimulatorImpl::getLoggerData )
+              &Simulator::getLoggerData )
         .def( "getLoggerStartTime",
-              &SimulatorImpl::getLoggerStartTime )    
+              &Simulator::getLoggerStartTime )    
         .def( "getLoggerEndTime",
-              &SimulatorImpl::getLoggerEndTime )        
+              &Simulator::getLoggerEndTime )        
         .def( "getLoggerPolicy",
-              &SimulatorImpl::getLoggerPolicy )
+              &Simulator::getLoggerPolicy )
         .def( "setLoggerPolicy",
-              ( void (SimulatorImpl::*)(
+              ( void (Simulator::*)(
                     String const&, Logger::Policy const& ) )
-              &SimulatorImpl::setLoggerPolicy )
+              &Simulator::setLoggerPolicy )
         .def( "setLoggerPolicy",
-              ( void (SimulatorImpl::*)(
+              ( void (Simulator::*)(
                     String const& aFullPNString,
                     py::object aParamList ) )
-              &SimulatorImpl::setLoggerPolicy )
+              &Simulator::setLoggerPolicy )
         .def( "getLoggerSize",
-              &SimulatorImpl::getLoggerSize )
+              &Simulator::getLoggerSize )
 
         // Simulation-related methods
         .def( "initialize",
-              &SimulatorImpl::initialize )
+              &Simulator::initialize )
         .def( "getCurrentTime",
-              &SimulatorImpl::getCurrentTime )
+              &Simulator::getCurrentTime )
         .def( "getNextEvent",
-              &SimulatorImpl::getNextEvent )
+              &Simulator::getNextEvent )
         .def( "stop",
-              &SimulatorImpl::stop )
+              &Simulator::stop )
         .def( "step",
-              ( void ( SimulatorImpl::* )( void ) )
-              &SimulatorImpl::step )
+              ( void ( Simulator::* )( void ) )
+              &Simulator::step )
         .def( "step",
-              ( void ( SimulatorImpl::* )( const Integer ) )
-              &SimulatorImpl::step )
+              ( void ( Simulator::* )( const Integer ) )
+              &Simulator::step )
         .def( "run",
-              ( void ( SimulatorImpl::* )() )
-              &SimulatorImpl::run )
+              ( void ( Simulator::* )() )
+              &Simulator::run )
         .def( "run",
-              ( void ( SimulatorImpl::* )( const Real ) ) 
-              &SimulatorImpl::run )
+              ( void ( Simulator::* )( const Real ) ) 
+              &Simulator::run )
         .def( "getPropertyInfo",
-              &SimulatorImpl::getPropertyInfo,
+              &Simulator::getPropertyInfo,
               return_copy_const_reference() )
         .def( "getDMInfo",
-              &SimulatorImpl::getDMInfo )
+              &Simulator::getDMInfo )
         .def( "setEventHandler",
-              &SimulatorImpl::setEventHandler )
+              &Simulator::setEventHandler )
         .add_property( "DMSearchPathSeparator",
-                       &SimulatorImpl::getDMSearchPathSeparator )
-        .def( "setDMSearchPath", &SimulatorImpl::setDMSearchPath )
-        .def( "getDMSearchPath", &SimulatorImpl::getDMSearchPath )
+                       &Simulator::getDMSearchPathSeparator )
+        .def( "setDMSearchPath", &Simulator::setDMSearchPath )
+        .def( "getDMSearchPath", &Simulator::getDMSearchPath )
         ;
 }
