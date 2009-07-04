@@ -295,19 +295,38 @@ private:
 
 struct PySimulator: public libemc::Simulator
 {
-  struct NullEventChecker
+  struct WrappingEventChecker
     :
     public libemc::EventChecker
   {
-    virtual ~NullEventChecker()
+    virtual ~WrappingEventChecker()
     {
       ; // do nothing
     }
 
     virtual bool operator()( void ) const
     {
-      return true;
+      if ( PyErr_CheckSignals() )
+      {
+	theSimulator.stop();
+	return false;
+      }
+      return theEventCheckerImpl && PyObject_IsTrue( boost::python::handle<>( PyObject_CallFunction( theEventCheckerImpl.get(), NULL ) ).get() );
     }
+
+    void setEventChecker( boost::python::handle<> aChecker )
+    {
+      theEventCheckerImpl = aChecker;
+    }
+
+    WrappingEventChecker( libemc::Simulator& aSimulator  )
+      : theSimulator( aSimulator )
+    {
+      ; // do nothing
+    }
+  private:
+    boost::python::handle<> theEventCheckerImpl;
+    Simulator& theSimulator;
   };
 
   class WrappingEventHandler
@@ -315,21 +334,13 @@ struct PySimulator: public libemc::Simulator
     public libemc::EventHandler
   {
   public:
-    WrappingEventHandler()
-    {
-      ; // do nothing
-    }
-
     virtual ~WrappingEventHandler() {}
 
     virtual void operator()( void ) const
     {
-      if ( theEventCheckerImpl && theEventHandlerImpl )
+      if ( theEventHandlerImpl )
         {
-	while( PyObject_IsTrue( boost::python::handle<>( PyObject_CallFunction( theEventCheckerImpl.get(), NULL ) ).get() ) )
-	  {
-	    PyObject_CallFunction( theEventHandlerImpl.get(), NULL );
-	  }
+	  PyObject_CallFunction( theEventHandlerImpl.get(), NULL );
 	}
     }
 
@@ -338,21 +349,16 @@ struct PySimulator: public libemc::Simulator
       theEventHandlerImpl = aHandler;
     }
 
-    void setEventChecker( boost::python::handle<> aChecker )
-    {
-      theEventCheckerImpl = aChecker;
-    }
-
   private:
     boost::python::handle<> theEventHandlerImpl;
-    boost::python::handle<> theEventCheckerImpl;
   };
 
+  DECLARE_SHAREDPTR( WrappingEventChecker )
   DECLARE_SHAREDPTR( WrappingEventHandler )
 
   void setEventChecker( boost::python::handle<> const& checker )
   {
-    theWrappingEventHandler->setEventChecker( checker );
+    theWrappingEventChecker->setEventChecker( checker );
   }
 
   void setEventHandler( boost::python::handle<> const& handler )
@@ -363,14 +369,16 @@ struct PySimulator: public libemc::Simulator
   PySimulator()
     :
     libemc::Simulator(),
-    theWrappingEventHandler( new WrappingEventHandler() )
+    theWrappingEventHandler( new WrappingEventHandler() ),
+    theWrappingEventChecker( new WrappingEventChecker( *this ) )
   {
-    libemc::Simulator::setEventChecker( EventCheckerSharedPtr( new NullEventChecker() ) ); 
+    libemc::Simulator::setEventChecker( theWrappingEventChecker ); 
     libemc::Simulator::setEventHandler( theWrappingEventHandler );
   }
 
 private:
   WrappingEventHandlerSharedPtr theWrappingEventHandler;
+  WrappingEventCheckerSharedPtr theWrappingEventChecker;
 };
 
 
