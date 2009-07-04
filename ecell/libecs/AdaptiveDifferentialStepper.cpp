@@ -48,11 +48,12 @@ AdaptiveDifferentialStepper::AdaptiveDifferentialStepper()
       theAbsoluteEpsilon( 0.1 ),
       theRelativeEpsilon( 0.1 ),
       safety( 0.9 ),
-      theMaxErrorRatio( 1.0 )
+      theMaxErrorRatio( 1.0 ),
+      theTolerableRejectedStepCount( std::numeric_limits< Integer >::max() )
 {
     // use more narrow range
-    setMinStepInterval( 1e-100 );
-    setMaxStepInterval( 1e+10 );
+    theMinStepInterval = 1e-100;
+    theMaxStepInterval = 1e+10;
 }
 
 AdaptiveDifferentialStepper::~AdaptiveDifferentialStepper()
@@ -74,30 +75,24 @@ void AdaptiveDifferentialStepper::step()
 
     setStepInterval( getNextStepInterval() );
 
+    Integer theRejectedStepCounter( 0 );
+
     while ( !calculate() )
     {
+        if ( ++theRejectedStepCounter >= theTolerableRejectedStepCount )
+        {
+            THROW_EXCEPTION_INSIDE( SimulationError,
+                String( "The times of rejections of step calculation "
+                    "exceeded a maximum tolerable count (" )
+                + stringCast( theTolerableRejectedStepCount ) + ")." );
+        }
+ 
         const Real anExpectedStepInterval( safety * getStepInterval() 
                                            * pow( getMaxErrorRatio(),
                                                   -1.0 / getOrder() ) );
 
-        if ( anExpectedStepInterval > getMinStepInterval() )
-        {
-            // shrink it if the error exceeds 110%
-            setStepInterval( anExpectedStepInterval );
-        }
-        else
-        {
-            setStepInterval( getMinStepInterval() );
-
-            // this must return false,
-            // so theTolerableStepInterval does NOT LIMIT the error.
-            THROW_EXCEPTION_INSIDE( SimulationError,
-                                    asString() + ": the error-limit step "
-                                    " interval is too small" );
-
-            calculate();
-            break;
-        }
+        // shrink it if the error exceeds 110%
+        setStepInterval( anExpectedStepInterval );
     }
 
     // an extra calculation for resetting the activities of processes

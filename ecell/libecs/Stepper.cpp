@@ -49,6 +49,8 @@
 
 #include "Stepper.hpp"
 
+#include "libecs.hpp"
+
 namespace libecs
 {
 
@@ -589,6 +591,37 @@ GET_METHOD_DEF( String, RngType, Stepper )
 String Stepper::asString() const
 {
     return getPropertyInterface().getClassName() + "[" + getID() + "]";
+}
+
+SET_METHOD_DEF( Real, StepInterval, Stepper )
+{
+    if ( value < getMinStepInterval() )
+    {
+        loadStepInterval( getMinStepInterval() );
+        THROW_EXCEPTION_INSIDE( SimulationError,
+                "The error-limit step interval is too small for ["
+                + asString() + "]" );
+    }
+    else
+    {
+        loadStepInterval( value );
+    }
+}
+
+GET_METHOD_DEF( Real, TimeScale, Stepper )
+{
+    return getStepInterval();
+}
+
+SET_METHOD_DEF( Real, MaxStepInterval, Stepper )
+{
+    issueWarning( "MaxStepInterval is no longer supported." );
+    theMaxStepInterval = value;
+}
+
+Interpolant* Stepper::createInterpolant( Variable* aVariable )
+{
+    return new Interpolant( aVariable );
 }
 
 } // namespace libecs

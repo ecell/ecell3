@@ -140,22 +140,7 @@ public:
     /**
        This may be overridden in dynamically scheduled steppers.
     */
-    virtual SET_METHOD( Real, StepInterval )
-    {
-        Real aNewStepInterval( value );
-
-        if( aNewStepInterval > getMaxStepInterval() )
-        {
-            aNewStepInterval = getMaxStepInterval();
-        }
-        else if ( aNewStepInterval < getMinStepInterval() )
-        {
-            aNewStepInterval = getMinStepInterval();
-        }
-
-        loadStepInterval( aNewStepInterval );
-    }
-
+    virtual SET_METHOD( Real, StepInterval );
 
     /**
        Get the step interval of this Stepper.
@@ -170,10 +155,7 @@ public:
         return theStepInterval;
     }
 
-    virtual GET_METHOD( Real, TimeScale )
-    {
-        return getStepInterval();
-    }
+    virtual GET_METHOD( Real, TimeScale );
 
     SET_METHOD( String, ID )
     {
@@ -196,10 +178,7 @@ public:
         return theMinStepInterval;
     }
 
-    SET_METHOD( Real, MaxStepInterval )
-    {
-        theMaxStepInterval = value;
-    }
+    SET_METHOD( Real, MaxStepInterval );
 
     GET_METHOD( Real, MaxStepInterval )
     {
@@ -424,10 +403,7 @@ public:
     void updateIntegratedVariableVector();
 
 
-    virtual InterpolantPtr createInterpolant( Variable* aVariable )
-    {
-        return new Interpolant( aVariable );
-    }
+    virtual Interpolant* createInterpolant( Variable* aVariable );
 
     const gsl_rng* getRng() const
     {
@@ -438,6 +414,13 @@ public:
     {
         return getCurrentTime() < rhs.getCurrentTime();
     }
+
+    /**
+       Get a string representation of this Entity as String.
+
+       @return a description string of this Entity.
+    */
+    virtual String asString() const;
 
 protected:
     void clearVariables();
@@ -469,14 +452,6 @@ protected:
     */
     void createInterpolants();
 
-
-    /**
-       Get a string representation of this Entity as String.
-
-       @return a description string of this Entity.
-    */
-    virtual String asString() const;
-
 protected:
     SystemVector              theSystemVector;
 
@@ -491,7 +466,6 @@ protected:
 
     RealVector                theValueBuffer;
 
-private:
     /** the index on the scheduler */
     int                       theSchedulerIndex;
 

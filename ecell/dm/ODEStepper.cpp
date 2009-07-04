@@ -195,10 +195,10 @@ protected:
     Real theJacobianRecalculateTheta;
     Real theSpectralRadius;
 
-    UnsignedInteger theStiffnessCounter;
+    UnsignedInteger theStiffnessCounter, theRejectedStepCounter;
     Integer CheckIntervalCount, SwitchingCount;
 
-    bool theFirstStepFlag, theJacobianCalculateFlag, theRejectedStepFlag;
+    bool theFirstStepFlag, theJacobianCalculateFlag;
     bool isInterrupted, isStiff;
 };
 
@@ -222,7 +222,7 @@ ODEStepper::ODEStepper()
       Uround( 1e-10 ),
       theStoppingCriterion( 0.0 ),
       theFirstStepFlag( true ),
-      theRejectedStepFlag( false ),
+      theRejectedStepCounter( 0 ),
       theJacobianCalculateFlag( true ),
       theAcceptedError( 0.0 ),
       theAcceptedStepInterval( 0.0 ),
@@ -699,8 +699,7 @@ bool ODEStepper::calculateRadauIIA()
             if ( theta < 0.99 )
             {
                 eta = theta / ( 1.0 - theta );
-                const Real anIterationError( eta * aNorm * pow( theta, static_cast<int>(getMaxIterationNumber() - 2 - anIterator) ) / theStoppingCriterion );
-
+                const Real anIterationError( eta * aNorm * pow( theta, static_cast<int>( getMaxIterationNumber() - 2 - anIterator) ) / theStoppingCriterion );
                 if ( anIterationError >= 1.0 )
                 {
                     aNewStepInterval = aStepInterval * 0.8 * pow( std::max( 1e-4, std::min( 20.0, anIterationError ) ) , -1.0 / ( 4 + getMaxIterationNumber() - 2 - anIterator ) );
@@ -767,7 +766,7 @@ bool ODEStepper::calculateRadauIIA()
         theAcceptedStepInterval = aStepInterval;
         theAcceptedError = std::max( 1.0e-2, anError );
 
-        if ( theRejectedStepFlag )
+        if ( theRejectedStepCounter != 0 )
             aNewStepInterval = std::min( aNewStepInterval, aStepInterval );
 
         theFirstStepFlag = false;
@@ -847,7 +846,7 @@ Real ODEStepper::estimateLocalError()
     if ( anError < 1.0 )
         return anError;
 
-    if ( theFirstStepFlag || theRejectedStepFlag )
+    if ( theFirstStepFlag || theRejectedStepCounter != 0 )
     {
         fireProcesses();
         setVariableVelocity( theW[ 4 ] );
@@ -894,12 +893,12 @@ void ODEStepper::stepRadauIIA()
     setStepInterval( getNextStepInterval() );
     clearVariables();
 
-    theRejectedStepFlag = false;
+    theRejectedStepCounter = 0;
 
     fireProcesses();
     setVariableVelocity( theW[ 3 ] );
 
-    if ( theJacobianCalculateFlag )
+    if ( theJacobianCalculateFlag || isInterrupted )
     {
         calculateJacobian();
         setJacobianMatrix();
@@ -912,7 +911,13 @@ void ODEStepper::stepRadauIIA()
 
     while ( !calculateRadauIIA() )
     {
-        theRejectedStepFlag = true;
+        if ( ++theRejectedStepCounter >= getTolerableRejectedStepCount() )
+        {
+            THROW_EXCEPTION_INSIDE( SimulationError,
+                String( "The times of rejections of step calculation "
+                    "exceeded a maximum tolerable count (" )
+                + stringCast( getTolerableRejectedStepCount() ) + ")." );
+        }
 
         if ( !theJacobianCalculateFlag )
         {
