@@ -307,10 +307,15 @@ struct PySimulator: public libemc::Simulator
     virtual bool operator()( void ) const
     {
       if ( PyErr_CheckSignals() )
-      {
-	theSimulator.stop();
-	return false;
-      }
+	{
+	  theSimulator.stop();
+	  return false;
+	}
+      else if ( PyErr_Occurred() )
+	{
+	  theSimulator.stop();
+	  python::throw_error_already_set();
+	}
       return theEventCheckerImpl && PyObject_IsTrue( boost::python::handle<>( PyObject_CallFunction( theEventCheckerImpl.get(), NULL ) ).get() );
     }
 
@@ -339,7 +344,7 @@ struct PySimulator: public libemc::Simulator
     virtual void operator()( void ) const
     {
       if ( theEventHandlerImpl )
-        {
+	{
 	  PyObject_CallFunction( theEventHandlerImpl.get(), NULL );
 	}
     }
