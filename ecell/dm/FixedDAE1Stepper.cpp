@@ -64,16 +64,16 @@ public:
           theContinuousVariableVector( NULLPTR ),
           theActivityBuffer( NULLPTR )
     {
-            ; // do nothing
+        ; // do nothing
     }
                                                 
     virtual ~FixedDAE1Stepper()
     {
-            // free an allocated matrix
-            gsl_matrix_free( theJacobianMatrix );
-            gsl_vector_free( theVelocityVector );
-            gsl_vector_free( theSolutionVector );
-            gsl_permutation_free( thePermutation );
+        // free an allocated matrix
+        gsl_matrix_free( theJacobianMatrix );
+        gsl_vector_free( theVelocityVector );
+        gsl_vector_free( theSolutionVector );
+        gsl_permutation_free( thePermutation );
     }
 
     SET_METHOD( Real, PerturbationRate )
