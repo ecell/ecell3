@@ -70,10 +70,22 @@ public:
     virtual ~FixedDAE1Stepper()
     {
         // free an allocated matrix
-        gsl_matrix_free( theJacobianMatrix );
-        gsl_vector_free( theVelocityVector );
-        gsl_vector_free( theSolutionVector );
-        gsl_permutation_free( thePermutation );
+        if ( theJacobianMatrix )
+        {
+            gsl_matrix_free( theJacobianMatrix );
+        }
+        if ( theVelocityVector )
+        {
+            gsl_vector_free( theVelocityVector );
+        }
+        if ( theSolutionVector )
+        {
+            gsl_vector_free( theSolutionVector );
+        }
+        if ( thePermutation )
+        {
+            gsl_permutation_free( thePermutation );
+        }
     }
 
     SET_METHOD( Real, PerturbationRate )
