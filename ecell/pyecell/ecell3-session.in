@@ -209,7 +209,7 @@ def main():
                 
             
     aSimulator = ecell.emc.Simulator()
-    aSimulator.setDMSearchPath( aSimulator.DMSearchPathSeparator.join( ecell.config.dm_path ) )
+    aSimulator.setDMSearchPath( aSimulator.DM_SEARCH_PATH_SEPARATOR.join( ecell.config.dm_path ) )
 
     aSession = Session( aSimulator )
 
