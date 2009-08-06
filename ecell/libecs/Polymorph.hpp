@@ -1332,7 +1332,7 @@ template< typename T0_, typename T1_, typename T2_, typename T3_, typename T4_,
 PolymorphValue::Handle PolymorphValue::create( boost::tuple< T0_, T1_, T2_, T3_, T4_, T5_, T6_, T7_, T8_, T9_ > const& aTuple )
 {
     typedef boost::tuple< T0_, T1_, T2_, T3_, T4_, T5_, T6_, T7_, T8_, T9_ > arg_type;
-    const int numberOfItems( boost::tuples::length< arg_type >::value );
+    const std::size_t numberOfItems( boost::tuples::length< arg_type >::value );
     std::size_t pbytes( sizeof( Polymorph ) * numberOfItems );
     assert( pbytes / sizeof( Polymorph ) == numberOfItems &&
             sizeof( PolymorphValue ) + pbytes >= sizeof( PolymorphValue ));
