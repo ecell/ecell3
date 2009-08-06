@@ -31,13 +31,15 @@
 
 #include "ModuleMaker.hpp"
 #include "SharedDynamicModule.hpp"
-#include <ltdl.h>
+#include "SharedModuleMakerInterface.hpp"
 #include <fstream>
 
-class SharedModuleMakerBase
+class SharedModuleMakerBase: public SharedModuleMakerInterface
 {
 public:
-    void setSearchPath( const std::string& path )
+    virtual ~SharedModuleMakerBase() {}
+
+    virtual void setSearchPath( const std::string& path )
     {
         theSearchPath.clear();
         for ( std::string::size_type i( 0 ), end( path.size() ), next( 0 );
@@ -52,7 +54,7 @@ public:
         }
     }
 
-    const std::string getSearchPath() const
+    virtual const std::string getSearchPath() const
     {
         typedef std::set< std::string > StringSet;
         std::string retval;
@@ -99,10 +101,6 @@ public:
         lt_dlexit();
     }
 
-public:
-    static const char PATH_SEPARATOR = LT_PATHSEP_CHAR;
-
-
 protected:
     std::set< std::string > theSearchPath;
 };
@@ -113,14 +111,14 @@ protected:
     @sa StaticClassModuleMaker, SharedDynamicModule
 */
 
-template<class T, class DMAllocator = typename SimpleAllocatorDef< T >::type >
-class SharedModuleMaker : public ModuleMaker< T, DMAllocator >,
+template<class T >
+class SharedModuleMaker : public ModuleMaker< T >,
                           public SharedModuleMakerBase
 {
 public:
-    typedef ModuleMaker< T, DMAllocator > Base;
-    typedef DynamicModule< T, DMAllocator > Module;
-    typedef SharedDynamicModule< T, DMAllocator > SharedModule;
+    typedef ModuleMaker< T > Base;
+    typedef DynamicModule< T > Module;
+    typedef SharedDynamicModule< T > SharedModule;
 
     SharedModuleMaker()
     {

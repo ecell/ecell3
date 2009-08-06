@@ -57,7 +57,7 @@
 namespace libecs
 {
 
-const char Model::PATH_SEPARATOR = SharedModuleMakerBase::PATH_SEPARATOR;
+const char Model::PATH_SEPARATOR = SharedModuleMakerInterface::PATH_SEPARATOR;
 
 Model::Model( ModuleMaker< EcsObject >& maker )
     : theCurrentTime( 0.0 ),
@@ -423,8 +423,8 @@ void Model::initialize()
 
 void Model::setDMSearchPath( const std::string& path )
 {
-    SharedModuleMakerBase* smmbase(
-        dynamic_cast< SharedModuleMakerBase* >( &theEcsObjectMaker ) );
+    SharedModuleMakerInterface* smmbase(
+        dynamic_cast< SharedModuleMakerInterface* >( &theEcsObjectMaker ) );
     if ( !smmbase )
     {
         THROW_EXCEPTION( IllegalOperation,
@@ -436,8 +436,8 @@ void Model::setDMSearchPath( const std::string& path )
 
 const std::string Model::getDMSearchPath() const
 {
-    SharedModuleMakerBase const* smmbase(
-        dynamic_cast< SharedModuleMakerBase const* >( &theEcsObjectMaker ) );
+    SharedModuleMakerInterface const* smmbase(
+        dynamic_cast< SharedModuleMakerInterface const* >( &theEcsObjectMaker ) );
     if ( !smmbase )
     {
         THROW_EXCEPTION( IllegalOperation,

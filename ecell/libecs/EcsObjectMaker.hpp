@@ -65,13 +65,7 @@ public:
     */
     DMType* make( const std::string& aClassname )
     {
-        Backend::Module::DMAllocator anAllocator( getModule( aClassname ).getAllocator() );
-        if ( !anAllocator )
-        {
-            THROW_EXCEPTION( Instantiation, "unexpected error" );
-        }
-
-        DMType* anInstance( reinterpret_cast< DMType *>( anAllocator() ) );
+        DMType* anInstance( reinterpret_cast< DMType *>( getModule( aClassname ).createInstance() ) );
         if ( !anInstance )
         {
             THROW_EXCEPTION( Instantiation,

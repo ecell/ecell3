@@ -42,14 +42,14 @@
     various subclasses of certain template parameter class T. 
 */
 
-template<class T, class DMAllocator = typename SimpleAllocatorDef< T >::type >
+template<class T >
 class ModuleMaker 
 {
 
 public:
 
-    typedef DynamicModule<T, DMAllocator> Module;
-    typedef std::map<const std::string, Module*> ModuleMap;
+    typedef DynamicModule< T > Module;
+    typedef std::map< const std::string, Module* > ModuleMap;
     typedef typename ModuleMap::iterator ModuleMapIterator;
 
 public: 

@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(testInstantiation)
     ModuleMaker< EcsObject > mmaker;
     DM_NEW_STATIC( &mmaker, EcsObject, System );
     
-    System* sys = reinterpret_cast< System * >( mmaker.getModule( "System" ).getAllocator()() );
+    System* sys = reinterpret_cast< System * >( mmaker.getModule( "System" ).createInstance() );
     BOOST_CHECK(sys);
     BOOST_CHECK_EQUAL("System", sys->getPropertyInterface().getClassName());
 
@@ -67,10 +67,10 @@ BOOST_AUTO_TEST_CASE(testGetSizeVariable)
     DM_NEW_STATIC( &mmaker, EcsObject, System );
     DM_NEW_STATIC( &mmaker, EcsObject, Variable );
     
-    System* sys = reinterpret_cast< System * >( mmaker.getModule( "System" ).getAllocator()() );
+    System* sys = reinterpret_cast< System * >( mmaker.getModule( "System" ).createInstance() );
     BOOST_CHECK_THROW( sys->getSizeVariable(), IllegalOperation );
 
-    Variable* var = reinterpret_cast< Variable * >( mmaker.getModule( "Variable" ).getAllocator()() );
+    Variable* var = reinterpret_cast< Variable * >( mmaker.getModule( "Variable" ).createInstance() );
     var->setValue( 123.0 );
     var->setID( "SIZE" );
     sys->registerEntity( var );

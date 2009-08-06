@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(testInstantiation)
     ModuleMaker< EcsObject > mmaker;
     DM_NEW_STATIC( &mmaker, EcsObject, MockProcess );
     
-    MockProcess* proc = reinterpret_cast< MockProcess * >( mmaker.getModule( "MockProcess" ).getAllocator()() );
+    MockProcess* proc = reinterpret_cast< MockProcess * >( mmaker.getModule( "MockProcess" ).createInstance() );
     BOOST_CHECK(proc);
     BOOST_CHECK_EQUAL("MockProcess", proc->getPropertyInterface().getClassName());
     delete proc;
@@ -68,15 +68,15 @@ BOOST_AUTO_TEST_CASE(testGetMolarActivity)
     DM_NEW_STATIC( &mmaker, EcsObject, Variable );
     DM_NEW_STATIC( &mmaker, EcsObject, System );
 
-    System* sys = reinterpret_cast< System* >( mmaker.getModule( "System" ).getAllocator()() );
+    System* sys = reinterpret_cast< System* >( mmaker.getModule( "System" ).createInstance() );
 
-    MockProcess* proc = reinterpret_cast< MockProcess * >( mmaker.getModule( "MockProcess" ).getAllocator()() );
+    MockProcess* proc = reinterpret_cast< MockProcess * >( mmaker.getModule( "MockProcess" ).createInstance() );
     proc->setActivity( N_A );
     BOOST_CHECK_EQUAL( N_A, proc->getActivity() );
     sys->registerEntity( proc );
     BOOST_CHECK_THROW( proc->getMolarActivity(), IllegalOperation );
 
-    Variable* var = reinterpret_cast< Variable * >( mmaker.getModule( "Variable" ).getAllocator()() );
+    Variable* var = reinterpret_cast< Variable * >( mmaker.getModule( "Variable" ).createInstance() );
     var->setValue( 1.0 );
     var->setID( "SIZE" );
     sys->registerEntity( var );
@@ -99,10 +99,10 @@ BOOST_AUTO_TEST_CASE(testGetStepper)
     DM_NEW_STATIC( &mmaker, EcsObject, MockProcess );
     DM_NEW_STATIC( &mmaker, EcsObject, PassiveStepper );
 
-    MockProcess* proc = reinterpret_cast< MockProcess * >( mmaker.getModule( "MockProcess" ).getAllocator()() );
+    MockProcess* proc = reinterpret_cast< MockProcess * >( mmaker.getModule( "MockProcess" ).createInstance() );
     BOOST_CHECK_EQUAL( "", proc->getStepperID() );
 
-    PassiveStepper* stepper = reinterpret_cast< PassiveStepper* >( mmaker.getModule( "PassiveStepper" ).getAllocator()() );
+    PassiveStepper* stepper = reinterpret_cast< PassiveStepper* >( mmaker.getModule( "PassiveStepper" ).createInstance() );
     stepper->setID( "STEPPER" );
     proc->setStepper( stepper );
 

@@ -25,50 +25,23 @@
 // 
 //END_HEADER
 
-#ifndef __DMOBJECT_HPP
-#define __DMOBJECT_HPP
+#ifndef __SHAREDMODULEMAKERINTERFACE_HPP
+#define __SHAREDMODULEMAKERINTERFACE_HPP
 
-#ifdef WIN32
-#ifndef DM_IMPORTS
-#define DM_IF __declspec(dllexport)
-#else
-#define DM_IF __declspec(dllimport)
-#endif /* !DM_IMPORTS */
-#else
-#define DM_IF
-#endif /* WIN32 */
+#include <string>
+#include <ltdl.h>
 
-#include "dmtool/DynamicModuleDescriptor.hpp"
+class SharedModuleMakerInterface
+{
+public:
+    virtual ~SharedModuleMakerInterface() {}
 
-#define DM_DESCRIPTOR_ENTRY( CLASSNAME ) \
-    { \
-        #CLASSNAME, \
-        &CLASSNAME::createInstance, \
-        &CLASSNAME::getClassInfoPtr, \
-        &CLASSNAME::initializeModule, \
-        &CLASSNAME::finalizeModule \
-    }
+    virtual void setSearchPath( const std::string& path ) = 0;
 
-#define DM_INIT( CLASSNAME )\
-  extern "C"\
-  {\
-    DM_IF DynamicModuleDescriptor __dm_descriptor = DM_DESCRIPTOR_ENTRY( CLASSNAME ); \
-  } // 
+    virtual const std::string getSearchPath() const = 0;
 
-#define DM_NEW_STATIC( MAKER, BASE, CLASSNAME )\
-  { \
-    static DynamicModuleDescriptor desc = DM_DESCRIPTOR_ENTRY( CLASSNAME ); \
-    ( MAKER )->addClass( new BuiltinDynamicModule< BASE >( desc ) ); \
-  } //
+public:
+    static const char PATH_SEPARATOR = LT_PATHSEP_CHAR;
+};
 
-#define DM_OBJECT( CLASSNAME )\
- static void* createInstance() { return new CLASSNAME ; }\
-
-
-#define DM_BASECLASS( CLASSNAME )\
-public:\
- typedef CLASSNAME * (* AllocatorFuncPtr )()
-
-
-#endif /* __DMOBJECT_HPP */
-
+#endif /* __SHAREDMODULEMAKERINTERFACE_HPP */

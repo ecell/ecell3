@@ -47,10 +47,14 @@
 #include <boost/python.hpp>
 #include <boost/python/tuple.hpp>
 #include <boost/python/object.hpp>
+#include <boost/python/reference_existing_object.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 #include <numpy/arrayobject.h>
 #include <stringobject.h>
+#include <weakrefobject.h>
+
+#include "dmtool/SharedModuleMakerInterface.hpp"
 
 #include "libecs/Model.hpp"
 #include "libecs/libecs.hpp"
@@ -1014,8 +1018,8 @@ public:
             if ( i != b )
                 retval += ", ";
             retval += VariableReference___repr__( &*i );
-            retval += ']';
         }
+        retval += ']';
 
         return retval;
     } 
@@ -1046,13 +1050,6 @@ public:
     }
 };
 
-template< typename T_ >
-inline PyObject* to_python_indirect_fun( T_ arg )
-{
-    return py::to_python_indirect< T_, py::detail::make_reference_holder >()( arg );
-}
-
-
 class PythonWarningHandler: public libecs::WarningHandler
 {
 public:
@@ -1075,23 +1072,289 @@ private:
     py::handle<> thePyObject;
 };
 
+class PythonDynamicModule;
+
+class PythonProcess: public Process
+{
+public:
+    virtual ~PythonProcess()
+    {
+        py::xdecref( theSelf );
+    }
+
+    LIBECS_DM_INIT_PROP_INTERFACE()
+    {
+        INHERIT_PROPERTIES( Process );
+    }
+
+    virtual void initialize()
+    {
+        if ( !theSelf )
+            return;
+        py::getattr( py::object( py::borrowed( theSelf ) ), "initialize" )();
+    }
+
+    virtual void fire()
+    {
+        if ( !theSelf )
+            return;
+        py::object retval( py::getattr( py::object( py::borrowed( theSelf ) ), "fire" )() );
+        if ( retval )
+        {
+            setActivity( py::extract< Real >( retval ) );
+        } 
+    }
+
+    virtual const bool isContinuous() const
+    {
+        if ( !theSelf )
+            return false;
+        return py::extract<bool>( py::getattr( py::object( py::borrowed( theSelf ) ), "isContinuous" ) );
+    }
+
+    virtual PropertyInterfaceBase const& getPropertyInterface() const
+    {
+        return _getPropertyInterface();
+    }
+
+    PropertyInterface< Process > const& _getPropertyInterface() const;
+
+    PropertySlotBase const* getPropertySlot( String const& aPropertyName ) const
+    {
+        return _getPropertyInterface().getPropertySlot( aPropertyName ); \
+    }
+
+    virtual void setProperty( String const& aPropertyName, Polymorph const& aValue )
+    {
+        return _getPropertyInterface().setProperty( *this, aPropertyName, aValue );
+    }
+
+    const Polymorph getProperty( String const& aPropertyName ) const
+    {
+        return _getPropertyInterface().getProperty( *this, aPropertyName );
+    }
+
+    void loadProperty( String const& aPropertyName, Polymorph const& aValue )
+    {
+        return _getPropertyInterface().loadProperty( *this, aPropertyName, aValue );
+    }
+
+    const Polymorph saveProperty( String const& aPropertyName ) const
+    {
+        return _getPropertyInterface().saveProperty( *this, aPropertyName );
+    }
+
+    const StringVector getPropertyList() const
+    {
+        return _getPropertyInterface().getPropertyList( *this );
+    }
+
+    PropertySlotProxy* createPropertySlotProxy( String const& aPropertyName )
+    {
+        return _getPropertyInterface().createPropertySlotProxy( *this, aPropertyName );
+    }
+
+    const PropertyAttributes
+    getPropertyAttributes( String const& aPropertyName ) const
+    {
+        return _getPropertyInterface().getPropertyAttributes( *this, aPropertyName );
+    }
+
+    PyObject* getPythonObject() const
+    {
+        return theSelf;
+    }
+
+    void setPythonObject( PyObject* aPythonObject )
+    {
+        py::xdecref( theSelf );
+        theSelf = py::incref( aPythonObject );
+    }
+
+    PythonDynamicModule const& getModule() const
+    {
+        return theModule;
+    }
+
+    PythonProcess( PythonDynamicModule const& aModule )
+        : theSelf( 0 ), theModule( aModule ) {}
+
+private:
+    PyObject* theSelf;
+    PythonDynamicModule const& theModule;
+    
+};
+
+struct PythonDynamicModule: public DynamicModule< EcsObject >
+{
+    typedef DynamicModule< EcsObject > Base;
+
+    struct make_ptr_instance: public py::objects::make_instance_impl< PythonProcess, py::objects::pointer_holder< PythonProcess*, PythonProcess >, make_ptr_instance > 
+    {
+        typedef py::objects::pointer_holder< PythonProcess*, PythonProcess > holder_t;
+
+        template <class Arg>
+        static inline holder_t* construct(void* storage, PyObject*, Arg& x)
+        {
+            return new (storage) holder_t(x);
+        }
+
+        template<typename Ptr>
+        static inline PyTypeObject* get_class_object(Ptr const& x)
+        {
+            return static_cast< PythonProcess const* >( boost::get_pointer(x) )->getModule().getPythonType();
+        }
+    };
+
+    virtual EcsObject* createInstance() const;
+
+    virtual const char* getFileName() const
+    {
+        const char* aRetval( 0 );
+        try
+        {
+            py::handle<> aPythonModule( PyImport_Import( py::getattr( thePythonClass, "__module__" ).ptr() ) );
+            if ( !aPythonModule )
+            {
+                py::throw_error_already_set();
+            }
+            aRetval = py::extract< const char * >( py::getattr( py::object( aPythonModule ), "__file__" ) );
+        }
+        catch ( py::error_already_set )
+        {
+            PyErr_Clear();
+        }
+        return aRetval;
+    }
+
+    virtual const char *getModuleName() const 
+    {
+        return reinterpret_cast< PyTypeObject* >( thePythonClass.ptr() )->tp_name;
+    }
+
+    virtual const DynamicModuleInfo* getInfo() const
+    {
+        return &thePropertyInterface;
+    }
+
+    PyTypeObject* getPythonType() const
+    {
+        return reinterpret_cast< PyTypeObject* >( thePythonClass.ptr() );
+    }
+ 
+    PythonDynamicModule( py::object aPythonClass )
+        : Base( DM_TYPE_DYNAMIC ),
+           thePythonClass( aPythonClass ),
+           thePropertyInterface( getModuleName(), "Process" )
+    {
+    }
+private:
+    py::object thePythonClass;
+    PropertyInterface< PythonProcess > thePropertyInterface;
+};
+
+EcsObject* PythonDynamicModule::createInstance() const
+{
+    PythonProcess* retval( new PythonProcess( *this ) );
+    py::handle<> aNewObject( make_ptr_instance::execute( retval ) );
+    if ( !aNewObject )
+    {
+        delete retval;
+        std::string anErrorStr( "Instantiation failure" );
+        PyObject* aPyErrObj( PyErr_Occurred() );
+        if ( aPyErrObj )
+        {
+            anErrorStr += aPyErrObj->ob_type->tp_name;
+            py::handle<> aPyErrStrRepr( PyObject_Str( aPyErrObj ) );
+            anErrorStr.insert( anErrorStr.size(),
+                PyString_AsString( aPyErrStrRepr.get() ),
+                PyString_Size( aPyErrStrRepr.get() ) );
+            PyErr_Clear();
+        }
+        throw std::runtime_error( anErrorStr );
+    }
+    retval->setPythonObject( aNewObject.get() );
+    return retval;
+}
+
+PropertyInterface< Process > const& PythonProcess::_getPropertyInterface() const
+{
+    return *reinterpret_cast< PropertyInterface< Process > const* >( theModule.getInfo() );
+}
+
+template< typename T_ >
+inline PyObject* to_python_indirect_fun( T_* arg )
+{
+    return py::to_python_indirect< T_, py::detail::make_reference_holder >()( arg );
+}
+
+template<>
+inline PyObject* to_python_indirect_fun< Process >( Process* arg )
+{
+    PythonProcess* tmp( dynamic_cast< PythonProcess* >( arg ) );
+    return tmp ? py::incref( tmp->getPythonObject() ):
+            py::to_python_indirect< Process*, py::detail::make_reference_holder >()( arg );
+}
 
 class Simulator
 {
+private:
+    struct CompositeModuleMaker: public ModuleMaker< EcsObject >,
+                                 public SharedModuleMakerInterface
+    {
+        virtual ~CompositeModuleMaker() {}
+
+        virtual void setSearchPath( const std::string& path )
+        {
+            SharedModuleMakerInterface* anInterface(
+                dynamic_cast< SharedModuleMakerInterface* >( &theDefaultModuleMaker ) );
+            if ( anInterface )
+            {
+                anInterface->setSearchPath( path );
+            }
+        }
+
+        virtual const std::string getSearchPath() const
+        {
+            SharedModuleMakerInterface* anInterface(
+                dynamic_cast< SharedModuleMakerInterface* >( &theDefaultModuleMaker ) );
+            if ( anInterface )
+            {
+                return anInterface->getSearchPath();
+            }
+        }
+
+        virtual const Module& getModule( const std::string& aClassName, bool forceReload = false )
+        {
+            if ( theModuleMap.find( aClassName ) == theModuleMap.end() )
+            {
+                return theDefaultModuleMaker.getModule( aClassName, forceReload );
+            }
+            return *theModuleMap[ aClassName ];
+        }
+
+        CompositeModuleMaker( ModuleMaker< EcsObject >& aDefaultModuleMaker )
+            : theDefaultModuleMaker( aDefaultModuleMaker ) {}
+
+    private:
+        ModuleMaker< EcsObject >& theDefaultModuleMaker;
+    };
+
 public:
     Simulator()
         : theRunningFlag( false ),
           theDirtyFlag( true ),
           theEventCheckInterval( 20 ),
           theEventHandler(),
-          thePropertiedObjectMaker( createDefaultModuleMaker() ),
-          theModel( *thePropertiedObjectMaker )
+          theDefaultPropertiedObjectMaker( createDefaultModuleMaker() ),
+          thePropertiedObjectMaker( *theDefaultPropertiedObjectMaker ),
+          theModel( thePropertiedObjectMaker )
     {
     }
 
     ~Simulator()
     {
-        delete thePropertiedObjectMaker;
+        delete theDefaultPropertiedObjectMaker;
     }
 
     void initialize()
@@ -1657,7 +1920,7 @@ public:
     {
         typedef ModuleMaker< EcsObject >::ModuleMap ModuleMap;
         PolymorphVector aVector;
-        const ModuleMap& modules( thePropertiedObjectMaker->getModuleMap() );
+        const ModuleMap& modules( thePropertiedObjectMaker.getModuleMap() );
 
         for( ModuleMap::const_iterator i( modules.begin() );
                     i != modules.end(); ++i )
@@ -1700,6 +1963,16 @@ public:
     Logger* getLogger( String const& aFullPNString ) const
     {
         return theModel.getLoggerBroker().getLogger( aFullPNString );
+    }
+
+    void addPythonDM( py::object obj )
+    {
+        if ( !PyType_Check( obj.ptr() ) )
+        {
+            PyErr_SetString( PyExc_TypeError, "argument must be a type object" );
+            py::throw_error_already_set();
+        }
+        thePropertiedObjectMaker.addClass( new PythonDynamicModule( obj ) );
     }
 
 protected:
@@ -1758,7 +2031,8 @@ private:
 
     py::handle<>    theEventHandler;
 
-    ModuleMaker< EcsObject >* thePropertiedObjectMaker;
+    ModuleMaker< EcsObject >* theDefaultPropertiedObjectMaker;
+    CompositeModuleMaker thePropertiedObjectMaker;
     Model           theModel;
 };
 
@@ -1807,6 +2081,12 @@ static py::object Process_get_variableReferences( Process* self )
 
 static Polymorph Entity___getattr__( Entity* self, std::string key )
 {
+    if ( key == "__members__" || key == "__methods__" )
+    {
+        PyErr_SetString( PyExc_KeyError, key.c_str() );
+        py::throw_error_already_set();
+    }
+
     if ( key.size() > 0 )
         key[ 0 ] = std::toupper( key[ 0 ] );
     return self->getProperty( key );
@@ -1924,13 +2204,14 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "variable",
                 py::make_function(
                     &VariableReference::getVariable,
-                    py::return_internal_reference<>() ) )
+                    py::return_value_policy< py::reference_existing_object >() ) )
         .def( "__str__", &VariableReference___repr__ )
         .def( "__repr__", &VariableReference___repr__ )
         ;
 
     py::class_< Stepper, py::bases<>, Stepper, boost::noncopyable >
         ( "Stepper", py::no_init )
+        .add_property( "id", &Stepper::getID )
         .add_property( "priority",
                        &Stepper::getPriority,
                        &Stepper::setPriority )
@@ -1951,7 +2232,9 @@ BOOST_PYTHON_MODULE( _ecs )
         // properties
         .add_property( "superSystem",
             py::make_function( &Entity::getSuperSystem,
-            py::return_internal_reference<> () ) )
+            py::return_value_policy< py::reference_existing_object > () ) )
+        .add_property( "id", &Entity::getID )
+        .add_property( "name", &Entity::getName )
         .def( "__setattr__", &Entity___setattr__ )
         .def( "__getattr__", &Entity___getattr__ )
         ;
@@ -1968,13 +2251,11 @@ BOOST_PYTHON_MODULE( _ecs )
         ( "Process", py::no_init )
         .add_property( "activity",  &Process::getActivity,
                                     &Process::setActivity )
+        .add_property( "isContinuous", &Process::isContinuous )
         .add_property( "priority",  &Process::getPriority )
         .add_property( "stepperID", &Process::getStepperID )
         .add_property( "variableReferences",
               py::make_function( &Process_get_variableReferences ) )
-        // methods
-        .def( "addValue",        &Process::addValue )
-        .def( "setFlux",         &Process::setFlux )
         ;
 
     py::class_< Variable, py::bases< Entity >, Variable, boost::noncopyable >
@@ -2042,7 +2323,7 @@ BOOST_PYTHON_MODULE( _ecs )
         // Entity-related methods
         .def( "createEntity",
               &Simulator::createEntity )
-        .def( "geteEntity",
+        .def( "getEntity",
               &Simulator::getEntity )
         .def( "deleteEntity",
               &Simulator::deleteEntity )
@@ -2123,9 +2404,6 @@ BOOST_PYTHON_MODULE( _ecs )
         .def( "stop",
               &Simulator::stop )
         .def( "step",
-              ( void ( Simulator::* )( void ) )
-              &Simulator::step )
-        .def( "step",
               ( void ( Simulator::* )( const Integer ) )
               &Simulator::step )
         .def( "run",
@@ -2145,5 +2423,6 @@ BOOST_PYTHON_MODULE( _ecs )
                        &Simulator::getDMSearchPathSeparator )
         .def( "setDMSearchPath", &Simulator::setDMSearchPath )
         .def( "getDMSearchPath", &Simulator::getDMSearchPath )
+        .def( "addPythonDM", &Simulator::addPythonDM )
         ;
 }

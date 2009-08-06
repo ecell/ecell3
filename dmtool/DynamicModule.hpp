@@ -33,16 +33,11 @@
 
 /// doc needed
 
-template< typename T >
-struct SimpleAllocatorDef
-{
-    typedef T* (*type)();
-};
-
 enum DynamicModuleType
 {
-    DM_TYPE_STATIC,
-    DM_TYPE_SHARED
+    DM_TYPE_BUILTIN,
+    DM_TYPE_SHARED,
+    DM_TYPE_DYNAMIC
 };
 
 class DynamicModuleInfo;
@@ -51,58 +46,24 @@ class DynamicModuleInfo;
   Common base class of DynamicModule and SharedDynamicModule
 */
   
-template < class T, class _TAllocator = typename SimpleAllocatorDef< T >::type >
+template < class T >
 class DynamicModule
 {
-public:
-
-    typedef _TAllocator DMAllocator;
-    typedef const char* (DynamicModule::*FileNameGetterType)() const;
-    typedef void (DynamicModule::*FinalizerType)();
-
 public:        
 
-    DynamicModule( DynamicModuleDescriptor const& desc,
-                   enum DynamicModuleType aType,
-                   FileNameGetterType aFileNameGetter = 0,
-                   FinalizerType aFinalizer = 0 )
-        : theDescriptor( desc ), theFileNameGetter( aFileNameGetter ),
-          theFinalizer( aFinalizer )
+    DynamicModule( enum DynamicModuleType aType ): theType( aType )
     {
-        desc.moduleInitializer();
     }
 
-    ~DynamicModule()
-    {
-        theDescriptor.moduleFinalizer();
-        if ( theFinalizer )
-            ( this->*theFinalizer )();
-    }
-
-    const DynamicModuleDescriptor& getDescriptor()
-    {
-        return theDescriptor;
-    }
+    virtual ~DynamicModule() {}
  
-    const char* getModuleName() const
-    {
-        return theDescriptor.moduleName;
-    }
+    virtual const char* getModuleName() const = 0;
 
-    const char* getFileName() const
-    {
-        return theFileNameGetter ? (this->*theFileNameGetter)(): 0;
-    }
+    virtual const char* getFileName() const = 0;
 
-    DMAllocator getAllocator() const
-    {
-        return reinterpret_cast< DMAllocator >( theDescriptor.allocator );
-    }
+    virtual T* createInstance() const = 0;
 
-    const DynamicModuleInfo* getInfo() const
-    {
-        return theDescriptor.infoLoader ? (*theDescriptor.infoLoader)(): 0;
-    }
+    virtual const DynamicModuleInfo* getInfo() const = 0;
 
     enum DynamicModuleType getType() const
     {
@@ -111,33 +72,79 @@ public:
 
 protected:
 
-    DynamicModuleDescriptor const& theDescriptor;
-
-    FileNameGetterType theFileNameGetter;
-
-    FinalizerType theFinalizer;
-
     enum DynamicModuleType theType;
 };
 
 
-/**
-   StaticDynamicModule is a class statically linked to the binary
-   that utilizes ModuleMaker
- */
-template < class T, class DMAllocator = typename SimpleAllocatorDef< T >::type >
-class StaticDynamicModule : public DynamicModule< T, DMAllocator >
+template < class T >
+class StaticDynamicModule: public DynamicModule< T >
 {
 public:
 
-    typedef DynamicModule< T, DMAllocator > Base;    
+    typedef DynamicModule< T > Base;
+
+public:        
+
+    StaticDynamicModule( enum DynamicModuleType aType,
+                   DynamicModuleDescriptor const& desc )
+        : Base( aType ), theDescriptor( desc )
+    {
+        theDescriptor.moduleInitializer();
+    }
+
+    virtual ~StaticDynamicModule()
+    {
+        theDescriptor.moduleFinalizer();
+    }
+
+    const DynamicModuleDescriptor& getDescriptor()
+    {
+        return theDescriptor;
+    }
+ 
+    virtual const char* getModuleName() const
+    {
+        return theDescriptor.moduleName;
+    }
+
+    virtual T* createInstance() const
+    {
+        return reinterpret_cast< T* >( ( *theDescriptor.allocator )() );
+    }
+
+    virtual const DynamicModuleInfo* getInfo() const
+    {
+        return ( *theDescriptor.infoLoader )();
+    }
+
+protected:
+
+    DynamicModuleDescriptor const& theDescriptor;
+};
+
+
+/**
+   BuiltinDynamicModule is a class statically linked to the binary
+   that utilizes ModuleMaker
+ */
+template < class T >
+class BuiltinDynamicModule : public StaticDynamicModule< T >
+{
+public:
+
+    typedef StaticDynamicModule< T > Base;
 
 public:
 
-    StaticDynamicModule( DynamicModuleDescriptor const& desc )
-        : DynamicModule< T, DMAllocator >( desc, DM_TYPE_STATIC )
+    BuiltinDynamicModule( DynamicModuleDescriptor const& desc )
+        : Base( DM_TYPE_BUILTIN, desc )
     {
         ; // do nothing
+    }
+
+    virtual const char* getFileName() const
+    {
+        return "<builtin>";
     }
 };
 

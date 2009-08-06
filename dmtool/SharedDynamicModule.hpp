@@ -42,31 +42,26 @@
                                         which holds the module information.
  */
 
-template < class T, class DMAllocator = typename SimpleAllocatorDef< T >::type >
-class SharedDynamicModule : public DynamicModule< T, DMAllocator >
+template < class T >
+class SharedDynamicModule : public StaticDynamicModule< T >
 {
 public:
 
-    typedef DynamicModule< T, DMAllocator > Base;    
+    typedef StaticDynamicModule< T > Base;
 
 public:
 
     SharedDynamicModule( DynamicModuleDescriptor const& desc,
                          const std::string& fileName,
                          lt_dlhandle handle )
-        : DynamicModule< T, DMAllocator >(
-            desc, DM_TYPE_SHARED,
-            reinterpret_cast< typename Base::FileNameGetterType >(
-                &SharedDynamicModule::getFileName ),
-            reinterpret_cast< typename Base::FinalizerType >(
-                &SharedDynamicModule::finalize ) )
+        : Base( DM_TYPE_SHARED, desc )
     {
         ; // do nothing
     }
 
 private:
 
-    void finalize()
+    virtual ~SharedDynamicModule()
     {
         if( this->theHandle )
         {
@@ -76,7 +71,7 @@ private:
     }
 
 
-    const char* getFileName() const
+    virtual const char* getFileName() const
     {
         return theFileName.c_str();
     }
