@@ -313,6 +313,28 @@ struct PropertySlotMapToPythonConverter
     }
 };
 
+struct StringVectorToPythonConverter
+{
+    static void addToRegistry()
+    {
+        py::to_python_converter< StringVector, StringVectorToPythonConverter >();
+    }
+
+    static PyObject* convert( StringVector const& aStringVector )
+    {
+        py::list retval;
+
+        for ( StringVector::const_iterator i( aStringVector.begin() );
+                i != aStringVector.end(); ++i )
+        {
+            retval.append( py::object( *i ) );
+        }
+
+        return py::incref( retval.ptr() );
+    }
+};
+
+
 template< typename Ttcell_ >
 inline void buildPythonTupleFromTuple(PyObject* pyt, const Ttcell_& cell,
         Py_ssize_t idx = 0)
@@ -1527,23 +1549,21 @@ public:
         theModel.deleteStepper( anID );
     }
 
-    const Polymorph getStepperList() const
+    const py::list getStepperList() const
     {
         Model::StepperMap const& aStepperMap( theModel.getStepperMap() );
+        py::list retval;
 
-        PolymorphVector aPolymorphVector; 
-        aPolymorphVector.reserve( aStepperMap.size() );
-        
         for( Model::StepperMap::const_iterator i( aStepperMap.begin() );
              i != aStepperMap.end(); ++i )
         {
-            aPolymorphVector.push_back( (*i).first );
+            retval.append( py::object( (*i).first ) );
         }
 
-        return aPolymorphVector;
+        return retval;
     }
 
-    const Polymorph 
+    const StringVector
     getStepperPropertyList( String const& aStepperID ) const
     {
         StepperPtr aStepperPtr( theModel.getStepper( aStepperID ) );
@@ -1711,7 +1731,7 @@ public:
         NEVER_GET_HERE;
     }
 
-    const Polymorph 
+    const StringVector
     getEntityPropertyList( String const& aFullIDString ) const
     {
         Entity const * anEntityPtr( theModel.getEntity( FullID( aFullIDString ) ) );
@@ -1825,9 +1845,9 @@ public:
                     PyInt_AsLong( static_cast< py::object >( aParamList[ 3 ] ).ptr() ) ) );
     }
 
-    const Polymorph getLoggerList() const
+    const py::list getLoggerList() const
     {
-        PolymorphVector aLoggerList;
+        py::list retval;
 
         LoggerBroker const& aLoggerBroker( theModel.getLoggerBroker() );
 
@@ -1835,10 +1855,10 @@ public:
                 i( aLoggerBroker.begin() ), end( aLoggerBroker.end() );
              i != end; ++i )
         {
-            aLoggerList.push_back( (*i).first.asString() );
+            retval.append( py::object( (*i).first.asString() ) );
         }
 
-        return aLoggerList;
+        return retval;
     }
 
     boost::shared_ptr< DataPointVector > 
@@ -2280,6 +2300,7 @@ BOOST_PYTHON_MODULE( _ecs )
     registerTupleConverters< std::pair< Real, String > >();
     PolymorphToPythonConverter::addToRegistry();
     StringKeyedMapToPythonConverter< PolymorphMap >::addToRegistry();
+    StringVectorToPythonConverter::addToRegistry();
     PropertySlotMapToPythonConverter::addToRegistry();
     DataPointVectorSharedPtrConverter::addToRegistry();
 
