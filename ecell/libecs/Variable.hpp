@@ -134,7 +134,7 @@ public:
         {
             Real aVelocitySum( calculateDifferenceSum( aCurrentTime,
                                                        anInterval ) );
-            loadValue( getValue() + aVelocitySum );
+            setValue( getValue() + aVelocitySum );
         }
     }
 
@@ -337,7 +337,7 @@ protected:
 
         const Real aVelocitySum( calculateDifferenceSum(
             aCurrentTime, anInterval ) );
-        loadValue( getValue() + aVelocitySum );
+        setValue( getValue() + aVelocitySum );
 
         theLastTime = aCurrentTime;
     }

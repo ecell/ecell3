@@ -202,7 +202,7 @@ void DifferentialStepper::resetAll()
     for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
     {
         VariablePtr const aVariable( theVariableVector[ c ] );
-        aVariable->loadValue( theValueBuffer[ c ] );
+        aVariable->setValue( theValueBuffer[ c ] );
     }
 }
 
@@ -225,7 +225,7 @@ void DifferentialStepper::interIntegrate()
     {
         VariablePtr const aVariable( theVariableVector[ c ] );
 
-        aVariable->loadValue( theValueBuffer[ c ] );
+        aVariable->setValue( theValueBuffer[ c ] );
         aVariable->interIntegrate( aCurrentTime );
     }
 }

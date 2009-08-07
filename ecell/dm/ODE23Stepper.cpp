@@ -87,7 +87,7 @@ void ODE23Stepper::interIntegrate2()
     {
         VariablePtr const aVariable( theVariableVector[ c ] );
 
-        aVariable->loadValue( theValueBuffer[ c ] );
+        aVariable->setValue( theValueBuffer[ c ] );
         aVariable->interIntegrate( aCurrentTime );
     }
 }
@@ -158,7 +158,7 @@ bool ODE23Stepper::calculate()
         }
 
         // restore x (original value)
-        theVariableVector[ c ]->loadValue( theValueBuffer[ c ] );
+        theVariableVector[ c ]->setValue( theValueBuffer[ c ] );
         theTaylorSeries[ 2 ][ c ] = 0.0;
     }
 

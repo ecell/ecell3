@@ -1097,66 +1097,127 @@ private:
 
 class PythonDynamicModule;
 
-class PythonProcess: public Process
+class PythonEntityBaseBase
 {
 public:
-    virtual ~PythonProcess()
+    virtual ~PythonEntityBaseBase()
     {
         py::xdecref( theSelf );
     }
 
-    LIBECS_DM_INIT_PROP_INTERFACE()
+    PyObject* getPythonObject() const
     {
-        INHERIT_PROPERTIES( Process );
+        return theSelf;
     }
 
-    virtual void initialize()
+    void setPythonObject( PyObject* aPythonObject )
     {
-        if ( !theSelf )
-            return;
-        py::getattr( py::object( py::borrowed( theSelf ) ), "initialize" )();
+        py::xdecref( theSelf );
+        theSelf = py::incref( aPythonObject );
+        thePrivPrefix = String( "_" ) + theSelf->ob_type->tp_name;
     }
 
-    virtual void fire()
+    PythonDynamicModule const& getModule() const
     {
-        if ( !theSelf )
-            return;
-        py::object retval( py::getattr( py::object( py::borrowed( theSelf ) ), "fire" )() );
-        if ( retval )
+        return theModule;
+    }
+
+    PythonEntityBaseBase( PythonDynamicModule const& aModule )
+        : theSelf( 0 ), theModule( aModule ), thePrivPrefix() {}
+
+protected:
+    void appendDictToSet( std::set< String >& retval, PyObject* aObject ) const
+    {
+        py::handle<> aSelfDict( PyObject_GetAttrString( aObject, const_cast< char* >( "__dict__" ) ) );
+        if ( !aSelfDict )
         {
-            setActivity( py::extract< Real >( retval ) );
-        } 
+            PyErr_Clear();
+            return;
+        }
+
+        if ( !PyMapping_Check( aSelfDict.get() ) )
+        {
+            return;
+        }
+
+        py::handle<> aKeyList( PyMapping_Keys( aSelfDict.get() ) );
+        BOOST_ASSERT( PyList_Check( aKeyList.get() ) );
+        for ( py::ssize_t i( 0 ), e( PyList_GET_SIZE( aKeyList.get() ) ); i < e; ++i )
+        {
+            py::handle<> aKey( py::borrowed( PyList_GET_ITEM( aKeyList.get(), i ) ) );
+            BOOST_ASSERT( PyString_Check( aKey.get() ) );
+            if ( PyString_GET_SIZE( aKey.get() ) >= thePrivPrefix.size()
+                    && memcmp( PyString_AS_STRING( aKey.get() ), thePrivPrefix.data(), thePrivPrefix.size() ) == 0 )
+            {
+                continue;
+            }
+
+            if ( PyString_GET_SIZE( aKey.get() ) >= 2
+                    && memcmp( PyString_AS_STRING( aKey.get() ), "__", 2 ) == 0 )
+            {
+                continue;
+            }
+
+            retval.insert( String( PyString_AS_STRING( aKey.get() ), PyString_GET_SIZE( aKey.get() ) ) );
+        }
     }
 
-    virtual const bool isContinuous() const
+    static void removeAttributesFromBases( std::set< String >& retval, PyObject *tp )
     {
-        if ( !theSelf )
-            return false;
-        return py::extract<bool>( py::getattr( py::object( py::borrowed( theSelf ) ), "isContinuous" ) );
+        BOOST_ASSERT( PyType_Check( tp ) );
+
+        py::handle<> aBasesList( PyObject_GetAttrString( tp, const_cast< char* >( "__bases__" ) ) );
+        if ( !aBasesList )
+        {
+            PyErr_Clear();
+            return;
+        }
+
+        if ( !PyTuple_Check( aBasesList.get() ) )
+        {
+            return;
+        }
+
+        for ( py::ssize_t i( 0 ), ie( PyTuple_GET_SIZE( aBasesList.get() ) ); i < ie; ++i )
+        {
+            py::handle<> aBase( py::borrowed( PyTuple_GET_ITEM( aBasesList.get(), i ) ) );
+            removeAttributesFromBases( retval, aBase.get() );
+
+            py::handle<> aBaseDict( PyObject_GetAttrString( aBase.get(), const_cast< char* >( "__dict__" ) ) );
+            if ( !aBaseDict )
+            {
+                PyErr_Clear();
+                return;
+            }
+
+            if ( !PyMapping_Check( aBaseDict.get() ) )
+            {
+                return;
+            }
+
+            py::handle<> aKeyList( PyMapping_Keys( aBaseDict.get() ) );
+            BOOST_ASSERT( PyList_Check( aKeyList.get() ) );
+            for ( py::ssize_t j( 0 ), je( PyList_GET_SIZE( aKeyList.get() ) ); j < je; ++j )
+            {
+                py::handle<> aKey( py::borrowed( PyList_GET_ITEM( aKeyList.get(), i ) ) );
+                BOOST_ASSERT( PyString_Check( aKey.get() ) );
+                String aKeyStr( PyString_AS_STRING( aKey.get() ), PyString_GET_SIZE( aKey.get() ) );  
+                retval.erase( aKeyStr );
+            }
+        }
     }
 
-    virtual PropertyInterfaceBase const& getPropertyInterface() const
-    {
-        return _getPropertyInterface();
-    }
+protected:
 
-    PropertyInterface< Process > const& _getPropertyInterface() const;
+    PyObject* theSelf;
+    PythonDynamicModule const& theModule;
+    String thePrivPrefix;
+};
 
-    PropertySlotBase const* getPropertySlot( String const& aPropertyName ) const
-    {
-        return _getPropertyInterface().getPropertySlot( aPropertyName ); \
-    }
-
-    virtual void setProperty( String const& aPropertyName, Polymorph const& aValue )
-    {
-        return _getPropertyInterface().setProperty( *this, aPropertyName, aValue );
-    }
-
-    const Polymorph getProperty( String const& aPropertyName ) const
-    {
-        return _getPropertyInterface().getProperty( *this, aPropertyName );
-    }
-
+template< typename Tderived_, typename Tbase_ >
+class PythonEntityBase: public Tbase_, public PythonEntityBaseBase
+{
+public:
     const Polymorph defaultGetProperty( String const& aPropertyName ) const
     {
         String lowerCasedPropertyName( aPropertyName );
@@ -1192,43 +1253,36 @@ public:
 
     const StringVector defaultGetPropertyList() const
     {
+        std::set< String > aPropertySet;
+        appendDictToSet( aPropertySet, theSelf );
+        appendDictToSet( aPropertySet, reinterpret_cast< PyObject* >( theSelf->ob_type ) );
+        removeAttributesFromBases( aPropertySet, reinterpret_cast< PyObject* >( theSelf->ob_type ) );
+
         StringVector retval;
-
-        py::handle<> aSelfDict( PyObject_GetAttrString( theSelf, const_cast< char* >( "__dict__" ) ) );
-        if ( !aSelfDict )
+        for ( std::set< String >::iterator i( aPropertySet.begin() ), e( aPropertySet.end() ); i != e; ++i )
         {
-            PyErr_Clear();
-            return retval;
-        }
-
-        if ( !PyMapping_Check( aSelfDict.get() ) )
-        {
-            return retval;
-        }
-
-        {
-            py::handle<> aKeyList( PyMapping_Keys( aSelfDict.get() ) );
-            BOOST_ASSERT( PyList_Check( aKeyList.get() ) );
-            for ( py::ssize_t i( 0 ), e( PyList_GET_SIZE( aKeyList.get() ) ); i < e; ++i )
-            {
-                py::handle<> aKey( py::borrowed( PyList_GET_ITEM( aKeyList.get(), i ) ) );
-                BOOST_ASSERT( PyString_Check( aKey.get() ) );
-                if ( PyString_GET_SIZE( aKey.get() ) < thePrivPrefix.size()
-                        || memcmp( PyString_AS_STRING( aKey.get() ), thePrivPrefix.data(), thePrivPrefix.size() ) != 0 )
-                {
-                    retval.push_back( String( PyString_AS_STRING( aKey.get() ), PyString_GET_SIZE( aKey.get() ) ) );
-                }
-            }
-        }
-
-        removeAttributesFromBases( retval, reinterpret_cast< PyObject* >( theSelf->ob_type ) );
-
-        for ( StringVector::iterator i( retval.begin() ); i != retval.end(); ++i )
-        {
-            (*i)[ 0 ] = std::toupper( (*i)[ 0] );
+            retval.push_back( *i );
+            retval.back()[ 0 ] = std::toupper( retval.back()[ 0 ] );
         }
 
         return retval;
+    }
+
+    PropertyInterface< Tbase_ > const& _getPropertyInterface() const;
+
+    PropertySlotBase const* getPropertySlot( String const& aPropertyName ) const
+    {
+        return _getPropertyInterface().getPropertySlot( aPropertyName ); \
+    }
+
+    virtual void setProperty( String const& aPropertyName, Polymorph const& aValue )
+    {
+        return _getPropertyInterface().setProperty( *this, aPropertyName, aValue );
+    }
+
+    const Polymorph getProperty( String const& aPropertyName ) const
+    {
+        return _getPropertyInterface().getProperty( *this, aPropertyName );
     }
 
     void loadProperty( String const& aPropertyName, Polymorph const& aValue )
@@ -1257,90 +1311,99 @@ public:
         return _getPropertyInterface().getPropertyAttributes( *this, aPropertyName );
     }
 
-    PyObject* getPythonObject() const
+    virtual PropertyInterfaceBase const& getPropertyInterface() const
     {
-        return theSelf;
+        return _getPropertyInterface();
     }
 
-    void setPythonObject( PyObject* aPythonObject )
+    PythonEntityBase( PythonDynamicModule const& aModule )
+        : PythonEntityBaseBase( aModule ) {}
+};
+
+class PythonProcess: public PythonEntityBase< PythonProcess, Process >
+{
+public:
+    virtual ~PythonProcess() {}
+
+    LIBECS_DM_INIT_PROP_INTERFACE()
     {
-        py::xdecref( theSelf );
-        theSelf = py::incref( aPythonObject );
-        thePrivPrefix = String( "_" ) + theSelf->ob_type->tp_name;
+        INHERIT_PROPERTIES( Process );
     }
 
-    PythonDynamicModule const& getModule() const
+    virtual void initialize()
     {
-        return theModule;
+        if ( !theSelf )
+            return;
+        py::getattr( py::object( py::borrowed( theSelf ) ), "initialize" )();
+    }
+
+    virtual void fire()
+    {
+        if ( !theSelf )
+            return;
+        py::object retval( py::getattr( py::object( py::borrowed( theSelf ) ), "fire" )() );
+        if ( retval )
+        {
+            setActivity( py::extract< Real >( retval ) );
+        } 
+    }
+
+    virtual const bool isContinuous() const
+    {
+        if ( !theSelf )
+            return false;
+        return py::extract<bool>( py::getattr( py::object( py::borrowed( theSelf ) ), "isContinuous" ) );
     }
 
     PythonProcess( PythonDynamicModule const& aModule )
-        : theSelf( 0 ), theModule( aModule ), thePrivPrefix() {}
+        : PythonEntityBase< PythonProcess, Process >( aModule ) {}
+};
 
-private:
-    static void removeAttributesFromBases( StringVector& retval, PyObject *tp )
+
+class PythonVariable: public PythonEntityBase< PythonVariable, Variable >
+{
+public:
+    LIBECS_DM_INIT_PROP_INTERFACE()
     {
-        BOOST_ASSERT( PyType_Check( tp ) );
-
-        py::handle<> aBasesList( PyObject_GetAttrString( tp, const_cast< char* >( "__bases__" ) ) );
-        if ( !aBasesList )
-        {
-            PyErr_Clear();
-            return;
-        }
-
-        if ( !PyList_Check( aBasesList.get() ) )
-        {
-            return;
-        }
-
-        for ( py::ssize_t i( 0 ), ie( PyList_GET_SIZE( aBasesList.get() ) ); i < ie; ++i )
-        {
-            py::handle<> aBase( py::borrowed( PyList_GET_ITEM( aBasesList.get(), i ) ) );
-            removeAttributesFromBases( retval, aBase.get() );
-
-            py::handle<> aBaseDict( PyObject_GetAttrString( aBase.get(), const_cast< char* >( "__dict__" ) ) );
-            if ( !aBaseDict )
-            {
-                PyErr_Clear();
-                return;
-            }
-
-            if ( !PyMapping_Check( aBaseDict.get() ) )
-            {
-                return;
-            }
-
-            py::handle<> aKeyList( PyMapping_Keys( aBaseDict.get() ) );
-            BOOST_ASSERT( PyList_Check( aKeyList.get() ) );
-            for ( py::ssize_t j( 0 ), je( PyList_GET_SIZE( aKeyList.get() ) ); i < je; ++j )
-            {
-                py::handle<> aKey( py::borrowed( PyList_GET_ITEM( aKeyList.get(), i ) ) );
-                BOOST_ASSERT( PyString_Check( aKey.get() ) );
-                String aKeyStr( PyString_AS_STRING( aKey.get() ), PyString_GET_SIZE( aKey.get() ) );  
-                StringVector::iterator it( std::find( retval.begin(), retval.end(), aKeyStr ) );
-                if ( it != retval.end() )
-                {
-                    retval.erase( it );
-                }
-            }
-        }
+        INHERIT_PROPERTIES( Variable );
     }
 
-private:
+    virtual void initialize()
+    {
+        if ( !theSelf )
+            return;
+        py::getattr( py::object( py::borrowed( theSelf ) ), "initialize" )();
+    }
 
-    PyObject* theSelf;
-    PythonDynamicModule const& theModule;
-    String thePrivPrefix;
+    virtual SET_METHOD( Real, Value )
+    {
+        py::handle<> aResult( PyObject_CallMethod( theSelf, const_cast< char* >( "onValueChanging" ), "f", value ) );
+        if ( !aResult )
+        {
+            PyErr_Clear();
+        }
+        else
+        {
+            if ( !PyObject_IsTrue( aResult.get() ) )
+            {
+                return;
+            }
+        }
+        Variable::setValue( value );
+    }
+
+    PythonVariable( PythonDynamicModule const& aModule )
+        : PythonEntityBase< PythonVariable, Variable >( aModule ) {}
 };
+
 
 struct PythonDynamicModule: public DynamicModule< EcsObject >
 {
     typedef DynamicModule< EcsObject > Base;
 
-    struct make_ptr_instance: public py::objects::make_instance_impl< PythonProcess, py::objects::pointer_holder< PythonProcess*, PythonProcess >, make_ptr_instance > 
+    struct make_ptr_instance: public py::objects::make_instance_impl< PythonEntityBaseBase, py::objects::pointer_holder< PythonEntityBaseBase*, PythonEntityBaseBase >, make_ptr_instance > 
     {
-        typedef py::objects::pointer_holder< PythonProcess*, PythonProcess > holder_t;
+        typedef py::objects::pointer_holder< PythonEntityBaseBase*, PythonEntityBaseBase > holder_t;
 
         template <class Arg>
         static inline holder_t* construct(void* storage, PyObject*, Arg& x)
@@ -1351,9 +1414,70 @@ struct PythonDynamicModule: public DynamicModule< EcsObject >
         template<typename Ptr>
         static inline PyTypeObject* get_class_object(Ptr const& x)
         {
-            return static_cast< PythonProcess const* >( boost::get_pointer(x) )->getModule().getPythonType();
+            return static_cast< PythonEntityBaseBase const* >( boost::get_pointer(x) )->getModule().getPythonType();
         }
     };
+
+    struct DMTypeResolverHelper
+    {
+        EntityType operator()( py::object aClass )
+        {
+            if ( !PyType_Check( aClass.ptr() ) )
+            {
+                return EntityType( EntityType::NONE );
+            }
+
+            if (  thePyTypeProcess.get() == reinterpret_cast< PyTypeObject* >( aClass.ptr() ) )
+            {
+                return EntityType( EntityType::PROCESS );
+            }
+            else if ( thePyTypeVariable.get() == reinterpret_cast< PyTypeObject* >( aClass.ptr() ) )
+            {
+                return EntityType( EntityType::VARIABLE );
+            }
+            else if ( thePyTypeSystem.get() == reinterpret_cast< PyTypeObject* >( aClass.ptr() ) )
+            {
+                return EntityType( EntityType::SYSTEM );
+            }
+
+            py::handle<> aBasesList( PyObject_GetAttrString( aClass.ptr(), const_cast< char* >( "__bases__" ) ) );
+            if ( !aBasesList )
+            {
+                PyErr_Clear();
+                return EntityType( EntityType::NONE );
+            }
+
+            if ( !PyTuple_Check( aBasesList.get() ) )
+            {
+                return EntityType( EntityType::NONE );
+            }
+
+
+            for ( py::ssize_t i( 0 ), ie( PyTuple_GET_SIZE( aBasesList.get() ) ); i < ie; ++i )
+            {
+                py::object aBase( py::borrowed( PyTuple_GET_ITEM( aBasesList.get(), i ) ) );
+                EntityType aResult( ( *this )( aBase ) );
+                if ( aResult.getType() != EntityType::NONE )
+                {
+                    return aResult;
+                }
+            }
+
+            return EntityType( EntityType::NONE );
+        }
+
+        DMTypeResolverHelper()
+            : thePyTypeProcess( py::objects::registered_class_object( typeid( Process ) ) ),
+              thePyTypeVariable( py::objects::registered_class_object( typeid( Variable ) ) ),
+              thePyTypeSystem( py::objects::registered_class_object( typeid( System ) ) )
+        {
+        }
+
+        py::type_handle thePyTypeProcess;
+        py::type_handle thePyTypeVariable;
+        py::type_handle thePyTypeSystem;
+    };            
+
 
     virtual EcsObject* createInstance() const;
 
@@ -1390,21 +1514,49 @@ struct PythonDynamicModule: public DynamicModule< EcsObject >
     {
         return reinterpret_cast< PyTypeObject* >( thePythonClass.ptr() );
     }
+
+    static EntityType getDMTypeFromPythonType( py::object aClass )
+    {
+        return DMTypeResolverHelper()( aClass );
+    }
  
     PythonDynamicModule( py::object aPythonClass )
         : Base( DM_TYPE_DYNAMIC ),
            thePythonClass( aPythonClass ),
-           thePropertyInterface( getModuleName(), "Process" )
+           theEntityType( getDMTypeFromPythonType( aPythonClass ) ),
+           thePropertyInterface( getModuleName(), theEntityType.asString() )
     {
     }
+
 private:
     py::object thePythonClass;
+    EntityType theEntityType;
     PropertyInterface< PythonProcess > thePropertyInterface;
 };
 
+template< typename Tderived_, typename Tbase_ >
+inline PropertyInterface< Tbase_ > const&
+PythonEntityBase< Tderived_, Tbase_ >::_getPropertyInterface() const
+{
+    return *reinterpret_cast< PropertyInterface< Tbase_ > const* >( theModule.getInfo() );
+}
+
 EcsObject* PythonDynamicModule::createInstance() const
 {
-    PythonProcess* retval( new PythonProcess( *this ) );
+    PythonEntityBaseBase* retval;
+
+    switch ( theEntityType.getType() )
+    {
+    case EntityType::PROCESS:
+        retval = new PythonProcess( *this );
+        break;
+    case EntityType::VARIABLE:
+        retval = new PythonVariable( *this );
+        break;
+    default:
+        throw std::runtime_error("not implemented");
+    }
+
     py::handle<> aNewObject( make_ptr_instance::execute( retval ) );
     if ( !aNewObject )
     {
@@ -1424,12 +1576,7 @@ EcsObject* PythonDynamicModule::createInstance() const
         throw std::runtime_error( anErrorStr );
     }
     retval->setPythonObject( aNewObject.get() );
-    return retval;
-}
-
-PropertyInterface< Process > const& PythonProcess::_getPropertyInterface() const
-{
-    return *reinterpret_cast< PropertyInterface< Process > const* >( theModule.getInfo() );
+    return dynamic_cast< EcsObject* >( retval );
 }
 
 template< typename T_ >
@@ -2199,7 +2346,47 @@ private:
     Model           theModel;
 };
 
-static int PropertyAttributes_GetItem( PropertyAttributes const* self, int idx )
+inline const char* typeCodeToString( enum PropertySlotBase::Type aTypeCode )
+{
+    switch ( aTypeCode )
+    {
+    case PropertySlotBase::POLYMORPH:
+        return "polymorph";
+    case PropertySlotBase::REAL:
+        return "real";
+    case PropertySlotBase::INTEGER:
+        return "integer";
+    case PropertySlotBase::STRING:
+        return "string";
+    }
+    return "???";
+}
+
+static std::string PropertyAttributes___str__( PropertyAttributes const* self )
+{
+    std::string retval;
+    retval += "{type=";
+    retval += typeCodeToString( self->getType() );
+    retval += ", ";
+    retval += "settable="
+              + stringCast( self->isSetable() )
+              + ", ";
+    retval += "gettable="
+              + stringCast( self->isGetable() )
+              + ", ";
+    retval += "loadable="
+              + stringCast( self->isLoadable() )
+              + ", ";
+    retval += "savable="
+              + stringCast( self->isSavable() )
+              + ", ";
+    retval += "dynamic="
+              + stringCast( self->isDynamic() )
+              + "}";
+    return retval;
+}
+
+static int PropertyAttributes___getitem__( PropertyAttributes const* self, int idx )
 {
     switch ( idx )
     {
@@ -2257,7 +2444,7 @@ static Polymorph Entity___getattr__( Entity* self, std::string key )
 
 static void Entity___setattr__( Entity* self, py::object key, py::object value )
 {
-    PythonProcess* tmp( dynamic_cast< PythonProcess* >( self ) );
+    PythonEntityBaseBase* tmp( dynamic_cast< PythonEntityBaseBase* >( self ) );
     if ( tmp )
     {
         PyObject_GenericSetAttr( tmp->getPythonObject(), key.ptr(), value.ptr() );
@@ -2328,7 +2515,8 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "loadable", &PropertyAttributes::isLoadable )
         .add_property( "savable", &PropertyAttributes::isSavable )
         .add_property( "dynamic", &PropertyAttributes::isDynamic )
-        .def( "__getitem__", &PropertyAttributes_GetItem )
+        .def( "__str__", &PropertyAttributes___str__ )
+        .def( "__getitem__", &PropertyAttributes___getitem__ )
         ;
 
     py::class_< Logger::Policy >( "LoggerPolicy", py::init<>() )
@@ -2434,8 +2622,17 @@ BOOST_PYTHON_MODULE( _ecs )
               py::make_function( &Process_get_variableReferences ) )
         ;
 
+    py::objects::register_dynamic_id< PythonEntityBaseBase >();
+    py::objects::register_conversion< PythonEntityBaseBase, PythonProcess >( true );
+    py::objects::register_conversion< PythonEntityBaseBase, PythonVariable >( true );
+    py::objects::register_conversion< PythonEntityBaseBase, Process >( true );
+    py::objects::register_conversion< PythonEntityBaseBase, Variable >( true );
+
     py::objects::register_dynamic_id< PythonProcess >();
     py::objects::register_conversion< PythonProcess, Process >( false );
+
+    py::objects::register_dynamic_id< PythonVariable >();
+    py::objects::register_conversion< PythonVariable, Variable >( false );
 
     py::class_< Variable, py::bases< Entity >, Variable, boost::noncopyable >
         ( "Variable", py::no_init )

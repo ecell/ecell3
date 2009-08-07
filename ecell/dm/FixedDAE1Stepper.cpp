@@ -243,7 +243,7 @@ public:
             VariablePtr const aVariable( theVariableVector[ c ] );
             const Real aValue( aVariable->getValue() );
 
-            aVariable->loadValue( aValue + aPerturbation );
+            aVariable->setValue( aValue + aPerturbation );
 
             FOR_ALL( IntVector, theDependentProcessVector[ c ] )
             {
@@ -289,7 +289,7 @@ public:
                 theTaylorSeries[ 0 ][ anIndex ] = 0.0;
             }
 
-            aVariable->loadValue( aValue );
+            aVariable->setValue( aValue );
         }
 
         for ( IntVector::size_type c( 0 ); 

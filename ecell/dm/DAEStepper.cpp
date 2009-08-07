@@ -575,7 +575,7 @@ public:
             theTaylorSeries[ 3 ][ c ] = theW[ c + aSize*2 ];
             theTaylorSeries[ 3 ][ c ] /= aStepInterval;
 
-            theVariableVector[ c ]->loadValue( theValueBuffer[ c ] );
+            theVariableVector[ c ]->setValue( theValueBuffer[ c ] );
         }
 
         for ( VariableVector::size_type c( 0 ); c < aSize; c++ )
@@ -723,7 +723,7 @@ public:
                 Real aDifference( gsl_vector_get( theSolutionVector1, c ) );
 
                 // for the case ( anError >= 1.0 )
-                theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + aDifference );
+                theVariableVector[ c ]->setValue( theValueBuffer[ c ] + aDifference );
 
                 aDifference /= aTolerance;
                 anError += aDifference * aDifference;
@@ -793,7 +793,7 @@ public:
             const Real aValue( aVariable->getValue() );
 
             aPerturbation = sqrt( Uround * std::max( 1e-5, fabs( aValue ) ) );
-            aVariable->loadValue( theValueBuffer[ i ] + aPerturbation );
+            aVariable->setValue( theValueBuffer[ i ] + aPerturbation );
 
             fireProcesses();
             setVariableVelocity( theTaylorSeries[ 4 ] );
@@ -821,7 +821,7 @@ public:
                 theJacobian[ j ][ i ] = - ( theTaylorSeries[ 4 ][ anIndex ] - theTaylorSeries[ 3 ][ anIndex ] ) / aPerturbation;
             }
 
-            aVariable->loadValue( aValue );
+            aVariable->setValue( aValue );
         }
     }
 
@@ -901,7 +901,7 @@ public:
                           - theW[ c + aSize ] * 0.14125529502095420843
                           - theW[ c + 2*aSize ] * 0.030029194105147424492 );
 
-            theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + z );
+            theVariableVector[ c ]->setValue( theValueBuffer[ c ] + z );
         }
 
         // ========= 1 ===========
@@ -938,7 +938,7 @@ public:
                                             + theW[ c + aSize ] * 0.20412935229379993199
                                             + theW[ c + 2*aSize ] * 0.38294211275726193779 );
 
-                theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + z );
+                theVariableVector[ c ]->setValue( theValueBuffer[ c ] + z );
             }
 
         // ========= 2 ===========
@@ -973,7 +973,7 @@ public:
         {
             const Real z( theW[ c ] * 0.96604818261509293619 + theW[ c + aSize ] );
 
-            theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + z );
+            theVariableVector[ c ]->setValue( theValueBuffer[ c ] + z );
         }
 
         // ========= 3 ===========

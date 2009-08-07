@@ -142,7 +142,7 @@ bool ODE45Stepper::calculate()
         {
             VariablePtr const aVariable( theVariableVector[ c ] );
         
-            aVariable->loadValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
+            aVariable->setValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
                                   * aStepInterval + theValueBuffer[ c ] );
         }
     }
@@ -155,7 +155,7 @@ bool ODE45Stepper::calculate()
             // get k1
             theTaylorSeries[ 0 ][ c ] = theRungeKuttaBuffer[ 5 ][ c ];
 
-            aVariable->loadValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
+            aVariable->setValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
                                   * aStepInterval + theValueBuffer[ c ] );
         }
     }
@@ -170,7 +170,7 @@ bool ODE45Stepper::calculate()
     {
         VariablePtr const aVariable( theVariableVector[ c ] );
             
-        aVariable ->loadValue( ( theTaylorSeries[ 0 ][ c ] * ( 3.0 / 40.0 ) 
+        aVariable ->setValue( ( theTaylorSeries[ 0 ][ c ] * ( 3.0 / 40.0 ) 
                                  + theRungeKuttaBuffer[ 0 ][ c ] * ( 9.0 / 40.0 ) )
                                * aStepInterval + theValueBuffer[ c ] );
     }
@@ -185,7 +185,7 @@ bool ODE45Stepper::calculate()
     {
         VariablePtr const aVariable( theVariableVector[ c ] );
             
-        aVariable->loadValue(
+        aVariable->setValue(
             ( theTaylorSeries[ 0 ][ c ] * ( 44.0 / 45.0 ) 
               - theRungeKuttaBuffer[ 0 ][ c ] * ( 56.0 / 15.0 )
               + theRungeKuttaBuffer[ 1 ][ c ] * ( 32.0 / 9.0 ) ) * aStepInterval
@@ -202,7 +202,7 @@ bool ODE45Stepper::calculate()
     {
         VariablePtr const aVariable( theVariableVector[ c ] );
             
-        aVariable->loadValue(
+        aVariable->setValue(
             ( theTaylorSeries[ 0 ][ c ] * ( 19372.0 / 6561.0 ) 
               - theRungeKuttaBuffer[ 0 ][ c ] * ( 25360.0 / 2187.0 )
               + theRungeKuttaBuffer[ 1 ][ c ] * ( 64448.0 / 6561.0 )
@@ -228,7 +228,7 @@ bool ODE45Stepper::calculate()
                     + theRungeKuttaBuffer[ 2 ][ c ] * ( 49.0 / 176.0 )
                     - theRungeKuttaBuffer[ 3 ][ c ] * ( 5103.0 / 18656.0 );
 
-        aVariable->loadValue( theTaylorSeries[ 1 ][ c ] * aStepInterval
+        aVariable->setValue( theTaylorSeries[ 1 ][ c ] * aStepInterval
                               + theValueBuffer[ c ] );
     }
 
@@ -260,7 +260,7 @@ bool ODE45Stepper::calculate()
                 - theTaylorSeries[ 1 ][ c ] ) *
                 ( theTaylorSeries[ 2 ][ c ] - theTaylorSeries[ 1 ][ c ] );
 
-        aVariable->loadValue( theTaylorSeries[ 2 ][ c ] * aStepInterval
+        aVariable->setValue( theTaylorSeries[ 2 ][ c ] * aStepInterval
                               + theValueBuffer[ c ] );
     }
 

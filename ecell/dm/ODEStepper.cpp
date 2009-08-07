@@ -412,7 +412,7 @@ void ODEStepper::calculateJacobian()
         const Real aValue( aVariable1->getValue() );
 
         aPerturbation = sqrt( Uround * std::max( 1e-5, fabs( aValue ) ) );
-        aVariable1->loadValue( theValueBuffer[ i ] + aPerturbation );
+        aVariable1->setValue( theValueBuffer[ i ] + aPerturbation );
 
         fireProcesses();
         setVariableVelocity( theW[ 4 ] );
@@ -425,7 +425,7 @@ void ODEStepper::calculateJacobian()
                     - ( theW[ 4 ][ j ] - theW[ 3 ][ j ] ) / aPerturbation;
         }
 
-        aVariable1->loadValue( aValue );
+        aVariable1->setValue( aValue );
     }
 }
 
@@ -529,7 +529,7 @@ void ODEStepper::calculateRhs()
                       - theW[ 1 ][ c ] * 0.14125529502095420843
                       - theW[ 2 ][ c ] * 0.030029194105147424492 );
 
-        theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + z );
+        theVariableVector[ c ]->setValue( theValueBuffer[ c ] + z );
     }
 
     // ========= 1 ===========
@@ -548,7 +548,7 @@ void ODEStepper::calculateRhs()
                       + theW[ 1 ][ c ] * 0.20412935229379993199
                       + theW[ 2 ][ c ] * 0.38294211275726193779 );
 
-        theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + z );
+        theVariableVector[ c ]->setValue( theValueBuffer[ c ] + z );
     }
 
     // ========= 2 ===========
@@ -565,7 +565,7 @@ void ODEStepper::calculateRhs()
 
         const Real z( theW[ 0 ][ c ] * 0.96604818261509293619 + theW[ 1 ][ c ] );
 
-        theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + z );
+        theVariableVector[ c ]->setValue( theValueBuffer[ c ] + z );
     }
 
     // ========= 3 ===========
@@ -835,7 +835,7 @@ Real ODEStepper::estimateLocalError()
         aDifference = gsl_vector_get( theSolutionVector1, c );
 
         // for the case ( anError >= 1.0 )
-        theVariableVector[ c ]->loadValue( theValueBuffer[ c ] + aDifference );
+        theVariableVector[ c ]->setValue( theValueBuffer[ c ] + aDifference );
 
         aDifference /= aTolerance;
         anError += aDifference * aDifference;
@@ -940,7 +940,7 @@ void ODEStepper::stepRadauIIA()
         theW[ 3 ][ c ] = theW[ 2 ][ c ];
         theW[ 3 ][ c ] /= aStepInterval;
 
-        theVariableVector[ c ]->loadValue( theValueBuffer[ c ] );
+        theVariableVector[ c ]->setValue( theValueBuffer[ c ] );
     }
 
     for ( VariableVector::size_type c( 0 ); c < theSystemSize; c++ )
@@ -992,7 +992,7 @@ bool ODEStepper::calculate()
         {
             VariablePtr const aVariable( theVariableVector[ c ] );
 
-            aVariable->loadValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
+            aVariable->setValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
                                   * aStepInterval
                                   + theValueBuffer[ c ] );
         }
@@ -1006,7 +1006,7 @@ bool ODEStepper::calculate()
             // get k1
             theTaylorSeries[ 0 ][ c ] = theW[ 5 ][ c ];
 
-            aVariable->loadValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
+            aVariable->setValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
                                   * aStepInterval + theValueBuffer[ c ] );
         }
     }
@@ -1021,7 +1021,7 @@ bool ODEStepper::calculate()
     {
         VariablePtr const aVariable( theVariableVector[ c ] );
 
-        aVariable->loadValue( ( theTaylorSeries[ 0 ][ c ] * ( 3.0 / 40.0 )
+        aVariable->setValue( ( theTaylorSeries[ 0 ][ c ] * ( 3.0 / 40.0 )
                                          + theW[ 0 ][ c ] * ( 9.0 / 40.0 ) )
                               * aStepInterval + theValueBuffer[ c ] );
     }
@@ -1036,7 +1036,7 @@ bool ODEStepper::calculate()
     {
         VariablePtr const aVariable( theVariableVector[ c ] );
 
-        aVariable->loadValue( ( theTaylorSeries[ 0 ][ c ] * ( 44.0 / 45.0 )
+        aVariable->setValue( ( theTaylorSeries[ 0 ][ c ] * ( 44.0 / 45.0 )
                                  - theW[ 0 ][ c ] * ( 56.0 / 15.0 )
                                  + theW[ 1 ][ c ] * ( 32.0 / 9.0 ) )
                               * aStepInterval + theValueBuffer[ c ] );
@@ -1052,7 +1052,7 @@ bool ODEStepper::calculate()
     {
         VariablePtr const aVariable( theVariableVector[ c ] );
 
-        aVariable->loadValue( ( theTaylorSeries[ 0 ][ c ] * ( 19372.0 / 6561.0 )
+        aVariable->setValue( ( theTaylorSeries[ 0 ][ c ] * ( 19372.0 / 6561.0 )
                                 - theW[ 0 ][ c ] * ( 25360.0 / 2187.0 )
                                 + theW[ 1 ][ c ] * ( 64448.0 / 6561.0 )
                                 - theW[ 2 ][ c ] * ( 212.0 / 729.0 ) )
@@ -1076,7 +1076,7 @@ bool ODEStepper::calculate()
                 + theW[ 2 ][ c ] * ( 49.0 / 176.0 )
                 - theW[ 3 ][ c ] * ( 5103.0 / 18656.0 );
 
-        aVariable->loadValue( theTaylorSeries[ 1 ][ c ] * aStepInterval
+        aVariable->setValue( theTaylorSeries[ 1 ][ c ] * aStepInterval
                               + theValueBuffer[ c ] );
     }
 
@@ -1107,7 +1107,7 @@ bool ODEStepper::calculate()
                 ( theTaylorSeries[ 2 ][ c ] - theTaylorSeries[ 1 ][ c ] )
                 * ( theTaylorSeries[ 2 ][ c ] - theTaylorSeries[ 1 ][ c ] );
 
-        aVariable->loadValue( theTaylorSeries[ 2 ][ c ] * aStepInterval
+        aVariable->setValue( theTaylorSeries[ 2 ][ c ] * aStepInterval
                               + theValueBuffer[ c ] );
     }
 
