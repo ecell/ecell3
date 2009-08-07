@@ -87,39 +87,42 @@ public:
 
     StaticDynamicModule( enum DynamicModuleType aType,
                    DynamicModuleDescriptor const& desc )
-        : Base( aType ), theDescriptor( desc )
+        : Base( aType ), theDescriptor( &desc )
     {
-        theDescriptor.moduleInitializer();
+        theDescriptor->moduleInitializer();
     }
 
     virtual ~StaticDynamicModule()
     {
-        theDescriptor.moduleFinalizer();
+        if ( theDescriptor )
+        {
+            ( *theDescriptor->moduleFinalizer )();
+        }
     }
 
     const DynamicModuleDescriptor& getDescriptor()
     {
-        return theDescriptor;
+        return *theDescriptor;
     }
  
     virtual const char* getModuleName() const
     {
-        return theDescriptor.moduleName;
+        return theDescriptor->moduleName;
     }
 
     virtual T* createInstance() const
     {
-        return reinterpret_cast< T* >( ( *theDescriptor.allocator )() );
+        return reinterpret_cast< T* >( ( *theDescriptor->allocator )() );
     }
 
     virtual const DynamicModuleInfo* getInfo() const
     {
-        return ( *theDescriptor.infoLoader )();
+        return ( *theDescriptor->infoLoader )();
     }
 
 protected:
 
-    DynamicModuleDescriptor const& theDescriptor;
+    DynamicModuleDescriptor const* theDescriptor;
 };
 
 

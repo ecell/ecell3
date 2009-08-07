@@ -54,7 +54,9 @@ public:
     SharedDynamicModule( DynamicModuleDescriptor const& desc,
                          const std::string& fileName,
                          lt_dlhandle handle )
-        : Base( DM_TYPE_SHARED, desc )
+        : Base( DM_TYPE_SHARED, desc ),
+          theFileName( fileName ),
+          theHandle( handle )
     {
         ; // do nothing
     }
@@ -63,6 +65,10 @@ private:
 
     virtual ~SharedDynamicModule()
     {
+        // make sure that the finalizer is called before
+        // closing dynamic library
+        ( *Base::theDescriptor->moduleFinalizer )();
+        Base::theDescriptor = 0;
         if( this->theHandle )
         {
             lt_dlclose( this->theHandle );
