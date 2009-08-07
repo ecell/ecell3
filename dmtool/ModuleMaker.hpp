@@ -84,13 +84,13 @@ public:
          @param dm a pointer to a DynamicModule to be added
     */
 
-    void addClass( Module* dm )
+    virtual void addClass( Module* dm )
     {
         assert( dm != NULL && dm->getModuleName() != NULL );
         this->theModuleMap[ dm->getModuleName() ] = dm;
     }
 
-    const ModuleMap& getModuleMap() const
+    virtual const ModuleMap& getModuleMap() const
     {
         return theModuleMap;
     }

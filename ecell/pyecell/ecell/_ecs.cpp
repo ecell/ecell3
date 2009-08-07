@@ -1454,11 +1454,26 @@ private:
 
         virtual const Module& getModule( const std::string& aClassName, bool forceReload = false )
         {
-            if ( theModuleMap.find( aClassName ) == theModuleMap.end() )
+            ModuleMap::iterator i( theRealModuleMap.find( aClassName ) );
+            if ( i == theRealModuleMap.end() )
             {
-                return theDefaultModuleMaker.getModule( aClassName, forceReload );
+                const Module& retval( theDefaultModuleMaker.getModule( aClassName, forceReload ) );
+                theRealModuleMap[ retval.getModuleName() ] = const_cast< Module* >( &retval );
+                return retval;
             }
-            return *theModuleMap[ aClassName ];
+            return *(*i).second;
+        }
+
+        virtual void addClass( Module* dm )
+        {
+            assert( dm != NULL && dm->getModuleName() != NULL );
+            this->theRealModuleMap[ dm->getModuleName() ] = dm;
+            ModuleMaker< EcsObject >::addClass( dm );
+        }
+
+        virtual const ModuleMap& getModuleMap() const
+        {
+            return theRealModuleMap;
         }
 
         CompositeModuleMaker( ModuleMaker< EcsObject >& aDefaultModuleMaker )
@@ -1466,6 +1481,7 @@ private:
 
     private:
         ModuleMaker< EcsObject >& theDefaultModuleMaker;
+        ModuleMap theRealModuleMap;
     };
 
 public:
