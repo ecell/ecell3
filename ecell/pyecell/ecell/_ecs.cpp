@@ -1308,8 +1308,8 @@ private:
 private:
 
     PyObject* theSelf;
-    String thePrivPrefix;
     PythonDynamicModule const& theModule;
+    String thePrivPrefix;
 };
 
 struct PythonDynamicModule: public DynamicModule< EcsObject >
@@ -2044,27 +2044,27 @@ public:
         theEventHandler = anEventHandler;
     }
 
-    const PolymorphVector getDMInfo() const
+    const py::object getDMInfo() const
     {
         typedef ModuleMaker< EcsObject >::ModuleMap ModuleMap;
-        PolymorphVector aVector;
         const ModuleMap& modules( thePropertiedObjectMaker.getModuleMap() );
+        py::list retval;
 
         for( ModuleMap::const_iterator i( modules.begin() );
                     i != modules.end(); ++i )
         {
-            PolymorphVector anInnerVector;
             const PropertyInterfaceBase* info(
                 reinterpret_cast< const PropertyInterfaceBase *>(
                     i->second->getInfo() ) );
             const char* aFilename( i->second->getFileName() );
 
-            aVector.push_back( boost::make_tuple(
-                info->getTypeName(), i->second->getModuleName(),
-                String( aFilename ? aFilename: "" ) ) );
+            retval.append( py::make_tuple(
+                py::object( info->getTypeName() ),
+                py::object( i->second->getModuleName() ),
+                py::object( aFilename ? aFilename: "" ) ) );
         }
 
-        return aVector;
+        return retval;
     }
 
     PropertyInterfaceBase::PropertySlotMap const&
