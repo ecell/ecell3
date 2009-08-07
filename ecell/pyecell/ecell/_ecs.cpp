@@ -1498,7 +1498,6 @@ public:
 
     ~Simulator()
     {
-        delete theDefaultPropertiedObjectMaker;
     }
 
     void initialize()
@@ -2175,7 +2174,7 @@ private:
 
     py::handle<>    theEventHandler;
 
-    ModuleMaker< EcsObject >* theDefaultPropertiedObjectMaker;
+    std::auto_ptr< ModuleMaker< EcsObject > > theDefaultPropertiedObjectMaker;
     CompositeModuleMaker thePropertiedObjectMaker;
     Model           theModel;
 };
