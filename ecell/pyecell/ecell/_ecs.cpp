@@ -47,6 +47,7 @@
 #include <boost/python.hpp>
 #include <boost/python/tuple.hpp>
 #include <boost/python/object.hpp>
+#include <boost/python/object/inheritance.hpp>
 #include <boost/python/reference_existing_object.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
@@ -793,9 +794,9 @@ PySequenceMethods DataPointVectorWrapper< Tdp_ >::__seq__ = {
 	(ssizeargfunc)0	/* sq_inplace_repeat */
 };
 
-template< typename Tdp_ > 
+template< typename Tdp_ >
 PyGetSetDef DataPointVectorWrapper< Tdp_ >::__getset__[] = {
-    { "__array_struct__", (getter)&DataPointVectorWrapper::__get___array__struct, NULL },
+    { const_cast< char* >( "__array_struct__" ), (getter)&DataPointVectorWrapper::__get___array__struct, NULL },
     { NULL }
 };
 
@@ -1134,6 +1135,76 @@ public:
         return _getPropertyInterface().getProperty( *this, aPropertyName );
     }
 
+    const Polymorph defaultGetProperty( String const& aPropertyName ) const
+    {
+        String lowerCasedPropertyName( aPropertyName );
+        lowerCasedPropertyName[ 0 ] = std::tolower( lowerCasedPropertyName[ 0 ] );
+        py::handle<> aValue( PyObject_GenericGetAttr( theSelf, py::handle<>( PyString_InternFromString( const_cast< char* >( lowerCasedPropertyName.c_str() ) ) ).get() ) );
+        if ( PyErr_Occurred() )
+        {
+            PyErr_Clear();
+            THROW_EXCEPTION_INSIDE( NoSlot, 
+                    "failed to retrieve property attributes "
+                    "for [" + aPropertyName + "]" );
+        }
+
+        return py::extract< Polymorph >( aValue.get() );
+    }
+
+    const PropertyAttributes defaultGetPropertyAttributes( String const& aPropertyName ) const
+    {
+        return PropertyAttributes( PropertySlotBase::POLYMORPH, true, true, true, true, true );
+    }
+
+
+    void defaultSetProperty( String const& aPropertyName, Polymorph const& aValue )
+    {
+        PyObject_GenericSetAttr( theSelf, py::handle<>( PyString_InternFromString( const_cast< char* >( aPropertyName.c_str() ) ) ).get(), py::object( aValue ).ptr() );
+        if ( PyErr_Occurred() )
+        {
+            PyErr_Clear();
+            THROW_EXCEPTION_INSIDE( NoSlot, 
+                            "failed to set property [" + aPropertyName + "]" );
+        }
+    }
+
+    const StringVector defaultGetPropertyList() const
+    {
+        StringVector retval;
+
+        py::handle<> aSelfDict( PyObject_GetAttrString( theSelf, const_cast< char* >( "__dict__" ) ) );
+        if ( !aSelfDict )
+        {
+            PyErr_Clear();
+            return retval;
+        }
+
+        if ( !PyMapping_Check( aSelfDict.get() ) )
+        {
+            return retval;
+        }
+
+        {
+            py::handle<> aKeyList( PyMapping_Keys( aSelfDict.get() ) );
+            BOOST_ASSERT( PyList_Check( aKeyList.get() ) );
+            for ( py::ssize_t i( 0 ), e( PyList_GET_SIZE( aKeyList.get() ) ); i < e; ++i )
+            {
+                py::handle<> aKey( py::borrowed( PyList_GET_ITEM( aKeyList.get(), i ) ) );
+                BOOST_ASSERT( PyString_Check( aKey.get() ) );
+                retval.push_back( String( PyString_AS_STRING( aKey.get() ), PyString_GET_SIZE( aKey.get() ) ) );  
+            }
+        }
+
+        removeAttributesFromBases( retval, reinterpret_cast< PyObject* >( theSelf->ob_type ) );
+
+        for ( StringVector::iterator i( retval.begin() ); i != retval.end(); ++i )
+        {
+            (*i)[ 0 ] = std::toupper( (*i)[ 0] );
+        }
+
+        return retval;
+    }
+
     void loadProperty( String const& aPropertyName, Polymorph const& aValue )
     {
         return _getPropertyInterface().loadProperty( *this, aPropertyName, aValue );
@@ -1178,6 +1249,56 @@ public:
 
     PythonProcess( PythonDynamicModule const& aModule )
         : theSelf( 0 ), theModule( aModule ) {}
+
+private:
+    static void removeAttributesFromBases( StringVector& retval, PyObject *tp )
+    {
+        BOOST_ASSERT( PyType_Check( tp ) );
+
+        py::handle<> aBasesList( PyObject_GetAttrString( tp, const_cast< char* >( "__bases__" ) ) );
+        if ( !aBasesList )
+        {
+            PyErr_Clear();
+            return;
+        }
+
+        if ( !PyList_Check( aBasesList.get() ) )
+        {
+            return;
+        }
+
+        for ( py::ssize_t i( 0 ), ie( PyList_GET_SIZE( aBasesList.get() ) ); i < ie; ++i )
+        {
+            py::handle<> aBase( py::borrowed( PyList_GET_ITEM( aBasesList.get(), i ) ) );
+            removeAttributesFromBases( retval, aBase.get() );
+
+            py::handle<> aBaseDict( PyObject_GetAttrString( aBase.get(), const_cast< char* >( "__dict__" ) ) );
+            if ( !aBaseDict )
+            {
+                PyErr_Clear();
+                return;
+            }
+
+            if ( !PyMapping_Check( aBaseDict.get() ) )
+            {
+                return;
+            }
+
+            py::handle<> aKeyList( PyMapping_Keys( aBaseDict.get() ) );
+            BOOST_ASSERT( PyList_Check( aKeyList.get() ) );
+            for ( py::ssize_t j( 0 ), je( PyList_GET_SIZE( aKeyList.get() ) ); i < je; ++j )
+            {
+                py::handle<> aKey( py::borrowed( PyList_GET_ITEM( aKeyList.get(), i ) ) );
+                BOOST_ASSERT( PyString_Check( aKey.get() ) );
+                String aKeyStr( PyString_AS_STRING( aKey.get() ), PyString_GET_SIZE( aKey.get() ) );  
+                StringVector::iterator it( std::find( retval.begin(), retval.end(), aKeyStr ) );
+                if ( it != retval.end() )
+                {
+                    retval.erase( it );
+                }
+            }
+        }
+    }
 
 private:
     PyObject* theSelf;
@@ -1266,9 +1387,10 @@ EcsObject* PythonDynamicModule::createInstance() const
         {
             anErrorStr += aPyErrObj->ob_type->tp_name;
             py::handle<> aPyErrStrRepr( PyObject_Str( aPyErrObj ) );
+            BOOST_ASSERT( PyString_Check( aPyErrStrRepr.get() ) );
             anErrorStr.insert( anErrorStr.size(),
-                PyString_AsString( aPyErrStrRepr.get() ),
-                PyString_Size( aPyErrStrRepr.get() ) );
+                PyString_AS_STRING( aPyErrStrRepr.get() ),
+                PyString_GET_SIZE( aPyErrStrRepr.get() ) );
             PyErr_Clear();
         }
         throw std::runtime_error( anErrorStr );
@@ -2092,11 +2214,23 @@ static Polymorph Entity___getattr__( Entity* self, std::string key )
     return self->getProperty( key );
 }
 
-static void Entity___setattr__( Entity* self, std::string key, Polymorph value )
+static void Entity___setattr__( Entity* self, py::object key, py::object value )
 {
-    if ( key.size() > 0 )
-        key[ 0 ] = std::toupper( key[ 0 ] );
-    self->setProperty( key, value );
+    PythonProcess* tmp( dynamic_cast< PythonProcess* >( self ) );
+    if ( tmp )
+    {
+        PyObject_GenericSetAttr( tmp->getPythonObject(), key.ptr(), value.ptr() );
+        if ( PyErr_Occurred() )
+        {
+            py::throw_error_already_set();
+        }
+        return;
+    }
+
+    std::string keyStr = py::extract< std::string >( key );
+    if ( keyStr.size() > 0 )
+        keyStr[ 0 ] = std::toupper( keyStr[ 0 ] );
+    self->setProperty( keyStr, py::extract< Polymorph >( value ) );
 }
 
 template< typename T_ >
@@ -2257,6 +2391,9 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "variableReferences",
               py::make_function( &Process_get_variableReferences ) )
         ;
+
+    py::objects::register_dynamic_id< PythonProcess >();
+    py::objects::register_conversion< PythonProcess, Process >( false );
 
     py::class_< Variable, py::bases< Entity >, Variable, boost::noncopyable >
         ( "Variable", py::no_init )
