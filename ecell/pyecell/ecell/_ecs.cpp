@@ -1191,7 +1191,11 @@ public:
             {
                 py::handle<> aKey( py::borrowed( PyList_GET_ITEM( aKeyList.get(), i ) ) );
                 BOOST_ASSERT( PyString_Check( aKey.get() ) );
-                retval.push_back( String( PyString_AS_STRING( aKey.get() ), PyString_GET_SIZE( aKey.get() ) ) );  
+                if ( PyString_GET_SIZE( aKey.get() ) < thePrivPrefix.size()
+                        || memcmp( PyString_AS_STRING( aKey.get() ), thePrivPrefix.data(), thePrivPrefix.size() ) != 0 )
+                {
+                    retval.push_back( String( PyString_AS_STRING( aKey.get() ), PyString_GET_SIZE( aKey.get() ) ) );
+                }
             }
         }
 
@@ -1240,6 +1244,7 @@ public:
     {
         py::xdecref( theSelf );
         theSelf = py::incref( aPythonObject );
+        thePrivPrefix = String( "_" ) + theSelf->ob_type->tp_name;
     }
 
     PythonDynamicModule const& getModule() const
@@ -1248,7 +1253,7 @@ public:
     }
 
     PythonProcess( PythonDynamicModule const& aModule )
-        : theSelf( 0 ), theModule( aModule ) {}
+        : theSelf( 0 ), theModule( aModule ), thePrivPrefix() {}
 
 private:
     static void removeAttributesFromBases( StringVector& retval, PyObject *tp )
@@ -1301,9 +1306,10 @@ private:
     }
 
 private:
+
     PyObject* theSelf;
+    String thePrivPrefix;
     PythonDynamicModule const& theModule;
-    
 };
 
 struct PythonDynamicModule: public DynamicModule< EcsObject >
