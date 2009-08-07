@@ -1128,7 +1128,7 @@ public:
 protected:
     void appendDictToSet( std::set< String >& retval, PyObject* aObject ) const
     {
-        py::handle<> aSelfDict( PyObject_GetAttrString( aObject, const_cast< char* >( "__dict__" ) ) );
+        py::handle<> aSelfDict( py::allow_null( PyObject_GetAttrString( aObject, const_cast< char* >( "__dict__" ) ) ) );
         if ( !aSelfDict )
         {
             PyErr_Clear();
@@ -1166,7 +1166,7 @@ protected:
     {
         BOOST_ASSERT( PyType_Check( tp ) );
 
-        py::handle<> aBasesList( PyObject_GetAttrString( tp, const_cast< char* >( "__bases__" ) ) );
+        py::handle<> aBasesList( py::allow_null( PyObject_GetAttrString( tp, const_cast< char* >( "__bases__" ) ) ) );
         if ( !aBasesList )
         {
             PyErr_Clear();
@@ -1183,7 +1183,7 @@ protected:
             py::handle<> aBase( py::borrowed( PyTuple_GET_ITEM( aBasesList.get(), i ) ) );
             removeAttributesFromBases( retval, aBase.get() );
 
-            py::handle<> aBaseDict( PyObject_GetAttrString( aBase.get(), const_cast< char* >( "__dict__" ) ) );
+            py::handle<> aBaseDict( py::allow_null( PyObject_GetAttrString( aBase.get(), const_cast< char* >( "__dict__" ) ) ) );
             if ( !aBaseDict )
             {
                 PyErr_Clear();
@@ -1222,8 +1222,8 @@ public:
     {
         String lowerCasedPropertyName( aPropertyName );
         lowerCasedPropertyName[ 0 ] = std::tolower( lowerCasedPropertyName[ 0 ] );
-        py::handle<> aValue( PyObject_GenericGetAttr( theSelf, py::handle<>( PyString_InternFromString( const_cast< char* >( lowerCasedPropertyName.c_str() ) ) ).get() ) );
-        if ( PyErr_Occurred() )
+        py::handle<> aValue( py::allow_null( PyObject_GenericGetAttr( theSelf, py::handle<>( PyString_InternFromString( const_cast< char* >( lowerCasedPropertyName.c_str() ) ) ).get() ) ) );
+        if ( !aValue )
         {
             PyErr_Clear();
             THROW_EXCEPTION_INSIDE( NoSlot, 
@@ -1335,13 +1335,14 @@ public:
         if ( !theSelf )
             return;
         py::getattr( py::object( py::borrowed( theSelf ) ), "initialize" )();
+        theFireMethod = py::getattr( py::object( py::borrowed( theSelf ) ), "fire" );
     }
 
     virtual void fire()
     {
         if ( !theSelf )
             return;
-        py::object retval( py::getattr( py::object( py::borrowed( theSelf ) ), "fire" )() );
+        py::object retval( theFireMethod() );
         if ( retval )
         {
             setActivity( py::extract< Real >( retval ) );
@@ -1357,6 +1358,8 @@ public:
 
     PythonProcess( PythonDynamicModule const& aModule )
         : PythonEntityBase< PythonProcess, Process >( aModule ) {}
+
+    py::object theFireMethod;
 };
 
 
@@ -1370,30 +1373,47 @@ public:
 
     virtual void initialize()
     {
+        Variable::initialize();
         if ( !theSelf )
             return;
         py::getattr( py::object( py::borrowed( theSelf ) ), "initialize" )();
+        theOnValueChangingMethod = py::handle<>( py::allow_null( PyObject_GetAttrString( theSelf, const_cast< char* >( "onValueChanging" ) ) ) );
     }
 
     virtual SET_METHOD( Real, Value )
     {
-        py::handle<> aResult( PyObject_CallMethod( theSelf, const_cast< char* >( "onValueChanging" ), "f", value ) );
-        if ( !aResult )
+        if ( theOnValueChangingMethod )
         {
-            PyErr_Clear();
+            if ( !PyCallable_Check( theOnValueChangingMethod.get() ) )
+            {
+                PyErr_SetString( PyExc_TypeError, "object is not callable" );
+                py::throw_error_already_set();
+            }
+
+            py::handle<> aResult( PyObject_CallFunction( theOnValueChangingMethod.get(), "f", value ) );
+            if ( !aResult )
+            {
+                py::throw_error_already_set();
+            }
+            else
+            {
+                if ( !PyObject_IsTrue( aResult.get() ) )
+                {
+                    return;
+                }
+            }
         }
         else
         {
-            if ( !PyObject_IsTrue( aResult.get() ) )
-            {
-                return;
-            }
+            PyErr_Clear();
         }
         Variable::setValue( value );
     }
 
     PythonVariable( PythonDynamicModule const& aModule )
         : PythonEntityBase< PythonVariable, Variable >( aModule ) {}
+
+    py::handle<> theOnValueChangingMethod;
 };
 
 
