@@ -431,6 +431,21 @@ struct StringKeyedMapToPythonConverter
     }
 };
 
+struct FullIDToPythonConverter
+{
+    static void addToRegistry()
+    {
+        py::to_python_converter< FullID, FullIDToPythonConverter >();
+    }
+
+    static PyObject* convert( FullID const& aFullID )
+    {
+        return py::incref( py::object( aFullID.asString() ).ptr() );
+    }
+};
+
+
+
 // exception translators
 
 static void translateException( const std::exception& anException )
@@ -1661,6 +1676,22 @@ inline PyObject* to_python_indirect_fun< System >( System* arg )
 
 class Simulator
 {
+public:
+    struct Model: public libecs::Model
+    {
+    public:
+        Simulator& getSimulator() const
+        {
+            return theSimulator;
+        }
+
+        Model( Simulator& aSimulator, ModuleMaker< EcsObject >& aModuleMaker )
+            : libecs::Model( aModuleMaker ), theSimulator( aSimulator ) {}
+
+    protected:
+        Simulator& theSimulator;
+    };
+
 private:
     struct CompositeModuleMaker: public ModuleMaker< EcsObject >,
                                  public SharedModuleMakerInterface
@@ -1787,7 +1818,7 @@ public:
           theEventHandler(),
           theDefaultPropertiedObjectMaker( createDefaultModuleMaker() ),
           thePropertiedObjectMaker( *theDefaultPropertiedObjectMaker ),
-          theModel( thePropertiedObjectMaker )
+          theModel( *this, thePropertiedObjectMaker )
     {
     }
 
@@ -2610,6 +2641,11 @@ static void Entity___setattr__( Entity* self, py::object key, py::object value )
     self->setProperty( keyStr, py::extract< Polymorph >( value ) );
 }
 
+static Simulator& Entity___get_simulator__( Entity* self )
+{
+    return static_cast< Simulator::Model const* >( self->getModel() )->getSimulator();
+}
+
 template< typename T_ >
 static PyObject* writeOnly( T_* )
 {
@@ -2639,6 +2675,7 @@ BOOST_PYTHON_MODULE( _ecs )
     StringVectorToPythonConverter::addToRegistry();
     PropertySlotMapToPythonConverter::addToRegistry();
     DataPointVectorSharedPtrConverter::addToRegistry();
+    FullIDToPythonConverter::addToRegistry();
 
     PolymorphRetriever::addToRegistry();
 
@@ -2743,10 +2780,14 @@ BOOST_PYTHON_MODULE( _ecs )
     py::class_< Entity, py::bases<>, Entity, boost::noncopyable >
         ( "Entity", py::no_init )
         // properties
+        .add_property( "simulator",
+            py::make_function( &Entity___get_simulator__,
+                py::return_value_policy< py::reference_existing_object >() ) )
         .add_property( "superSystem",
             py::make_function( &Entity::getSuperSystem,
-            py::return_value_policy< py::reference_existing_object > () ) )
+            py::return_value_policy< py::reference_existing_object >() ) )
         .add_property( "id", &Entity::getID )
+        .add_property( "fullID", &Entity::getFullID )
         .add_property( "name", &Entity::getName )
         .def( "__setattr__", &Entity___setattr__ )
         .def( "__getattr__", &Entity___getattr__ )
