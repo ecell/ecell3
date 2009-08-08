@@ -264,6 +264,15 @@ struct PolymorphRetriever
         return Polymorph();
     }
 
+    static bool isConvertible( PyObject* aPyObjectPtr )
+    {
+        return PyFloat_Check( aPyObjectPtr )
+                || PyInt_Check( aPyObjectPtr )
+                || PyString_Check( aPyObjectPtr )
+                || PyUnicode_Check( aPyObjectPtr )
+                || PySequence_Check( aPyObjectPtr );
+    }
+
     static void* convertible( PyObject* aPyObject )
     {
         // always passes the test for efficiency.    overload won't work.
@@ -1132,13 +1141,15 @@ protected:
             return;
         }
 
-        py::handle<> aKeyList( PyMapping_Keys( aSelfDict.get() ) );
+        py::handle<> aKeyList( PyMapping_Items( aSelfDict.get() ) );
         BOOST_ASSERT( PyList_Check( aKeyList.get() ) );
         for ( py::ssize_t i( 0 ), e( PyList_GET_SIZE( aKeyList.get() ) ); i < e; ++i )
         {
-            py::handle<> aKey( py::borrowed( PyList_GET_ITEM( aKeyList.get(), i ) ) );
+            py::handle<> aKeyValuePair( py::borrowed( PyList_GET_ITEM( aKeyList.get(), i ) ) );
+            BOOST_ASSERT( PyTuple_Check( aKeyValuePair.get() ) && PyTuple_GET_SIZE( aKeyValuePair.get() ) == 2 );
+            py::handle<> aKey( py::borrowed( PyTuple_GET_ITEM( aKeyValuePair.get(), 0 ) ) );
             BOOST_ASSERT( PyString_Check( aKey.get() ) );
-            if ( PyString_GET_SIZE( aKey.get() ) >= thePrivPrefix.size()
+            if ( PyString_GET_SIZE( aKey.get() ) >= static_cast< py::ssize_t >( thePrivPrefix.size() )
                     && memcmp( PyString_AS_STRING( aKey.get() ), thePrivPrefix.data(), thePrivPrefix.size() ) == 0 )
             {
                 continue;
@@ -1150,7 +1161,42 @@ protected:
                 continue;
             }
 
+            py::handle<> aValue( py::borrowed( PyTuple_GET_ITEM( aKeyValuePair.get(), 1 ) ) );
+            if ( !PolymorphRetriever::isConvertible( aValue.get() ) )
+            {
+                continue;
+            }
+
             retval.insert( String( PyString_AS_STRING( aKey.get() ), PyString_GET_SIZE( aKey.get() ) ) );
+        }
+    }
+
+    void addAttributesFromBases( std::set< String >& retval, PyObject* anUpperBound, PyObject* tp ) const
+    {
+        BOOST_ASSERT( PyType_Check( tp ) );
+
+        if ( anUpperBound == tp )
+        {
+            return;
+        }
+
+        py::handle<> aBasesList( py::allow_null( PyObject_GetAttrString( tp, const_cast< char* >( "__bases__" ) ) ) );
+        if ( !aBasesList )
+        {
+            PyErr_Clear();
+            return;
+        }
+
+        if ( !PyTuple_Check( aBasesList.get() ) )
+        {
+            return;
+        }
+
+        for ( py::ssize_t i( 0 ), ie( PyTuple_GET_SIZE( aBasesList.get() ) ); i < ie; ++i )
+        {
+            py::handle<> aBase( py::borrowed( PyTuple_GET_ITEM( aBasesList.get(), i ) ) );
+            appendDictToSet( retval, aBase.get() );
+            addAttributesFromBases( retval, anUpperBound, aBase.get() );
         }
     }
 
@@ -1257,8 +1303,14 @@ public:
     {
         std::set< String > aPropertySet;
         appendDictToSet( aPropertySet, theSelf );
-        appendDictToSet( aPropertySet, reinterpret_cast< PyObject* >( theSelf->ob_type ) );
-        removeAttributesFromBases( aPropertySet, reinterpret_cast< PyObject* >( theSelf->ob_type ) );
+
+        PyObject* anUpperBound(
+                reinterpret_cast< PyObject* >(
+                    py::objects::registered_class_object(
+                        typeid( Tbase_ ) ).get() ) );
+        addAttributesFromBases( aPropertySet, anUpperBound,
+                reinterpret_cast< PyObject* >( theSelf->ob_type ) );
+        removeAttributesFromBases( aPropertySet, anUpperBound );
 
         StringVector retval;
         for ( std::set< String >::iterator i( aPropertySet.begin() ), e( aPropertySet.end() ); i != e; ++i )
