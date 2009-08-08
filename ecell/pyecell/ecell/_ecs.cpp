@@ -1095,11 +1095,11 @@ private:
     py::handle<> thePyObject;
 };
 
+template< typename T >
 class PythonDynamicModule;
 
-class PythonEntityBaseBase
+struct PythonEntityBaseBase
 {
-public:
     virtual ~PythonEntityBaseBase()
     {
         py::xdecref( theSelf );
@@ -1116,14 +1116,6 @@ public:
         theSelf = py::incref( aPythonObject );
         thePrivPrefix = String( "_" ) + theSelf->ob_type->tp_name;
     }
-
-    PythonDynamicModule const& getModule() const
-    {
-        return theModule;
-    }
-
-    PythonEntityBaseBase( PythonDynamicModule const& aModule )
-        : theSelf( 0 ), theModule( aModule ), thePrivPrefix() {}
 
 protected:
     void appendDictToSet( std::set< String >& retval, PyObject* aObject ) const
@@ -1207,10 +1199,11 @@ protected:
         }
     }
 
+    PythonEntityBaseBase(): theSelf( 0 ), thePrivPrefix() {}
+
 protected:
 
     PyObject* theSelf;
-    PythonDynamicModule const& theModule;
     String thePrivPrefix;
 };
 
@@ -1218,6 +1211,15 @@ template< typename Tderived_, typename Tbase_ >
 class PythonEntityBase: public Tbase_, public PythonEntityBaseBase
 {
 public:
+    virtual ~PythonEntityBase()
+    {
+    }
+
+    PythonDynamicModule< Tderived_ > const& getModule() const
+    {
+        return theModule;
+    }
+
     const Polymorph defaultGetProperty( String const& aPropertyName ) const
     {
         String lowerCasedPropertyName( aPropertyName );
@@ -1316,8 +1318,20 @@ public:
         return _getPropertyInterface();
     }
 
-    PythonEntityBase( PythonDynamicModule const& aModule )
-        : PythonEntityBaseBase( aModule ) {}
+    PythonEntityBase( PythonDynamicModule< Tderived_ > const& aModule )
+        : theModule( aModule ) {}
+
+    static void addToRegistry()
+    {
+        py::objects::register_conversion< PythonEntityBaseBase, Tderived_ >( true );
+        py::objects::register_conversion< PythonEntityBaseBase, Tbase_ >( true );
+        py::objects::register_dynamic_id< Tderived_ >();
+        py::objects::register_conversion< Tderived_, Tbase_ >( false );
+    }
+
+protected:
+
+    PythonDynamicModule< Tderived_ > const& theModule;
 };
 
 class PythonProcess: public PythonEntityBase< PythonProcess, Process >
@@ -1356,7 +1370,7 @@ public:
         return py::extract<bool>( py::getattr( py::object( py::borrowed( theSelf ) ), "isContinuous" ) );
     }
 
-    PythonProcess( PythonDynamicModule const& aModule )
+    PythonProcess( PythonDynamicModule< PythonProcess > const& aModule )
         : PythonEntityBase< PythonProcess, Process >( aModule ) {}
 
     py::object theFireMethod;
@@ -1377,7 +1391,11 @@ public:
         if ( !theSelf )
             return;
         py::getattr( py::object( py::borrowed( theSelf ) ), "initialize" )();
-        theOnValueChangingMethod = py::handle<>( py::allow_null( PyObject_GetAttrString( theSelf, const_cast< char* >( "onValueChanging" ) ) ) );
+        theOnValueChangingMethod = py::handle<>( py::allow_null( PyObject_GenericGetAttr( theSelf, py::handle<>( PyString_InternFromString( const_cast< char* >( "onValueChanging" ) ) ).get() ) ) );
+        if ( !theOnValueChangingMethod )
+        {
+            PyErr_Clear();
+        }
     }
 
     virtual SET_METHOD( Real, Value )
@@ -1410,20 +1428,56 @@ public:
         Variable::setValue( value );
     }
 
-    PythonVariable( PythonDynamicModule const& aModule )
+    PythonVariable( PythonDynamicModule< PythonVariable > const& aModule )
         : PythonEntityBase< PythonVariable, Variable >( aModule ) {}
 
     py::handle<> theOnValueChangingMethod;
 };
 
 
+class PythonSystem: public PythonEntityBase< PythonSystem, System >
+{
+public:
+    LIBECS_DM_INIT_PROP_INTERFACE()
+    {
+        INHERIT_PROPERTIES( System );
+    }
+
+    virtual void initialize()
+    {
+        System::initialize();
+        if ( !theSelf )
+            return;
+        py::getattr( py::object( py::borrowed( theSelf ) ), "initialize" )();
+    }
+
+    PythonSystem( PythonDynamicModule< PythonSystem > const& aModule )
+        : PythonEntityBase< PythonSystem, System >( aModule ) {}
+};
+
+template<typename T_>
+struct DeduceEntityType
+{
+    static EntityType value;
+};
+
+template<>
+EntityType DeduceEntityType< PythonProcess >::value( EntityType::PROCESS );
+
+template<>
+EntityType DeduceEntityType< PythonVariable >::value( EntityType::VARIABLE );
+
+template<>
+EntityType DeduceEntityType< PythonSystem >::value( EntityType::SYSTEM );
+
+template< typename T_ >
 struct PythonDynamicModule: public DynamicModule< EcsObject >
 {
     typedef DynamicModule< EcsObject > Base;
 
-    struct make_ptr_instance: public py::objects::make_instance_impl< PythonEntityBaseBase, py::objects::pointer_holder< PythonEntityBaseBase*, PythonEntityBaseBase >, make_ptr_instance > 
+    struct make_ptr_instance: public py::objects::make_instance_impl< T_, py::objects::pointer_holder< T_*, T_ >, make_ptr_instance > 
     {
-        typedef py::objects::pointer_holder< PythonEntityBaseBase*, PythonEntityBaseBase > holder_t;
+        typedef py::objects::pointer_holder< T_*, T_ > holder_t;
 
         template <class Arg>
         static inline holder_t* construct(void* storage, PyObject*, Arg& x)
@@ -1434,70 +1488,9 @@ struct PythonDynamicModule: public DynamicModule< EcsObject >
         template<typename Ptr>
         static inline PyTypeObject* get_class_object(Ptr const& x)
         {
-            return static_cast< PythonEntityBaseBase const* >( boost::get_pointer(x) )->getModule().getPythonType();
+            return static_cast< T_ const* >( boost::get_pointer(x) )->getModule().getPythonType();
         }
     };
-
-    struct DMTypeResolverHelper
-    {
-        EntityType operator()( py::object aClass )
-        {
-            if ( !PyType_Check( aClass.ptr() ) )
-            {
-                return EntityType( EntityType::NONE );
-            }
-
-            if (  thePyTypeProcess.get() == reinterpret_cast< PyTypeObject* >( aClass.ptr() ) )
-            {
-                return EntityType( EntityType::PROCESS );
-            }
-            else if ( thePyTypeVariable.get() == reinterpret_cast< PyTypeObject* >( aClass.ptr() ) )
-            {
-                return EntityType( EntityType::VARIABLE );
-            }
-            else if ( thePyTypeSystem.get() == reinterpret_cast< PyTypeObject* >( aClass.ptr() ) )
-            {
-                return EntityType( EntityType::SYSTEM );
-            }
-
-            py::handle<> aBasesList( PyObject_GetAttrString( aClass.ptr(), const_cast< char* >( "__bases__" ) ) );
-            if ( !aBasesList )
-            {
-                PyErr_Clear();
-                return EntityType( EntityType::NONE );
-            }
-
-            if ( !PyTuple_Check( aBasesList.get() ) )
-            {
-                return EntityType( EntityType::NONE );
-            }
-
-
-            for ( py::ssize_t i( 0 ), ie( PyTuple_GET_SIZE( aBasesList.get() ) ); i < ie; ++i )
-            {
-                py::object aBase( py::borrowed( PyTuple_GET_ITEM( aBasesList.get(), i ) ) );
-                EntityType aResult( ( *this )( aBase ) );
-                if ( aResult.getType() != EntityType::NONE )
-                {
-                    return aResult;
-                }
-            }
-
-            return EntityType( EntityType::NONE );
-        }
-
-        DMTypeResolverHelper()
-            : thePyTypeProcess( py::objects::registered_class_object( typeid( Process ) ) ),
-              thePyTypeVariable( py::objects::registered_class_object( typeid( Variable ) ) ),
-              thePyTypeSystem( py::objects::registered_class_object( typeid( System ) ) )
-        {
-        }
-
-        py::type_handle thePyTypeProcess;
-        py::type_handle thePyTypeVariable;
-        py::type_handle thePyTypeSystem;
-    };            
-
 
     virtual EcsObject* createInstance() const;
 
@@ -1534,24 +1527,18 @@ struct PythonDynamicModule: public DynamicModule< EcsObject >
     {
         return reinterpret_cast< PyTypeObject* >( thePythonClass.ptr() );
     }
-
-    static EntityType getDMTypeFromPythonType( py::object aClass )
-    {
-        return DMTypeResolverHelper()( aClass );
-    }
  
     PythonDynamicModule( py::object aPythonClass )
         : Base( DM_TYPE_DYNAMIC ),
            thePythonClass( aPythonClass ),
-           theEntityType( getDMTypeFromPythonType( aPythonClass ) ),
-           thePropertyInterface( getModuleName(), theEntityType.asString() )
+           thePropertyInterface( getModuleName(),
+                                 DeduceEntityType< T_ >::value.asString() )
     {
     }
 
 private:
     py::object thePythonClass;
-    EntityType theEntityType;
-    PropertyInterface< PythonProcess > thePropertyInterface;
+    PropertyInterface< T_ > thePropertyInterface;
 };
 
 template< typename Tderived_, typename Tbase_ >
@@ -1561,21 +1548,12 @@ PythonEntityBase< Tderived_, Tbase_ >::_getPropertyInterface() const
     return *reinterpret_cast< PropertyInterface< Tbase_ > const* >( theModule.getInfo() );
 }
 
-EcsObject* PythonDynamicModule::createInstance() const
+template< typename T_ >
+EcsObject* PythonDynamicModule< T_ >::createInstance() const
 {
-    PythonEntityBaseBase* retval;
+    T_* retval;
 
-    switch ( theEntityType.getType() )
-    {
-    case EntityType::PROCESS:
-        retval = new PythonProcess( *this );
-        break;
-    case EntityType::VARIABLE:
-        retval = new PythonVariable( *this );
-        break;
-    default:
-        throw std::runtime_error("not implemented");
-    }
+    retval = new T_( *this );
 
     py::handle<> aNewObject( make_ptr_instance::execute( retval ) );
     if ( !aNewObject )
@@ -1596,7 +1574,7 @@ EcsObject* PythonDynamicModule::createInstance() const
         throw std::runtime_error( anErrorStr );
     }
     retval->setPythonObject( aNewObject.get() );
-    return dynamic_cast< EcsObject* >( retval );
+    return retval;
 }
 
 template< typename T_ >
@@ -1611,6 +1589,22 @@ inline PyObject* to_python_indirect_fun< Process >( Process* arg )
     PythonProcess* tmp( dynamic_cast< PythonProcess* >( arg ) );
     return tmp ? py::incref( tmp->getPythonObject() ):
             py::to_python_indirect< Process*, py::detail::make_reference_holder >()( arg );
+}
+
+template<>
+inline PyObject* to_python_indirect_fun< Variable >( Variable* arg )
+{
+    PythonVariable* tmp( dynamic_cast< PythonVariable* >( arg ) );
+    return tmp ? py::incref( tmp->getPythonObject() ):
+            py::to_python_indirect< Variable*, py::detail::make_reference_holder >()( arg );
+}
+
+template<>
+inline PyObject* to_python_indirect_fun< System >( System* arg )
+{
+    PythonSystem* tmp( dynamic_cast< PythonSystem* >( arg ) );
+    return tmp ? py::incref( tmp->getPythonObject() ):
+            py::to_python_indirect< System*, py::detail::make_reference_holder >()( arg );
 }
 
 class Simulator
@@ -1672,6 +1666,66 @@ private:
         ModuleMaker< EcsObject >& theDefaultModuleMaker;
         ModuleMap theRealModuleMap;
     };
+
+    struct DMTypeResolverHelper
+    {
+        EntityType operator()( py::object aClass )
+        {
+            if ( !PyType_Check( aClass.ptr() ) )
+            {
+                return EntityType( EntityType::NONE );
+            }
+
+            if (  thePyTypeProcess.get() == reinterpret_cast< PyTypeObject* >( aClass.ptr() ) )
+            {
+                return EntityType( EntityType::PROCESS );
+            }
+            else if ( thePyTypeVariable.get() == reinterpret_cast< PyTypeObject* >( aClass.ptr() ) )
+            {
+                return EntityType( EntityType::VARIABLE );
+            }
+            else if ( thePyTypeSystem.get() == reinterpret_cast< PyTypeObject* >( aClass.ptr() ) )
+            {
+                return EntityType( EntityType::SYSTEM );
+            }
+
+            py::handle<> aBasesList( PyObject_GetAttrString( aClass.ptr(), const_cast< char* >( "__bases__" ) ) );
+            if ( !aBasesList )
+            {
+                PyErr_Clear();
+                return EntityType( EntityType::NONE );
+            }
+
+            if ( !PyTuple_Check( aBasesList.get() ) )
+            {
+                return EntityType( EntityType::NONE );
+            }
+
+
+            for ( py::ssize_t i( 0 ), ie( PyTuple_GET_SIZE( aBasesList.get() ) ); i < ie; ++i )
+            {
+                py::object aBase( py::borrowed( PyTuple_GET_ITEM( aBasesList.get(), i ) ) );
+                EntityType aResult( ( *this )( aBase ) );
+                if ( aResult.getType() != EntityType::NONE )
+                {
+                    return aResult;
+                }
+            }
+
+            return EntityType( EntityType::NONE );
+        }
+
+        DMTypeResolverHelper()
+            : thePyTypeProcess( py::objects::registered_class_object( typeid( Process ) ) ),
+              thePyTypeVariable( py::objects::registered_class_object( typeid( Variable ) ) ),
+              thePyTypeSystem( py::objects::registered_class_object( typeid( System ) ) )
+        {
+        }
+
+        py::type_handle thePyTypeProcess;
+        py::type_handle thePyTypeVariable;
+        py::type_handle thePyTypeSystem;
+    };            
 
 public:
     Simulator()
@@ -2302,7 +2356,30 @@ public:
             PyErr_SetString( PyExc_TypeError, "argument must be a type object" );
             py::throw_error_already_set();
         }
-        thePropertiedObjectMaker.addClass( new PythonDynamicModule( obj ) );
+
+        EntityType aDMType( DMTypeResolverHelper()( obj ) );
+
+        DynamicModule< EcsObject >* aModule( 0 );
+
+        switch ( aDMType.getType() )
+        {
+        case EntityType::PROCESS:
+            aModule = new PythonDynamicModule< PythonProcess >( obj );
+            break;
+
+        case EntityType::VARIABLE:
+            aModule = new PythonDynamicModule< PythonVariable >( obj );
+            break;
+
+        case EntityType::SYSTEM:
+            aModule = new PythonDynamicModule< PythonSystem >( obj );
+            break;
+
+        default:
+            THROW_EXCEPTION( NotImplemented, "not implemented" );
+        }
+    
+        thePropertiedObjectMaker.addClass( aModule );
     }
 
 protected:
@@ -2643,16 +2720,9 @@ BOOST_PYTHON_MODULE( _ecs )
         ;
 
     py::objects::register_dynamic_id< PythonEntityBaseBase >();
-    py::objects::register_conversion< PythonEntityBaseBase, PythonProcess >( true );
-    py::objects::register_conversion< PythonEntityBaseBase, PythonVariable >( true );
-    py::objects::register_conversion< PythonEntityBaseBase, Process >( true );
-    py::objects::register_conversion< PythonEntityBaseBase, Variable >( true );
-
-    py::objects::register_dynamic_id< PythonProcess >();
-    py::objects::register_conversion< PythonProcess, Process >( false );
-
-    py::objects::register_dynamic_id< PythonVariable >();
-    py::objects::register_conversion< PythonVariable, Variable >( false );
+    PythonVariable::addToRegistry();
+    PythonProcess::addToRegistry();
+    PythonSystem::addToRegistry();
 
     py::class_< Variable, py::bases< Entity >, Variable, boost::noncopyable >
         ( "Variable", py::no_init )
