@@ -1946,6 +1946,21 @@ public:
 
         return theModel.createEntity( aClassname, FullID( aFullIDString ) );
     }
+    
+    Variable* createVariable( String const& aClassname )
+    {
+        return theModel.createVariable( aClassname );
+    }
+
+    Process* createProcess( String const& aClassname )
+    {
+        return theModel.createProcess( aClassname );
+    }
+
+    System* createSystem( String const& aClassname )
+    {
+        return theModel.createSystem( aClassname );
+    }
 
     Entity* getEntity( String const& aFullIDString )
     {
@@ -2580,23 +2595,22 @@ static Polymorph Entity___getattr__( Entity* self, std::string key )
     return self->getProperty( key );
 }
 
-static void Entity___setattr__( Entity* self, py::object key, py::object value )
+static void Entity___setattr__( py::object aSelf, py::object key, py::object value )
 {
-    PyObject* aSelf( py::detail::wrapper_base_::owner( self ) );
-    if ( aSelf )
+    py::handle<> aDescr( py::allow_null( PyObject_GetAttr( reinterpret_cast< PyObject* >( aSelf.ptr()->ob_type ), key.ptr() ) ) );
+    if ( !aDescr || !aDescr.get()->ob_type->tp_descr_set )
     {
-        PyObject_GenericSetAttr( aSelf, key.ptr(), value.ptr() );
-        if ( PyErr_Occurred() )
-        {
-            py::throw_error_already_set();
-        }
-        return;
+        PyErr_Clear();
+        Entity* self = py::extract< Entity* >( aSelf );
+        std::string keyStr = py::extract< std::string >( key );
+        if ( keyStr.size() > 0 )
+            keyStr[ 0 ] = std::toupper( keyStr[ 0 ] );
+        self->setProperty( keyStr, py::extract< Polymorph >( value ) );
     }
-
-    std::string keyStr = py::extract< std::string >( key );
-    if ( keyStr.size() > 0 )
-        keyStr[ 0 ] = std::toupper( keyStr[ 0 ] );
-    self->setProperty( keyStr, py::extract< Polymorph >( value ) );
+    else
+    {
+        aDescr.get()->ob_type->tp_descr_set( aDescr.get(), aSelf.ptr(), value.ptr() );
+    }
 }
 
 static Simulator& Entity___get_simulator__( Entity* self )
@@ -2771,7 +2785,7 @@ BOOST_PYTHON_MODULE( _ecs )
 
     py::class_< Stepper, py::bases<>, Stepper, boost::noncopyable >
         ( "Stepper", py::no_init )
-        .add_property( "id", &Stepper::getID )
+        .add_property( "id", &Stepper::getID, &Stepper::setID )
         .add_property( "priority",
                        &Stepper::getPriority,
                        &Stepper::setPriority )
@@ -2796,7 +2810,7 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "superSystem",
             py::make_function( &Entity::getSuperSystem,
             return_existing_object() ) )
-        .add_property( "id", &Entity::getID )
+        .add_property( "id", &Entity::getID, &Entity::setID )
         .add_property( "fullID", &Entity::getFullID )
         .add_property( "name", &Entity::getName )
         .def( "__setattr__", &Entity___setattr__ )
@@ -2888,6 +2902,15 @@ BOOST_PYTHON_MODULE( _ecs )
         .def( "createEntity",
               &Simulator::createEntity,
               return_entity() )
+        .def( "createVariable",
+              &Simulator::createVariable,
+              py::return_internal_reference<>() )
+        .def( "createProcess",
+              &Simulator::createProcess,
+              py::return_internal_reference<>() )
+        .def( "createSystem",
+              &Simulator::createSystem,
+              py::return_internal_reference<>() )
         .def( "getEntity",
               &Simulator::getEntity,
               return_entity() )
