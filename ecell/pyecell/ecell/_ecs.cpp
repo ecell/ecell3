@@ -1,5 +1,4 @@
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-//
 //       This file is part of the E-Cell System
 //
 //       Copyright (C) 1996-2009 Keio University
@@ -69,6 +68,22 @@
 
 using namespace libecs;
 namespace py = boost::python;
+
+inline py::object generic_getattr( py::object anObj, const char* aName )
+{
+    py::handle<> aRetval( py::allow_null( PyObject_GenericGetAttr(
+        anObj.ptr(),
+        py::handle<>(
+            PyString_InternFromString(
+                const_cast< char* >( aName ) ) ).get() ) ) );
+    if ( !aRetval )
+    {
+        py::throw_error_already_set();
+    }
+
+    return py::object( aRetval );
+}
+
 
 struct PolymorphToPythonConverter
 {
@@ -1407,8 +1422,8 @@ public:
     virtual void initialize()
     {
         PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
-        py::getattr( py::object( py::borrowed( aSelf ) ), "initialize" )();
-        theFireMethod = py::getattr( py::object( py::borrowed( aSelf ) ), "fire" );
+        generic_getattr( py::object( py::borrowed( aSelf ) ), "initialize" )();
+        theFireMethod = generic_getattr( py::object( py::borrowed( aSelf ) ), "fire" );
     }
 
     virtual void fire()
@@ -1423,7 +1438,20 @@ public:
     virtual const bool isContinuous() const
     {
         PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
-        return py::extract<bool>( py::getattr( py::object( py::borrowed( aSelf ) ), "isContinuous" ) );
+        py::handle<> anIsContinuousDescr( py::allow_null( PyObject_GenericGetAttr( reinterpret_cast< PyObject* >( aSelf->ob_type ), py::handle<>( PyString_InternFromString( const_cast< char* >( "isContinuous" ) ) ).get() ) ) );
+        if ( !anIsContinuousDescr )
+        {
+            PyErr_Clear();
+            return Process::isContinuous();
+        }
+
+        descrgetfunc aDescrGetFunc( anIsContinuousDescr.get()->ob_type->tp_descr_get );
+        if ( aDescrGetFunc )
+        {
+            return py::extract< bool >( py::handle<>( aDescrGetFunc( anIsContinuousDescr.get(), aSelf, reinterpret_cast< PyObject* >( aSelf->ob_type ) ) ).get() );
+        }
+
+        return py::extract< bool >( anIsContinuousDescr.get() );
     }
 
     PythonProcess( PythonDynamicModule< PythonProcess > const& aModule )
