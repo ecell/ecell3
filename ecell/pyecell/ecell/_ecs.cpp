@@ -47,7 +47,9 @@
 #include <boost/python.hpp>
 #include <boost/python/tuple.hpp>
 #include <boost/python/object.hpp>
+#include <boost/python/wrapper.hpp>
 #include <boost/python/object/inheritance.hpp>
+#include <boost/python/object/find_instance.hpp>
 #include <boost/python/reference_existing_object.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
@@ -1124,25 +1126,8 @@ class PythonDynamicModule;
 
 struct PythonEntityBaseBase
 {
-    virtual ~PythonEntityBaseBase()
-    {
-        py::xdecref( theSelf );
-    }
-
-    PyObject* getPythonObject() const
-    {
-        return theSelf;
-    }
-
-    void setPythonObject( PyObject* aPythonObject )
-    {
-        py::xdecref( theSelf );
-        theSelf = py::incref( aPythonObject );
-        thePrivPrefix = String( "_" ) + theSelf->ob_type->tp_name;
-    }
-
 protected:
-    void appendDictToSet( std::set< String >& retval, PyObject* aObject ) const
+    static void appendDictToSet( std::set< String >& retval, std::string const& aPrivPrefix, PyObject* aObject )
     {
         py::handle<> aSelfDict( py::allow_null( PyObject_GetAttrString( aObject, const_cast< char* >( "__dict__" ) ) ) );
         if ( !aSelfDict )
@@ -1164,8 +1149,8 @@ protected:
             BOOST_ASSERT( PyTuple_Check( aKeyValuePair.get() ) && PyTuple_GET_SIZE( aKeyValuePair.get() ) == 2 );
             py::handle<> aKey( py::borrowed( PyTuple_GET_ITEM( aKeyValuePair.get(), 0 ) ) );
             BOOST_ASSERT( PyString_Check( aKey.get() ) );
-            if ( PyString_GET_SIZE( aKey.get() ) >= static_cast< py::ssize_t >( thePrivPrefix.size() )
-                    && memcmp( PyString_AS_STRING( aKey.get() ), thePrivPrefix.data(), thePrivPrefix.size() ) == 0 )
+            if ( PyString_GET_SIZE( aKey.get() ) >= static_cast< py::ssize_t >( aPrivPrefix.size() )
+                    && memcmp( PyString_AS_STRING( aKey.get() ), aPrivPrefix.data(), aPrivPrefix.size() ) == 0 )
             {
                 continue;
             }
@@ -1186,7 +1171,7 @@ protected:
         }
     }
 
-    void addAttributesFromBases( std::set< String >& retval, PyObject* anUpperBound, PyObject* tp ) const
+    static void addAttributesFromBases( std::set< String >& retval, std::string const& aPrivPrefix, PyObject* anUpperBound, PyObject* tp )
     {
         BOOST_ASSERT( PyType_Check( tp ) );
 
@@ -1210,8 +1195,8 @@ protected:
         for ( py::ssize_t i( 0 ), ie( PyTuple_GET_SIZE( aBasesList.get() ) ); i < ie; ++i )
         {
             py::handle<> aBase( py::borrowed( PyTuple_GET_ITEM( aBasesList.get(), i ) ) );
-            appendDictToSet( retval, aBase.get() );
-            addAttributesFromBases( retval, anUpperBound, aBase.get() );
+            appendDictToSet( retval, aPrivPrefix, aBase.get() );
+            addAttributesFromBases( retval, aPrivPrefix, anUpperBound, aBase.get() );
         }
     }
 
@@ -1260,20 +1245,16 @@ protected:
         }
     }
 
-    PythonEntityBaseBase(): theSelf( 0 ), thePrivPrefix() {}
-
-protected:
-
-    PyObject* theSelf;
-    String thePrivPrefix;
+    PythonEntityBaseBase() {}
 };
 
 template< typename Tderived_, typename Tbase_ >
-class PythonEntityBase: public Tbase_, public PythonEntityBaseBase
+class PythonEntityBase: public Tbase_, public PythonEntityBaseBase, public py::wrapper< Tbase_ >
 {
 public:
     virtual ~PythonEntityBase()
     {
+        py::decref( py::detail::wrapper_base_::owner( this ) );
     }
 
     PythonDynamicModule< Tderived_ > const& getModule() const
@@ -1283,9 +1264,10 @@ public:
 
     const Polymorph defaultGetProperty( String const& aPropertyName ) const
     {
+        PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
         String lowerCasedPropertyName( aPropertyName );
         lowerCasedPropertyName[ 0 ] = std::tolower( lowerCasedPropertyName[ 0 ] );
-        py::handle<> aValue( py::allow_null( PyObject_GenericGetAttr( theSelf, py::handle<>( PyString_InternFromString( const_cast< char* >( lowerCasedPropertyName.c_str() ) ) ).get() ) ) );
+        py::handle<> aValue( py::allow_null( PyObject_GenericGetAttr( aSelf, py::handle<>( PyString_InternFromString( const_cast< char* >( lowerCasedPropertyName.c_str() ) ) ).get() ) ) );
         if ( !aValue )
         {
             PyErr_Clear();
@@ -1305,7 +1287,8 @@ public:
 
     void defaultSetProperty( String const& aPropertyName, Polymorph const& aValue )
     {
-        PyObject_GenericSetAttr( theSelf, py::handle<>( PyString_InternFromString( const_cast< char* >( aPropertyName.c_str() ) ) ).get(), py::object( aValue ).ptr() );
+        PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
+        PyObject_GenericSetAttr( aSelf, py::handle<>( PyString_InternFromString( const_cast< char* >( aPropertyName.c_str() ) ) ).get(), py::object( aValue ).ptr() );
         if ( PyErr_Occurred() )
         {
             PyErr_Clear();
@@ -1316,15 +1299,24 @@ public:
 
     const StringVector defaultGetPropertyList() const
     {
+        PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
         std::set< String > aPropertySet;
-        appendDictToSet( aPropertySet, theSelf );
+
+        if ( thePrivPrefix.empty() )
+        {
+            PyObject* anOwner( py::detail::wrapper_base_::owner( this ) );
+            BOOST_ASSERT( anOwner != NULL );
+            thePrivPrefix = String( "_" ) + anOwner->ob_type->tp_name;
+        }
+
+        appendDictToSet( aPropertySet, thePrivPrefix, aSelf );
 
         PyObject* anUpperBound(
                 reinterpret_cast< PyObject* >(
                     py::objects::registered_class_object(
                         typeid( Tbase_ ) ).get() ) );
-        addAttributesFromBases( aPropertySet, anUpperBound,
-                reinterpret_cast< PyObject* >( theSelf->ob_type ) );
+        addAttributesFromBases( aPropertySet, thePrivPrefix, anUpperBound,
+                reinterpret_cast< PyObject* >( aSelf->ob_type ) );
         removeAttributesFromBases( aPropertySet, anUpperBound );
 
         StringVector retval;
@@ -1390,15 +1382,16 @@ public:
 
     static void addToRegistry()
     {
-        py::objects::register_conversion< PythonEntityBaseBase, Tderived_ >( true );
-        py::objects::register_conversion< PythonEntityBaseBase, Tbase_ >( true );
         py::objects::register_dynamic_id< Tderived_ >();
+        py::objects::register_dynamic_id< Tbase_ >();
         py::objects::register_conversion< Tderived_, Tbase_ >( false );
+        py::objects::register_conversion< Tbase_, Tderived_ >( true );
     }
 
 protected:
 
     PythonDynamicModule< Tderived_ > const& theModule;
+    mutable String thePrivPrefix;
 };
 
 class PythonProcess: public PythonEntityBase< PythonProcess, Process >
@@ -1413,16 +1406,13 @@ public:
 
     virtual void initialize()
     {
-        if ( !theSelf )
-            return;
-        py::getattr( py::object( py::borrowed( theSelf ) ), "initialize" )();
-        theFireMethod = py::getattr( py::object( py::borrowed( theSelf ) ), "fire" );
+        PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
+        py::getattr( py::object( py::borrowed( aSelf ) ), "initialize" )();
+        theFireMethod = py::getattr( py::object( py::borrowed( aSelf ) ), "fire" );
     }
 
     virtual void fire()
     {
-        if ( !theSelf )
-            return;
         py::object retval( theFireMethod() );
         if ( retval )
         {
@@ -1432,9 +1422,8 @@ public:
 
     virtual const bool isContinuous() const
     {
-        if ( !theSelf )
-            return false;
-        return py::extract<bool>( py::getattr( py::object( py::borrowed( theSelf ) ), "isContinuous" ) );
+        PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
+        return py::extract<bool>( py::getattr( py::object( py::borrowed( aSelf ) ), "isContinuous" ) );
     }
 
     PythonProcess( PythonDynamicModule< PythonProcess > const& aModule )
@@ -1455,10 +1444,9 @@ public:
     virtual void initialize()
     {
         Variable::initialize();
-        if ( !theSelf )
-            return;
-        py::getattr( py::object( py::borrowed( theSelf ) ), "initialize" )();
-        theOnValueChangingMethod = py::handle<>( py::allow_null( PyObject_GenericGetAttr( theSelf, py::handle<>( PyString_InternFromString( const_cast< char* >( "onValueChanging" ) ) ).get() ) ) );
+        PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
+        py::getattr( py::object( py::borrowed( aSelf ) ), "initialize" )();
+        theOnValueChangingMethod = py::handle<>( py::allow_null( PyObject_GenericGetAttr( aSelf, py::handle<>( PyString_InternFromString( const_cast< char* >( "onValueChanging" ) ) ).get() ) ) );
         if ( !theOnValueChangingMethod )
         {
             PyErr_Clear();
@@ -1513,9 +1501,8 @@ public:
     virtual void initialize()
     {
         System::initialize();
-        if ( !theSelf )
-            return;
-        py::getattr( py::object( py::borrowed( theSelf ) ), "initialize" )();
+        PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
+        py::getattr( py::object( py::borrowed( aSelf ) ), "initialize" )();
     }
 
     PythonSystem( PythonDynamicModule< PythonSystem > const& aModule )
@@ -1547,8 +1534,9 @@ struct PythonDynamicModule: public DynamicModule< EcsObject >
         typedef py::objects::pointer_holder< T_*, T_ > holder_t;
 
         template <class Arg>
-        static inline holder_t* construct(void* storage, PyObject*, Arg& x)
+        static inline holder_t* construct(void* storage, PyObject* arg, Arg& x)
         {
+            py::detail::initialize_wrapper( py::incref( arg ), boost::get_pointer(x) );
             return new (storage) holder_t(x);
         }
 
@@ -1618,11 +1606,9 @@ PythonEntityBase< Tderived_, Tbase_ >::_getPropertyInterface() const
 template< typename T_ >
 EcsObject* PythonDynamicModule< T_ >::createInstance() const
 {
-    T_* retval;
-
-    retval = new T_( *this );
-
+    T_* retval( new T_( *this ) );
     py::handle<> aNewObject( make_ptr_instance::execute( retval ) );
+
     if ( !aNewObject )
     {
         delete retval;
@@ -1630,17 +1616,20 @@ EcsObject* PythonDynamicModule< T_ >::createInstance() const
         PyObject* aPyErrObj( PyErr_Occurred() );
         if ( aPyErrObj )
         {
+            anErrorStr += "(";
             anErrorStr += aPyErrObj->ob_type->tp_name;
+            anErrorStr += ": ";
             py::handle<> aPyErrStrRepr( PyObject_Str( aPyErrObj ) );
             BOOST_ASSERT( PyString_Check( aPyErrStrRepr.get() ) );
             anErrorStr.insert( anErrorStr.size(),
                 PyString_AS_STRING( aPyErrStrRepr.get() ),
                 PyString_GET_SIZE( aPyErrStrRepr.get() ) );
+            anErrorStr += ")";
             PyErr_Clear();
         }
         throw std::runtime_error( anErrorStr );
     }
-    retval->setPythonObject( aNewObject.get() );
+
     return retval;
 }
 
@@ -1648,30 +1637,6 @@ template< typename T_ >
 inline PyObject* to_python_indirect_fun( T_* arg )
 {
     return py::to_python_indirect< T_, py::detail::make_reference_holder >()( arg );
-}
-
-template<>
-inline PyObject* to_python_indirect_fun< Process >( Process* arg )
-{
-    PythonProcess* tmp( dynamic_cast< PythonProcess* >( arg ) );
-    return tmp ? py::incref( tmp->getPythonObject() ):
-            py::to_python_indirect< Process*, py::detail::make_reference_holder >()( arg );
-}
-
-template<>
-inline PyObject* to_python_indirect_fun< Variable >( Variable* arg )
-{
-    PythonVariable* tmp( dynamic_cast< PythonVariable* >( arg ) );
-    return tmp ? py::incref( tmp->getPythonObject() ):
-            py::to_python_indirect< Variable*, py::detail::make_reference_holder >()( arg );
-}
-
-template<>
-inline PyObject* to_python_indirect_fun< System >( System* arg )
-{
-    PythonSystem* tmp( dynamic_cast< PythonSystem* >( arg ) );
-    return tmp ? py::incref( tmp->getPythonObject() ):
-            py::to_python_indirect< System*, py::detail::make_reference_holder >()( arg );
 }
 
 class Simulator
@@ -1942,7 +1907,7 @@ public:
     }
 
     
-    PyObject* createEntity( String const& aClassname, 
+    Entity* createEntity( String const& aClassname, 
                           String const& aFullIDString )
     {
         if( theRunningFlag )
@@ -1951,47 +1916,12 @@ public:
                              "cannot create an Entity during simulation" );
         }
 
-        PyObject* retval( 0 );
-        Entity* ent( theModel.createEntity( aClassname, FullID( aFullIDString ) ) );
-
-        switch ( static_cast< enum EntityType::Type >( ent->getEntityType() ) )
-        {
-        case EntityType::VARIABLE:
-            retval = to_python_indirect_fun( static_cast< Variable* >( ent ) );
-            break;
-        case EntityType::PROCESS:
-            retval = to_python_indirect_fun( static_cast< Process* >( ent ) );
-            break;
-        case EntityType::SYSTEM:
-            retval = to_python_indirect_fun( static_cast< System* >( ent ) );
-            break;
-        default:
-            retval = py::incref( Py_None );
-        }
-
-        return retval;
+        return theModel.createEntity( aClassname, FullID( aFullIDString ) );
     }
 
-    PyObject* getEntity( String const& aFullIDString )
+    Entity* getEntity( String const& aFullIDString )
     {
-        PyObject* retval( 0 );
-        Entity* ent( theModel.getEntity( FullID( aFullIDString ) ) );
-        switch ( static_cast< enum EntityType::Type >( ent->getEntityType() ) )
-        {
-        case EntityType::VARIABLE:
-            retval = to_python_indirect_fun( static_cast< Variable* >( ent ) );
-            break;
-        case EntityType::PROCESS:
-            retval = to_python_indirect_fun( static_cast< Process* >( ent ) );
-            break;
-        case EntityType::SYSTEM:
-            retval = to_python_indirect_fun( static_cast< System* >( ent ) );
-            break;
-        default:
-            return py::incref( Py_None );
-        }
-
-        return retval;
+        return theModel.getEntity( FullID( aFullIDString ) );
     }
 
 
@@ -2624,10 +2554,10 @@ static Polymorph Entity___getattr__( Entity* self, std::string key )
 
 static void Entity___setattr__( Entity* self, py::object key, py::object value )
 {
-    PythonEntityBaseBase* tmp( dynamic_cast< PythonEntityBaseBase* >( self ) );
-    if ( tmp )
+    PyObject* aSelf( py::detail::wrapper_base_::owner( self ) );
+    if ( aSelf )
     {
-        PyObject_GenericSetAttr( tmp->getPythonObject(), key.ptr(), value.ptr() );
+        PyObject_GenericSetAttr( aSelf, key.ptr(), value.ptr() );
         if ( PyErr_Occurred() )
         {
             py::throw_error_already_set();
@@ -2683,6 +2613,9 @@ BOOST_PYTHON_MODULE( _ecs )
     py::register_exception_translator< Exception >( &translateException );
     py::register_exception_translator< std::exception >( &translateException );
     py::register_exception_translator< std::range_error >( &translateRangeError );
+    PythonVariable::addToRegistry();
+    PythonProcess::addToRegistry();
+    PythonSystem::addToRegistry();
 
     py::def( "getLibECSVersionInfo", &getLibECSVersionInfo );
     py::def( "getLibECSVersion",     &getVersion );
@@ -2754,7 +2687,7 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "variable",
                 py::make_function(
                     &VariableReference::getVariable,
-                    py::return_value_policy< py::reference_existing_object >() ) )
+                    return_existing_object() ) )
         .def( "__str__", &VariableReference___repr__ )
         .def( "__repr__", &VariableReference___repr__ )
         ;
@@ -2782,10 +2715,10 @@ BOOST_PYTHON_MODULE( _ecs )
         // properties
         .add_property( "simulator",
             py::make_function( &Entity___get_simulator__,
-                py::return_value_policy< py::reference_existing_object >() ) )
+                return_existing_object() ) )
         .add_property( "superSystem",
             py::make_function( &Entity::getSuperSystem,
-            py::return_value_policy< py::reference_existing_object >() ) )
+            return_existing_object() ) )
         .add_property( "id", &Entity::getID )
         .add_property( "fullID", &Entity::getFullID )
         .add_property( "name", &Entity::getName )
@@ -2811,11 +2744,6 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "variableReferences",
               py::make_function( &Process_get_variableReferences ) )
         ;
-
-    py::objects::register_dynamic_id< PythonEntityBaseBase >();
-    PythonVariable::addToRegistry();
-    PythonProcess::addToRegistry();
-    PythonSystem::addToRegistry();
 
     py::class_< Variable, py::bases< Entity >, Variable, boost::noncopyable >
         ( "Variable", py::no_init )
@@ -2881,9 +2809,11 @@ BOOST_PYTHON_MODULE( _ecs )
 
         // Entity-related methods
         .def( "createEntity",
-              &Simulator::createEntity )
+              &Simulator::createEntity,
+              py::return_internal_reference<>() )
         .def( "getEntity",
-              &Simulator::getEntity )
+              &Simulator::getEntity,
+              py::return_internal_reference<>() )
         .def( "deleteEntity",
               &Simulator::deleteEntity )
         .def( "getEntityList",
