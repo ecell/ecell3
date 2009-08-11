@@ -2618,6 +2618,55 @@ static void setWarningHandler( py::handle<> const& handler )
     libecs::setWarningHandler( &thehandler );
 }
 
+struct return_entity
+    : public py::with_custodian_and_ward_postcall<
+            0, 1, py::default_call_policies >
+{
+    struct result_converter
+    {
+        template< typename T_ >
+        struct apply
+        {
+            struct type
+            {
+                PyObject* operator()( Entity* ptr ) const
+                {
+                    if ( ptr == 0 )
+                        return py::detail::none();
+                    else
+                        return ( *this )( *ptr );
+                }
+                
+                PyObject* operator()( Entity const& x ) const
+                {
+                    Entity* const ptr( const_cast< Entity* >( &x ) );
+                    PyObject* aRetval( py::detail::wrapper_base_::owner( ptr ) );
+                    if ( !aRetval )
+                    {
+                        if ( Process* tmp = dynamic_cast< Process* >( ptr ) )
+                        {
+                            aRetval = py::detail::make_reference_holder::execute( tmp );
+                        }
+                        else if ( Variable* tmp = dynamic_cast< Variable* >( ptr ) )
+                        {
+                            aRetval = py::detail::make_reference_holder::execute( tmp );
+                        }
+                        else if ( System* tmp = dynamic_cast< System* >( ptr ) )
+                        {
+                            aRetval = py::detail::make_reference_holder::execute( tmp );
+                        }
+                        else
+                        {
+                            aRetval = py::detail::make_reference_holder::execute( ptr );
+                        }
+                    }
+                    return aRetval;
+                }
+            };
+        };
+    };
+};
+
 BOOST_PYTHON_MODULE( _ecs )
 {
     DataPointVectorWrapper< DataPoint >::__class_init__();
@@ -2838,10 +2887,10 @@ BOOST_PYTHON_MODULE( _ecs )
         // Entity-related methods
         .def( "createEntity",
               &Simulator::createEntity,
-              py::return_internal_reference<>() )
+              return_entity() )
         .def( "getEntity",
               &Simulator::getEntity,
-              py::return_internal_reference<>() )
+              return_entity() )
         .def( "deleteEntity",
               &Simulator::deleteEntity )
         .def( "getEntityList",
