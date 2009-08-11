@@ -1438,15 +1438,15 @@ public:
     virtual const bool isContinuous() const
     {
         PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
-        py::handle<> anIsContinuousDescr( py::allow_null( PyObject_GetAttrString( reinterpret_cast< PyObject* >( aSelf->ob_type ),  "isContinuous" ) ) );
-        if ( !anIsContinuousDescr || !( anIsContinuousDescr.get()->ob_type->tp_flags & Py_TPFLAGS_HAVE_CLASS ) )
+        py::handle<> anIsContinuousDescr( py::allow_null( PyObject_GenericGetAttr( reinterpret_cast< PyObject* >( aSelf->ob_type ), py::handle<>( PyString_InternFromString( "isContinuous" ) ).get() ) ) );
+        if ( !anIsContinuousDescr )
         {
             PyErr_Clear();
             return Process::isContinuous();
         }
 
         descrgetfunc aDescrGetFunc( anIsContinuousDescr.get()->ob_type->tp_descr_get );
-        if ( aDescrGetFunc )
+        if ( ( anIsContinuousDescr.get()->ob_type->tp_flags & Py_TPFLAGS_HAVE_CLASS ) && aDescrGetFunc )
         {
             return py::extract< bool >( py::handle<>( aDescrGetFunc( anIsContinuousDescr.get(), aSelf, reinterpret_cast< PyObject* >( aSelf->ob_type ) ) ).get() );
         }
