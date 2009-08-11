@@ -2370,7 +2370,7 @@ public:
         return theModel.getPropertyInterface( aClassname ).getPropertySlotMap();
     }
 
-    const char getDMSearchPathSeparator() const
+    static const char getDMSearchPathSeparator()
     {
         return Model::PATH_SEPARATOR;
     }
@@ -2985,8 +2985,8 @@ BOOST_PYTHON_MODULE( _ecs )
               &Simulator::getDMInfo )
         .def( "setEventHandler",
               &Simulator::setEventHandler )
-        .add_property( "DM_SEARCH_PATH_SEPARATOR",
-                       &Simulator::getDMSearchPathSeparator )
+        .add_static_property( "DM_SEARCH_PATH_SEPARATOR",
+              &Simulator::getDMSearchPathSeparator )
         .def( "setDMSearchPath", &Simulator::setDMSearchPath )
         .def( "getDMSearchPath", &Simulator::getDMSearchPath )
         .def( "addPythonDM", &Simulator::addPythonDM )
