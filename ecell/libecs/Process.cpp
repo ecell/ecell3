@@ -263,8 +263,22 @@ void Process::registerVariableReference( StringCref aName,
                                          IntegerParam aCoefficient,
                                          const bool isAccessor )
 {
+    if ( !getSuperSystem() )
+    {
+        THROW_EXCEPTION_INSIDE( IllegalOperation,
+                                asString() + ": process is not associated to "
+                                "any system" );
+    }
+
     // relative search; allow relative systempath
     SystemPtr aSystem( getSuperSystem()->getSystem( aFullID.getSystemPath() ) );
+    if ( !aSystem )
+    {
+        THROW_EXCEPTION_INSIDE( IllegalOperation,
+                                asString() + ": system path ["
+                                + aFullID.getSystemPath().asString()
+                                + "] could not be resolved" );
+    }
 
     VariablePtr aVariable( aSystem->getVariable( aFullID.getID() ) );
 
