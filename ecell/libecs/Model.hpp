@@ -350,8 +350,6 @@ private:
 
     System*                         theRootSystem;
 
-    std::vector< Entity* >          theDeletionQueue;
-
     SystemStepper                   theSystemStepper;
 
     StepperMap                      theStepperMap;
