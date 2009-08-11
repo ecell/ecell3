@@ -1438,8 +1438,8 @@ public:
     virtual const bool isContinuous() const
     {
         PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
-        py::handle<> anIsContinuousDescr( py::allow_null( PyObject_GenericGetAttr( reinterpret_cast< PyObject* >( aSelf->ob_type ), py::handle<>( PyString_InternFromString( const_cast< char* >( "isContinuous" ) ) ).get() ) ) );
-        if ( !anIsContinuousDescr )
+        py::handle<> anIsContinuousDescr( py::allow_null( PyObject_GetAttrString( reinterpret_cast< PyObject* >( aSelf->ob_type ),  "isContinuous" ) ) );
+        if ( !anIsContinuousDescr || !( anIsContinuousDescr.get()->ob_type->tp_flags & Py_TPFLAGS_HAVE_CLASS ) )
         {
             PyErr_Clear();
             return Process::isContinuous();
@@ -2598,7 +2598,7 @@ static Polymorph Entity___getattr__( Entity* self, std::string key )
 static void Entity___setattr__( py::object aSelf, py::object key, py::object value )
 {
     py::handle<> aDescr( py::allow_null( PyObject_GetAttr( reinterpret_cast< PyObject* >( aSelf.ptr()->ob_type ), key.ptr() ) ) );
-    if ( !aDescr || !aDescr.get()->ob_type->tp_descr_set )
+    if ( !aDescr || !( aDescr->ob_type->tp_flags & Py_TPFLAGS_HAVE_CLASS ) || !aDescr.get()->ob_type->tp_descr_set )
     {
         PyErr_Clear();
         Entity* self = py::extract< Entity* >( aSelf );
