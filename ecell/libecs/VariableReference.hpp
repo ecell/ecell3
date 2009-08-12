@@ -39,8 +39,11 @@
 namespace libecs
 {
 
+class Process;
+
 class LIBECS_API VariableReference
 {
+    friend class Process;
 
 public:
     class CoefficientLess
@@ -76,10 +79,10 @@ public:
         }
     };
 
-    class NameLess
+    class FullIDLess 
     {
     public:
-        NameLess()
+        FullIDLess()
         {
             ; // do nothing
         }
@@ -87,40 +90,14 @@ public:
         bool operator()( VariableReferenceCref aLhs, 
                          VariableReferenceCref aRhs ) const
         {
-            return compare( aLhs.getName(), aRhs.getName() );
+            return compare( aLhs.getFullID(), aRhs.getFullID() );
         }
-
-        bool operator()( StringCref aLhs, 
-                         VariableReferenceCref aRhs ) const
-        {
-            return compare( aLhs, aRhs.getName() );
-        }
-
-        bool operator()( VariableReferenceCref aLhs, 
-                         StringCref aRhs ) const
-        {
-            return compare( aLhs.getName(), aRhs );
-        }
-
 
     private:
 
-        static const bool compare( StringCref aLhs, StringCref aRhs )
+        static const bool compare( FullID const& aLhs, FullID const& aRhs )
         {
-            const bool anIsLhsEllipsis(
-                VariableReference::isEllipsisNameString( aLhs ) );
-            const bool anIsRhsEllipsis(
-                VariableReference::isEllipsisNameString( aRhs ) );
-
-            // both are ellipses, or both are normal names.
-            if( anIsLhsEllipsis == anIsLhsEllipsis )
-            {
-                return std::less<String>()( aLhs, aRhs );
-            }
-            else // always sort ellipses last
-            {
-                return anIsRhsEllipsis;
-            }
+            return std::less<String>()( aLhs, aRhs );
         }
     };
 
@@ -148,26 +125,26 @@ public:
             } 
             else // lhs.coeff == rhs.coeff
             {
-                return NameLess()( aLhs, aRhs );
+                return FullIDLess()( aLhs, aRhs );
             }
         }
     };
 
 public:
     VariableReference()
-        : theVariable( NULLPTR ),
+        : theFullID( EntityType( EntityType::VARIABLE ), ".", DEFAULT_NAME ),
+          theVariable( NULLPTR ),
           theCoefficient( 0 ),
           theIsAccessor( true )
     {
         ; // do nothing
     }
 
-    VariableReference( StringCref aName, 
-                       Variable* aVariable, 
+    VariableReference( FullID const& anFullID,
                        IntegerParam aCoefficient,
                        const bool anIsAccessor = true )    
-        : theName( aName ),
-          theVariable( aVariable ), 
+        : theFullID( anFullID ),
+          theVariable( NULLPTR ),
           theCoefficient( aCoefficient ),
           theIsAccessor( anIsAccessor )
     {
@@ -181,15 +158,29 @@ public:
         theName = aName;
     }
 
-    // can there be unnamed VariableReferences?
     const String getName() const 
     { 
         return theName; 
     }
 
-    void setVariable( Variable* aVariable )
+    void setSerial( IntegerParam anID )
     {
-        theVariable = aVariable;
+        theSerial = anID;
+    }
+
+    const Integer getSerial() const
+    {
+        return theSerial;
+    }
+
+    void setFullID( FullID const& aFullID )
+    {
+        theFullID = aFullID;
+    }
+
+    FullID const& getFullID() const
+    {
+        return theFullID;
     }
 
     Variable* getVariable() const 
@@ -220,59 +211,6 @@ public:
     const bool isAccessor() const
     {
         return theIsAccessor;
-    }
-
-    void setValue( RealParam aValue ) const
-    {
-        theVariable->setValue( aValue );
-    }
-
-    const Real getValue() const
-    {
-        return theVariable->getValue();
-    }
-
-    /**
-       Add a value to the variable according to the coefficient.
-       
-       Set a new value to the variable.    
-       The new value is: old_value + ( aValue * theCoeffiencnt ).
-
-       @param aValue a Real value to be added.
-    */
-    void addValue( RealParam aValue ) const
-    {
-        theVariable->addValue( aValue * theCoefficient );
-    }
-
-    const Real getMolarConc() const
-    {
-        return theVariable->getMolarConc();
-    }
-
-    const Real getNumberConc() const
-    {
-        return theVariable->getNumberConc();
-    }
-
-    const Real getVelocity() const
-    {
-        return theVariable->getVelocity();
-    }
-
-    const bool isFixed() const
-    {
-        return theVariable->isFixed();
-    }
-
-    void setFixed( const bool aValue ) const
-    {
-        theVariable->setFixed( aValue );
-    }
-
-    SystemPtr getSuperSystem() const
-    {
-        return theVariable->getSuperSystem();
     }
 
     const bool isEllipsisName() const
@@ -314,12 +252,85 @@ public:
         return aName == DEFAULT_NAME;
     }
 
+    LIBECS_DEPRECATED
+    void setValue( RealParam aValue ) const
+    {
+        theVariable->setValue( aValue );
+    }
+
+    LIBECS_DEPRECATED
+    const Real getValue() const
+    {
+        return theVariable->getValue();
+    }
+
+    /**
+       Add a value to the variable according to the coefficient.
+       
+       Set a new value to the variable.    
+       The new value is: old_value + ( aValue * theCoeffiencnt ).
+
+       @param aValue a Real value to be added.
+       @deprecated
+    */
+    LIBECS_DEPRECATED
+    void addValue( RealParam aValue ) const
+    {
+        theVariable->addValue( aValue * theCoefficient );
+    }
+
+    LIBECS_DEPRECATED
+    const Real getMolarConc() const
+    {
+        return theVariable->getMolarConc();
+    }
+
+    LIBECS_DEPRECATED
+    const Real getNumberConc() const
+    {
+        return theVariable->getNumberConc();
+    }
+
+    LIBECS_DEPRECATED
+    const Real getVelocity() const
+    {
+        return theVariable->getVelocity();
+    }
+
+    LIBECS_DEPRECATED
+    const bool isFixed() const
+    {
+        return theVariable->isFixed();
+    }
+
+    LIBECS_DEPRECATED
+    void setFixed( const bool aValue ) const
+    {
+        theVariable->setFixed( aValue );
+    }
+
+    SystemPtr getSuperSystem() const
+    {
+        return theVariable->getSuperSystem();
+    }
+
+
+protected:
+
+    void setVariable( Variable* aVariable )
+    {
+        theVariable = aVariable;
+    }
+
+
 public:
     static const String ELLIPSIS_PREFIX;
     static const String DEFAULT_NAME;
 
 private:
+    int               theSerial;
     String            theName;
+    FullID            theFullID;
     Variable*         theVariable;
     Integer           theCoefficient;
     bool              theIsAccessor;

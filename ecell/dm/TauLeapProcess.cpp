@@ -185,7 +185,7 @@ protected:
     const Real getPropensity_FirstOrder() const
     {
         const Real 
-            aMultiplicity( theVariableReferenceVector[0].getValue() );
+            aMultiplicity( theVariableReferenceVector[0].getVariable()->getValue() );
         
         if( aMultiplicity > 0.0 )
         {
@@ -211,8 +211,8 @@ protected:
 
     const Real getPropensity_SecondOrder_TwoSubstrates() const
     {
-        const Real aMultiplicity( theVariableReferenceVector[0].getValue() *
-                                   theVariableReferenceVector[1].getValue() );
+        const Real aMultiplicity( theVariableReferenceVector[0].getVariable()->getValue() *
+                                   theVariableReferenceVector[1].getVariable()->getValue() );
         
         if( aMultiplicity > 0.0 )
         {
@@ -229,11 +229,11 @@ protected:
     {
         if( theVariableReferenceVector[0].getVariable() == value )
         {
-            return ( k * theVariableReferenceVector[1].getValue() ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
+            return ( k * theVariableReferenceVector[1].getVariable()->getValue() ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
         }
         else if( theVariableReferenceVector[1].getVariable() == value )
         {
-            return ( k * theVariableReferenceVector[0].getValue() ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
+            return ( k * theVariableReferenceVector[0].getVariable()->getValue() ) / ( getSuperSystem()->getSizeVariable()->getValue() * N_A );
         }
         else
         {

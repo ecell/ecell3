@@ -92,6 +92,7 @@ public:
 
     virtual void initialize()
     {
+        Process::initialize();
         _LIBECS_MIXIN_CLASS_::initialize();
             
         for( VariableReferenceVectorConstIterator i(
@@ -107,7 +108,7 @@ public:
 
     virtual void fire()
     { 
-        theVariableReference.setValue(
+        theVariableReference.getVariable()->setValue(
             theVariableReference.getCoefficient() * 
                 theVirtualMachine.execute( *theCompiledCode ) );
     }

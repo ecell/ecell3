@@ -77,15 +77,15 @@ LIBECS_DM_CLASS( MichaelisUniUniFluxProcess, ContinuousProcess )
 
     virtual void fire()
     {
-        const Real S( S0.getMolarConc() );
-        const Real P( P0.getMolarConc() );
+        const Real S( S0.getVariable()->getMolarConc() );
+        const Real P( P0.getVariable()->getMolarConc() );
 
         const Real KmP_S( KmP * S );
         const Real KmS_P( KmS * P );
 
         Real velocity( KcF * KmP_S );
         velocity -= KcR * KmS_P;
-        velocity *= C0.getValue(); 
+        velocity *= C0.getVariable()->getValue(); 
 
         velocity /= KmS_P + KmP_S + KmSP;
 

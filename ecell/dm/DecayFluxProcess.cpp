@@ -92,7 +92,7 @@ public:
     {
         Real velocity( k );
 
-        velocity *= pow( S0.getValue(), - S0.getCoefficient() );
+        velocity *= pow( S0.getVariable()->getValue(), - S0.getCoefficient() );
         setFlux( velocity );
     }
 

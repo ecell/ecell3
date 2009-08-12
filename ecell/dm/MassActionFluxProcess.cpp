@@ -75,7 +75,7 @@ public:
             do
             {
                 ++aCoefficient;
-                velocity *= aVariableReference.getMolarConc();
+                velocity *= aVariableReference.getVariable()->getMolarConc();
             }
             while( aCoefficient != 0 );
         }

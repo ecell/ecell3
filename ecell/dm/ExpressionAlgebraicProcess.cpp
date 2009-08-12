@@ -82,6 +82,7 @@ public:
 
     virtual void initialize()
     {
+        Process::initialize();
         _LIBECS_MIXIN_CLASS_::initialize();
     }
 

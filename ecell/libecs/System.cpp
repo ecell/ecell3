@@ -517,9 +517,9 @@ void System::registerEntity( Entity* anEntity )
     case EntityType::SYSTEM:
         registerEntity( static_cast< System* >( anEntity ) );
         break;
+    default:
+        THROW_EXCEPTION_INSIDE( InvalidEntityType, "invalid EntityType specified [" + anEntity->getEntityType().asString() + "]" );
     }
-
-    THROW_EXCEPTION_INSIDE( InvalidEntityType, "invalid EntityType specified" );
 }
 
 

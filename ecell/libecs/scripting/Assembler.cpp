@@ -57,19 +57,24 @@ Assembler::appendVariableReferenceMethodInstruction(
 {
 
     if ( aMethodName == "MolarConc" ) {
-        APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
+        APPEND_OBJECT_METHOD_REAL( aVariableReference->getVariable(),
+                                   Variable,
                                    getMolarConc );
     } else if ( aMethodName == "NumberConc" ) {
-        APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
+        APPEND_OBJECT_METHOD_REAL( aVariableReference->getVariable(),
+                                   Variable,
                                    getNumberConc );
     } else if ( aMethodName == "Value" ) {
-        APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
+        APPEND_OBJECT_METHOD_REAL( aVariableReference->getVariable(),
+                                   Variable,
                                    getValue );
     } else if ( aMethodName == "Velocity" ) {
-        APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
+        APPEND_OBJECT_METHOD_REAL( aVariableReference->getVariable(),
+                                   Variable,
                                    getVelocity );
     } else if ( aMethodName == "Coefficient" ) {
-        APPEND_OBJECT_METHOD_INTEGER( aVariableReference, VariableReference,
+        APPEND_OBJECT_METHOD_INTEGER( aVariableReference,
+                                      VariableReference,
                                       getCoefficient );
     } else {
         THROW_EXCEPTION( NotFound, 

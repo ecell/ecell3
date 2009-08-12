@@ -245,23 +245,33 @@ public:
        @param aCoefficient an Integer value of the coefficient.
        @param isAccessor true if the specified variable affects the Process's
               behavior.
+       @return a serial number that refers to the registered variable reference.
     */
-    void registerVariableReference( StringCref aName, 
-                                    FullID const& aFullID, 
-                                    IntegerParam aCoefficient, 
-                                    const bool isAccessor = true );
+    const Integer registerVariableReference( StringCref aName, 
+                                             FullID const& aFullID, 
+                                             IntegerParam aCoefficient, 
+                                             const bool isAccessor = true );
+
+    /**
+       Register a new anonymous VariableReference to theVariableReferenceVector.
+
+       VariableReferences are sorted by coefficients, preserving the relative
+       order by the names.
+
+       @param aFullID a Pointer to the Variable.
+       @param aCoefficient an Integer value of the coefficient.
+       @param isAccessor true if the specified variable affects the Process's
+              behavior.
+       @return a serial number that refers to the registered variable reference.
+    */
+    const Integer registerVariableReference( FullID const& aFullID, 
+                                             IntegerParam aCoefficient, 
+                                             const bool isAccessor = true );
 
     void removeVariableReference( StringCref aName );
 
+    void removeVariableReference( Integer anID );
 
-    /**
-       Create a new VariableReference.
-
-       Default values of coefficient and accessor_flag are 0 and true (1).
-       
-       @param aValue a PolymorphVector specifying a VariableReference.
-    */
-    void setVariableReference( VariableReference aVarRef );
 
     /**
        Get VariableReference by a tag name.
@@ -270,7 +280,16 @@ public:
        @return a VariableReference
        @see VariableReference
     */
-    VariableReferenceCref getVariableReference( StringCref aVariableReferenceName );
+    VariableReference const& getVariableReference( StringCref aVariableReferenceName ) const;
+
+    /**
+       Get VariableReference by a serial number.
+
+       @param aVariableReferenceName
+       @return a VariableReference
+       @see VariableReference
+    */
+    VariableReference const& getVariableReference( IntegerParam anID ) const;
 
     /**
        @return a const reference to the VariableReferenceVector
@@ -322,23 +341,7 @@ public:
 
        @param aValue aReal value to be added.
     */
-    void addValue( RealParam aValue )
-    {
-        setActivity( aValue );
-
-        // Increase or decrease variables, skipping zero coefficients.
-        std::for_each( theVariableReferenceVector.begin(),
-                       theZeroVariableReferenceIterator,
-                       boost::bind2nd(
-                            boost::mem_fun_ref(
-                                &VariableReference::addValue ), aValue ) );
-
-        std::for_each( thePositiveVariableReferenceIterator,
-                       theVariableReferenceVector.end(),
-                       boost::bind2nd(
-                            boost::mem_fun_ref(
-                                &VariableReference::addValue ), aValue ) );
-    }
+    void addValue( RealParam aValue );
 
 
     /**
@@ -380,7 +383,19 @@ public:
 protected:
     VariableReferenceVectorIterator findVariableReference( StringCref aName );
 
+    VariableReferenceVectorConstIterator findVariableReference( StringCref aName ) const;
+
+    VariableReferenceVectorIterator findVariableReference( IntegerParam anID );
+
+    VariableReferenceVectorConstIterator findVariableReference( IntegerParam anID ) const; 
+
+    VariableReference& setVariableReference( VariableReference const& aVarRef );
+
+    static void addValue( VariableReference const& aVarRef, RealParam value );
+
     void updateVariableReferenceVector();
+
+    void resolveVariableReferences();
 
 protected:
     VariableReferenceVector theVariableReferenceVector;
@@ -391,6 +406,7 @@ private:
     StepperPtr    theStepper;
     Real          theActivity;
     Integer       thePriority;
+    Integer       theNextSerial;
 };
 
 } // namespace libecs

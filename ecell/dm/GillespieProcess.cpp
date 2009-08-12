@@ -147,7 +147,7 @@ void GillespieProcess::fire()
         do
         {
             ++aCoefficient;
-            velocity *= aVariableReference.getMolarConc();
+            velocity *= aVariableReference.getVariable()->getMolarConc();
         }
         while( aCoefficient != 0 );
     }
@@ -180,7 +180,7 @@ const Real GillespieProcess::getPD_SecondOrder_OneSubstrate( VariablePtr aVariab
 {
     if( theVariableReferenceVector[ 0 ].getVariable() == aVariable )
     {
-        const Real aValue( theVariableReferenceVector[ 0 ].getValue() );
+        const Real aValue( theVariableReferenceVector[ 0 ].getVariable()->getValue() );
 
         if ( aValue > 0.0 ) // there must be at least one molecule
         {
@@ -199,12 +199,12 @@ const Real GillespieProcess::getPD_SecondOrder_OneSubstrate( VariablePtr aVariab
 
 const Real GillespieProcess::getMinValue_SecondOrder_OneSubstrate() const
 {
-    return theVariableReferenceVector[ 0 ].getValue() * 0.5;
+    return theVariableReferenceVector[ 0 ].getVariable()->getValue() * 0.5;
 }
 
 const Real GillespieProcess::getPropensity_SecondOrder_OneSubstrate() const
 {
-    const Real aValue( theVariableReferenceVector[ 0 ].getValue() );
+    const Real aValue( theVariableReferenceVector[ 0 ].getVariable()->getValue() );
 
     if ( aValue > 1.0 ) // there must be two or more molecules
     {
@@ -220,11 +220,11 @@ const Real GillespieProcess::getPD_SecondOrder_TwoSubstrates( VariablePtr aVaria
 {
     if ( theVariableReferenceVector[ 0 ].getVariable() == aVariable )
     {
-        return c * theVariableReferenceVector[ 1 ].getValue();
+        return c * theVariableReferenceVector[ 1 ].getVariable()->getValue();
     }
     else if ( theVariableReferenceVector[ 1 ].getVariable() == aVariable )
     {
-        return c * theVariableReferenceVector[ 0 ].getValue();
+        return c * theVariableReferenceVector[ 0 ].getVariable()->getValue();
     }
     else
     {
@@ -234,7 +234,7 @@ const Real GillespieProcess::getPD_SecondOrder_TwoSubstrates( VariablePtr aVaria
 
 const Real GillespieProcess::getPropensity_FirstOrder() const
 {
-    const Real aValue(    theVariableReferenceVector[ 0 ].getValue() );
+    const Real aValue( theVariableReferenceVector[ 0 ].getVariable()->getValue() );
 
     if ( aValue > 0.0 )
         {
@@ -248,7 +248,7 @@ const Real GillespieProcess::getPropensity_FirstOrder() const
 
 const Real GillespieProcess::getMinValue_FirstOrder() const
 {
-    return theVariableReferenceVector[ 0 ].getValue();
+    return theVariableReferenceVector[ 0 ].getVariable()->getValue();
 }
 
 const Real GillespieProcess::getPD_FirstOrder( VariablePtr aVariable ) const
@@ -265,8 +265,8 @@ const Real GillespieProcess::getPD_FirstOrder( VariablePtr aVariable ) const
 
 const Real GillespieProcess::getPropensity_SecondOrder_TwoSubstrates() const
 {
-    const Real aValue1( theVariableReferenceVector[ 0 ].getValue() );
-    const Real aValue2( theVariableReferenceVector[ 1 ].getValue() );
+    const Real aValue1( theVariableReferenceVector[ 0 ].getVariable()->getValue() );
+    const Real aValue2( theVariableReferenceVector[ 1 ].getVariable()->getValue() );
 
     if ( aValue1 > 0.0 && aValue2 > 0.0 )
     {
@@ -280,8 +280,8 @@ const Real GillespieProcess::getPropensity_SecondOrder_TwoSubstrates() const
 
 const Real GillespieProcess::getMinValue_SecondOrder_TwoSubstrates() const
 {
-    const Real aFirstValue( theVariableReferenceVector[ 0 ].getValue() );
-    const Real aSecondValue( theVariableReferenceVector[ 1 ].getValue() );
+    const Real aFirstValue( theVariableReferenceVector[ 0 ].getVariable()->getValue() );
+    const Real aSecondValue( theVariableReferenceVector[ 1 ].getVariable()->getValue() );
 
     return fmin( aFirstValue, aSecondValue );
 }

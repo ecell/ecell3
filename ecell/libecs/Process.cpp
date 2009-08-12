@@ -44,6 +44,7 @@
 #include "Process.hpp"
 
 #include <boost/format.hpp>
+#include <boost/bind.hpp>
 
 namespace libecs
 {
@@ -178,7 +179,8 @@ Process::Process()
       thePositiveVariableReferenceIterator( theVariableReferenceVector.end() ),
       theActivity( 0.0 ),
       thePriority( 0 ),
-      theStepper( NULLPTR )
+      theStepper( NULLPTR ),
+      theNextSerial( 1 )
 {
     ; // do nothing
 }
@@ -235,7 +237,26 @@ void Process::setStepper( StepperPtr const aStepper )
 }
 
 VariableReferenceCref
-Process::getVariableReference( StringCref aVariableReferenceName )
+Process::getVariableReference( IntegerParam anID ) const
+{
+    VariableReferenceVectorConstIterator anIterator(
+            findVariableReference( anID ) );
+
+    if( anIterator != theVariableReferenceVector.end() )
+    {
+        return *anIterator;
+    }
+    else
+    {
+        THROW_EXCEPTION_INSIDE( NotFound,
+                                asString() + ": VariableReference #"
+                                + stringCast( anID )
+                                + " not found in this Process" );
+    }
+}
+
+VariableReferenceCref
+Process::getVariableReference( StringCref aVariableReferenceName ) const
 {
     VariableReferenceVectorConstIterator anIterator(
             findVariableReference( aVariableReferenceName ) );
@@ -253,70 +274,55 @@ Process::getVariableReference( StringCref aVariableReferenceName )
     }
 }
 
+void Process::removeVariableReference( IntegerParam anID )
+{
+    VariableReferenceVector::iterator i( findVariableReference( anID ) );
+    if ( i == theVariableReferenceVector.end() )
+    {
+        THROW_EXCEPTION_INSIDE( NotFound,
+                                asString() + ": VariableReference #"
+                                + stringCast( anID )
+                                + " not found in this Process" );
+    }
+    theVariableReferenceVector.erase( i );
+}
+
 void Process::removeVariableReference( StringCref aName )
 {
-    theVariableReferenceVector.erase( findVariableReference( aName ) );
+    VariableReferenceVector::iterator i( findVariableReference( aName ) );
+    if ( i == theVariableReferenceVector.end() )
+    {
+        THROW_EXCEPTION_INSIDE( NotFound,
+                                asString() + ": VariableReference ["
+                                + aName
+                                + "] not found in this Process" );
+    }
+    theVariableReferenceVector.erase( i );
 }
 
-void Process::registerVariableReference( StringCref aName,
-                                         FullID const& aFullID,
-                                         IntegerParam aCoefficient,
-                                         const bool isAccessor )
+const Integer Process::registerVariableReference( FullID const& aFullID,
+                                                  IntegerParam aCoefficient,
+                                                  const bool isAccessor )
 {
-    if ( !getSuperSystem() )
-    {
-        THROW_EXCEPTION_INSIDE( IllegalOperation,
-                                asString() + ": process is not associated to "
-                                "any system" );
-    }
-
-    // relative search; allow relative systempath
-    SystemPtr aSystem( getSuperSystem()->getSystem( aFullID.getSystemPath() ) );
-    if ( !aSystem )
-    {
-        THROW_EXCEPTION_INSIDE( IllegalOperation,
-                                asString() + ": system path ["
-                                + aFullID.getSystemPath().asString()
-                                + "] could not be resolved" );
-    }
-
-    VariablePtr aVariable( aSystem->getVariable( aFullID.getID() ) );
-
-    setVariableReference(
-        VariableReference( aName, aVariable, aCoefficient, isAccessor ) );
+    VariableReference aRegisteredVarRef( setVariableReference( VariableReference( aFullID, aCoefficient, isAccessor ) ) );
+    return aRegisteredVarRef.getSerial();
 }
 
 
-void Process::setVariableReference( VariableReference aVarRef )
+const Integer Process::registerVariableReference( StringCref aName,
+                                                  FullID const& aFullID,
+                                                  IntegerParam aCoefficient,
+                                                  const bool isAccessor )
 {
-    if( aVarRef.isDefaultName() )
-    {
-        try
-        {
-            Integer anEllipsisNumber( 0 );
-            if( ! theVariableReferenceVector.empty() )
-            {
-                VariableReferenceVectorConstIterator
-                    aLastEllipsisIterator(
-                        std::max_element( theVariableReferenceVector.begin(), 
-                                          theVariableReferenceVector.end(), 
-                                          VariableReference::NameLess() ) );
-                
-                VariableReferenceCref aLastEllipsis( *aLastEllipsisIterator );
-                
-                anEllipsisNumber = aLastEllipsis.getEllipsisNumber();
-                ++anEllipsisNumber;
-            }
-            aVarRef.setName( VariableReference::ELLIPSIS_PREFIX + 
-                ( boost::format( "%03d" ) % anEllipsisNumber ).str() );
-        }
-        catch( const ValueError& )
-        {
-            ; // do nothing
-        }
-    }
+    VariableReference aRegisteredVarRef( setVariableReference( VariableReference( aFullID, aCoefficient, isAccessor ) ) );
+    aRegisteredVarRef.setName( aName );
+    return aRegisteredVarRef.getSerial();
+}
 
-    if( findVariableReference( aVarRef.getName() ) != theVariableReferenceVector.end() )
+
+VariableReference& Process::setVariableReference( VariableReference const& aVarRef )
+{
+    if( !aVarRef.getName().empty() && findVariableReference( aVarRef.getName() ) != theVariableReferenceVector.end() )
     {
         THROW_EXCEPTION_INSIDE( AlreadyExist,
                                 asString() + ": VariableReference ["
@@ -325,11 +331,50 @@ void Process::setVariableReference( VariableReference aVarRef )
     }
 
     theVariableReferenceVector.push_back( aVarRef );
-
-    //FIXME: can the following be moved to initialize()?
-    updateVariableReferenceVector();
+    VariableReference& aRetval( theVariableReferenceVector.back() );
+    aRetval.setSerial( theNextSerial++ );
+    return aRetval;
 }
 
+void Process::resolveVariableReferences()
+{
+    if ( !getSuperSystem() )
+    {
+        THROW_EXCEPTION_INSIDE( IllegalOperation,
+                                asString() + ": process is not associated to "
+                                "any system" );
+    }
+
+    Integer anEllipsisNumber( 0 );
+
+    for ( VariableReferenceVector::iterator
+            i( theVariableReferenceVector.begin() ),
+            e( theVariableReferenceVector.end() );
+          i != e; ++i )
+    {
+        VariableReference& aVarRef( *i );
+
+        if( aVarRef.isDefaultName() )
+        {
+            aVarRef.setName( VariableReference::ELLIPSIS_PREFIX + 
+                ( boost::format( "%03d" ) % anEllipsisNumber ).str() );
+            anEllipsisNumber++;
+        }
+
+        // relative search; allow relative systempath
+        FullID const& aFullID( aVarRef.getFullID() );
+        SystemPtr aSystem( getSuperSystem()->getSystem( aFullID.getSystemPath() ) );
+        if ( !aSystem )
+        {
+            THROW_EXCEPTION_INSIDE( IllegalOperation,
+                                    asString() + ": system path ["
+                                    + aFullID.getSystemPath().asString()
+                                    + "] could not be resolved" );
+        }
+
+        aVarRef.setVariable( aSystem->getVariable( aFullID.getID() ) );
+    }
+}
 
 void Process::updateVariableReferenceVector()
 {
@@ -368,6 +413,60 @@ Process::findVariableReference( StringCref aVariableReferenceName )
 
     return theVariableReferenceVector.end();
 }
+
+
+VariableReferenceVectorConstIterator 
+Process::findVariableReference( StringCref aVariableReferenceName ) const
+{
+    // well this is a linear search.. but this won't be used during simulation.
+    for( VariableReferenceVector::const_iterator i(
+            theVariableReferenceVector.begin() );
+         i != theVariableReferenceVector.end(); ++i )
+    {
+        if( (*i).getName() == aVariableReferenceName )
+        {
+            return i;
+        }
+    }
+
+    return theVariableReferenceVector.end();
+}
+
+VariableReferenceVectorIterator 
+Process::findVariableReference( IntegerParam anID )
+{
+    // well this is a linear search.. but this won't be used during simulation.
+    for( VariableReferenceVectorIterator i(
+            theVariableReferenceVector.begin() );
+         i != theVariableReferenceVector.end(); ++i )
+    {
+        if( (*i).getSerial() == anID )
+        {
+            return i;
+        }
+    }
+
+    return theVariableReferenceVector.end();
+}
+
+
+VariableReferenceVectorConstIterator 
+Process::findVariableReference( IntegerParam anID ) const
+{
+    // well this is a linear search.. but this won't be used during simulation.
+    for( VariableReferenceVector::const_iterator i(
+            theVariableReferenceVector.begin() );
+         i != theVariableReferenceVector.end(); ++i )
+    {
+        if( (*i).getSerial() == anID )
+        {
+            return i;
+        }
+    }
+
+    return theVariableReferenceVector.end();
+}
+
 
 
 void Process::declareUnidirectional()
@@ -412,7 +511,27 @@ const bool Process::isDependentOn( const ProcessCptr aProcessPtr ) const
 
 void Process::initialize()
 {
-    ; // do nothing
+    resolveVariableReferences();
+    updateVariableReferenceVector(); 
+}
+
+void Process::addValue( VariableReference const& aVarRef, RealParam value )
+{
+    aVarRef.getVariable()->addValue( aVarRef.getCoefficient() * value );
+}
+
+void Process::addValue( RealParam aValue )
+{
+    setActivity( aValue );
+
+    // Increase or decrease variables, skipping zero coefficients.
+    std::for_each( theVariableReferenceVector.begin(),
+                   theZeroVariableReferenceIterator,
+                   boost::bind( &addValue, _1, aValue ) );
+
+    std::for_each( thePositiveVariableReferenceIterator,
+                   theVariableReferenceVector.end(),
+                   boost::bind( &addValue, _1, aValue ) );
 }
 
 } // namespace libecs

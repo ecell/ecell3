@@ -2438,6 +2438,11 @@ public:
         thePropertiedObjectMaker.addClass( aModule );
     }
 
+    System* getRootSystem() const
+    {
+        return theModel.getRootSystem();
+    }
+
 protected:
 
     ModelRef getModel() 
@@ -2768,11 +2773,8 @@ BOOST_PYTHON_MODULE( _ecs )
 
     py::class_< VariableReference >( "VariableReference", py::no_init )
         // properties
-        .add_property( "superSystem",
-            py::make_function(
-                &VariableReference::getSuperSystem,
-                py::return_internal_reference<> () ) )
         .add_property( "coefficient", &VariableReference::getCoefficient )
+        .add_property( "serial",      &VariableReference::getSerial )
         .add_property( "name",        &VariableReference::getName )
         .add_property( "isAccessor",  &VariableReference::isAccessor )
         .add_property( "variable",
@@ -2823,6 +2825,7 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "size",        &System::getSize )
         .add_property( "sizeN_A",     &System::getSizeN_A )
         .add_property( "stepperID",   &System::getStepperID )
+        .def( "registerEntity",       ( void( System::* )( Entity* ) )&System::registerEntity )
         ;
 
     py::class_< Process, py::bases< Entity >, Process, boost::noncopyable >
@@ -2869,6 +2872,12 @@ BOOST_PYTHON_MODULE( _ecs )
 
     // Simulator class
     py::class_< Simulator, py::bases<>, boost::shared_ptr< Simulator >, boost::noncopyable >( "Simulator" )
+        .add_static_property( "DM_SEARCH_PATH_SEPARATOR",
+              &Simulator::getDMSearchPathSeparator )
+        .add_property( "rootSystem",
+              py::make_function( &Simulator::getRootSystem,
+                    py::return_internal_reference<>() ) )
+
         .def( py::init<>() )
         .def( "getClassInfo",
               &Simulator::getClassInfo )
@@ -3008,8 +3017,6 @@ BOOST_PYTHON_MODULE( _ecs )
               &Simulator::getDMInfo )
         .def( "setEventHandler",
               &Simulator::setEventHandler )
-        .add_static_property( "DM_SEARCH_PATH_SEPARATOR",
-              &Simulator::getDMSearchPathSeparator )
         .def( "setDMSearchPath", &Simulator::setDMSearchPath )
         .def( "getDMSearchPath", &Simulator::getDMSearchPath )
         .def( "addPythonDM", &Simulator::addPythonDM )
