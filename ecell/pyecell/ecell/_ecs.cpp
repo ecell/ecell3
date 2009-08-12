@@ -2628,6 +2628,10 @@ static void Entity___setattr__( py::object aSelf, py::object key, py::object val
     else
     {
         aDescr.get()->ob_type->tp_descr_set( aDescr.get(), aSelf.ptr(), value.ptr() );
+        if (PyErr_Occurred())
+        {
+            py::throw_error_already_set();
+        }
     }
 }
 
@@ -2846,7 +2850,7 @@ BOOST_PYTHON_MODULE( _ecs )
         // properties
         .add_property( "Size",        &System::getSize )
         .add_property( "SizeN_A",     &System::getSizeN_A )
-        .add_property( "StepperID",   &System::getStepperID )
+        .add_property( "StepperID",   &System::getStepperID, &System::setStepperID )
         .def( "registerEntity",       ( void( System::* )( Entity* ) )&System::registerEntity )
         ;
 
@@ -2855,8 +2859,10 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "Activity",  &Process::getActivity,
                                     &Process::setActivity )
         .add_property( "IsContinuous", &Process::isContinuous )
-        .add_property( "Priority",  &Process::getPriority )
-        .add_property( "StepperID", &Process::getStepperID )
+        .add_property( "Priority",  &Process::getPriority,
+                                    &Process::setPriority )
+        .add_property( "StepperID", &Process::getStepperID,
+                                    &Process::setStepperID )
         .add_property( "variableReferences",
               py::make_function( &Process_get_variableReferences ) )
         ;
