@@ -1300,9 +1300,7 @@ public:
     const Polymorph defaultGetProperty( String const& aPropertyName ) const
     {
         PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
-        String lowerCasedPropertyName( aPropertyName );
-        lowerCasedPropertyName[ 0 ] = std::tolower( lowerCasedPropertyName[ 0 ] );
-        py::handle<> aValue( py::allow_null( PyObject_GenericGetAttr( aSelf, py::handle<>( PyString_InternFromString( const_cast< char* >( lowerCasedPropertyName.c_str() ) ) ).get() ) ) );
+        py::handle<> aValue( py::allow_null( PyObject_GenericGetAttr( aSelf, py::handle<>( PyString_InternFromString( const_cast< char* >( aPropertyName.c_str() ) ) ).get() ) ) );
         if ( !aValue )
         {
             PyErr_Clear();
@@ -1358,7 +1356,6 @@ public:
         for ( std::set< String >::iterator i( aPropertySet.begin() ), e( aPropertySet.end() ); i != e; ++i )
         {
             retval.push_back( *i );
-            retval.back()[ 0 ] = std::toupper( retval.back()[ 0 ] );
         }
 
         return retval;
@@ -1373,7 +1370,6 @@ public:
 
     virtual void setProperty( String const& aPropertyName, Polymorph const& aValue )
     {
-        return _getPropertyInterface().setProperty( *this, aPropertyName, aValue );
     }
 
     const Polymorph getProperty( String const& aPropertyName ) const
@@ -2615,8 +2611,6 @@ static Polymorph Entity___getattr__( Entity* self, std::string key )
         py::throw_error_already_set();
     }
 
-    if ( key.size() > 0 )
-        key[ 0 ] = std::toupper( key[ 0 ] );
     return self->getProperty( key );
 }
 
@@ -2628,8 +2622,6 @@ static void Entity___setattr__( py::object aSelf, py::object key, py::object val
         PyErr_Clear();
         Entity* self = py::extract< Entity* >( aSelf );
         std::string keyStr = py::extract< std::string >( key );
-        if ( keyStr.size() > 0 )
-            keyStr[ 0 ] = std::toupper( keyStr[ 0 ] );
         self->setProperty( keyStr, py::extract< Polymorph >( value ) );
     }
     else
@@ -2817,19 +2809,19 @@ BOOST_PYTHON_MODULE( _ecs )
     py::class_< Stepper, py::bases<>, Stepper, boost::noncopyable >
         ( "Stepper", py::no_init )
         .add_property( "id", &Stepper::getID, &Stepper::setID )
-        .add_property( "priority",
+        .add_property( "Priority",
                        &Stepper::getPriority,
                        &Stepper::setPriority )
-        .add_property( "stepInterval",
+        .add_property( "StepInterval",
                        &Stepper::getStepInterval, 
                        &Stepper::setStepInterval )
-        .add_property( "maxStepInterval",
+        .add_property( "MaxStepInterval",
                        &Stepper::getMaxStepInterval,
                        &Stepper::setMaxStepInterval )
-        .add_property( "minStepInterval",
+        .add_property( "MinStepInterval",
                        &Stepper::getMinStepInterval,
                        &Stepper::setMinStepInterval )
-        .add_property( "rngSeed", &writeOnly<Stepper>, &Stepper::setRngSeed )
+        .add_property( "RngSeed", &writeOnly<Stepper>, &Stepper::setRngSeed )
         ;
 
     py::class_< Entity, py::bases<>, Entity, boost::noncopyable >
@@ -2841,9 +2833,9 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "superSystem",
             py::make_function( &Entity::getSuperSystem,
             return_existing_object() ) )
-        .add_property( "id", &Entity::getID, &Entity::setID )
-        .add_property( "fullID", &Entity::getFullID )
-        .add_property( "name", &Entity::getName )
+        .add_property( "ID", &Entity::getID, &Entity::setID )
+        .add_property( "FullID", &Entity::getFullID )
+        .add_property( "Name", &Entity::getName )
         .def( "__setattr__", &Entity___setattr__ )
         .def( "__getattr__", &Entity___getattr__ )
         ;
@@ -2851,30 +2843,30 @@ BOOST_PYTHON_MODULE( _ecs )
     py::class_< System, py::bases< Entity >, System, boost::noncopyable>
         ( "System", py::no_init )
         // properties
-        .add_property( "size",        &System::getSize )
-        .add_property( "sizeN_A",     &System::getSizeN_A )
-        .add_property( "stepperID",   &System::getStepperID )
+        .add_property( "Size",        &System::getSize )
+        .add_property( "SizeN_A",     &System::getSizeN_A )
+        .add_property( "StepperID",   &System::getStepperID )
         .def( "registerEntity",       ( void( System::* )( Entity* ) )&System::registerEntity )
         ;
 
     py::class_< Process, py::bases< Entity >, Process, boost::noncopyable >
         ( "Process", py::no_init )
-        .add_property( "activity",  &Process::getActivity,
+        .add_property( "Activity",  &Process::getActivity,
                                     &Process::setActivity )
-        .add_property( "isContinuous", &Process::isContinuous )
-        .add_property( "priority",  &Process::getPriority )
-        .add_property( "stepperID", &Process::getStepperID )
+        .add_property( "IsContinuous", &Process::isContinuous )
+        .add_property( "Priority",  &Process::getPriority )
+        .add_property( "StepperID", &Process::getStepperID )
         .add_property( "variableReferences",
               py::make_function( &Process_get_variableReferences ) )
         ;
 
     py::class_< Variable, py::bases< Entity >, Variable, boost::noncopyable >
         ( "Variable", py::no_init )
-        .add_property( "value",  &Variable::getValue,
+        .add_property( "Value",  &Variable::getValue,
                                  &Variable::setValue )
-        .add_property( "molarConc",  &Variable::getMolarConc,
+        .add_property( "MolarConc",  &Variable::getMolarConc,
                                      &Variable::setMolarConc  )
-        .add_property( "numberConc", &Variable::getNumberConc,
+        .add_property( "NumberConc", &Variable::getNumberConc,
                                      &Variable::setNumberConc )
         ;
 
