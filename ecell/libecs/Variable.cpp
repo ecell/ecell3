@@ -103,6 +103,6 @@ void Variable::clearInterpolantVector()
 void Variable::registerInterpolant( InterpolantPtr const anInterpolantPtr )
 {
     theInterpolantVector.push_back( anInterpolantPtr );
-    }
+}
 
 } // namespace libecs
