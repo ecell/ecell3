@@ -956,10 +956,22 @@ PyTypeObject STLIteratorWrapper< Titer_ >::__class__ = {
 
 static std::string VariableReference___repr__( VariableReference const* self )
 {
-    return std::string( "[" ) + self->getName() + ": "
-            + "coefficient=" + stringCast( self->getCoefficient() ) + ", "
-            + "variable=" + self->getFullID().asString() + ", "
-            + "accessor=" + ( self->isAccessor() ? "true": "false" ) + "]";
+    std::string retval;
+    retval += "[";
+    retval += self->getName().empty() ? "<anonymous>": self->getName();
+    retval += " (#";
+    retval += stringCast( self->getSerial() );
+    retval += "): ";
+    retval += "coefficient=";
+    retval += stringCast( self->getCoefficient() );
+    retval += ", ";
+    retval += "variable=";
+    retval += self->getFullID().asString();
+    retval += ", ";
+    retval += "accessor=";
+    retval += ( self->isAccessor() ? "true": "false" );
+    retval += "]";
+    return retval;
 }
 
 
@@ -968,39 +980,47 @@ class VariableReferences
 public:
     VariableReferences( Process* proc ): theProc( proc ) {}
 
-    void add( String const& name, String const& fullID, Integer const& coef,
+    Integer add( String const& name, String const& fullID, Integer const& coef,
               bool isAccessor )
     {
-        theProc->registerVariableReference( name, FullID( fullID ),
-                                            coef, isAccessor );
+        return theProc->registerVariableReference( name, FullID( fullID ),
+                                                   coef, isAccessor );
     }
 
-    void add( String const& name, String const& fullID, Integer const& coef )
+    Integer add( String const& name, String const& fullID, Integer const& coef )
     {
-        theProc->registerVariableReference( name, FullID( fullID ),
-                                            coef, false );
+        return theProc->registerVariableReference( name, FullID( fullID ),
+                                                   coef, false );
     }
 
+    Integer add( String const& fullID, Integer const& coef, bool isAccessor )
+    {
+        return theProc->registerVariableReference( FullID( fullID ),
+                                                   coef, isAccessor );
+    }
+
+    Integer add( String const& fullID, Integer const& coef )
+    {
+        return theProc->registerVariableReference( FullID( fullID ),
+                                                   coef, false );
+    }
 
     void remove( String const& name )
     {
         theProc->removeVariableReference( name );
     }
 
+    void remove( Integer const id )
+    {
+        theProc->removeVariableReference( id );
+    }
+
     VariableReference const& __getitem__( py::object name )
     {
         if ( PyInt_Check( name.ptr() ) )
         {
-            long idx( PyInt_AS_LONG( name.ptr() ) );
-            VariableReferenceVector const& refs(
-                    theProc->getVariableReferenceVector() );
-            if ( idx < 0
-                 || static_cast< VariableReferenceVector::size_type >( idx )
-                    >= refs.size() )
-            {
-                throw std::range_error( "Index out of bounds");
-            }
-            return refs[ idx ];
+            Integer id( PyInt_AS_LONG( name.ptr() ) );
+            return theProc->getVariableReference( id );
         }
         else if ( PyString_Check( name.ptr() ) )
         {
@@ -2757,12 +2777,21 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "negativeReferences",
                        &VariableReferences::getNegativeReferences )
         .def( "add",
-              ( void ( VariableReferences::* )( String const&, String const&, Integer const&, bool ) )
+              ( Integer ( VariableReferences::* )( String const&, String const&, Integer const&, bool ) )
               &VariableReferences::add )
         .def( "add",
-              ( void ( VariableReferences::* )( String const&, String const&, Integer const& ) )
+              ( Integer ( VariableReferences::* )( String const&, String const&, Integer const& ) )
               &VariableReferences::add )
-        .def( "remove", &VariableReferences::remove )
+        .def( "add",
+              ( Integer ( VariableReferences::* )( String const&, Integer const&, bool ) )
+              &VariableReferences::add )
+        .def( "add",
+              ( Integer ( VariableReferences::* )( String const&, Integer const& ) )
+              &VariableReferences::add )
+        .def( "remove", ( void ( VariableReferences::* )( String const& ) )
+              &VariableReferences::remove )
+        .def( "remove", ( void ( VariableReferences::* )( Integer const ) )
+              &VariableReferences::remove )
         .def( "__getitem__", &VariableReferences::__getitem__,
               return_copy_const_reference() )
         .def( "__len__", &VariableReferences::__len__ )
