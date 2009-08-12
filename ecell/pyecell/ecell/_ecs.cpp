@@ -1455,7 +1455,7 @@ public:
     virtual const bool isContinuous() const
     {
         PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
-        py::handle<> anIsContinuousDescr( py::allow_null( PyObject_GenericGetAttr( reinterpret_cast< PyObject* >( aSelf->ob_type ), py::handle<>( PyString_InternFromString( "isContinuous" ) ).get() ) ) );
+        py::handle<> anIsContinuousDescr( py::allow_null( PyObject_GenericGetAttr( reinterpret_cast< PyObject* >( aSelf->ob_type ), py::handle<>( PyString_InternFromString( "IsContinuous" ) ).get() ) ) );
         if ( !anIsContinuousDescr )
         {
             PyErr_Clear();
