@@ -958,7 +958,7 @@ static std::string VariableReference___repr__( VariableReference const* self )
 {
     return std::string( "[" ) + self->getName() + ": "
             + "coefficient=" + stringCast( self->getCoefficient() ) + ", "
-            + "variable=" + self->getVariable()->getFullID().asString() + ", "
+            + "variable=" + self->getFullID().asString() + ", "
             + "accessor=" + ( self->isAccessor() ? "true": "false" ) + "]";
 }
 
