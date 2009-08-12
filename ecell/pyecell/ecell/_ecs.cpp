@@ -1437,6 +1437,7 @@ public:
 
     virtual void initialize()
     {
+        Process::initialize();
         PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
         generic_getattr( py::object( py::borrowed( aSelf ) ), "initialize" )();
         theFireMethod = generic_getattr( py::object( py::borrowed( aSelf ) ), "fire" );
