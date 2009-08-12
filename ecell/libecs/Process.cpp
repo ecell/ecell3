@@ -314,7 +314,7 @@ const Integer Process::registerVariableReference( StringCref aName,
                                                   IntegerParam aCoefficient,
                                                   const bool isAccessor )
 {
-    VariableReference aRegisteredVarRef( setVariableReference( VariableReference( aFullID, aCoefficient, isAccessor ) ) );
+    VariableReference& aRegisteredVarRef( setVariableReference( VariableReference( aFullID, aCoefficient, isAccessor ) ) );
     aRegisteredVarRef.setName( aName );
     return aRegisteredVarRef.getSerial();
 }
