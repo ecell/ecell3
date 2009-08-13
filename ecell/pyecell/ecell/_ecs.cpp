@@ -457,7 +457,9 @@ struct FullIDToPythonConverter
 
     static PyObject* convert( FullID const& aFullID )
     {
-        return py::incref( py::object( aFullID.asString() ).ptr() );
+        return py::incref(
+            ( aFullID.isValid() ? py::object( aFullID.asString() ):
+                                py::object() ).ptr() );
     }
 };
 
@@ -2836,6 +2838,10 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "serial",      &VariableReference::getSerial )
         .add_property( "name",        &VariableReference::getName )
         .add_property( "isAccessor",  &VariableReference::isAccessor )
+        .add_property( "FullID",
+                py::make_function(
+                    &VariableReference::getFullID,
+                    return_copy_const_reference() ) )
         .add_property( "variable",
                 py::make_function(
                     &VariableReference::getVariable,
