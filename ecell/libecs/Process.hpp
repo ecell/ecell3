@@ -241,7 +241,7 @@ public:
        order by the names.
 
        @param aName name of the VariableReference. 
-       @param aFullID a Pointer to the Variable.
+       @param aFullID the FullID of the target variable
        @param aCoefficient an Integer value of the coefficient.
        @param isAccessor true if the specified variable affects the Process's
               behavior.
@@ -258,7 +258,7 @@ public:
        VariableReferences are sorted by coefficients, preserving the relative
        order by the names.
 
-       @param aFullID a Pointer to the Variable.
+       @param aFullID the FullID of the target variable.
        @param aCoefficient an Integer value of the coefficient.
        @param isAccessor true if the specified variable affects the Process's
               behavior.
@@ -268,13 +268,50 @@ public:
                                              IntegerParam aCoefficient, 
                                              const bool isAccessor = true );
 
+    /**
+       Register a new VariableReference to theVariableReferenceVector.
+
+       VariableReferences are sorted by coefficients, preserving the relative
+       order by the names.
+
+       @param aName name of the VariableReference. 
+       @param aVariable target Variable
+       @param aCoefficient an Integer value of the coefficient.
+       @param isAccessor true if the specified variable affects the Process's
+              behavior.
+       @return a serial number that refers to the registered variable reference.
+    */
+    const Integer registerVariableReference( StringCref aName, 
+                                             Variable* aVariable, 
+                                             IntegerParam aCoefficient, 
+                                             const bool isAccessor = true );
+
+    /**
+       Register a new anonymous VariableReference to theVariableReferenceVector.
+
+       VariableReferences are sorted by coefficients, preserving the relative
+       order by the names.
+
+       @param aVariable target Variable
+       @param aCoefficient an Integer value of the coefficient.
+       @param isAccessor true if the specified variable affects the Process's
+              behavior.
+       @return a serial number that refers to the registered variable reference.
+    */
+    const Integer registerVariableReference( Variable* aVariable, 
+                                             IntegerParam aCoefficient, 
+                                             const bool isAccessor = true );
+
+
     void removeVariableReference( StringCref aName );
 
     void removeVariableReference( Integer anID );
 
+    void removeVariableReference( Variable const* aVariable );
+
 
     /**
-       Get VariableReference by a tag name.
+       Get VariableReference by the tag name.
 
        @param aVariableReferenceName
        @return a VariableReference
@@ -283,13 +320,22 @@ public:
     VariableReference const& getVariableReference( StringCref aVariableReferenceName ) const;
 
     /**
-       Get VariableReference by a serial number.
+       Get VariableReference by the serial number.
 
        @param aVariableReferenceName
        @return a VariableReference
        @see VariableReference
     */
     VariableReference const& getVariableReference( IntegerParam anID ) const;
+
+    /**
+       Get VariableReference by the variable
+
+       @param aVariableReferenceName
+       @return a VariableReference
+       @see VariableReference
+    */
+    VariableReference const& getVariableReference( Variable const* anID ) const;
 
     /**
        @return a const reference to the VariableReferenceVector

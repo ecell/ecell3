@@ -289,15 +289,58 @@ void Process::removeVariableReference( IntegerParam anID )
 
 void Process::removeVariableReference( StringCref aName )
 {
-    VariableReferenceVector::iterator i( findVariableReference( aName ) );
-    if ( i == theVariableReferenceVector.end() )
+    bool aIsRemoved( false );
+
+    for ( VariableReferenceVector::size_type
+            i( 0 ), e ( theVariableReferenceVector.size() );
+            i < e; )
+    {
+        if ( theVariableReferenceVector[ i ].getName() == aName )
+        {
+            theVariableReferenceVector.erase( theVariableReferenceVector.begin() + i );
+            aIsRemoved = true;
+        }
+        else
+        {
+            ++i;
+        }
+    }
+
+    if ( !aIsRemoved )
     {
         THROW_EXCEPTION_INSIDE( NotFound,
                                 asString() + ": VariableReference ["
                                 + aName
                                 + "] not found in this Process" );
     }
-    theVariableReferenceVector.erase( i );
+}
+
+void Process::removeVariableReference( Variable const* aVariable )
+{
+    bool aIsRemoved( false );
+
+    for ( VariableReferenceVector::size_type
+            i( 0 ), e ( theVariableReferenceVector.size() );
+            i < e; )
+    {
+        if ( theVariableReferenceVector[ i ].getVariable() == aVariable )
+        {
+            theVariableReferenceVector.erase( theVariableReferenceVector.begin() + i );
+            aIsRemoved = true;
+        }
+        else
+        {
+            ++i;
+        }
+    }
+
+    if ( !aIsRemoved )
+    {
+        THROW_EXCEPTION_INSIDE( NotFound,
+                                asString() + ": VariableReference ["
+                                + aVariable->asString()
+                                + "] not found in this Process" );
+    }
 }
 
 const Integer Process::registerVariableReference( FullID const& aFullID,
@@ -319,6 +362,23 @@ const Integer Process::registerVariableReference( StringCref aName,
     return aRegisteredVarRef.getSerial();
 }
 
+const Integer Process::registerVariableReference( StringCref aName,
+                                                  Variable* aVariable,
+                                                  IntegerParam aCoefficient,
+                                                  const bool isAccessor )
+{
+    VariableReference& aRegisteredVarRef( setVariableReference( VariableReference( aVariable, aCoefficient, isAccessor ) ) );
+    aRegisteredVarRef.setName( aName );
+    return aRegisteredVarRef.getSerial();
+}
+
+const Integer Process::registerVariableReference( Variable* aVariable,
+                                                  IntegerParam aCoefficient,
+                                                  const bool isAccessor )
+{
+    VariableReference& aRegisteredVarRef( setVariableReference( VariableReference( aVariable, aCoefficient, isAccessor ) ) );
+    return aRegisteredVarRef.getSerial();
+}
 
 VariableReference& Process::setVariableReference( VariableReference const& aVarRef )
 {
@@ -372,7 +432,14 @@ void Process::resolveVariableReferences()
                                     + "] could not be resolved" );
         }
 
-        aVarRef.setVariable( aSystem->getVariable( aFullID.getID() ) );
+        if ( !aVarRef.getVariable() )
+        {
+            aVarRef.setVariable( aSystem->getVariable( aFullID.getID() ) );
+        }
+        else
+        {
+            aVarRef.setFullID( aVarRef.getVariable()->getFullID() );
+        }
     }
 }
 

@@ -175,10 +175,15 @@ void FullID::parse( StringCref fullidstring )
     aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
 
     theID = aString.substr( aFieldStart, aFieldEnd - aFieldStart );
-}        
+}
 
 String FullID::asString() const
 {
+    if ( theID.empty() )
+    {
+        return String( "(invalid)" );
+    }
+
     return theEntityType.asString() + FullID::DELIMITER 
         + theSystemPath.asString() + FullID::DELIMITER + theID;
 }

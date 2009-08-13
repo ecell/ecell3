@@ -110,6 +110,11 @@ public:
 class FullID
 {
 public:
+    FullID()
+        : theEntityType( EntityType::NONE ),
+          theSystemPath(),
+          theID() {}
+
     FullID( const EntityType type,
             SystemPathCref systempath,
             StringCref id )
@@ -244,9 +249,6 @@ public:
 
 protected:
     LIBECS_API void parse( StringCref fullidstring );
-
-private:
-    FullID();
 
 public:
     static const char DELIMITER = ':';

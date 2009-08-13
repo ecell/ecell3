@@ -1005,6 +1005,28 @@ public:
                                                    coef, false );
     }
 
+    Integer add( String const& name, Variable* var, Integer const& coef,
+              bool isAccessor )
+    {
+        return theProc->registerVariableReference( name, var,
+                                                   coef, isAccessor );
+    }
+
+    Integer add( String const& name, Variable* var, Integer const& coef )
+    {
+        return theProc->registerVariableReference( name, var, coef, false );
+    }
+
+    Integer add( Variable* var, Integer const& coef, bool isAccessor )
+    {
+        return theProc->registerVariableReference( var, coef, isAccessor );
+    }
+
+    Integer add( Variable* var, Integer const& coef )
+    {
+        return theProc->registerVariableReference( var, coef, false );
+    }
+
     void remove( String const& name )
     {
         theProc->removeVariableReference( name );
@@ -2784,6 +2806,18 @@ BOOST_PYTHON_MODULE( _ecs )
               &VariableReferences::add )
         .def( "add",
               ( Integer ( VariableReferences::* )( String const&, Integer const& ) )
+              &VariableReferences::add )
+        .def( "add",
+              ( Integer ( VariableReferences::* )( String const&, Variable*, Integer const&, bool ) )
+              &VariableReferences::add )
+        .def( "add",
+              ( Integer ( VariableReferences::* )( String const&, Variable*, Integer const& ) )
+              &VariableReferences::add )
+        .def( "add",
+              ( Integer ( VariableReferences::* )( Variable*, Integer const&, bool ) )
+              &VariableReferences::add )
+        .def( "add",
+              ( Integer ( VariableReferences::* )( Variable*, Integer const& ) )
               &VariableReferences::add )
         .def( "remove", ( void ( VariableReferences::* )( String const& ) )
               &VariableReferences::remove )

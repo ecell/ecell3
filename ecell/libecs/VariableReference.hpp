@@ -43,8 +43,6 @@ class Process;
 
 class LIBECS_API VariableReference
 {
-    friend class Process;
-
 public:
     class CoefficientLess
     {
@@ -132,7 +130,7 @@ public:
 
 public:
     VariableReference()
-        : theFullID( EntityType( EntityType::VARIABLE ), ".", DEFAULT_NAME ),
+        : theFullID(),
           theVariable( NULLPTR ),
           theCoefficient( 0 ),
           theIsAccessor( true )
@@ -145,6 +143,17 @@ public:
                        const bool anIsAccessor = true )    
         : theFullID( anFullID ),
           theVariable( NULLPTR ),
+          theCoefficient( aCoefficient ),
+          theIsAccessor( anIsAccessor )
+    {
+        ; // do nothing
+    }
+
+    VariableReference( Variable* aVariable,
+                       IntegerParam aCoefficient,
+                       const bool anIsAccessor = true )    
+        : theFullID(),
+          theVariable( aVariable ),
           theCoefficient( aCoefficient ),
           theIsAccessor( anIsAccessor )
     {
@@ -186,6 +195,11 @@ public:
     Variable* getVariable() const 
     { 
         return theVariable; 
+    }
+
+    void setVariable( Variable* aVariable )
+    {
+        theVariable = aVariable;
     }
 
     void setCoefficient( IntegerParam aCoefficient )
@@ -313,15 +327,6 @@ public:
     {
         return theVariable->getSuperSystem();
     }
-
-
-protected:
-
-    void setVariable( Variable* aVariable )
-    {
-        theVariable = aVariable;
-    }
-
 
 public:
     static const String ELLIPSIS_PREFIX;
