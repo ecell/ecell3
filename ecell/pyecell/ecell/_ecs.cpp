@@ -968,7 +968,8 @@ static std::string VariableReference___str__( VariableReference const* self )
     retval += stringCast( self->getCoefficient() );
     retval += ", ";
     retval += "variable=";
-    retval += self->getFullID().asString();
+    retval += self->getVariable() ? self->getVariable()->asString():
+                                    self->getFullID().asString();
     retval += ", ";
     retval += "accessor=";
     retval += ( self->isAccessor() ? "true": "false" );
