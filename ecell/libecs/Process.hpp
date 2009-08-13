@@ -435,8 +435,6 @@ protected:
 
     VariableReferenceVectorConstIterator findVariableReference( IntegerParam anID ) const; 
 
-    VariableReference& setVariableReference( VariableReference const& aVarRef );
-
     static void addValue( VariableReference const& aVarRef, RealParam value );
 
     void updateVariableReferenceVector();

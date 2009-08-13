@@ -43,6 +43,7 @@ class Process;
 
 class LIBECS_API VariableReference
 {
+    friend class Process;
 public:
     class CoefficientLess
     {
@@ -138,10 +139,12 @@ public:
         ; // do nothing
     }
 
-    VariableReference( FullID const& anFullID,
+    VariableReference( IntegerParam aSerial,
+                       FullID const& anFullID,
                        IntegerParam aCoefficient,
                        const bool anIsAccessor = true )    
-        : theFullID( anFullID ),
+        : theSerial( aSerial ),
+          theFullID( anFullID ),
           theVariable( NULLPTR ),
           theCoefficient( aCoefficient ),
           theIsAccessor( anIsAccessor )
@@ -149,10 +152,12 @@ public:
         ; // do nothing
     }
 
-    VariableReference( Variable* aVariable,
+    VariableReference( IntegerParam aSerial,
+                       Variable* aVariable,
                        IntegerParam aCoefficient,
                        const bool anIsAccessor = true )    
-        : theFullID(),
+        : theSerial( aSerial ),
+          theFullID(),
           theVariable( aVariable ),
           theCoefficient( aCoefficient ),
           theIsAccessor( anIsAccessor )
@@ -172,19 +177,9 @@ public:
         return theName; 
     }
 
-    void setSerial( IntegerParam anID )
-    {
-        theSerial = anID;
-    }
-
     const Integer getSerial() const
     {
         return theSerial;
-    }
-
-    void setFullID( FullID const& aFullID )
-    {
-        theFullID = aFullID;
     }
 
     FullID const& getFullID() const
@@ -195,11 +190,6 @@ public:
     Variable* getVariable() const 
     { 
         return theVariable; 
-    }
-
-    void setVariable( Variable* aVariable )
-    {
-        theVariable = aVariable;
     }
 
     void setCoefficient( IntegerParam aCoefficient )
@@ -323,17 +313,36 @@ public:
         theVariable->setFixed( aValue );
     }
 
+    LIBECS_DEPRECATED
     SystemPtr getSuperSystem() const
     {
         return theVariable->getSuperSystem();
     }
+
+protected:
+
+    void setSerial( IntegerParam anID )
+    {
+        theSerial = anID;
+    }
+
+    void setFullID( FullID const& aFullID )
+    {
+        theFullID = aFullID;
+    }
+
+    void setVariable( Variable* aVariable )
+    {
+        theVariable = aVariable;
+    }
+
 
 public:
     static const String ELLIPSIS_PREFIX;
     static const String DEFAULT_NAME;
 
 private:
-    int               theSerial;
+    Integer           theSerial;
     String            theName;
     FullID            theFullID;
     Variable*         theVariable;

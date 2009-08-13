@@ -347,8 +347,10 @@ const Integer Process::registerVariableReference( FullID const& aFullID,
                                                   IntegerParam aCoefficient,
                                                   const bool isAccessor )
 {
-    VariableReference aRegisteredVarRef( setVariableReference( VariableReference( aFullID, aCoefficient, isAccessor ) ) );
-    return aRegisteredVarRef.getSerial();
+    theVariableReferenceVector.push_back(
+            VariableReference(
+                theNextSerial, aFullID, aCoefficient, isAccessor ) );
+    return theNextSerial++;
 }
 
 
@@ -357,44 +359,36 @@ const Integer Process::registerVariableReference( StringCref aName,
                                                   IntegerParam aCoefficient,
                                                   const bool isAccessor )
 {
-    VariableReference& aRegisteredVarRef( setVariableReference( VariableReference( aFullID, aCoefficient, isAccessor ) ) );
-    aRegisteredVarRef.setName( aName );
-    return aRegisteredVarRef.getSerial();
-}
-
-const Integer Process::registerVariableReference( StringCref aName,
-                                                  Variable* aVariable,
-                                                  IntegerParam aCoefficient,
-                                                  const bool isAccessor )
-{
-    VariableReference& aRegisteredVarRef( setVariableReference( VariableReference( aVariable, aCoefficient, isAccessor ) ) );
-    aRegisteredVarRef.setName( aName );
-    return aRegisteredVarRef.getSerial();
+    theVariableReferenceVector.push_back(
+            VariableReference(
+                theNextSerial, aFullID, aCoefficient, isAccessor ) );
+    theVariableReferenceVector.back().setName( aName );
+    return theNextSerial++;
 }
 
 const Integer Process::registerVariableReference( Variable* aVariable,
                                                   IntegerParam aCoefficient,
                                                   const bool isAccessor )
 {
-    VariableReference& aRegisteredVarRef( setVariableReference( VariableReference( aVariable, aCoefficient, isAccessor ) ) );
-    return aRegisteredVarRef.getSerial();
+    theVariableReferenceVector.push_back(
+            VariableReference(
+                theNextSerial, aVariable, aCoefficient, isAccessor ) );
+    return theNextSerial++;
 }
 
-VariableReference& Process::setVariableReference( VariableReference const& aVarRef )
+
+const Integer Process::registerVariableReference( StringCref aName,
+                                                  Variable* aVariable,
+                                                  IntegerParam aCoefficient,
+                                                  const bool isAccessor )
 {
-    if( !aVarRef.getName().empty() && findVariableReference( aVarRef.getName() ) != theVariableReferenceVector.end() )
-    {
-        THROW_EXCEPTION_INSIDE( AlreadyExist,
-                                asString() + ": VariableReference ["
-                                + aVarRef.getName()
-                                + "] already exists in this Process" );
-    }
-
-    theVariableReferenceVector.push_back( aVarRef );
-    VariableReference& aRetval( theVariableReferenceVector.back() );
-    aRetval.setSerial( theNextSerial++ );
-    return aRetval;
+    theVariableReferenceVector.push_back(
+            VariableReference(
+                theNextSerial, aVariable, aCoefficient, isAccessor ) );
+    theVariableReferenceVector.back().setName( aName );
+    return theNextSerial++;
 }
+
 
 void Process::resolveVariableReferences()
 {
