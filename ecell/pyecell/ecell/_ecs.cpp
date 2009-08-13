@@ -954,7 +954,7 @@ PyTypeObject STLIteratorWrapper< Titer_ >::__class__ = {
 };
 
 
-static std::string VariableReference___repr__( VariableReference const* self )
+static std::string VariableReference___str__( VariableReference const* self )
 {
     std::string retval;
     retval += "[";
@@ -1108,7 +1108,7 @@ public:
         return py::object( STLIteratorWrapper< VariableReferenceVector::const_iterator >( theProc->getVariableReferenceVector() ) );
     }
 
-    std::string __repr__()
+    std::string __str__()
     {
         VariableReferenceVector const& refs(
                 theProc->getVariableReferenceVector() );
@@ -1123,7 +1123,7 @@ public:
         {
             if ( i != b )
                 retval += ", ";
-            retval += VariableReference___repr__( &*i );
+            retval += VariableReference___str__( &*i );
         }
         retval += ']';
 
@@ -2827,8 +2827,7 @@ BOOST_PYTHON_MODULE( _ecs )
               return_copy_const_reference() )
         .def( "__len__", &VariableReferences::__len__ )
         .def( "__iter__", &VariableReferences::__iter__ )
-        .def( "__repr__", &VariableReferences::__repr__ )
-        .def( "__str__", &VariableReferences::__repr__ )
+        .def( "__str__", &VariableReferences::__str__ )
         ;
 
     py::class_< VariableReference >( "VariableReference", py::no_init )
@@ -2841,8 +2840,7 @@ BOOST_PYTHON_MODULE( _ecs )
                 py::make_function(
                     &VariableReference::getVariable,
                     return_existing_object() ) )
-        .def( "__str__", &VariableReference___repr__ )
-        .def( "__repr__", &VariableReference___repr__ )
+        .def( "__str__", &VariableReference___str__ )
         ;
 
     py::class_< Stepper, py::bases<>, Stepper, boost::noncopyable >
