@@ -569,11 +569,20 @@ const bool Process::isDependentOn( const ProcessCptr aProcessPtr ) const
     return false;
 }
 
-
-void Process::initialize()
+void Process::preinitialize()
 {
     resolveVariableReferences();
     updateVariableReferenceVector(); 
+} 
+
+void Process::initialize()
+{
+    if( getStepper() == NULLPTR )
+    {
+        THROW_EXCEPTION_INSIDE( InitializationFailed,
+                                "No stepper is connected with [" +
+                                asString() + "]." );
+    }
 }
 
 void Process::addValue( VariableReference const& aVarRef, RealParam value )

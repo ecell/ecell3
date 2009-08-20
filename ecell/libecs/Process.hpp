@@ -127,6 +127,8 @@ public:
         return EntityType( EntityType::PROCESS );
     }
 
+    virtual void preinitialize();
+
     virtual void initialize();
     
     virtual void fire() = 0;

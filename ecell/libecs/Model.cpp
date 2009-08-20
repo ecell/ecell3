@@ -328,8 +328,31 @@ void Model::deleteStepper( String const& anID )
 }
 
 
-void Model::checkStepper( System const* const aSystem )
+void Model::preinitializeEntities( System* aSystem )
 {
+    aSystem->preinitialize();
+
+    System::Variables variables( aSystem->getVariables() );
+    std::for_each( boost::begin( variables ), boost::end( variables ),
+            ComposeUnary( boost::bind( &Variable::preinitialize, _1 ),
+                          SelectSecond< boost::range_value< System::Variables >::type >() ) );
+
+    System::Processes processes( aSystem->getProcesses() );
+    std::for_each( boost::begin( processes ), boost::end( processes ),
+            ComposeUnary( boost::bind( &Process::preinitialize, _1 ),
+                          SelectSecond< boost::range_value< System::Processes >::type >() ) );
+
+    System::Systems systems( aSystem->getSystems() );
+    std::for_each( boost::begin( systems ), boost::end( systems ),
+            ComposeUnary( boost::bind( &Model::preinitializeEntities, _1 ),
+                          SelectSecond< boost::range_value< System::Systems >::type >() ) );
+}
+
+
+void Model::initializeEntities( System* const aSystem )
+{
+    aSystem->initialize();
+
     if( aSystem->getStepper() == NULLPTR )
     {
         THROW_EXCEPTION( InitializationFailed,
@@ -337,27 +360,11 @@ void Model::checkStepper( System const* const aSystem )
                          aSystem->getFullID().asString() + "]." );
     }
 
-    System::Systems systems( aSystem->getSystems() );
+    System::Variables variables( aSystem->getVariables() );
+    std::for_each( boost::begin( variables ), boost::end( variables ),
+            ComposeUnary( boost::bind( &Variable::initialize, _1 ),
+                          SelectSecond< boost::range_value< System::Variables >::type >() ) );
 
-    std::for_each( boost::begin( systems ), boost::end( systems ),
-            ComposeUnary( boost::bind( &Model::checkStepper, _1 ),
-                          SelectSecond< boost::range_value< System::Systems >::type >() ) );
-
-}
-
-
-void Model::initializeSystems( System* aSystem )
-{
-    aSystem->initialize();
-    System::Systems systems( aSystem->getSystems() );
-    std::for_each( boost::begin( systems ), boost::end( systems ),
-            ComposeUnary( boost::bind( &Model::initializeSystems, _1 ),
-                          SelectSecond< boost::range_value< System::Systems >::type >() ) );
-}
-
-
-void Model::initializeProcesses( System* const aSystem )
-{
     System::Processes processes( aSystem->getProcesses() );
     std::for_each( boost::begin( processes ), boost::end( processes ),
             ComposeUnary( boost::bind( &Process::initialize, _1 ),
@@ -365,7 +372,7 @@ void Model::initializeProcesses( System* const aSystem )
 
     System::Systems systems( aSystem->getSystems() );
     std::for_each( boost::begin( systems ), boost::end( systems ),
-            ComposeUnary( boost::bind( &Model::initializeProcesses, _1 ),
+            ComposeUnary( boost::bind( &Model::initializeEntities, _1 ),
                           SelectSecond< boost::range_value< System::Systems >::type >() ) );
 }
 
@@ -390,9 +397,7 @@ void Model::initialize()
 
     checkSizeVariable( aRootSystem );
 
-    initializeSystems( aRootSystem );
-
-    checkStepper( aRootSystem );
+    preinitializeEntities( aRootSystem );
 
     // initialization of Stepper needs four stages:
     // (1) update current times of all the steppers, and integrate Variables.
@@ -401,7 +406,8 @@ void Model::initialize()
     // (4) post-initialize() procedures:
     //         - construct stepper dependency graph and
     //         - fill theIntegratedVariableVector.
-    initializeProcesses( aRootSystem );
+    initializeEntities( aRootSystem );
+
     std::for_each( theStepperMap.begin(), theStepperMap.end(),
         ComposeUnary( boost::bind( &Stepper::initialize, _1 ),
                       SelectSecond< StepperMap::value_type >() ) );

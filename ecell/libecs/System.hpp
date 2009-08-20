@@ -72,6 +72,8 @@ public:
         return EntityType( EntityType::SYSTEM );
     }
 
+    virtual void preinitialize();
+
     virtual void initialize();
 
     /**

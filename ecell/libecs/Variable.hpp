@@ -92,6 +92,10 @@ public:
         return EntityType( EntityType::VARIABLE );
     }
 
+    /**
+       Pre-initializes this variable. 
+    */
+    virtual void preinitialize();
 
     /**
        Initializes this variable. 

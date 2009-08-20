@@ -67,6 +67,10 @@ void Variable::dispose()
     clearInterpolantVector();
 }
 
+void Variable::preinitialize()
+{
+}
+
 void Variable::initialize()
 {
     clearInterpolantVector();

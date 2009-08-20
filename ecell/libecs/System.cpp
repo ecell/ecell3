@@ -190,22 +190,13 @@ void System::configureSizeVariable()
     theSizeVariable = findSizeVariable();
 }
 
-void System::initialize()
+void System::preinitialize()
 {
     // no need to call subsystems' initialize() -- the Model does this
     if ( !theStepper )
     {
         theStepper = theModel->getStepper( theStepperID );
         theStepper->registerSystem( this );
-    }
-
-    //
-    // Variable::initialize()
-    //
-    for ( VariableMapConstIterator i( theVariableMap.begin() );
-          i != theVariableMap.end() ; ++i )
-    {
-        i->second->initialize();
     }
 
     //
@@ -223,6 +214,11 @@ void System::initialize()
     }
 
     configureSizeVariable();
+}
+
+
+void System::initialize()
+{
 }
 
 

@@ -327,11 +327,9 @@ private:
        
        @throw InitializationFailed if the check is failed.
     */
-    static void checkStepper( System const* aSystem );
+    static void preinitializeEntities( System* aSystem );
 
-    static void initializeSystems( System* aSystem );
-
-    static void initializeProcesses( System* aSystem );
+    static void initializeEntities( System* aSystem );
 
 public:
     static const char PATH_SEPARATOR;

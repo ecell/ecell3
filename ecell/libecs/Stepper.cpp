@@ -338,6 +338,8 @@ void Stepper::unregisterAllSystem()
 
 void Stepper::registerProcess( Process* aProcess )
 { 
+    BOOST_ASSERT( aProcess != NULLPTR );
+
     if( std::find( theProcessVector.begin(), theProcessVector.end(), 
                    aProcess ) == theProcessVector.end() )
     {
