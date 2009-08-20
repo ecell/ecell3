@@ -179,11 +179,6 @@ class Session:
     def setEventHandler( self, event ):
         self.theSimulator.setEventHandler( event )
 
-    # no need to initialize explicitly in the current version
-    # def initialize( self ):
-    #     self.theSimulator.initialize()
-
-
     #
     # Stepper methods
     #
