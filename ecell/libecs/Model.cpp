@@ -150,7 +150,7 @@ System* Model::createSystem( String const& aClassname )
 
 Entity* Model::createEntity( String const& aClassname, FullIDCref aFullID )
 {
-    if( aFullID.getSystemPath().empty() )
+    if( aFullID.getSystemPath().isModel() )
     {
         THROW_EXCEPTION( BadSystemPath, "empty SystemPath" );
     }
@@ -197,20 +197,8 @@ Entity* Model::createEntity( String const& aClassname, FullIDCref aFullID )
 
 SystemPtr Model::getSystem( SystemPathCref aSystemPath ) const
 {
-    SystemPath aSystemPathCopy( aSystemPath );
-
-    // 1. "" (empty) means Model itself, which is invalid for this method.
-    // 2. Not absolute is invalid (not absolute implies not empty).
-    if( ( ! aSystemPathCopy.isAbsolute() ) || aSystemPathCopy.empty() )
-    {
-        THROW_EXCEPTION( BadSystemPath, 
-                         "[" + aSystemPath.asString() +
-                         "] is not an absolute SystemPath" );
-    }
-
-    aSystemPathCopy.pop_front();
-
-    return getRootSystem()->getSystem( aSystemPathCopy );
+    return getRootSystem()->getSystem(
+        aSystemPath.toRelative( SystemPath( "/" ) ) );
 }
 
 
@@ -220,7 +208,7 @@ Entity* Model::getEntity( FullIDCref aFullID ) const
     SystemPathCref aSystemPath( aFullID.getSystemPath() );
     String const&         anID( aFullID.getID() );
 
-    if( aSystemPath.empty() )
+    if( aSystemPath.isModel() )
     {
         if( anID == "/" )
         {

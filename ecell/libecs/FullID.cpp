@@ -55,43 +55,62 @@ void SystemPath::parse( StringCref systempathstring )
     String aString( systempathstring );
     eraseWhiteSpaces( aString );
     
-    String::size_type aFieldStart( 0 );
+    String::size_type aCompStart( 0 );
     
     // absolute path ( start with '/' )
-    if( aString[0] == DELIMITER )
-     {
-         //insert(end(), String( 1, DELIMITER ) );
-         push_back( String( 1, DELIMITER ) );
-
-         if( aString.size() == 1 )
-         {
-             return;
-         }
-
-         ++aFieldStart;
-     }
-
-    String::size_type aFieldEnd( aString.find_first_of( DELIMITER, aFieldStart ) );
-    push_back( aString.substr( aFieldStart, aFieldEnd - aFieldStart ) );
-
-    while( aFieldEnd != String::npos )
+    if( aString[ 0 ] == DELIMITER )
     {
-        aFieldStart = aFieldEnd + 1;
-        aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
-        
-        insert( end(), aString.substr( aFieldStart, aFieldEnd - aFieldStart ) );
+        push_back( String( 1, DELIMITER ) );
+        ++aCompStart;
     }
 
+    for ( String::size_type aCompEnd; aCompStart < aString.size();
+            aCompStart = aCompEnd + 1 )
+    {
+        aCompEnd = aString.find_first_of( DELIMITER, aCompStart );
+        if ( aCompEnd == String::npos )
+        {
+            aCompEnd = aString.size();
+        }
+
+        String aComponent( aString.substr( aCompStart, aCompEnd - aCompStart ) );
+        if ( aComponent == ".." )
+        {
+            if ( theComponents.size() == 1 &&
+                    theComponents.front()[ 0 ] == DELIMITER )
+            {
+                THROW_EXCEPTION( BadSystemPath, 
+                                 "Too many levels of retraction with .." );
+            }
+            else if ( theComponents.empty() || theComponents.back() == ".." )
+            {
+                theComponents.push_back( aComponent );
+            }
+            else 
+            {
+                theComponents.pop_back();
+            }
+        }
+        else if ( !aComponent.empty() && aComponent != "." )
+        {
+            theComponents.push_back( aComponent );
+        }
+    }
+
+    if ( !aString.empty() && theComponents.empty() )
+    {
+        theComponents.push_back( "." );
+    }
 }
 
 String SystemPath::asString() const
 {
-    StringList::const_iterator i = begin();
+    StringList::const_iterator i = theComponents.begin();
     String aString;
 
     if( isAbsolute() )
     {
-        if( size() == 1 )
+        if( theComponents.size() == 1 )
         {
             return "/";
         }
@@ -103,7 +122,7 @@ String SystemPath::asString() const
     else
     {
         // isAbsolute() == false implies that this can be empty
-        if( empty() )
+        if( theComponents.empty() )
         {
             return aString;
         }
@@ -113,14 +132,14 @@ String SystemPath::asString() const
         }
     }
 
-    if( i == end() )
+    if( i == theComponents.end() )
     {
         return aString;
     }
 
     ++i;
 
-    while( i != end() )
+    while( i != theComponents.end() )
     {
         aString += '/';
         aString += *i;
@@ -130,6 +149,110 @@ String SystemPath::asString() const
     return aString;
 }
 
+void SystemPath::canonicalize()
+{
+    StringList aNewPathComponents;
+
+    for ( StringList::const_iterator i( theComponents.begin() );
+           i != theComponents.end(); ++i )
+    {
+        if ( *i == "." )
+        {
+            continue;
+        }
+        else if ( *i == ".." )
+        {
+            if ( aNewPathComponents.empty() )
+            {
+                break;
+            }
+            aNewPathComponents.pop_back();
+        }
+        else
+        {
+            aNewPathComponents.push_back( *i );
+        }
+    }
+
+    theComponents.swap( aNewPathComponents );
+}
+
+SystemPath SystemPath::toRelative( SystemPath const& aBaseSystemPath ) const
+{
+    // 1. "" (empty) means Model itself, which is invalid for this method.
+    // 2. Not absolute is invalid (not absolute implies not empty).
+    if( ! isAbsolute() || isModel() )
+    {
+        return *this;
+    }
+
+    if( ! aBaseSystemPath.isAbsolute() || aBaseSystemPath.isModel() )
+    {
+        THROW_EXCEPTION( BadSystemPath, 
+                         "[" + aBaseSystemPath.asString() +
+                         "] is not an absolute SystemPath" );
+    }
+
+    SystemPath aThisPathCopy;
+    SystemPath const* thisPath;
+
+    if ( !isCanonicalized() )
+    {
+        aThisPathCopy = *this;
+        aThisPathCopy.canonicalize();
+        thisPath = &aThisPathCopy;
+    }
+    else
+    {
+        thisPath = this;
+    }
+
+    SystemPath aBaseSystemPathCopy;
+    SystemPath const* aCanonicalizedBaseSystemPath;
+    if ( !aBaseSystemPath.isCanonicalized() )
+    {
+        aCanonicalizedBaseSystemPath = &aBaseSystemPath;
+    }
+    else
+    {
+        aBaseSystemPathCopy = aBaseSystemPath;
+        aBaseSystemPathCopy.canonicalize();
+        aCanonicalizedBaseSystemPath = &aBaseSystemPathCopy;
+    }
+
+    SystemPath aRetval;
+    StringList::const_iterator j( thisPath->theComponents.begin() ),
+                               je( thisPath->theComponents.end() );
+    StringList::const_iterator
+        i( aCanonicalizedBaseSystemPath->theComponents.begin() ),
+        ie( aCanonicalizedBaseSystemPath->theComponents.end() );
+
+    while ( i != ie && j != je )
+    {
+        String const& aComp( *i );
+        if ( aComp != *j )
+        {
+            break;
+        }
+        ++i, ++j;
+    }
+    if ( i != ie )
+    {
+        while ( i != ie )
+        {
+            aRetval.theComponents.push_back( ".." );
+            ++i;
+        }
+    }
+    std::copy( j, je, std::back_inserter( aRetval.theComponents ) );
+
+    if ( aRetval.theComponents.empty() )
+    {
+        aRetval.theComponents.push_back( "." );
+    }
+
+    return aRetval; 
+}
 
 
 ///////////////// FullID
@@ -160,13 +283,14 @@ void FullID::parse( StringCref fullidstring )
     aFieldStart = aFieldEnd + 1;
     aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
     if( aFieldEnd == String::npos )
-        {
-            THROW_EXCEPTION( BadID, "only one ':' in the FullID string [" 
-                                    + aString + "]" );
-        }
+    {
+        THROW_EXCEPTION( BadID, "only one ':' in the FullID string [" 
+                                + aString + "]" );
+    }
 
+    
     theSystemPath = SystemPath( aString.substr( aFieldStart, 
-                                                aFieldEnd - aFieldStart ) );
+                                aFieldEnd - aFieldStart ) );
     
     aFieldStart = aFieldEnd + 1;
 

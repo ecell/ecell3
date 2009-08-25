@@ -311,22 +311,29 @@ void System::unregisterEntity( SystemMap::iterator const& i )
 System*
 System::getSystem( SystemPath const& aSystemPath ) const
 {
-    if ( aSystemPath.empty() )
+    if ( aSystemPath.isModel() )
     {
-        return const_cast<SystemPtr>( this );
+        THROW_EXCEPTION_INSIDE( BadSystemPath, 
+                                "Cannot retrieve the model" );
     }
-    
+
     if ( aSystemPath.isAbsolute() )
     {
         return theModel->getSystem( aSystemPath );
     }
 
-    SystemPtr const aNextSystem( getSystem( aSystemPath.front() ) );
+    System* aRetval( const_cast< System* >( this ) );
+    for ( SystemPath::const_iterator i( aSystemPath.begin() );
+          i != aSystemPath.end(); ++i )
+    {
+        if ( *i == "." )
+        {
+            continue;
+        }
+        aRetval = aRetval->getSystem( *i );
+    }
 
-    SystemPath aSystemPathCopy( aSystemPath );
-    aSystemPathCopy.pop_front();
-
-    return aNextSystem->getSystem( aSystemPathCopy );
+    return aRetval;
 }
     
 

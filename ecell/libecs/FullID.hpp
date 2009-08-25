@@ -41,23 +41,31 @@ namespace libecs
 /** 
    SystemPath 
 */
-class LIBECS_API SystemPath : public StringList
+class SystemPath
 {
 public:
-    explicit SystemPath( StringCref systempathstring = "" )
+    typedef StringList::const_iterator const_iterator;
+    typedef StringList::size_type size_type;
+
+public:
+    explicit SystemPath( StringCref systempathstring )
+        : isCanonicalized_( true )
     {
         parse( systempathstring );
     }
 
-    SystemPath( SystemPathCref systempath )
-        : StringList( static_cast<StringList>( systempath ) )
+    SystemPath(): isCanonicalized_( true ) {}
+
+    SystemPath( SystemPathCref that )
+        : isCanonicalized_( that.isCanonicalized_  ),
+          theComponents( that.theComponents )
     {
         ; // do nothing
     }
 
     ~SystemPath() {}
 
-    String asString() const;
+    LIBECS_API String asString() const;
 
     /** @deprecated use asString() instead. */
     LIBECS_DEPRECATED String getString() const
@@ -65,10 +73,91 @@ public:
         return asString();
     }
 
+    bool operator==( SystemPath const& rhs ) const
+    {
+        return theComponents == rhs.theComponents;
+    }
+
+    bool operator!=( SystemPath const& rhs ) const
+    {
+        return !operator==( rhs );
+    }
+
+    bool operator<( SystemPath const& rhs ) const
+    {
+        return theComponents < rhs.theComponents;
+    }
+
+    bool operator>=( SystemPath const& rhs ) const
+    {
+        return !operator<( rhs );
+    }
+
+    bool operator>( SystemPath const& rhs ) const
+    {
+        return theComponents > rhs.theComponents;
+    }
+
+    bool operator<=( SystemPath const& rhs ) const
+    {
+        return !operator>( rhs );
+    }
+
+    SystemPath const& operator=( SystemPath const& rhs )
+    {
+        theComponents = rhs.theComponents;
+        return *this;
+    }
+
+    void swap( SystemPath& that )
+    {
+        theComponents.swap( that.theComponents );
+    }
+
+    void push_back( String const& aComponent )
+    {
+        theComponents.push_back( aComponent );
+        if ( aComponent == "." || aComponent == ".." )
+        {
+            isCanonicalized_ = false;
+        }
+    }
+
+    void pop_back()
+    {
+        theComponents.pop_back();
+    }
+
+    const_iterator begin() const
+    {
+        return theComponents.begin();
+    }
+
+    const_iterator end() const
+    {
+        return theComponents.end();
+    }
+
+    size_type size() const
+    {
+        return theComponents.size();
+    }
+
     bool isAbsolute() const
     {
-        return ( ( ( ! empty() ) && ( front()[0] == DELIMITER ) ) || empty() );
+        return ( ! theComponents.empty() &&
+                theComponents.front()[0] == DELIMITER )
+                || isModel();
     }
+
+    bool isModel() const
+    {
+        return theComponents.empty();
+    }
+
+    void canonicalize();
+
+    SystemPath toRelative( SystemPath const& aBaseSystemPath ) const;
 
     bool isValid() const
     {
@@ -76,24 +165,24 @@ public:
         return true;
     }
 
+    bool isCanonicalized() const
+    {
+        return isCanonicalized_;
+    }
+
     operator String() const
     {
         return asString();
     }
 
-protected:
+private:
 
-    /**
-       Standardize a SystemPath. 
-       Reduce '..'s and remove extra white spaces.
-
-       @return reference to the systempath
-    */
-    void standardize();
+    LIBECS_API void parse( StringCref systempathstring );
 
 private:
 
-    void parse( StringCref systempathstring );
+    bool isCanonicalized_;
+    StringList theComponents;
 
 public:
 
@@ -134,7 +223,6 @@ public:
     {
         ; // do nothing
     }
-
 
     FullID( StringCref fullidstring )
     {
