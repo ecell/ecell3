@@ -597,11 +597,11 @@ void Process::addValue( RealParam aValue )
     // Increase or decrease variables, skipping zero coefficients.
     std::for_each( theVariableReferenceVector.begin(),
                    theZeroVariableReferenceIterator,
-                   boost::bind( &addValue, _1, aValue ) );
+                   boost::bind( &VariableReference::addValue, _1, aValue ) );
 
     std::for_each( thePositiveVariableReferenceIterator,
                    theVariableReferenceVector.end(),
-                   boost::bind( &addValue, _1, aValue ) );
+                   boost::bind( &VariableReference::addValue, _1, aValue ) );
 }
 
 } // namespace libecs
