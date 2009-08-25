@@ -186,7 +186,6 @@ BOOST_AUTO_TEST_CASE(testBasic)
         const unsigned char* pc = code->data();
         const unsigned char* eoc = &*code->end();
         CHECK_INSTRUCTION( pc, scripting::PUSH_REAL, 0. );
-        CHECK_INSTRUCTION( pc, scripting::CALL_FUNC1, &::sin );
         CHECK_INSTRUCTION( pc, scripting::RET, scripting::NoOperand() );
         BOOST_CHECK_EQUAL( eoc, pc );
     }
@@ -396,8 +395,7 @@ BOOST_AUTO_TEST_CASE(testVariableReferenceResolver)
         CHECK_INSTRUCTION( pc, scripting::ADD, scripting::NoOperand() );
         CHECK_INSTRUCTION( pc, scripting::OBJECT_METHOD_REAL, (
                 scripting::RealObjectMethodProxy::create<
-                    VariableReference, &VariableReference::getValue >(
-                        &aVarRefResolver.a ) ) );
+                    Variable, &Variable::getValue >( 0 ) ) );
         CHECK_INSTRUCTION( pc, scripting::ADD, scripting::NoOperand() );
         CHECK_INSTRUCTION( pc, scripting::RET, scripting::NoOperand() );
         BOOST_CHECK_EQUAL(eoc, pc);
