@@ -44,7 +44,7 @@ class EcsObject;
 class WarningHandler: public std::unary_function< String, void >
 {
 public:
-    virtual ~WarningHandler();
+    LIBECS_API virtual ~WarningHandler();
 
     virtual void operator()( const String& ) const = 0;
 };
