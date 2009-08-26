@@ -1595,8 +1595,9 @@ template<>
 EntityType DeduceEntityType< PythonSystem >::value( EntityType::SYSTEM );
 
 template< typename T_ >
-struct PythonDynamicModule: public DynamicModule< EcsObject >
+class PythonDynamicModule: public DynamicModule< EcsObject >
 {
+public:
     typedef DynamicModule< EcsObject > Base;
 
     struct make_ptr_instance: public py::objects::make_instance_impl< T_, py::objects::pointer_holder< T_*, T_ >, make_ptr_instance > 
@@ -2690,6 +2691,11 @@ struct return_entity
         {
             struct type
             {
+                PyTypeObject const *get_pytype() const
+				{
+					return 0;
+				}
+
                 PyObject* operator()( Entity* ptr ) const
                 {
                     if ( ptr == 0 )
