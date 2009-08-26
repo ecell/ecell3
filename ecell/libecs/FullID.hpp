@@ -155,9 +155,9 @@ public:
         return theComponents.empty();
     }
 
-    void canonicalize();
+    LIBECS_API void canonicalize();
 
-    SystemPath toRelative( SystemPath const& aBaseSystemPath ) const;
+    LIBECS_API SystemPath toRelative( SystemPath const& aBaseSystemPath ) const;
 
     bool isValid() const
     {
@@ -278,7 +278,7 @@ public:
     }
 
 
-    bool isValid() const;
+    LIBECS_API bool isValid() const;
 
     LIBECS_API String asString() const;
 
@@ -435,7 +435,7 @@ public:
         return asString();
     }
 
-    bool isValid() const;
+    LIBECS_API bool isValid() const;
 
     bool operator<( FullPNCref rhs ) const
     {
