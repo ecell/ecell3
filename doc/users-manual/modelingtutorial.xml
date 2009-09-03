@@ -673,7 +673,18 @@ System CompartmentSystem( / )
       <para>The simplest way to script custom rate equations is to use
 <classname>ExpressionFluxProcess</classname>.   
 
-    Here is an example taken from the Drosophila sample model.   
+    Here is an example taken from the Drosophila sample model which you can
+    find under
+    <literal>${datadir}/doc/ecell/samples/Drosophila</literal>
+    <footnote>
+      <para>
+        <literal>${datadir}</literal> refers to the directory either given
+        to <literal>--datadir</literal> option of <literal>configure</literal>
+        script or <literal>${prefix}/share</literal>. On Windows,
+        <literal>${prefix}</literal> would be the directory to which the
+        application is installted.
+      </para>
+    </footnote>
     In this expression, Size * N_A of the supersystem of the &Process;
     is used to keep the unit of the expression [ num / second ].
 <example>

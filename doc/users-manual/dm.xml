@@ -41,11 +41,8 @@
   <sect1>
     <title>Defining a new class</title>
     
-    
     <para>A new object class can be defined by writing a C++ source
     code file with some special usage of C++ macros.</para>
-
-
 
     <para>Here is a boilarplate template of a &DM; file, with which you
     should feel familiar if you have a C++ experience. Replace
@@ -53,7 +50,7 @@
     <parameter>BASECLASS</parameter> according to your case.
 
     <example>
-      <title>CLASSNAME.cpp; a boilarplate &DM; template.</title>
+      <title>CLASSNAME.cpp; a boilerplate &DM; template.</title>
     <programlisting linenumbering="numbered">
 #include &lt;libecs/libecs.hpp>
 #include &lt;libecs/<parameter>BASECLASS</parameter>.hpp>
@@ -63,15 +60,13 @@ USE_LIBECS;
 LIBECS_DM_CLASS( <parameter>CLASSNAME</parameter>, <parameter>BASECLASS</parameter> )
 {
 public:
+    LIBECS_DM_OBJECT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> )
+    {
+      // ( Property definition of this class comes here. )
+    }
 
-  LIBECS_DM_OBJECT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> )
-  {
-    // ( Property definition of this class comes here. )
-  }
-
-
-  <parameter>CLASSNAME</parameter>() {}// A constructor without an argument
-  <parameter>~CLASSNAME</parameter>() {}// A destructor
+    <parameter>CLASSNAME</parameter>() {}// A constructor without an argument
+    <parameter>~CLASSNAME</parameter>() {}// A destructor
 };
 
 LIBECS_DM_INIT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> );
@@ -532,8 +527,7 @@ of a specific type and a property name.
 
 		<listitem>
 		  <para><emphasis>Usage:</emphasis> <function>SET_METHOD</function> macro is
-	      used to declare or define a property set method, of which the property type is <parameter>TYPE</parameter> and the property name is <parameter>NAME</parameter>, in a
-	      class scope (class definition).  The given property
+	      used to declare or define a property set method, of which the property type is <parameter>TYPE</parameter> and the property name is <parameter>NAME</parameter>, in a class definition.  The given property
 	      value is available as the <varname>value</varname>
 	      argument variable.</para>
 		</listitem>
@@ -541,26 +535,26 @@ of a specific type and a property name.
 		<listitem><para><emphasis>Example:</emphasis></para>
 		  <informalexample>
 		    <para>This code:
-<programlisting>class HogeProcess
+<programlisting>class FooProcess
 {
-  SET_METHOD( Real, Flux )
-  {
-    theFlux = value;
-  }
+    SET_METHOD( Real, Flux )
+    {
+        theFlux = value;
+    }
 
-  Real theFlux;
+    Real theFlux;
 };</programlisting>
 
-is expanded to the following valid C++ program.
+will expand to the following C++ program.
 
-<programlisting>class HogeProcess
+<programlisting>class FooProcess
 {
-  void setFlux( const Real&amp;value )
-  {
-    theFlux = value;
-  }
+    void setFlux( const Real&amp; value )
+    {
+        theFlux = value;
+    }
 
-  Real theFlux;
+    Real theFlux;
 };
 </programlisting>
 
@@ -590,35 +584,34 @@ In this example, the given property value is stored in the member variable
 	      <function>GET_METHOD</function> macro is used to declare
 	      or define a property get method, of which the property
 	      type is <parameter>TYPE</parameter> and the property
-	      name is <parameter>NAME</parameter>, in a class scope
-	      (class definition).  Definition of the method must
-	      return the value of the property as a
+	      name is <parameter>NAME</parameter>, in a class definition.
+	      Definition of the method must return the value of the property as a
 	      <parameter>TYPE</parameter> object.</para>
 		</listitem>
 
 		<listitem><para><emphasis>Example:</emphasis></para>
 		  <informalexample>
 		    <para>This code:
-<programlisting>class HogeProcess
+<programlisting>class FooProcess
 {
-  GET_METHOD( Real, Flux )
-  {
-    return theFlux;
-  }
+    GET_METHOD( Real, Flux )
+    {
+        return theFlux;
+    }
 
-  Real theFlux;
+    Real theFlux;
 };</programlisting>
 
-is expanded to the following valid C++ program.
+will expand to the following C++ program.
 
-<programlisting>class HogeProcess
+<programlisting>class FooProcess
 {
-  const Real getFlux() const
-  {
-    return theFlux;
-  }
+    const Real getFlux() const
+    {
+        return theFlux;
+    }
 
-  Real theFlux;
+    Real theFlux;
 };
 </programlisting>
 </para>
@@ -648,27 +641,36 @@ is expanded to the following valid C++ program.
 		<listitem>
 <para><emphasis>Example:</emphasis></para>
 		  <informalexample>
-		    <para><function>SET_METHOD_DEF</function> macro is usually
+		    <para>
+              <function>SET_METHOD_DEF</function> macro is usually
 used in conjunction with <function>SET_METHOD</function> macro.  For instance,
-the following code declares a property get method in the class scope by using 
-<function>SET_METHOD</function>, and defines the procedure of the method 
-after the class definition with <function>SET_METHOD_DEF</function>. 
-In this example, the method is virtual.
+the following code declares a property getter method with <function>SET_METHOD</function> in the class definition, and later defines the actual body of the
+method using <function>SET_METHOD_DEF</function>. 
 
-<programlisting>class HogeProcess
+
+              <programlisting>class FooProcess
 {
-  virtual SET_METHOD( Real, Flux );
+    virtual SET_METHOD( Real, Flux );
 
-  Real theFlux;
+    Real theFlux;
 };
 
-SET_METHOD_DEF( Real, Flux, HogeProcess )
+SET_METHOD_DEF( Real, Flux, FooProcess )
 {
-  return theFlux;  
+    theFlux = value;
 }
 </programlisting>
-</para>
-</informalexample>
+
+
+              The definition part will expand to the following C++ program.
+
+              <programlisting>void FooProcess::setFlux( const Real&amp; value )
+{
+    theFlux = value;
+}
+</programlisting>
+            </para>
+          </informalexample>
 		</listitem>
 
 	      </itemizedlist>
@@ -745,27 +747,27 @@ GET_METHOD( <parameter>NAME</parameter>, <parameter>TYPE</parameter> )
 
 	<para>For example, to define a property
 	'<property>Flux</property>' of type <type>Real</type> on the
-	<classname>HogeProcess</classname> class, write like this in
+	<classname>FooProcess</classname> class, write like this in
 	the public area of the class definition:
 
         <programlisting>
 public:
 
-  LIBECS_DM_OBJECT( <parameter>HogeProcess</parameter>, <parameter>Process</parameter> )
+  LIBECS_DM_OBJECT( <parameter>FooProcess</parameter>, <parameter>Process</parameter> )
   {
     PROPERTYSLOT_SET_GET( <parameter>Flux</parameter>, <parameter>Real</parameter> );
   }</programlisting> 
 
          This registers these methods:
 
-<programlisting>void HogeProcess::setFlux( const Real&amp; );</programlisting>
+<programlisting>void FooProcess::setFlux( const Real&amp; );</programlisting>
 
 and       
 
-<programlisting>const Real HogeProcess::getFlux() const;</programlisting>
+<programlisting>const Real FooProcess::getFlux() const;</programlisting>
 
          as the set and get methods of '<property>Flux</property>'
-         property of the class <classname>HogeProcess</classname>,
+         property of the class <classname>FooProcess</classname>,
          respectively.  Signatures of the methods must match with the
          prototypes defined in the previous section.
          <function>LIBECS_DM_OBJECT</function> can have any number of
@@ -807,12 +809,12 @@ and
                <methodname>setFlux2</methodname>() and
                <methodname>anotherGetMethod</methodname>() methods of
                <property>Flux</property> property of the class
-               <classname>HogeProcess</classname>:
+               <classname>FooProcess</classname>:
 
 <programlisting>
 PROPERTYSLOT( Flux, Real, 
-              &amp;HogeProcess::setFlux2,
-              &amp;HogeProcess::anotherGetMethod );</programlisting>
+              &amp;FooProcess::setFlux2,
+              &amp;FooProcess::anotherGetMethod );</programlisting>
 </para>
 
 	    </listitem>
@@ -914,10 +916,11 @@ not set instead of default to set and get methods.
 
         <programlisting>LIBECS_DM_OBJECT( <parameter>CLASSNAME</parameter>, <parameter>DMTYPE</parameter> )
 {
-  INHERIT_PROPERTIES( <parameter>PROPERTY_BASECLASS</parameter> );
+    INHERIT_PROPERTIES( <parameter>PROPERTY_BASECLASS</parameter> );
   
-  PROPERTYSLOT_SET_GET( <parameter>NAME</parameter>, <parameter>TYPE</parameter> );
-}</programlisting> 
+    PROPERTYSLOT_SET_GET( <parameter>NAME</parameter>, <parameter>TYPE</parameter> );
+}
+</programlisting> 
 
         Here <parameter>PROPERTY_BASECLASS</parameter> is usually the
         same as <parameter>BASECLASS</parameter>.  An exception is
@@ -961,63 +964,75 @@ bypassing the &PropertySlot;, (2) dynamically-bound access via a
     <sect1>
       <title>Defining a new Process class</title>
 
-
-      <para>To define a new &Process; class, 
-      at least <methodname>fire()</methodname> and 
-      <methodname>initialize()</methodname> methods must be defined.
+      <para>
+        To define a new &Process; class, at least the following two methods
+        need to be defined.
+        <itemizedlist>
+          <listitem><para><methodname>initialize()</methodname></para></listitem>
+          <listitem><para><methodname>fire()</methodname></para></listitem>
+        </itemizedlist>
+        <methodname>initialize()</methodname> is called when the simulation
+        state needs to be reset.  Note that reset can happen anytime
+        during the session, not just at the beginning; especially when the
+        reintegration of the state is requested.
+        <methodname>fire()</methodname> is called when the reaction takes
+        place.  You have to update the &Variable;s referred to by your
+        &Process; according to &VariableReference;.
       </para>
 
+      <para>
+        The &Process;'s &VariableReference;s are stored in
+        <literal>theVariableReferenceVector</literal> member variable,
+        sorted by coefficient. Hence references that have negative coefficients
+        are followed by those of zero coefficients, and so by those of
+        positive coefficients.  You can get the offset from which
+        the &quot;zero&quot; or positive references start through
+        <methodname>getZeroVariableReferenceOffset()</methodname> or
+        <methodname>getPositiveVariableReferenceOffset()</methodname>.
+        If you want to look up for a specific &VariableReference; by name, use
+        <methodname>getVariableReference()</methodname>.
+      </para>
 
-      <para>VariableReference, VariableReferenceVector</para>
-
-    <example>
-      <title>SimpleProcess.cpp</title>
-    <programlisting linenumbering="numbered">
-#include "libecs.hpp"
-#include "Process.hpp"
-#include "PropertySlotMaker.hpp"
+      <example>
+        <title>SimpleProcess.cpp</title>
+        <programlisting linenumbering="numbered">#include &lt;libecs.hpp&gt;
+#include &lt;Process.hpp&gt;
 
 USE_LIBECS;
 
 LIBECS_DM_CLASS( SimpleProcess, Process )
 {
-
- public:
-
-  LIBECS_DM_OBJECT( SimpleFluxProcess, Process )
+public:
+    LIBECS_DM_OBJECT( SimpleFluxProcess, Process )
     {
-      PROPERTYSLOT_SET_GET( Real, k );
+        PROPERTYSLOT_SET_GET( Real, k );
     }
 
-  SimpleProcess()
-    :
-  k( 0.0 )
+    SimpleProcess(): k( 0.0 )
     {
-      ; // do nothing
     }
 
-  SIMPLE_SET_GET_METHOD( Real, k );
+    SIMPLE_SET_GET_METHOD( Real, k );
 
-  virtual void initialize()
+    virtual void initialize()
     {
-      Process::initialize();
-      S0 = getVariableReference( "S0" );
+        Process::initialize();
+        S0 = getVariableReference( "S0" );
     }
 
-  virtual void fire()
+    virtual void fire()
     {
-      setFlux( k * S0.getConcentration() );
+        setFlux( k * S0.getMolarConc() );
     }
 
- protected:
-
-  Real k;
-  VariableReference S0;
+protected:
+    Real k;
+    VariableReference S0;
 };
 
 LIBECS_DM_INIT( SimpleProcess, Process );
 </programlisting>
-    </example>
+      </example>
 
       
     </sect1>
