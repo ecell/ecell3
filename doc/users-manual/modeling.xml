@@ -1835,9 +1835,9 @@ future, a high-performance replacement of this,
 	    </listitem>
 
 	    <listitem>
-	      <para><property>MinStepInterval</property> / <property>MaxStepInterval</property></para>
+	      <para><property>MinStepInterval</property></para>
 
-	      <para>Minimum and maximum limits in step size.  These limits
+	      <para>Species the minimum value of step width.  This limit
 	      preceeds the <property>Tolerance</property> property
 	      above.</para>
 
@@ -1845,6 +1845,12 @@ future, a high-performance replacement of this,
 	      disable the adaptive step size control mechanism: set
 	      the same number to both of the property slots.</para>
 	    </listitem>
+
+        <listitem>
+          <para><property>MaxStepInterval</property></para>
+          <para>This property is no longer supported and has no specific
+          effect if it is set</para>
+        </listitem>
 	  </itemizedlist>
 </para>
 
@@ -2196,34 +2202,31 @@ Process PythonProcess( PY )
 
 
       <sect3>
-	<title>Power-law canonical DEs (S-System and GMA)</title>
+        <title>Power-law canonical DEs (S-System and GMA)</title>
 
-	<para><classname>ESSYNSStepper</classname> supports S-System and
-         GMA simulations by using the ESSYNS algorithm.  
-	A <classname>ESSYNSStepper</classname> must be connected 
-        with either a <classname>SSystemProcess</classname> or
-	a <classname>GMAProcess</classname>.  Use
-	<property>SSystemMatrix</property> or
-	<property>GMAMatrix</property> property to set the system
-	parameters.</para>
+        <para>
+          <classname>ESSYNSStepper</classname> supports S-System and
+          GMA simulations by using the ESSYNS algorithm.  A
+          <classname>ESSYNSStepper</classname> must be connected with either
+          a <classname>SSystemProcess</classname> or
+          a <classname>GMAProcess</classname> as its sole &VariableReference;.
+          Use <property>SSystemMatrix</property> or
+          <property>GMAMatrix</property> property to set the system parameters.
+        </para>
+        <para>
+          A sample model under the directory
+          <filename>doc/sample/ssystem/</filename> gives an example usage.
+        </para>
 
-	<para>A sample model under the directory
-	<filename>doc/sample/ssystem/</filename> gives an example
-	usage.</para>
-
-	<para>These modules are still under development. More
-	descriptions to come....</para>
+        <para>
+          These modules are still under development. More descriptions to come...
+        </para>
 
       </sect3>
 
-
-
     </sect2>
 
-
   </sect1>
-
-
 
   <sect1>
   <title>Modeling Convensions</title>
