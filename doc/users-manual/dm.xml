@@ -644,7 +644,7 @@ will expand to the following C++ program.
 		    <para>
               <function>SET_METHOD_DEF</function> macro is usually
 used in conjunction with <function>SET_METHOD</function> macro.  For instance,
-the following code declares a property getter method with <function>SET_METHOD</function> in the class definition, and later defines the actual body of the
+the following code declares a property setter method with <function>SET_METHOD</function> in the class definition, and later defines the actual body of the
 method using <function>SET_METHOD_DEF</function>. 
 
 
@@ -1022,12 +1022,14 @@ public:
 
     virtual void fire()
     {
-        setFlux( k * S0.getMolarConc() );
+        // concentration gets reverted to the number of molecules
+        // according to the volume of the System where the Process belongs.
+        setFlux( k * S0.getMolarConc() * getSuperSystem()->getSize() * N_A );
     }
 
 protected:
     Real k;
-    VariableReference S0;
+    VariableReference const&amp; S0;
 };
 
 LIBECS_DM_INIT( SimpleProcess, Process );

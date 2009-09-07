@@ -1838,7 +1838,7 @@ future, a high-performance replacement of this,
 	      <para><property>MinStepInterval</property></para>
 
 	      <para>Species the minimum value of step width.  This limit
-	      preceeds the <property>Tolerance</property> property
+	      precedes the <property>Tolerance</property> property
 	      above.</para>
 
 	      <para>These properties can also be useful to completely

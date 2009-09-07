@@ -57,7 +57,21 @@ items.
         following command.
       </para>
       <para><command>ecell3-em2eml</command> <replaceable>filename.em</replaceable></para>
-
+      <para>You can obtain the full description of the command line options
+      giving -h option to <command>ecell3-em2eml</command>.</para>
+      <para>
+      <screen>ecell3-eml2em -- convert eml to em
+         
+Usage:
+        ecell3-eml2em [-h] [-f] [-o outfile] infile
+ 
+         
+Options:
+        -h or --help    :  Print this message.
+        -f or --force   :  Force overwrite even if outfile already exists.
+        -o or --outfile=:  Specify output file name.  '-' means stdout.
+</screen>
+      </para>
     </sect2>
 
     <sect2>
@@ -134,7 +148,7 @@ ecell3-dmc options:
 	  <para>To start <application>&app;</application> 
       in GUI mode, type the following command.</para> 
 
-      <screen><command>ecell3-session</command> &amp;</screen>
+      <screen><command>ecell3-session-monitor</command> &amp;</screen>
 
       <para>This will invoke an instance of the simulator with
       <application>Osogo Session Manager</application> attached as a GUI
@@ -182,7 +196,7 @@ ecell3-dmc options:
         <para>
           <screen><prompt>$</prompt> <userinput>ECELL3_DM_PATH=.:/home/example/mydms</userinput>
 <prompt>$</prompt> <userinput>export ECELL3_DM_PATH</userinput>
-<prompt>$</prompt> <userinput><command>ecell3-em2eml</command></userinput>
+<prompt>$</prompt> <userinput><command>ecell3-session-monitor</command></userinput>
           </screen>
         </para>
       </informalexample>
@@ -194,34 +208,6 @@ ecell3-dmc options:
       </para>
     </sect2>
   </sect1>
-
-  <sect1>
-    <title>Other Commands</title>
-
-    <sect2>
-      <title>Converting &EM; file to &EML;</title>
-
-      <para>Use <command>ecell3-eml2em</command> command to convert an
-      &EML; file to an &EM; file.
-</para>
-
-      <screen>ecell3-eml2em -- convert eml to em
-         
-Usage:
-        ecell3-eml2em [-h] [-f] [-o outfile] infile
- 
-         
-Options:
-        -h or --help    :  Print this message.
-        -f or --force   :  Force overwrite even if outfile already exists.
-        -o or --outfile=:  Specify output file name.  '-' means stdout.
-</screen>
-
-
-    </sect2>
-
-  </sect1>
-
 
   </chapter>
 
