@@ -124,13 +124,6 @@ void GillespieProcess::initialize()
     declareUnidirectional();
 
     calculateOrder();
-
-    if( ! ( getOrder() == 1 || getOrder() == 2 ) )
-    {
-        THROW_EXCEPTION_INSIDE( ValueError,
-                                asString() + ": only first or second order "
-                                "scheme is allowed" );
-    }
 }
 
 void GillespieProcess::fire()
@@ -314,7 +307,7 @@ void GillespieProcess::calculateOrder()
 
     // set theGetPropensityMethodPtr and theGetMinValueMethodPtr
 
-    if( getOrder() == 0 )     // no substrate
+    if( theOrder == 0 )     // no substrate
     {
         theGetPropensityMethodPtr =
                     RealMethodProxy::create<&GillespieProcess::getZero>();
@@ -322,7 +315,7 @@ void GillespieProcess::calculateOrder()
                     RealMethodProxy::create<&GillespieProcess::getZero>();
         theGetPDMethodPtr         = &GillespieProcess::getPD_Zero;
     }
-    else if( getOrder() == 1 )     // one substrate, first order.
+    else if( theOrder == 1 )     // one substrate, first order.
     {
         theGetPropensityMethodPtr =
                     RealMethodProxy::create<&GillespieProcess::getPropensity_FirstOrder>();
@@ -330,7 +323,7 @@ void GillespieProcess::calculateOrder()
                     RealMethodProxy::create<&GillespieProcess::getMinValue_FirstOrder>();
         theGetPDMethodPtr         = &GillespieProcess::getPD_FirstOrder;
     }
-    else if( getOrder() == 2 )
+    else if( theOrder == 2 )
     {
         if( getZeroVariableReferenceOffset() == 2 ) // 2 substrates, 2nd order
         {    
@@ -378,8 +371,10 @@ void GillespieProcess::calculateOrder()
     }
     else
     {
-        NEVER_GET_HERE;
-    } 
+        THROW_EXCEPTION_INSIDE( InitializationFailed,
+                                asString() + ": only first or second order "
+                                "scheme is allowed" );
+    }
 }
 
 LIBECS_DM_INIT( GillespieProcess, Process );
