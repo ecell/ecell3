@@ -157,14 +157,6 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
     declareUnidirectional();
   
     calculateOrder();
-    
-    if( ! ( getOrder() == 1 || getOrder() == 2 ) )
-      {
-	THROW_EXCEPTION( ValueError, 
-			 String( getClassName() ) + 
-			 "[" + getFullID().getString() + 
-			 "]: Only first or second order scheme is allowed." );
-      }
   }
 
   virtual void fire()
@@ -439,10 +431,11 @@ inline void GillespieProcess::calculateOrder()
     }
   else
     {
-      NEVER_GET_HERE;
+      THROW_EXCEPTION( ValueError, 
+		       String( getClassName() ) + 
+		       "[" + getFullID().getString() + 
+		       "]: Only first or second order scheme is allowed." );
     } 
-
-
 }
 
 #endif /* __GILLESPIEPROCESS_HPP */
