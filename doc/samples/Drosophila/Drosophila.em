@@ -28,9 +28,9 @@ System System( /CELL/CYTOPLASM )
 	StepperID	DE;
 	
 	Variable Variable( SIZE ) 
-        {	
-                Value   @(VOLUME);
-        }
+	{	
+		Value   @(VOLUME);
+	}
 
 	Variable Variable( M )
 	{
