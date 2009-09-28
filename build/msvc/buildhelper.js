@@ -316,6 +316,22 @@ BuildHelper.invoke = function(prog, flavor, args) {
     return retval;
 };
 
+BuildHelper.getShortPath = function(path) {
+    if (FileSystemObject.FileExists(path))
+        return FileSystemObject.GetFile(path).ShortPath;
+    else if (FileSystemObject.FolderExists(path))
+        return FileSystemObject.GetFolder(path).ShortPath;
+    var comps = [];
+    var parent = FileSystemObject.GetAbsolutePathName(path); 
+    do {
+        comps.push(FileSystemObject.GetFileName(parent));
+        parent = FileSystemObject.GetParentFolderName(parent);
+    } while (!FileSystemObject.FolderExists(parent));
+    var retval = FileSystemObject.GetFolder(parent).ShortPath;
+    for (var i = comps.length; --i >= 0; )
+        retval = FileSystemObject.BuildPath(retval, comps[i]);
+    return retval;
+};
 
 BuildHelper.ArgsParser = function() {
     this.initialize.apply(this, arguments);

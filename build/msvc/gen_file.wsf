@@ -10,7 +10,7 @@ var buildInfo = {
 	vcOutDir: WScript.Arguments(0),
 	projectDir: WScript.Arguments(1),
     pythonHome: WshShell.Environment("Process")("PYTHONHOME")
-}.map(WrapIDispatchMethod(FileSystemObject, 'GetAbsolutePathName(path)'));
+}.map(BuildHelper.getShortPath);
 ]]></script>
     <script language="JScript" src="info.js" />
     <script language="JScript"><![CDATA[
