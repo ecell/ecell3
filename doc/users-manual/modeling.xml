@@ -472,7 +472,7 @@ The &Entity; class has three subclasses:
       <example>
 	<title>A tiny &EM; example</title>
 	<programlisting linenumbering="numbered">
-Stepper ODE45Stepper( ODE_1 ) 
+Stepper ODEStepper( ODE_1 ) 
 { 
         # no property 
 } 
@@ -512,7 +512,7 @@ System System( / )
       <para>This example is a model of a mass-action differential
       equation. In this example, the model has a &Stepper;
       <literal>ODE_1</literal> of class
-      <classname>ODE45Stepper</classname>, which is a generic ordinary
+      <classname>ODEStepper</classname>, which is a generic ordinary
       differential equation solver.  The model also has the root
       system (<literal>/</literal>).  The root sytem has the
       <property>StepperID</property> property, and four &Entity;
@@ -1805,10 +1805,12 @@ Process PythonProcess( PY1 )
 
 	<para>If your model is a system of ODEs, then in this version
 of the software (version &appversion;) the recommended choice is
-<classname>ODE45Stepper</classname>.  A current drawback of this
-&Stepper; is that it is not good at solving stiff systems.  In near
-future, a high-performance replacement of this,
-<classname>ODEStepper</classname>, will be included.</para>
+<classname>ODEStepper</classname>.  This &Stepper; is a high-performance replacement of <classname>ODE45Stepper</classname>, which was the choice for the previous versions.</para>
+
+    <para><classname>ODEStepper</classname> is implemented so that
+    it can adaptively switch the solving method between the implicit one
+    (Radau IIA) and the explicit one (Dormand-Prince), according to the
+    current stiffness of the input.</para>
 
 
 	<para>Some other available ODE &Stepper; classes are
