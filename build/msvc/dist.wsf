@@ -48,6 +48,7 @@ var tasks = {
 
         BuildHelper.mkdir(this.distBinDir);
         BuildHelper.copy(this.vcOutDir + 'ecs.dll', this.distBinDir);
+        BuildHelper.copy(this.vcOutDir + 'ecs.pdb', this.distBinDir);
     },
 
     installLTDL: function() {
@@ -114,6 +115,7 @@ var tasks = {
 
         BuildHelper.mkdir(this.distBinDir);
         BuildHelper.copy(this.vcOutDir + 'emc.dll', this.distBinDir);
+        BuildHelper.copy(this.vcOutDir + 'emc.pdb', this.distBinDir);
     },
 
     installDMTool: function() {
