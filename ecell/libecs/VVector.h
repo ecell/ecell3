@@ -151,6 +151,7 @@ typedef int ssize_t;
 
 #include <string.h>
 #include <assert.h>
+#include <stdio.h>
 
 #ifdef WIN32
 #include "fcntl.h"
