@@ -64,7 +64,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib gsl.lib python*_d.lib $(BOOST_PYTHON_LIB_NAME)-gd.lib"
+				AdditionalDependencies="ecs.lib gsl.lib python*_d.lib $(BOOST_PYTHON_LIBNAME)-gd.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				IgnoreDefaultLibraryNames=""
@@ -144,7 +144,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib gsl.lib python*_d.lib $(BOOST_PYTHON_LIB_NAME)-gd.lib"
+				AdditionalDependencies="ecs.lib gsl.lib python*_d.lib $(BOOST_PYTHON_LIBNAME)-gd.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				IgnoreDefaultLibraryNames=""
@@ -221,7 +221,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib gsl.lib python*.lib $(BOOST_PYTHON_LIB_NAME).lib"
+				AdditionalDependencies="ecs.lib gsl.lib python*.lib $(BOOST_PYTHON_LIBNAME).lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				GenerateDebugInformation="true"
@@ -300,7 +300,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib gsl.lib python*.lib $(BOOST_PYTHON_LIB_NAME).lib"
+				AdditionalDependencies="ecs.lib gsl.lib python*.lib $(BOOST_PYTHON_LIBNAME).lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				GenerateDebugInformation="true"
