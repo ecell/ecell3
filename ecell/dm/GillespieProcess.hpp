@@ -40,6 +40,8 @@
 
 #include "GillespieProcessInterface.hpp"
 
+#undef getc
+
 LIBECS_DM_CLASS_EXTRA_1( GillespieProcess, libecs::Process,
                          GillespieProcessInterface )
 {
