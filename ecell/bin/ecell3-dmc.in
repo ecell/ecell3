@@ -64,7 +64,7 @@ def main():
     # -------------------------------------
     prefix = r'''@PREFIX@'''
     ecell3dir = r'''@ECELL_DIRNAME@'''
-    BOOST_LIBRARIES = r'''-lboost_python'''
+    BOOST_LIBRARIES = r'''-l@BOOST_PYTHON_LIBNAME@'''
     exec_prefix = prefix
     BINDIR = exec_prefix + os.sep + 'bin'
     STDLIBDIRS = [ '-L' + exec_prefix + os.sep + 'lib' ]
