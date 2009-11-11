@@ -37,6 +37,7 @@
 #include <libecs/FullID.hpp>
 #include <libecs/MethodProxy.hpp>
 
+#undef getc
 
 USE_LIBECS;
 
