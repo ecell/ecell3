@@ -18,32 +18,33 @@ DM_SRC_DIR =  ${datadir}/${ECELL_DIRNAME}/dms
 PYTHON_INCLUDES = @PYTHON_INCLUDES@
 PYTHON_LIBS = @PYTHON_LIBS@
 
-DMS = MassActionFluxProcess.cpp \
-MichaelisUniUniFluxProcess.cpp \
-ConstantFluxProcess.cpp \
-DecayFluxProcess.cpp \
-SSystemProcess.cpp \
-GillespieProcess.cpp \
-TauLeapProcess.cpp \
-TauLeapStepper.cpp \
-FixedODE1Stepper.cpp \
-FixedDAE1Stepper.cpp \
-ODE23Stepper.cpp \
-ODE45Stepper.cpp \
-DAEStepper.cpp \
-ODEStepper.cpp \
-ESSYNSStepper.cpp \
-GMAProcess.cpp \
-SSystemProcess.cpp \
-FluxDistributionStepper.cpp \
-QuasiDynamicFluxProcess.cpp \
-PythonFluxProcess.cpp \
-PythonProcess.cpp \
-ExpressionFluxProcess.cpp \
-ExpressionAlgebraicProcess.cpp \
-ExpressionAssignmentProcess.cpp
+DMS = \
+	ConstantFluxProcess.cpp \
+	DAEStepper.cpp \
+	DecayFluxProcess.cpp \
+	ESSYNSStepper.cpp \
+	ExpressionAlgebraicProcess.cpp \
+	ExpressionAssignmentProcess.cpp \
+	ExpressionFluxProcess.cpp \
+	FixedDAE1Stepper.cpp \
+	FixedODE1Stepper.cpp \
+	FluxDistributionStepper.cpp \
+	GMAProcess.cpp \
+	GillespieProcess.cpp \
+	MassActionFluxProcess.cpp \
+	MichaelisUniUniFluxProcess.cpp \
+	ODE23Stepper.cpp \
+	ODE45Stepper.cpp \
+	ODEStepper.cpp \
+	PingPongBiBiFluxProcess.cpp \
+	PythonFluxProcess.cpp \
+	PythonProcess.cpp \
+	QuasiDynamicFluxProcess.cpp \
+	SSystemProcess.cpp \
+	TauLeapProcess.cpp \
+	TauLeapStepper.cpp
 
-DMH =  \
+DMH = \
 	ESSYNSProcessInterface.hpp \
 	PythonProcessBase.hpp \
 	ExpressionProcessBase.hpp \
