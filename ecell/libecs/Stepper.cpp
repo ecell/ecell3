@@ -617,7 +617,6 @@ GET_METHOD_DEF( Real, TimeScale, Stepper )
 
 SET_METHOD_DEF( Real, MaxStepInterval, Stepper )
 {
-    issueWarning( "MaxStepInterval is no longer supported." );
     theMaxStepInterval = value;
 }
 
