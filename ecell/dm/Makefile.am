@@ -107,14 +107,14 @@ install-data-local:
 	test -z "$(dmsodir)" || $(mkdir_p) "$(DESTDIR)$(dmsodir)"
 	@for p in $(SOS); do \
 		if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-		f=$(am__strip_dir) \
+		$(am__strip_dir) \
 		echo " ${INSTALL} -m 755 '$$d$$p' '$(DESTDIR)$(dmsodir)/$$f'"; \
 		${INSTALL} -m 755 "$$d$$p" "$(DESTDIR)$(dmsodir)/$$f"; \
 	done
 
 uninstall-local:
 	@for p in $(SOS); do \
-		f=$(am__strip_dir) \
+		$(am__strip_dir) \
 		echo " rm -f '$(DESTDIR)$(dmsodir)/$$f'"; \
 		$(RM) "$(DESTDIR)$(dmsodir)/$$f"; \
 	done
