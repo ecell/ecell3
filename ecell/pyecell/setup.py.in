@@ -17,7 +17,7 @@ include_dirs = [
     ]
 
 common_libraries = [
-    os.environ.get('BOOST_PYTHON_LIB_NAME', 'boost_python'),
+    os.environ.get('BOOST_PYTHON_LIBNAME', 'boost_python'),
     'gsl'
     ]
 
