@@ -281,7 +281,7 @@ namespace libecs
 
     SET_METHOD( Real, NextStepInterval )
     {
-      theNextStepInterval = value;
+      theNextStepInterval = std::min( value, theMaxStepInterval );
     }
 
     GET_METHOD( Real, NextStepInterval )
