@@ -51,9 +51,6 @@ AdaptiveDifferentialStepper::AdaptiveDifferentialStepper()
       theMaxErrorRatio( 1.0 ),
       theTolerableRejectedStepCount( std::numeric_limits< Integer >::max() )
 {
-    // use more narrow range
-    theMinStepInterval = 1e-100;
-    theMaxStepInterval = 1e+10;
 }
 
 AdaptiveDifferentialStepper::~AdaptiveDifferentialStepper()
