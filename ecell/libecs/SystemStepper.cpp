@@ -53,6 +53,7 @@ namespace libecs
     setCurrentTime( INF );
     theMaxStepInterval = INF;
     setStepInterval( INF );
+    setMinStepInterval( 0.0 );
     setPriority( (std::numeric_limits<Integer>::max)() ); 
   }
 
