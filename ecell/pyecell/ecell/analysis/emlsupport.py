@@ -83,7 +83,7 @@ class EmlSupport( ecell.eml.Eml ):
         '''
         
         aSimulator = ecell.emc.Simulator()
-        aSession = ecell.Session( aSimulator )
+        aSession = ecell.Session.Session( aSimulator )
         # aSession.loadModel( self )
 
         ##
@@ -265,5 +265,5 @@ if __name__ == '__main__':
     if len( sys.argv ) > 1:
         main( sys.argv[ 1 ] )
     else:
-        filename = '../../../../doc/sample/Heinrich/Heinrich.eml'
+        filename = '../../../../doc/samples/Heinrich/Heinrich.eml'
         main( os.path.abspath( filename ) )

@@ -78,13 +78,13 @@ class PathwayProxy:
 
         for processFullID in processList:
             
-#            if not ecell.eml.Eml.isEntityExist( self.theEmlSupport, processFullID ):
+#            if not self.theEmlSupport.isEntityExist( processFullID ):
 #                continue
 
             self.__processList.append( processFullID )
             
             try:
-                aVariableReferenceList = ecell.eml.Eml.getEntityProperty( self.theEmlSupport, processFullID + ':VariableReferenceList' )
+                aVariableReferenceList = self.theEmlSupport.getEntityProperty( processFullID + ':VariableReferenceList' )
 
             except AttributeError, e:
                 continue
@@ -129,7 +129,7 @@ class PathwayProxy:
 
         # update the related variable list
         try:
-            aVariableReferenceList = ecell.eml.Eml.getEntityProperty( self.theEmlSupport, processFullID + ':VariableReferenceList' )
+            aVariableReferenceList = self.theEmlSupport.getEntityProperty( processFullID + ':VariableReferenceList' )
 
         except AttributeError, e:
             return
@@ -168,7 +168,7 @@ class PathwayProxy:
 #                continue
             
             try:
-                aVariableReferenceList = ecell.eml.Eml.getEntityProperty( self.theEmlSupport, processFullID + ':VariableReferenceList' )
+                aVariableReferenceList = self.theEmlSupport.getEntityProperty( processFullID + ':VariableReferenceList' )
 
             except AttributeError, e:
                 continue
@@ -182,11 +182,11 @@ class PathwayProxy:
 
         for processFullID in self.__processList:
 
-#            if not ecell.eml.Eml.isEntityExist( self.theEmlSupport, processFullID ):
+#            if not self.theEmlSupport.isEntityExist( processFullID ):
 #                continue
             
             try:
-                aVariableReferenceList = ecell.eml.Eml.getEntityProperty( self.theEmlSupport, processFullID + ':VariableReferenceList' )
+                aVariableReferenceList = self.theEmlSupport.getEntityProperty( processFullID + ':VariableReferenceList' )
 
             except AttributeError, e:
                 continue
@@ -263,7 +263,7 @@ class PathwayProxy:
         for processFullID in self.__processList:
 
             try:
-                aVariableReferenceList = ecell.eml.Eml.getEntityProperty( self.theEmlSupport, processFullID + ':VariableReferenceList' )
+                aVariableReferenceList = self.theEmlSupport.getEntityProperty( processFullID + ':VariableReferenceList' )
 
             except AttributeError, e:
                 continue
@@ -296,7 +296,7 @@ class PathwayProxy:
             processFullID = self.__processList[ j ]
 
             try:
-                aVariableReferenceList = ecell.eml.Eml.getEntityProperty( self.theEmlSupport, processFullID + ':VariableReferenceList' )
+                aVariableReferenceList = self.theEmlSupport.getEntityProperty( processFullID + ':VariableReferenceList' )
 
             except AttributeError, e:
                 continue
@@ -337,7 +337,7 @@ class PathwayProxy:
             processFullID = self.__processList[ j ]
 
             try:
-                aVariableReferenceList = ecell.eml.Eml.getEntityProperty( self.theEmlSupport, processFullID + ':VariableReferenceList' )
+                aVariableReferenceList = self.theEmlSupport.getEntityProperty( processFullID + ':VariableReferenceList' )
 
             except AttributeError, e:
                 continue
@@ -372,11 +372,11 @@ class PathwayProxy:
         reversibilityList = []
         for processFullID in self.__processList:
 
-            propertyList = ecell.eml.Eml.getEntityPropertyList( self.theEmlSupport, processFullID )
+            propertyList = self.theEmlSupport.getEntityPropertyList( processFullID )
 
             if propertyList.count( 'isReversible' ) != 0:
                 # isReversible is handled as float
-                isReversible = float( ecell.Eml.getEntityProperty( self.theEmlSupport, processFullID + ':isReversible' )[ 0 ] )
+                isReversible = float( self.theEmlSupport.getEntityProperty( processFullID + ':isReversible' )[ 0 ] )
                 reversibilityList.append( int( isReversible ) )
                 
             else:
@@ -421,5 +421,5 @@ if __name__ == '__main__':
     if len( sys.argv ) > 1:
         main( sys.argv[ 1 ] )
     else:
-        filename = '../../../../doc/sample/Heinrich/Heinrich.eml'
+        filename = '../../../../doc/samples/Heinrich/Heinrich.eml'
         main( os.path.abspath( filename ) )
