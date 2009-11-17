@@ -1533,7 +1533,7 @@ public:
                 py::throw_error_already_set();
             }
 
-            py::handle<> aResult( PyObject_CallFunction( theOnValueChangingMethod.get(), "f", value ) );
+            py::handle<> aResult( PyObject_CallFunction( theOnValueChangingMethod.get(), const_cast<char*>("f"), value ) );
             if ( !aResult )
             {
                 py::throw_error_already_set();
@@ -1752,6 +1752,8 @@ private:
             {
                 return anInterface->getSearchPath();
             }
+
+            return "";
         }
 
         virtual const Module& getModule( const std::string& aClassName, bool forceReload = false )
