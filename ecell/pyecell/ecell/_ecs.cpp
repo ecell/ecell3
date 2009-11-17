@@ -1712,22 +1712,6 @@ inline PyObject* to_python_indirect_fun( T_* arg )
 
 class Simulator
 {
-public:
-    struct Model: public libecs::Model
-    {
-    public:
-        Simulator& getSimulator() const
-        {
-            return theSimulator;
-        }
-
-        Model( Simulator& aSimulator, ModuleMaker< EcsObject >& aModuleMaker )
-            : libecs::Model( aModuleMaker ), theSimulator( aSimulator ) {}
-
-    protected:
-        Simulator& theSimulator;
-    };
-
 private:
     struct CompositeModuleMaker: public ModuleMaker< EcsObject >,
                                  public SharedModuleMakerInterface
@@ -2663,11 +2647,6 @@ static void Entity___setattr__( py::object aSelf, py::object key, py::object val
     }
 }
 
-static Simulator& Entity___get_simulator__( Entity* self )
-{
-    return static_cast< Simulator::Model const* >( self->getModel() )->getSimulator();
-}
-
 template< typename T_ >
 static PyObject* writeOnly( T_* )
 {
@@ -2879,9 +2858,6 @@ BOOST_PYTHON_MODULE( _ecs )
     py::class_< Entity, py::bases<>, Entity, boost::noncopyable >
         ( "Entity", py::no_init )
         // properties
-        .add_property( "simulator",
-            py::make_function( &Entity___get_simulator__,
-                return_existing_object() ) )
         .add_property( "superSystem",
             py::make_function( &Entity::getSuperSystem,
             return_existing_object() ) )
