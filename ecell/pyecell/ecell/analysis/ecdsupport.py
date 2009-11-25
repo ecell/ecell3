@@ -44,25 +44,7 @@ import numpy.fft
 import numpy
 
 
-def checkTrend( aValue1, aValue2 ):
-    '''
-    check the type of a difference between two value,
-    +1 for positive, -1 for negative, 0 for zero
-    return in ( +1, -1, 0 )
-    '''
-
-    aDerivative = aValue2 - aValue1
-    if ( aDerivative > 0 ):
-        return +1
-    elif ( aDerivative < 0 ):
-        return -1
-    else:
-        return 0
-
-# end of checkTrend
-
-
-class EcdSupport( ecell.ECDDataFile ):
+class EcdSupport( ecell.ECDDataFile.ECDDataFile ):
 
 
     def __init__( self, aFileName=None ):
@@ -203,7 +185,7 @@ class EcdSupport( ecell.ECDDataFile ):
                 aPreviousValue = float( aData[ 1 ] )
 
                 # reverse
-                aPreviousTrend = checkTrend( aValue, aPreviousValue )
+                aPreviousTrend = cmp( aPreviousValue, aValue )
                 
                 break
 
@@ -218,7 +200,7 @@ class EcdSupport( ecell.ECDDataFile ):
             aTime = float( aData[ 0 ] )
             aValue = float( aData[ 1 ] )
 
-            aTrend = checkTrend( aPreviousValue, aValue )
+            aTrend = cmp( aValue, aPreviousValue )
 
             if not ( aPreviousTrend == aTrend ):
                 aFlexionPointList.append( [ aPreviousTime, aPreviousValue, aPreviousTrend ] )
