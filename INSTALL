@@ -6,13 +6,13 @@ Koichi Takahashi <shafi@e-cell.org>
 Getting the latest version of E-Cell 3
 ======================================
 
-1. Get tarball:
+1. Get a tarball:
 
    Official distributions can be found at:
 
      http://www.e-cell.org/software
 
-2. Get source code via Subversion:
+2. Or, get the latest source code via Subversion:
 
    Official development site of E-Cell 3 is:
 
@@ -39,8 +39,8 @@ Getting the latest version of E-Cell 3
 Supported Systems
 =================
 
-Will work in most modern Unix-like systems. Windows build is supported now
-with a separate build system that resides in build/msvc.
+Will work in most modern Unix-like systems. Windows build is now supported
+with a separate build system that resides under build/msvc.
 
 
 Building Prerequisite
