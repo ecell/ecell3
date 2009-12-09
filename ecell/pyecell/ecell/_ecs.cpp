@@ -1840,7 +1840,7 @@ public:
           theEventHandler(),
           theDefaultPropertiedObjectMaker( createDefaultModuleMaker() ),
           thePropertiedObjectMaker( *theDefaultPropertiedObjectMaker ),
-          theModel( *this, thePropertiedObjectMaker )
+          theModel( thePropertiedObjectMaker )
     {
     }
 
