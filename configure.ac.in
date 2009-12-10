@@ -18,11 +18,11 @@ AC_CONFIG_SUBDIRS([libltdl dmtool ecell])
 AC_ARG_ENABLE([gui],
   AC_HELP_STRING([--disable-gui],
                  [build ecell without gui frontends.]), [],
-  [enable_gui=yes]
-)
-AC_ARG_WITH([numpy-includes],
-  AC_HELP_STRING([--with-numpy-includes=DIR],
-                 [specify the numpy header location]),,)
+  [enable_gui=yes])
+
+AC_ARG_WITH([boost-python-libname],
+  AC_HELP_STRING([--with-boost-python-libname=LIBNAME],
+                 [specify the library name of Boost.Python [[boost_python]]]))
 
 AC_ARG_ENABLE([compiler-extensions],
   AC_HELP_STRING([--disable-compiler-extensions],

@@ -6,13 +6,13 @@ Koichi Takahashi <shafi@e-cell.org>
 Getting the latest version of E-Cell 3
 ======================================
 
-1. Get tarball:
+1. Get a tarball:
 
    Official distributions can be found at:
 
      http://www.e-cell.org/software
 
-2. Get source code via Subversion:
+2. Or, get the latest source code via Subversion:
 
    Official development site of E-Cell 3 is:
 
@@ -39,8 +39,8 @@ Getting the latest version of E-Cell 3
 Supported Systems
 =================
 
-Will work in most modern Unix-like systems. Windows build is supported now
-with a separate build system that resides in build/msvc.
+Will work in most modern Unix-like systems. Windows build is now supported
+with a separate build system that resides under build/msvc.
 
 
 Building Prerequisite
@@ -117,11 +117,15 @@ Install
   you need to run ./autogen.sh before running configure in case you have
   obtained the source from the repository.
 
-You may find the following options to configure are useful.
+You may find the following configure options are useful.
+
+  ``--with-boost-python-libname=LIBNAME``
+     Specify the library name (the portion of the file name with
+     the `lib` prefix and the extension removed) of the Boost.Python,
+     which falls back to `boost_python`.
  
-  --with-numpy-includes=DIR    Specify this when numpy is installed
-                               under non-standard installation directory.
-  --disable-gui                Specify to disable building GUI frontends.
+  ``--disable-gui``
+     Specify this when you do not want GUI frontend.
 
 
 $Id$
