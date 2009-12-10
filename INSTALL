@@ -117,11 +117,15 @@ Install
   you need to run ./autogen.sh before running configure in case you have
   obtained the source from the repository.
 
-You may find the following options to configure are useful.
+You may find the following configure options are useful.
+
+  ``--with-boost-python-libname=LIBNAME``
+     Specify the library name (the portion of the file name with
+     the `lib` prefix and the extension removed) of the Boost.Python,
+     which falls back to `boost_python`.
  
-  --with-numpy-includes=DIR    Specify this when numpy is installed
-                               under non-standard installation directory.
-  --disable-gui                Specify to disable building GUI frontends.
+  ``--disable-gui``
+     Specify this when you do not want GUI frontend.
 
 
 $Id$
