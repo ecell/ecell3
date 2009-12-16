@@ -98,10 +98,22 @@ public:
 
     ~FluxDistributionStepper()
     {
-        gsl_matrix_free( theUnknownMatrix );
-        gsl_matrix_free( theInverseMatrix );
-        gsl_vector_free( theVariableVelocityVector );
-        gsl_vector_free( theFluxVector );
+        if ( theUnknownMatrix )
+        {
+            gsl_matrix_free( theUnknownMatrix );
+        }
+        if ( theInverseMatrix )
+        {
+            gsl_matrix_free( theInverseMatrix );
+        }
+        if ( theVariableVelocityVector )
+        {
+            gsl_vector_free( theVariableVelocityVector );
+        }
+        if ( theFluxVector )
+        {
+            gsl_vector_free( theFluxVector );
+        }
     }
 
     SIMPLE_SET_GET_METHOD( Real, Epsilon );
