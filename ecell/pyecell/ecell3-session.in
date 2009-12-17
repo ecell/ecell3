@@ -224,6 +224,9 @@ More info: http://www.e-cell.org/software''' % (
         sys.version_info[0], sys.version_info[1], sys.version_info[2] )
         )
 
+    global theSession
+    theSession = aSession
+
     if anEmlFile:
         aSession.loadModel( anEmlFile )
 
