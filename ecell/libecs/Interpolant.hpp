@@ -44,35 +44,40 @@ public:
     class VariablePtrCompare
     {
     public:
-        bool operator()( InterpolantCptr const aLhs, 
-                         InterpolantCptr const aRhs ) const
+        bool operator()( Interpolant const* aLhs, 
+                         Interpolant const* aRhs ) const
         {
             return compare( aLhs->getVariable(), aRhs->getVariable() );
         }
 
-        bool operator()( InterpolantCptr const aLhs,
-                         VariableCptr const aRhs ) const
+        bool operator()( Interpolant const* aLhs,
+                         Variable const* aRhs ) const
         {
             return compare( aLhs->getVariable(), aRhs );
         }
 
-        bool operator()( VariableCptr const aLhs, 
-                         InterpolantCptr const aRhs ) const
+        bool operator()( Variable const* aLhs, 
+                         Interpolant const* aRhs ) const
         {
             return compare( aLhs, aRhs->getVariable() );
         }
 
     private:
         // if statement can be faster than returning an expression directly
-        static bool compare( VariableCptr const aLhs, 
-                                    VariableCptr const aRhs )
+        static bool compare( Variable const* aLhs, 
+                             Variable const* aRhs )
         {
             return aLhs < aRhs;
         }
     };
 
 
-    Interpolant( VariablePtr const aVariable );
+    Interpolant( Variable const* aVariable, Stepper const* aStepper )
+        : theVariable( aVariable ), theStepper( aStepper )
+    {
+        // do nothing
+    }
+
 
     virtual ~Interpolant();
     
@@ -86,13 +91,19 @@ public:
         return 0.0;
     }
      
-    VariablePtr const getVariable() const
+    Variable const* getVariable() const
     {
         return theVariable;
     }
 
-private:
-    VariablePtr const theVariable;
+    Stepper const* getStepper() const
+    {
+        return theStepper;
+    }
+
+protected:
+    Variable const* theVariable;
+    Stepper const* theStepper;
 };
 
 

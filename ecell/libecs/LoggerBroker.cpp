@@ -221,5 +221,23 @@ LoggerBroker::getLoggersByFullID( FullID const& aFullID ) const
     );
 }
 
+void LoggerBroker::removeLoggersByFullID( FullID const& aFullID )
+{
+    LoggerMap::iterator anOuterIter( theLoggerMap.find( aFullID ) );
+
+    if( anOuterIter == theLoggerMap.end() )
+    {
+        THROW_EXCEPTION( NotFound, "Logger for [" + aFullID.asString() 
+                                   + "] not found" );
+    }
+
+    std::for_each( (*anOuterIter).second.begin(),
+                   (*anOuterIter).second.end(),
+                   ComposeUnary(
+                       DeletePtr< Logger >(),
+                       SelectSecond< PerFullIDMap::value_type >() ) );
+    theLoggerMap.erase( anOuterIter );
+}
+
 
 } // namespace libecs

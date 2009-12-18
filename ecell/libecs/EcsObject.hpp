@@ -610,7 +610,9 @@ public:
     }
 
 
-    EcsObject(): disposed_( false )
+    EcsObject()
+        : theModel( 0 ), theHandle( Handle::INVALID_HANDLE_VALUE ),
+          disposed_( false )
     {
         ; // do nothing
     }
@@ -620,10 +622,9 @@ public:
         dispose();
     }
 
-    virtual void dispose()
-    {
-        disposed_ = true;
-    }
+    virtual void dispose();
+
+    virtual void detach();
 
     /**
        Get a Model object to which this object belongs.

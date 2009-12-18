@@ -186,20 +186,6 @@ Process::Process()
 }
 
 
-void Process::dispose()
-{
-    if ( !disposed_ )
-    {
-        if( getStepper() )
-        {
-            getStepper()->unregisterProcess( this );
-        }
-    }
-
-    Entity::dispose();
-}
-
-
 Process::~Process()
 {
 }
@@ -274,20 +260,25 @@ Process::getVariableReference( StringCref aVariableReferenceName ) const
     }
 }
 
-void Process::removeVariableReference( IntegerParam anID )
+bool Process::removeVariableReference( IntegerParam anID, bool raiseException )
 {
     VariableReferenceVector::iterator i( findVariableReference( anID ) );
     if ( i == theVariableReferenceVector.end() )
     {
+        if ( !raiseException )
+        {
+            return false;
+        }
         THROW_EXCEPTION_INSIDE( NotFound,
                                 asString() + ": VariableReference #"
                                 + stringCast( anID )
                                 + " not found in this Process" );
     }
     theVariableReferenceVector.erase( i );
+    return true;
 }
 
-void Process::removeVariableReference( StringCref aName )
+bool Process::removeVariableReference( String const& aName, bool raiseException  )
 {
     bool aIsRemoved( false );
 
@@ -306,16 +297,18 @@ void Process::removeVariableReference( StringCref aName )
         }
     }
 
-    if ( !aIsRemoved )
+    if ( !aIsRemoved && raiseException )
     {
         THROW_EXCEPTION_INSIDE( NotFound,
                                 asString() + ": VariableReference ["
                                 + aName
                                 + "] not found in this Process" );
     }
+
+    return aIsRemoved;
 }
 
-void Process::removeVariableReference( Variable const* aVariable )
+bool Process::removeVariableReference( Variable const* aVariable, bool raiseException )
 {
     bool aIsRemoved( false );
 
@@ -334,13 +327,15 @@ void Process::removeVariableReference( Variable const* aVariable )
         }
     }
 
-    if ( !aIsRemoved )
+    if ( !aIsRemoved && raiseException )
     {
         THROW_EXCEPTION_INSIDE( NotFound,
                                 asString() + ": VariableReference ["
                                 + aVariable->asString()
                                 + "] not found in this Process" );
     }
+
+    return aIsRemoved;
 }
 
 const Integer Process::registerVariableReference( FullID const& aFullID,
@@ -602,6 +597,15 @@ void Process::addValue( RealParam aValue )
     std::for_each( thePositiveVariableReferenceIterator,
                    theVariableReferenceVector.end(),
                    boost::bind( &VariableReference::addValue, _1, aValue ) );
+}
+
+void Process::detach()
+{
+    if ( theStepper )
+    {
+        try { theStepper->unregisterProcess( this ); } catch ( NotFound const& ) {}
+    }
+    Entity::detach();
 }
 
 } // namespace libecs

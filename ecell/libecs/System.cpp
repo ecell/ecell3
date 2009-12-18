@@ -269,36 +269,8 @@ void System::registerEntity( System* aSystem )
     aSystem->setSuperSystem( this );
 
     notifyChangeOfEntityList();
+
 }
-
-
-void System::unregisterEntity( System* aSystem )
-{
-    System const* aSuperSystem( aSystem->getSuperSystem() );
-
-    if ( !aSuperSystem )
-    {
-        THROW_EXCEPTION_INSIDE( NotFound, 
-                        asString() + ": System is not associated to "
-                        "any System" );
-    }
-    else if ( aSuperSystem != this )
-    {
-        THROW_EXCEPTION_INSIDE( NotFound, 
-                        asString() + ": System is already associated to "
-                        "another system" );
-    }
-
-    SystemMap::iterator i( theSystemMap.find( aSystem->getID() ) );
-    if ( i == theSystemMap.end() || (*i).second != aSystem )
-    {
-        THROW_EXCEPTION_INSIDE( NotFound, 
-                         asString() + ": System is not associated" );
-    }
-
-    unregisterEntity( i );
-}
-
 
 void System::unregisterEntity( SystemMap::iterator const& i )
 {
@@ -414,36 +386,6 @@ void System::registerEntity( Process* aProcess )
 }
 
 
-void System::unregisterEntity( Process* aProcess )
-{
-    System const* aSuperSystem( aProcess->getSuperSystem() );
-
-    if ( !aSuperSystem )
-    {
-        THROW_EXCEPTION_INSIDE( NotFound, 
-                         asString() + ": Process [" + aProcess->asString()
-                         + "] is not associated t0 any System" );
-    }
-    if ( aSuperSystem != this )
-    {
-        THROW_EXCEPTION_INSIDE( NotFound, 
-                         asString() + ": Process ["
-                         + aProcess->asString()
-                         + "] is associated to another system" );
-    }
-
-    ProcessMap::iterator i( theProcessMap.find( aProcess->getID() ) );
-    if ( i == theProcessMap.end() || (*i).second != aProcess )
-    {
-        THROW_EXCEPTION_INSIDE( NotFound, 
-                         asString() + ": Process ["
-                         + aProcess->asString() + "] is not associated" );
-    }
-
-    unregisterEntity( i );
-}
-
-
 void System::unregisterEntity( ProcessMap::iterator const& i )
 {
     (*i).second->setSuperSystem( NULLPTR );
@@ -467,35 +409,6 @@ void System::registerEntity( Variable* aVariable )
     aVariable->setSuperSystem( this );
 
     notifyChangeOfEntityList();
-}
-
-
-void System::unregisterEntity( Variable* aVariable )
-{
-    System const* aSuperSystem( aVariable->getSuperSystem() );
-
-    if ( !aSuperSystem )
-    {
-        THROW_EXCEPTION_INSIDE( NotFound, 
-                         asString() + ": Variable [" + aVariable->asString()
-                         + "] is not associated to any System" );
-    }
-    if ( aSuperSystem != this )
-    {
-        THROW_EXCEPTION_INSIDE( NotFound, 
-                        asString() + ": Variable [" + aVariable->asString()
-                        + "] is associated to another system" );
-    }
-
-    VariableMap::iterator i( theVariableMap.find( aVariable->getID() ) );
-    if ( i == theVariableMap.end() || (*i).second != aVariable )
-    {
-        THROW_EXCEPTION_INSIDE( NotFound, 
-                         asString() + ": Variable [" + aVariable->asString()
-                         + "] is not associated" );
-    }
-
-    unregisterEntity( i );
 }
 
 
@@ -523,6 +436,25 @@ void System::registerEntity( Entity* anEntity )
     default:
         THROW_EXCEPTION_INSIDE( InvalidEntityType, "invalid EntityType specified [" + anEntity->getEntityType().asString() + "]" );
     }
+}
+
+
+void System::unregisterEntity( Entity* anEntity )
+{
+    System const* const aSuperSystem( anEntity->getSuperSystem() );
+    if ( !aSuperSystem )
+    {
+        THROW_EXCEPTION_INSIDE( NotFound, 
+                         asString() + ": " + anEntity->asString()
+                         + " is not associated to any System" );
+    }
+    if ( aSuperSystem != this )
+    {
+        THROW_EXCEPTION_INSIDE( NotFound, 
+                        asString() + ": " + anEntity->asString()
+                        + " is associated to another system" );
+    }
+    unregisterEntity( anEntity->getEntityType(), anEntity->getID() );
 }
 
 
@@ -568,6 +500,40 @@ void System::unregisterEntity( EntityType const& anEntityType, String const& anI
         }
         break;
     }
+}
+
+void System::detach()
+{
+    for ( SystemMap::iterator i( theSystemMap.begin() ),
+                              e( theSystemMap.end() );
+          i != e; ++i )
+    {
+        ( *i ).second->detach();
+    }
+
+    for ( ProcessMap::iterator i( theProcessMap.begin() ),
+                               e( theProcessMap.end() );
+          i != e; ++i )
+    {
+        ( *i ).second->detach();
+    }
+
+    for ( VariableMap::iterator i( theVariableMap.begin() ),
+                                e( theVariableMap.end() );
+          i != e; ++i )
+    {
+        ( *i ).second->detach();
+    }
+
+    if ( theStepper )
+    {
+        try { theStepper->unregisterSystem( this ); } catch ( NotFound const& ) {}
+        theStepper = 0;
+    }
+
+    theSizeVariable = 0;
+
+    Entity::detach();
 }
 
 } // namespace libecs

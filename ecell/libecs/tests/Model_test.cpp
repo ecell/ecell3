@@ -55,6 +55,7 @@ BOOST_AUTO_TEST_CASE(testCreateEntity)
     ModuleMaker< EcsObject > mmaker;
     DM_NEW_STATIC( &mmaker, EcsObject, MockProcess );
     Model model( mmaker );
+    model.setup();
 
     Variable* var( dynamic_cast< Variable* >(
             model.createEntity( "Variable", FullID( "Variable:/:test" ) ) ) );
@@ -88,6 +89,7 @@ BOOST_AUTO_TEST_CASE(testCreateStepper)
 {
     ModuleMaker< EcsObject > mmaker;
     Model model( mmaker );
+    model.setup();
 
     Stepper* stepper( model.createStepper( "PassiveStepper", "test" ) );
 
@@ -100,6 +102,7 @@ BOOST_AUTO_TEST_CASE(testDeleteStepper1)
 {
     ModuleMaker< EcsObject > mmaker;
     Model model( mmaker );
+    model.setup();
 
     Stepper* stepper( model.createStepper( "PassiveStepper", "test" ) );
     model.getStepper( "test" ); // assert no throw
@@ -112,6 +115,7 @@ BOOST_AUTO_TEST_CASE(testDeleteStepper2)
     ModuleMaker< EcsObject > mmaker;
     DM_NEW_STATIC( &mmaker, EcsObject, MockProcess );
     Model model( mmaker );
+    model.setup();
 
     Stepper* stepper( model.createStepper( "PassiveStepper", "test" ) );
     model.getStepper( "test" ); // assert no throw
@@ -128,6 +132,7 @@ BOOST_AUTO_TEST_CASE(testDeleteStepper3)
     ModuleMaker< EcsObject > mmaker;
     DM_NEW_STATIC( &mmaker, EcsObject, MockProcess );
     Model model( mmaker );
+    model.setup();
 
     Stepper* stepper( model.createStepper( "PassiveStepper", "test" ) );
     model.getStepper( "test" ); // assert no throw
@@ -140,3 +145,25 @@ BOOST_AUTO_TEST_CASE(testDeleteStepper3)
     BOOST_CHECK_THROW( model.deleteStepper( "test" ), IllegalOperation );
 }
 
+BOOST_AUTO_TEST_CASE(testDeleteEntity1)
+{
+    ModuleMaker< EcsObject > mmaker;
+    Model model( mmaker );
+    model.setup();
+
+    Stepper* stepper( model.createStepper( "PassiveStepper", "test" ) );
+    model.getStepper( "test" ); // assert no throw
+
+    FullID aFullID( "Variable:/:test" );
+    BOOST_CHECK_THROW( model.getEntity( aFullID ), NotFound );
+    model.createEntity( "Variable", aFullID );
+
+    model.getRootSystem()->setStepperID( "test" );
+
+    model.initialize();
+
+    model.deleteEntity( aFullID );
+
+    BOOST_CHECK_THROW( model.getEntity( aFullID ), NotFound );
+    BOOST_CHECK_THROW( model.deleteEntity( aFullID ), NotFound );
+}

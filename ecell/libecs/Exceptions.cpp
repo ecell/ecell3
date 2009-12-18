@@ -35,23 +35,50 @@
 
 #include "Exceptions.hpp"
 #include "EcsObject.hpp"
+#include "Model.hpp"
 
 namespace libecs
 {
+
+Exception::Exception( String const& method, String const& message, EcsObject const* object )
+    : theMethod( method ), 
+      theMessage( message ),
+      theEcsObjectHandle( object ? object->getHandle(): Handle::INVALID_HANDLE_VALUE ),
+      theModel( object ? object->getModel(): 0 ),
+      theWhatMsg()
+{
+    ; // do nothing
+}
+
 Exception::~Exception() throw()
 {
     ; // do nothing
 }
+
+EcsObject const* Exception::getEcsObject() const throw()
+{
+    EcsObject const* object( 0 );
+
+    if ( theModel && theEcsObjectHandle != Handle::INVALID_HANDLE_VALUE )
+    {
+        try { object = theModel->getObject( theEcsObjectHandle ); }
+        catch ( std::exception const& ) {}
+    }
+
+    return object;
+}
+
 const char* Exception::what() const throw()
 {
     if (theWhatMsg.empty())
     {
         String whatMsg( getClassName() );
         whatMsg += ": " + theMessage;
-        if ( theEcsObject )
+        EcsObject const* object( getEcsObject() );
+        if ( object )
         {
             whatMsg += " (";
-            whatMsg += theEcsObject->asString();
+            whatMsg += object->asString();
             whatMsg += ")";
         }
         theWhatMsg = whatMsg;

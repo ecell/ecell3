@@ -109,4 +109,12 @@ void Variable::registerInterpolant( InterpolantPtr const anInterpolantPtr )
     theInterpolantVector.push_back( anInterpolantPtr );
 }
 
+
+void Variable::detach()
+{
+    clearInterpolantVector();
+    Entity::detach();
+}
+
+
 } // namespace libecs

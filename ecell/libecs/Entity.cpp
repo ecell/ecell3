@@ -108,4 +108,22 @@ String Entity::asString() const
 }
 
 
+void Entity::detach()
+{
+    if ( theSuperSystem )
+    {
+        if ( theModel )
+        {
+            try { theModel->getLoggerBroker().removeLoggersByFullID( getFullID() ); }
+            catch ( NotFound const& ) {}
+        }
+
+        try { theSuperSystem->unregisterEntity( this ); }
+        catch ( NotFound const& ) {}
+    }
+    theSuperSystem = NULLPTR;
+    EcsObject::detach();
+}
+
+
 } // namespace libecs

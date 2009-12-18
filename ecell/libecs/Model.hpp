@@ -68,6 +68,9 @@ protected:
 
 public:
     Model( ModuleMaker< EcsObject >& maker );
+
+    void setup();
+
     ~Model();
     /**
        Initialize the whole model.
@@ -183,13 +186,25 @@ public:
 
 
     /**
+       detach an EcsObject from the Model
+    */
+    void detachObject( EcsObject* anObject );
+
+    /**
        Retrieves an Entity object pointed by the FullID.
 
        @param aFullID a FullID of the requested Entity.
        @return A borrowed pointer to the Entity specified by the FullID.
     */
-    Entity* getEntity( FullIDCref aFullID ) const;
+    Entity* getEntity( FullID const& aFullID ) const;
 
+
+    /**
+       Delete a Entity with aFullID.
+
+       @param aFullID      a FullID of the Entity to delete.
+     */
+    void deleteEntity( FullID const& aFullID );
 
     /**
        Retrieves a System object pointed by the SystemPath.    
@@ -308,8 +323,12 @@ public:
 
     const String getDMSearchPath() const;
 
-    /// @internal
     void markDirty();
+
+    bool isDirty() const
+    {
+        return this->isDirty_;
+    }
 
 private:
     /** @internal */
@@ -331,10 +350,12 @@ private:
 
     static void initializeEntities( System* aSystem );
 
+    static void removeVariableReferences( System* aSystem, Variable const* aVariable );
+
 public:
     static const char PATH_SEPARATOR;
 
-private:
+protected:
 
     Time                            theCurrentTime;
     Stepper*                        theLastStepper;
@@ -357,7 +378,7 @@ private:
     SystemMaker                     theSystemMaker;
     VariableMaker                   theVariableMaker;
     ProcessMaker                    theProcessMaker;
-    bool                            isDirty;
+    bool                            isDirty_;
 };
 
 } // namespace libecs

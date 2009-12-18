@@ -196,19 +196,6 @@ public:
 
 
     /**
-       Register a Process object to this System.
-
-       This method steals ownership of the given pointer.
-    */
-    void registerEntity( Process* aProcess );
-
-
-    /**
-       Unregister the specified Process object from this System.
-     */
-    void unregisterEntity( Process* aProcess );
-
-    /**
        Register a Variable object to this System.
 
        This method steals ownership of the given pointer.
@@ -217,9 +204,11 @@ public:
 
 
     /**
-       Unregister the specified Process object from this System.
-     */
-    void unregisterEntity( Variable* aProcess );
+       Register a Process object to this System.
+
+       This method steals ownership of the given pointer.
+    */
+    void registerEntity( Process* aProcess );
 
 
     /**
@@ -231,17 +220,17 @@ public:
 
 
     /**
-       Unregister the specified System object from this System.
-     */
-    void unregisterEntity( System* aProcess );
-
-
-    /**
        Register an Entity object to this System.
 
        This method steals ownership of the given pointer.
      */
     void registerEntity( Entity* anEntity );
+
+
+    /**
+       Unregister the specified Entity object from this System.
+     */
+    void unregisterEntity( Entity* anEntity );
 
 
     /**
@@ -275,6 +264,8 @@ public:
     Variable const* findSizeVariable() const;
 
     void configureSizeVariable();
+
+    virtual void detach();
 
 public: // property slots
     GET_METHOD( Polymorph, SystemList );

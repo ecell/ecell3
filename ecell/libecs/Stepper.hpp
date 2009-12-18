@@ -231,10 +231,8 @@ public:
 
     /**
        Remove all the associated System from this Stepper.
-
-       @param aSystemPtr a pointer to a System object
     */
-    void unregisterAllSystem();
+    void unregisterAllSystems();
 
     /**
          Register a Process to this Stepper.
@@ -252,6 +250,10 @@ public:
     */
     void unregisterProcess( ProcessPtr aProcessPtr );
 
+    /**
+       Remove all the associated Process from this Stepper.
+    */
+    void unregisterAllProcesses();
 
     void loadStepInterval( RealParam aStepInterval )
     {
@@ -371,7 +373,7 @@ public:
     }
 
 
-    const VariableIndex getVariableIndex( Variable const* aVariable );
+    const VariableIndex getVariableIndex( Variable const* aVariable ) const;
 
     virtual void interrupt( TimeParam aTime ) = 0;
 
@@ -403,7 +405,7 @@ public:
     void updateIntegratedVariableVector();
 
 
-    virtual Interpolant* createInterpolant( Variable* aVariable );
+    virtual Interpolant* createInterpolant( Variable const* aVariable ) const;
 
     const gsl_rng* getRng() const
     {
@@ -421,6 +423,8 @@ public:
        @return a description string of this Entity.
     */
     virtual String asString() const;
+
+    virtual void detach();
 
 protected:
     void clearVariables();

@@ -273,15 +273,16 @@ void DifferentialStepper::interrupt( TimeParam aTime )
 const Real DifferentialStepper::Interpolant::getDifference(
         RealParam aTime, RealParam anInterval ) const
 {
-    if ( !theStepper.theStateFlag )
+    DifferentialStepper const* const theStepper( reinterpret_cast< DifferentialStepper const    * >( this->theStepper ) );
+    if ( !theStepper->theStateFlag )
     {
         return 0.0;
     }
 
-    const Real aTimeInterval1( aTime - theStepper.getCurrentTime() );
+    const Real aTimeInterval1( aTime - theStepper->getCurrentTime() );
     const Real aTimeInterval2( aTimeInterval1 - anInterval );
 
-    RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
+    RealMatrixCref aTaylorSeries( theStepper->getTaylorSeries() );
     RealCptr aTaylorCoefficientPtr( aTaylorSeries.origin() + theIndex );
 
     // calculate first order.
@@ -293,11 +294,11 @@ const Real DifferentialStepper::Interpolant::getDifference(
 
 
     // check if second and higher order calculations are necessary.
-    const RealMatrix::size_type aTaylorSize( theStepper.getOrder() );
+    const RealMatrix::size_type aTaylorSize( theStepper->getOrder() );
     if( aTaylorSize >= 2)
     {
         const Real aStepIntervalInv(
-            1.0 / theStepper.getTolerableStepInterval() );
+            1.0 / theStepper->getTolerableStepInterval() );
         
         const RealMatrix::size_type aStride( aTaylorSeries.strides()[0] );
 
@@ -333,14 +334,16 @@ const Real DifferentialStepper::Interpolant::getDifference(
 
 const Real DifferentialStepper::Interpolant::getVelocity( RealParam aTime ) const
 {
-    if ( !theStepper.theStateFlag )
+    DifferentialStepper const* const theStepper( reinterpret_cast< DifferentialStepper const* >( this->theStepper ) );
+
+    if ( !theStepper->theStateFlag )
     {
         return 0.0;
     }
 
-    const Real aTimeInterval( aTime - theStepper.getCurrentTime() );
+    const Real aTimeInterval( aTime - theStepper->getCurrentTime() );
 
-    RealMatrixCref aTaylorSeries( theStepper.getTaylorSeries() );
+    RealMatrixCref aTaylorSeries( theStepper->getTaylorSeries() );
     RealCptr aTaylorCoefficientPtr( aTaylorSeries.origin() + theIndex );
 
     // calculate first order.
@@ -350,7 +353,7 @@ const Real DifferentialStepper::Interpolant::getVelocity( RealParam aTime ) cons
     Real aValue( *aTaylorCoefficientPtr );
 
     // check if second and higher order calculations are necessary.
-    const RealMatrix::size_type aTaylorSize( theStepper.getStage() );
+    const RealMatrix::size_type aTaylorSize( theStepper->getStage() );
     if( aTaylorSize >= 2 && aTimeInterval != 0.0 )
     {
         const RealMatrix::size_type aStride( aTaylorSeries.strides()[0] );
@@ -360,7 +363,7 @@ const Real DifferentialStepper::Interpolant::getVelocity( RealParam aTime ) cons
         RealMatrix::size_type s( 1 );
 
         const Real theta( aTimeInterval 
-                          / theStepper.getTolerableStepInterval() );
+                          / theStepper->getTolerableStepInterval() );
 
         do 
         {
@@ -380,5 +383,12 @@ const Real DifferentialStepper::Interpolant::getVelocity( RealParam aTime ) cons
 
     return aValue;
 }
+
+
+libecs::Interpolant* DifferentialStepper::createInterpolant( Variable const* aVariable ) const
+{
+    return new DifferentialStepper::Interpolant( aVariable, this );
+}
+
 
 } // namespace libecs

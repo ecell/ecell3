@@ -37,6 +37,7 @@
 #include <boost/range/begin.hpp>
 #include <boost/range/end.hpp>
 #include <boost/range/value_type.hpp>
+#include <boost/iterator/transform_iterator.hpp>
 
 #include "dmtool/SharedModuleMaker.hpp"
 
@@ -70,7 +71,11 @@ Model::Model( ModuleMaker< EcsObject >& maker )
       theSystemMaker( theEcsObjectMaker ),
       theVariableMaker( theEcsObjectMaker ),
       theProcessMaker( theEcsObjectMaker ),
-      isDirty( false )
+      isDirty_( false )
+{
+}
+
+void Model::setup()
 {
     registerBuiltinModules();
 
@@ -91,16 +96,20 @@ Model::Model( ModuleMaker< EcsObject >& maker )
     theLastStepper = &theSystemStepper;
 }
 
-
 Model::~Model()
 {
-    std::for_each( theObjectMap.begin(), theObjectMap.end(),
-            ComposeUnary( boost::bind( &EcsObject::dispose, _1 ),
-                    SelectSecond< HandleToObjectMap::value_type >() ) );
+    std::vector< EcsObject* > objects;
+    for ( HandleToObjectMap::const_iterator i( theObjectMap.begin() ),
+                                            e( theObjectMap.end() );
+          i != e; ++i )
+    {
+        objects.push_back( ( *i ).second );
+    }
 
-    std::for_each( theObjectMap.begin(), theObjectMap.end(),
-            ComposeUnary( DeletePtr< EcsObject >(),
-                    SelectSecond< HandleToObjectMap::value_type >() ) );
+    std::for_each( objects.begin(), objects.end(),
+            boost::bind( &EcsObject::dispose, _1 ) );
+
+    std::for_each( objects.begin(), objects.end(), DeletePtr< EcsObject >() );
 }
 
 
@@ -243,6 +252,38 @@ Entity* Model::getEntity( FullIDCref aFullID ) const
 }
 
 
+void Model::removeVariableReferences( System* aSystem, Variable const* aVariable )
+{
+    System::Processes processes( aSystem->getProcesses() );
+    std::for_each( boost::begin( processes ), boost::end( processes ),
+            ComposeUnary(
+                boost::bind(
+                    (bool(Process::*)(Variable const*, bool))&Process::removeVariableReference,
+                    _1, aVariable, false ),
+                SelectSecond< boost::range_value< System::Processes >::type >() ) );
+}
+
+void Model::detachObject( EcsObject* anObject )
+{
+    {
+        Stepper* aStepper( dynamic_cast< Stepper* >( anObject ) );
+        if ( aStepper )
+        {
+            theStepperMap.erase( aStepper->getID() );
+        }
+    }
+    {
+        Variable* aVariable( dynamic_cast< Variable* >( anObject ) );
+        if ( aVariable )
+        {
+            removeVariableReferences( theRootSystem, aVariable );
+        }
+    }
+    theObjectMap.erase( anObject->getHandle() );
+    markDirty();
+}
+
+
 EcsObject* Model::getObject( Handle const& handle ) const
 {
     HandleToObjectMap::const_iterator i( theObjectMap.find( handle ) );
@@ -297,21 +338,6 @@ void Model::registerStepper( Stepper* aStepper )
         StepperEvent( getCurrentTime() + aStepper->getStepInterval(),
                       aStepper ) );
 
-    markDirty();
-}
-
-void Model::deleteStepper( String const& anID )
-{
-    Stepper* aStepper( getStepper( anID ) );
-
-    if ( !aStepper->getProcessVector().empty() )
-    {
-        THROW_EXCEPTION( IllegalOperation,
-                "Stepper [" + anID + "] is relied on by one or more processes" );
-    }
-
-    aStepper->unregisterAllSystem(); 
-    theStepperMap.erase( anID );
     markDirty();
 }
 
@@ -412,7 +438,7 @@ void Model::initialize()
         theScheduler.getEvent(c).reschedule();
     }
 
-    isDirty = false;
+    isDirty_ = false;
 }
 
 void Model::setDMSearchPath( const std::string& path )
@@ -452,7 +478,7 @@ void Model::registerBuiltinModules()
 
 void Model::step()
 {
-    if ( isDirty )
+    if ( isDirty_ )
     {
         flushLoggers();
         initialize();
@@ -467,7 +493,7 @@ void Model::step()
 
 void Model::markDirty()
 {
-    isDirty = true;
+    isDirty_ = true;
 }
 
 Handle Model::generateNextHandle()
@@ -479,5 +505,26 @@ Handle Model::generateNextHandle()
     }
     return Handle( theNextHandleVal );
 }
+
+
+void Model::deleteStepper( String const& anID )
+{
+    Stepper* aStepper( getStepper( anID ) );
+
+    if ( !aStepper->getProcessVector().empty() )
+    {
+        THROW_EXCEPTION( IllegalOperation,
+                "Stepper [" + anID + "] is relied on by one or more processes" );
+    }
+
+    aStepper->detach();
+}
+
+
+void Model::deleteEntity( FullID const& aFullID )
+{
+    getEntity( aFullID )->detach();
+}
+
 
 } // namespace libecs

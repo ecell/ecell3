@@ -65,7 +65,7 @@ namespace libecs
 
            @return a borrowed pointer to the super system.
         */
-        SystemPtr getSuperSystem() const 
+        System* getSuperSystem() const 
         {
             return theSuperSystem;
         }
@@ -179,6 +179,11 @@ namespace libecs
             theSuperSystem = supersystem; 
         }
 
+        /**
+          Detach this entity from Model
+        */
+        virtual void detach();
+
     protected:
     
         void setLoggerMap( LoggerBroker::PerFullIDMap* anLoggerMap )
@@ -193,7 +198,7 @@ namespace libecs
         EntityRef operator=( EntityRef );
 
     private:
-        SystemPtr                      theSuperSystem;
+        System*                        theSuperSystem;
         LoggerBroker::PerFullIDMap*    theLoggerMap;
         String                         theID;
         String                         theName;

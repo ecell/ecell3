@@ -315,6 +315,7 @@ public:
 
     void registerInterpolant( InterpolantPtr const anInterpolant );
 
+    virtual void detach();
 
 protected:
     const Real calculateDifferenceSum( RealParam aCurrentTime, 

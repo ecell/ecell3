@@ -120,7 +120,6 @@ public:
     Process();
 
     virtual ~Process();
-    virtual void dispose();
 
     virtual const EntityType getEntityType() const
     {
@@ -305,11 +304,11 @@ public:
                                              const bool isAccessor = true );
 
 
-    void removeVariableReference( StringCref aName );
+    bool removeVariableReference( String const& aName, bool raiseException = true );
 
-    void removeVariableReference( Integer anID );
+    bool removeVariableReference( Integer anID, bool raiseException = true );
 
-    void removeVariableReference( Variable const* aVariable );
+    bool removeVariableReference( Variable const* aVariable, bool raiseException = true );
 
 
     /**
@@ -371,12 +370,6 @@ public:
         return theStepper;
     }
 
-
-    ModelPtr getModel() const
-    {
-        return getSuperSystem()->getModel();
-    }
-
     /**
        Add a value to each of VariableReferences.
 
@@ -427,6 +420,8 @@ public:
        Check if this Process can affect on a given Process.
     */
     const bool isDependentOn( const ProcessCptr aProcessPtr ) const;
+
+    virtual void detach();
 
 protected:
     VariableReferenceVectorIterator findVariableReference( StringCref aName );

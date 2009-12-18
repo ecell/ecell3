@@ -35,10 +35,12 @@
 #include <stdexcept>
 
 #include "libecs/Defs.hpp"
+#include "libecs/Handle.hpp"
 
 namespace libecs
 {
 class EcsObject;
+class Model;
 
 /**
    A macro to throw an exception with the method name and the causal
@@ -75,14 +77,7 @@ public:
        @param message the description of the exception.
        @param entity the entity where the exception occurred.
      */
-    Exception( String const& method, String const& message = "", EcsObject const* object = 0 )
-        : theMethod( method ), 
-          theMessage( message ),
-          theEcsObject( object ),
-          theWhatMsg()
-    {
-        ; // do nothing
-    }
+    Exception( String const& method, String const& message = "", EcsObject const* object = 0 );
 
     virtual ~Exception() throw();
 
@@ -103,15 +98,13 @@ public:
         return theMethod;
     }
 
-    EcsObject const* getEcsObject() const throw()
-    {
-        return theEcsObject;
-    }
+    EcsObject const* getEcsObject() const throw();
 
 protected:
     const String theMethod;
     const String theMessage;
-    EcsObject const* const theEcsObject;
+    Handle const theEcsObjectHandle;
+    Model const* const theModel;
     mutable String theWhatMsg;
 };
 

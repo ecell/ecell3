@@ -331,7 +331,7 @@ void Stepper::unregisterSystem( System* aSystemPtr )
 }
 
 
-void Stepper::unregisterAllSystem()
+void Stepper::unregisterAllSystems()
 {
     theSystemVector.clear();
 }
@@ -424,6 +424,12 @@ void Stepper::unregisterProcess( ProcessPtr aProcess )
 }
 
 
+void Stepper::unregisterAllProcesses()
+{
+    theProcessVector.clear();
+    theVariableVector.clear();
+}
+
 void Stepper::log()
 {
     for ( ProcessVector::const_iterator i( theProcessVector.begin() ),
@@ -499,7 +505,7 @@ GET_METHOD_DEF( Polymorph, ProcessList, Stepper )
 }
 
 const Stepper::VariableVector::size_type 
-Stepper::getVariableIndex( Variable const* aVariable )
+Stepper::getVariableIndex( Variable const* aVariable ) const
 {
     VariableVectorConstIterator
         anIterator( std::find( theVariableVector.begin(), 
@@ -620,9 +626,16 @@ SET_METHOD_DEF( Real, MaxStepInterval, Stepper )
     theMaxStepInterval = value;
 }
 
-Interpolant* Stepper::createInterpolant( Variable* aVariable )
+Interpolant* Stepper::createInterpolant( Variable const* aVariable ) const
 {
-    return new Interpolant( aVariable );
+    return new Interpolant( aVariable, this );
+}
+
+void Stepper::detach()
+{
+    unregisterAllSystems();
+    unregisterAllProcesses();
+    EcsObject::detach();
 }
 
 } // namespace libecs

@@ -211,12 +211,12 @@ protected:
 
     void setDirty()
     {
-        theDirtyFlag = true;
+        theModel.markDirty();
     }
 
     const bool isDirty() const
     {
-        return theDirtyFlag;
+        return theModel.isDirty();
     }
 
     inline void handleEvent()
@@ -225,23 +225,10 @@ protected:
         {
             (*theEventHandler)();
         }
-
-        clearDirty();
-    }
-
-    void clearDirty() const
-    {
-        if ( isDirty() )
-        {
-            initialize();
-
-            theDirtyFlag = false;
-        }
     }
 
     void start()
     {
-        clearDirty();
         theRunningFlag = true;
     }
 

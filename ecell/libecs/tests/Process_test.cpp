@@ -69,6 +69,7 @@ BOOST_AUTO_TEST_CASE(testGetMolarActivity)
     DM_NEW_STATIC( &mmaker, EcsObject, System );
 
     System* sys = reinterpret_cast< System* >( mmaker.getModule( "System" ).createInstance() );
+    sys->setSuperSystem( sys );
 
     MockProcess* proc = reinterpret_cast< MockProcess * >( mmaker.getModule( "MockProcess" ).createInstance() );
     proc->setActivity( N_A );

@@ -75,11 +75,10 @@ public:
     {
 
     public:
-        Interpolant( DifferentialStepperRef aStepper, 
-                     VariablePtr const aVariablePtr )
-            : libecs::Interpolant( aVariablePtr ),
-              theStepper( aStepper ),
-              theIndex( theStepper.getVariableIndex( aVariablePtr ) )
+        Interpolant( Variable const* aVariablePtr,
+                     Stepper const* aStepper )
+            : libecs::Interpolant( aVariablePtr, aStepper ),
+              theIndex( theStepper->getVariableIndex( aVariablePtr ) )
         {
             ; // do nothing
         }
@@ -92,9 +91,7 @@ public:
 
     protected:
 
-        DifferentialStepperRef        theStepper;
         VariableVector::size_type theIndex;
-
     };
 
 public:
@@ -144,10 +141,7 @@ public:
 
     virtual void interrupt( TimeParam aTime );
 
-    virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
-    {
-        return new DifferentialStepper::Interpolant( *this, aVariable );
-    }
+    virtual libecs::Interpolant* createInterpolant( Variable const* aVariable ) const;
 
     virtual GET_METHOD( Integer, Stage )
     { 

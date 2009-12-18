@@ -335,6 +335,8 @@ public:
 
     ConstLoggersPerFullID getLoggersByFullID( FullID const& aFullID ) const;
 
+    void removeLoggersByFullID( FullID const& aFullID );
+
 private:
     /// non-copyable
     LoggerBroker( LoggerBroker const& );

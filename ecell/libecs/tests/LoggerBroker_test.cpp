@@ -53,6 +53,7 @@ BOOST_AUTO_TEST_CASE(testNonExistent)
 
     ModuleMaker< EcsObject > mmaker;
     Model model( mmaker );
+    model.setup();
 
     BOOST_CHECK_THROW(
         model.getLoggerBroker().createLogger(
@@ -68,6 +69,7 @@ BOOST_AUTO_TEST_CASE(testIteration)
     ModuleMaker< EcsObject > mmaker;
 
     Model model( mmaker );
+    model.setup();
 
     model.createEntity( "Variable", FullID( "Variable:/:test" ) );
     Entity* var( model.getEntity( FullID( "Variable:/:test" ) ) );
@@ -104,6 +106,7 @@ BOOST_AUTO_TEST_CASE(testValid)
     ModuleMaker< EcsObject > mmaker;
 
     Model model( mmaker );
+    model.setup();
 
     model.createEntity( "Variable", FullID( "Variable:/:test" ) );
     Entity* var( model.getEntity( FullID( "Variable:/:test" ) ) );
@@ -166,6 +169,7 @@ BOOST_AUTO_TEST_CASE(testPastTheEnd)
     ModuleMaker< EcsObject > mmaker;
 
     Model model( mmaker );
+    model.setup();
 
     BOOST_CHECK( model.getLoggerBroker().begin() ==
                  model.getLoggerBroker().end() );

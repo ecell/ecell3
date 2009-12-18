@@ -44,9 +44,10 @@
 
 #include "EcsObject.hpp"
 
+#include "Model.hpp"
+
 namespace libecs
 {
-
 
 ///////////////////////////// EcsObject
 const PropertyAttributes EcsObject::
@@ -101,6 +102,24 @@ String EcsObject::asString() const
 {
     return ( boost::format( "%s[#%p]" ) % boost::io::group(
             getPropertyInterface().getClassName(), this ) ).str();
+}
+
+void EcsObject::dispose()
+{
+    if ( !disposed_ )
+    {
+        detach();
+        disposed_ = true;
+    }
+}
+
+void EcsObject::detach()
+{
+    if ( theModel )
+    {
+        theModel->detachObject( this );
+        theModel = 0;
+    }
 }
 
 #define NULLGETSET_SPECIALIZATION_DEF( TYPE )\

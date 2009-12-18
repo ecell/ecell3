@@ -115,13 +115,6 @@ inline libecs::Polymorph LocalSimulatorImplementation::buildPolymorph( const lib
 }
 
 
-void LocalSimulatorImplementation::deleteStepper( libecs::StringCref anID )
-{
-    getModel().deleteStepper( anID );
-    setDirty();
-}
-
-
 const libecs::Polymorph LocalSimulatorImplementation::getStepperList() const
 {
     libecs::Model::StepperMap const& aStepperMap( getModel().getStepperMap() );
@@ -195,8 +188,6 @@ const libecs::Polymorph LocalSimulatorImplementation::saveStepperProperty(
 {
     libecs::StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
 
-    clearDirty();
-
     return aStepperPtr->saveProperty( aPropertyName );
 }
 
@@ -225,10 +216,7 @@ void LocalSimulatorImplementation::createEntity(
 void LocalSimulatorImplementation::deleteEntity(
         libecs::StringCref aFullIDString )
 {
-    THROW_EXCEPTION( libecs::NotImplemented,
-                     "deleteEntity() method is not supported yet" );
-
-    setDirty();
+    getModel().deleteEntity( libecs::FullID( aFullIDString ) );
 }
 
 const libecs::Polymorph LocalSimulatorImplementation::getEntityList(
@@ -306,8 +294,6 @@ const libecs::Polymorph LocalSimulatorImplementation::getEntityProperty(
     libecs::FullPN aFullPN( aFullPNString );
     libecs::EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
             
-    clearDirty();
-
     return anEntityPtr->getProperty( aFullPN.getPropertyName() );
 }
 
@@ -326,8 +312,6 @@ const libecs::Polymorph LocalSimulatorImplementation::saveEntityProperty(
 {
     libecs::FullPN aFullPN( aFullPNString );
     libecs::EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
-
-    clearDirty();
 
     return anEntityPtr->saveProperty( aFullPN.getPropertyName() );
 }
@@ -377,8 +361,6 @@ void LocalSimulatorImplementation::createLogger(
         THROW_EXCEPTION( libecs::Exception,
                          "second argument must be a tuple of 4 items");
     }
-
-    clearDirty();
 
     getModel().getLoggerBroker().createLogger(
         libecs::FullPN( aFullPNString ),

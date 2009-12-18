@@ -40,13 +40,6 @@
 namespace libecs
 {
 
-Interpolant::Interpolant( VariablePtr const aVariable )
-    : theVariable( aVariable )
-{
-    // do nothing
-}
-
-
 Interpolant::~Interpolant()
 {
 
