@@ -115,6 +115,13 @@ inline libecs::Polymorph LocalSimulatorImplementation::buildPolymorph( const lib
 }
 
 
+void LocalSimulatorImplementation::deleteStepper( libecs::StringCref anID )
+{
+    getModel().deleteStepper( anID );
+    setDirty();
+}
+
+
 const libecs::Polymorph LocalSimulatorImplementation::getStepperList() const
 {
     libecs::Model::StepperMap const& aStepperMap( getModel().getStepperMap() );
