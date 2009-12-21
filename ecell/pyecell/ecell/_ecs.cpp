@@ -983,6 +983,86 @@ PyTypeObject STLIteratorWrapper< Titer_ >::__class__ = {
 };
 
 
+class PropertyAttributesIterator
+{
+protected:
+    PyObject_VAR_HEAD
+    PropertyAttributes const& theImpl;
+    int theIdx;
+
+public:
+    static PyTypeObject __class__;
+
+public:
+    void* operator new( size_t )
+    {
+        return PyObject_New( PropertyAttributesIterator, &__class__ );
+    }
+
+    PropertyAttributesIterator( PropertyAttributes const& impl )
+        : theImpl( impl ), theIdx( 0 )
+    {
+    }
+
+    ~PropertyAttributesIterator()
+    {
+    }
+
+public:
+    static PyTypeObject* __class_init__()
+    {
+        PyType_Ready( &__class__ );
+        return &__class__;
+    }
+
+    static PropertyAttributesIterator* create( PropertyAttributes const& impl )
+    {
+        return new PropertyAttributesIterator( impl );
+    }
+
+    static void __dealloc__( PropertyAttributesIterator* self )
+    {
+        self->~PropertyAttributesIterator();
+    }
+
+    static PyObject* __next__( PropertyAttributesIterator* self );
+};
+
+
+PyTypeObject PropertyAttributesIterator::__class__ = {
+	PyObject_HEAD_INIT( &PyType_Type )
+	0,					/* ob_size */
+	"ecell._ecs.PropertyAttributesIterator", /* tp_name */
+	sizeof( PropertyAttributesIterator ), /* tp_basicsize */
+	0,					/* tp_itemsize */
+	/* methods */
+	(destructor)&PropertyAttributesIterator::__dealloc__, /* tp_dealloc */
+	0,					/* tp_print */
+	0,					/* tp_getattr */
+	0,					/* tp_setattr */
+	0,					/* tp_compare */
+	0,					/* tp_repr */
+	0,					/* tp_as_number */
+	0,					/* tp_as_sequence */
+	0,					/* tp_as_mapping */
+	0,					/* tp_hash */
+	0,					/* tp_call */
+	0,					/* tp_str */
+	PyObject_GenericGetAttr,		/* tp_getattro */
+	0,					/* tp_setattro */
+	0,					/* tp_as_buffer */
+	Py_TPFLAGS_HAVE_CLASS | Py_TPFLAGS_HAVE_WEAKREFS | Py_TPFLAGS_HAVE_ITER,/* tp_flags */
+	0,					/* tp_doc */
+	0,	/* tp_traverse */
+	0,					/* tp_clear */
+	0,					/* tp_richcompare */
+	0,					/* tp_weaklistoffset */
+	PyObject_SelfIter,  /* tp_iter */
+	(iternextfunc)&PropertyAttributesIterator::__next__,		/* tp_iternext */
+	0,		        	/* tp_methods */
+	0					/* tp_members */
+};
+
 static std::string VariableReference___str__( VariableReference const* self )
 {
     std::string retval;
@@ -2523,6 +2603,25 @@ static int PropertyAttributes___getitem__( PropertyAttributes const* self, int i
     throw std::range_error("Index out of bounds");
 }
 
+static PyObject* PropertyAttributes___iter__( PropertyAttributes const* self )
+{
+    return reinterpret_cast< PyObject* >( PropertyAttributesIterator::create( *self ) );
+}
+
+PyObject* PropertyAttributesIterator::__next__( PropertyAttributesIterator* self )
+{
+    try
+    {
+        return py::incref( py::object( PropertyAttributes___getitem__( &self->theImpl, self->theIdx++ ) ).ptr() );
+    }
+    catch ( std::range_error const& )
+    {
+        PyErr_SetNone( PyExc_StopIteration );
+    }
+    return 0;
+}
+
+
 static py::object LoggerPolicy_GetItem( Logger::Policy const* self, int idx )
 {
     switch ( idx )
@@ -2691,6 +2790,7 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "dynamic", &PropertyAttributes::isDynamic )
         .def( "__str__", &PropertyAttributes___str__ )
         .def( "__getitem__", &PropertyAttributes___getitem__ )
+        .def( "__iter__", &PropertyAttributes___iter__ )
         ;
 
     py::class_< Logger::Policy >( "LoggerPolicy", py::init<>() )
