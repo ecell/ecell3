@@ -1,6 +1,6 @@
 #!/usr/local/bin/python
 #
-# $Id$ $Date$
+# encoding: iso-8859-15
 
 """
 A system for processing Python as markup embedded in text.
