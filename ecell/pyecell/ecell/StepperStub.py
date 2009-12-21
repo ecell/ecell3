@@ -139,10 +139,10 @@ class StepperStub( ObjectStub ):
     # ---------------------------------------------------------------
 
     def setProperty( self, aPropertyName, aValue ):
-
-        return self.theSimulator.setStepperProperty( self.theID, 
-                                                     aPropertyName, 
-                                                     aValue )
+        self.theSimulator.setStepperProperty( self.theID, 
+                                              aPropertyName, 
+                                              aValue )
+        self.theSimulator.markDirty()
 
     # end of setProperty
 

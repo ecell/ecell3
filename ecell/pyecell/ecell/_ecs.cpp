@@ -3087,6 +3087,8 @@ BOOST_PYTHON_MODULE( _ecs )
               return_copy_const_reference() )
         .def( "getDMInfo",
               &AbstractSimulator::getDMInfo )
+        .def( "markDirty",
+              &AbstractSimulator::markDirty )
         ;
 
     // Simulator class
