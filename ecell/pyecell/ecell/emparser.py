@@ -33,8 +33,8 @@ import tempfile
 import ecell.eml
 from ecell.ecssupport import *
 
-import lex
-import yacc
+import ply.lex as lex
+import ply.yacc as yacc
 
 """
 A program for converting .em file to EML.
@@ -47,6 +47,8 @@ __author__ = 'Kentarou Takahashi and Koichi Takahashi <shafi@e-cell.org>'
 __copyright__ = 'Copyright (C) 2002-2003 Keio University'
 __license__ = 'GPL'
 
+LEXTAB = "ecell.emlextab"
+PARSERTAB = "ecell.emparsetab"
 
 
 # Reserved words
@@ -425,12 +427,8 @@ def createListleft( t ):
 
 
 def initializePLY():
-    lextabname = "emlextab"
-    yacctabname = "emparsetab"
-
-    lex.lex(lextab=lextabname, optimize=1)
-    #lex.lex(lextab=lextabname)
-    yacc.yacc(tabmodule=yacctabname)
+    lex.lex(lextab=LEXTAB, optimize=1)
+    yacc.yacc(tabmodule=PARSERTAB)
 
 def convertEm2Eml( anEmFileObject, debug=0 ):
 
@@ -447,24 +445,14 @@ def patchEm2Eml( anEmlObject, anEmFileObject, debug=0 ):
     anEml = anEmlObject
     
     # Build the lexer
-    aLexer = lex.lex(lextab="emlextab")
+    aLexer = lex.lex(lextab=LEXTAB)
     aLexer.filename = 'undefined'
-        # Tokenizen test..
-        #while debug == 1:
-            
-            # Give the lexer some input for test
-        #    lex.input(anEmFileObject.read())
-
-        #   tok = aLexer.token( anEmFileObject.read() )
-        #    if not tok: break      # No more input
-        #    print tok
-
     # Parsing
-    aParser = yacc.yacc(optimize=1, tabmodule="emparsetab")
+    aParser = yacc.yacc(optimize=1, tabmodule=PARSERTAB)
     anAst = aParser.parse( anEmFileObject.read(), lexer=aLexer ,debug=debug )
         
-    import pprint
     if debug != 0:
+        import pprint
         print pprint.pprint(anAst)
         
     if anAst == None:
