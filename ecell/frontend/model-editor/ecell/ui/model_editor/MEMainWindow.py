@@ -44,7 +44,8 @@ from ecell.ui.model_editor.LayoutCommand import *
 from ecell.ui.model_editor.PathwayEditor import * 
 from ecell.ui.model_editor.ConfirmWindow import *
 from ecell.ui.model_editor.Runtime import *
-        
+from ecell.ui.model_editor.FileSelection import *
+
 class MEMainWindow( ListWindow ):
     def __init__( self, theModelEditor):
         
@@ -438,7 +439,7 @@ class MEMainWindow( ListWindow ):
         defaultName = aDirname + os.sep + aFileName
 
         # create file selection dialog
-        aDialog = gtk.FileSelection()
+        aDialog = FileSelection()
 
         # set init path for dialog
         aDialog.set_filename( defaultName )
