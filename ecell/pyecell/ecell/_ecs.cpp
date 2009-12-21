@@ -463,6 +463,33 @@ struct FullIDToPythonConverter
     }
 };
 
+struct PythonToFullIDConverter
+{
+    static void* convertible(PyObject* pyo)
+    {
+        if ( !PyString_Check( pyo ) )
+        {
+            return 0;
+        }
+
+        return pyo;
+    }
+
+    static void construct(PyObject* pyo, py::converter::rvalue_from_python_stage1_data* data)
+    {
+        data->convertible = new( reinterpret_cast<
+            py::converter::rvalue_from_python_storage<FullID>* >(
+                data )->storage.bytes ) FullID(
+                boost::python::extract< std::string >( pyo ) );
+    }
+
+    static void addToRegistry()
+    {
+        py::converter::registry::insert( &convertible, &construct,
+                                         py::type_id< FullID >() );
+    }
+};
+
 
 
 // exception translators
@@ -2633,6 +2660,7 @@ BOOST_PYTHON_MODULE( _ecs )
     PropertySlotMapToPythonConverter::addToRegistry();
     DataPointVectorSharedPtrConverter::addToRegistry();
     FullIDToPythonConverter::addToRegistry();
+    PythonToFullIDConverter::addToRegistry();
 
     PolymorphRetriever::addToRegistry();
 
