@@ -39,6 +39,7 @@ import ecell.ui.osogo.config as config
 from ecell.ui.osogo.Plot import *
 from ecell.ui.osogo.OsogoPluginWindow import *
 from ecell.ui.osogo.ConfirmWindow import *
+from ecell.ui.osogo.FileSelection import FileSelection
 
 COL_LOG = 2
 COL_PIX = 1
@@ -61,7 +62,7 @@ class TracerWindow( OsogoPluginWindow ):
         self.theSession = self.thePluginManager.theSession
         self.theViewType = MULTIPLE
         self.isControlShown = False
-        self.theSaveDirectorySelection = gtk.FileSelection( 'Select File' )
+        self.theSaveDirectorySelection = FileSelection( 'Select File' )
         self.theSaveDirectorySelection.ok_button.connect('clicked', self.changeSaveDirectory)
         self.theSaveDirectorySelection.cancel_button.connect('clicked', self.closeParentWindow)
 

@@ -349,7 +349,7 @@ class DMInfo:
                 anInfo[DM_ACCEPTNEWPROPERTY] = True
 
         propertyList = dict(
-            ( name, info + ( DM_DEFAULTVALUES[ info[ INFO_TYPE ] ], ) ) \
+            ( name, tuple( info ) + ( DM_DEFAULTVALUES[ info[ INFO_TYPE ] ], ) ) \
             for name, info in self.theSimulator.getPropertyInfo( aName ).iteritems() \
             )
         anInfo[ DM_PROPERTYLIST ] = propertyList.keys()

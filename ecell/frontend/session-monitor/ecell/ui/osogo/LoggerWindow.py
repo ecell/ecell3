@@ -42,6 +42,7 @@ from ecell.ECDDataFile import *
 
 from ecell.ui.osogo.OsogoWindow import *
 from ecell.ui.osogo.LoggingPolicy import *
+from ecell.ui.osogo.FileSelection import FileSelection
 
 # ---------------------------------------------------------------
 # This is LoggerWindow class .
@@ -65,7 +66,7 @@ class LoggerWindow(OsogoWindow):
 		# ---------------------------------------------------------------
 		# Creates save file selection
 		# ---------------------------------------------------------------
-		self.theSaveDirectorySelection = gtk.FileSelection( 'Select File' )
+		self.theSaveDirectorySelection = FileSelection( 'Select File' )
 		self.theSaveDirectorySelection.ok_button.connect('clicked', self.changeSaveDirectory)
 		self.theSaveDirectorySelection.cancel_button.connect('clicked', self.closeParentWindow)
 

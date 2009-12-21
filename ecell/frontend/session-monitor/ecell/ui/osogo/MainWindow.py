@@ -53,6 +53,7 @@ from ecell.ui.osogo.AboutSessionMonitor import *
 from ecell.ui.osogo.main import *
 from ecell.ui.osogo.GtkSessionMonitor import *
 from ecell.ui.osogo.ConfirmWindow import *
+from ecell.ui.osogo.FileSelection import FileSelection
 import ecell.ui.osogo.MessageWindow as MessageWindow
 
 class SimulationButton:
@@ -435,7 +436,7 @@ class MainWindow(OsogoWindow):
         else:
 
             # creates FileSelection
-            self.theFileSelection = gtk.FileSelection()
+            self.theFileSelection = FileSelection()
             self.theFileSelection.connect('delete_event', self.__deleteFileSelection )
             self.theFileSelection.cancel_button.connect('clicked', self.__deleteFileSelection) 
             aPixbuf16 = gtk.gdk.pixbuf_new_from_file(
