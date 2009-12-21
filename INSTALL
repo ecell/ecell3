@@ -70,7 +70,7 @@ Building Prerequisite
 
   http://www.dabeaz.com/ply/
 
-6. (optional) PyGTK (version 2.4 or later, >= 2.6 is recommended)
+7. (optional) PyGTK (version 2.4 or later, >= 2.6 is recommended)
    -- only needed to build GUI frontends. 
 
   http://www.pygtk.org/
@@ -85,12 +85,12 @@ Building Prerequisite
     ``--disable-gui`` option to configure script.  Otherwise
     configure will fail with an error in the check of PyGTK installation.
 
-7. (optional) GNOME-Python (version 2.0 or later, >= 2.6 is recommended)
+8. (optional) GNOME-Python (version 2.0 or later, >= 2.6 is recommended)
    -- only needed to build GUI frontends. 
 
   http://www.pygtk.org/
 
-8. (optional) libsbml (version 2.x) -- needed for SBML support.
+9. (optional) libsbml (version 2.x) -- needed for SBML support.
 
   http://sourceforge.net/projects/sbml
 
@@ -98,13 +98,13 @@ Building Prerequisite
 
   libsbml 3.x series are not supported due to significant API differences.
 
-9. (optional) doxygen -- neeeded to generate API reference
+10. (optional) doxygen -- neeeded to generate API reference
 
   http://www.stack.nl/~dimitri/doxygen/
 
   The documentation is currently incomplete.
 
-10. (optional) docbook-tools -- needed to generate users manual
+11. (optional) docbook-tools -- needed to generate users manual
 
   http://sources.redhat.com/docbook-tools/
 
