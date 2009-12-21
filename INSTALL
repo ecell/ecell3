@@ -66,7 +66,11 @@ Building Prerequisite
 
   http://numpy.scipy.org/
 
-6. (optional) PyGTK (version 2.0 or later, >= 2.6 is recommended)
+6. Ply (version 2.1 or later)
+
+  http://www.dabeaz.com/ply/
+
+6. (optional) PyGTK (version 2.4 or later, >= 2.6 is recommended)
    -- only needed to build GUI frontends. 
 
   http://www.pygtk.org/
