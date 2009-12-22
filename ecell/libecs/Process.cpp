@@ -313,13 +313,14 @@ bool Process::removeVariableReference( Variable const* aVariable, bool raiseExce
     bool aIsRemoved( false );
 
     for ( VariableReferenceVector::size_type
-            i( 0 ), e ( theVariableReferenceVector.size() );
+            i( 0 ), e( theVariableReferenceVector.size() );
             i < e; )
     {
         if ( theVariableReferenceVector[ i ].getVariable() == aVariable )
         {
             theVariableReferenceVector.erase( theVariableReferenceVector.begin() + i );
             aIsRemoved = true;
+            --e;
         }
         else
         {
@@ -410,20 +411,38 @@ void Process::resolveVariableReferences()
             anEllipsisNumber++;
         }
 
-        // relative search; allow relative systempath
-        FullID const& aFullID( aVarRef.getFullID() );
-        SystemPtr aSystem( getSuperSystem()->getSystem( aFullID.getSystemPath() ) );
-        if ( !aSystem )
-        {
-            THROW_EXCEPTION_INSIDE( IllegalOperation,
-                                    asString() + ": system path ["
-                                    + aFullID.getSystemPath().asString()
-                                    + "] could not be resolved" );
-        }
-
         if ( !aVarRef.getVariable() )
         {
-            aVarRef.setVariable( aSystem->getVariable( aFullID.getID() ) );
+            // relative search; allow relative systempath
+            FullID const& aFullID( aVarRef.getFullID() );
+            if ( aFullID.isValid() )
+            {
+                System* aSystem( 0 );
+                try
+                {
+                    aSystem = getSuperSystem()->getSystem( aFullID.getSystemPath() );
+                }
+                catch ( BadSystemPath const& )
+                {
+                }
+
+                if ( !aSystem )
+                {
+                    THROW_EXCEPTION_INSIDE( IllegalOperation,
+                                            asString() + ": system path ["
+                                            + aFullID.getSystemPath().asString()
+                                            + "] could not be resolved" );
+                }
+
+                aVarRef.setVariable( aSystem->getVariable( aFullID.getID() ) );
+            }
+            else
+            {
+                THROW_EXCEPTION_INSIDE( IllegalOperation,
+                                        asString() + ": variable reference #"
+                                        + boost::lexical_cast<std::string>( aVarRef.getSerial() )
+                                        + " could not be resolved" );
+            }
         }
         else
         {
