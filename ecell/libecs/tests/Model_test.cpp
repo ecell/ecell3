@@ -167,3 +167,40 @@ BOOST_AUTO_TEST_CASE(testDeleteEntity1)
     BOOST_CHECK_THROW( model.getEntity( aFullID ), NotFound );
     BOOST_CHECK_THROW( model.deleteEntity( aFullID ), NotFound );
 }
+
+BOOST_AUTO_TEST_CASE(testDeleteEntity2)
+{
+    ModuleMaker< EcsObject > mmaker;
+    DM_NEW_STATIC( &mmaker, EcsObject, MockProcess );
+    Model model( mmaker );
+    model.setup();
+
+    Stepper* stepper( model.createStepper( "PassiveStepper", "test" ) );
+    model.getStepper( "test" ); // assert no throw
+
+    FullID aVariableFullID( "Variable:/:test" );
+    BOOST_CHECK_THROW( model.getEntity( aVariableFullID ), NotFound );
+    Variable* aVariable( dynamic_cast< Variable* >( model.createEntity( "Variable", aVariableFullID ) ) );
+    Process* aProcess1( dynamic_cast< Process* >( model.createEntity( "MockProcess", FullID( "Process:/:P1" ) ) ) );
+    Process* aProcess2( dynamic_cast< Process* >( model.createEntity( "MockProcess", FullID( "Process:/:P2" ) ) ) );
+    Integer aVarRefID1( aProcess1->registerVariableReference( "R", aVariable, 1 ) );
+    Integer aVarRefID2( aProcess2->registerVariableReference( "R", aVariable, 1 ) );
+
+    aProcess1->getVariableReference( "R" ); // no throw
+    aProcess1->getVariableReference( aVarRefID1 ); // no throw
+    aProcess2->getVariableReference( "R" ); // no throw
+    aProcess2->getVariableReference( aVarRefID2 ); // no throw
+
+    model.getRootSystem()->setStepperID( "test" );
+
+    model.initialize();
+
+    model.deleteEntity( aVariableFullID );
+
+    BOOST_CHECK_THROW( model.getEntity( aVariableFullID ), NotFound );
+
+    BOOST_CHECK_THROW( aProcess1->getVariableReference( "R" ), NotFound );
+    BOOST_CHECK_THROW( aProcess1->getVariableReference( aVarRefID1 ), NotFound );
+    BOOST_CHECK_THROW( aProcess2->getVariableReference( "R" ), NotFound );
+    BOOST_CHECK_THROW( aProcess2->getVariableReference( aVarRefID2 ), NotFound );
+}
