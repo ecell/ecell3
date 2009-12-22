@@ -311,7 +311,7 @@ PolymorphRetriever::PySeqSTLIterator::value_type
 PolymorphRetriever::PySeqSTLIterator::operator*()
 {
     return PolymorphRetriever::convert(
-            PySequence_GetItem( theSeq, theIdx ) );
+            py::handle<>( PySequence_GetItem( theSeq, theIdx ) ).get() );
 }
 
 
@@ -586,7 +586,7 @@ public:
 
         static void __dealloc__( Iterator* self )
         {
-            self->~Iterator();
+            delete self;
         }
 
         static PyObject* __next__( Iterator* self )
@@ -614,6 +614,11 @@ private:
     void* operator new( size_t )
     {
         return PyObject_New( DataPointVectorWrapper, &__class__);
+    }
+
+    void operator delete( void* ptr )
+    {
+        reinterpret_cast< PyObject* >( ptr )->ob_type->tp_free( reinterpret_cast< PyObject* >( ptr ) );
     }
 
     DataPointVectorWrapper( boost::shared_ptr< DataPointVector > const& aVector )
@@ -649,7 +654,7 @@ public:
 
     static void __dealloc__( DataPointVectorWrapper* self )
     {
-        self->~DataPointVectorWrapper();
+        delete self;
     }
 
     static PyObject* __repr__( DataPointVectorWrapper* self )
@@ -910,6 +915,11 @@ public:
         return PyObject_New( STLIteratorWrapper, &__class__ );
     }
 
+    void operator delete( void* ptr )
+    {
+        reinterpret_cast< PyObject* >( ptr )->ob_type->tp_free( reinterpret_cast< PyObject* >( ptr ) );
+    }
+
     template< typename Trange_ >
     STLIteratorWrapper( Trange_ const& range )
         : theIdx( boost::begin( range ) ), theEnd( boost::end( range ) )
@@ -935,7 +945,7 @@ public:
 
     static void __dealloc__( STLIteratorWrapper* self )
     {
-        self->~STLIteratorWrapper();
+        delete self;
     }
 
     static PyObject* __next__( STLIteratorWrapper* self )
@@ -999,6 +1009,11 @@ public:
         return PyObject_New( PropertyAttributesIterator, &__class__ );
     }
 
+    void operator delete( void* ptr )
+    {
+        reinterpret_cast< PyObject* >( ptr )->ob_type->tp_free( reinterpret_cast< PyObject* >( ptr ) );
+    }
+
     PropertyAttributesIterator( PropertyAttributes const& impl )
         : theImpl( impl ), theIdx( 0 )
     {
@@ -1022,7 +1037,7 @@ public:
 
     static void __dealloc__( PropertyAttributesIterator* self )
     {
-        self->~PropertyAttributesIterator();
+        delete self;
     }
 
     static PyObject* __next__( PropertyAttributesIterator* self );
