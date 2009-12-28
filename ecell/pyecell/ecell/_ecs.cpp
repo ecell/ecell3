@@ -2369,11 +2369,6 @@ public:
 
     }
 
-    const Real getCurrentTime() const
-    {
-        return getCurrentTime();
-    }
-
     void run()
     {
         start();
@@ -2412,7 +2407,7 @@ public:
         //FIXME: dirty, ugly!
         Stepper* aSystemStepper( getSystemStepper() );
         aSystemStepper->setCurrentTime( aStopTime );
-        aSystemStepper->setStepInterval( 0.0 );
+        // aSystemStepper->setStepInterval( 0.0 );
 
         getScheduler().updateEvent( 0, aStopTime );
 
@@ -2424,9 +2419,8 @@ public:
                 unsigned int aCounter( theEventCheckInterval );
                 do 
                 {
-                    if( getTopEvent().getStepper() == aSystemStepper )
+                    if( getTopEvent().getTime() > aStopTime )
                     {
-                        Model::step();
                         stop();
                         break;
                     }
@@ -2444,9 +2438,8 @@ public:
         {
             while ( theRunningFlag )
             {
-                if( getTopEvent().getStepper() == aSystemStepper )
+                if( getTopEvent().getTime() > aStopTime )
                 {
-                    Model::step();
                     stop();
                     break;
                 }

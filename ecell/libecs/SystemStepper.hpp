@@ -70,7 +70,7 @@ public:
 protected:
 
     void integrateVariablesRecursively( SystemPtr const aSystem,
-                                                                            RealParam aTime );
+                                        RealParam aTime );
 
 };
 

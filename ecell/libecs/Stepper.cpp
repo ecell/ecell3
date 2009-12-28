@@ -65,7 +65,7 @@ Stepper::Stepper()
       theSchedulerIndex( -1 ),
       thePriority( 0 ),
       theCurrentTime( 0.0 ),
-      theStepInterval( 0.001 ),
+      theNextTime( 0.001 ),
       theMinStepInterval( 1e-100 ),
       theMaxStepInterval( std::numeric_limits<Real>::infinity() )
 {
@@ -548,8 +548,9 @@ void Stepper::integrate( RealParam aTime )
         (*i)->integrate( aTime );
     }
 
-    // this must be after Variable::integrate()
+    Real const aStepInterval( getNextTime() - getCurrentTime() );
     setCurrentTime( aTime );
+    setNextTime( aTime + aStepInterval );
 }
 
 
@@ -601,18 +602,23 @@ String Stepper::asString() const
     return getPropertyInterface().getClassName() + "[" + getID() + "]";
 }
 
-SET_METHOD_DEF( Real, StepInterval, Stepper )
+SET_METHOD_DEF( Real, NextTime, Stepper )
 {
-    if ( value < getMinStepInterval() )
+    Real const aStepInterval( value - getCurrentTime() );
+
+    if ( aStepInterval < getMinStepInterval() )
     {
-        loadStepInterval( getMinStepInterval() );
+        theNextTime = value;
         THROW_EXCEPTION_INSIDE( SimulationError,
-                "The error-limit step interval is too small for ["
-                + asString() + "]" );
+                String( "The step interval for [" )
+                + asString() + "] ("
+                + stringCast( aStepInterval )
+                + ") is behind the error-limit step interval ("
+                + stringCast( getMinStepInterval() ) + ")" );
     }
     else
     {
-        loadStepInterval( value );
+        theNextTime = value;
     }
 }
 

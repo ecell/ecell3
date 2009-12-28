@@ -33,6 +33,7 @@
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
+#include <cmath>
 #include "AdaptiveDifferentialStepper.hpp"
 
 namespace libecs
@@ -64,17 +65,16 @@ void AdaptiveDifferentialStepper::initialize()
     DifferentialStepper::initialize();
 }
 
-void AdaptiveDifferentialStepper::step()
+void AdaptiveDifferentialStepper::updateInternalState( Real aStepInterval )
 {
     theStateFlag = false;
 
     clearVariables();
 
-    setStepInterval( getNextStepInterval() );
-
     Integer theRejectedStepCounter( 0 );
+    const Real maxError( getMaxErrorRatio() );
 
-    while ( !calculate() )
+    while ( !calculate( aStepInterval ) )
     {
         if ( ++theRejectedStepCounter >= theTolerableRejectedStepCount )
         {
@@ -84,34 +84,29 @@ void AdaptiveDifferentialStepper::step()
                 + stringCast( theTolerableRejectedStepCount ) + ")." );
         }
  
-        const Real anExpectedStepInterval( safety * getStepInterval() 
-                                           * pow( getMaxErrorRatio(),
-                                                  -1.0 / getOrder() ) );
-
         // shrink it if the error exceeds 110%
-        setStepInterval( anExpectedStepInterval );
+        aStepInterval = aStepInterval * safety * std::pow( maxError,
+                                                  -1.0 / getOrder() );
     }
 
     // an extra calculation for resetting the activities of processes
     fireProcesses();
 
-    setTolerableStepInterval( getStepInterval() );
+    setTolerableStepInterval( aStepInterval );
 
     theStateFlag = true;
 
     // grow it if error is 50% less than desired
-    const Real maxError( getMaxErrorRatio() );
+    Real aNewStepInterval( aStepInterval );
     if ( maxError < 0.5 )
     {
-        const Real aNewStepInterval( getTolerableStepInterval() * safety
-                                     * pow( maxError,
-                                            -1.0 / ( getOrder() + 1 ) ) );
-        setNextStepInterval( aNewStepInterval );
+        aNewStepInterval = aNewStepInterval * safety * std::pow( maxError,
+                                            -1.0 / ( getOrder() + 1 ) );
     }
-    else 
-    {
-        setNextStepInterval( getTolerableStepInterval() );
-    }
+
+    setNextStepInterval( aNewStepInterval );
+
+    DifferentialStepper::updateInternalState( aStepInterval );
 }
 
 } // namespace libecs

@@ -102,7 +102,7 @@ public:
         }
     }
 
-    virtual void step()
+    virtual void updateInternalState( Real aStepInterval )
     {
         clearVariables();
 
@@ -118,7 +118,7 @@ public:
 
         setVariableVelocity( theTaylorSeries[ 0 ] );
     }
-    
+
     GET_METHOD( Real, Epsilon )
     {
         return epsilon;

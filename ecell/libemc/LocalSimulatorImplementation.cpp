@@ -585,7 +585,6 @@ void LocalSimulatorImplementation::run( const libecs::Real aDuration )
     //FIXME: dirty, ugly!
     libecs::StepperPtr aSystemStepper( getModel().getSystemStepper() );
     aSystemStepper->setCurrentTime( aStopTime );
-    aSystemStepper->setStepInterval( 0.0 );
 
     getModel().getScheduler().updateEvent( 0, aStopTime );
 
@@ -593,27 +592,24 @@ void LocalSimulatorImplementation::run( const libecs::Real aDuration )
     if( typeid( *theEventChecker ) != typeid( DefaultEventChecker ) &&
         theEventHandler.get() != NULLPTR )
     {
-        runWithEvent();
+        runWithEvent( aStopTime );
     }
     else
     {
-        runWithoutEvent();
+        runWithoutEvent( aStopTime );
     }
 
 }
 
-void LocalSimulatorImplementation::runWithEvent()
+void LocalSimulatorImplementation::runWithEvent( libecs::Real const aStopTime )
 {
-    libecs::StepperCptr const aSystemStepper( getModel().getSystemStepper() );
-
     do
     {
         unsigned int aCounter( theEventCheckInterval );
         do 
         {
-            if( getModel().getTopEvent().getStepper() == aSystemStepper )
+            if( getModel().getTopEvent().getTime() > aStopTime )
             {
-                getModel().step();
                 stop();
                 return;
             }
@@ -630,15 +626,14 @@ void LocalSimulatorImplementation::runWithEvent()
     while( theRunningFlag );
 }
 
-void LocalSimulatorImplementation::runWithoutEvent()
+void LocalSimulatorImplementation::runWithoutEvent( libecs::Real const aStopTime )
 {
     libecs::StepperCptr const aSystemStepper( getModel().getSystemStepper() );
 
     do
     {
-        if( getModel().getTopEvent().getStepper() == aSystemStepper )
+        if( getModel().getTopEvent().getTime() > aStopTime )
         {
-            getModel().step();
             stop();
             return;    // the only exit
         }

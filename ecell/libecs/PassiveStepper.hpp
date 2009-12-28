@@ -67,21 +67,16 @@ public:
     virtual void step()
     {
         fireProcesses();
-
-        setStepInterval( INF );
+        theNextTime = INF;
     }
 
     virtual void interrupt( TimeParam aTime )
     {
         setCurrentTime( aTime );
-        setStepInterval( 0.0 );
+        theNextTime = aTime;
     }
 
-    virtual SET_METHOD( Real, StepInterval )
-    {
-        // skip range check
-        loadStepInterval( value );
-    }
+    virtual SET_METHOD( Real, NextTime );
 };
 
 } // namespace libecs

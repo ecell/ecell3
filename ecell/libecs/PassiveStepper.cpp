@@ -55,5 +55,10 @@ void PassiveStepper::initialize()
     Stepper::initialize();
 }
 
+SET_METHOD_DEF( Real, NextTime, PassiveStepper )
+{
+    // skip range check
+    theNextTime = value;
+}
 
 } // namespace libecs

@@ -55,7 +55,8 @@ LIBECS_DM_INIT_STATIC( DifferentialStepper, Stepper );
 DifferentialStepper::DifferentialStepper()
     : theNextStepInterval( 0.001 ),
       theTolerableStepInterval( 0.001 ),
-      theStateFlag( true )
+      theStateFlag( true ),
+      isInterrupted( true )
 {
     ; // do nothing
 }
@@ -70,6 +71,8 @@ DifferentialStepper::~DifferentialStepper()
 void DifferentialStepper::initialize()
 {
     Stepper::initialize();
+
+    isInterrupted = true;
 
     createInterpolants();
 
@@ -245,15 +248,13 @@ void DifferentialStepper::interrupt( TimeParam aTime )
         return;
     }
 
-    const Real aCurrentTime( getCurrentTime() );
-
     // aCallerTimeScale == 0 implies need for immediate reset
     if( aCallerTimeScale != 0.0 )
     {
         // Shrink the next step size to that of caller's
         setNextStepInterval( aCallerTimeScale );
 
-        const Real aNextStep( aCurrentTime + aStepInterval );
+        const Real aNextStep( getCurrentTime() + aStepInterval );
         const Real aCallerNextStep( aCallerCurrentTime + aCallerTimeScale );
 
         // If the next step of this occurs *before* the next step 
@@ -264,11 +265,25 @@ void DifferentialStepper::interrupt( TimeParam aTime )
         }
     }
 
-    const Real aNewStepInterval( aCallerCurrentTime - aCurrentTime );
-
-    loadStepInterval( aNewStepInterval );
+    setNextTime( aCallerCurrentTime );
 }
 
+void DifferentialStepper::step()
+{
+    updateInternalState( getNextStepInterval() );
+}
+
+void DifferentialStepper::updateInternalState( Real aStepInterval )
+{
+    setStepInterval( aStepInterval );
+
+    // check if the step interval was changed, by epsilon
+    if ( std::fabs( getTolerableStepInterval() - aStepInterval )
+             > std::numeric_limits<Real>::epsilon() )
+        isInterrupted = true;
+    else
+        isInterrupted = false;
+}
 
 const Real DifferentialStepper::Interpolant::getDifference(
         RealParam aTime, RealParam anInterval ) const

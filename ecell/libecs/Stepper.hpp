@@ -75,6 +75,7 @@ public:
         
         PROPERTYSLOT_SET_GET( Integer, Priority );
         PROPERTYSLOT_SET_GET( Real,    StepInterval );
+        PROPERTYSLOT_SET_GET( Real,    NextTime );
         PROPERTYSLOT_SET_GET( Real,    MaxStepInterval );
         PROPERTYSLOT_SET_GET( Real,    MinStepInterval );
         PROPERTYSLOT_SET( String, RngSeed );
@@ -122,9 +123,6 @@ public:
     /**
        Get the current time of this Stepper.
 
-       The current time is defined as a next scheduled point in time
-       of this Stepper.
-
        @return the current time in Real.
     */
     GET_METHOD( Real, CurrentTime )
@@ -138,21 +136,42 @@ public:
     }
 
     /**
-       This may be overridden in dynamically scheduled steppers.
-    */
-    virtual SET_METHOD( Real, StepInterval );
-
-    /**
        Get the step interval of this Stepper.
 
        The step interval is a length of time that this Stepper proceeded
        in the last step.
-       
+
        @return the step interval of this Stepper
     */
     GET_METHOD( Real, StepInterval )
     {
-        return theStepInterval;
+        Real const aNextTime( getNextTime() );
+        Real const aCurrentTime( getCurrentTime() );
+        if ( aCurrentTime == libecs::INF )
+        {
+            return libecs::INF;
+        }
+        return aNextTime - aCurrentTime;
+    }
+
+    SET_METHOD( Real, StepInterval )
+    {
+        setNextTime( getCurrentTime() + value );
+    }
+
+    /**
+       This may be overridden in dynamically scheduled steppers.
+    */
+    virtual SET_METHOD( Real, NextTime );
+
+    /**
+       Get the next time to which this Stepper is scheduled
+
+       @return the next time to be scheduled to
+    */
+    GET_METHOD( Real, NextTime )
+    {
+        return theNextTime;
     }
 
     virtual GET_METHOD( Real, TimeScale );
@@ -254,11 +273,6 @@ public:
        Remove all the associated Process from this Stepper.
     */
     void unregisterAllProcesses();
-
-    void loadStepInterval( RealParam aStepInterval )
-    {
-        theStepInterval = aStepInterval;
-    }
 
     void registerLogger( LoggerPtr );
 
@@ -477,7 +491,7 @@ protected:
 
     Real                      theCurrentTime;
 
-    Real                      theStepInterval;
+    Real                      theNextTime;
 
     Real                      theMinStepInterval;
     Real                      theMaxStepInterval;

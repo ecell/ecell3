@@ -51,6 +51,7 @@
 
 #include "DiscreteTimeStepper.hpp"
 #include "DiscreteEventStepper.hpp"
+#include "DifferentialStepper.hpp"
 #include "PassiveStepper.hpp"
 #include "System.hpp"
 #include "Variable.hpp"
@@ -435,7 +436,13 @@ void Model::initialize()
 
     for( EventIndex c( 0 ); c != theScheduler.getSize(); ++c )
     {
-        theScheduler.getEvent(c).reschedule();
+        StepperEvent& anEvent( theScheduler.getEvent( c ) );
+        DifferentialStepper* aStepper( dynamic_cast< DifferentialStepper* >( anEvent.getStepper() ) );
+        if ( aStepper )
+        {
+            aStepper->updateInternalState( aStepper->getStepInterval() );
+        }
+        anEvent.reschedule();
     }
 
     isDirty_ = false;
@@ -472,6 +479,7 @@ void Model::registerBuiltinModules()
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, DiscreteEventStepper );
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, DiscreteTimeStepper );
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, PassiveStepper );
+    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, SystemStepper );
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, System );
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, Variable );
 }
