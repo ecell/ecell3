@@ -35,8 +35,6 @@
 #include "libecs/Defs.hpp"
 #include "libecs/Stepper.hpp"
 
-#include <iostream>
-
 namespace libecs
 {
 
