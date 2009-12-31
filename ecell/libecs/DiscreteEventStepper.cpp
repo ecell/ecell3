@@ -111,7 +111,7 @@ void DiscreteEventStepper::initialize()
     // That means, this Stepper doesn't necessary step immediately
     // after initialize().
     ProcessEventCref aTopEvent( theScheduler.getTopEvent() );
-    setNextTime( aTopEvent.getTime() );
+    theNextTime = aTopEvent.getTime();
 }
 
 
@@ -124,7 +124,7 @@ void DiscreteEventStepper::step()
     theScheduler.step();
 
     // Set new StepInterval.
-    setNextTime( theScheduler.getTopEvent().getTime() );
+    theNextTime = theScheduler.getTopEvent().getTime();
 }
 
 
