@@ -55,6 +55,18 @@ void PassiveStepper::initialize()
     Stepper::initialize();
 }
 
+void PassiveStepper::step()
+{
+    fireProcesses();
+    theNextTime = INF;
+}
+
+void PassiveStepper::interrupt( TimeParam aTime )
+{
+    setCurrentTime( aTime );
+    theNextTime = aTime;
+}
+
 SET_METHOD_DEF( Real, NextTime, PassiveStepper )
 {
     // skip range check

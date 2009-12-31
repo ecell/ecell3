@@ -64,17 +64,9 @@ public:
     
     virtual void initialize();
 
-    virtual void step()
-    {
-        fireProcesses();
-        theNextTime = INF;
-    }
+    virtual void step();
 
-    virtual void interrupt( TimeParam aTime )
-    {
-        setCurrentTime( aTime );
-        theNextTime = aTime;
-    }
+    virtual void interrupt( TimeParam aTime );
 
     virtual SET_METHOD( Real, NextTime );
 };
