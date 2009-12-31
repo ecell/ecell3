@@ -170,12 +170,10 @@ protected:
 
     VariableReferenceListVector theVariableReferenceListVector;
 
+protected:
+
     bool theStateFlag;
-
     bool isInterrupted;
-
-private:
-
     Real theNextStepInterval;
     Real theTolerableStepInterval;
 };

@@ -53,10 +53,10 @@ namespace libecs
 LIBECS_DM_INIT_STATIC( DifferentialStepper, Stepper );
 
 DifferentialStepper::DifferentialStepper()
-    : theNextStepInterval( 0.001 ),
-      theTolerableStepInterval( 0.001 ),
-      theStateFlag( true ),
-      isInterrupted( true )
+    : theStateFlag( true ),
+      isInterrupted( true ),
+      theNextStepInterval( 0.001 ),
+      theTolerableStepInterval( 0.001 )
 {
     ; // do nothing
 }
