@@ -54,8 +54,6 @@ public:
     virtual void initialize();
     virtual bool calculate( Real aStepInterval );
 
-    virtual void interrupt( TimeParam aTime );
-
     virtual GET_METHOD( Integer, Order ) { return 4; }
     virtual GET_METHOD( Integer, Stage ) { return 5; }
 
@@ -331,10 +329,4 @@ bool ODE45Stepper::calculate( Real aStepInterval )
     setSpectralRadius( aSpectralRadius / aStepInterval );
 
     return true;
-}
-
-void ODE45Stepper::interrupt( TimeParam aTime )
-{
-    isInterrupted = true;
-    AdaptiveDifferentialStepper::interrupt( aTime );
 }

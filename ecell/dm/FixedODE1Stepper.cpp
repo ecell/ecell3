@@ -63,6 +63,8 @@ public:
 
         fireProcesses();
         setVariableVelocity( theTaylorSeries[ 0 ] );
+
+        DifferentialStepper::updateInternalState( aStepInterval );
     }
 };
 

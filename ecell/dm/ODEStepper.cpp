@@ -127,7 +127,6 @@ public:
     virtual void initialize();
     virtual void updateInternalState( Real aStepInterval );
     virtual bool calculate( Real aStepInterval );
-    virtual void interrupt( TimeParam aTime );
 
     void initializeStepper();
 
@@ -201,7 +200,7 @@ protected:
     Integer CheckIntervalCount, SwitchingCount;
 
     bool theFirstStepFlag, theJacobianCalculateFlag;
-    bool isInterrupted, isStiff;
+    bool isStiff;
 };
 
 
@@ -235,7 +234,6 @@ ODEStepper::ODEStepper()
       theStiffnessCounter( 0 ),
       CheckIntervalCount( 100 ),
       SwitchingCount( 20 ),
-      isInterrupted( true ),
       isStiff( true )
 {
     const Real pow913( pow( 9.0, 1.0 / 3.0 ) );
@@ -1223,10 +1221,4 @@ void ODEStepper::updateInternalState( Real aStepInterval )
         updateInternalStateRadauIIA( aStepInterval );
     else
         AdaptiveDifferentialStepper::updateInternalState( aStepInterval );
-}
-
-void ODEStepper::interrupt( TimeParam aTime )
-{
-    isInterrupted = true;
-    AdaptiveDifferentialStepper::interrupt( aTime );
 }

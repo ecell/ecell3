@@ -87,8 +87,7 @@ public:
           theAcceptedError( 0.0 ),
           theAcceptedStepInterval( 0.0 ),
           theJacobianRecalculateTheta( 0.001 ),
-          theContinuousVariableVector( NULLPTR ),
-          isInterrupted( true )
+          theContinuousVariableVector( NULLPTR )
     {
         const Real pow913( pow( 9.0, 1.0 / 3.0 ) );
 
@@ -203,7 +202,6 @@ public:
 
         theFirstStepFlag = true;
         theJacobianCalculateFlag = true;
-        isInterrupted = true;
 
         const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
         if ( theSystemSize != aSize )
@@ -600,12 +598,6 @@ public:
         theStateFlag = true;
 
         DifferentialStepper::updateInternalState( aStepInterval );
-    }
-
-    virtual void interrupt( TimeParam aTime )
-    {
-        isInterrupted = true;
-        DifferentialStepper::interrupt( aTime );
     }
 
     void checkDependency()
@@ -1101,8 +1093,6 @@ protected:
 
     bool    theJacobianCalculateFlag;
     Real    theJacobianRecalculateTheta;
-
-    bool    isInterrupted;
 };
 
 LIBECS_DM_INIT( DAEStepper, Stepper );

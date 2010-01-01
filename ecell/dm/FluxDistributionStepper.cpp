@@ -318,7 +318,7 @@ public:
 
     }
  
-    virtual void updateInternalState( Real aStepInterval )
+    virtual void updateInternalState( Real )
     {
         ; // do nothing
     }
