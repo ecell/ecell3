@@ -117,9 +117,7 @@ namespace libecs
     // That means, this Stepper doesn't necessary step immediately
     // after initialize().
     ProcessEventCref aTopEvent( theScheduler.getTopEvent() );
-    const Real aNewTime( aTopEvent.getTime() );
-
-    loadStepInterval( aNewTime - aCurrentTime );
+    theNextTime = aTopEvent.getTime();
   }
 
 
@@ -137,20 +135,7 @@ namespace libecs
 
     // Set new StepInterval.
     ProcessEventCref aNewTopEvent( theScheduler.getTopEvent() );
-    const Real aNewStepInterval( aNewTopEvent.getTime() - getCurrentTime() );
-
-    // ProcessPtr const aNewTopProcess( aTopEvent.getProcess() );
-    // Calculate new timescale.
-    // To prevent 0.0 * INF -> NaN from happening, simply set zero 
-    // if the tolerance is zero.  
-    // ( DiscreteEventProcess::getTimeScale() can return INF. )
-
-    // temporarily disabled
-    //    theTimeScale = ( theTolerance == 0.0 ) ? 
-    //      0.0 : theTolerance * aNewTopProcess->getTimeScale();
-
-    // FIXME: should be setStepInterval()
-    loadStepInterval( aNewStepInterval );
+    theNextTime = aNewTopEvent.getTime();
   }
 
 
@@ -166,9 +151,7 @@ namespace libecs
     theScheduler.updateAllEvents( getCurrentTime() );
 
     ProcessEventCref aTopEvent( theScheduler.getTopEvent() );
-    const Real aNewTime( aTopEvent.getTime() );
-
-    loadStepInterval( aNewTime - getCurrentTime() );
+    theNextTime = aTopEvent.getTime();
   }
 
   void DiscreteEventStepper::log()

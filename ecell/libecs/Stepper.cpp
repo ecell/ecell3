@@ -64,7 +64,7 @@ namespace libecs
     theSchedulerIndex( -1 ),
     thePriority( 0 ),
     theCurrentTime( 0.0 ),
-    theStepInterval( 0.001 ),
+    theNextTime( 0.001 ),
     theMinStepInterval( 1e-100 ),
     theMaxStepInterval( std::numeric_limits<Real>::infinity() )
   {
@@ -554,7 +554,9 @@ namespace libecs
       }
 
     // this must be after Variable::integrate()
+    Real const aStepInterval( getStepInterval() );
     setCurrentTime( aTime );
+    setNextTime( aTime + aStepInterval );
   }
 
 
@@ -600,18 +602,22 @@ namespace libecs
     return gsl_rng_name( getRng() );
   }
 
-  SET_METHOD_DEF( Real, StepInterval, Stepper )
+  SET_METHOD_DEF( Real, NextTime, Stepper )
   {
-    if ( value < getMinStepInterval() )
+    Real const aCurrentTime( getCurrentTime() );
+    Real const aStepInterval( value - aCurrentTime );	
+    if ( aStepInterval < getMinStepInterval() )
     {
-      loadStepInterval( getMinStepInterval() );
+      theNextTime = aCurrentTime + getMinStepInterval();
       THROW_EXCEPTION( SimulationError,
 		       "The error-limit step interval of Stepper [" + 
-		       getID() + "] is too small." );
+		       getID() + "] is too small (" +
+		       boost::lexical_cast<std::string>( aStepInterval ) +
+		       ")." );
     }
     else
     {
-      loadStepInterval( value );
+      theNextTime = value;
     }
   }
 
@@ -630,6 +636,12 @@ namespace libecs
   {
     return new Interpolant( aVariablePtr );
   }
+
+  SET_METHOD_DEF( Real, CurrentTime, Stepper )
+  {
+    theCurrentTime = value;
+  }
+
 
 } // namespace libecs
 

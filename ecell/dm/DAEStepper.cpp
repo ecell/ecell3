@@ -38,7 +38,138 @@
 #include <gsl/gsl_complex.h>
 #include <gsl/gsl_complex_math.h>
 
-#include "DAEStepper.hpp"
+#include "libecs/DifferentialStepper.hpp"
+
+USE_LIBECS;
+
+DECLARE_VECTOR( Integer, IntVector );
+
+LIBECS_DM_CLASS( DAEStepper, DifferentialStepper )
+{
+
+public:
+
+  LIBECS_DM_OBJECT( DAEStepper, Stepper )
+    {
+      INHERIT_PROPERTIES( DifferentialStepper );
+
+      PROPERTYSLOT_SET_GET( Integer, MaxIterationNumber );
+      PROPERTYSLOT_SET_GET( Real, Uround );
+
+      PROPERTYSLOT_SET_GET( Real, AbsoluteTolerance );
+      PROPERTYSLOT_SET_GET( Real, RelativeTolerance );
+
+      PROPERTYSLOT_SET_GET( Real, JacobianRecalculateTheta );
+    }
+
+  DAEStepper( void );
+  virtual ~DAEStepper( void );
+
+  SET_METHOD( Integer, MaxIterationNumber )
+    {
+      theMaxIterationNumber = value;
+    }
+
+  GET_METHOD( Integer, MaxIterationNumber )
+    {
+      return theMaxIterationNumber;
+    }
+
+  SIMPLE_SET_GET_METHOD( Real, Uround );
+
+  SET_METHOD( Real, AbsoluteTolerance )
+    {
+      theAbsoluteTolerance = value;
+
+      const Real aRatio( theAbsoluteTolerance / theRelativeTolerance );
+      rtoler = 0.1 * pow( theRelativeTolerance, 2.0 / 3.0 );
+      atoler = rtoler * aRatio;
+    }
+
+  GET_METHOD( Real, AbsoluteTolerance )
+    {
+      return theAbsoluteTolerance;
+    }
+
+  SET_METHOD( Real, RelativeTolerance )
+    {
+      theRelativeTolerance = value;
+
+      const Real aRatio( theAbsoluteTolerance / theRelativeTolerance );
+      rtoler = 0.1 * pow( theRelativeTolerance, 2.0 / 3.0 );
+      atoler = rtoler * aRatio;
+    }
+
+  GET_METHOD( Real, RelativeTolerance )
+    {
+      return theRelativeTolerance;
+    }
+
+  SET_METHOD( Real, JacobianRecalculateTheta )
+    {
+      theJacobianRecalculateTheta = value;
+    }
+
+  GET_METHOD( Real, JacobianRecalculateTheta )
+    {
+      return theJacobianRecalculateTheta;
+    }
+
+  virtual void initialize();
+  std::pair< bool, Real > calculateRadauIIA( Real const aStepInterval, Real const aPreviousStepInterval );
+  virtual void updateInternalState( Real aStepInterval );
+
+  void checkDependency();
+
+  Real estimateLocalError( Real const aStepInterval );
+
+  void calculateJacobian();
+
+  void setJacobianMatrix( Real const aStepInterval );
+  void decompJacobianMatrix();
+  void calculateRhs( Real const aStepInterval );
+  Real solve();
+
+  virtual GET_METHOD( Integer, Order ) { return 3; }
+  virtual GET_METHOD( Integer, Stage ) { return 5; }
+
+protected:
+
+  Real    alpha, beta, gamma;
+
+  VariableVector::size_type     theSystemSize;
+
+  // IntVector as std::vector<VariableVector::size_type>
+  IntVector  theContinuousVariableVector;
+  RealVector theDiscreteActivityBuffer;
+
+  std::vector<RealVector>    theJacobian;
+
+  gsl_matrix*        theJacobianMatrix1;
+  gsl_permutation*   thePermutation1;
+  gsl_vector*        theVelocityVector1;
+  gsl_vector*        theSolutionVector1;
+
+  gsl_matrix_complex*        theJacobianMatrix2;
+  gsl_permutation*           thePermutation2;
+  gsl_vector_complex*        theVelocityVector2;
+  gsl_vector_complex*        theSolutionVector2;
+
+  RealVector         theW;
+
+  UnsignedInteger     theMaxIterationNumber;
+  Real                theStoppingCriterion;
+  Real                eta, Uround;
+
+  Real    theAbsoluteTolerance, atoler;
+  Real    theRelativeTolerance, rtoler;
+
+  bool    theFirstStepFlag, theRejectedStepFlag;
+  Real    theAcceptedError, theAcceptedStepInterval;
+
+  bool    theJacobianCalculateFlag;
+  Real    theJacobianRecalculateTheta;
+};
 
 #define SQRT6 2.4494897427831779
 
@@ -66,10 +197,8 @@ DAEStepper::DAEStepper()
   theJacobianCalculateFlag( true ),
   theAcceptedError( 0.0 ),
   theAcceptedStepInterval( 0.0 ),
-  thePreviousStepInterval( 0.001 ),
   theJacobianRecalculateTheta( 0.001 ),
-  theContinuousVariableVector( NULLPTR ),
-  isInterrupted( true )
+  theContinuousVariableVector( NULLPTR )
 {
   const Real pow913( pow( 9.0, 1.0 / 3.0 ) );
   
@@ -78,7 +207,6 @@ DAEStepper::DAEStepper()
   gamma = ( 6.0 + pow913*pow913 - pow913 ) / 30.0;
 
   const Real aNorm( alpha*alpha + beta*beta );
-  const Real aStepInterval( getStepInterval() );
 
   alpha /= aNorm;
   beta /= aNorm;
@@ -137,7 +265,6 @@ void DAEStepper::initialize()
 
   theFirstStepFlag = true;
   theJacobianCalculateFlag = true;
-  isInterrupted = true;
 
   const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
   if ( theSystemSize != aSize )
@@ -359,10 +486,9 @@ void DAEStepper::calculateJacobian()
     }
 }
 
-void DAEStepper::setJacobianMatrix()
+void DAEStepper::setJacobianMatrix( Real const aStepInterval )
 {
   VariableVector::size_type aSize( getReadOnlyVariableOffset() );
-  const Real aStepInterval( getStepInterval() );
   
   const Real alphah( alpha / aStepInterval );
   const Real betah( beta / aStepInterval );
@@ -414,10 +540,9 @@ void DAEStepper::decompJacobianMatrix()
 				&aSignNum );
 }
 
-void DAEStepper::calculateRhs()
+void DAEStepper::calculateRhs( Real const aStepInterval )
 {
   const Real aCurrentTime( getCurrentTime() );
-  const Real aStepInterval( getStepInterval() );
   const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
   const ProcessVector::size_type
     aDiscreteProcessOffset( getDiscreteProcessOffset() );
@@ -615,10 +740,9 @@ Real DAEStepper::solve()
   return sqrt( aNorm / ( 3 * aSize ) );
 }
 
-bool DAEStepper::calculate()
+std::pair< bool, Real > DAEStepper::calculateRadauIIA( Real const aStepInterval, Real const aPreviousStepInterval )
 {
   const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
-  const Real aStepInterval( getStepInterval() );
   Real aNewStepInterval;
   Real aNorm;
   Real theta( fabs( theJacobianRecalculateTheta ) );
@@ -629,7 +753,7 @@ bool DAEStepper::calculate()
     {
       const Real c1( ( 4.0 - SQRT6 ) / 10.0 );
       const Real c2( ( 4.0 + SQRT6 ) / 10.0 );
-      const Real c3q( aStepInterval / thePreviousStepInterval );
+      const Real c3q( aStepInterval / aPreviousStepInterval );
       const Real c1q( c3q * c1 );
       const Real c2q( c3q * c2 );
 
@@ -639,9 +763,9 @@ bool DAEStepper::calculate()
 	  const Real cont2( theTaylorSeries[ 1 ][ c ] + 3.0 * cont3 );
 	  const Real cont1( theTaylorSeries[ 0 ][ c ] + 2.0 * cont2 - 3.0 * cont3 );
 
-	  const Real z1( thePreviousStepInterval * c1q * ( cont1 + c1q * ( cont2 + c1q * cont3 ) ) );
-	  const Real z2( thePreviousStepInterval * c2q * ( cont1 + c2q * ( cont2 + c2q * cont3 ) ) );
-	  const Real z3( thePreviousStepInterval * c3q * ( cont1 + c3q * ( cont2 + c3q * cont3 ) ) );
+	  const Real z1( aPreviousStepInterval * c1q * ( cont1 + c1q * ( cont2 + c1q * cont3 ) ) );
+	  const Real z2( aPreviousStepInterval * c2q * ( cont1 + c2q * ( cont2 + c2q * cont3 ) ) );
+	  const Real z3( aPreviousStepInterval * c3q * ( cont1 + c3q * ( cont2 + c3q * cont3 ) ) );
 
 	  theW[ c ] = 4.3255798900631553510 * z1
 	    + 0.33919925181580986954 * z2 + 0.54177053993587487119 * z3;
@@ -665,7 +789,7 @@ bool DAEStepper::calculate()
 
   while ( anIterator < getMaxIterationNumber() )
     {
-      calculateRhs();
+      calculateRhs( aStepInterval );
       
       const Real aPreviousNorm( std::max( aNorm, Uround ) );
       aNorm = solve();
@@ -685,16 +809,12 @@ bool DAEStepper::calculate()
 	      
 	      if ( anIterationError >= 1.0 )
 		{
-		  aNewStepInterval = aStepInterval * 0.8 * pow( std::max( 1e-4, std::min( 20.0, anIterationError ) ) , -1.0 / ( 4 + getMaxIterationNumber() - 2 - anIterator ) );
-		  setStepInterval( aNewStepInterval );
-		  
-		  return false;
+		  return std::make_pair( false, aStepInterval * 0.8 * pow( std::max( 1e-4, std::min( 20.0, anIterationError ) ) , -1.0 / ( 4 + getMaxIterationNumber() - 2 - anIterator ) ) );
 		}
 	    }
 	  else
 	    {
-	      setStepInterval( aStepInterval * 0.5 );
-	      return false;
+	      return std::make_pair( false, aStepInterval * 0.5 );
 	    }
 	}
       
@@ -722,7 +842,7 @@ bool DAEStepper::calculate()
       theW[ c + aSize*2 ] = w1 * 0.96604818261509293619 + w2;
     }
   
-  const Real anError( estimateLocalError() );
+  const Real anError( estimateLocalError( aStepInterval ) );
   
   Real aSafetyFactor( std::min( 0.9, 0.9 * ( 1 + 2*getMaxIterationNumber() ) / ( anIterator + 1 + 2*getMaxIterationNumber() ) ) );
   aSafetyFactor = std::max( 0.125, std::min( 5.0, pow( anError, 0.25 ) / aSafetyFactor ) );
@@ -763,11 +883,13 @@ bool DAEStepper::calculate()
       if ( aStepIntervalRate >= 1.0 && aStepIntervalRate <= 1.2 )
 	{
 	  setNextStepInterval( aStepInterval );
-	  return true;
 	}
-      
-      setNextStepInterval( aNewStepInterval );
-      return true;
+      else
+	{
+	  setNextStepInterval( aNewStepInterval );
+	}
+
+      return std::make_pair( true, aStepInterval );
     }
   else
     {
@@ -775,18 +897,14 @@ bool DAEStepper::calculate()
       
       if ( theFirstStepFlag )
 	{
-	  setStepInterval( 0.1 * aStepInterval );
+	  aNewStepInterval =  0.1 * aStepInterval;
 	}
-      else
-	{
-	  setStepInterval( aNewStepInterval );
-	}
-      
-      return false;
+
+      return std::make_pair( false, aNewStepInterval );
     }
 }
 
-Real DAEStepper::estimateLocalError()
+Real DAEStepper::estimateLocalError( Real const aStepInterval )
 {
   if ( theSystemSize == 0 )
     return 0.0;
@@ -794,8 +912,7 @@ Real DAEStepper::estimateLocalError()
   const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
   const ProcessVector::size_type 
     aDiscreteProcessOffset( getDiscreteProcessOffset() );
-  const Real aStepInterval( getStepInterval() );
-  
+ 
   Real anError;
   
   const Real hee1( ( -13.0 - 7.0 * SQRT6 ) / ( 3.0 * aStepInterval ) );
@@ -894,16 +1011,15 @@ Real DAEStepper::estimateLocalError()
   return anError;
 }
 
-void DAEStepper::step()
+void DAEStepper::updateInternalState( Real aStepInterval )
 {
   const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
   
   theStateFlag = false;
   
-  thePreviousStepInterval = getStepInterval();
-  setStepInterval( getNextStepInterval() );
+  Real const aPreviousStepInterval( getStepInterval() );
+
   clearVariables();
-  //    interIntegrate();
 
   theRejectedStepFlag = false;
   
@@ -923,18 +1039,24 @@ void DAEStepper::step()
   if ( theJacobianCalculateFlag )
     {
       calculateJacobian();
-      setJacobianMatrix();
+      setJacobianMatrix( aStepInterval );
     }
   else
     {
-      if ( thePreviousStepInterval != getStepInterval() )
-	setJacobianMatrix();
+      if ( aPreviousStepInterval != aStepInterval )
+	setJacobianMatrix( aStepInterval );
     }
 
   UnsignedInteger count( 0 );
-  while ( !calculate() )
+
+  for ( ;; )
     {
+      std::pair< Real, bool > aResult( calculateRadauIIA( aStepInterval, aPreviousStepInterval ) );
+
+      if ( aResult.first ) break;
       if ( count++ > 3 ) break;
+
+      aStepInterval = aResult.second;
 
       theRejectedStepFlag = true;
       
@@ -944,10 +1066,9 @@ void DAEStepper::step()
 	  theJacobianCalculateFlag = true;
 	}
 
-      setJacobianMatrix();
+      setJacobianMatrix( aStepInterval );
     }
 
-  const Real aStepInterval( getStepInterval() );
   setTolerableStepInterval( aStepInterval );
 
   // theW will already be transformed to Z-form
@@ -983,15 +1104,5 @@ void DAEStepper::step()
 
   theStateFlag = true;
 
-  if ( fabs( getTolerableStepInterval() - getStepInterval() )
-       > std::numeric_limits<Real>::epsilon() )
-    isInterrupted = true;
-  else
-    isInterrupted = false;
-}
-
-void DAEStepper::interrupt( TimeParam aTime )
-{
-  isInterrupted = true;
-  DifferentialStepper::interrupt( aTime );
+  DifferentialStepper::updateInternalState( aStepInterval );
 }

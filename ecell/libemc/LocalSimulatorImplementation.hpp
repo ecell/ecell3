@@ -255,8 +255,8 @@ namespace libemc
       theRunningFlag = true;
     }
 
-    void runWithEvent();
-    void runWithoutEvent();
+    void runWithEvent( libecs::Real const aStopTime );
+    void runWithoutEvent( libecs::Real const aStopTime );
 
   private:
 

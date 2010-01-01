@@ -581,7 +581,6 @@ namespace libemc
     //FIXME: dirty, ugly!
     StepperPtr aSystemStepper( getModel().getSystemStepper() );
     aSystemStepper->setCurrentTime( aStopTime );
-    aSystemStepper->setStepInterval( 0.0 );
 
     getModel().getScheduler().updateEvent( 0, aStopTime );
 
@@ -590,27 +589,24 @@ namespace libemc
 	typeid( DefaultEventChecker ) && 
 	theEventHandler.get() != NULLPTR )
       {
-	runWithEvent();
+	runWithEvent( aStopTime );
       }
     else
       {
-	runWithoutEvent();
+	runWithoutEvent( aStopTime );
       }
 
   }
 
-  void LocalSimulatorImplementation::runWithEvent()
+  void LocalSimulatorImplementation::runWithEvent( Real const aStopTime )
   {
-    StepperCptr const aSystemStepper( getModel().getSystemStepper() );
-
     do
       {
 	unsigned int aCounter( theEventCheckInterval );
 	do 
 	  {
-	    if( getModel().getTopEvent().getStepper() == aSystemStepper )
+	    if( getModel().getTopEvent().getTime() > aStopTime )
 	      {
-		getModel().step();
 		stop();
 		return;
 	      }
@@ -627,15 +623,12 @@ namespace libemc
     return;  // the exit
   }
 
-  void LocalSimulatorImplementation::runWithoutEvent()
+  void LocalSimulatorImplementation::runWithoutEvent( Real const aStopTime )
   {
-    StepperCptr const aSystemStepper( getModel().getSystemStepper() );
-
     do
       {
-	if( getModel().getTopEvent().getStepper() == aSystemStepper )
+	if( getModel().getTopEvent().getTime() > aStopTime )
 	  {
-	    getModel().step();
 	    stop();
 	    return;  // the only exit
 	  }

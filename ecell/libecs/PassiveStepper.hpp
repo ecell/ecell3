@@ -78,26 +78,11 @@ namespace libecs
     
     virtual void initialize();
 
-    virtual void step()
-    {
-      fireProcesses();
+    virtual void step();
 
-      setStepInterval( INF );
-    }
+    virtual void interrupt( TimeParam aTime );
 
-    virtual void interrupt( TimeParam aTime )
-    {
-      setCurrentTime( aTime );
-      setStepInterval( 0.0 );
-    }
-
-    virtual SET_METHOD( Real, StepInterval )
-    {
-      // skip range check
-      loadStepInterval( value );
-    }
-
-
+    virtual SET_METHOD( Real, NextTime );
   };
 
 

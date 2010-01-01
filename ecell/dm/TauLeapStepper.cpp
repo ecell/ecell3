@@ -31,7 +31,130 @@
 
 #include <gsl/gsl_randist.h>
 
-#include "TauLeapStepper.hpp"
+#ifdef WIN32
+// Avoid conflicts with min() / max() macros in windows.h
+#define NOMINMAX
+#endif /* WIN32 */
+
+#include "libecs/DifferentialStepper.hpp"
+#include "libecs/libecs.hpp"
+
+#include "GillespieProcess.hpp"
+
+USE_LIBECS;
+
+DECLARE_CLASS( GillespieProcess );
+DECLARE_VECTOR( GillespieProcessPtr, GillespieProcessVector );
+
+LIBECS_DM_CLASS( TauLeapStepper, DifferentialStepper )
+{  
+  
+public:
+
+  LIBECS_DM_OBJECT( TauLeapStepper, Stepper )
+    {
+      INHERIT_PROPERTIES( DifferentialStepper );
+
+      PROPERTYSLOT_SET_GET( Real, Epsilon );
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Tau );
+    }
+
+  TauLeapStepper( void )
+    :
+    epsilon( 0.03 ),
+    tau( libecs::INF )
+    {
+      ; // do nothing
+    }
+  
+  virtual ~TauLeapStepper( void )
+    {
+      ; // do nothing
+    }  
+
+  virtual void initialize();
+  virtual void updateInternalState( Real aStepInterval );
+  
+  GET_METHOD( Real, Epsilon )
+  {
+    return epsilon;
+  }
+
+  SET_METHOD( Real, Epsilon )
+  {
+    epsilon = value;
+  }
+
+  GET_METHOD( Real, Tau )
+  {
+    return tau;
+  }
+
+ protected:
+
+  const Real getTotalPropensity()
+    {
+      Real totalPropensity( 0.0 );
+      FOR_ALL( GillespieProcessVector, theGillespieProcessVector )
+	{
+	  totalPropensity += (*i)->getPropensity();
+	}
+
+      return totalPropensity;
+    }
+
+  void calculateTau()
+    {
+      tau = libecs::INF;
+
+      const Real totalPropensity( getTotalPropensity() );
+      
+      const GillespieProcessVector::size_type 
+	aSize( theGillespieProcessVector.size() );  
+      for( GillespieProcessVector::size_type i( 0 ); i < aSize; ++i )
+	{
+	  Real aMean( 0.0 );
+	  Real aVariance( 0.0 );
+	  
+	  for( GillespieProcessVector::size_type j( 0 ); j < aSize; ++j )
+	    {
+	      const Real aPropensity
+		( theGillespieProcessVector[ j ]->getPropensity() );
+	      VariableReferenceVectorCref aVariableReferenceVector
+		( theGillespieProcessVector[ j ]->getVariableReferenceVector() );
+	      
+	      // future works : theDependentProcessVector
+	      Real expectedChange( 0.0 );
+	      for( VariableReferenceVectorConstIterator 
+		     k( aVariableReferenceVector.begin() ); 
+		   k != aVariableReferenceVector.end(); ++k )
+		{
+		  expectedChange += theGillespieProcessVector[ i ]->getPD( (*k).getVariable() ) * (*k).getCoefficient();
+		}
+	      
+	      aMean += expectedChange * aPropensity;
+	      aVariance += expectedChange * expectedChange * aPropensity;
+	    }
+	  
+	  const Real aTolerance( epsilon * totalPropensity );
+	  const Real expectedTau
+	    ( std::min( aTolerance / std::abs( aMean ), 
+			aTolerance * aTolerance / aVariance ) );
+	  if ( expectedTau < tau )
+	    {
+	      tau = expectedTau;
+	    }
+	}
+    }
+
+ protected:
+  
+  Real epsilon;
+  Real tau;
+  GillespieProcessVector theGillespieProcessVector;
+
+};
+
  
 LIBECS_DM_INIT( TauLeapStepper, Stepper );
 
@@ -56,8 +179,8 @@ void TauLeapStepper::initialize()
     }
 }
 
-void TauLeapStepper::step()
-{      
+void TauLeapStepper::updateInternalState( Real aStepInterval )
+{
   clearVariables();
       
   calculateTau();

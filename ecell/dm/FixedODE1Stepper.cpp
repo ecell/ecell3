@@ -29,9 +29,30 @@
 // E-Cell Project.
 //
 
-#include "Variable.hpp"
+#include "libecs/DifferentialStepper.hpp"
+#include "libecs/Variable.hpp"
 
-#include "FixedODE1Stepper.hpp"
+USE_LIBECS;
+
+LIBECS_DM_CLASS( FixedODE1Stepper, DifferentialStepper )
+{
+
+public:
+
+  LIBECS_DM_OBJECT( FixedODE1Stepper, Stepper )
+    {
+      INHERIT_PROPERTIES( DifferentialStepper );
+    }
+
+  FixedODE1Stepper( void );
+  
+  virtual ~FixedODE1Stepper( void );
+
+  virtual void updateInternalState( Real aStepInterval );
+
+protected:
+
+};
 
 LIBECS_DM_INIT( FixedODE1Stepper, Stepper );
 
@@ -45,49 +66,14 @@ FixedODE1Stepper::~FixedODE1Stepper()
   ; // do nothing
 }
 
-void FixedODE1Stepper::step()
+void FixedODE1Stepper::updateInternalState( Real aStepInterval )
 {
   const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
   clearVariables();
 
-  setStepInterval( getNextStepInterval() );
-
   fireProcesses();
   setVariableVelocity( theTaylorSeries[ 0 ] );
 
-  /**
-  for( VariableVector::size_type c( 0 ); c < aSize; ++c )
-    {
-      VariablePtr const aVariable( theVariableVector[ c ] );
-      //      theTaylorSeries[ 0 ][ c ] = aVariable->getVelocity();
-    }
-  */
-
-  /**
-     avoid negative value
-
-     FOR_ALL( VariableVector, theVariableVector )
-     {
-     while ( (*i)->checkRange( getStepInterval() ) == false )
-     {
-     //FIXME:
-     setStepInterval( getStepInterval() * 0.5 );
-     }
-     }
-  */
-
-  /**
-     if ( getStepInterval() < getTolerableStepInterval() )
-     {
-     setNextStepInterval( getStepInterval() * 2.0 );
-     }
-     else 
-     {
-     setNextStepInterval( getStepInterval() );
-     }
-  */
-
-  setNextStepInterval( getTolerableStepInterval() );
+  DifferentialStepper::updateInternalState( aStepInterval );
 }
-

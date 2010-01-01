@@ -29,16 +29,180 @@
 // E-Cell Project, Lab. for Bioinformatics, Keio University.
 //
 
-#include "Variable.hpp"
-#include "Process.hpp"
-
 #define GSL_RANGE_CHECK_OFF
 
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_complex.h>
 #include <gsl/gsl_complex_math.h>
 
-#include "ODEStepper.hpp"
+#include <cmath>
+
+#include "libecs/Variable.hpp"
+#include "libecs/Process.hpp"
+#include "libecs/DifferentialStepper.hpp"
+
+USE_LIBECS;
+
+LIBECS_DM_CLASS( ODEStepper, AdaptiveDifferentialStepper )
+{
+
+public:
+
+  LIBECS_DM_OBJECT( ODEStepper, Stepper )
+    {
+      INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
+
+      PROPERTYSLOT_SET_GET( Integer, MaxIterationNumber );
+      PROPERTYSLOT_SET_GET( Real, Uround );
+      
+      PROPERTYSLOT( Real, Tolerance,
+		    &ODEStepper::initializeTolerance,
+		    &AdaptiveDifferentialStepper::getTolerance );
+
+      PROPERTYSLOT( Real, AbsoluteToleranceFactor,
+		    &ODEStepper::initializeAbsoluteToleranceFactor,
+		    &AdaptiveDifferentialStepper::getAbsoluteToleranceFactor );
+      
+
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Stiffness );
+      PROPERTYSLOT_SET_GET( Real, JacobianRecalculateTheta );
+
+      PROPERTYSLOT( Integer, isStiff,
+		    &ODEStepper::setIntegrationType,
+		    &ODEStepper::getIntegrationType );
+
+      PROPERTYSLOT_SET_GET( Integer, CheckIntervalCount );
+      PROPERTYSLOT_SET_GET( Integer, SwitchingCount );
+    }
+
+  ODEStepper( void );
+  virtual ~ODEStepper( void );
+
+  SET_METHOD( Integer, MaxIterationNumber )
+    {
+      theMaxIterationNumber = value;
+    }
+
+  GET_METHOD( Integer, MaxIterationNumber )
+    {
+      return theMaxIterationNumber;
+    }
+
+  SIMPLE_SET_GET_METHOD( Real, Uround );
+
+  SIMPLE_SET_GET_METHOD( Integer, CheckIntervalCount );
+  SIMPLE_SET_GET_METHOD( Integer, SwitchingCount );
+
+  void setIntegrationType( Integer value )
+    {
+      isStiff = static_cast<bool>( value );
+      initializeStepper();
+    }
+
+  const Integer getIntegrationType() const { return isStiff; }
+  
+  SET_METHOD( Real, JacobianRecalculateTheta )
+    {
+      theJacobianRecalculateTheta = value;
+    }
+
+  GET_METHOD( Real, JacobianRecalculateTheta )
+    {
+      return theJacobianRecalculateTheta;
+    }
+
+  GET_METHOD( Real, Stiffness )
+    {
+      return 3.3 / theSpectralRadius;
+    }
+
+  GET_METHOD( Real, SpectralRadius )
+    {
+      return theSpectralRadius;
+    }
+
+  SET_METHOD( Real, SpectralRadius )
+    {
+      theSpectralRadius = value;
+    }
+
+  virtual void initialize();
+  virtual void updateInternalState( Real aStepInterval );
+  virtual bool calculate( Real aStepInterval );
+
+  void initializeStepper();
+
+  void calculateJacobian();
+  Real calculateJacobianNorm();
+  void setJacobianMatrix( Real const aStepInterval );
+  void decompJacobianMatrix();
+  void calculateRhs( Real const aStepInterval );
+  Real solve();
+  Real estimateLocalError( Real const aStepInterval );
+
+  void initializeRadauIIA( VariableVector::size_type );
+  std::pair< bool, Real > calculateRadauIIA( Real const aStepInterval, Real const aPreviousStepInterval );
+  void updateInternalStateRadauIIA( Real aStepInterval );
+
+  void initializeTolerance( RealParam value )
+  {
+    setTolerance( value ); // AdaptiveDifferentialStepper::
+    rtoler = 0.1 * pow( getTolerance(), 2.0 / 3.0 );
+    atoler = rtoler * getAbsoluteToleranceFactor();
+  }
+
+  void initializeAbsoluteToleranceFactor( RealParam value )
+  {
+    setAbsoluteToleranceFactor( value ); // AdaptiveDifferentialStepper::
+    atoler = rtoler * getAbsoluteToleranceFactor();
+  }
+
+  virtual GET_METHOD( Integer, Order )
+  {
+    if ( isStiff ) return 3;
+    else return 4;
+  }
+
+  virtual GET_METHOD( Integer, Stage )
+  {
+    return 4;
+  }
+
+protected:
+
+  Real    alpha, beta, gamma;
+
+  VariableVector::size_type     theSystemSize;
+
+  RealMatrix    theJacobian, theW;
+
+  gsl_matrix*        theJacobianMatrix1;
+  gsl_permutation*   thePermutation1;
+  gsl_vector*        theVelocityVector1;
+  gsl_vector*        theSolutionVector1;
+
+  gsl_matrix_complex*        theJacobianMatrix2;
+  gsl_permutation*           thePermutation2;
+  gsl_vector_complex*        theVelocityVector2;
+  gsl_vector_complex*        theSolutionVector2;
+
+  UnsignedInteger    theMaxIterationNumber;
+  Real               theStoppingCriterion;
+  Real               eta, Uround;
+
+  Real               rtoler, atoler;
+
+  Real    theAcceptedError, theAcceptedStepInterval, thePreviousStepInterval;
+
+  Real    theJacobianRecalculateTheta;
+  Real    theSpectralRadius;
+
+  UnsignedInteger    theStiffnessCounter;
+  Integer    CheckIntervalCount, SwitchingCount, theRejectedStepCounter;
+
+  bool    theFirstStepFlag, theJacobianCalculateFlag;
+  bool    isStiff;
+};
 
 LIBECS_DM_INIT( ODEStepper, Stepper );
 
@@ -72,7 +236,6 @@ ODEStepper::ODEStepper()
   theStiffnessCounter( 0 ),
   CheckIntervalCount( 100 ),
   SwitchingCount( 20 ),
-  isInterrupted( true ),
   isStiff( true )
 {
   const Real pow913( pow( 9.0, 1.0 / 3.0 ) );
@@ -82,7 +245,6 @@ ODEStepper::ODEStepper()
   gamma = ( 6.0 + pow913 * pow913 - pow913 ) / 30.0;
   
   const Real aNorm( alpha * alpha + beta * beta );
-  const Real aStepInterval( getStepInterval() );
   
   alpha /= aNorm;
   beta /= aNorm;
@@ -136,7 +298,6 @@ void ODEStepper::initialize()
 
 void ODEStepper::initializeStepper()
 {
-  isInterrupted = true;
   isStiff = true;
   theStiffnessCounter = 0;
 
@@ -256,10 +417,8 @@ void ODEStepper::calculateJacobian()
     }
 }
 
-void ODEStepper::setJacobianMatrix()
+void ODEStepper::setJacobianMatrix( Real const aStepInterval )
 {
-  const Real aStepInterval( getStepInterval() );
-  
   const Real alphah( alpha / aStepInterval );
   const Real betah( beta / aStepInterval );
   const Real gammah( gamma / aStepInterval );
@@ -303,19 +462,6 @@ void ODEStepper::decompJacobianMatrix()
 
 Real ODEStepper::calculateJacobianNorm()
 {
-  /**
-  Real anEuclideanNorm( 0.0 );
-
-  for ( RealVector::size_type i( 0 ); i < theSystemSize; i++ )
-    for ( RealVector::size_type j( 0 ); j < theSystemSize; j++ )
-      {
-	const Real aPartialDerivative( theJacobian[ i ][ j ] );
-	anEuclideanNorm += aPartialDerivative * aPartialDerivative;
-      }
-
-  return sqrt( anEuclideanNorm );
-  */
-
   RealVector theEigenVector( theSystemSize, sqrt( 1.0 / theSystemSize ) ),
     theTempVector( theSystemSize );
 
@@ -348,10 +494,9 @@ Real ODEStepper::calculateJacobianNorm()
   return norm;
 }
 
-void ODEStepper::calculateRhs()
+void ODEStepper::calculateRhs( Real const aStepInterval )
 {
   const Real aCurrentTime( getCurrentTime() );
-  const Real aStepInterval( getStepInterval() );
   
   const Real alphah( alpha / aStepInterval );
   const Real betah( beta / aStepInterval );
@@ -474,10 +619,8 @@ Real ODEStepper::solve()
   return sqrt( aNorm / ( 3 * theSystemSize ) );
 }
 
-bool ODEStepper::calculateRadauIIA()
+std::pair< bool, Real > ODEStepper::calculateRadauIIA( Real const aStepInterval, Real const aPreviousStepInterval )
 {
-  const Real aStepInterval( getStepInterval() );
-
   Real aNewStepInterval;
   Real aNorm;
   Real theta( fabs( theJacobianRecalculateTheta ) );
@@ -488,7 +631,7 @@ bool ODEStepper::calculateRadauIIA()
     {
       const Real c1( ( 4.0 - SQRT6 ) / 10.0 );
       const Real c2( ( 4.0 + SQRT6 ) / 10.0 );
-      const Real c3q( getStepInterval() / thePreviousStepInterval );
+      const Real c3q( aStepInterval / aPreviousStepInterval );
       const Real c1q( c3q * c1 );
       const Real c2q( c3q * c2 );
       for ( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
@@ -497,9 +640,9 @@ bool ODEStepper::calculateRadauIIA()
 	  const Real cont2( theTaylorSeries[ 1 ][ c ] + 3.0 * cont3 );
 	  const Real cont1( theTaylorSeries[ 0 ][ c ] + 2.0 * cont2 - 3.0 * cont3 );
 
-	  const Real z1( thePreviousStepInterval * c1q * ( cont1 + c1q * ( cont2 + c1q * cont3 ) ) );
-	  const Real z2( thePreviousStepInterval * c2q * ( cont1 + c2q * ( cont2 + c2q * cont3 ) ) );
-	  const Real z3( thePreviousStepInterval * c3q * ( cont1 + c3q * ( cont2 + c3q * cont3 ) ) );
+	  const Real z1( aPreviousStepInterval * c1q * ( cont1 + c1q * ( cont2 + c1q * cont3 ) ) );
+	  const Real z2( aPreviousStepInterval * c2q * ( cont1 + c2q * ( cont2 + c2q * cont3 ) ) );
+	  const Real z3( aPreviousStepInterval * c3q * ( cont1 + c3q * ( cont2 + c3q * cont3 ) ) );
 
 	  theW[ 0 ][ c ] = 4.3255798900631553510 * z1
 	    + 0.33919925181580986954 * z2 + 0.54177053993587487119 * z3;
@@ -530,7 +673,7 @@ bool ODEStepper::calculateRadauIIA()
 	  break;
 	}
 
-      calculateRhs();
+      calculateRhs( aStepInterval );
       
       const Real previousNorm( std::max( aNorm, Uround ) );
       aNorm = solve();
@@ -550,17 +693,12 @@ bool ODEStepper::calculateRadauIIA()
 	      
 	      if ( anIterationError >= 1.0 )
 		{
-		  aNewStepInterval = aStepInterval * 0.8 * pow( std::max( 1e-4, std::min( 20.0, anIterationError ) ) , -1.0 / ( 4 + getMaxIterationNumber() - 2 - anIterator ) );
-		  setStepInterval( aNewStepInterval );
-
-		  return false;
+		  return std::make_pair( false, aStepInterval * 0.8 * pow( std::max( 1e-4, std::min( 20.0, anIterationError ) ) , -1.0 / ( 4 + getMaxIterationNumber() - 2 - anIterator ) ) );
 		}
 	    }
 	  else
 	    {
-	      setStepInterval( aStepInterval * 0.5 );
-
-	      return false;
+	      return std::make_pair( false, aStepInterval * 0.5 );
 	    }
 	}
       
@@ -588,7 +726,7 @@ bool ODEStepper::calculateRadauIIA()
       theW[ 2 ][ c ] = w1 * 0.96604818261509293619 + w2;
     }
 
-  const Real anError( estimateLocalError() );
+  const Real anError( estimateLocalError( aStepInterval ) );
 
   Real aSafetyFactor( std::min( 0.9, 0.9 * ( 1 + 2*getMaxIterationNumber() ) / ( anIterator + 1 + 2*getMaxIterationNumber() ) ) );
   aSafetyFactor = std::max( 0.125, std::min( 5.0, pow( anError, 0.25 ) / aSafetyFactor ) );
@@ -629,11 +767,12 @@ bool ODEStepper::calculateRadauIIA()
       if ( aStepIntervalRate >= 1.0 && aStepIntervalRate <= 1.2 )
 	{
 	  setNextStepInterval( aStepInterval );
-	  return true;
 	}
-      
-      setNextStepInterval( aNewStepInterval );
-      return true;
+      else
+	{
+	  setNextStepInterval( aNewStepInterval );
+	}
+      return std::make_pair( true, aStepInterval );
     }
   else
     {
@@ -641,21 +780,15 @@ bool ODEStepper::calculateRadauIIA()
 
       if ( theFirstStepFlag )
 	{
-	  setStepInterval( 0.1 * aStepInterval );
-	}
-      else
-	{
-	  setStepInterval( aNewStepInterval );
+	  aNewStepInterval = 0.1 * aStepInterval;
 	}
 
-      return false;
+      return std::make_pair( false, aNewStepInterval );
     }
 }
 
-Real ODEStepper::estimateLocalError()
+Real ODEStepper::estimateLocalError( Real const aStepInterval )
 {
-  const Real aStepInterval( getStepInterval() );
-  
   Real anError;
   
   const Real hee1( ( -13.0 - 7.0 * SQRT6 ) / ( 3.0 * aStepInterval ) );
@@ -729,15 +862,18 @@ Real ODEStepper::estimateLocalError()
   return anError;
 }
 
-void ODEStepper::stepRadauIIA()
+void ODEStepper::updateInternalStateRadauIIA( Real aStepInterval )
 {
   if ( !theJacobianMatrix1 )
-    return;
+    {
+      DifferentialStepper::updateInternalState( aStepInterval );
+      return;
+    }
 
   theStateFlag = false;
-  
-  thePreviousStepInterval = getStepInterval();
-  setStepInterval( getNextStepInterval() );
+
+  Real const aPreviousStepInterval( getStepInterval() );
+
   clearVariables();
   //    interIntegrate();
   
@@ -749,16 +885,24 @@ void ODEStepper::stepRadauIIA()
   if ( theJacobianCalculateFlag || isInterrupted )
     {
       calculateJacobian();
-      setJacobianMatrix();
+      setJacobianMatrix( aStepInterval );
     }
   else
     {
-      if ( thePreviousStepInterval != getStepInterval() )
-          setJacobianMatrix();
+      if ( aPreviousStepInterval != aStepInterval )
+          setJacobianMatrix( aStepInterval );
     }
 
-  while ( !calculateRadauIIA() )
+  for ( ;; )
     {
+      std::pair< bool, Real > const aResult( calculateRadauIIA( aStepInterval, aPreviousStepInterval ) );
+      if ( aResult.first )
+	{
+	  break;
+	}
+
+      aStepInterval = aResult.second;
+
       if ( ++theRejectedStepCounter >= getTolerableRejectedStepCount() )
         {
           THROW_EXCEPTION( SimulationError,
@@ -775,10 +919,9 @@ void ODEStepper::stepRadauIIA()
 	  theJacobianCalculateFlag = true;
 	}
 
-      setJacobianMatrix();
+      setJacobianMatrix( aStepInterval );
     }
 
-  const Real aStepInterval( getStepInterval() );
   setTolerableStepInterval( aStepInterval );
   
   setSpectralRadius( calculateJacobianNorm() );
@@ -818,9 +961,11 @@ void ODEStepper::stepRadauIIA()
 
   // an extra calculation for resetting the activities of processes
   fireProcesses();
+
+  DifferentialStepper::updateInternalState( aStepInterval );
 }
 
-bool ODEStepper::calculate()
+bool ODEStepper::calculate( Real aStepInterval )
 {
   const Real eps_rel( getTolerance() );
   const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
@@ -828,7 +973,6 @@ bool ODEStepper::calculate()
   const Real a_dydt( getDerivativeToleranceFactor() );
 
   const Real aCurrentTime( getCurrentTime() );
-  const Real aStepInterval( getStepInterval() );
 
   // ========= 1 ===========
 
@@ -1051,7 +1195,7 @@ bool ODEStepper::calculate()
   return true;
 }
 
-void ODEStepper::step()
+void ODEStepper::updateInternalState( Real aStepInterval )
 {
   // check the stiffness of this system by previous results
   if ( getCheckIntervalCount() > 0 )
@@ -1060,7 +1204,7 @@ void ODEStepper::step()
 	{
 	  if ( isStiff ) setSpectralRadius( calculateJacobianNorm() );
 	  
-	  const Real lambdah( getSpectralRadius() * getStepInterval() );
+	  const Real lambdah( getSpectralRadius() * aStepInterval );
 
 	  if ( isStiff == ( lambdah < 3.3 * 0.8 ) )
 	    {
@@ -1076,21 +1220,6 @@ void ODEStepper::step()
       ++theStiffnessCounter;
     }
 
-  if ( isStiff ) stepRadauIIA();
-  else AdaptiveDifferentialStepper::step();
-
-  //   check if the step interval was changed, by epsilon
-  if ( fabs( getTolerableStepInterval() - getStepInterval() )
-       > std::numeric_limits<Real>::epsilon() )
-    {
-      isInterrupted = true;
-    }
-  else
-    isInterrupted = false;
-}
-
-void ODEStepper::interrupt( TimeParam aTime )
-{
-  isInterrupted = true;
-  AdaptiveDifferentialStepper::interrupt( aTime );
+  if ( isStiff ) updateInternalStateRadauIIA( aStepInterval );
+  else AdaptiveDifferentialStepper::updateInternalState( aStepInterval );
 }

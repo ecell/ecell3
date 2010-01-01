@@ -87,6 +87,7 @@ namespace libecs
 	
 	PROPERTYSLOT_SET_GET( Integer,       Priority );
 	PROPERTYSLOT_SET_GET( Real,      StepInterval );
+	PROPERTYSLOT_SET_GET( Real,      NextTime );
 	PROPERTYSLOT_SET_GET( Real,      MaxStepInterval );
 	PROPERTYSLOT_SET_GET( Real,      MinStepInterval );
 	PROPERTYSLOT_SET    ( String,    RngSeed );
@@ -160,17 +161,28 @@ namespace libecs
       return theCurrentTime;
     }
 
-    SET_METHOD( Real, CurrentTime )
+    SET_METHOD( Real, CurrentTime );
+
+    SET_METHOD( Real, StepInterval )
     {
-      theCurrentTime = value;
+      setNextTime( getCurrentTime() + value );
+    }
+
+    GET_METHOD( Real, StepInterval )
+    {
+      Real const aNextTime( getNextTime() );
+      Real const aCurrentTime( getCurrentTime() );
+      if ( aCurrentTime == libecs::INF )
+      {
+        return libecs::INF;
+      }
+      return aNextTime - aCurrentTime;
     }
 
     /**
        This may be overridden in dynamically scheduled steppers.
-
     */
-
-    virtual SET_METHOD( Real, StepInterval );
+    virtual SET_METHOD( Real, NextTime );
 
     /**
        Get the step interval of this Stepper.
@@ -180,11 +192,9 @@ namespace libecs
        
        @return the step interval of this Stepper
     */
-
-
-    GET_METHOD( Real, StepInterval )
+    GET_METHOD( Real, NextTime )
     {
-      return theStepInterval;
+      return theNextTime;
     }
 
     virtual GET_METHOD( Real, TimeScale );
@@ -294,11 +304,6 @@ namespace libecs
 
     void removeProcess( ProcessPtr aProcessPtr );
 
-
-    void loadStepInterval( RealParam aStepInterval )
-    {
-      theStepInterval = aStepInterval;
-    }
 
     void registerLogger( LoggerPtr );
 
@@ -566,7 +571,7 @@ namespace libecs
 
     Real                theCurrentTime;
 
-    Real                theStepInterval;
+    Real                theNextTime;
 
     Real                theMinStepInterval;
     Real                theMaxStepInterval;

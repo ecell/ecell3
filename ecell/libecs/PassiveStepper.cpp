@@ -55,6 +55,22 @@ namespace libecs
     Stepper::initialize();
   }
 
+  void PassiveStepper::step()
+  {
+    fireProcesses();
+    theNextTime = INF;
+  }
+
+  void PassiveStepper::interrupt( TimeParam aTime )
+  {
+    setCurrentTime( aTime );
+    theNextTime = 0.0;
+  }
+
+  SET_METHOD_DEF( Real, NextTime, PassiveStepper )
+  {
+    theNextTime = value;
+  }
 
 } // namespace libecs
 

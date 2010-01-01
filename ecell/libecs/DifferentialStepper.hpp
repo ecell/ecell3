@@ -318,6 +318,10 @@ namespace libecs
 
     virtual void reset();
 
+    virtual void step();
+
+    virtual void updateInternalState( Real aStepInterval );
+
     virtual void interrupt( TimeParam aTime );
 
     virtual InterpolantPtr createInterpolant( VariablePtr aVariable )
@@ -348,9 +352,11 @@ namespace libecs
 
     VariableReferenceListVector theVariableReferenceListVector;
 
+  protected:
+
     bool theStateFlag;
 
-  private:
+    bool isInterrupted;
 
     Real theNextStepInterval;
     Real theTolerableStepInterval;
@@ -503,9 +509,9 @@ namespace libecs
 
     virtual void initialize();
 
-    virtual void step();
+    virtual void updateInternalState( Real aStepInterval );
 
-    virtual bool calculate() = 0;
+    virtual bool calculate( Real aStepInterval ) = 0;
 
     virtual GET_METHOD( Integer, Stage )
     { 

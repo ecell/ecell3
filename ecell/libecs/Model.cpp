@@ -42,6 +42,7 @@
 #include "Stepper.hpp"
 #include "SystemStepper.hpp"
 
+#include "DifferentialStepper.hpp"
 #include "Model.hpp"
 
 namespace libecs
@@ -328,15 +329,6 @@ namespace libecs
     //     - construct stepper dependency graph and
     //     - fill theIntegratedVariableVector.
 
-    /*
-    const Real aCurrentTime( getCurrentTime() );
-    for( StepperMapConstIterator i( theStepperMap.begin() );
-    	 i != theStepperMap.end(); ++i )
-      {
-    	(*i).second->integrate( aCurrentTime );
-      }
-    */
-    
     FOR_ALL_SECOND( StepperMap, theStepperMap, initializeProcesses );
     FOR_ALL_SECOND( StepperMap, theStepperMap, initialize );
     theSystemStepper.initialize();
@@ -346,26 +338,20 @@ namespace libecs
 		    updateIntegratedVariableVector );
 
     theScheduler.updateEventDependency();
-    //    theScheduler.updateAllEvents( getCurrentTime() );
 
     for( EventIndex c( 0 ); c != theScheduler.getSize(); ++c )
       {
-	theScheduler.getEvent(c).reschedule();
+	StepperEvent& anEvent( theScheduler.getEvent( c ) );
+	DifferentialStepper* aStepper( dynamic_cast< DifferentialStepper* >( anEvent.getStepper() ) );
+	if ( aStepper )
+	  {
+	    aStepper->updateInternalState( aStepper->getStepInterval() );
+	  }
+	anEvent.reschedule();
       }
-
-
-
-
-
-
   }
 
-
 } // namespace libecs
-
-
-
-
 
 /*
   Do not modify

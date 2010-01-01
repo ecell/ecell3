@@ -56,6 +56,7 @@ namespace libecs
   DifferentialStepper::DifferentialStepper()
     :
     theStateFlag( true ),
+    isInterrupted( true ),
     theNextStepInterval( 0.001 ),
     theTolerableStepInterval( 0.001 )
   {
@@ -70,6 +71,8 @@ namespace libecs
   void DifferentialStepper::initialize()
   {
     Stepper::initialize();
+
+    isInterrupted = true;
 
     createInterpolants();
 
@@ -249,15 +252,13 @@ namespace libecs
 	return;
       }
 
-    const Real aCurrentTime( getCurrentTime() );
-
     // aCallerTimeScale == 0 implies need for immediate reset
     if( aCallerTimeScale != 0.0 )
       {
 	// Shrink the next step size to that of caller's
 	setNextStepInterval( aCallerTimeScale );
 
-	const Real aNextStep( aCurrentTime + aStepInterval );
+	const Real aNextStep( getCurrentTime() + aStepInterval );
 	const Real aCallerNextStep( aCallerCurrentTime + aCallerTimeScale );
 
 	// If the next step of this occurs *before* the next step 
@@ -266,17 +267,30 @@ namespace libecs
 	  {
 	    return;
 	  }
-
-	
-	// If the next step of this will occur *after* the caller,
-	// reschedule this Stepper, as well as shrinking the next step size.
-	//    setStepInterval( aCallerCurrentTime + ( aCallerTimeScale * 0.5 ) 
-	//		     - aCurrentTime );
       }
       
-    const Real aNewStepInterval( aCallerCurrentTime - aCurrentTime );
+    theNextTime = aCallerCurrentTime;
+    isInterrupted = true;
+  }
+ 
+  void DifferentialStepper::step()
+  {
+    updateInternalState( getNextStepInterval() );
+  }
 
-    loadStepInterval( aNewStepInterval );
+  void DifferentialStepper::updateInternalState( Real aStepInterval )
+  {
+    setStepInterval( aStepInterval );
+    // check if the step interval was changed, by epsilon
+    if ( std::fabs( getTolerableStepInterval() - aStepInterval )
+	 > std::numeric_limits<Real>::epsilon() )
+      {
+	isInterrupted = true;
+      }
+    else
+      {
+	isInterrupted = false;
+      }
   }
 
 
@@ -315,18 +329,16 @@ namespace libecs
     //			  || ( theDependentStepperVector.size() > 1 ) );
   }
 
-  void AdaptiveDifferentialStepper::step()
+  void AdaptiveDifferentialStepper::updateInternalState( Real aStepInterval )
   {
     theStateFlag = false;
 
     clearVariables();
 
-    setStepInterval( getNextStepInterval() );
-    //    setTolerableInterval( 0.0 );
-
     Integer theRejectedStepCounter( 0 );
+    const Real maxError( getMaxErrorRatio() );
 
-    while ( !calculate() )
+    while ( !calculate( aStepInterval ) )
       {
 	if ( ++theRejectedStepCounter >= theTolerableRejectedStepCount )
 	  {
@@ -338,60 +350,28 @@ namespace libecs
 			     + ")." );
 	  }
 
-	const Real anExpectedStepInterval( safety * getStepInterval() 
-					   * pow( getMaxErrorRatio(),
-						  -1.0 / getOrder() ) );
-
 	// shrink it if the error exceeds 110%
-	setStepInterval( anExpectedStepInterval );
+	aStepInterval = aStepInterval * safety * std::pow( getMaxErrorRatio(),
+						  -1.0 / getOrder() );
       }
 
     // an extra calculation for resetting the activities of processes
     fireProcesses();
 
-    setTolerableStepInterval( getStepInterval() );
+    setTolerableStepInterval( aStepInterval );
 
     theStateFlag = true;
 
     // grow it if error is 50% less than desired
-    const Real maxError( getMaxErrorRatio() );
+    Real aNewStepInterval( aStepInterval );
     if ( maxError < 0.5 )
       {
-	const Real aNewStepInterval( getTolerableStepInterval() * safety
-				     * pow( maxError ,
-					    -1.0 / ( getOrder() + 1 ) ) );
-	//	const Real aNewStepInterval( getStepInterval() * 2.0 );
-
-	setNextStepInterval( aNewStepInterval );
+	aNewStepInterval = aNewStepInterval * safety * std::pow( maxError,
+					    -1.0 / ( getOrder() + 1 ) );
       }
-    else 
-      {
-	setNextStepInterval( getTolerableStepInterval() );
-      }
+    setNextStepInterval( aNewStepInterval );
 
-    /**
-    // check the tolerances for Epsilon
-    if ( isEpsilonChecked() ) 
-      {
-	const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
-
-	for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
-	  {
-	    VariablePtr const aVariable( theVariableVector[ c ] );
-	    
-	    const Real aTolerance( FMA( fabs( aVariable->getValue() ),
-					theRelativeEpsilon,
-					theAbsoluteEpsilon ) );
-
-	    const Real aVelocity( fabs( theVelocityBuffer[ c ] ) );
-	    
-	    if ( aTolerance < aVelocity * getStepInterval() )
-	      {
-		setStepInterval( aTolerance / aVelocity );
-	      }
-	  }
-      }
-    */
+    DifferentialStepper::updateInternalState( aStepInterval );
   }
 
 } // namespace libecs

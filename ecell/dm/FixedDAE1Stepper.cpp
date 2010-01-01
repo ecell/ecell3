@@ -29,10 +29,102 @@
 // E-Cell Project.
 //
 
-#include "Variable.hpp"
-#include "Process.hpp"
+#include <gsl/gsl_linalg.h>
 
-#include "FixedDAE1Stepper.hpp"
+#include "libecs/DifferentialStepper.hpp"
+#include "libecs/Process.hpp"
+
+USE_LIBECS;
+
+DECLARE_VECTOR( int, IntVector );
+
+LIBECS_DM_CLASS( FixedDAE1Stepper, DifferentialStepper )
+{
+
+public:
+
+  LIBECS_DM_OBJECT( FixedDAE1Stepper, Stepper )
+    {
+      INHERIT_PROPERTIES( DifferentialStepper );
+
+      PROPERTYSLOT_SET_GET( Real, PerturbationRate );
+      PROPERTYSLOT_SET_GET( Real, Tolerance );
+    }
+
+  FixedDAE1Stepper( void );
+  
+  virtual ~FixedDAE1Stepper( void );
+
+  SET_METHOD( Real, PerturbationRate )
+  {
+    thePerturbationRate = value;
+  }
+
+  GET_METHOD( Real, PerturbationRate )
+  {
+    return thePerturbationRate;
+  }
+
+  SET_METHOD( Real, Tolerance )
+  {
+    theTolerance = value;
+  }
+
+  GET_METHOD( Real, Tolerance )
+  {
+    return theTolerance;
+  }
+
+  virtual void initialize();
+
+  virtual void updateInternalState( Real aStepInterval );
+
+  void calculateVelocityVector( Real const aStepInterval );
+  void calculateJacobian( Real const aStepInterval );
+
+  void checkDependency();
+
+  const Real solve( Real const aStepInterval );
+
+protected:
+
+  UnsignedInteger     theSystemSize;
+  Real                thePerturbationRate;
+  Real                theTolerance;
+
+  // std::vector<ProcessVector>
+  std::vector<IntVector>       theDependentProcessVector;
+  std::vector<IntVector>       theDependentVariableVector;
+
+  gsl_matrix*         theJacobianMatrix;
+  gsl_vector*         theVelocityVector;
+  gsl_vector*         theSolutionVector;
+  gsl_permutation*    thePermutation;
+
+  IntVector       theContinuousVariableVector;
+  RealVector      theActivityBuffer;
+};
+
+USE_LIBECS;
+
+LIBECS_DM_CLASS( FixedODE1Stepper, DifferentialStepper )
+{
+public:
+
+  LIBECS_DM_OBJECT( FixedODE1Stepper, Stepper )
+    {
+      INHERIT_PROPERTIES( DifferentialStepper );
+    }
+
+  FixedODE1Stepper( void );
+  
+  virtual ~FixedODE1Stepper( void );
+
+  virtual void updateInternalState( Real aStepInterval );
+
+protected:
+
+};
 
 LIBECS_DM_INIT( FixedDAE1Stepper, Stepper );
 
@@ -231,10 +323,9 @@ void FixedDAE1Stepper::checkDependency()
   theActivityBuffer.resize( theProcessVector.size() );
 }
 
-void FixedDAE1Stepper::calculateVelocityVector()
+void FixedDAE1Stepper::calculateVelocityVector( Real const aStepInterval )
 {
   const Real aCurrentTime( getCurrentTime() );
-  const Real aStepInterval( getStepInterval() );
 
   const ProcessVector::size_type 
     aDiscreteProcessOffset( getDiscreteProcessOffset() );
@@ -295,10 +386,9 @@ void FixedDAE1Stepper::calculateVelocityVector()
   setCurrentTime( aCurrentTime );
 }
   
-void FixedDAE1Stepper::calculateJacobian()
+void FixedDAE1Stepper::calculateJacobian( Real const aStepInterval )
 {
   const Real aCurrentTime( getCurrentTime() );
-  const Real aStepInterval( getStepInterval() );
   const Real aPerturbation( thePerturbationRate * aStepInterval );
   const VariableVector::size_type 
     aReadOnlyVariableOffset( getReadOnlyVariableOffset() );
@@ -354,7 +444,7 @@ void FixedDAE1Stepper::calculateJacobian()
 	    ( theTaylorSeries[ 0 ][ anIndex ] / aPerturbation );
 
 	  gsl_matrix_set( theJacobianMatrix, i, c,
-			  -1.0 * aDerivative * getStepInterval() );
+			  -1.0 * aDerivative * aStepInterval );
 
 	  theTaylorSeries[ 0 ][ anIndex ] = 0.0;
 	}
@@ -373,7 +463,7 @@ void FixedDAE1Stepper::calculateJacobian()
   setCurrentTime( aCurrentTime );
 }
 
-const Real FixedDAE1Stepper::solve()
+const Real FixedDAE1Stepper::solve( Real const aStepInterval )
 {
   const VariableVector::size_type 
     aReadOnlyVariableOffset( getReadOnlyVariableOffset() );
@@ -396,13 +486,13 @@ const Real FixedDAE1Stepper::solve()
       const Real aVelocity( aVariable->getValue() - theValueBuffer[ c ] );
       aTotalVelocity += aVelocity;
       
-      theTaylorSeries[ 0 ][ c ] = aVelocity / getStepInterval();
+      theTaylorSeries[ 0 ][ c ] = aVelocity / aStepInterval;
     }
 
   return fabs( anError / aTotalVelocity );
 }
 
-void FixedDAE1Stepper::step()
+void FixedDAE1Stepper::updateInternalState( Real aStepInterval )
 {
   theStateFlag = false;
 
@@ -412,10 +502,10 @@ void FixedDAE1Stepper::step()
   int anIterator( 0 );
   while ( anIterator < 5 )
     {
-      calculateVelocityVector();
-      calculateJacobian();
+      calculateVelocityVector( aStepInterval );
+      calculateJacobian( aStepInterval );
 
-      const Real anError( solve() );
+      const Real anError( solve( aStepInterval ) );
 
       if ( anError < getTolerance() )
 	{
@@ -427,7 +517,8 @@ void FixedDAE1Stepper::step()
 
   resetAll();
 
-  //    interIntegrate();
   theStateFlag = true;
+
+  DifferentialStepper::updateInternalState( aStepInterval );
 }
 

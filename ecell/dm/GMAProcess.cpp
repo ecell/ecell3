@@ -353,35 +353,4 @@ const std::vector<RealVector>& GMAProcess::getESSYNSMatrix()
     }
   
   return theY;
-
-  /*
-  const Real aStepInterval( getSuperSystem()->
-			    getStepper()->getStepInterval() );
-
-
-  //integrate
-  Real aY( 0.0 ); 
-  for( Integer i( 1 ); i < theSystemSize+1; i++ )
-    {
-      aY = 0.0;//reset aY 
-      for( Integer m( 1 ); m <= Order; m++ )
-        {
-	  aY += ((theY[i-1])[m] *
-		 gsl_sf_pow_int( aStepInterval, m ) / gsl_sf_fact( m ));
-	}
-      (theY[i-1])[0] += aY;
-    }
-
-  //set value
-  anIndex = 0;
-
-  for( VariableReferenceVectorConstIterator
-	 i ( thePositiveVariableReferenceIterator );
-       i != theVariableReferenceVector.end(); ++i )
-    {
-      (*i).getVariable()->setValue( exp( (theY[anIndex])[0] ) );
-      anIndex++;
-    }
-
-  */
 }

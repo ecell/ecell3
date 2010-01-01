@@ -51,18 +51,9 @@ DMH = \
 	PythonProcessBase.hpp \
 	ExpressionProcessBase.hpp \
 	ExpressionCompiler.hpp \
-	FixedODE1Stepper.hpp \
-	FixedDAE1Stepper.hpp \
 	GillespieProcess.hpp \
-	ESSYNSStepper.hpp \
-	ODE23Stepper.hpp \
-	ODEStepper.hpp \
-	DAEStepper.hpp \
-	FluxDistributionStepper.hpp \
 	QuasiDynamicFluxProcess.hpp \
-	TauLeapProcess.hpp \
-	TauLeapStepper.hpp \
-	ODE45Stepper.hpp
+	TauLeapProcess.hpp
 
 DESCS =  \
 	ConstantFluxProcess.desc \

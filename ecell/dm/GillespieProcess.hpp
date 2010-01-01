@@ -136,13 +136,6 @@ LIBECS_DM_CLASS( GillespieProcess, Process )
     return theOrder;
   }
 
-  /*
-  virtual GET_METHOD( Real, TimeScale )
-  {
-    return theGetMinValueMethodPtr( this ) * getStepInterval();
-  }
-  */
-
   //  virtual void updateStepInterval()
   virtual GET_METHOD( Real, StepInterval )
   {
