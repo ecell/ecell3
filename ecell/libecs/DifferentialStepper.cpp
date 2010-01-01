@@ -265,7 +265,7 @@ void DifferentialStepper::interrupt( TimeParam aTime )
         }
     }
 
-    setNextTime( aCallerCurrentTime );
+    theNextTime = aCallerCurrentTime;
     isInterrupted = true;
 }
 
