@@ -172,6 +172,8 @@ public:
         resetAll();
 
         theStateFlag = true;
+
+        DifferentialStepper::updateInternalState( aStepInterval );
     }
 
     void calculateVelocityVector( Real const aStepInterval )
