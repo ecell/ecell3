@@ -1,6 +1,7 @@
 ecell-3.2: ?-Nov-2008
  
  * A few cosmetic changes
+
    - Fixed indent / coding style.
 
    - Fixed doxygen comments.
