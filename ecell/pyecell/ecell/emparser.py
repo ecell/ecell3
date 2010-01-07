@@ -448,7 +448,7 @@ def patchEm2Eml( anEmlObject, anEmFileObject, debug=0 ):
     aLexer = lex.lex(lextab=LEXTAB)
     aLexer.filename = 'undefined'
     # Parsing
-    aParser = yacc.yacc(optimize=1, tabmodule=PARSERTAB)
+    aParser = yacc.yacc(optimize=0, tabmodule=PARSERTAB)
     anAst = aParser.parse( anEmFileObject.read(), lexer=aLexer ,debug=debug )
         
     if debug != 0:
