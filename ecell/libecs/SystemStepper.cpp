@@ -51,9 +51,9 @@ LIBECS_DM_INIT_STATIC( SystemStepper, Stepper );
 SystemStepper::SystemStepper() 
 {
     setCurrentTime( INF );
-    theMaxStepInterval = INF;
-    setNextTime( INF );
+    setMaxStepInterval( INF );
     setMinStepInterval( 0.0 );
+    setNextTime( INF );
     setPriority( (std::numeric_limits<Integer>::max)() ); 
 }
 
