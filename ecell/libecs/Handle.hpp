@@ -48,8 +48,7 @@ public:
 
     bool operator==( Handle const& rhs ) const
     {
-        if ( hdl_ == rhs.hdl_ )
-            return true;
+        return hdl_ == rhs.hdl_;
     }
 
     bool operator!=( Handle const& rhs ) const
