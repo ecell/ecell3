@@ -104,13 +104,13 @@ public:
 
     libecs::DataPointVectorCref aVector( *aVectorSharedPtr );
 
-    int aDimensions[2] = { aVector.getSize(),
+    npy_intp aDimensions[2] = { aVector.getSize(),
 			   aVector.getElementSize() / sizeof( double ) };
 
 
     PyArrayObject* anArrayObject( reinterpret_cast<PyArrayObject*>
-				  ( PyArray_FromDims( 2, aDimensions, 
-						      PyArray_DOUBLE ) ) );
+				  ( PyArray_New( &PyArray_Type, 2, aDimensions, 
+						      PyArray_DOUBLE, NULL, NULL, 0, 0, NULL ) ) );
 
     memcpy( anArrayObject->data, aVector.getRawArray(),   
 	    aVector.getSize() * aVector.getElementSize() );
