@@ -88,13 +88,15 @@ def main():
 	# -------------------------------------
 	anEmlFile = None
 	anEssFile = None
+	anIniFile = None
 
 	# -------------------------------------
 	# gets options
 	# -------------------------------------
 	try:
-		opts , args = getopt.getopt( sys.argv[1:] , 'he:f:',
-					     ["help", "exec=", "file="])
+		opts , args = getopt.getopt( sys.argv[1:] , 'he:f:i:',
+					     ["help", "exec=", 
+					      "file=", "ini="])
 	except:
 		usage()
 		sys.exit(1)
@@ -116,6 +118,10 @@ def main():
 		# load model file (.eml)
 		if anOption in ( "-f", '--file' ):
 			anEmlFile = anArg
+			
+		# load model file (.eml)
+		if anOption in ( "-i", '--ini' ):
+			anIniFile = anArg
 			
 	# -------------------------------------
 	# prohibits to use -e and -f options 
@@ -163,6 +169,24 @@ def main():
 			# initialize & update windows
 			aMainWindow = aSession.openWindow('MainWindow')
 			aSession.updateWindows()
+
+			if anIniFile is not None \
+				    and os.path.isfile( anIniFile ):
+				# load model
+				aSession.message( "%s is loaded.\n" 
+						  % anIniFile )
+
+				try:
+					aMainWindow.setAppearance( anIniFile )
+				except:
+					aSession.message( ' can\'t load [%s]' 
+							  % anIniFile )
+					anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback ) )
+					aSession.message( "-----------" )
+					aSession.message( anErrorMessage )
+					aSession.message( "-----------" )
+				else:
+					aSession.updateWindows()
 
 	# executes script file (.ess)
 	elif anEssFile != None:

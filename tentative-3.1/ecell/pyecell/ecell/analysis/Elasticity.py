@@ -97,7 +97,7 @@ def getAcculateElasticityArray( pathwayProxy, fullPN ):
     
     # first step
     aSession = pathwayProxy.theEmlSupport.createSession()
-
+    
     value = aSession.theSimulator.getEntityProperty( fullPN )
     aPerturbation = RELATIVE_PERTURBATION * value + ABSOLUTE_PERTURBATION
 
@@ -343,6 +343,99 @@ def getEpsilonElasticityMatrix2( pathwayProxy ):
     return elasticityMatrix
 
 # end of getEpsilonElasticityMatrix2
+
+#
+# tentative
+#
+
+def getSensitivityArray( pathwayProxy, targetpn, fullpnList ):
+    '''
+    calculate and return the sensitivities (array)
+    with 1st order Taylor expansion
+    pathwayProxy: a PathwayProxy instance
+    targetpn: (str) the full property name
+    fullpnList: (list ) a list of full property names (str)
+    return elasticityArray
+    '''
+
+    size = len( fullpnList )
+    
+    # first step
+    elasticityArray = numpy.zeros( size, float )
+    
+    aSession = pathwayProxy.theEmlSupport.createSession()
+    aSession.theSimulator.initialize()
+    for i in range( size ):
+        elasticityArray[ i ] = aSession.theSimulator.getEntityProperty( fullpnList[ i ] )
+    
+    # second step
+    aSession = pathwayProxy.theEmlSupport.createSession()
+
+    value = aSession.theSimulator.getEntityProperty( targetpn )
+    aPerturbation = RELATIVE_PERTURBATION * value + ABSOLUTE_PERTURBATION
+
+    aSession.theSimulator.setEntityProperty( targetpn, value + aPerturbation )
+    aSession.theSimulator.initialize()
+
+    for c in range( size ):
+        elasticityArray[ c ] = ( aSession.theSimulator.getEntityProperty( fullpnList[ c ] ) - elasticityArray[ c ] ) / aPerturbation
+
+    return elasticityArray
+
+# end of getSensitivityArray
+
+def getAcculateSensitivityArray( pathwayProxy, targetpn, fullpnList ):
+    '''
+    calculate and return the sensitivities (array)
+    with 2nd order Taylor expansion
+    pathwayProxy: a PathwayProxy instance
+    targetpn: (str) the full property name
+    fullpnList: (list ) a list of full property names (str)
+    return elasticityArray
+    '''
+
+    size = len( fullpnList )
+
+    elasticityArray = numpy.zeros( size, float )
+    
+    # first step
+    aSession = pathwayProxy.theEmlSupport.createSession()
+
+    value = aSession.theSimulator.getEntityProperty( targetpn )
+    aPerturbation = RELATIVE_PERTURBATION * value + ABSOLUTE_PERTURBATION
+
+    aSession.theSimulator.setEntityProperty( targetpn, value - 2.0 * aPerturbation )
+    aSession.theSimulator.initialize()
+
+    for c in range( size ):
+        elasticityArray[ c ] = aSession.theSimulator.getEntityProperty( fullpnList[ c ] )
+
+    # second step
+    aSession = pathwayProxy.theEmlSupport.createSession()
+    aSession.theSimulator.setEntityProperty( targetpn, value - aPerturbation )
+    aSession.theSimulator.initialize()
+    for c in range( size ):
+        elasticityArray[ c ] -= 8.0 * aSession.theSimulator.getEntityProperty( fullpnList[ c ] )
+
+    # third step
+    aSession = pathwayProxy.theEmlSupport.createSession()
+    aSession.theSimulator.setEntityProperty( targetpn, value + aPerturbation )
+    aSession.theSimulator.initialize()
+    for c in range( size ):
+        elasticityArray[ c ] += 8.0 * aSession.theSimulator.getEntityProperty( fullpnList[ c ] )
+
+    # last(fourth) step
+    aSession = pathwayProxy.theEmlSupport.createSession()
+    aSession.theSimulator.setEntityProperty( targetpn, value + 2.0 * aPerturbation )
+    aSession.theSimulator.initialize()
+    for c in range( size ):
+        elasticityArray[ c ] -= aSession.theSimulator.getEntityProperty( fullpnList[ c ] )
+
+        elasticityArray[ c ] /= 12.0 * aPerturbation
+
+    return elasticityArray
+
+# end of getAcculateSensitivityArray
 
 
 if __name__ == '__main__':

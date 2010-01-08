@@ -55,7 +55,6 @@ class EntityListWindow(OsogoWindow):
 
     VARIABLE_COLUMN_INFO_MAP= {
         # Name:      Type
-
         'Value':     gobject.TYPE_STRING
         }
 
@@ -77,6 +76,7 @@ class EntityListWindow(OsogoWindow):
 
         # initialize parameters
         self.theSelectedFullPNList = []
+        self.theCheckedFullIDList = []
 
         self.searchString = ''
 
@@ -109,12 +109,13 @@ class EntityListWindow(OsogoWindow):
             #			'on_variable_tree_cursor_changed':self.selectVariable,\
             
             'on_view_button_clicked': self.createPluginWindow,\
+            'on_log_all_button_clicked': self.logAllEntities,\
+            'on_clear_checked_button_clicked': self.clearCheckboxes,
             'on_variable_tree_button_press_event': self.popupMenu,\
             'on_process_tree_button_press_event': self.popupMenu,\
             # search 
             'on_search_button_clicked': self.pushSearchButton,\
-            'on_search_entry_key_press_event':\
-            self.keypressOnSearchEntry,\
+            'on_search_entry_key_press_event': self.keypressOnSearchEntry,\
             'on_clear_button_clicked': self.pushClearButton, 
             'on_search_scope_changed': self.searchScopeChanged
             } )
@@ -168,15 +169,18 @@ class EntityListWindow(OsogoWindow):
         if ( self.theSession.theModelWalker != None ):
             self['search_button'].set_sensitive(True)
             self['view_button'].set_sensitive(True)
+            self['log_all_button'].set_sensitive(True)
             self['search_entry'].set_sensitive(True)
             self['plugin_optionmenu'].set_sensitive(True)
+
+            self['clear_checked_button'].set_sensitive( len( self.theCheckedFullIDList ) != 0 )
 
         else:
             self['search_button'].set_sensitive(0)
             self['view_button'].set_sensitive(0)
+            self['log_all_button'].set_sensitive(0)
             self['search_entry'].set_sensitive(0)
             self['plugin_optionmenu'].set_sensitive(0)
-    
 
     def getQueue( self ):
         return self.theQueue
@@ -243,28 +247,36 @@ class EntityListWindow(OsogoWindow):
         """initialize ProcessTree
         """
 
-        columnTypeList = []
+        columnTypeList = [ gobject.TYPE_BOOLEAN ]
+        renderer = gtk.CellRendererToggle()
+        renderer.set_property( 'activatable', True )
+        renderer.connect( 'toggled', self.__toggleCheckbox, self.processTree )
+        checkboxColumn = gtk.TreeViewColumn( '', renderer, active=0 )
+        checkboxColumn.set_reorderable( True )
+        checkboxColumn.set_sort_column_id( 0 )
+        self.processTree.append_column( checkboxColumn )
 
         for i in range( len( self.PROCESS_COLUMN_LIST ) ):
-            title = self.PROCESS_COLUMN_LIST[i]
+            title = self.PROCESS_COLUMN_LIST[ i ]
 
             try:
                 type = self.PROCESS_COLUMN_INFO_MAP[ title ]
             except:
                 type = self.COMMON_COLUMN_INFO_MAP[ title ]
 
-            column = gtk.TreeViewColumn( title,
-                                         gtk.CellRendererText(),
-                                         text=i )
+            column = gtk.TreeViewColumn( title, 
+                                         gtk.CellRendererText(), 
+                                         text=i+1 )
             column.set_reorderable( True )
-            column.set_sort_column_id( i )
+            column.set_sort_column_id( i+1 )
+
             self.processTree.append_column( column )
             columnTypeList.append( type )
             if type == gobject.TYPE_FLOAT:
                 column.set_alignment( 1.0 )
                 column.get_cell_renderers()[0].set_property( 'xalign', 1.0 )
 
-        self.processTree.set_search_column( 0 )
+        self.processTree.set_search_column( 1 )
 
         model = gtk.ListStore( *columnTypeList )
         self.processTree.set_model( model )
@@ -274,34 +286,66 @@ class EntityListWindow(OsogoWindow):
         """initializes VariableTree
         """
 
-        columnTypeList = []
+        columnTypeList = [ gobject.TYPE_BOOLEAN ]
+        renderer = gtk.CellRendererToggle()
+        renderer.set_property( 'activatable', True )
+        renderer.connect( 'toggled', self.__toggleCheckbox, self.variableTree )
+        checkboxColumn = gtk.TreeViewColumn( '', renderer, active=0 )
+        checkboxColumn.set_reorderable( True )
+        checkboxColumn.set_sort_column_id( 0 )
+        self.variableTree.append_column( checkboxColumn )
 
         for i in range( len( self.VARIABLE_COLUMN_LIST ) ):
-            title = self.VARIABLE_COLUMN_LIST[i]
+            title = self.VARIABLE_COLUMN_LIST[ i ]
 
             try:
                 type = self.VARIABLE_COLUMN_INFO_MAP[ title ]
             except:
                 type = self.COMMON_COLUMN_INFO_MAP[ title ]
 
-            column = gtk.TreeViewColumn( title,
-                                         gtk.CellRendererText(),
-                                         text=i )
+            renderer = gtk.CellRendererText()
+            if title == EntityListWindow.DEFAULT_VARIABLE_PROPERTY:
+                renderer.connect( 'edited', self.editVariableColumn, i+1 )
+                renderer.set_property( 'editable', True )
+
+            column = gtk.TreeViewColumn( title, renderer, text=i+1 )
             column.set_reorderable( True )
-            column.set_sort_column_id( i )
+            column.set_sort_column_id( i+1 )
             self.variableTree.append_column( column )
             columnTypeList.append( type )
             if type == gobject.TYPE_FLOAT:
                 column.set_alignment( 1.0 )
                 column.get_cell_renderers()[0].set_property( 'xalign', 1.0 )
 
-        self.variableTree.set_search_column( 0 )
+        self.variableTree.set_search_column( 1 )
 
         model = gtk.ListStore( *columnTypeList )
         self.variableTree.set_model( model )
 
+    def editVariableColumn( self, widget, path, new_text, col ):
 
+        if self.theSession.theModelWalker == None:
+            return
 
+        model = self.variableTree.get_model()
+
+        iter = model.get_iter( path )
+        fullid = model.get_data( model.get_string_from_iter( iter ) )
+        propertyName = EntityListWindow.VARIABLE_COLUMN_LIST[ col-1 ]
+        # propertyName = self.variableTree.get_column( col-1 ).get_title()
+
+        if propertyName != EntityListWindow.DEFAULT_VARIABLE_PROPERTY:
+            return
+
+        try:
+            value = float( new_text )
+        except:
+            message = '[%s] is not a float number.' % new_text
+            dialog = ConfirmWindow( OK_MODE, message, 'Error!' )
+            return
+
+        fullpn = createFullPN( '%s:%s' % ( fullid, propertyName ) )
+        self.thePropertyWindow.setValue( fullpn, value )
 
     def __initializePluginWindowOptionMenu( self ):
         """initializes PluginWindowOptionMenu
@@ -385,6 +429,30 @@ class EntityListWindow(OsogoWindow):
         self.thePopupMenu.append( gtk.MenuItem() )
 
         # ------------------------------------------
+        # supporting selection
+        # ------------------------------------------
+
+        aMutatorString = "Select Mutators"
+        aMenuItem = gtk.MenuItem( aMutatorString )
+        aMenuItem.connect( 'activate', self.selectEffectors, 0 )
+        aMenuItem.set_name( aMutatorString )
+        self.thePopupMenu.append( aMenuItem )
+
+        anAccessorString = "Select Accessors"
+        aMenuItem = gtk.MenuItem( anAccessorString )
+        aMenuItem.connect( 'activate', self.selectEffectors, 1 )
+        aMenuItem.set_name( anAccessorString )
+        self.thePopupMenu.append( aMenuItem )
+
+#         firstid = aSelectedRawFullPNList[ 0 ]
+#         entityType = convertFullPNToFullID( firstid )[ 0 ]
+#         if entityType != VARIABLE and entityType != PROCESS:
+#             pass
+
+        # appends separator
+        self.thePopupMenu.append( gtk.MenuItem() )
+
+        # ------------------------------------------
         # menus for Bord
         # ------------------------------------------
         # creates menu of Board
@@ -413,7 +481,6 @@ class EntityListWindow(OsogoWindow):
         # menus for submenu
         # ------------------------------------------
         self.thePopupSubMenu = None  
-
 
     def __openPluginInstanceSelectionWindow( self, *arg ):
         """open PluginInstanceSelectionWindow
@@ -470,6 +537,7 @@ class EntityListWindow(OsogoWindow):
         Returns None
         [Note]:creates and adds submenu that includes menus of PluginWindow instances
         """
+
         # When right button is pressed
         if anEvent.type == gtk.gdk._2BUTTON_PRESS:
 
@@ -485,9 +553,14 @@ class EntityListWindow(OsogoWindow):
                     self.thePropertyWindow.showMessageOnStatusBar(aMessage)
                     return False
 
-            #self.theQueue.pushFullPNList( aSelectedRawFullPNList )
-            self.thePluginManager.createInstance( aPluginWindowType, self.thePropertyWindow.theFullPNList() )
+            # self.theQueue.pushFullPNList( aSelectedRawFullPNList )
+            # self.thePluginManager.createInstance( aPluginWindowType, self.thePropertyWindow.theFullPNList() )
 
+#             if self.thePropertyWindow.theFullPNList() \
+#                     != aSelectedRawFullPNList:
+#                 raise RuntimeError, 'Inconsistent internal lists: (%s == %s)' % ( self.thePropertyWindow.theFullPNList(), aSelectedRawFullPNList )
+
+            self.thePluginManager.createInstance( aPluginWindowType, aSelectedRawFullPNList )
 
 
         # When right button is pressed
@@ -532,7 +605,6 @@ class EntityListWindow(OsogoWindow):
 
                     # saves this submenu set to buffer (self.thePopupSubMenu)
                     self.thePopupSubMenu = aMenuItem
-
 
             # displays all items on PopupMenu
             self.thePopupMenu.show_all() 
@@ -669,7 +741,10 @@ class EntityListWindow(OsogoWindow):
 
             stub = self.theSession.createEntityStub( fullIDString )
 
-            valueList = []
+            if fullID in self.theCheckedFullIDList:
+                valueList = [ True ]
+            else:
+                valueList = [ False ]
 
             for title in columnList:
 
@@ -801,7 +876,7 @@ class EntityListWindow(OsogoWindow):
 
         anIter = aListStore.get_iter_first()
         while anIter != None:
-            if aListStore.get_value( anIter, 0 ) in anIDList:
+            if aListStore.get_value( anIter, 1 ) in anIDList:
                 donotHandle = self.donotHandle
                 self.donotHandle = True
                 aSelection.select_iter( anIter )
@@ -907,14 +982,18 @@ class EntityListWindow(OsogoWindow):
         for row in model:
 
             iter = row.iter
-            fullID = model.get_data( model.get_string_from_iter( iter ) )
-
-            stub = self.theSession.createEntityStub( fullID )
+            fullIDString = model.get_data( model.get_string_from_iter( iter ) )
+            fullid = createFullID( fullIDString )
+            stub = self.theSession.createEntityStub( fullIDString )
 
             columnList = []
+
+            if fullid in self.theCheckedFullIDList:
+                columnList += [ 0, True ]
+
             for propertyColumn in propertyColumnList:
-                newValue = stub[ propertyColumn[1] ]
-                columnList += [ propertyColumn[0], "%g"%(newValue) ] 
+                newValue = stub[ propertyColumn[ 1 ] ]
+                columnList += [ propertyColumn[ 0 ] + 1, "%g" % ( newValue ) ] 
 
             model.set( iter, *columnList )
 
@@ -1046,9 +1125,14 @@ class EntityListWindow(OsogoWindow):
             self.thePropertyWindow.showMessageOnStatusBar(aMessage)
             return False
 
-        #self.theQueue.pushFullPNList( aSelectedRawFullPNList )
-        self.thePluginManager.createInstance( aPluginWindowType, self.thePropertyWindow.theFullPNList() )
+        # self.theQueue.pushFullPNList( aSelectedRawFullPNList )
+        # self.thePluginManager.createInstance( aPluginWindowType, self.thePropertyWindow.theFullPNList() )
 
+#         if self.thePropertyWindow.theFullPNList() \
+#                 != aSelectedRawFullPNList:
+#             raise RuntimeError, 'Inconsistent internal lists: (%s == %s)' % ( self.thePropertyWindow.theFullPNList(), aSelectedRawFullPNList )
+
+        self.thePluginManager.createInstance( aPluginWindowType, aSelectedRawFullPNList )
 
 
     def appendData( self, *obj ):
@@ -1070,12 +1154,13 @@ class EntityListWindow(OsogoWindow):
         if type( obj[0] ) == gtk.MenuItem:
             aSetFlag = True
             aPluginWindowTitle = obj[0].get_name()
+            aSelectedRawFullPNList = self.__getSelectedRawFullPNList()
 
             for anInstance in self.thePluginManager.theInstanceList:
                 if anInstance.getTitle() == aPluginWindowTitle:
 
                     try:
-                        anInstance.appendRawFullPNList( self.__getSelectedRawFullPNList() )
+                        anInstance.appendRawFullPNList( aSelectedRawFullPNList )
                     except TypeError:
                         anErrorFlag = True
                         aMessage = "Can't append data to %s" %str(anInstance.getTitle())
@@ -1095,9 +1180,10 @@ class EntityListWindow(OsogoWindow):
             self.theSelectedPluginInstanceList = []
             selection=self.thePluginInstanceSelection['plugin_tree'].get_selection()
             selection.selected_foreach(self.thePluginInstanceSelection.plugin_select_func)
+            aSelectedRawFullPNList = self.__getSelectedRawFullPNList()
 
             # When no FullPN is selected, displays error message.
-            if self.__getSelectedRawFullPNList() == None or len( self.__getSelectedRawFullPNList() ) == 0:
+            if aSelectedRawFullPNList == None or len( aSelectedRawFullPNList ) == 0:
 
                 aMessage = 'No entity is selected.'
                 aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
@@ -1122,7 +1208,7 @@ class EntityListWindow(OsogoWindow):
                 for anInstance in self.thePluginManager.theInstanceList:
                     if anInstance.getTitle() == aPluginWindowTitle:
                         try:
-                            anInstance.appendRawFullPNList( self.__getSelectedRawFullPNList() )
+                            anInstance.appendRawFullPNList( aSelectedRawFullPNList )
                         except TypeError:
                             anErrorFlag = True
                             aMessage = "Can't append data to %s" %str(anInstance.getTitle())
@@ -1149,44 +1235,65 @@ class EntityListWindow(OsogoWindow):
                 return NONE
 
 
+    def __getCheckedFullPNList( self ):
+
+        if len( self.theCheckedFullIDList ) == 0:
+            return []
+
+        if self.theCheckedFullIDList[ 0 ][ 0 ] == VARIABLE: 
+            propertyName = self.DEFAULT_VARIABLE_PROPERTY
+        else: # self.theCheckedFullIDList[ 0 ][ 0 ] == PROCESS
+            propertyName = self.DEFAULT_PROCESS_PROPERTY
+               
+        fullpnList = []
+        for fullid in self.theCheckedFullIDList:
+            fullpnList.append( fullid + ( propertyName, ) )
+
+        return map( self.thePropertyWindow.supplementFullPN, fullpnList )
 
     def __getSelectedRawFullPNList( self ):
         """
         Return a list of selected FullPNs
         """
-        return self.theQueue.getActualFullPNList()
-        
-        # this is redundant
-        self.theSelectedFullPNList = []
-
-        if ( self.theLastSelectedWindow == "None" ):
-            return None
-
-        if ( self.theLastSelectedWindow == "Variable" ):
-
-            selection=self.variableTree.get_selection()
-            selection.selected_foreach(self.variable_select_func)
-
-        if ( self.theLastSelectedWindow == "Process" ):
-
-            selection=self.processTree.get_selection()
-            selection.selected_foreach(self.process_select_func)
-
-        if len(self.theSelectedFullPNList) == 0:
-            selectedSystemList = self.getSelectedSystemList()
-            for aSystemFullID in selectedSystemList:
-                self.theSelectedFullPNList.append( convertFullIDToFullPN( aSystemFullID ) )
-
-
-        # If no property is selected on PropertyWindow, 
-        # create plugin Window with default property (aValue) 
-        if len( str(self.thePropertyWindow.getSelectedFullPN()) ) == 0:
-            return self.theSelectedFullPNList
-
-        # If a property is selected on PropertyWindow, 
-        # create plugin Window with selected property
+        # return self.theQueue.getActualFullPNList()
+        aCheckedFullPNList = self.__getCheckedFullPNList()
+        if len( aCheckedFullPNList ) != 0:
+            return aCheckedFullPNList
         else:
-            return [self.thePropertyWindow.getSelectedFullPN()]
+            return map( self.thePropertyWindow.supplementFullPN, 
+                        self.theQueue.getActualFullPNList() )
+ 
+#         # this is redundant
+#         self.theSelectedFullPNList = []
+
+#         if ( self.theLastSelectedWindow == "None" ):
+#             return None
+
+#         if ( self.theLastSelectedWindow == "Variable" ):
+
+#             selection=self.variableTree.get_selection()
+#             selection.selected_foreach(self.variable_select_func)
+
+#         if ( self.theLastSelectedWindow == "Process" ):
+
+#             selection=self.processTree.get_selection()
+#             selection.selected_foreach(self.process_select_func)
+
+#         if len(self.theSelectedFullPNList) == 0:
+#             selectedSystemList = self.getSelectedSystemList()
+#             for aSystemFullID in selectedSystemList:
+#                 self.theSelectedFullPNList.append( convertFullIDToFullPN( aSystemFullID ) )
+
+
+#         # If no property is selected on PropertyWindow, 
+#         # create plugin Window with default property (aValue) 
+#         if len( str(self.thePropertyWindow.getSelectedFullPN()) ) == 0:
+#             return self.theSelectedFullPNList
+
+#         # If a property is selected on PropertyWindow, 
+#         # create plugin Window with selected property
+#         else:
+#             return [self.thePropertyWindow.getSelectedFullPN()]
 
 
 
@@ -1224,43 +1331,8 @@ class EntityListWindow(OsogoWindow):
             self.thePropertyWindow.showMessageOnStatusBar(aMessage)
             return False
 
-        self.theSession.getWindow('BoardWindow').addPluginWindows( aPluginWindowType, \
-        self.__getSelectedRawFullPNList() )
+        self.theSession.getWindow('BoardWindow').addPluginWindows( aPluginWindowType, aSelectedRawFullPNList )
 
-
-
-    def createLogger( self, *arg ):
-        """creates Logger about all FullPN selected on EntityTreeView
-        Returns None
-        """
-
-        # clear status bar
-        self.thePropertyWindow.clearStatusBar()
-
-        # gets selected RawFullPNList
-        aSelectedRawFullPNList = self.__getSelectedRawFullPNList()
-
-
-        # When no entity is selected, displays confirm window.
-        if len(aSelectedRawFullPNList) == 0:
-
-
-            aMessage = 'No Entity is selected.'
-            self.thePropertyWindow.showMessageOnStatusBar(aMessage)
-            aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
-            return None
-
-        # creates Logger using PropertyWindow
-        #self.theQueue.pushFullPNList( aSelectedRawFullPNList )
-        self.thePropertyWindow.createLogger()
-
-        # display message on status bar
-        if len(aSelectedRawFullPNList) == 1:
-            aMessage = 'Logger was created.'
-        else:
-            aMessage = 'Loggers were created.'
-        self.thePropertyWindow.showMessageOnStatusBar(aMessage)
-        #self.checkCreateLoggerButton()
 
     def searchEntity( self ):
         """search Entities
@@ -1340,3 +1412,282 @@ class EntityListWindow(OsogoWindow):
         else:
             self['search_button'].set_sensitive( False)
             
+    def toggleDefaultProperties( self ):
+
+        if EntityListWindow.DEFAULT_VARIABLE_PROPERTY == 'Value':
+
+            EntityListWindow.DEFAULT_VARIABLE_PROPERTY = 'MolarConc'
+            EntityListWindow.DEFAULT_PROCESS_PROPERTY = 'MolarActivity'
+
+            EntityListWindow.VARIABLE_COLUMN_INFO_MAP= {
+                'MolarConc': gobject.TYPE_STRING
+                }
+
+            EntityListWindow.PROCESS_COLUMN_INFO_MAP= {
+                'MolarActivity': gobject.TYPE_STRING
+                }
+
+            EntityListWindow.VARIABLE_COLUMN_LIST \
+                = [ 'ID', 'MolarConc', 'Classname', 'Path' ]
+            EntityListWindow.PROCESS_COLUMN_LIST \
+                = [ 'ID', 'MolarActivity', 'Classname', 'Path' ]
+
+        elif EntityListWindow.DEFAULT_VARIABLE_PROPERTY == 'MolarConc':
+            EntityListWindow.DEFAULT_VARIABLE_PROPERTY = 'Value'
+            EntityListWindow.DEFAULT_PROCESS_PROPERTY = 'Activity'
+
+            EntityListWindow.VARIABLE_COLUMN_INFO_MAP= {
+                'Value': gobject.TYPE_STRING
+                }
+
+            EntityListWindow.PROCESS_COLUMN_INFO_MAP= {
+                'Activity': gobject.TYPE_STRING
+                }
+
+            EntityListWindow.VARIABLE_COLUMN_LIST \
+                = [ 'ID', 'Value', 'Classname', 'Path' ]
+            EntityListWindow.PROCESS_COLUMN_LIST \
+                = [ 'ID', 'Activity', 'Classname', 'Path' ]
+
+        else:
+            raise RuntimeError, 'Invalid DEFAULT_VARIABLE_PROPERTY [%s].' % EntityListWindow.DEFAULT_VARIABLE_PROPERTY
+
+    def updateDefaultProperties( self ):
+
+        for column in self.variableTree.get_columns():
+            if column.get_title() == 'MolarConc':
+                column.set_title( 'Value' )
+            elif column.get_title() == 'Value':
+                column.set_title( 'MolarConc' )
+
+        for column in self.processTree.get_columns():
+            if column.get_title() == 'MolarActivity':
+                column.set_title( 'Activity' )
+            elif column.get_title() == 'Activity':
+                column.set_title( 'MolarActivity' )
+
+        self.reconstructLists()
+
+    def logAllEntities( self, *arg ):
+
+        self.logAllVariables( *arg )
+        self.logAllProcesses( *arg )
+
+    def logAllVariables( self, *arg ):
+        variableList = self.theSession.getVariableList()
+        propertyList = [ '%s:%s' % ( fullid, self.DEFAULT_VARIABLE_PROPERTY ) 
+                         for fullid in variableList ]
+
+        self.__logAll( propertyList )
+
+    def logAllProcesses( self, *arg ):
+        processList = self.theSession.getProcessList()
+        propertyList = [ '%s:%s' % ( fullid, self.DEFAULT_PROCESS_PROPERTY ) 
+                         for fullid in processList ]
+
+        self.__logAll( propertyList )
+
+    def __logAll( self, propertyList ):
+        if self.theSession.isRunning():
+            return
+
+        loggingPolicy = self.theSession.getLogPolicyParameters()
+        loggerList = self.theSession.theSimulator.getLoggerList()
+
+        for fullpn in propertyList:
+            if not fullpn in loggerList:
+                try:
+                    self.theSession.theSimulator.createLogger( fullpn, 
+                                                               loggingPolicy )
+                except:
+                    self.theSession.message( 'Error while creating logger\n logger for ' + fullpn + ' not created\n' )
+                else:
+                    self.theSession.message( 'Logger created for %s\n' % fullpn )
+
+        self.thePluginManager.updateFundamentalWindows()
+
+#         message = '%d properties were logged.' % len( propertyList )
+#         dialog = ConfirmWindow( OK_MODE, message, 'Log All Properties' )
+
+    def selectEffectors( self, *arg ):
+
+        # 0: mutators, 1: accessors
+        selectionType = arg[ 1 ]
+
+        # gets selected RawFullPNList
+        aSelectedRawFullPNList = self.__getSelectedRawFullPNList()
+
+        # When no entity is selected, displays confirm window.
+        if len( aSelectedRawFullPNList ) == 0:
+            aMessage = 'No Entity is selected.'
+            self.thePropertyWindow.showMessageOnStatusBar( aMessage )
+            aDialog = ConfirmWindow( OK_MODE, aMessage, 'Error!' )
+            return
+
+        selectedIDList = []
+        entityType = convertFullPNToFullID( aSelectedRawFullPNList[ 0 ] )[ 0 ]
+        for fullpn in aSelectedRawFullPNList:
+            fullid = convertFullPNToFullID( fullpn )
+            if fullid[ 0 ] != entityType:
+                aMessage = 'Multiple Entity type selection is not supported.'
+                self.thePropertyWindow.showMessageOnStatusBar( aMessage )
+                aDialog = ConfirmWindow( OK_MODE, aMessage, 'Error!' )
+                return
+
+            selectedIDList.append( ':%s:%s' % ( fullid[ 1 ], fullid[ 2 ] ) )
+
+        self.clearCheckboxes()
+
+        if entityType == VARIABLE:
+
+            model = self.processTree.get_model()
+            for row in model:
+                iter = row.iter
+                processid \
+                    = model.get_data( model.get_string_from_iter( iter ) )
+                stub = self.theSession.createEntityStub( processid )
+                processid = createFullID( processid )
+                references = stub.getProperty( 'VariableReferenceList' )
+
+                references = [ ref[ 1 ] for ref in references 
+                               if ref[ 2 ] != 0 or selectionType ]
+
+                for fullid in selectedIDList:
+                    if fullid in references:
+                        self.toggleCheckbox( model, iter )
+
+        elif entityType == PROCESS:
+
+            tempList = []
+            for processid in selectedIDList:
+                stub = self.theSession.createEntityStub( 'Process%s' 
+                                                         % processid )
+                references = stub.getProperty( 'VariableReferenceList' )
+
+                for ref in references:
+                    fullid = 'Variable%s' % ref[ 1 ]
+                    if ( ref[ 2 ] != 0 or selectionType ) \
+                            and not fullid in tempList:
+                        tempList.append( fullid )
+
+            # sorted( set( tempList ), key=tempList.index) # uniq
+
+            # the following would be redundant.
+            fullidList = []
+            model = self.variableTree.get_model()
+            for row in model:
+                iter = row.iter
+                variableid \
+                    = model.get_data( model.get_string_from_iter( iter ) )
+                if variableid in tempList:
+                    self.toggleCheckbox( model, iter )
+
+    def createLogger( self, *arg ):
+        """creates Logger about all FullPN selected on EntityTreeView
+        Returns None
+        """
+
+        # clear status bar
+        self.thePropertyWindow.clearStatusBar()
+
+        # gets selected RawFullPNList
+        aSelectedRawFullPNList = self.__getSelectedRawFullPNList()
+
+        # When no entity is selected, displays confirm window.
+        if len(aSelectedRawFullPNList) == 0:
+
+            aMessage = 'No Entity is selected.'
+            self.thePropertyWindow.showMessageOnStatusBar(aMessage)
+            aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
+            return None
+
+        # creates Logger using PropertyWindow
+        # self.theQueue.pushFullPNList( aSelectedRawFullPNList )
+        # self.thePropertyWindow.createLogger()
+        self.__createLogger( aSelectedRawFullPNList )
+
+        # display message on status bar
+        if len(aSelectedRawFullPNList) == 1:
+            aMessage = 'Logger was created.'
+        else:
+            aMessage = 'Loggers were created.'
+        self.thePropertyWindow.showMessageOnStatusBar(aMessage)
+        #self.checkCreateLoggerButton()
+
+    def __createLogger( self, fullpnList ):
+
+        loggingPolicy = self.theSession.getLogPolicyParameters()
+
+        try:
+            for fullpn in fullpnList:
+                fullpnString = createFullPNString( fullpn )
+
+                # creates loggerstub and call its create method.
+                stub = self.theSession.createLoggerStub( fullpnString )
+                if not stub.exists():
+                    stub.create()
+                    stub.setLoggerPolicy( loggingPolicy )
+
+        except:
+            # When to create log is failed, 
+            # display error message on MessageWindow.
+            message = traceback.format_exception( sys.exc_type,sys.exc_value, 
+                                                  sys.exc_traceback )
+            self.thePluginManager.printMessage( message )
+
+            # updates fandamental windows.
+            self.thePluginManager.updateFundamentalWindows()
+
+    def clearCheckboxes( self, *arg ):
+
+        if len( self.theCheckedFullIDList ) == 0:
+            return
+
+        if self.theCheckedFullIDList[ 0 ][ 0 ] == VARIABLE:
+            model = self.variableTree.get_model()
+        else: # self.theCheckedFullIDList[ 0 ][ 0 ] == PROCESS
+            model = self.processTree.get_model()
+
+        for row in model:
+            model.set_value( row.iter, 0, False )
+
+        self.theCheckedFullIDList = []
+        self['clear_checked_button'].set_sensitive( 0 )
+
+    def __toggleCheckbox( self, cell, path, tree ):
+
+        model = tree.get_model()
+        iter = model.get_iter( path )
+        self.toggleCheckbox( model, iter )
+
+    def toggleCheckbox( self, model, iter ):
+
+        selected = model.get_value( iter, 0 )
+        fullIDString = model.get_data( model.get_string_from_iter( iter ) )
+        fullid = createFullID( fullIDString )
+
+        if not selected:
+            if len( self.theCheckedFullIDList ) > 0 \
+                    and self.theCheckedFullIDList[ 0 ][ 0 ] != fullid[ 0 ]:
+                if fullid[ 0 ] == VARIABLE:
+                    another = self.processTree.get_model()
+                else:
+                    another = self.variableTree.get_model()
+
+                for row in another:
+                    if another.get_value( row.iter, 0 ):
+                        another.set_value( row.iter, 0, False )
+
+                self.theCheckedFullIDList = []
+
+            self.theCheckedFullIDList.append( fullid )
+            self['clear_checked_button'].set_sensitive( True )
+        else:
+            if fullid in self.theCheckedFullIDList:
+                self.theCheckedFullIDList.remove( fullid )
+            else:
+                pass # never get here
+            
+            self['clear_checked_button'].set_sensitive( len( self.theCheckedFullIDList ) != 0 )
+
+        model.set_value( iter, 0, not selected )

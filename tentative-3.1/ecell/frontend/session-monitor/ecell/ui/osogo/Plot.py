@@ -33,10 +33,14 @@ import gtk
 import gtk.gdk
 import pango
 import gobject
+import os
 
 from ecell.ecssupport import *
 
+import ecell.ui.osogo.config as config
 from ecell.ui.osogo.DataGenerator import *
+from ecell.ui.osogo.ConfirmWindow import *
+
 
 #class Plot,
  
@@ -1251,6 +1255,12 @@ class Plot:
         xToggle.connect( "activate", self.__toggleXAxis )
         yToggle = gtk.MenuItem ( "Toggle Y axis" )
         yToggle.connect( "activate", self.__toggleYAxis )
+        imageMenuItem = gtk.MenuItem ( "Save image" )
+        imageMenuItem.connect( "activate", self.__saveImage )
+        dataMenuItem = gtk.MenuItem ( "Save data" )
+        dataMenuItem.connect( "activate", self.__saveData )
+        csvMenuItem = gtk.MenuItem ( "Save data as CSV" )
+        csvMenuItem.connect( "activate", self.__selectCSVFile )
         #take this condition out if phase plotting works for history
         if self.theOwner.allHasLogger():
             if self.theStripMode == MODE_STRIP:
@@ -1264,6 +1274,10 @@ class Plot:
         theMenu.append( yToggle )
         theMenu.append( gtk.SeparatorMenuItem() )
         theMenu.append( guiMenuItem )
+        theMenu.append( gtk.SeparatorMenuItem() )
+        theMenu.append( imageMenuItem )
+        theMenu.append( dataMenuItem )
+        theMenu.append( csvMenuItem )
         theMenu.show_all()
         theMenu.popup( None, None, None, 1, 0 )
 
@@ -1486,6 +1500,157 @@ class Plot:
         self.recalculateSize()
         self.totalRedraw()
 
-
 # plot display coordinates
 
+    def __deleteFileSelection( self, *args ):
+
+        fileSelection = args[ 1 ]
+
+        # deletes the reference to FileSelection
+        if fileSelection is not None:
+            fileSelection.destroy()
+            del fileSelection
+
+    def __openFileSelection( self, f, pattern, title ):
+
+        def callback( obj, fileSelection ):
+
+            filename = fileSelection.get_filename()
+            self.__deleteFileSelection( obj, fileSelection )
+
+            # when the file already exists
+            if os.path.isfile( filename ):
+                message = 'Would you like to replace the existing file? \n[%s]' % filename
+                dialog = ConfirmWindow( OKCANCEL_MODE, message, 'Confirm File Overwrite' )
+                if dialog.return_result() != OK_PRESSED:
+                    return
+
+            f( filename )
+
+        # creates FileSelection
+        fileSelection = gtk.FileSelection()
+        fileSelection.connect( 'delete_event', 
+                               self.__deleteFileSelection,
+                               fileSelection )
+        fileSelection.cancel_button.connect( 'clicked', 
+                                             self.__deleteFileSelection,
+                                             fileSelection ) 
+
+        pixbuf16 = gtk.gdk.pixbuf_new_from_file(
+            os.path.join( config.GLADEFILE_PATH, 'ecell.png' ) )
+        pixbuf32 = gtk.gdk.pixbuf_new_from_file(
+            os.path.join( config.GLADEFILE_PATH, 'ecell32.png' ) )
+        fileSelection.set_icon_list( pixbuf16, pixbuf32 )
+
+        fileSelection.ok_button.connect( 'clicked', callback, fileSelection )
+
+        fileSelection.complete( pattern )
+        fileSelection.set_title( title )
+        fileSelection.show_all()
+
+    def __saveImage( self, *args ):
+
+        if self.theStripMode == MODE_STRIP:
+            message = 'Strip mode is not supported.\n'
+            self.theOwner.theSession.message( message )
+            return
+
+        try:
+            import Gnuplot
+        except:
+            message = 'ImportError: No module named Gnuplot'
+            self.theOwner.theSession.message( message )
+            return
+
+        self.__openFileSelection( self.__saveCurrentView, 
+                                  '*.eps', 'Select Image File' )
+
+    def __saveCurrentView( self, filename ):
+
+        import Gnuplot
+
+        _, ext = os.path.splitext( filename )
+        ext = ext.lower()
+
+        g = Gnuplot.Gnuplot()
+
+        if ext == '.eps':
+            g( 'set term post enhanced color' )
+        elif ext == '.ps':
+            g( 'set term post' )
+        elif ext == '.png':
+            g( 'set term png' )
+        elif ext == '.jpg' or ext == '.jpeg':
+            g( 'set term jpeg' )
+        elif ext == '.svg':
+            g( 'set term svg' )
+        elif ext == '.gif':
+            g( 'set term gif' )
+        else:
+            message = 'The extension [%s] is not supported (*.eps, *.ps, *.png, *.jpg, *.jpeg, *.svg, *.gif).\n' % ext
+            self.theOwner.theSession.message( message )
+            return
+
+        g( "set output '%s'" % filename )
+
+        gdataList = []
+        pnList = []
+        for aSeries in self.theSeriesMap.values():
+            if not aSeries.isOn():
+                continue
+
+            fullpn = aSeries.getFullPNString()
+            pn = fullpn.split( ':' )[ -1 ]
+            if not pn in pnList:
+                pnList.append( pn )
+
+            data = nu.transpose( aSeries.getAllData() )
+            gdata = Gnuplot.Data( data[ 0 ], data[ 1 ],
+                                  title=fullpn,
+                                  with_='lines')
+            gdataList.append( gdata )
+
+        g.xlabel( 'Time' )
+
+        if len( pnList ) > 1:
+            ylabel = '%s and %s' % ( ', '.join( pnList[ : -1 ] ), 
+                                     pnList[ -1 ] )
+            g.ylabel( ylabel )
+        else:
+            g.ylabel( pnList[ 0 ] )
+
+        g.set_range( 'xrange', 
+                     ( self.theXAxis.theFrame[ 0 ], 
+                       self.theXAxis.theFrame[ 1 ] ) )
+        g.set_range( 'yrange', 
+                     ( self.theYAxis.theFrame[ 0 ], 
+                       self.theYAxis.theFrame[ 1 ] ) )
+        g( 'set xtics %g' % self.theXAxis.theTickStep )
+        g( 'set ytics %g' % self.theYAxis.theTickStep )
+
+        g.plot( *gdataList )
+
+    def __saveData( self, *args ):
+
+        fullpnList = []
+        for aSeries in self.theSeriesMap.values():
+            fullpn = aSeries.getFullPNString()
+            if aSeries.isOn() and self.theOwner.hasLogger( fullpn ):
+                fullpnList.append( fullpn )
+
+        self.theOwner.theSession.saveLoggerData( fullpnList )
+
+    def __selectCSVFile( self, *args ):
+
+        self.__openFileSelection( self.__saveDataAsCSV, 
+                                  '*.csv', 'Select CSV File' )
+
+    def __saveDataAsCSV( self, filename ):
+
+        fullpnList = []
+        for aSeries in self.theSeriesMap.values():
+            fullpn = aSeries.getFullPNString()
+            if aSeries.isOn() and self.theOwner.hasLogger( fullpn ):
+                fullpnList.append( fullpn )
+
+        self.theOwner.theSession.saveDataAsCSV( filename, fullpnList )

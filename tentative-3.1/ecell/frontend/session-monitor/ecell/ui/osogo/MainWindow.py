@@ -40,6 +40,8 @@ import traceback
 import math
 import time
 import datetime
+import numpy
+import ConfigParser
 
 import gtk
 import gobject
@@ -55,6 +57,18 @@ from ecell.ui.osogo.GtkSessionMonitor import *
 from ecell.ui.osogo.ConfirmWindow import *
 from ecell.ui.osogo.FileSelection import FileSelection
 import ecell.ui.osogo.MessageWindow as MessageWindow
+
+import cStringIO
+import zipfile
+
+from ecell.analysis.MatrixIO import writeMatrix
+from ecell.analysis.emlsupport import EmlSupport
+from ecell.analysis.Structure import generateFullRankMatrix
+from ecell.analysis.Structure import generateElementaryFluxMode
+from ecell.analysis.Elasticity import getEpsilonElasticityMatrix2
+from ecell.analysis.Jacobian import getJacobianMatrix2
+from ecell.analysis.ControlCoefficient import calculateUnscaledControlCoefficient
+from ecell.analysis.ControlCoefficient import scaleControlCoefficient
 
 class SimulationButton:
     def __init__( self ):
@@ -162,7 +176,6 @@ class MainWindow(OsogoWindow):
         self.theSession = aSession
         self.theMessageWindow = MessageWindow.MessageWindow()
 
-
         # initialize Timer components
         self.startTime = 0
         self.tempTime = 0
@@ -243,7 +256,7 @@ class MainWindow(OsogoWindow):
             'stepper_window_menu_activate'    : self.__displayWindow,
             'board_window_menu_activate'      : self.__displayWindow,
             'about_menu_activate'             : self.__displayAbout,
-            #sbml
+            # sbml
             'on_import_sbml_activate'         : self.__openFileSelection,
             'on_export_sbml_activate'         : self.__openFileSelection,
             # toolbars
@@ -272,7 +285,25 @@ class MainWindow(OsogoWindow):
             'on_run_speed_indicator_activate' : self.__displayIndicator,  
             'on_timer_activate'               : self.__displayTimer,
             'on_logo_animation_menu_activate' : self.__setAnimationSensitive,
-            'on_logging_policy1_activate'     : self.__openLogPolicy
+            'on_logging_policy1_activate'     : self.__openLogPolicy,
+
+            # analysis
+            'on_toggle_defaults_activate'    : self.__toggleDefaultProperties,
+            'on_log_all_activate'            : self.__logAll,
+            'on_log_all_variables_activate'  : self.__logAll,
+            'on_log_all_processes_activate'  : self.__logAll,
+            'on_save_data_as_csv_activate'   : self.__openFileSelection,
+            'on_save_properties_activate'    : self.__openFileSelection,
+            'on_load_properties_activate'    : self.__openFileSelection,
+            'on_execute_analysis_activate'   : self.__openFileSelection,
+            'on_bifurcation_analysis_activate': self.__openBifurcationWindow,
+            'on_multiple_plot_activate'      : self.__openMultiPlotWindow,
+            'on_property_editor_activate'    : self.__openPropertyEditorWindow,
+            'on_save_appearance_activate'    : self.__saveAppearance,
+            'on_revert_appearance_activate'  : self.__revertAppearance,
+            'on_config_button_clicked'       : self.__revertAppearance,
+            'on_import_sif_activate'         : self.__openFileSelection,
+            'on_import_sif_as_odes_activate' : self.__openFileSelection,
             }
                 
         self.addHandlers( self.theHandlerMap )
@@ -283,7 +314,6 @@ class MainWindow(OsogoWindow):
 
         self.__setMenuAndButtonsStatus( False )
         #self.theSession.updateFundamentalWindows()
-
 
         # display MainWindow
         self[self.__class__.__name__].show_all()
@@ -299,6 +329,7 @@ class MainWindow(OsogoWindow):
         self.openAboutSessionMonitor = False 
 
         self.update()
+
         # -------------------------------------
         # creates EntityListWindow 
         # -------------------------------------
@@ -306,6 +337,17 @@ class MainWindow(OsogoWindow):
         self.theEntityListWindow = self.theSession.createEntityListWindow( 'top_frame', self['statusbar'] )
         self['entitylistarea'].add( self.theEntityListWindow['top_frame'] )
 
+
+        # initialize config button menu
+        menu = gtk.Menu()
+        menuItem = gtk.MenuItem( 'Revert Appearance' )
+        menuItem.connect( 'activate', self.__revertAppearance )
+        menu.append( menuItem )
+        menuItem = gtk.MenuItem( 'Save Appearance' )
+        menuItem.connect( 'activate', self.__saveAppearance )
+        menu.append( menuItem )
+        menu.show_all()
+        self[ 'config_button' ].set_menu( menu )
 
         # --------------------
         # set Timer entry
@@ -355,12 +397,13 @@ class MainWindow(OsogoWindow):
         self['timer_clear_button'].set_sensitive(aDataLoadedStatus)
         self['load_model_button'].set_sensitive(not aDataLoadedStatus)
         self['load_script_button'].set_sensitive(not aDataLoadedStatus)
+        self['config_button'].set_sensitive(aDataLoadedStatus)
         self['save_model_button'].set_sensitive(aDataLoadedStatus)
         self['entitylist_button'].set_sensitive(aDataLoadedStatus)
         self['logger_button'].set_sensitive(aDataLoadedStatus)
         self['stepper_button'].set_sensitive(aDataLoadedStatus)
         self['interface_button'].set_sensitive(aDataLoadedStatus)
-        self['board_button'].set_sensitive(aDataLoadedStatus)
+#         self['board_button'].set_sensitive(aDataLoadedStatus)
         self['indicator_button'].set_sensitive(aDataLoadedStatus)
         self['timer_button'].set_sensitive(aDataLoadedStatus)
 
@@ -370,6 +413,22 @@ class MainWindow(OsogoWindow):
         self['save_model_menu'].set_sensitive(aDataLoadedStatus)
         self['import_sbml'].set_sensitive(not aDataLoadedStatus)
         self['export_sbml'].set_sensitive(aDataLoadedStatus)
+
+        # analysis
+        self['log_all'].set_sensitive(aDataLoadedStatus)
+        self['log_all_variables'].set_sensitive(aDataLoadedStatus)
+        self['log_all_processes'].set_sensitive(aDataLoadedStatus)
+        self['save_data_as_csv'].set_sensitive(aDataLoadedStatus)
+        self['save_properties'].set_sensitive(aDataLoadedStatus)
+        self['load_properties'].set_sensitive(aDataLoadedStatus)
+        self['execute_analysis'].set_sensitive(aDataLoadedStatus)
+        self['bifurcation_analysis'].set_sensitive(aDataLoadedStatus)
+        self['multiple_plot'].set_sensitive(aDataLoadedStatus)
+        self['property_editor'].set_sensitive(aDataLoadedStatus)
+        self['save_appearance'].set_sensitive(aDataLoadedStatus)
+        self['revert_appearance'].set_sensitive(aDataLoadedStatus)
+        self['import_sif'].set_sensitive(not aDataLoadedStatus)
+        self['import_sif_as_odes'].set_sensitive(not aDataLoadedStatus)
 
         # window menu
         self['logger_window_menu'].set_sensitive(aDataLoadedStatus)
@@ -418,6 +477,18 @@ class MainWindow(OsogoWindow):
         # when 'Export SBML' is selected
         elif arg[0] == self['export_sbml']:
             self.openFileSelection('Save','SBML')
+        elif arg[0] == self['import_sif']:
+            self.openFileSelection('Load', 'SIF')
+        elif arg[0] == self['import_sif_as_odes']:
+            self.openFileSelection('Load', 'SIF2')
+        elif arg[0] == self['save_data_as_csv']:
+            self.openFileSelection('Save', 'CSV')
+        elif arg[0] == self['save_properties']:
+            self.openFileSelection('Save', 'CSV2')
+        elif arg[0] == self['load_properties']:
+            self.openFileSelection('Load', 'CSV2')
+        elif arg[0] == self['execute_analysis']:
+            self.openFileSelection('Save', 'Analysis')
 
     def openFileSelection( self, aType, aTarget ) :
         """displays FileSelection 
@@ -471,12 +542,36 @@ class MainWindow(OsogoWindow):
                 self.theFileSelection.complete( '*.'+ MODEL_FILE_EXTENSION )
                 self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,MODEL_FILE_EXTENSION) )
 
-            # when 'Save Model' is selected
+            # when 'Export SBML' is selected
             elif aType == 'Save' and aTarget == 'SBML':
                 self.theFileSelection.ok_button.connect('clicked', self.__exportSBML)
                 self.theFileSelection.complete( '*.'+ MODEL_FILE_EXTENSION )
                 self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,MODEL_FILE_EXTENSION) )
 
+            # when 'Import SIF' is selected
+            elif aType == 'Load' and ( aTarget == 'SIF' or aTarget == 'SIF2' ):
+                self.theFileSelection.ok_button.connect('clicked', self.__loadData, aTarget)
+                self.theFileSelection.complete( '*.sif' )
+                self.theFileSelection.set_title("Select %s File (.sif)" %(aTarget) )
+            # when 'Save Data as CSV' is selected
+            elif aType == 'Save' and aTarget == 'CSV':
+                self.theFileSelection.ok_button.connect('clicked', self.__saveLoggerDataAsCSV, aTarget)
+                self.theFileSelection.complete( '*.csv' )
+                self.theFileSelection.set_title("Select %s File (.csv)" %(aTarget) )
+            # when 'Save Properties as CSV' is selected
+            elif aType == 'Save' and aTarget == 'CSV2':
+                self.theFileSelection.ok_button.connect('clicked', self.__savePropertiesAsCSV, aTarget)
+                self.theFileSelection.complete( '*.csv' )
+                self.theFileSelection.set_title("Select %s File (.csv)" %(aTarget) )
+            # when 'Load Properties as CSV' is selected
+            elif aType == 'Load' and aTarget == 'CSV2':
+                self.theFileSelection.ok_button.connect('clicked', self.__loadPropertiesFromCSV, aTarget)
+                self.theFileSelection.complete( '*.csv' )
+                self.theFileSelection.set_title("Select %s File (.csv)" %(aTarget) )
+            elif aType == 'Save' and aTarget == 'Analysis':
+                self.theFileSelection.ok_button.connect('clicked', self.__executeAnalysis, aTarget)
+                self.theFileSelection.complete( '*.zip' )
+                self.theFileSelection.set_title("Select an Archive File (.zip)" )
             else:
                 raise "(%s,%s) does not match." %(aType,aTarget)
 
@@ -527,8 +622,12 @@ class MainWindow(OsogoWindow):
             elif aFileType == 'Script':
                 self.theSession.loadScript( aFileName )
             elif aFileType == 'SBML':
-                    self.theSession.importSBML( aFileName )
-                                
+                self.theSession.importSBML( aFileName )
+            elif aFileType == 'SIF':
+                self.theSession.importSIF( aFileName, stepper=0 )
+            elif aFileType == 'SIF2':
+                self.theSession.importSIF( aFileName, stepper=1 )
+                
             self.theEntityListWindow.updateButtons()
 
             self.update()
@@ -873,7 +972,7 @@ class MainWindow(OsogoWindow):
                         str( round( ( self.theCurrentTime - self.theLastTime ) /
                                     ( time.time() - self.theLastRealTime ), 5 ) ) )
                 self.updateCount = 0
-                
+
         # when Model is already loaded.
         if len(self.theSession.theModelName) > 0:
             # updates status of menu and button 
@@ -1079,17 +1178,18 @@ class MainWindow(OsogoWindow):
         if self.__button_update:
             return
 
-        # checks the length of argument, but this is verbose
-        if len(arg) < 1 :
-                    return None
+#         # checks the length of argument, but this is verbose
+#         if len(arg) < 1 :
+#                     return None
 
-        if ( arg[0].get_name() != "message_window_menu" ):
-            anObject = arg[0].get_child()
-        else:
-            anObject = arg[0]
+#         if ( arg[0].get_name() != "message_window_menu" ):
+#             anObject = arg[0].get_child()
+#         else:
+#             anObject = arg[0]
 
         # show
-        if anObject.get_active():
+#         if anObject.get_active():
+        if not self.theMessageWindowVisible:
             self.theMessageWindowVisible = True
             self.showMessageWindow() 
             self.__resizeVertically( self.theMessageWindow.getActualSize()[1] )
@@ -1106,7 +1206,8 @@ class MainWindow(OsogoWindow):
         self.updateButtons()
 
     def __toggleEntityListWindow( self, *arg ):
-        if arg[0].get_active():
+#         if arg[0].get_active():
+        if not self.theEntityListWindowVisible:
             self.theEntityListWindowVisible = True
             self['entitylistarea'].show()
             self.__resizeVertically( self['entitylistarea'].get_allocation()[3] )
@@ -1174,6 +1275,708 @@ class MainWindow(OsogoWindow):
 
     def __createEntityListWindow( self, *arg ):
         anEntityListWindow = self.theSession.createEntityListWindow( "EntityListWindow", self['statusbar'] )
+
+    def __executeAnalysis( self, *arg ):
+
+        # gets file name
+        filename = self.theFileSelection.get_filename()
+
+        # when the file already exists
+        if os.path.isfile( filename ):
+
+            # displays confirm window
+            message = 'Would you like to replace the existing file? \n[%s]' \
+                % filename
+            dialog = ConfirmWindow( OKCANCEL_MODE, message, 
+                                    'Confirm File Overwrite' )
+
+            # when canceled, does nothing 
+            if dialog.return_result() != OK_PRESSED:
+                return None
+
+        # when ok is pressed, overwrites it.
+        # deletes FileSelection
+        self.__deleteFileSelection()
+
+        self.__printMessage( 'Executing analyses...' )
+
+        model = self.theSession.asModel()
+        stepperList = model.getStepperList()
+        stepperID = None
+        for id in stepperList:
+            className = model.getStepperClass( id )
+            if className in [ 'FixedODE1Stepper', 
+                              'ODEStepper', 'ODE45Stepper' ]:
+                if stepperID is None:
+                    stepperID = id
+                    # propertyList = model.getStepperPropertyList( stepperID )
+                    model.deleteStepper( stepperID )
+                    model.createStepper( 'FixedODE1Stepper', stepperID )
+                    model.setStepperProperty( stepperID, 'StepInterval', 
+                                              [ '1e-12' ] )
+                else:
+                    self.__printMessage( 'Only one ODE Stepper is allowed for the analyses.' )
+                    return
+
+        if stepperID is None:
+            self.__printMessage( 'At least one ODE Stepper is needed for the analyses.' )
+            return
+
+        if len( stepperList ) > 1:
+            self.__printMessage( 'Multiple Steppers may misslead the resuts.' )
+
+        archive = zipfile.ZipFile( filename, 'w', zipfile.ZIP_DEFLATED )
+
+        emlSupport = EmlSupport( None, model.asString().encode() )
+        pathwayProxy = emlSupport.createPathwayProxy()
+
+        variableList = pathwayProxy.getVariableList()
+        processList = pathwayProxy.getProcessList()
+
+        # stoichiometry matrix
+        stoichiometryMatrix = pathwayProxy.getStoichiometryMatrix()
+
+        if self[ 'stoichiometry_matrix' ].get_active():
+            data = cStringIO.StringIO()
+            writeMatrix( data, stoichiometryMatrix, 
+                         variableList, processList )
+            info = zipfile.ZipInfo( 'StoichiometryMatrix.csv' )
+            info.external_attr = 0644 << 16L
+            archive.writestr( info, data.getvalue() )
+            data.close()
+
+        # decomposed matrices
+        ( linkMatrix, kernelMatrix, independentList ) \
+            = generateFullRankMatrix( stoichiometryMatrix )
+
+#         reducedMatrix = numpy.take( stoichiometryMatrix, independentList )
+
+#         reducedVariableList = []
+#         for i in independentList:
+#             reducedVariableList.append( variableList[ i ] )
+
+#         # elementary flux mode
+#         modeList = generateElementaryFluxMode( stoichiometryMatrix, pathwayProxy.getReversibilityList() )
+#         modeMatrix = numpy.transpose( numpy.array( modeList ) )
+#         data = cStringIO.StringIO()
+#         writeMatrix( data, modeMatrix, processList )
+#         archive.writestr( 'ElementaryFluxMode.csv', data.getvalue() )
+#         data.close()
+
+        # elasticity matrix
+        elasticityMatrix = getEpsilonElasticityMatrix2( pathwayProxy )
+
+        if self[ 'elasticity_matrix' ].get_active():
+            data = cStringIO.StringIO()
+            writeMatrix( data, elasticityMatrix, variableList, processList )
+            info = zipfile.ZipInfo( 'UnscaledElasticityMatrix.csv' )
+            info.external_attr = 0644 << 16L
+            archive.writestr( info, data.getvalue() )
+            data.close()
+
+        # Jacobian matrix
+        aJacobianMatrix = getJacobianMatrix2( pathwayProxy )
+
+        if self[ 'jacobian_matrix' ].get_active():
+            data = cStringIO.StringIO()
+            writeMatrix( data, aJacobianMatrix, 
+                         variableList, variableList )
+            info = zipfile.ZipInfo( 'JacobianMatrix.csv' )
+            info.external_attr = 0644 << 16L
+            archive.writestr( info, data.getvalue() )
+            data.close()
+
+        # unscaled control coefficients
+        ( unscaledCCCMatrix, unscaledFCCMatrix ) \
+            = calculateUnscaledControlCoefficient( stoichiometryMatrix, 
+                                                   elasticityMatrix )
+
+        if self[ 'cccs' ].get_active():
+            data = cStringIO.StringIO()
+            writeMatrix( data, unscaledCCCMatrix, variableList, processList )
+            info = zipfile.ZipInfo( 'UnscaledCCCMatrix.csv' )
+            info.external_attr = 0644 << 16L
+            archive.writestr( info, data.getvalue() )
+            data.close()
+
+        if self[ 'fccs' ].get_active():
+            data = cStringIO.StringIO()
+            writeMatrix( data, unscaledFCCMatrix, processList, processList )
+            info = zipfile.ZipInfo( 'UnscaledFCCMatrix.csv' )
+            info.external_attr = 0644 << 16L
+            archive.writestr( info, data.getvalue() )
+            data.close()
+
+        # scaled control coefficients
+        ( scaledCCCMatrix, scaledFCCMatrix ) \
+            = scaleControlCoefficient( pathwayProxy, 
+                                       unscaledCCCMatrix, unscaledFCCMatrix )
+
+        if self[ 'scaled_cccs' ].get_active():
+            data = cStringIO.StringIO()
+            writeMatrix( data, scaledCCCMatrix, variableList, processList )
+            info = zipfile.ZipInfo( 'ScaledFCCMatrix.csv' )
+            info.external_attr = 0644 << 16L
+            archive.writestr( info, data.getvalue() )
+            data.close()
+
+        if self[ 'scaled_fccs' ].get_active():
+            data = cStringIO.StringIO()
+            writeMatrix( data, scaledFCCMatrix, processList, processList )
+            info = zipfile.ZipInfo( 'ScaledFCCMatrix.csv' )
+            info.external_attr = 0644 << 16L
+            archive.writestr( info, data.getvalue() )
+            data.close()
+
+        archive.close()
+
+    def __toggleDefaultProperties( self, *arg ):
+        if self.theEntityListWindow is None:
+            return
+
+        self.theEntityListWindow.toggleDefaultProperties()
+
+        windowList = self.theSession.getWindow( 'EntityListWindow' )
+        for window in windowList:
+            window.updateDefaultProperties()
+
+        propertyName = self.theEntityListWindow.DEFAULT_VARIABLE_PROPERTY
+        if propertyName == 'Value':
+            self[ 'toggle_defaults' ].set_label( 'Value -> MolarConc' )
+        else: # propertyName == 'MolarConc'
+            self[ 'toggle_defaults' ].set_label( 'MolarConc -> Value' )
+
+    def __saveLoggerDataAsCSV( self, *arg ):
+
+        # gets file name
+        filename = self.theFileSelection.get_filename()
+
+        # when the file already exists
+        if os.path.isfile( filename ):
+
+            # displays confirm window
+            message = 'Would you like to replace the existing file? \n[%s]' \
+                % filename
+            dialog = ConfirmWindow( OKCANCEL_MODE, message, 
+                                    'Confirm File Overwrite' )
+
+            # when canceled, does nothing 
+            if dialog.return_result() != OK_PRESSED:
+                return None
+
+        # when ok is pressed, overwrites it.
+        # deletes FileSelection
+        self.__deleteFileSelection()
+
+        try:
+
+            # displays save message
+            self.theSession.message( 'Save Logger Data as CSV [%s]\n' 
+                                     % filename )
+
+            # saves Model
+            self.theSession.saveDataAsCSV( filename )
+
+        except:
+
+            # expants message window, when it is folded.
+            if not self[ 'message_togglebutton' ].get_child().get_active():
+                self[ 'message_togglebutton' ].get_child().set_active( True )
+
+            # displays confirm window
+            message = 'Can\'t save [%s]\nSee MessageWindow for details.' \
+                % filename
+            dialog = ConfirmWindow( OK_MODE, message, 'Error!' )
+
+            # displays error message of MessageWindow
+            self.theSession.message( 'Can\'t save [%s]' % filename )
+            message \
+                = '\n'.join( traceback.format_exception( sys.exc_type, 
+                                                         sys.exc_value, 
+                                                         sys.exc_traceback ) )
+            self.theSession.message( message )
+
+        # updates
+        self.update()
+        self.updateButtons()
+        self.theSession.updateFundamentalWindows()
+
+    def __savePropertiesAsCSV( self, *arg ):
+
+        # gets file name
+        filename = self.theFileSelection.get_filename()
+
+        # when the file already exists
+        if os.path.isfile( filename ):
+
+            # displays confirm window
+            message = 'Would you like to replace the existing file? \n[%s]' \
+                % filename
+            dialog = ConfirmWindow( OKCANCEL_MODE, message, 
+                                    'Confirm File Overwrite' )
+
+            # when canceled, does nothing 
+            if dialog.return_result() != OK_PRESSED:
+                return None
+
+        # when ok is pressed, overwrites it.
+        # deletes FileSelection
+        self.__deleteFileSelection()
+
+        try:
+
+            # displays save message
+            self.theSession.message( 'Save Properties as CSV [%s]\n'
+                                     % filename )
+
+            # saves Model
+            self.theSession.savePropertiesAsCSV( filename )
+
+        except:
+
+            # expants message window, when it is folded.
+            if not self[ 'message_togglebutton' ].get_child().get_active():
+                self[ 'message_togglebutton' ].get_child().set_active( True )
+
+            # displays confirm window
+            message = 'Can\'t save [%s]\nSee MessageWindow for details.' \
+                % filename
+            dialog = ConfirmWindow( OK_MODE, message, 'Error!' )
+
+            # displays error message of MessageWindow
+            self.theSession.message( 'Can\'t save [%s]' % filename )
+            message \
+                = '\n'.join( traceback.format_exception( sys.exc_type, 
+                                                         sys.exc_value, 
+                                                         sys.exc_traceback ) )
+            self.theSession.message( message )
+
+        # updates
+        self.update()
+
+    def __loadPropertiesFromCSV( self, *arg ):
+
+        # gets file name
+        filename = self.theFileSelection.get_filename()
+        self.__deleteFileSelection()
+
+        # when the file already exists
+        if not os.path.isfile( filename ):
+
+            # displays confirm window
+            message = 'File [%s] not found' % filename
+            dialog = ConfirmWindow( OK_MODE, message, 'Error!' )
+
+            # displays error message of MessageWindow
+            self.theSession.message( 'Can\'t load [%s]' % filename )
+            return
+
+        try:
+
+            # displays save message
+            self.theSession.message( 'Load Properties from CSV [%s]\n' 
+                                     % filename )
+
+            # saves Model
+            self.theSession.loadPropertiesFromCSV( filename )
+
+        except:
+
+            # expants message window, when it is folded.
+            if not self[ 'message_togglebutton' ].get_child().get_active():
+                self[ 'message_togglebutton' ].get_child().set_active( True )
+
+            # displays confirm window
+            message = 'Can\'t load [%s]\nSee MessageWindow for details.' \
+                % filename
+            dialog = ConfirmWindow( OK_MODE, message, 'Error!' )
+
+            # displays error message of MessageWindow
+            self.theSession.message( 'Can\'t load [%s]' % filename )
+            message \
+                = '\n'.join( traceback.format_exception( sys.exc_type, 
+                                                         sys.exc_value, 
+                                                         sys.exc_traceback ) )
+            self.theSession.message( message )
+
+        # updates
+        self.update()
+        self.updateButtons()
+        self.theSession.updateAllPluginWindows()
+        self.theSession.updateFundamentalWindows()
+
+    def __logAll( self, *arg ):
+        if self.theEntityListWindow is None:
+            return
+
+        # checks the length of argument, but this is verbose
+        if len( arg ) < 1:
+            return None
+
+        if arg[ 0 ] == self[ 'log_all' ]:
+            self.theEntityListWindow.logAllEntities()
+        elif arg[ 0 ] == self[ 'log_all_variables' ]:
+            self.theEntityListWindow.logAllVariables()
+        elif arg[ 0 ] == self[ 'log_all_processes' ]:
+            self.theEntityListWindow.logAllProcesses()
+
+    def __openBifurcationWindow( self, *arg ):
+        self.theSession.thePluginManager.createInstance( 'BifurcationWindow', 
+                                                         [ '' ] )
+
+    def __openMultiPlotWindow( self, *arg ):
+        self.theSession.thePluginManager.createInstance( 'MultiPlotWindow', 
+                                                         [ '' ] )
+
+    def __openPropertyEditorWindow( self, *arg ):
+        self.theSession.thePluginManager.createInstance( 'PropertyEditorWindow', [ '' ] )
+
+    def __saveAppearance( self, *arg ):
+
+        def callback( filename, *arg ):
+
+            self.theSession.message( 'Save ini file [%s].\n' % filename )
+            configParser = ConfigParser.ConfigParser()
+
+#             x, y = self[ 'MainWindow' ].get_position()
+#             width, height = self[ 'MainWindow' ].get_size()
+
+#             configParser.add_section( 'MainWindow' )
+#             configParser.set( 'MainWindow', 'x', x )
+#             configParser.set( 'MainWindow', 'y', y )
+#             configParser.set( 'MainWindow', 'width', width )
+#             configParser.set( 'MainWindow', 'height', height )
+
+            for windowName, fundamentalWindow \
+                    in self.theSession.theFundamentalWindows.items():
+                if not fundamentalWindow.exists():
+                    continue
+
+                x, y = fundamentalWindow[ windowName ].get_position()
+                width, height = fundamentalWindow[ windowName ].get_size()
+
+                section = windowName
+                configParser.add_section( section )
+                configParser.set( section, 'x', str( x ) )
+                configParser.set( section, 'y', str( y ) )
+                configParser.set( section, 'width', str( width ) )
+                configParser.set( section, 'height', str( height ) )
+
+                if windowName == 'MainWindow':
+                    configParser.set( section, 'step_type', 
+                                      self.getStepType() )
+                    configParser.set( section, 'step_size', 
+                                      str( self.getStepSize() ) )
+                    configParser.set( section, 'toolbar', 
+                                      self.theToolbarVisible )
+                    configParser.set( section, 'statusbar', 
+                                      self.theStatusbarVisible )
+                    configParser.set( section, 'indicator', 
+                                      self.indicatorVisible )
+                    configParser.set( section, 'timer', self.timerVisible )
+                    configParser.set( section, 'message_window', 
+                                      self.theMessageWindowVisible )
+                    configParser.set( section, 'entity_list_window', 
+                                      self.theEntityListWindowVisible )
+
+                    systemList \
+                        = self.theEntityListWindow.getSelectedSystemList()
+                    systemList = [ createFullPNString( convertFullIDToFullPN( fullid, 'Size' ) ) for fullid in systemList ]
+                    configParser.set( section, 'system_selection',
+                                      str( systemList ) )
+
+                    analysisList = [ 'stoichiometry_matrix', 
+                                     'elasticity_matrix', 'jacobian_matrix', 
+                                     'cccs', 'fccs', 
+                                     'scaled_cccs', 'scaled_fccs' ]
+                    for analysisType in analysisList:
+                        configParser.set( section, analysisType,
+                                          self[ analysisType ].get_active() )
+
+                    propertyName \
+                        = self.theEntityListWindow.DEFAULT_VARIABLE_PROPERTY
+                    configParser.set( section, 'default_property',
+                                      propertyName )
+
+            entityListWindows = self.theSession.theEntityListInstanceMap.keys()
+            for i, listWindow in enumerate( entityListWindows ):
+                windowName = 'EntityListWindow'
+                if listWindow[ windowName ] is None:
+                    continue
+
+                x, y = listWindow[ windowName ].get_position()
+                width, height = listWindow[ windowName ].get_size()
+
+                section = '%s%d' % ( windowName, i + 1 )
+                configParser.add_section( section )
+                configParser.set( section, 'x', str( x ) )
+                configParser.set( section, 'y', str( y ) )
+                configParser.set( section, 'width', str( width ) )
+                configParser.set( section, 'height', str( height ) )
+
+                systemList = listWindow.getSelectedSystemList()
+                systemList = [ createFullPNString( convertFullIDToFullPN( fullid, 'Size' ) ) for fullid in systemList ]
+                configParser.set( section, 'system_selection',
+                                  str( systemList ) )
+
+            pluginList = self.theSession.thePluginManager.theInstanceList
+            for i, pluginWindow in enumerate( pluginList ):
+                className = pluginWindow.__class__.__name__
+                x, y = pluginWindow[ className ].get_position()
+                width, height = pluginWindow[ className ].get_size()
+
+                section = 'Plugin%d' % ( i + 1 )
+                configParser.add_section( section )
+                configParser.set( section, 'class_name', className )
+                fullpnList = [ createFullPNString( fullpn ) for fullpn in pluginWindow.getRawFullPNList() ]
+                configParser.set( section, 'data', str( fullpnList ) )
+                configParser.set( section, 'x', str( x ) )
+                configParser.set( section, 'y', str( y ) )
+                configParser.set( section, 'width', str( width ) )
+                configParser.set( section, 'height', str( height ) )
+
+            configFile = open( filename, 'w' )
+            configParser.write( configFile )
+            configFile.close()
+
+        self.__saveFileChooserDialog( callback )
+
+    def setAppearance( self, filename, *arg ):
+
+        pluginExp = re.compile( 'Plugin[1-9][0-9]*' )
+        entityListWindowExp = re.compile( 'EntityListWindow[1-9][0-9]*' )
+        fundamentalWindows = [ 'LoggerWindow', 'InterfaceWindow', 
+                               'StepperWindow', 'BoardWindow' ]
+
+        configParser = ConfigParser.ConfigParser()
+        configParser.read( filename )
+
+        for section in configParser.sections():
+            if section == 'MainWindow':
+                pluginWindow = self
+                className = 'MainWindow'
+
+                if configParser.has_option( section, 'step_type' ):
+                    self.setStepType( configParser.getboolean( section, 
+                                                               'step_type' ) )
+                if configParser.has_option( section, 'step_size' ):
+                    value = configParser.get( section, 'step_size' )
+                    try:
+                        value = float( value )
+                    except:
+                        pass
+                    else:
+                        self.setStepSize( value )
+
+                if configParser.has_option( section, 'toolbar' ):
+                    self.theToolbarVisible \
+                        = not configParser.getboolean( section, 'toolbar' )
+                    self.__displayToolbar()
+
+                if configParser.has_option( section, 'statusbar' ):
+                    self.theStatusbarVisible \
+                        = not configParser.getboolean( section, 'statusbar' )
+                    self.__displayStatusbar()
+
+                if configParser.has_option( section, 'indicator' ):
+                    self.indicatorVisible \
+                        = not configParser.getboolean( section, 'indicator' )
+                    self.__displayIndicator()
+
+                if configParser.has_option( section, 'timer' ):
+                    self.timerVisible \
+                        = not configParser.getboolean( section, 'timer' )
+                    self.__displayTimer()
+
+                if configParser.has_option( section, 'message_window' ):
+                    if configParser.getboolean( section, 'message_window' ) \
+                            != self.theMessageWindowVisible:
+                        self.__toggleMessageWindow()
+
+                if configParser.has_option( section, 'entity_list_window' ):
+                    if configParser.getboolean( section, 
+                                                'entity_list_window' ) \
+                            != self.theEntityListWindowVisible:
+                        self.__toggleEntityListWindow()
+
+                if configParser.has_option( section, 'system_selection' ):
+                    value = configParser.get( section, 'system_selection' )
+                    fullpnList = self.evalFullPNList( value )
+                    if fullpnList is not None:
+                        self.theEntityListWindow.doSelectSystem( fullpnList )
+                    
+                analysisList = [ 'stoichiometry_matrix', 'elasticity_matrix', 
+                                 'jacobian_matrix', 'cccs', 'fccs', 
+                                 'scaled_cccs', 'scaled_fccs' ]
+                for analysisType in analysisList:
+                    if configParser.has_option( section, analysisType ):
+                        self[ analysisType ].set_active( 
+                            configParser.getboolean( section, analysisType ) )
+
+                propertyName = configParser.get( section, 'default_property' )
+                if self.theEntityListWindow.DEFAULT_VARIABLE_PROPERTY \
+                        != propertyName:
+                    self.__toggleDefaultProperties()
+
+            elif pluginExp.match( section ) is not None:
+                if not ( configParser.has_option( section, 'class_name' ) 
+                         and configParser.has_option( section, 'data' ) ):
+                    continue
+
+                className = configParser.get( section, 'class_name' )
+
+                value = configParser.get( section, 'data' )
+                data = self.evalFullPNList( value )
+                if data is None:
+                    continue
+
+                pluginWindow = self.theSession.thePluginManager.createInstance( className, data )
+            elif entityListWindowExp.match( section ) is not None:
+                className = 'EntityListWindow'
+                pluginWindow = self.theSession.createEntityListWindow()
+                if configParser.has_option( section, 'system_selection' ):
+                    value = configParser.get( section, 'system_selection' )
+                    fullpnList = self.evalFullPNList( value )
+                    if fullpnList is not None:
+                        pluginWindow.doSelectSystem( fullpnList )
+            elif section in fundamentalWindows:
+                className = section
+                pluginWindow = self.theSession.openWindow( className )
+            else:
+                continue
+
+            x, y = pluginWindow[ className ].get_position()
+            width, height = pluginWindow[ className ].get_size()
+
+            x = configParser.getint( section, 'x' ) \
+                if configParser.has_option( section, 'x' ) else x
+            y = configParser.getint( section, 'y' ) \
+                if configParser.has_option( section, 'y' ) else y
+            width = configParser.getint( section, 'width' ) \
+                if configParser.has_option( section, 'width' ) \
+                else width
+            height = configParser.getint( section, 'height' ) \
+                if configParser.has_option( section, 'height' ) \
+                else height
+
+            pluginWindow[ className ].move( x, y )
+            pluginWindow[ className ].resize( width, height )
+
+        self[ 'MainWindow' ].present()
+
+    def evalFullPNList( self, value ):
+
+        try:
+            fullpnList = eval( value )
+        except:
+            return None
+
+        if type( fullpnList ) != list:
+            return None
+
+        result = []
+        for fullpnString in fullpnList:
+            fullpn = createFullPN( fullpnString )
+            fullid = createFullIDString( convertFullPNToFullID( fullpn ) )
+            if self.theSession.theSimulator.isEntityExist( fullid ):
+                properties = self.theSession.theSimulator.getEntityPropertyList( fullid )
+                if fullpn[ 3 ] in properties:
+                    result.append( fullpn )
+                else:
+                    message = 'Property [%s] was omitted.\n' % fullpnString
+                    self.theSession.message( message )
+            else:
+                message = 'Property [%s] was omitted.\n' % fullpnString
+                self.theSession.message( message )
+
+        if len( result ) == 0:
+            return None
+
+        return result
+
+    def __revertAppearance( self, *arg ):
+
+        def callback( filename, *arg ):
+            self.theSession.message( 'Loading ini file [%s].\n' 
+                                     % ( filename ) )
+            self.setAppearance( filename, *arg )
+
+        self.__openFileChooserDialog( callback )
+
+    def __saveFileChooserDialog( self, callback, *arg ):
+
+        dialog = gtk.FileChooserDialog( "Open..", None,
+                                        gtk.FILE_CHOOSER_ACTION_SAVE,
+                                        ( gtk.STOCK_CANCEL, 
+                                          gtk.RESPONSE_CANCEL,
+                                          gtk.STOCK_OPEN, gtk.RESPONSE_OK ) )
+        dialog.set_default_response( gtk.RESPONSE_OK )
+   
+        filter = gtk.FileFilter()
+        extensions = [ 'ini' ]
+        filter.set_name( ', '.join( extensions ) )
+
+        for ext in extensions:
+            filter.add_mime_type( ext )
+            filter.add_pattern( '*.%s' % ext )
+
+        dialog.add_filter( filter )
+   
+        response = dialog.run()
+
+        if response == gtk.RESPONSE_OK:
+            filename = dialog.get_filename()
+            dialog.destroy()
+
+            # when the file already exists
+            if os.path.isfile( filename ):
+                message = 'Would you like to replace the existing file? \n[%s]' % filename
+                confirmDialog = ConfirmWindow( OKCANCEL_MODE, message,
+                                               'Confirm File Overwrite' )
+
+                # when canceled, does nothing
+                if confirmDialog.return_result() != OK_PRESSED:
+                    return
+
+            callback( filename, *arg )
+
+        else: # response == gtk.RESPONSE_CANCEL
+            dialog.destroy()
+
+    def __openFileChooserDialog( self, callback, *arg ):
+
+        dialog = gtk.FileChooserDialog( "Open..", None,
+                                        gtk.FILE_CHOOSER_ACTION_OPEN,
+                                        ( gtk.STOCK_CANCEL, 
+                                          gtk.RESPONSE_CANCEL,
+                                          gtk.STOCK_OPEN, gtk.RESPONSE_OK ) )
+        dialog.set_default_response( gtk.RESPONSE_OK )
+   
+        filter = gtk.FileFilter()
+        extensions = [ 'ini' ]
+        filter.set_name( ', '.join( extensions ) )
+
+        for ext in extensions:
+            filter.add_mime_type( ext )
+            filter.add_pattern( '*.%s' % ext )
+
+        dialog.add_filter( filter )
+   
+        response = dialog.run()
+
+        if response == gtk.RESPONSE_OK:
+            filename = dialog.get_filename()
+            dialog.destroy()
+
+            if not os.path.isfile( filename ):
+                message = 'File [%s] not found.' % filename
+                confirmDialog = ConfirmWindow( OK_MODE, message, 'Error!' )
+                return
+
+            callback( filename, *arg )
+
+        else: # response == gtk.RESPONSE_CANCEL
+            dialog.destroy()
 
     def deleted( self, *arg ):
         """ When 'delete_event' signal is chatcked( for example, [X] button is clicked ),

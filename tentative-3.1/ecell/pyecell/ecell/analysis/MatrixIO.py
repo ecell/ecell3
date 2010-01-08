@@ -99,10 +99,8 @@ def writeMatrix( outputFile, matrix, rowList=None, columnList=None ):
 
     if type( outputFile ) == str:
         fout = open( outputFile, 'w' )
-    elif type( outputFile ) == file:
+    else: # type( outputFile ) == file
         fout = outputFile
-    else:
-        return
 
     ( m, n ) = numpy.shape( matrix )
 

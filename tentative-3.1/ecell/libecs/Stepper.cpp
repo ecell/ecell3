@@ -535,12 +535,28 @@ namespace libecs
 
   void Stepper::fireProcesses()
   {
-    FOR_ALL( ProcessVector, theProcessVector )
+    ProcessVectorConstIterator aDiscreteProcessOffset
+      ( theProcessVector.begin() + theDiscreteProcessOffset );
+
+    // 1. Call discrete Processes first.
+    for( ProcessVectorConstIterator i( aDiscreteProcessOffset );
+	 i != theProcessVector.end(); ++i )
       {
 	(*i)->fire();
       }
-  }
 
+    // 2. Then, continuous Processes.
+    for( ProcessVectorConstIterator i( theProcessVector.begin() );
+	 i != aDiscreteProcessOffset; ++i )
+      {
+	(*i)->fire();
+      }
+
+//     FOR_ALL( ProcessVector, theProcessVector )
+//       {
+// 	(*i)->fire();
+//       }
+  }
 
   void Stepper::integrate( RealParam aTime )
   {

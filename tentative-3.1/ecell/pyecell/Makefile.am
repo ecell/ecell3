@@ -72,6 +72,7 @@ EXTRA_DIST = \
 	ecell/analysis/emlsupport2.py \
 	ecell/analysis/sbmlsupport.py \
 	ecell/analysis/util.py \
+	ecell/analysis/sif2eml.py \
 	setup.py.in
 
 bin_SCRIPTS = \

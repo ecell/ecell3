@@ -30,6 +30,8 @@ import eml
 import sys
 import os
 import time
+import re
+import csv
 
 
 from numpy import *
@@ -98,11 +100,7 @@ class Session:
     # end of loadModel
         
 
-    def saveModel( self , aModel ):
-        # aModel : a file name (string) or a file object
-        # return -> None
-        # This method can thwor exceptions. 
-        
+    def asModel( self ):
         # creates ana seve an EML instance 
         anEml = eml.Eml()
 
@@ -111,6 +109,13 @@ class Session:
         self.__saveEntity( anEml, 'System::/' )
         self.__saveAllEntity( anEml )
         self.__saveProperty( anEml )
+        return anEml
+
+    def saveModel( self , aModel ):
+        # aModel : a file name (string) or a file object
+        # return -> None
+        # This method can thwor exceptions. 
+        anEml = self.asModel()
 
         # if the type is string
         if type( aModel ) == str:
@@ -628,6 +633,65 @@ class Session:
 
 
         return aList
+
+    #
+    # tentative
+    #
+
+    def __getEntityList( self, entityType, systemPath='/' ):
+        entityList = []
+        idList = self.getEntityList( entityType, systemPath )
+
+        entityList.extend( [ '%s:%s:%s' % ( entityType, systemPath, id )
+                             for id in idList ] )
+
+        subsystemList = self.getEntityList( 'System', systemPath )
+        for subsystemID in subsystemList:
+            fullid = createFullID( 'System:%s:%s' 
+                                   % ( systemPath, subsystemID ) )
+            subsystemPath = createSystemPathFromFullID( fullid )
+            entityList.extend( self.__getEntityList( entityType, 
+                                                     subsystemPath ) )
+
+        return entityList
+
+    def __getAllEntityList( self, systemPath='/' ):
+        entityList = []
+
+        idList = self.getEntityList( 'Variable', systemPath )
+        entityList.extend( [ ( ecs_constants.ENTITYTYPE_DICT[ 'Variable' ], 
+                               systemPath, id ) for id in idList ] )
+        idList = self.getEntityList( 'Process', systemPath )
+        entityList.extend( [ ( ecs_constants.ENTITYTYPE_DICT[ 'Process' ], 
+                               systemPath, id ) for id in idList ] )
+
+        subsystemList = self.getEntityList( 'System', systemPath )
+        subsystemList = [ ( ecs_constants.ENTITYTYPE_DICT[ 'System' ], 
+                            systemPath, id ) for id in subsystemList ]
+        entityList.extend( subsystemList )
+
+        for fullid in subsystemList:
+            subsystemPath = createSystemPathFromFullID( fullid )
+            entityList.extend( self.__getAllEntityList( subsystemPath ) )
+
+        return entityList
+
+    def getAllEntityList( self ):
+        entityList = [ ( ecs_constants.ENTITYTYPE_DICT[ 'System' ], '', '/' ) ]
+        entityList.extend( self.__getAllEntityList( '/' ) )
+        return entityList
+
+    def getVariableList( self ):
+        return self.__getEntityList( 'Variable', '/' )
+
+    def getProcessList( self ):
+        return self.__getEntityList( 'Process', '/' )
+
+    def getSystemList( self ):
+        systemList = [ 'System::/' ]
+        systemList.extend( self.__getEntityList( 'System', '/' ) )
+        return systemList
+
 
 if __name__ == "__main__":
     pass

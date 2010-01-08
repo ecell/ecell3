@@ -43,6 +43,9 @@ class Eml:
 
         if aFileObject is None:
             aStringData = '<?xml version="1.0" ?><eml></eml>'
+        elif type( aFileObject ) == str:
+            aStringData = ''.join( map( str.strip, 
+                                        aFileObject.split( '\n' ) ) )
         else:
             aStringData = ''.join( map( str.strip, aFileObject.readlines() ) )
 
@@ -101,8 +104,7 @@ class Eml:
         for anElement in self.__theEmlNode.childNodes:
             if anElement.nodeName == 'stepper' and \
                    anElement.getAttribute( 'id' ) == anID:
-
-                anElement.removeChild( aChildElement )
+                self.__theEmlNode.removeChild( anElement )
     
 
 
@@ -567,7 +569,27 @@ class Eml:
         anInfoElement.appendChild( anInfoData )
 
         return anInfoElement
-    
+
+    #
+    # tentative
+    #
+
+    def isEntityPropertyExist( self, aFullIDString, aPropertyName=None ):
+
+        if aPropertyName is None:
+            aFullPN = createFullPN( aFullIDString )
+            aPropertyName = aFullPN[3]
+            aFullID = convertFullPNToFullID( aFullPN )
+            fullid = createFullIDString( aFullID )
+        else:
+            fullid = aFullIDString
+
+        try:
+            self.__getEntityPropertyNode( fullid, aPropertyName )
+        except:
+            return 0
+        else:
+            return 1
 
 
 def convertSystemFullID2SystemID( aSystemFullID ):

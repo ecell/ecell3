@@ -120,6 +120,16 @@ class OsogoPluginWindow(PluginWindow):
 
 		self.theRawFullPNList += aRawFullPNList 
 
+	def removeRawFullPNList( self, aRawFullPNList ):
+		"""remove RawFullPNList
+		aRawFullPNList  --  a RawFullPNList to be removed (RawFullPNList)
+		Returns None
+		"""
+
+		for fullpn in aRawFullPNList:
+			if fullpn in self.theRawFullPNList:
+				self.theRawFullPNList.remove( fullpn )
+
 	# ---------------------------------------------------------------
 	# getRawFullPNList
 	#   - return RawFullPNList

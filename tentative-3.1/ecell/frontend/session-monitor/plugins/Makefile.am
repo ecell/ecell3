@@ -9,11 +9,17 @@ sessionmonitorplugins_DATA = \
 	PropertyWindow.glade \
 	TracerWindow.glade \
 	VariableWindow.glade \
+	BifurcationWindow.glade \
+	MultiPlotWindow.glade \
+	PropertyEditorWindow.glade \
 	BargraphWindow.py \
 	DigitalWindow.py \
 	PropertyWindow.py \
 	TracerWindow.py \
 	VariableWindow.py \
+	BifurcationWindow.py \
+	MultiPlotWindow.py \
+	PropertyEditorWindow.py \
 	orange.xpm \
 	BargraphWindow.xpm \
 	DigitalWindow.xpm \

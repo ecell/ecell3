@@ -58,6 +58,16 @@ import ecell.ui.osogo.BoardWindow as BoardWindow
 import ecell.ui.osogo.LoggingPolicy as LoggingPolicy
 import ecell.ui.osogo.OsogoPluginManager as OsogoPluginManager
 
+from ecell.analysis.sif2eml import sif2eml
+import ecell.ecs_constants as ecs_constants
+
+
+DEFAULT_IGNORED_DICT \
+    = { ecs_constants.VARIABLE: [ 'DiffusionCoeff' ], 
+        ecs_constants.PROCESS: [ 'VariableReferenceList',
+                                 'Priority', 'StepperID' ],
+        ecs_constants.SYSTEM: [ 'StepperID' ] }
+
 class GtkSessionMonitor(Session):
 #
 # GtkSessionMonitor class functions
@@ -537,6 +547,14 @@ class GtkSessionMonitor(Session):
         self.setParameter( 'available_space' ,logPolicy[3] )
         self.saveParameters()
 
+    def importSBML( self, filename ):
+        raise NotImplementedError, 'importSBML is not implemented now.'
+
+    def importSIF( self, filename, stepper=0 ):
+        model = sif2eml(filename, 0.5, 
+                        {'inhibit': -1, 'activate': -1},
+                        0.1, stepper)
+        self.loadModel(model)
 
 #------------------------------------------------------------------------
 #IMPORTANT!
@@ -714,5 +732,114 @@ class GtkSessionMonitor(Session):
     def saveLoggerData( self, fullpn=0, aSaveDirectory='./Data', aStartTime=-1, anEndTime=-1, anInterval=-1 ):
         Session.saveLoggerData( self, fullpn, aSaveDirectory, aStartTime, anEndTime, anInterval )
 
+    def saveDataAsCSV( self, filename, fullpn=0,
+                       startTime=-1, endTime=-1, interval=-1 ):
+        
+        fullpnList = []
+        if type( fullpn ) == str:
+            fullpnList.append( fullpn )
+        elif not fullpn:
+            fullpnList = self.getLoggerList()
+        elif type( fullpn ) == list: 
+            fullpnList = fullpn
+        elif type( fullpn ) == tuple: 
+            fullpnList = fullpn
+        else:
+            self.message( "%s is not suitable type.\nuse string or list or tuple" % fullpn )
+            return
 
+        if len( fullpnList ) == 0:
+            self.message( 'No property name is specified.' )
+            return
 
+        dataList = []
+        for fullPNString in fullpnList:
+            loggerStub = self.createLoggerStub( fullPNString )
+            if not loggerStub.exists():
+                self.message( '\nLogger doesn\'t exist.!\n' )
+                return
+
+            loggerStartTime, loggerEndTime \
+                = loggerStub.getStartTime(), loggerStub.getEndTime()
+
+            if startTime == -1 or endTime == -1:
+                startTime = loggerStartTime
+                endTime = loggerEndTime
+            else:
+                if not ( loggerStartTime < startTime < loggerEndTime ):
+                    startTime = loggerStartTime
+                if not ( loggerStartTime < endTime < loggerEndTime ):
+                    endTime = loggerEndTime
+
+            if interval == -1:
+                loggerData = loggerStub.getData( startTime, endTime )
+            else:
+                loggerData = loggerStub.getData( startTime, endTime, interval )
+
+            dataList.append( loggerData )
+
+        result = ecdsupport.integrateData( dataList )
+
+        csvWriter = csv.writer( file( filename, 'w' ), lineterminator="\n" )
+
+        labels = [ 't' ]
+        labels.extend( fullpnList )
+        csvWriter.writerow( labels )
+
+        for stateArray in result:
+            state = [ '%.16e' % x for x in stateArray ]
+            csvWriter.writerow( state )
+
+    # end of saveDataAsCSV
+
+    def savePropertiesAsCSV( self, filename, ignored=DEFAULT_IGNORED_DICT ):
+
+        fullidList = self.getSystemList()
+        fullidList.extend( self.getVariableList() )
+        fullidList.extend( self.getProcessList() )
+
+        csvWriter = csv.writer( file( filename, 'w' ), lineterminator="\n" )
+
+        for fullid in fullidList:
+            entityType = createFullID( fullid )[ 0 ]
+            propertyList = self.theSimulator.getEntityPropertyList( fullid )
+
+            for propertyName in propertyList:
+                if propertyName in ignored[ entityType ]:
+                    continue
+
+                fullpn = '%s:%s' % ( fullid, propertyName )
+                attributes \
+                    = self.theSimulator.getEntityPropertyAttributes( fullpn )
+
+                # 0: set, 1: get, 2: load, 3: save
+                if attributes[ 3 ] != 0:
+                    value = self.theSimulator.saveEntityProperty( fullpn )
+
+                    if type( value ) == int:
+                        csvWriter.writerow( [ fullid, propertyName, value ] )
+                    elif type( value ) == float:
+                        csvWriter.writerow( [ fullid, propertyName, value ] )
+                    elif type( value ) == str:
+                        csvWriter.writerow( [ fullid, propertyName, 
+                                              "\"%s\"" % value ] )
+                    elif type( value ) == list or type( value ) == tuple:
+                        csvWriter.writerow( [ fullid, propertyName, 
+                                              str( value ) ] )
+
+    def loadPropertiesFromCSV( self, filename, ignored=DEFAULT_IGNORED_DICT ):
+
+        csvReader = csv.reader( open( filename, 'r' ), lineterminator="\n" )
+        for row in csvReader:
+            fullid, propertyName, value = row
+            value = eval( value )
+            fullpn = '%s:%s' % ( fullid, propertyName )
+
+            entityType = createFullID( fullid )[ 0 ]
+            if propertyName in ignored[ entityType ]:
+                continue
+
+            attributes \
+                = self.theSimulator.getEntityPropertyAttributes( fullpn )
+            if attributes[ 2 ] != 0:
+                self.theSimulator.loadEntityProperty( fullpn, value )

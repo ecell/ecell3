@@ -221,6 +221,83 @@ class EcdSupport( ecell.ECDDataFile.ECDDataFile ):
 
 # end of EcdSupport
 
+#
+# tentative
+#
+
+def integrateData( dataList ):
+
+	idxList = [ 0 for _ in range( len( dataList ) ) ]
+        checkList = [ i for i in range( len( idxList ) ) 
+                      if len( dataList[ i ] ) != 0 ]
+
+        result = []
+        while len( checkList ) != 0:
+            updateList = []
+            minTime = numpy.inf
+            for i in checkList:
+                loggingTime = dataList[ i ][ idxList[ i ] ][ 0 ]
+                if minTime > loggingTime:
+                    minTime = loggingTime
+                    updateList = [ i ]
+                elif minTime == loggingTime:
+                    updateList.append( i )
+
+            stateArray = numpy.zeros( len( idxList ) + 1, float )
+            stateArray[ 0] = minTime
+            for i in range( len( idxList ) ):
+                stateArray[ i + 1 ] =  dataList[ i ][ idxList[ i ] ][ 1 ]
+
+                if i in updateList:
+                    if idxList[ i ] < len( dataList[ i ] ) - 1:
+                        idxList[ i ] += 1
+                    else:
+                        checkList.remove( i )
+
+            result.append( numpy.array( stateArray ) )
+
+        return result
+
+# end of integrateData
+
+
+def flexions( data ):
+	'''get a list of flexion points
+	this function doesn\'t check the time and comments
+	only for simple use
+	return (list) of [ (float), (float), ( +1, -1, 0 ) ]
+	'''
+
+	dataSize = len( data )
+	if dataSize < 3:
+		return []
+
+	flexionList = []
+	previousTime = data[ 1 ][ 0 ]
+	previousValue = data[ 1 ][ 1 ]
+	previousTrend = cmp( data[ 0 ][ 1 ], previousValue )
+	trend = previousTrend
+
+	for i in range( 2, dataSize ):
+		t, value = data[ i ][ 0 ], data[ i ][ 1 ]
+		trend = cmp( previousValue, value )
+
+		if previousTrend != trend:
+			flexionList.append( ( previousTime, 
+					      previousValue, 
+					      previousTrend ) )
+
+		previousTime, previousValue, previousTrend = t, value, trend
+
+	if len( flexionList ) == 0 and previousTrend == 0:
+		flexionList.append( ( previousTime, 
+				      previousValue, 
+				      previousTrend ) )
+
+        return flexionList
+
+# end of flexions
+
 
 if __name__ == '__main__':
 
