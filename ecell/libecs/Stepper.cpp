@@ -550,7 +550,7 @@ void Stepper::integrate( RealParam aTime )
 
     Real const aStepInterval( getNextTime() - getCurrentTime() );
     setCurrentTime( aTime );
-    setNextTime( aTime + aStepInterval );
+    theNextTime = aTime + aStepInterval;
 }
 
 

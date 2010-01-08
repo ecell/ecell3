@@ -578,13 +578,15 @@ void LocalSimulatorImplementation::run( const libecs::Real aDuration )
 
     start();
 
-    const libecs::Real aStopTime( getModel().getCurrentTime() + aDuration );
+    const libecs::Real aCurrentTime( getModel().getCurrentTime() );
+    const libecs::Real aStopTime( aCurrentTime + aDuration );
 
     // setup SystemStepper to step at aStopTime
 
     //FIXME: dirty, ugly!
     libecs::StepperPtr aSystemStepper( getModel().getSystemStepper() );
-    aSystemStepper->setCurrentTime( aStopTime );
+    aSystemStepper->setCurrentTime( aCurrentTime );
+    aSystemStepper->setNextTime( aStopTime );
 
     getModel().getScheduler().updateEvent( 0, aStopTime );
 

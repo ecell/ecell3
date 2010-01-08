@@ -62,9 +62,7 @@ void StepperEvent::update( TimeParam aTime )
 
 void StepperEvent::reschedule()
 {
-    const Time aLocalTime( theStepper->getCurrentTime() );
-    const Time aNewStepInterval( theStepper->getStepInterval() );
-    setTime( aNewStepInterval + aLocalTime );
+    setTime( theStepper->getNextTime() );
 }
 
 

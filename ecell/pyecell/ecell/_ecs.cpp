@@ -2400,14 +2400,15 @@ public:
 
         start();
 
-        const Real aStopTime( getCurrentTime() + aDuration );
+        const Real aCurrentTime( getCurrentTime() );
+        const Real aStopTime( aCurrentTime + aDuration );
 
         // setup SystemStepper to step at aStopTime
 
         //FIXME: dirty, ugly!
         Stepper* aSystemStepper( getSystemStepper() );
-        aSystemStepper->setCurrentTime( aStopTime );
-        // aSystemStepper->setStepInterval( 0.0 );
+        aSystemStepper->setCurrentTime( aCurrentTime );
+        aSystemStepper->setNextTime( aStopTime );
 
         getScheduler().updateEvent( 0, aStopTime );
 
