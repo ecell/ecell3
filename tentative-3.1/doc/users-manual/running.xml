@@ -1,0 +1,235 @@
+  <!-- =========== Getting Started ============================== -->
+  <!-- Use the Getting Started section to describe the steps required
+  to start the application and to describe the user interface components
+  of the application. If there is other information that it is important
+  for readers to know before they start using the application, you should
+  also include this information here. 
+  If the information about how to get started is very short, you can 
+  include it in the Introduction and omit this section. -->
+
+  <chapter id="ecell3-getting-started"> 
+  <title>Getting Started</title> 
+
+  <highlights>
+    <para>By reading this chapter, you can get information about the following 
+items.
+</para>
+
+    <simplelist>
+      <member>What types of files are needed to run the simulator.</member>
+      <member>How to prepare the files needed to run the simulator.</member>
+      <member>How to run the simulation with &app;.</member>
+    </simplelist>
+
+  </highlights>
+
+  <sect1 id="prepare-simulation"> 
+    <title>Preparing Simulation</title> 
+    
+    <para> To start the simulation, you need to have these types of files:
+      <itemizedlist>
+	<listitem>
+	  <para>A model file in EML format.</para>
+	</listitem>
+	<listitem>
+	  <para>
+              (optionally) shared object files (.so in
+              Linux operating system), if you are using special classes
+              of object in the model file which is not provided by the system
+              by default.
+             </para>
+	</listitem>
+	<listitem>
+	  <para>
+              (optionally) a script file (&ecell; Session Script, or
+              &ESS;) to automate the simulation session.
+             </para>
+	</listitem>
+      </itemizedlist>
+
+    </para>
+
+    <sect2>
+      <title>Converting EM to EML</title>
+
+      <para>Simulation models for &ecell; is often written in &EM; format.
+        To convert &EM; (.em) files to &EML; (.eml) files, type the
+        following command.
+      </para>
+      <para><command>ecell3-em2eml</command> <replaceable>filename.em</replaceable></para>
+
+    </sect2>
+
+    <sect2>
+      <title>Compiling C++ Dynamic Modules</title>
+
+      <para>
+        You might have some Dynamic Modules (or &DM; in short)
+        specifically made for the simulation model in the form of C++
+        source code.  If that is the case, those files have to be compiled
+        and linked to form shared module files (usually suffixed by
+        <literal>.so</literal> on Unix-like platforms, <literal>.dylib</literal>
+        on Mac OS X or <literal>.dll</literal> on Windows) before running the
+        simulation.  You will also need to set
+        <literal>ECELL3_DM_PATH</literal> environment variable to the
+        appropriate value to use the &DM;s (discussed below).
+      </para>
+
+      <para>
+        To compile and like &DM;s,  <command>ecell3-dmc</command> command is provided for convenience.
+      </para>
+
+      <screen><command>ecell3-dmc</command> <option>[options]</option>
+<replaceable>filename.cpp</replaceable> <option>[compiler options]</option></screen>
+
+      <para>The arguments given before the file name (<option>[command
+      options]</option> are interpreted as options to the
+      <command>ecell3-dmc</command> command itself.</para>
+
+      <para>The arguments after the file name are passed to a backend
+      compiler (such as g++) as-is.  The backend compiler used is the
+      same as that used to build the system itself.</para>
+
+      <para>To inspect what the command actually does inside, enable
+      verbose mode by specifying <option>-v</option> option.</para>
+
+      <para>To get a full list of available
+      <command>ecell3-dmc</command> options, invoke the command with
+      <option>-h</option> option, and without the input file.  Here is
+the help message shown by issuing <command>ecedll3-dmc</command> <option>-h</option>.
+
+<literallayout class="monospaced">
+Compile dynamic modules for E-Cell Simulation Environment Versin 3.
+
+Usage:
+        ecell3-dmc [ ecell3-dmc options ] sourcefile [ compiler options ]
+        ecell3-dmc -h|--help
+
+ecell3-dmc options:
+        --no-stdinclude          Don't set standard include file path.
+        --no-stdlibdir           Don't set standard include file path.
+        --ldflags=[ldflags]      Specify options to the linker.
+        --cxxflags=[cxxflags]    Override the default compiler options.
+        --dmcompile=[path]       Specify dmcompile path.
+        -v or --verbose          Be verbose.
+        -h or --help             Print this message.
+</literallayout>
+
+</para>
+
+
+    </sect2>
+    
+  </sect1>
+
+  <sect1 id="ecell3-start">
+    <title>Starting &app;</title>
+    <para>You can start <application>&app;</application> either in 
+    scripting mode and GUI mode.
+    </para> 
+
+    <sect2>
+      <title>GUI mode</title>
+
+	  <para>To start <application>&app;</application> 
+      in GUI mode, type the following command.</para> 
+
+      <screen><command>ecell3-session</command> &amp;</screen>
+
+      <para>This will invoke an instance of the simulator with
+      <application>Osogo Session Manager</application> attached as a GUI
+      frontend.</para>
+
+    </sect2>
+
+    <sect2>
+      <title>Scripting mode</title>
+
+	  <para>
+        To start <application>&app;</application> in scripting mode,
+        type the following command:
+
+        <screen><command>ecell3-session</command> <optional><parameter><replaceable>filename.ess</replaceable></parameter></optional></screen>
+
+        where <replaceable>filename.ess</replaceable> is the name of the
+        Python script file you want to execute.
+      </para>
+	  <para>
+        If <replaceable>filename.ess</replaceable> is omitted,
+        the interpreter starts up in interactive mode.
+      </para>
+      <para>
+        See chapter 5 for the scripting feature.
+      </para>
+    </sect2>
+    
+    <sect2>
+      <title>DM search path and <literal>ECELL3_DM_PATH</literal> environment variable</title>
+
+      <para>
+        If your model makes use of non-standard &DM;s that you had to build
+        using <command>ecell3-dmc</command>, then you need to specify
+        the directory where the &DM;s are placed in
+        <literal>ECELL3_DM_PATH</literal> environment variable.
+        <literal>ECELL3_DM_PATH</literal> can have multiple directory names
+        separated by either <literal>:</literal> (colon) on Unix-like platform
+        or <literal>;</literal> (semicolon) on Windows.
+      </para>
+      <para>
+        The following is an example of setting <literal>ECELL3_DM_PATH</literal> before launching <command>ecell3-session-monitor</command>:
+      </para>
+      <informalexample>
+        <para>
+          <screen><prompt>$</prompt> <userinput>ECELL3_DM_PATH=.:/home/example/mydms</userinput>
+<prompt>$</prompt> <userinput>export ECELL3_DM_PATH</userinput>
+<prompt>$</prompt> <userinput><command>ecell3-em2eml</command></userinput>
+          </screen>
+        </para>
+      </informalexample>
+      <para>
+        Note that up to E-Cell SE 3.1.105, the current working directory was
+        implicitly treated as if it was included in
+        <literal>ECELL3_DM_PATH</literal>.
+        This quirk is removed since 3.1.106.
+      </para>
+    </sect2>
+  </sect1>
+
+  <sect1>
+    <title>Other Commands</title>
+
+    <sect2>
+      <title>Converting &EM; file to &EML;</title>
+
+      <para>Use <command>ecell3-eml2em</command> command to convert an
+      &EML; file to an &EM; file.
+</para>
+
+      <screen>ecell3-eml2em -- convert eml to em
+         
+Usage:
+        ecell3-eml2em [-h] [-f] [-o outfile] infile
+ 
+         
+Options:
+        -h or --help    :  Print this message.
+        -f or --force   :  Force overwrite even if outfile already exists.
+        -o or --outfile=:  Specify output file name.  '-' means stdout.
+</screen>
+
+
+    </sect2>
+
+  </sect1>
+
+
+  </chapter>
+
+
+<!--
+Local Variables:
+mode: sgml
+sgml-parent-document: ("users-manual.xml" "book" "chapter")
+End:
+-->
+

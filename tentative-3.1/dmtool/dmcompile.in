@@ -1,0 +1,188 @@
+#!/usr/bin/env python
+
+# usage: dmcompile cfile [[cflags]... ]
+
+import sys
+import os
+import glob
+from optparse import OptionParser, IndentedHelpFormatter, BadOptionError, make_option
+from distutils.sysconfig import get_config_var
+from distutils.ccompiler import new_compiler
+from distutils.errors import CompileError, LinkError
+from distutils.util import split_quoted
+
+# prefix='@prefix@'
+# exec_prefix='@exec_prefix@'
+# libdir='@libdir@'
+ORIG_CXXFLAGS = '@CXXFLAGS@'
+ORIG_CPPFLAGS = '@CPPFLAGS@'
+ORIG_LDFLAGS = '@LDFLAGS@'
+SHLEXT = os.popen('echo @LTDL_SHLIB_EXT@').readline().rstrip()
+CXXSUFFIX = '.cpp'
+CXXFLAGS = os.environ.get('CXXFLAGS','')
+CPPFLAGS = os.environ.get('CPPFLAGS','')
+LDFLAGS =  os.environ.get('LDFLAGS','')
+PROLOGUE = '''%prog -- Compile dynamic modules for E-Cell SE Version 3'''
+USAGE = '''%prog [-vh] [-o file] <compiler / linker options> source.cpp'''
+OPTIONS = [
+    make_option('-v', '--verbose', action='store_true', dest='verbose'),
+    make_option('-I', action='append', type='string', dest='include_dir'),
+    make_option('-D', action='append', type='string', dest='macro'),
+    make_option('-L', action='append', type='string', dest='library_dir'),
+    make_option('-l', action='append', type='string', dest='library'),
+    make_option('-o', '--output', type='string', dest='out')
+]
+
+class CustomizedHelpFormatter( IndentedHelpFormatter ):
+    def format_prolog( self, prolog ):
+        if prolog:
+            return self._format_text( prolog ) + "\n"
+        else:
+            return ""
+
+class CustomizedOptionParser( OptionParser ):
+    def __init__( self, prolog=None, formatter=None, *arg, **kwarg ):
+        self.prolog = prolog
+        if formatter is None:
+            formatter = CustomizedHelpFormatter()
+        OptionParser.__init__( self, formatter=formatter, *arg, **kwarg )
+
+    def get_default_values( self ):
+        retval = OptionParser.get_default_values( self )
+        retval.unknown = None
+        return retval
+
+    def get_prolog( self ):
+        if self.prolog is None:
+            return None
+        else:
+            return self.expand_prog_name( self.prolog )
+
+    def format_prolog( self, formatter ):
+        return formatter.format_prolog( self.get_prolog() )
+
+    def format_help( self, formatter=None ):
+        if formatter is None:
+            formatter = self.formatter
+        return self.format_prolog( formatter ) + \
+                OptionParser.format_help( self, formatter )
+
+    def _process_long_opt(self, rargs, values):
+        arg = rargs[ 0 ]
+        argname, = arg.split( '=', 1 )
+        try:
+            OptionParser._process_long_opt( self, rargs, values )
+        except BadOptionError:
+            sys.stderr.write( 
+                "%s: unknown option '%s'; passing it through to the compiler\n" % ( self.get_prog_name(), argname ) )
+            if values.unknown is None:
+                values.unknown = []
+            values.unknown.append( arg )
+
+    def _process_short_opts(self, rargs, values):
+        arg = rargs[ 0 ]
+        try:
+            OptionParser._process_short_opts( self, rargs, values )
+        except BadOptionError:
+            sys.stderr.write( 
+                "%s: unknown option '%s'; passing it through to the compiler\n" % ( self.get_prog_name(), arg ) )
+            if values.unknown is None:
+                values.unknown = []
+            values.unknown.append( arg )
+
+progname = os.path.basename( sys.argv[0] )
+
+def msg( outstr ):
+    global progname
+    print "%s: %s" % ( progname, outstr )
+
+def main():
+    global ORIG_CXXFLAGS, ORIG_CPPFLAGS, ORIG_LDFLAGS, SHLEXT, \
+           CXXSUFFIX, CXXFLAGS, CPPFLAGS, LDFLAGS, PROLOGUE, USAGE, OPTIONS
+    parser = CustomizedOptionParser(prolog=PROLOGUE, usage=USAGE, option_list=OPTIONS)
+    opts, args = parser.parse_args( sys.argv[1:] )
+  
+    out = opts.out
+
+    # check if source file is given
+    if len( args ) < 1:
+        parser.error( "no source file was given." )
+        return 255 
+
+    if out == None:
+        if len( args ) == 1:
+            out, dummy  = os.path.splitext( args[ 0 ] )
+            out += SHLEXT
+        else:
+            msg( "specify the output filename." )
+            return 255 
+    else:
+        path_without_ext, ext = os.path.splitext( out )
+        if ext == '':
+            out = path_without_ext + SHLEXT
+
+    # compiler: use env + autoconf + plus anything that was given on the cmd line (?) -- FIXME
+    cxxflags = split_quoted( ORIG_CXXFLAGS ) + \
+        split_quoted( CXXFLAGS )
+    cppflags = split_quoted( ORIG_CPPFLAGS ) + \
+        split_quoted( CPPFLAGS )
+    # linker: use env + autoconf (?) -- FIXME
+    ldflags = split_quoted( ORIG_LDFLAGS ) + \
+        split_quoted( LDFLAGS )
+
+    if opts.unknown is not None:
+        for flag in opts.unknown:
+            cxxflags.append( flag )
+
+    shlflags = split_quoted( get_config_var('CCSHARED') )
+
+    compiler = new_compiler( verbose=opts.verbose )
+    if opts.verbose:
+        old_spawn = compiler.spawn
+        def new_spawn( self, cmd ):
+            print ' '.join( cmd )
+            old_spawn( cmd )
+        compiler.__class__.spawn = new_spawn
+    if opts.include_dir is not None:
+        map( compiler.add_include_dir, opts.include_dir )
+    if opts.library_dir is not None:
+        map( compiler.add_library_dir, opts.library_dir )
+    if opts.library is not None:
+        map( compiler.add_library, opts.library )
+    if opts.macro is not None:
+        for val in opts.macro:
+            compiler.define_macro( *( val.split( '=', 1 ) ) )
+
+    objects = None
+    try:
+        objects = compiler.compile( args, extra_preargs = shlflags + cxxflags + cppflags )
+    except CompileError, e:
+        msg( "failed to compile the specified source files: " + repr( e ) )
+        return 1 
+
+    if sys.platform == 'darwin':
+        compiler.linker_so = [ arg for arg in compiler.linker_so if arg != '-shard' ]
+
+    dlflags = []
+    dlflags.extend(
+        split_quoted(
+            get_config_var( 'LDSHARED' ).replace(
+                get_config_var( 'LINKCC' ), '' ).replace(
+                    get_config_var( 'LDFLAGS' ), '' ) ) )
+
+    try:
+        try:
+            compiler.link( output_filename = out,
+                    target_desc = compiler.SHARED_OBJECT,
+                    objects = objects,
+                    extra_preargs = ldflags + dlflags,
+                    target_lang = 'c++' )
+        except LinkError, e:
+            msg( "failed to link the object files: " + repr( e ) )
+            return 1 
+    finally:
+        map( os.unlink, objects )
+
+if __name__ == '__main__':
+    sys.exit( main() )
+

@@ -1,0 +1,25 @@
+EXTRA_DIST=\
+	ConstantFluxProcess.vcproj\
+	DAEStepper.vcproj\
+	DecayFluxProcess.vcproj\
+	ESSYNSStepper.vcproj\
+	ExpressionAlgebraicProcess.vcproj\
+	ExpressionAssignmentProcess.vcproj\
+	ExpressionFluxProcess.vcproj\
+	FixedDAE1Stepper.vcproj\
+	FixedODE1Stepper.vcproj\
+	FluxDistributionStepper.vcproj\
+	GMAProcess.vcproj\
+	GillespieProcess.vcproj\
+	MassActionFluxProcess.vcproj\
+	MichaelisUniUniFluxProcess.vcproj\
+	ODE23Stepper.vcproj\
+	ODE45Stepper.vcproj\
+	ODEStepper.vcproj\
+	PingPongBiBiFluxProcess.vcproj\
+	PythonFluxProcess.vcproj\
+	PythonProcess.vcproj\
+	QuasiDynamicFluxProcess.vcproj\
+	SSystemProcess.vcproj\
+	TauLeapProcess.vcproj\
+	TauLeapStepper.vcproj

@@ -1,0 +1,244 @@
+ecell-3.1.108: 12-Jan-2010
+
+ * Refactored differential steppers so that they give accurate results on
+   the step right after the (re)start.  A new virtual method
+   DifferentialStepper::updateInternalState() was added to accomplish this,
+   and therefore backwards binary compatibility was lost as for Steppers' DMs.
+
+ * Unbundle ply as it's pretty obsolete.  Users must install one beforehand.
+
+
+ecell-3.1.107: 4-Jul-2009
+
+ * Added new API functions, libecs::issueWarning() and
+   libecs::setWarningHandler() that can be used to report a warning to the
+   frontend from within a dynamic module.
+
+ * Deprecated Stepper's "MaxStepInterval" property as it doesn't make much
+   sense.
+
+ * Added a new property "TolerableRejectedStepCount" to DifferentialStepper
+   (i.e. ODEStepper and its siblings) that specifies the maximum torelable
+   count of rejected steps.
+
+ * Fixed a bug in ODEStepper that causes SIGABRT under the circumstances
+   no processes are associated to the stepper. Noticed by Sachio Nohara.
+   Thanks.
+
+ * Patched libltdl so it would not be interfered by the newer versions of
+   libtool.
+
+ * Migrated to libsbml 3.x.  SBML to EML and EML to SBML converter are now
+   officially confirmed to work with it.
+
+ * Changed ecell3-session-monitor so that it would never change the current
+   working directory to the one the model file is located.
+   Patch by Michele Mattioni.  Thanks.
+
+ * Console class in the ecell3-session-manager script insensibly imports
+   the attributes of a SessionManager instance into the global scope, which
+   turned out to obstruct the definition of classes in the user script.
+   Noticed by Giuseppe Aprea.  Thanks.
+
+
+ecell-3.1.107RC4: 5-Apr-2009
+
+ * Resource files required by the frontends (session monitor and model editor)
+   were completely missing in the tarballs due to the errors in Makefile.
+   Noticed by 김한조.  Thanks.
+
+ * Console class in the ecell3-session-manager script insensibly imports
+   the attributes of a SessionManager instance into the global scope, which
+   turned out to obstruct the definition of classes in the user script.
+   Noticed by Giuseppe Aprea.  Thanks.
+
+
+ecell-3.1.107RC3: 11-Mar-2009
+
+ * Removed deprecate API calls in session-monitor. This enables it to run
+   on Mac OS X with the native GTK+.
+
+ * Fixed bugs in DM compiler tools.
+
+ * Fixed weird behavior of the expression compiler that is used in
+   Expression*Process'es.
+
+ * Eliminate usage of string module.
+
+ * Fixed win32 build.
+
+
+ecell-3.1.107RC2: 6-Feb-2009
+
+ * Fixed a bug in ecell.Session.saveLoggerData().
+
+ * Fixed a bug in ecell.ECDDataFile.
+
+
+ecell-3.1.107RC1: 5-Feb-2009
+
+ * Fixed compilation problem on newer GCC (>= 4.3).
+
+ * Reorganized the source tree structure.
+
+   - Integrated pyecs into pyecell.
+
+   - Merged ecell.emc into ecell.ecs to avoid static initializer weirdness in
+     some platform (including Mac OS X).
+
+   - Two GUI frontends (session-monitor and model-editor) were renewed to be
+     two packages of python modules, ecell.ui.osogo and ecell.ui.model_editor.
+
+ * pyecell changes
+
+   - Moved GtkSessionMonitor to ecell.ui.osogo.GtkSessionMonitor that resides
+     in ecell/frontend/session_manager
+
+   - Renamed ecell.SessionManager to ecell.session_manager.
+
+   - Removed the following constants from ecell.ecs_constants.
+
+     - TRUE
+     - FALSE
+
+
+ecell-3.1.106: 5-Feb-2008
+
+  * class PropertySlotProxyLoggerAdapter was decoupled from PropertySlot.hpp
+    to the separate file, PropertySlotProxyLoggerAdapter.hpp in order not to
+    incorporate various concerns in a single file.
+
+  * A number of leaks were plugged. Note that a few other leaks involved in
+    property interfaces are still active in this release on purpose to
+    maintain binary compatibility with older releases. The fix was already
+    established and will be in the next release.
+
+  * Visual Studio build files (build/msvc/*.vcproj) were updated so it can
+    cross-build 64-bit binaries.
+
+  * PythonProcess and PythonFluxProcess now don't require that python
+    interpreter be already initialized.
+
+  * model-editor no longer depends on Python for Windows Extension.
+    Now the win32 / win64 native builds require Python 2.4 or later.
+
+
+ecell-3.1.106RC2: 24-Dec-2007
+
+  * Avoided resetting LD_LIBRARY_PATH in ecell-python for the sake of
+    inter-platform operability. This was also problematic in combination within
+    multiple ldconfig paths.
+
+  * Fixed sample installation rule so that samples would get installed in
+    sample-per-directory manner.
+
+  * Fixed configure scripts for dmtool and dynamic modules so that modules they
+    produce would have right extensions that follows the libltdl's convention.
+
+
+ecell-3.1.106RC1: 14-Dec-2007
+
+  * Updated bundled libtool script for better compatibility with MacOSX and
+    similar systems.
+
+  * The users manual is now bundled in the distribution.
+
+  * Improved dynamic priority queue.
+
+  * Support for the newest NumPy release in ecell.Analysis.
+
+  * Numerous minor bugfixes.
+
+  * Added two new functions, libecs::initialize() and libecs::finalize().
+    Those functions need to be called before using the simulation kernel or
+    after finished up with it respectively. Users don't have to take care of
+    this change as long as they are using E-Cell through the Python frontends
+    as these functions are automatically called on start-up and clean-up
+    of pyecs module.
+
+
+ecell-3.1.105: 19-Sep-2005
+
+
+ecell-3.1.103: 17-Jan-2005
+
+
+ecell-3.1.102: 27-May-2004
+
+
+ecell-3.1.101: 10-Apr-2004
+
+
+ecell-3.1.100: 31-Dec-2003
+
+
+ecell-3.1.99: 10-Oct-2003
+
+
+ecell-3.1.98: 5-Sep-2003
+
+
+ecell-3.1.97: 17-Aug-2003 
+
+
+ecell-3.1.96: 15-Jul-2003
+
+
+ecell-3.1.94: 14-Apr-2003
+
+
+ecell-3.1.93: 31-Mar-2003
+
+
+ecell-3.1.92: 16-Mar-2003
+
+
+ecell-3.1.91: 9-Mar-2003
+
+
+ecell-3.1.90: 3-Mar-2003
+
+
+ecell-3.1.6:  22-Feb-2003
+
+
+ecell-3.1.5:  8-Feb-2003
+
+
+ecell-3.1.4:  31-Jan-2003
+
+
+ecell-3.1.3:  26-Jan-2003
+
+
+ecell-3.1.2:  26-Dec-2002
+
+
+ecell-3.1.1:  10-Dec-2002
+
+
+ecell-3.1.0:  18-Oct-2002
+
+
+ecell-3.0.4:  25-Jun-2002
+
+
+ecell-3.0.3:  2-Jun-2002
+
+
+ecell-3.0.2:  14-May-2002
+
+
+ecell-3.0.1:  30-Apr-2002
+
+
+ecell-3.0.0:  16-Apr-2002
+
+
+ecell-3.0.0a2:  31-Jan-2002
+
+       - second snapshot release
+
+ecell-3.0a1:  28-Sep-2001
+
+       - first snapshot release

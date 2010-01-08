@@ -1,0 +1,746 @@
+  <!-- ================ Writing em ================================ -->
+
+  <chapter id="modelingtutorial"> 
+    <title>Modeling Tutorial</title>
+
+  <highlights>
+    <para>This chapter is a simple modeling tutorial using &ecell;.</para>
+  </highlights>
+
+
+    <sect1>
+      <title>Running the model</title>
+
+      <para>All the examples in this section can be run by the
+      following procedure.
+
+<orderedlist>
+	  <listitem>
+	    <para>Create and save the model file (for example,
+	      <filename>simple-gillespie.em</filename>) with a text
+	      editor.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para>Convert the &EM; file to an &EML; file by
+	      <command>ecell3-em2eml</command> command.
+
+<screen><prompt>$</prompt> <userinput>ecell3-em2eml simple-gillespie.em</userinput></screen>
+</para>
+	  </listitem>
+
+	  <listitem>
+	    <para>Run it in GUI mode with
+	      <command>gecell</command> command.
+
+<screen><prompt>$</prompt> <userinput>gecell -f simple-gillespie.eml</userinput></screen>
+
+            or, in the script mode with <command>ecell3-session</command> command (see the following chapter):
+
+<screen><prompt>$</prompt> <userinput>ecell3-session -f simple-gillespie.eml</userinput></screen>
+</para>
+	  </listitem>
+	</orderedlist>
+</para>
+    </sect1>
+
+
+
+
+    <sect1>
+      <title>Using Gillespie algorithm</title>
+
+      <para>&app; comes with a set of classes for simulations using
+       Gillespie's stochastic algorithm.</para>
+
+
+      <sect2>
+	<title>A Trivial Reaction System</title>
+	
+	<para>At the very first, let us start with the simplest possible
+      stable system of elementary reactions, which has two variables
+      (in this case the numbers of molecules of molecular species) and
+      a couple of elementary reaction processes.  Because elementary reactions
+      are irreversible, at least two instances of the reactions are needed 
+      for the system to be stable.  The reaction system looks like this:
+<literallayout class="monospaced">
+    -- P1 -->
+S1            S2
+   &lt;-- P2 --
+</literallayout>
+      <literal>S1</literal> and <literal>S2</literal> are molecular
+      species, and <literal>P1</literal> and <literal>P2</literal> are
+      reaction processes.  Rate constants of both reactions are the
+      same: 1.0 [1/s].  Initial numbers of molecules
+      of <literal>S1</literal> and <literal>S2</literal> are 1000 and 0,
+      respectively.  Because rate constants are the same, the system has
+      a steady state at <literal>S1 == S2 == 500</literal>.</para>
+	
+      </sect2>
+
+
+
+      <sect2>
+	<title>Specifying the Next Reaction method</title>
+
+	<para><classname>NRStepper</classname> class implements Gibson's
+         efficient variation of the Gillespie algorithm, or the Next
+         Reaction (NR) method.</para>
+
+	<para>To use the <classname>NRStepper</classname>
+         in your simulation model, write like this in your &EM; file:
+
+<programlisting>Stepper NRStepper( NR1 )
+{
+    # no property
+}</programlisting>
+
+       In this example, the <classname>NRStepper</classname> has the
+       StepperID '<literal>NR1</literal>'. For now, no property
+       needs to be specified for this object.</para>
+      </sect2>
+
+
+      <sect2>
+	<title>Defining the compartment</title>
+
+	<para>Next, define a compartment, and connect it to the
+         &Stepper; <literal>NR1</literal>.  Because this model has
+         only a single compartment, we use the root sytem
+         (<literal>/</literal>).  Although this model does not depend
+         on size of the compartment because all reactions are first
+         order, it is a good idea to always define the size explicitly
+         rather than letting it defaults to <literal>1.0</literal>.
+         Here we set it to <literal>1e-15</literal> [L].
+
+<programlisting>System System( / )
+{
+    StepperID       NR1;
+
+    Variable Variable( SIZE ) { Value 1e-15; }
+
+    # ...
+}
+</programlisting>
+</para>
+      </sect2>
+
+      <sect2>
+	<title>Defining the variables</title>
+
+	<para>Now define the main variables <literal>S1</literal> and
+         <literal>S2</literal>.  Use '<property>Value</property>' properties
+         of the objects to set the initial values.
+
+<programlisting>System System( / )
+{
+    # ...
+
+    Variable Variable( S1 )
+    {
+        Value   1000;
+    }
+        
+    Variable Variable( S2 )
+    {
+        Value   0;
+    }
+        
+    # ...
+}</programlisting>
+</para>
+
+      </sect2>
+
+      <sect2>
+	<title>Defining reaction processes</title>
+
+	<para>Lastly, create reaction process instances
+      <literal>P1</literal> and <literal>P2</literal>.
+      <classname>GillespieProcess</classname> class works together
+      with the <classname>NRStepper</classname> to simulate elementary
+      reactions.</para>
+
+	<para>Two different types of properties,
+      <property>k</property> and
+      <property>VariableReferenceList</property>, must be set for each
+      of the <classname>GillespieProcess</classname> object.
+      <property>k</property> is the rate constant parameter in [1/sec]
+      if the reaction is first-order, or [1/sec/M] if it is a
+      second-order reaction. (Don't forget to define
+      <literal>SIZE</literal> &Variable; if there is a second-order
+      reaction.)  Set <property>VariableReferenceList</property>
+      properties so that <literal>P1</literal> consumes
+      <literal>S1</literal> and produce <literal>S2</literal>, and
+      <literal>P2</literal> uses <literal>S2</literal> to create
+      <literal>S1</literal>.</para>
+
+
+	<programlisting>
+System System( / )
+{
+    # ...
+
+    Process GillespieProcess( P1 )              # the reaction S1 --> S2
+    {
+        VariableReferenceList   [ S :.:S1 -1 ]
+                                [ P :.:S2 1 ];
+        k       1.0;                            # the rate constant
+    }
+
+    Process GillespieProcess( P2 )              # the reaction S2 --> S1
+    {
+        VariableReferenceList   [ S :.:S2 -1 ]
+                                [ P :.:S1 1 ];
+        k       1.0;
+    }
+}
+</programlisting>
+      </sect2>
+
+
+      <sect2>
+	<title>Putting them together</title>
+
+	<para>Here is the complete &EM; of the model that really
+         works.  Run this model with <command>gecell</command> and
+         open a TracerWindow to plot trajectories of
+         <literal>S1</literal> and <literal>S2</literal>. 
+         You will see
+         those two &Variable;s immediately reaching the steady state around
+         500.0. If you zoom around the trajectories, you will be able
+         to see stochastic fluctuations.</para>
+
+	<example>
+	  <title>The simplest Gillespie-Gibson model</title>
+	  <programlisting>Stepper NRStepper( NR1 )
+{
+    # no property
+}
+
+System System( / )
+{
+    StepperID       NR1;
+
+    Variable Variable( SIZE ) { Value 1e-15; }
+
+    Variable Variable( S1 )
+    {
+        Value   1000;
+    }
+        
+    Variable Variable( S2 )
+    {
+        Value   0;
+    }
+        
+    Process GillespieProcess( P1 )              # the reaction S1 --> S2
+    {
+        VariableReferenceList   [ S :.:S1 -1 ]
+                                [ P :.:S2 1 ];
+        k       1.0;                            # the rate constant
+    }
+
+    Process GillespieProcess( P2 )              # the reaction S2 --> S1
+    {
+        VariableReferenceList   [ S :.:S2 -1 ]
+                                [ P :.:S1 1 ];
+        k       1.0;
+    }
+}
+</programlisting>
+	</example>
+
+      </sect2>
+
+
+    </sect1>
+
+    <sect1>
+      <title>Using Deterministic Differential Equations</title>
+
+      <para>The previous section described how to create a model that
+       runs with the stochastic Gillespie's algorithm.  &ecell; is a
+       multi-algorithm simulator, and different algorithms can be used
+       to run the model.  This section explains a way to use a
+       deterministic differential equation solver to run the system
+       of simple mass-action reactions.</para>
+
+
+      <sect2>
+	<title>Choosing Stepper and Process classes</title>
+
+	<para>In the current version, we recommend
+         <classname>ODE45Stepper</classname> class as a
+         general-purpose &Stepper; for differential equation systems.
+         This &Stepper; implements an explicit fourth order numerical
+         integration algorithm with a fifth-order error control.
+         </para>
+
+	<para><classname>MassActionFluxProcess</classname> is the
+         continuous differential equation conterpart of the
+         discrete-event
+         <classname>GillespieProcess</classname>. Unlike
+         <classname>GillespieProcess</classname>,
+         <classname>MassActionFluxProcess</classname> does not have
+         limitation in the order of the reaction mechanism. For
+         example, it can handle the reaction like this: <literal>S0 +
+         S1 + 2 S2 --> P0 + P1</literal>.
+         </para>
+
+      </sect2>
+
+      <sect2>
+	<title>Converting the model</title>
+
+	<para>Converting the trivial reaction system model for
+         Gillespie to use differential equations is very easy; just
+         replace <classname>NRStepper</classname> with
+         <classname>ODE45Stepper</classname>, and change the classname of 
+         <classname>GillespieProcess</classname> to
+         <classname>MassActionFluxProcess</classname>.</para>
+
+	<para>The following is the model of the trivial model that
+         runs on the differential <classname>ODE45Stepper</classname>.
+         You will get similar simulation result than the stochastic
+         model in the previous section.  However, if you zoom, you
+         would notice that the stochastic fluctuation can no longer be
+         observed because the model is turned from stochastic to
+         deterministic.</para>
+
+	<example>
+	  <title>A simple deterministic mass-action model</title>
+	  <programlisting>
+Stepper ODE45Stepper( ODE1 )
+{
+    # no property
+}
+
+System System( / )
+{
+    StepperID       ODE1;
+
+    Variable Variable( SIZE ) { Value 1e-15; }
+
+    Variable Variable( S1 )
+    {
+        Value   1000;
+    }
+        
+    Variable Variable( S2 )
+    {
+        Value   0;
+    }
+        
+    Process MassActionFluxProcess( P1 )
+    {
+        VariableReferenceList   [ S0 :.:S1 -1 ]
+                                [ P0 :.:S2 1 ];
+        k       1.0;
+    }
+
+    Process MassActionFluxProcess( P2 )
+    {
+        VariableReferenceList   [ S0 :.:S2 -1 ]
+                                [ P0 :.:S1 1 ];
+        k       1.0;
+    }
+}
+</programlisting>
+      </example>
+
+      </sect2>
+
+      <!--
+Incidentally, in this particular trivial model,
+      volume of the compartment does not affect the behavior of the
+         model because all the reactions are first-order.
+      -->
+
+    </sect1>
+
+    <sect1>
+      <title>Making the Model Switchable Between Algorithms</title>
+
+      <para>Fortunately, at least as far as the model has only
+       elementary reactions, switching between these stochastic and
+       deterministic algorithms is just to switch between
+       <classname>NRStepper</classname>/<classname>GillespieProcess</classname>
+       pair and
+       <classname>ODE45Stepper</classname>/<classname>MassActionFluxProcess</classname>
+       pair of classnames.  Both &Process; classes takes the same property
+       '<property>k</property>' with the same unit.</para>
+
+      <para>Some use of &empy; macros makes the model generic.  In the
+       following example, setting the &Python; variable
+       <literal>TYPE</literal> to <literal>ODE</literal> makes it run
+       in deterministic differential equation mode, and setting
+       <literal>TYPE</literal> to <literal>NR</literal> turns it stochastic.
+
+      <example>
+	<title>simple-switchable.em</title>
+	  
+	<programlisting>
+@{ALGORITHM='ODE'}
+
+@{
+if ALGORITHM == 'ODE':
+    STEPPER='ODE45Stepper'
+    PROCESS='MassActionFluxProcess'
+elif ALGORITHM == 'NR':
+    STEPPER='NRStepper'
+    PROCESS='GillespieProcess'
+else:
+    raise 'unknown algorithm: %s' % ALGORITHM
+}
+
+Stepper @(STEPPER)( STEPPER1 )
+{
+    # no property
+}
+
+System System( / )
+{
+    StepperID       STEPPER1;
+
+    Variable Variable( SIZE ) { Value 1e-15; }
+
+    Variable Variable( S1 )
+    {
+        Value   1000;
+    }
+        
+    Variable Variable( S2 )
+    {
+        Value   0;
+    }
+        
+    Process @(PROCESS)( P1 )
+    {
+        VariableReferenceList   [ S0 :.:S1 -1 ]
+                                [ P0 :.:S2 1 ];
+        k       1.0;
+    }
+
+    Process @(PROCESS)( P2 )
+    {
+        VariableReferenceList   [ S0 :.:S2 -1 ]
+                                [ P0 :.:S1 1 ];
+        k       1.0;
+    }
+}
+</programlisting>
+</example>
+
+</para>
+
+    </sect1>
+
+    <sect1>
+      <title>A Simple Deterministic / Stochastic Composite Simulation</title>
+
+      <para>&ecell; can drive a model with multiple &Stepper; objects.
+       Each &Stepper; can implement different simulation algorithms,
+       and have different time scales.  This framework of
+       multi-algorithm, multi-timescale simulation is quite generic, and
+       virtually any combination of any number of different types of sub-models
+       is possible.  This section exemplifies a tiny model of coupled
+       ODE and Gillespie reactions.</para>
+
+      <sect2>
+	<title>A tiny multi-timescale reactions model</title>
+
+	<para>Consider this tiny model of four &Variable;s and six
+	reaction &Process;es:
+
+<literallayout class="monospaced">
+    -- P1 -->                   -- P4 -->
+S1            S2  -- P3 --> S3            S4
+^  &lt;-- P2 --                   &lt;-- P5 --  |
+|                                         |
+ \ _______________ P6 ____________________/
+</literallayout>
+
+        Although it may look complicated at first glance, this system 
+        consists of two instances of the 'trivial' system we have modeled
+        in the previous sections coupled together:
+
+<literallayout class="monospaced">
+Sub-model 1:
+    -- P1 -->
+S1            S2
+   &lt;-- P2 -- 
+</literallayout>
+
+and
+
+<literallayout class="monospaced">
+Sub-model 2:
+    -- P4 -->
+S3            S4
+   &lt;-- P5 -- 
+</literallayout>
+
+       These two sub-models are in turn coupled by reaction processes
+       <literal>P3</literal> and <literal>P6</literal>.  Because time
+       scales of <literal>P3</literal> and <literal>P6</literal> are
+       determined by <literal>S2</literal> and <literal>S4</literal>,
+       respectively, <literal>P3</literal> belongs to the sub-model 1,
+       and <literal>P6</literal> is a part of the sub-model 2.
+
+<literallayout class="monospaced">
+Sub-model 1:   S2  -- P3 --> S3
+               S1 &lt;-- P6 --> S4  :Sub-model 2
+</literallayout>
+
+       Rate constants of the main reactions, <literal>P1</literal>,
+<literal>P2</literal>, <literal>P4</literal>, and
+<literal>P5</literal> are the same as the previous model:
+<literal>1.0</literal> [1/sec].  But the 'bridging' reactions are slower
+than the main reactions: <literal>1e-1</literal> for
+<literal>P3</literal> and <literal>1e-3</literal> for
+<literal>P6</literal>.   Consequently, sub-models 1 and 2 would have
+approximately <literal>1e-1 / 1e-3 == 1e-2</literal> times different
+steady-state levels.   Because the rate constants of the main reactions
+are the same, this implies time scale of both sub-models are different.
+</para>
+
+      </sect2>
+
+      <sect2>
+	<title>Writing model file</title>
+
+	<para>The following code implements the multi-time scale
+         model.  The first two lines specify algorithms to use for
+         those two parts of the model. <varname>ALGORITHM1</varname>
+         variable specifies the algorithm to use for the sub-model 1, and
+         <varname>ALGORITHM2</varname> is for the sub-model 2.  Values of 
+         these variables can either be <literal>'NR'</literal> or
+         <literal>'ODE'</literal>.</para>
+
+        <para>For example, to try pure-stochastic simulation,
+         set these variables like this:
+
+<programlisting>
+@{ALGORITHM1='NR'}
+@{ALGORITHM2='NR'}
+</programlisting>
+
+
+         Setting <varname>ALGORITHM1</varname> to <literal>'NR'</literal> and
+         <varname>ALGORITHM2</varname> to <literal>'ODE</literal> would be
+         an ideal configuration.  This runs a magnitude faster than
+         the pure-stochastic configuration.
+
+<programlisting>
+@{ALGORITHM1='NR'}
+@{ALGORITHM2='ODE'}
+</programlisting>
+ 
+        Also try pure-deterministic run.
+
+<programlisting>
+@{ALGORITHM1='ODE'}
+@{ALGORITHM2='ODE'}
+</programlisting>
+
+        In this particular model, this configuration runs very fast
+        because the system easily reaches the steady-state and
+        stiffness of the model is low.  However, this does not necessary
+        mean pure-ODE is always the fastest. Under some situations
+        NR/ODE composite simulation exceeds both pure-stochastic and 
+        pure-deterministic (reference?).</para>
+
+      <example>
+	<title>composite.em</title>
+	  
+	<programlisting>
+@{ALGORITHM1= ['NR' or 'ODE']}
+@{ALGORITHM2= ['NR' or 'ODE']}
+
+
+# a function to give appropriate class names.
+@{
+def getClassNamesByAlgorithm( anAlgorithm ):
+    if anAlgorithm == 'ODE':
+        return 'ODE45Stepper', 'MassActionFluxProcess'
+    elif anAlgorithm == 'NR':
+        return 'NRStepper', 'GillespieProcess'
+    else:
+        raise 'unknown algorithm: %s' % ALGORITHM1
+}
+
+# get classnames
+@{
+STEPPER1, PROCESS1 = getClassNamesByAlgorithm( ALGORITHM1 )
+STEPPER2, PROCESS2 = getClassNamesByAlgorithm( ALGORITHM2 )
+}
+
+# create appropriate steppers.
+# stepper ids are the same as the ALGORITHM.
+@('Stepper %s ( %s ) {}' % ( STEPPER1, ALGORITHM1 ))
+
+# if we have two different algorithms, one more stepper is needed.
+@(ALGORITHM1 != ALGORITHM2 ? 'Stepper %s( %s ) {}' % ( STEPPER2, ALGORITHM2 ))
+
+
+
+System CompartmentSystem( / )
+{
+    StepperID   @(ALGORITHM1);
+    
+    Variable Variable( SIZE ) { Value 1e-15; }
+
+    Variable Variable( S1 )
+    {
+        Value   1000;
+    }
+    
+    Variable Variable( S2 )
+    {
+        Value   0;
+    }
+    
+    Variable Variable( S3 )
+    {
+        Value   1000000;
+    }
+    
+    Variable Variable( S4 )
+    {
+        Value   0;
+    }
+
+
+    Process @(PROCESS1)( P1 )
+    {
+        VariableReferenceList   [ S0 :.:S1 -1 ] [ P0 :.:S2 1 ];
+        k       1.0;
+    }
+
+    Process @(PROCESS1)( P2 )
+    {
+        VariableReferenceList   [ S0 :.:S2 -1 ] [ P0 :.:S1 1 ];
+        k       1.0;
+    }
+
+    Process @(PROCESS1)( P3 )
+    {
+        VariableReferenceList   [ S0 :.:S2 -1 ] [ P0 :.:S3 1 ];
+        k       1e-1;
+    }
+
+    Process @(PROCESS2)( P4 )
+    {
+        StepperID @(ALGORITHM2);
+
+        VariableReferenceList   [ S0 :.:S3 -1 ] [ P0 :.:S4 1 ];
+        k       1.0;
+    }
+
+    Process @(PROCESS2)( P5 )
+    {
+        StepperID @(ALGORITHM2);
+
+        VariableReferenceList   [ S0 :.:S4 -1 ] [ P0 :.:S3 1 ];
+        k       1.0;
+    }
+
+    Process @(PROCESS2)( P6 )
+    {
+        StepperID @(ALGORITHM2);
+
+        VariableReferenceList   [ S0 :.:S4 -1 ] [ P0 :.:S1 1 ];
+        k       1e-4;
+    }
+    
+}
+</programlisting>
+</example>
+
+
+      </sect2>
+
+    </sect1>
+
+
+    <sect1>
+      <title>Custom equations</title>
+
+    <sect2>
+      <title>Complex flux rate equations</title>
+
+      <para>The simplest way to script custom rate equations is to use
+<classname>ExpressionFluxProcess</classname>.   
+
+    Here is an example taken from the Drosophila sample model which you can
+    find under
+    <literal>${datadir}/doc/ecell/samples/Drosophila</literal>
+    <footnote>
+      <para>
+        <literal>${datadir}</literal> refers to the directory either given
+        to <literal>--datadir</literal> option of <literal>configure</literal>
+        script or <literal>${prefix}/share</literal>. On Windows,
+        <literal>${prefix}</literal> would be the directory to which the
+        application is installted.
+      </para>
+    </footnote>
+    In this expression, Size * N_A of the supersystem of the &Process;
+    is used to keep the unit of the expression [ num / second ].
+<example>
+	  <title>A differential equation in the Drosophila model</title>
+	  <programlisting>
+Process ExpressionFluxProcess( R_toy1 )
+{
+    vs      0.76;
+    KI      1;
+    Expression "(vs*KI) / (KI + C0.MolarConc ^ 3) 
+                                       * self.getSuperSystem().SizeN_A";
+
+    VariableReferenceList   [ P0 :.:M 1 ] [ C0 :.:Pn 0 ];
+}</programlisting>
+	</example>
+</para>
+
+      <para>FIXME: some more examples</para>
+
+    </sect2>
+
+    <sect2>
+      <title>Algebraic equations</title>
+
+      <para>Use of <classname>ExpressionAlgebraicProcess</classname>
+      is the easiest method to describe algebraic equations.</para>
+
+      <para>Be careful about the coefficients of the &VariableReference;s.  
+(Usually just set unities.)
+</para>
+
+      <para>FIXME: some more examples here</para>
+
+    </sect2>
+
+    
+    </sect1>
+
+    <sect1>
+      <title>Other Modeling Schemes</title>
+
+    <sect2>
+      <title>Discrete events</title>
+      <para></para>
+    </sect2>
+    </sect1>
+
+
+
+  </chapter>
+
+
+<!--
+Local Variables:
+mode: sgml
+sgml-parent-document: ("users-manual.xml" "book" "chapter")
+End:
+-->
+

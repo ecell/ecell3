@@ -1,0 +1,136 @@
+============================================================================
+Installation notes for E-Cell Simulation Environment Version 3 (E-Cell SE 3)
+============================================================================
+Koichi Takahashi <shafi@e-cell.org>
+
+Getting the latest version of E-Cell 3
+======================================
+
+1. Get a tarball:
+
+   Official distributions can be found at:
+
+     http://www.e-cell.org/software
+
+2. Or, get the latest source code via Subversion:
+
+   Official development site of E-Cell 3 is:
+
+     http://www.e-cell.org/software
+
+   You can get the latest development version through anonymous repository
+   access.  See the instruction in the following page:
+
+     http://sourceforge.net/svn/?group_id=72485
+
+   The repository of the E-Cell 3.1 series is located in:
+
+     http://ecell.svn.sourceforge.net/svnroot/ecell/ecell3/branches/ecell-3.1
+
+   The breeding edge version (head revision) of E-Cell can be fetched from
+   the following:
+
+     http://ecell.svn.sourceforge.net/svnroot/ecell/ecell3/trunk
+
+   Note that the head is less likely to work in your environment since
+   it is always under heavy development.
+
+
+Supported Systems
+=================
+
+Will work in most modern Unix-like systems. Windows build is now supported
+with a separate build system that resides under build/msvc.
+
+
+Building Prerequisite
+=====================
+
+1. GNU compiler collections (version 3.1 or later)
+
+  http://gcc.gnu.org/
+
+2. Python version 2.3 or later
+
+  http://www.python.org/
+
+3. Boost C++ libraries (version 1.33.0 or later)
+
+  http://www.boost.org/
+
+4. GNU scientific library (GSL) (version 1.8 or later)
+
+  http://www.gnu.org/software/gsl/
+
+5. NumPy (version 1.0 or later, >= 1.0.3 is recommended)
+
+  http://numpy.scipy.org/
+
+6. Ply (version 2.1 or later)
+
+  http://www.dabeaz.com/ply/
+
+7. (optional) PyGTK (version 2.4 or later, >= 2.6 is recommended)
+   -- only needed to build GUI frontends. 
+
+  http://www.pygtk.org/
+
+  Notes:
+
+  * Glade support is also needed to get the frontend to work, so
+    libglade of a version that satisifies the PyGTK requisuite
+    has to be installed beforehand.
+
+  * if you wish to use E-Cell on a headless environment, specify
+    ``--disable-gui`` option to configure script.  Otherwise
+    configure will fail with an error in the check of PyGTK installation.
+
+8. (optional) GNOME-Python (version 2.0 or later, >= 2.6 is recommended)
+   -- only needed to build GUI frontends. 
+
+  http://www.pygtk.org/
+
+9. (optional) libsbml (version 2.x) -- needed for SBML support.
+
+  http://sourceforge.net/projects/sbml
+
+  At the time of writing the latest version of the 2.x series is 2.3.5.
+
+  libsbml 3.x series are not supported due to significant API differences.
+
+10. (optional) doxygen -- neeeded to generate API reference
+
+  http://www.stack.nl/~dimitri/doxygen/
+
+  The documentation is currently incomplete.
+
+11. (optional) docbook-tools -- needed to generate users manual
+
+  http://sources.redhat.com/docbook-tools/
+
+  In debian and its derivatives, it is provided as docbook-utils package.
+
+Install
+=======
+
+1. ./configure [--prefix=...] [--...]
+2. make
+3. make install
+
+  NOTE:
+  you need to run ./autogen.sh before running configure in case you have
+  obtained the source from the repository.
+
+You may find the following configure options are useful.
+
+  ``--with-boost-python-libname=LIBNAME``
+     Specify the library name (the portion of the file name with
+     the `lib` prefix and the extension removed) of the Boost.Python,
+     which falls back to `boost_python`.
+ 
+  ``--disable-gui``
+     Specify this when you do not want GUI frontend.
+
+
+$Id$
+
