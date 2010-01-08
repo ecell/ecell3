@@ -469,6 +469,8 @@ class BifurcationWindow( OsogoPluginWindow ):
                     x = session.theSimulator.getEntityProperty( fullpn )
                     data = numpy.array( [ value, x ] )
                     result[ fullpn ][ 1 ].append( data )
+
+                yield True
                 continue
 
             session.run( duration )
