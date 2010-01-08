@@ -59,7 +59,7 @@ def getJacobianMatrix( pathwayProxy ):
     velocityBuffer = numpy.zeros( size, float )
 
     aSession = pathwayProxy.theEmlSupport.createSession()
-    aSession.step()
+    aSession.theSimulator.initialize()
     
     for i in range( size ):
         velocityBuffer[ i ] = aSession.theSimulator.getEntityProperty( variableList[ i ] + ':Velocity' )
@@ -73,7 +73,7 @@ def getJacobianMatrix( pathwayProxy ):
         aPerturbation = value * RELATIVE_PERTURBATION + ABSOLUTE_PERTURBATION
         aSession.theSimulator.setEntityProperty( variableList[ i ] + ':Value', value + aPerturbation )
 
-        aSession.step()
+        aSession.theSimulator.initialize()
 
         for j in range( size ):
             aJacobianMatrix[ j ][ i ] = ( aSession.theSimulator.getEntityProperty( variableList[ j ] + ':Velocity' ) - velocityBuffer[ j ] ) / aPerturbation 
@@ -103,7 +103,7 @@ def getJacobianMatrix2( pathwayProxy ):
 
     aSession = pathwayProxy.theEmlSupport.createSession()
 
-    aSession.step()
+    aSession.theSimulator.initialize()
     for i in range( size ):
         velocityBuffer[ i ] = aSession.theSimulator.getEntityProperty( variableList[ i ] + ':Velocity' )
 
@@ -119,7 +119,7 @@ def getJacobianMatrix2( pathwayProxy ):
             perturbationList.append( aPerturbation )
             aSession.theSimulator.setEntityProperty( fullPN, value + aPerturbation )
 
-        aSession.step()
+        aSession.theSimulator.initialize()
 
         for c in range( len( groupList ) ):
             i = groupList[ c ]

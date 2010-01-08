@@ -60,7 +60,7 @@ def getElasticityArray( pathwayProxy, fullPN ):
     elasticityArray = numpy.zeros( size, float )
     
     aSession = pathwayProxy.theEmlSupport.createSession()
-    aSession.step()
+    aSession.theSimulator.initialize()
     for i in range( size ):
         elasticityArray[ i ] = aSession.theSimulator.getEntityProperty( processList[ i ] + ':Activity' )
     
@@ -71,7 +71,7 @@ def getElasticityArray( pathwayProxy, fullPN ):
     aPerturbation = RELATIVE_PERTURBATION * value + ABSOLUTE_PERTURBATION
 
     aSession.theSimulator.setEntityProperty( fullPN, value + aPerturbation )
-    aSession.step()
+    aSession.theSimulator.initialize()
 
     for c in range( size ):
         elasticityArray[ c ] = ( aSession.theSimulator.getEntityProperty( processList[ c ] + ':Activity' ) - elasticityArray[ c ] ) / aPerturbation
@@ -102,7 +102,7 @@ def getAcculateElasticityArray( pathwayProxy, fullPN ):
     aPerturbation = RELATIVE_PERTURBATION * value + ABSOLUTE_PERTURBATION
 
     aSession.theSimulator.setEntityProperty( fullPN, value - 2.0 * aPerturbation )
-    aSession.step()
+    aSession.theSimulator.initialize()
 
     for c in range( size ):
         elasticityArray[ c ] = aSession.theSimulator.getEntityProperty( processList[ c ] + ':Activity' )
@@ -110,21 +110,21 @@ def getAcculateElasticityArray( pathwayProxy, fullPN ):
     # second step    
     aSession = pathwayProxy.theEmlSupport.createSession()
     aSession.theSimulator.setEntityProperty( fullPN, value - aPerturbation )
-    aSession.step()
+    aSession.theSimulator.initialize()
     for c in range( size ):
         elasticityArray[ c ] -= 8.0 * aSession.theSimulator.getEntityProperty( processList[ c ] + ':Activity' )
 
     # third step    
     aSession = pathwayProxy.theEmlSupport.createSession()
     aSession.theSimulator.setEntityProperty( fullPN, value + aPerturbation )
-    aSession.step()
+    aSession.theSimulator.initialize()
     for c in range( size ):
         elasticityArray[ c ] += 8.0 * aSession.theSimulator.getEntityProperty( processList[ c ] + ':Activity' )
 
     # last(fourth) step
     aSession = pathwayProxy.theEmlSupport.createSession()
     aSession.theSimulator.setEntityProperty( fullPN, value + 2.0 * aPerturbation )
-    aSession.step()
+    aSession.theSimulator.initialize()
     for c in range( size ):
         elasticityArray[ c ] -= aSession.theSimulator.getEntityProperty( processList[ c ] + ':Activity' )
 
@@ -177,7 +177,7 @@ def convertToScaled( pathwayProxy, fullPN, elasticityArray ):
     except:
         value = aSession.theSimulator.getEntityProperty( fullPN )
 
-    aSession.step()
+    aSession.theSimulator.initialize()
 
     for i in range( size ):
 
@@ -315,7 +315,7 @@ def getEpsilonElasticityMatrix2( pathwayProxy ):
 
     aSession = pathwayProxy.theEmlSupport.createSession()
 
-    aSession.step()
+    aSession.theSimulator.initialize()
     for i in range( len( processList ) ):
         activityBuffer[ i ] = aSession.theSimulator.getEntityProperty( processList[ i ] + ':Activity' )
     
@@ -331,7 +331,7 @@ def getEpsilonElasticityMatrix2( pathwayProxy ):
             perturbationList.append( aPerturbation )
             aSession.theSimulator.setEntityProperty( fullPN, value + aPerturbation )
 
-        aSession.step()
+        aSession.theSimulator.initialize()
 
         for c in range( len( groupList ) ):
             i = groupList[ c ]
