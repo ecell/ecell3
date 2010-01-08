@@ -556,7 +556,7 @@ namespace libecs
     // this must be after Variable::integrate()
     Real const aStepInterval( getStepInterval() );
     setCurrentTime( aTime );
-    setNextTime( aTime + aStepInterval );
+    theNextTime = aTime + aStepInterval;
   }
 
 

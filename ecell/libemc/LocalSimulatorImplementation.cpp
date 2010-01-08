@@ -574,13 +574,15 @@ namespace libemc
 
     start();
 
-    const libecs::Real aStopTime( getModel().getCurrentTime() + aDuration );
+    const libecs::Real aCurrentTime( getModel().getCurrentTime() );
+    const libecs::Real aStopTime( aCurrentTime + aDuration );
 
     // setup SystemStepper to step at aStopTime
 
     //FIXME: dirty, ugly!
     StepperPtr aSystemStepper( getModel().getSystemStepper() );
-    aSystemStepper->setCurrentTime( aStopTime );
+    aSystemStepper->setCurrentTime( aCurrentTime );
+    aSystemStepper->setNextTime( aStopTime );
 
     getModel().getScheduler().updateEvent( 0, aStopTime );
 
@@ -610,7 +612,7 @@ namespace libemc
 		stop();
 		return;
 	      }
-	    
+
 	    getModel().step();
 
 	    --aCounter;
@@ -634,7 +636,6 @@ namespace libemc
 	  }
 
 	getModel().step();
-
       }	while( 1 );
 
   }
