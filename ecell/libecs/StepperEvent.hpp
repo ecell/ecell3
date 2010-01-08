@@ -34,60 +34,30 @@
 
 #include "libecs/Defs.hpp"
 #include "libecs/Stepper.hpp"
+#include "libecs/EventScheduler.hpp"
 
 namespace libecs
 {
 
 DECLARE_CLASS( StepperEvent );
 
-class StepperEvent: public EventBase
+class LIBECS_API StepperEvent: public EventBase
 {
 public:
-    StepperEvent( TimeParam aTime, StepperPtr aStepperPtr )
-        : EventBase( aTime ),
-          theStepper( aStepperPtr )
-    {
-        ; // do nothing
-    }
+    StepperEvent( TimeParam aTime, Stepper* aStepperPtr );
 
+    void fire();
 
-    void fire()
-    {
-        theStepper->integrate( getTime() );
-        theStepper->step();
-        theStepper->log();
+    void update( TimeParam aTime );
 
-        reschedule();
-    }
+    void reschedule();
 
+    const bool isDependentOn( StepperEventCref anEvent ) const;
 
-    void update( TimeParam aTime )
-    {
-        theStepper->interrupt( aTime );
-
-        reschedule();
-    }
-
-
-    void reschedule()
-    {
-        const Time aLocalTime( theStepper->getCurrentTime() );
-        const Time aNewStepInterval( theStepper->getStepInterval() );
-        setTime( aNewStepInterval + aLocalTime );
-    }
-
-
-    const bool isDependentOn( StepperEventCref anEvent ) const
-    {
-        return theStepper->isDependentOn( anEvent.getStepper() );
-    }
-
-
-    const StepperPtr getStepper() const
+    Stepper* getStepper() const
     {
         return theStepper;
     }
-
 
     /**
        this method is basically used in initializing and rescheduling 
@@ -163,7 +133,7 @@ public:
 
 private:
 
-    StepperPtr theStepper;
+    Stepper* theStepper;
 
 };
 } // namespace libecs

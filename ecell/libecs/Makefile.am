@@ -53,7 +53,8 @@ LoggerAdapter.cpp\
 PhysicalLogger.cpp\
 VariableReference.cpp\
 LoggerBroker.cpp\
-Exceptions.cpp
+Exceptions.cpp\
+StepperEvent.cpp
 
 
 libecsdir=$(ECELL_INCLUDE_DIR)/libecs
