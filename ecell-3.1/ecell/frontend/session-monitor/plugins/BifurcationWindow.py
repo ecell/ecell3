@@ -105,7 +105,8 @@ class BifurcationWindow( OsogoPluginWindow ):
         if self.theSession.theModelWalker != None:
             self.removeRawFullPNList( 
                 [ fullpn for fullpn in self.getRawFullPNList() 
-                  if not fullpn in self.getDefaultFullPNList() ] )
+                  if not createFullPNString( fullpn )
+                  in self.getDefaultFullPNList() ] )
             self.__updatePropertyTree()
             self.__updatePropertyBox()
 
