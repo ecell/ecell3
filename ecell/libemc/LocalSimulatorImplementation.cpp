@@ -483,12 +483,13 @@ namespace libemc
     return aVector;
   }
 
-  void LocalSimulatorImplementation::initialize() const
+  void LocalSimulatorImplementation::initialize()
   {
     // calling the model's initialize(), which is non-const,
     // is semantically a const operation at the simulator level.
     const_cast<LocalSimulatorImplementation*>( this )->
       getModel().initialize();
+	theDirtyFlag = false;
   }
 
   const libecs::Real LocalSimulatorImplementation::getCurrentTime() const

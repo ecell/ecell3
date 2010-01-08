@@ -204,6 +204,8 @@ namespace libemc
 
     virtual const libecs::Polymorph getDMInfo() = 0;
 
+    virtual void initialize() = 0; 
+
   };   //end of class Simulator
 
   /** @} */ //end of libemc_module 

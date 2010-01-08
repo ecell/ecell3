@@ -632,6 +632,8 @@ BOOST_PYTHON_MODULE( _ecs )
 	  &PySimulator::setEventChecker )
     .def( "setEventHandler",
 	  &PySimulator::setEventHandler )
+    .def( "initialize",
+      &PySimulator::initialize )
     ;  
 
 }

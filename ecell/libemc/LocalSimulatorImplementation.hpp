@@ -201,6 +201,8 @@ namespace libemc
 
     virtual const libecs::Polymorph getDMInfo();
 
+    virtual void initialize();
+
   protected:
 
     libecs::ModelRef getModel() 
@@ -212,8 +214,6 @@ namespace libemc
     { 
       return theModel; 
     }
-
-    void initialize() const;
 
     libecs::LoggerPtr getLogger( libecs::StringCref aFullPNString ) const;
 
@@ -242,10 +242,7 @@ namespace libemc
     {
       if( isDirty() )
 	{
-	  initialize();
-	  // interruptAll();
-	  
-	  theDirtyFlag = false;
+	  const_cast< LocalSimulatorImplementation* >( this )->initialize();
 	}
     }
 
