@@ -478,6 +478,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\ecell\libecs\StepperEvent.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\ecell\libecs\System.cpp"
 				>
 			</File>
