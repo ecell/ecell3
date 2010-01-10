@@ -12,7 +12,7 @@ SAMPLES = \
 	branchG \
 	ga \
 	heatshock \
-	sessionmanager \
+	session_manager \
 	simple \
 	tauleap
 

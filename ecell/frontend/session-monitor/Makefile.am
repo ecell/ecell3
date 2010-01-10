@@ -12,6 +12,7 @@ EXTRA_DIST = \
 	ecell/ui/osogo/ConfirmWindow.py\
 	ecell/ui/osogo/DataGenerator.py\
 	ecell/ui/osogo/EntityListWindow.py\
+	ecell/ui/osogo/FileSelection.py\
 	ecell/ui/osogo/FullPNQueue.py\
 	ecell/ui/osogo/GtkSessionMonitor.py\
 	ecell/ui/osogo/InterfaceWindow.py\

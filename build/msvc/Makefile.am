@@ -12,7 +12,6 @@ EXTRA_DIST=\
 	libemc.vcproj\
 	libltdl.vcproj\
 	pyecell.vcproj\
-	pyecs.vcproj\
 	model-editor.vcproj\
 	session-monitor.vcproj\
 	ecell_config.h\

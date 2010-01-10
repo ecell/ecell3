@@ -20,6 +20,3 @@ EXTRA_DIST = \
 	configure.ac.in
 
 doc_DATA = $(BASIC_DOCS)
-
-dist-hook:
-	cp py-compile $(distdir)

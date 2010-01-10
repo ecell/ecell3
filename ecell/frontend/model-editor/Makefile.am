@@ -34,6 +34,7 @@ EXTRA_DIST = \
 	ecell/ui/model_editor/EntityList.py\
 	ecell/ui/model_editor/EntityListTab.py\
 	ecell/ui/model_editor/Error.py\
+	ecell/ui/model_editor/FileSelection.py \
 	ecell/ui/model_editor/FullIDBrowserWindow.py\
 	ecell/ui/model_editor/GraphicalUtils.py\
 	ecell/ui/model_editor/Layout.py\
