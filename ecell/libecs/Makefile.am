@@ -101,7 +101,8 @@ MethodProxy.hpp\
 EcsObjectMaker.hpp\
 PropertySlotProxyLoggerAdapter.hpp\
 PropertyAttributes.hpp\
-Handle.hpp
+Handle.hpp\
+RealMath.hpp
 
 noinst_HEADERS=\
 osif.h\
