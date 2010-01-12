@@ -840,7 +840,7 @@ PyTypeObject DataPointVectorWrapper< Tdp_ >::Iterator::__class__ = {
 	0,			        /* tp_init */
 	PyType_GenericAlloc,			/* tp_alloc */
 	PyType_GenericNew,			/* tp_new */
-	PyObject_Free,			/* tp_free */
+	PyObject_Del,			/* tp_free */
 };
 
 template< typename Tdp_ >
@@ -884,7 +884,7 @@ PyTypeObject DataPointVectorWrapper< Tdp_ >::__class__ = {
 	0,			/* tp_init */
 	PyType_GenericAlloc,			/* tp_alloc */
 	PyType_GenericNew,			/* tp_new */
-	PyObject_Free,			/* tp_free */
+	PyObject_Del,			/* tp_free */
 };
 
 template< typename Tdp_ >
@@ -1009,7 +1009,7 @@ PyTypeObject STLIteratorWrapper< Titer_ >::__class__ = {
 	0,			        /* tp_init */
 	PyType_GenericAlloc,			/* tp_alloc */
 	PyType_GenericNew,			/* tp_new */
-	PyObject_Free,			/* tp_free */
+	PyObject_Del,			/* tp_free */
 };
 
 
@@ -1105,7 +1105,7 @@ PyTypeObject PropertyAttributesIterator::__class__ = {
 	0,			        /* tp_init */
 	PyType_GenericAlloc,			/* tp_alloc */
 	PyType_GenericNew,			/* tp_new */
-	PyObject_Free,			/* tp_free */
+	PyObject_Del,			/* tp_free */
 };
 
 static std::string VariableReference___str__( VariableReference const* self )
