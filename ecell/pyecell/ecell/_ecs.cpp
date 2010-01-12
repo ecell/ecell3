@@ -830,7 +830,17 @@ PyTypeObject DataPointVectorWrapper< Tdp_ >::Iterator::__class__ = {
 	PyObject_SelfIter,  /* tp_iter */
 	(iternextfunc)&DataPointVectorWrapper::Iterator::__next__,		/* tp_iternext */
 	0,		        	/* tp_methods */
-	0					/* tp_members */
+	0,					/* tp_members */
+	0,                  /* tp_getset */
+	0,					/* tp_base */
+	0,					/* tp_dict */
+	0,					/* tp_descr_get */
+	0,					/* tp_descr_set */
+	0,					/* tp_dictoffset */
+	0,			        /* tp_init */
+	PyType_GenericAlloc,			/* tp_alloc */
+	PyType_GenericNew,			/* tp_new */
+	PyObject_Free,			/* tp_free */
 };
 
 template< typename Tdp_ >
@@ -989,7 +999,17 @@ PyTypeObject STLIteratorWrapper< Titer_ >::__class__ = {
 	PyObject_SelfIter,  /* tp_iter */
 	(iternextfunc)&STLIteratorWrapper::__next__,		/* tp_iternext */
 	0,		        	/* tp_methods */
-	0					/* tp_members */
+	0,					/* tp_members */
+	0,                  /* tp_getset */
+	0,					/* tp_base */
+	0,					/* tp_dict */
+	0,					/* tp_descr_get */
+	0,					/* tp_descr_set */
+	0,					/* tp_dictoffset */
+	0,			        /* tp_init */
+	PyType_GenericAlloc,			/* tp_alloc */
+	PyType_GenericNew,			/* tp_new */
+	PyObject_Free,			/* tp_free */
 };
 
 
@@ -1075,7 +1095,17 @@ PyTypeObject PropertyAttributesIterator::__class__ = {
 	PyObject_SelfIter,  /* tp_iter */
 	(iternextfunc)&PropertyAttributesIterator::__next__,		/* tp_iternext */
 	0,		        	/* tp_methods */
-	0					/* tp_members */
+    0,                  /* tp_members */
+	0,                  /* tp_getset */
+	0,					/* tp_base */
+	0,					/* tp_dict */
+	0,					/* tp_descr_get */
+	0,					/* tp_descr_set */
+	0,					/* tp_dictoffset */
+	0,			        /* tp_init */
+	PyType_GenericAlloc,			/* tp_alloc */
+	PyType_GenericNew,			/* tp_new */
+	PyObject_Free,			/* tp_free */
 };
 
 static std::string VariableReference___str__( VariableReference const* self )
