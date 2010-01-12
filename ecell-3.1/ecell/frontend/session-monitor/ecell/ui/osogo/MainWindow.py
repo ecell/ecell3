@@ -1415,7 +1415,7 @@ class MainWindow(OsogoWindow):
         if self[ 'scaled_cccs' ].get_active():
             data = cStringIO.StringIO()
             writeMatrix( data, scaledCCCMatrix, variableList, processList )
-            info = zipfile.ZipInfo( 'ScaledFCCMatrix.csv' )
+            info = zipfile.ZipInfo( 'ScaledCCCMatrix.csv' )
             info.external_attr = 0644 << 16L
             archive.writestr( info, data.getvalue() )
             data.close()
