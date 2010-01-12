@@ -43,10 +43,7 @@ EXTRA_DIST = \
 	ecell/expressionlextab.py \
 	ecell/expressionparser.py \
 	ecell/expressionparsetab.py \
-	ecell/lex.py \
-	ecell/lextab.py \
 	ecell/util.py \
-	ecell/yacc.py \
 	ecell/_tableio.c \
 	ecell/README.TableIO \
 	ecell/session_manager/Constants.py \
