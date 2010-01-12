@@ -28,9 +28,9 @@
 import os
 import gtk
 import gtk.gdk
-import gtk.glade
 
 from ecell.ui.model_editor.Config import *
+import ecell.ui.model_editor.glade_compat as glade
 
 class Window:
     """The super class of Window class.
@@ -82,9 +82,9 @@ class Window:
         # ------------------------------------------------
         if os.access( os.path.join( GLADEFILE_PATH, self.theGladeFile ), os.R_OK ):
             if self.theRoot != None:
-                self.widgets = gtk.glade.XML( self.theGladeFile, root='top_frame' )
+                self.widgets = glade.XML( self.theGladeFile, root='top_frame' )
             else:
-                self.widgets = gtk.glade.XML( self.theGladeFile, root=None )
+                self.widgets = glade.XML( self.theGladeFile, root=None )
         else:
             raise IOError( "can't read %s." %self.theGladeFile )
 

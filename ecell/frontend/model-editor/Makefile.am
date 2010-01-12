@@ -81,6 +81,7 @@ EXTRA_DIST = \
 	ecell/ui/model_editor/VariableReferenceEditorComponent.py\
 	ecell/ui/model_editor/ViewComponent.py\
 	ecell/ui/model_editor/Window.py\
+	ecell/ui/model_editor/glade_compat.py\
 	ecell/ui/model_editor/opengui.py
 
 EXTRA_DIST +=\

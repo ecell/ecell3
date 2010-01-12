@@ -35,6 +35,7 @@ EXTRA_DIST = \
 	ecell/ui/osogo/Window.py\
 	ecell/ui/osogo/__init__.py\
 	ecell/ui/osogo/config.py\
+	ecell/ui/osogo/glade_compat.py\
 	ecell/ui/osogo/main.py\
 	ecell/ui/osogo/opengui.py
 

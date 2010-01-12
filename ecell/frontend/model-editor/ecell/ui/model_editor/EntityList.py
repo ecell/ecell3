@@ -35,7 +35,6 @@ import os
 import os.path
 import gtk
 import gtk.gdk
-import gtk.glade
 import gobject
 
 from ecell.ui.model_editor.Config import *

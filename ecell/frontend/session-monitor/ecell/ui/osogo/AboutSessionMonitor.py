@@ -26,13 +26,12 @@
 #END_HEADER
 
 import gtk
-import gtk.glade
 import os
 import gtk.gdk
 
 import ecell.ui.osogo.config as config
 from ecell.ui.osogo.MainWindow import *
-
+import ecell.ui.osogo.glade_compat as glade
 
 class AboutSessionMonitor:
 	
@@ -49,7 +48,7 @@ class AboutSessionMonitor:
 		self.theMainWindow = aMainWindow	
 		
 		filename = os.path.join( config.GLADEFILE_PATH, "AboutSessionMonitor.glade" )
-		widgets=gtk.glade.XML(filename,"attachment_box")
+		widgets = glade.XML(filename,"attachment_box")
 		att_box = widgets.get_widget("attachment_box")
 
 		# Create the Dialog

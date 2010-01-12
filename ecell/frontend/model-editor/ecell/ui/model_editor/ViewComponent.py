@@ -29,10 +29,10 @@ import os
 
 import gtk
 import gtk.gdk
-import gtk.glade
 
 from ecell.ui.model_editor.Config import *
 from ecell.ui.model_editor.Constants import *
+import ecell.ui.model_editor.glade_compat as glade
 
 class ViewComponent:
     """The super class of Component class.
@@ -72,7 +72,7 @@ class ViewComponent:
         # checks and loads glade file
         # ------------------------------------------------
         if os.access( os.path.join( GLADEFILE_PATH, self.theGladeFile ), os.R_OK ):
-                self.widgets = gtk.glade.XML( self.theGladeFile, root=anAttachment )
+                self.widgets = glade.XML( self.theGladeFile, root=anAttachment )
         else:
             raise IOError( "can't read %s." %self.theGladeFile )
         

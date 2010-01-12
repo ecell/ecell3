@@ -35,7 +35,6 @@ import os
 
 import gtk
 import gtk.gdk
-import gtk.glade
 
 from ecell.ui.osogo.Window import *
 
