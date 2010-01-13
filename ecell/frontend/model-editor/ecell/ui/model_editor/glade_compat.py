@@ -42,7 +42,8 @@ try:
             conv.parse_file(fname)
             cwd = os.getcwd()
             os.chdir(os.path.dirname(fname))
-            self.builder.add_from_string(conv.to_xml())
+            xml = conv.to_xml()
+            self.builder.add_from_string(xml, len(xml))
             os.chdir(cwd)
 
         def signal_connect(self, handler_name, func):
