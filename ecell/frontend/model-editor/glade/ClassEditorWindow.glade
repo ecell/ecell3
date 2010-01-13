@@ -339,7 +339,7 @@
 				  <property name="enable_arrow_keys">True</property>
 				  <property name="enable_arrows_always">False</property>
 
-				  <child internal-child="entry">
+				  <child>
 				    <widget class="GtkEntry" id="combo-entry1">
 				      <property name="visible">True</property>
 				      <property name="can_focus">True</property>
@@ -353,7 +353,7 @@
 				    </widget>
 				  </child>
 
-				  <child internal-child="list">
+				  <child>
 				    <widget class="GtkList" id="combo-list1">
 				      <property name="visible">True</property>
 				      <property name="selection_mode">GTK_SELECTION_BROWSE</property>
@@ -625,7 +625,7 @@
 				  <property name="enable_arrow_keys">True</property>
 				  <property name="enable_arrows_always">False</property>
 
-				  <child internal-child="entry">
+				  <child>
 				    <widget class="GtkEntry" id="combo-entry2">
 				      <property name="visible">True</property>
 				      <property name="can_focus">True</property>
@@ -639,7 +639,7 @@
 				    </widget>
 				  </child>
 
-				  <child internal-child="list">
+				  <child>
 				    <widget class="GtkList" id="combo-list2">
 				      <property name="visible">True</property>
 				      <property name="selection_mode">GTK_SELECTION_BROWSE</property>
@@ -876,7 +876,7 @@
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
   <property name="show_fileops">True</property>
 
-  <child internal-child="cancel_button">
+  <child>
     <widget class="GtkButton" id="cancel_button1">
       <property name="visible">True</property>
       <property name="can_default">True</property>
@@ -886,7 +886,7 @@
     </widget>
   </child>
 
-  <child internal-child="ok_button">
+  <child>
     <widget class="GtkButton" id="ok_button1">
       <property name="visible">True</property>
       <property name="can_default">True</property>

@@ -10,7 +10,7 @@
 #
 # E-Cell System is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public
-# License as published by the Free Software Foundation; either
+#print  License as published by the Free Software Foundation; either
 # version 2 of the License, or (at your option) any later version.
 # 
 # E-Cell System is distributed in the hope that it will be useful,
@@ -31,6 +31,7 @@ __all__ = [
 
 try:
     from gtk import Builder, Action
+    from warnings import warn
     import os
 
     class XML(object):
@@ -277,7 +278,7 @@ try:
             for node in objects:
                 self._convert(node.getAttribute("class"), node)
                 if self._get_object(node.getAttribute('id')) is not None:
-                    print "WARNING: duplicate id \"" + node.getAttribute('id') + "\""
+                    warn("duplicate id \"" + node.getAttribute('id') + "\"")
                     self.objects[node.getAttribute('id')] = node
 
             # Convert Gazpachos UI tag
@@ -462,8 +463,8 @@ try:
                 if signal_name in ['activate', 'toggled']:
                     action.appendChild(signal)
                 else:
-                    print 'Unhandled signal %s::%s' % (node.getAttribute('class'),
-                                                       signal_name)
+                    warn('Unhandled signal %s::%s' % (node.getAttribute('class'),
+                                                       signal_name))
 
             if not uimgr.childNodes:
                 child = self._dom.createElement('child')
@@ -482,8 +483,8 @@ try:
             for accelerator in get_accelerator_nodes(node):
                 signal_name = accelerator.getAttribute('signal')
                 if signal_name != 'activate':
-                    print 'Unhandled accelerator signal for %s::%s' % (
-                        node.getAttribute('class'), signal_name)
+                    warn('Unhandled accelerator signal for %s::%s' % (
+                        node.getAttribute('class'), signal_name))
                     continue
                 accelerator.removeAttribute('signal')
                 child.appendChild(accelerator)

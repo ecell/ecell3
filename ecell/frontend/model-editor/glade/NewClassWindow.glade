@@ -167,7 +167,7 @@
 			  <property name="enable_arrow_keys">True</property>
 			  <property name="enable_arrows_always">False</property>
 
-			  <child internal-child="entry">
+			  <child>
 			    <widget class="GtkEntry" id="combo-entry1">
 			      <property name="width_request">210</property>
 			      <property name="visible">True</property>
@@ -182,7 +182,7 @@
 			    </widget>
 			  </child>
 
-			  <child internal-child="list">
+			  <child>
 			    <widget class="GtkList" id="combo-list1">
 			      <property name="visible">True</property>
 			      <property name="selection_mode">GTK_SELECTION_BROWSE</property>
