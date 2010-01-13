@@ -426,9 +426,9 @@ def createListleft( t ):
         return [t[1]]
 
 
-def initializePLY():
-    lex.lex(lextab=LEXTAB, optimize=1)
-    yacc.yacc(tabmodule=PARSERTAB)
+def initializePLY(outputdir):
+    lex.lex(lextab=LEXTAB, optimize=1, outputdir=dir)
+    yacc.yacc(tabmodule=PARSERTAB, outputdir=dir)
 
 def convertEm2Eml( anEmFileObject, debug=0 ):
 
@@ -548,7 +548,4 @@ class Preprocessor:
         
         self.interpreter.shutdown()
 
-
-if __name__ == '__main__':
-    initializePLY()
 
