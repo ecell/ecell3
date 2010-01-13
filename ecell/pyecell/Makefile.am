@@ -37,9 +37,7 @@ EXTRA_DIST = \
 	ecell/ecssupport.py \
 	ecell/em.py \
 	ecell/eml.py \
-	ecell/emlextab.py \
 	ecell/emparser.py \
-	ecell/emparsetab.py \
 	ecell/expressionlextab.py \
 	ecell/expressionparser.py \
 	ecell/expressionparsetab.py \
