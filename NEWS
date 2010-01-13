@@ -1,4 +1,4 @@
-ecell-3.2: ?-Nov-2008
+ecell-3.2.0RC1: 13-Jan-2009
  
  * A few cosmetic changes
 
@@ -146,6 +146,9 @@ ecell-3.2: ?-Nov-2008
 
  * pyecell changes
 
+   - Added ecell._ecs.addPythonDM() that enables an user to implement one's own
+     DMs in Python.
+
    - ecell._ecs.Simulator.getLoggerData() now returns
      ecell._ecs.DataPointSharedVector instead of
      numpy.core.multiarray.array(). The object can be safely fed to numpy
@@ -157,6 +160,7 @@ ecell-3.2: ?-Nov-2008
      - ecell._ecs.Logger
      - ecell._ecs.LoggerPolicy
      - ecell._ecs.PropertyAttributes
+     - ecell._ecs.AbstractSimulator
 
    - ecell._ecs.Simulator.setEventChecker() was removed as per the dismissal of
      the concept of event checker.  Instead, an event handler must return a
@@ -167,6 +171,63 @@ ecell-3.2: ?-Nov-2008
 
    - Added two class constants ELLIPSIS and ELLIPSIS_PREFIX to
      ecell._ecs.Simulator.
+
+
+ecell-3.1.108RC1: 13-Jan-2010
+
+ * Refactored differential steppers so that they give accurate results on
+   the step right after the (re)start.  A new virtual method
+   DifferentialStepper::updateInternalState() was added to accomplish this,
+   and therefore backwards binary compatibility was lost as for Steppers' DMs.
+
+ * Unbundled ply as it's pretty obsolete.  Users must install it beforehand.
+
+ * Switched to gtk.Builder from gtk.glade.XML.
+
+
+ecell-3.1.107: 4-Jul-2009
+
+ * Added new API functions, libecs::issueWarning() and
+   libecs::setWarningHandler() that can be used to report a warning to the
+   frontend from within a dynamic module.
+
+ * Deprecated Stepper's "MaxStepInterval" property as it doesn't make much
+   sense.
+
+ * Added a new property "TolerableRejectedStepCount" to DifferentialStepper
+   (i.e. ODEStepper and its siblings) that specifies the maximum torelable
+   count of rejected steps.
+
+ * Fixed a bug in ODEStepper that causes SIGABRT under the circumstances
+   no processes are associated to the stepper. Noticed by Sachio Nohara.
+   Thanks.
+
+ * Patched libltdl so it would not be interfered by the newer versions of
+   libtool.
+
+ * Migrated to libsbml 3.x.  SBML to EML and EML to SBML converter are now
+   officially confirmed to work with it.
+
+ * Changed ecell3-session-monitor so that it would never change the current
+   working directory to the one the model file is located.
+   Patch by Michele Mattioni.  Thanks.
+
+ * Console class in the ecell3-session-manager script insensibly imports
+   the attributes of a SessionManager instance into the global scope, which
+   turned out to obstruct the definition of classes in the user script.
+   Noticed by Giuseppe Aprea.  Thanks.
+
+
+ecell-3.1.107RC4: 5-Apr-2009
+
+ * Resource files required by the frontends (session monitor and model editor)
+   were completely missing in the tarballs due to the errors in Makefile.
+   Noticed by 김한조.  Thanks.
+
+ * Console class in the ecell3-session-manager script insensibly imports
+   the attributes of a SessionManager instance into the global scope, which
+   turned out to obstruct the definition of classes in the user script.
+   Noticed by Giuseppe Aprea.  Thanks.
 
 
 ecell-3.1.107RC3: 11-Mar-2009
