@@ -104,7 +104,6 @@ bin_dir = '''@bindir@'''
 bin_dir = expand_shell_variables( bin_dir, locals() )
 if len( bin_dir ) == 0 or not os.path.isdir( bin_dir ):
     bin_dir = os.path.join( prefix, 'bin' )
-bin_dir = os.path.join( bin_dir, per_app_dir_name  )
 
 _lib_dir = '''@libdir@'''
 _lib_dir = expand_shell_variables( _lib_dir, locals() )
