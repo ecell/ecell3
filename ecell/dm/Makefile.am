@@ -50,7 +50,7 @@ DMH = \
 	ExpressionProcessBase.hpp \
 	GillespieProcess.hpp \
 	GillespieProcessInterface.hpp \
-	QuasiDynamicFluxProcess.hpp
+	QuasiDynamicFluxProcess.hpp \
 	QuasiDynamicFluxProcessInterface.hpp
 
 SOS = \
