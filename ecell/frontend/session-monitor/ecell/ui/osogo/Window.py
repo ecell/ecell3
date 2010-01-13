@@ -39,9 +39,9 @@ import os
 
 import gtk
 import gtk.gdk
-import gtk.glade
 
 from ecell.ui.osogo.config import *
+import ecell.ui.osogo.glade_compat as glade
 
 class Window:
     """The super class of Window class.
@@ -72,9 +72,9 @@ class Window:
         # ------------------------------------------------
         if os.access( self.gladeFile, os.R_OK ):
             if self.rootWidget != None:
-                self.widgets = gtk.glade.XML( self.gladeFile, root= str( self.rootWidget ) )
+                self.widgets = glade.XML( self.gladeFile, root= str( self.rootWidget ) )
             else:
-                self.widgets = gtk.glade.XML( self.gladeFile, root= None )
+                self.widgets = glade.XML( self.gladeFile, root= None )
         else:
             raise IOError( "can't read %s." %self.gladeFile )
         
