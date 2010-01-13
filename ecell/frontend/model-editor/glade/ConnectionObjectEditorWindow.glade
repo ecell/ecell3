@@ -20,7 +20,7 @@
       <property name="homogeneous">False</property>
       <property name="spacing">0</property>
 
-      <child internal-child="action_area">
+      <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox1">
 	  <property name="visible">True</property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>

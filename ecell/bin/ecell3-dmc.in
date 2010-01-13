@@ -80,9 +80,9 @@ def main():
     # get options and arguments
     # -------------------------------------
     try:
-        opts , args = getopt.getopt( sys.argv[1:], "hv",
+        opts , args = getopt.getopt( sys.argv[1:], "hvo",
                 ["help", "verbose", "no-stdinclude","no-stdlibdir", "ldflags=",
-                 "cxxflags=", "no-define-cxxflags=", "dmcompile="])
+                 "cxxflags=", "no-define-cxxflags=", "dmcompile=", "output="])
     except:
         help()
         sys.exit( 1 ) 
@@ -94,6 +94,7 @@ def main():
     LDFLAGS = []
     CXXFLAGS = []
     CXXCOMPILEFLAGS = []
+    OUTPUT = None
     cmdList = []
     dmcompile = DMCOMPILE
 
@@ -139,6 +140,9 @@ def main():
             else:
                 dmcompile = anArg
 
+        if anOption in ( "-o", "--output" ):
+            OUTPUT = anArg
+
     # check if source file is given
     if len( args ) < 1:
         help()
@@ -149,6 +153,9 @@ def main():
 
     if VERBOSE:
         cmdList.append( '-v' )
+
+    if OUTPUT is not None:
+        cmdList += [ '-o', OUTPUT ]
 
     # on MS-Windows, command line doesn't expand *.cpp automatically
     srcs = reduce( operator.add, map( glob, args ) )
