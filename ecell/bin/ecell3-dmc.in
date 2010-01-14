@@ -80,7 +80,7 @@ def main():
     # get options and arguments
     # -------------------------------------
     try:
-        opts , args = getopt.getopt( sys.argv[1:], "hvo",
+        opts , args = getopt.getopt( sys.argv[1:], "hvo:",
                 ["help", "verbose", "no-stdinclude","no-stdlibdir", "ldflags=",
                  "cxxflags=", "no-define-cxxflags=", "dmcompile=", "output="])
     except:
