@@ -427,8 +427,10 @@ def createListleft( t ):
 
 
 def initializePLY(outputdir):
-    lex.lex(lextab=LEXTAB, optimize=1, outputdir=outputdir)
-    yacc.yacc(tabmodule=PARSERTAB, outputdir=outputdir)
+    lextabmod = LEXTAB.split('.')
+    parsertabmod = PARSERTAB.split('.')
+    lex.lex( lextab=lextabmod[-1], optimize=1, outputdir=os.path.join( outputdir,*lextabmod[:-1] ) )
+    yacc.yacc( tabmodule=parsertabmod[-1], outputdir=os.path.join( outputdir, *parsertabmod[:-1] ) )
 
 def convertEm2Eml( anEmFileObject, debug=0 ):
 

@@ -39,13 +39,16 @@ __author__ = 'Tatsuya Ishida'
 __copyright__ = 'Copyright (C) 2002-2009 Keio University'
 __license__ = 'GPL'
 
+LEXTAB = "ecell.expressionlextab"
+PARSERTAB = "ecell.expressionparsetab"
 
-import string
+
+import os
 import types
 
 # import the lex and yacc
-import lex
-import yacc
+import ply.lex as lex
+import ply.yacc as yacc
 
 #import libsbml
 
@@ -309,15 +312,11 @@ def p_error(t):
 
 
 
-def initializePLY():
-    lextabname = "expressionlextab"
-    yacctabname = "expressionparsetab"
-
-    lex.lex( lextab=lextabname, optimize=1 )
-    #lex.lex()
-
-    yacc.yacc( tabmodule=yacctabname )
-    #return yacc.yacc()
+def initializePLY(outputdir):
+    lextabmod = LEXTAB.split('.')
+    parsertabmod = PARSERTAB.split('.')
+    lex.lex( lextab=lextabmod[-1], optimize=1, outputdir=os.path.join( outputdir,*lextabmod[:-1] ) )
+    yacc.yacc( tabmodule=parsertabmod[-1], outputdir=os.path.join( outputdir, *parsertabmod[:-1] ) )
 
 
 def isID_Namespace( aVariableID ):
@@ -399,6 +398,3 @@ def convertExpression( anExpression, aVariableReferenceListObject, aReactionPath
 
     return [ aParser.parse( anExpression, lexer=aLexer, debug=debug ),
              aDelayFlag ]
-
-if __name__ == '__main__':
-    initializePLY()

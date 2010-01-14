@@ -47,6 +47,7 @@ def ply_generation_hook(builder):
     old_path = sys.path
     sys.path[0:0] = builder.build_lib
     __import__('ecell.emparser').emparser.initializePLY(builder.build_lib)
+    __import__('ecell.expressionparser').emparser.initializePLY(builder.build_lib)
     sys.path = old_path
 
 old_setup = core.old_setup
