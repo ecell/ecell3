@@ -3,7 +3,10 @@
 import os
 import sys
 import numpy.distutils.core as core
-from numpy.distutils.numpy_distribution import NumpyDistribution
+try:
+    from numpy.distutils.numpy_distribution import NumpyDistribution
+except:
+    from distutils.dist import Distribution as NumpyDistribution
 from numpy.distutils.command.build_py import build_py as _build_py
 from types import *
 
