@@ -39,16 +39,20 @@ class build_py(_build_py):
         _build_py.initialize_options(self)
         self.generation_hooks = self.distribution.generation_hooks
 
-    def build_modules(self):
-        _build_py.build_modules(self)
+    def byte_compile(self, *arg, **kwarg):
+        self.generate_modules()
+        _build_py.byte_compile(self, *arg, **kwarg)
+
+    def generate_modules(self):
         if self.generation_hooks:
-            for hook in self.generated_modules:
+            for hook in self.generation_hooks:
                 hook(self)
 
 def ply_generation_hook(builder):
     old_path = sys.path
     sys.path[0:0] = builder.build_lib
     __import__('ecell.emparser').emparser.initializePLY(builder.build_lib)
+    __import__('ecell.expressionparser').emparser.initializePLY(builder.build_lib)
     sys.path = old_path
 
 old_setup = core.old_setup

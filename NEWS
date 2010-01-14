@@ -1,3 +1,12 @@
+ecell-3.1.108RC2: 15-Jan-2010
+
+ * Fixed ecell3-dmc so that it accepts -o (--output=) option so that users
+   can specify extra object files to the command line as well.
+
+ * Resuscitate ecell3-session-monitor which stopped working due to the
+   migration to gtk.Builder.
+
+
 ecell-3.1.108RC1: 13-Jan-2010
 
  * Refactored differential steppers so that they give accurate results on
