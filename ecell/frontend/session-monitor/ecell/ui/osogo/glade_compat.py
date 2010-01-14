@@ -171,6 +171,7 @@ try:
             self.root = root
             self.root_objects = []
             self.objects = {}
+            self.menuitem_actions = {}
 
         #
         # Public API
@@ -277,8 +278,9 @@ try:
 
             for node in objects:
                 self._convert(node.getAttribute("class"), node)
-                if self._get_object(node.getAttribute('id')) is not None:
-                    warn("duplicate id \"" + node.getAttribute('id') + "\"")
+                prev_obj = self._get_object(node.getAttribute('id'))
+                if self.menuitem_actions.get(prev_obj) is not None:
+                    warn("duplicate id \"%s\" (%s)" % (node.getAttribute('id'), prev_obj.getAttribute("class")))
                     self.objects[node.getAttribute('id')] = node
 
             # Convert Gazpachos UI tag
@@ -458,6 +460,7 @@ try:
             action = self._create_object(name,
                                          object_id,
                                          properties=properties)
+            self.menuitem_actions[object_id] = action
             for signal in get_signal_nodes(node):
                 signal_name = signal.getAttribute('name')
                 if signal_name in ['activate', 'toggled']:
