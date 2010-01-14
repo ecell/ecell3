@@ -125,7 +125,7 @@
 				      <property name="enable_arrow_keys">True</property>
 				      <property name="enable_arrows_always">False</property>
 
-				      <child internal-child="entry">
+				      <child>
 					<widget class="GtkEntry" id="datatype_combo">
 					  <property name="visible">True</property>
 					  <property name="can_focus">True</property>
@@ -139,7 +139,7 @@
 					</widget>
 				      </child>
 
-				      <child internal-child="list">
+				      <child>
 					<widget class="GtkList" id="convertwidget3">
 					  <property name="visible">True</property>
 					  <property name="selection_mode">GTK_SELECTION_BROWSE</property>
