@@ -231,36 +231,36 @@ class MainWindow(OsogoWindow):
         # -------------------------------------
         self.theHandlerMap =  { 
             # menu
-            'load_model_menu_activate'        : self.__openFileSelection,
-            'load_script_menu_activate'       : self.__openFileSelection,
-            'save_model_menu_activate'        : self.__openFileSelection,
+            'load_model_menu_activate'        : self.__openFileDlgForLoadModel,
+            'load_script_menu_activate'       : self.__openFileDlgForLoadScript,
+            'save_model_menu_activate'        : self.__openFileDlgForSaveModel,
             'exit_menu_activate'              : self.__deleted,
             'message_window_menu_activate'    : self.__toggleMessageWindow,
             'entitylist_window_menu_activate' : self.__toggleEntityListWindow,
-            'interface_window_menu_activate'  : self.__displayWindow ,
+            'interface_window_menu_activate'  : self.__displayInterfaceWindow,
             'entity_list_menu_activate'       : self.__createEntityListWindow ,
-            'logger_window_menu_activate'     : self.__displayWindow,
-            'stepper_window_menu_activate'    : self.__displayWindow,
-            'board_window_menu_activate'      : self.__displayWindow,
+            'logger_window_menu_activate'     : self.__displayLoggerWindow,
+            'stepper_window_menu_activate'    : self.__displayStepperWindow,
+            'board_window_menu_activate'      : self.__displayBoardWindow,
             'about_menu_activate'             : self.__displayAbout,
             #sbml
-            'on_import_sbml_activate'         : self.__openFileSelection,
-            'on_export_sbml_activate'         : self.__openFileSelection,
+            'on_import_sbml_activate'         : self.__openFileDlgForImportSBML,
+            'on_export_sbml_activate'         : self.__openFileDlgForExportSBML,
             # toolbars
             'simulation_button_clicked'       : self.__handleSimulation,
             'step_button_clicked'             : self.__stepSimulation,
             
             'on_sec_step_entry_activate'      : self.__setStepSizeOrSec,
             'on_timer_clear_button_clicked'   : self.__clearTimer,
-            'on_load_model_button_clicked'    : self.__openFileSelection,
-            'on_load_script_button_clicked'   : self.__openFileSelection,
-            'on_save_model_button_clicked'    : self.__openFileSelection,
+            'on_load_model_button_clicked'    : self.__openFileDlgForLoadModel,
+            'on_load_script_button_clicked'   : self.__openFileDlgForLoadScript,
+            'on_save_model_button_clicked'    : self.__openFileDlgForSaveModel,
             'on_entitylist_button_clicked'    : self.__createEntityListWindow,
-            'on_logger_button_toggled'        : self.__displayWindow,
+            'on_logger_button_toggled'        : self.__displayLoggerWindow,
             'on_message_togglebutton_toggled' : self.__toggleMessageWindow,
-            'on_stepper_button_toggled'       : self.__displayWindow,
-            'on_interface_button_toggled'     : self.__displayWindow,
-            'on_board_button_toggled'         : self.__displayWindow,
+            'on_stepper_button_toggled'       : self.__displayStepperWindow,
+            'on_interface_button_toggled'     : self.__displayInterfaceWindow,
+            'on_board_button_toggled'         : self.__displayBoardWindow,
             'logo_button_clicked'             : self.__displayAbout,
             'on_timer_button_toggled'         : self.__displayTimer,
             'on_indicator_button_toggled'     : self.__displayIndicator,
@@ -385,41 +385,26 @@ class MainWindow(OsogoWindow):
         self['timer_menu'].set_sensitive(aDataLoadedStatus)
         self['logo_animation_menu'].set_sensitive(aDataLoadedStatus)
 
-    def __openFileSelection( self, *arg ) :
-        """checks argument and calls self.openFileSelection() method.
-        arg[0]  ---  self['load_model_menu'] /
-                self['load_script_menu'] /
-                self['save_model_menu']
+    def __openFileDlgForLoadModel( self, *arg ) :
+        self.openFileDlg('Load','Model')
 
-        Return None
-        [Note]: When the FileSelection is already displayed,
-                moves it to the top of desktop.
-        """
-
-        # checks the length of argument, but this is verbose
-        if len( arg ) < 1:
-            return None
-
-        # when 'Load Model' is selected
-        if arg[0] == self['load_model_menu'] or \
-                   arg[0] == self['load_model_button']:
-            self.openFileSelection('Load','Model')
+    def __openFileDlgForLoadScript( self, *arg ) :
         # when 'Load Script' is selected
-        elif arg[0] == self['load_script_menu'] or \
-                     arg[0] == self['load_script_button']:
-            self.openFileSelection('Load','Script')
-        # when 'Save Model' is selected
-        elif arg[0] == self['save_model_menu'] or \
-                     arg[0] == self['save_model_button']:
-            self.openFileSelection('Save','Model')
-        # when 'Import SBML' is selected
-        elif arg[0] == self['import_sbml']:
-            self.openFileSelection('Load','SBML')
-        # when 'Export SBML' is selected
-        elif arg[0] == self['export_sbml']:
-            self.openFileSelection('Save','SBML')
+        self.openFileDlg('Load','Script')
 
-    def openFileSelection( self, aType, aTarget ) :
+    def __openFileDlgForSaveModel( self, *arg ):
+        # when 'Save Model' is selected
+        self.openFileDlg('Save','Model')
+
+    def __openFileDlgForImportSBML( self, *arg ):
+        # when 'Import SBML' is selected
+        self.openFileDlg('Load','SBML')
+
+    def __openFileDlgForExportSBML( self, *arg ):
+        # when 'Export SBML' is selected
+        self.openFileDlg('Save','SBML')
+
+    def openFileDlg( self, aType, aTarget ) :
         """displays FileSelection 
         aType     ---  'Load'/'Save' (str)
         aTarget   ---  'Model'/'Script'/'SBML' (str)
@@ -1025,41 +1010,20 @@ class MainWindow(OsogoWindow):
         self['timer_menu'].set_active(isActive)
         ( self['timer_button'].get_child() ).set_active(isActive)
 
-    def __displayWindow( self, *arg ):
-        """This method is called, when the menu or buttons on MainWindow is pressed.
-        arg[0]   ---  menu or button
-        Returns None
-        """
-        if self.__button_update:
-            return
+    def __displayLoggerWindow( self, *arg ):
+        self.theSession.toggleWindow('LoggerWindow')
+        self.update()
 
-        # checks the length of argument, but this is verbose
-        if len( arg ) < 1:
-            return None
+    def __displayStepperWindow( self, *arg ):
+        self.theSession.toggleWindow('StepperWindow')
+        self.update()
 
-        # --------------------------------------
-        # LoggerWindow
-        # --------------------------------------
-        # When LoggerWindow is selected
-        if arg[0] == self['logger_button'] or \
-           arg[0] == self['logger_window_menu']:
-            self.theSession.toggleWindow('LoggerWindow')
+    def __displayInterfaceWindow( self, *arg ):
+        self.theSession.toggleWindow('InterfaceWindow')
+        self.update()
 
-        # When StepperWindow is selected
-        elif arg[0] == self['stepper_button'] or \
-             arg[0] == self['stepper_window_menu']:
-            self.theSession.toggleWindow('StepperWindow')
-
-        # When InterfaceWindow is selected
-        elif arg[0] == self['interface_button'] or \
-                     arg[0] == self['interface_window_menu']:
-            self.theSession.toggleWindow('InterfaceWindow')
-
-        # When BoardWindow is selected
-        elif arg[0] == self['board_button'] or \
-             arg[0] == self['board_window_menu']:
-            self.theSession.toggleWindow('BoardWindow')
-
+    def __displayBoardWindow( self, *arg ):
+        self.theSession.toggleWindow('BoardWindow')
         self.update()
 
     def hideMessageWindow( self ):            
@@ -1069,7 +1033,6 @@ class MainWindow(OsogoWindow):
     def showMessageWindow( self ):
         self[ 'messagehandlebox' ].show()
         ( self['message_togglebutton'].get_child() ).set_active(True)
-
 
     def __toggleMessageWindow( self, *arg ) :
         """expands or folds MessageWindow
