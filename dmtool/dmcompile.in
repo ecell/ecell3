@@ -155,18 +155,19 @@ def main():
         for val in opts.macro:
             compiler.define_macro( *( val.split( '=', 1 ) ) )
 
-    objects = []
+    extra_objects = []
+    objects = None
     sources = []
     for i in args:
         _, ext = os.path.splitext(i)
         ext = ext.lower()
         if ext in OBJECT_EXTS:
-            objects.append(i)
+            extra_objects.append(i)
         else:
             sources.append(i)
 
     try:
-        objects += compiler.compile( sources, extra_preargs = shlflags + cxxflags + cppflags )
+        objects = compiler.compile( sources, extra_preargs = shlflags + cxxflags + cppflags )
     except CompileError, e:
         msg( "failed to compile the specified source files: " + repr( e ) )
         return 1 
@@ -185,7 +186,7 @@ def main():
         try:
             compiler.link( output_filename = out,
                     target_desc = compiler.SHARED_OBJECT,
-                    objects = objects,
+                    objects = objects + extra_objects,
                     extra_preargs = ldflags + dlflags,
                     target_lang = 'c++' )
         except LinkError, e:
