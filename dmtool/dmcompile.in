@@ -14,6 +14,8 @@ from distutils.util import split_quoted
 # prefix='@prefix@'
 # exec_prefix='@exec_prefix@'
 # libdir='@libdir@'
+OBJECT_EXTS = ['.so', '.o', '.obj', '.a', '.lib'];
+
 ORIG_CXXFLAGS = '@CXXFLAGS@'
 ORIG_CPPFLAGS = '@CPPFLAGS@'
 ORIG_LDFLAGS = '@LDFLAGS@'
@@ -153,9 +155,18 @@ def main():
         for val in opts.macro:
             compiler.define_macro( *( val.split( '=', 1 ) ) )
 
-    objects = None
+    objects = []
+    sources = []
+    for i in args:
+        _, ext = os.path.splitext(i)
+        ext = ext.lower()
+        if ext in OBJECT_EXTS:
+            objects.append(i)
+        else:
+            sources.append(i)
+
     try:
-        objects = compiler.compile( args, extra_preargs = shlflags + cxxflags + cppflags )
+        objects += compiler.compile( sources, extra_preargs = shlflags + cxxflags + cppflags )
     except CompileError, e:
         msg( "failed to compile the specified source files: " + repr( e ) )
         return 1 
