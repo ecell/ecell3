@@ -58,8 +58,11 @@ ecell-3.2.0RC1: 13-Jan-2009
      - Changed the signature of EcsObject::defaultGetPropertyList() so that it
        returns a StringList by value, not by reference.
 
-     - Added the virtual EcsObject::asString() that provides the description of
+     - Added EcsObject::asString() that provides the description of
        the instance. 
+
+     - Added EcsObject::dispose() that should be called when an EcsObject is
+       no longer necessary but its destruction is not wanted.
 
      - Virtual function definitions are move from LIBECS_DM_OBJECT to
        LIBECS_DM_INIT_STATIC. This means the vtables and typeinfo entries for
@@ -78,18 +81,31 @@ ecell-3.2.0RC1: 13-Jan-2009
 
    - ExpressionCompiler was moved from ecell/dm to ecell/libecs/scripting.
 
-   - Added deleteStepper() to Model.
+   - Added deleteStepper() and deleteEntity() to Model, which enables one
+     to dynamically modify the structure of the model.
 
-   - Entiy:
+   - Entity:
 
      - Removed getFullIDString() from Entity.
 
      - Added asString() to Entity.
 
-   - Procss:
+     - Added detach() to Entity, which allows one to detach an Entity
+       (i.e. remove) from the Model.
+
+   - Process:
 
      - Process::registerVariableReference() was changed to have the same
        signature as the previous version of Process::setVariableReference().
+
+     - Processes now can accept multiple VariableReferences of the same name.
+       They are differentiated with serial numbers.
+
+     - The initialization process was splitted into two phases,
+       Process::preinitialize() and Process::initialize(). preinitialize()
+       are called to all the Processes before any other Entities are
+       initialized through initialize(), and then initialize() are called
+       as well as the other Entities.
 
    - System:
 
@@ -135,14 +151,12 @@ ecell-3.2.0RC1: 13-Jan-2009
 
    - Removed obsolute CompartmentSystem and FluxProcess.
 
- * libemc changes.
+ * libemc changes
 
    - Rename Simulator::isEntityExist() to Simulator::entityExists().
 
    - Remove Simulator::getLoggerMinimumInterval() and
-
-   - Simulator::setLoggerMinimumInterval() in favor of setLoggerPolicy().
-
+     Simulator::setLoggerMinimumInterval() in favor of setLoggerPolicy().
 
  * pyecell changes
 
