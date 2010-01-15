@@ -229,7 +229,7 @@ class MainWindow(OsogoWindow):
         # -------------------------------------
         # append signal handlers
         # -------------------------------------
-        self.theHandlerMap =  { 
+        aHandlerMap =  { 
             # menu
             'load_model_menu_activate'        : self.__openFileDlgForLoadModel,
             'load_script_menu_activate'       : self.__openFileDlgForLoadScript,
@@ -274,8 +274,26 @@ class MainWindow(OsogoWindow):
             'on_logo_animation_menu_activate' : self.__setAnimationSensitive,
             'on_logging_policy1_activate'     : self.__openLogPolicy
             }
+
+        self.__togglableWindows = {
+            'BoardWindow': (
+                self['board_window_menu'],
+                self['board_button'].get_child() ),
+            'LoggerWindow': (
+                self['logger_window_menu'],
+                self['logger_button'].get_child() ),
+            'InterfaceWindow': (
+                self['interface_window_menu'],
+                self['interface_button'].get_child() ),
+            'StepperWindow': (
+                self['stepper_window_menu'],
+                self['stepper_button'].get_child() ),
+            'MessageWindow': (
+                self['message_window_menu'],
+                self['message_togglebutton'].get_child() ),
+            }
                 
-        self.addHandlers( self.theHandlerMap )
+        self.addHandlers( aHandlerMap )
         self.setIconList(
             os.path.join( config.GLADEFILE_PATH, "ecell.png" ),
             os.path.join( config.GLADEFILE_PATH, "ecell32.png" ) )
@@ -298,7 +316,6 @@ class MainWindow(OsogoWindow):
         self.theAboutSessionMonitor = None
         self.openAboutSessionMonitor = False 
 
-        self.update()
         # -------------------------------------
         # creates EntityListWindow 
         # -------------------------------------
@@ -319,6 +336,8 @@ class MainWindow(OsogoWindow):
         # ---------------------
         
         self['indicator_box'].hide()
+
+        self.update()
 
     def __expose( self, *arg ):
         """expose
@@ -871,60 +890,28 @@ class MainWindow(OsogoWindow):
 
         return str( theTime.hour-9 )+" : "+str( theTime.minute ) + " : " + str( theTime.second )
 
+    def updateButton( self, name, state ):
+        self.__button_update = True
+        for w in self.__togglableWindows[ name ]:
+            if state != w.get_active():
+                w.set_active( state )
+        self.__button_update = False
+
+    def toggleWindow( self, name, state ):
+        self.updateButton( name, state )
+        self.theSession.toggleWindow( name, state )
+
     def updateButtons( self ):
         """ updates Buttons and menus with 
         latest FundamentalWindow status
         """
-        
         if not self.exists():
             return
 
-        self.__button_update = True
+        for n in self.__togglableWindows:
+            self.updateButton( n, self.theSession.doesExist( n ) )
 
-        # boardwindow:
-        if self.theSession.doesExist('BoardWindow' ):
-            flag = True
-        else:
-            flag = False
-        self['board_window_menu'].set_active( flag )
-        ( self['board_button'].get_child() ).set_active(flag)
-
-        # Loggerwindow:
-        if self.theSession.doesExist('LoggerWindow' ):
-            flag = True
-        else:
-            flag = False
-        self['logger_window_menu'].set_active( flag )
-        ( self['logger_button'].get_child() ).set_active(flag)
-            
-        # interface window:
-        if self.theSession.doesExist('InterfaceWindow' ):
-            flag = True
-        else:
-            flag = False
-        self['interface_window_menu'].set_active( flag )
-        ( self['interface_button'].get_child() ).set_active(flag)
-
-        # stepperwindow:
-        if self.theSession.doesExist('StepperWindow' ):
-            flag = True
-        else:
-            flag = False
-        self['stepper_window_menu'].set_active( flag )
-        ( self['stepper_button'].get_child() ).set_active(flag)
-
-
-    
-        #MessageWindow
-        if self.theMessageWindowVisible:
-            flag = True
-        else:
-            flag = False
-        self['message_window_menu'].set_active(flag)
-        ( self['message_togglebutton'].get_child() ).set_active( flag )
-
-
-        self.__button_update = False
+        self.updateButton( 'MessageWindow', self.theMessageWindowVisible )
 
     def __openLogPolicy( self, *arg):
         """
@@ -1011,20 +998,24 @@ class MainWindow(OsogoWindow):
         ( self['timer_button'].get_child() ).set_active(isActive)
 
     def __displayLoggerWindow( self, *arg ):
-        self.theSession.toggleWindow('LoggerWindow')
-        self.update()
+        if self.__button_update:
+            return
+        self.toggleWindow( 'LoggerWindow', arg[ 0 ].get_active() )
 
     def __displayStepperWindow( self, *arg ):
-        self.theSession.toggleWindow('StepperWindow')
-        self.update()
+        if self.__button_update:
+            return
+        self.toggleWindow( 'StepperWindow', arg[ 0 ].get_active()  )
 
     def __displayInterfaceWindow( self, *arg ):
-        self.theSession.toggleWindow('InterfaceWindow')
-        self.update()
+        if self.__button_update:
+            return
+        self.toggleWindow( 'InterfaceWindow', arg[ 0 ].get_active()  )
 
     def __displayBoardWindow( self, *arg ):
-        self.theSession.toggleWindow('BoardWindow')
-        self.update()
+        if self.__button_update:
+            return
+        self.toggleWindow( 'BoardWindow', arg[ 0 ].get_active()  )
 
     def hideMessageWindow( self ):            
         self[ 'messagehandlebox' ].hide()

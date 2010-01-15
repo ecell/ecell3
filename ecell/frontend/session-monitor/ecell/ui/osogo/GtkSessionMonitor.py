@@ -251,16 +251,18 @@ class GtkSessionMonitor(Session):
             self.theFundamentalWindows[aWindowName].update()
     
     # ==========================================================================
-    def toggleWindow( self, aWindowName ):
-        if self.theFundamentalWindows[aWindowName].exists():
-            self.theFundamentalWindows[aWindowName].close()
-            
-        else:
-            self.theFundamentalWindows[aWindowName].openWindow()
-            self.theFundamentalWindows[aWindowName].update()
+    def toggleWindow( self, aWindowName, aNewState=None ):
+        aState = self.theFundamentalWindows[aWindowName].exists()
+        if aNewState is None:
+            aNewState = not aState
+        if aState != aNewState:
+            if aNewState:
+                self.theFundamentalWindows[aWindowName].openWindow()
+                self.theFundamentalWindows[aWindowName].update()
+            else:
+                self.theFundamentalWindows[aWindowName].close()
         if self.theFundamentalWindows['MainWindow'].exists():
             self.theFundamentalWindows['MainWindow'].update()
-
 
     # ==========================================================================
     def createPluginWindow(self, aType, aFullPNList):
