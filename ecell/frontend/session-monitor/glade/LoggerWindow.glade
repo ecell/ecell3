@@ -126,7 +126,7 @@
 				      <property name="enable_arrows_always">False</property>
 
 				      <child>
-					<widget class="GtkEntry" id="datatype_combo">
+					<widget class="GtkEntry" id="datatype_combo_entry">
 					  <property name="visible">True</property>
 					  <property name="can_focus">True</property>
 					  <property name="editable">False</property>
@@ -319,7 +319,7 @@
 			      </child>
 
 			      <child>
-				<widget class="GtkLabel" id="label9">
+				<widget class="GtkLabel" id="label10">
 				  <property name="visible">True</property>
 				  <property name="label" translatable="yes">Save directory</property>
 				  <property name="use_underline">False</property>
@@ -466,7 +466,7 @@
 			      </child>
 
 			      <child>
-				<widget class="GtkLabel" id="label10">
+				<widget class="GtkLabel" id="label11">
 				  <property name="visible">True</property>
 				  <property name="label" translatable="yes">data interval</property>
 				  <property name="use_underline">False</property>
@@ -626,7 +626,7 @@
 				  </child>
 
 				  <child>
-				    <widget class="GtkLabel" id="label11">
+				    <widget class="GtkLabel" id="label12">
 				      <property name="visible">True</property>
 				      <property name="label" translatable="yes">Specify the time to save</property>
 				      <property name="use_underline">False</property>
