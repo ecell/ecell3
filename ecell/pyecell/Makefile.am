@@ -38,9 +38,7 @@ EXTRA_DIST = \
 	ecell/em.py \
 	ecell/eml.py \
 	ecell/emparser.py \
-	ecell/expressionlextab.py \
 	ecell/expressionparser.py \
-	ecell/expressionparsetab.py \
 	ecell/util.py \
 	ecell/_tableio.c \
 	ecell/README.TableIO \
