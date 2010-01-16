@@ -167,7 +167,14 @@ Entity* Model::createEntity( String const& aClassname, FullIDCref aFullID )
 
     System* aContainerSystemPtr( getSystem( aFullID.getSystemPath() ) );
     Entity* retval( 0 );
-    
+
+    if ( !aContainerSystemPtr )
+    {
+        THROW_EXCEPTION( BadSystemPath,
+                         "[" + aFullID.getSystemPath().asString()
+                         + "] cannot be reached" );
+    }
+ 
     switch( aFullID.getEntityType() )
     {
     case EntityType::VARIABLE:
