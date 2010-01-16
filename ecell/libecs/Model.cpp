@@ -216,6 +216,13 @@ namespace libecs
 
     SystemPtr aSystem ( getSystem( aSystemPath ) );
 
+    if ( !aSystem )
+      {
+	THROW_EXCEPTION( BadSystemPath, 
+			 "[" + aSystemPath.getString()
+			 + "] cannot be reached" );
+      }
+
     switch( aFullID.getEntityType() )
       {
       case EntityType::VARIABLE:
