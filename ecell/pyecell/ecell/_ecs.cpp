@@ -66,6 +66,21 @@
 #include "libecs/DataPointVector.hpp"
 #include "libecs/VariableReference.hpp"
 
+#if PY_VERSION_HEX < 0x02050000
+
+typedef inquiry lenfunc;
+typedef intargfunc ssizeargfunc;
+typedef intintargfunc ssizessizeargfunc;
+typedef intobjargproc ssizeobjargproc;
+typedef intintobjargproc ssizessizeobjargproc;
+typedef int Py_ssize_t;
+
+namespace boost { namespace python {
+typedef ::Py_ssize_t ssize_t;
+} } // namespace boost::python
+
+#endif
+
 using namespace libecs;
 namespace py = boost::python;
 
