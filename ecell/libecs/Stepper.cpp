@@ -36,7 +36,6 @@
 #include <functional>
 #include <algorithm>
 #include <limits>
-#include <boost/bind.hpp>
 
 #include "Util.hpp"
 #include "Variable.hpp"
@@ -369,7 +368,7 @@ void Stepper::unregisterProcess( ProcessPtr aProcess )
         aProcess->getVariableReferenceVector() );
     std::transform( aVarRefVector.begin(), aVarRefVector.end(),
                     inserter( aVarSet, aVarSet.begin() ),
-                    boost::bind( &VariableReference::getVariable, _1 ) );
+                    std::mem_fun_ref( &VariableReference::getVariable ) );
 
     VariableVector aNewVector;
     VariableVector::size_type aReadWriteVariableOffset,
@@ -438,7 +437,8 @@ void Stepper::log()
     {
         LoggerBroker::LoggersPerFullID loggers( (*i)->getLoggers() );
         std::for_each( loggers.begin(), loggers.end(),
-                       boost::bind( &Logger::log, _1, theCurrentTime ) );
+                       std::bind2nd( std::mem_fun( &Logger::log ),
+                                      theCurrentTime ) );
     }
 
     for ( VariableVector::const_iterator i( theVariableVector.begin() ),
@@ -448,7 +448,8 @@ void Stepper::log()
     {
         LoggerBroker::LoggersPerFullID loggers( (*i)->getLoggers() );
         std::for_each( loggers.begin(), loggers.end(),
-                       boost::bind( &Logger::log, _1, theCurrentTime ) );
+                       std::bind2nd( std::mem_fun( &Logger::log ),
+                                      theCurrentTime ) );
     }
 
     for ( SystemVector::const_iterator i( theSystemVector.begin() ),
@@ -457,7 +458,8 @@ void Stepper::log()
     {
         LoggerBroker::LoggersPerFullID loggers( (*i)->getLoggers() );
         std::for_each( loggers.begin(), loggers.end(),
-                       boost::bind( &Logger::log, _1, theCurrentTime ) );
+                       std::bind2nd( std::mem_fun( &Logger::log ),
+                                      theCurrentTime ) );
     }
 }
 
