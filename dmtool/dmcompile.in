@@ -42,6 +42,37 @@ class CustomizedHelpFormatter( IndentedHelpFormatter ):
         else:
             return ""
 
+
+if sys.hexversion < 0x02050000:
+    _old_OptionParser = OptionParser
+    class OptionParser(_old_OptionParser):
+        def __init__(self, *arg, **kwarg):
+            self.translate2exc = None
+            _old_OptionParser.__init__(self, *arg, **kwarg)
+
+        def _process_short_opts(self, rargs, values):
+            self.translate2exc = (
+                BadOptionError,
+                "no such option: %s"
+                )
+            try:
+                return _old_OptionParser._process_short_opts(self, rargs, values)
+            finally:
+                self.translate2exc = None
+
+        def error(self, msg):
+            if self.translate2exc is not None:
+                # XXX: ugh, but it should be ok
+                import re
+                from gettext import gettext
+                matched = re.match(
+                    gettext(self.translate2exc[1]).replace('%s', '(\S+)'), msg)
+                if matched:
+                    raise self.translate2exc[0](matched.group(1))
+            else:
+                _old_OptionParser.error(self, msg)
+
+
 class CustomizedOptionParser( OptionParser ):
     def __init__( self, prolog=None, formatter=None, *arg, **kwarg ):
         self.prolog = prolog
