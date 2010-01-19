@@ -95,6 +95,10 @@ ecell-3.2.0RC1: 13-Jan-2009
    - Added deleteStepper() and deleteEntity() to Model, which enables one
      to dynamically modify the structure of the model.
 
+   - Added Model::setup() that needs to be called right after Model is
+     constructed.  This was necessary to make the initialization process
+     more customizable.
+
    - Entity:
 
      - Removed getFullIDString() from Entity.
