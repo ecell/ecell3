@@ -437,8 +437,8 @@ void Stepper::log()
     {
         LoggerBroker::LoggersPerFullID loggers( (*i)->getLoggers() );
         std::for_each( loggers.begin(), loggers.end(),
-                       std::bind2nd( std::mem_fun( &Logger::log ),
-                                      theCurrentTime ) );
+                       BindSecond( std::mem_fun( &Logger::log ),
+                                   theCurrentTime ) );
     }
 
     for ( VariableVector::const_iterator i( theVariableVector.begin() ),
@@ -448,8 +448,8 @@ void Stepper::log()
     {
         LoggerBroker::LoggersPerFullID loggers( (*i)->getLoggers() );
         std::for_each( loggers.begin(), loggers.end(),
-                       std::bind2nd( std::mem_fun( &Logger::log ),
-                                      theCurrentTime ) );
+                       BindSecond( std::mem_fun( &Logger::log ),
+                                   theCurrentTime ) );
     }
 
     for ( SystemVector::const_iterator i( theSystemVector.begin() ),
@@ -458,8 +458,8 @@ void Stepper::log()
     {
         LoggerBroker::LoggersPerFullID loggers( (*i)->getLoggers() );
         std::for_each( loggers.begin(), loggers.end(),
-                       std::bind2nd( std::mem_fun( &Logger::log ),
-                                      theCurrentTime ) );
+                       BindSecond( std::mem_fun( &Logger::log ),
+                                   theCurrentTime ) );
     }
 }
 

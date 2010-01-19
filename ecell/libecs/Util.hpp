@@ -31,6 +31,7 @@
 
 #ifndef __UTIL_HPP
 #define __UTIL_HPP
+
 #include <stdlib.h>
 #include <sstream>
 #include <functional>
@@ -49,6 +50,7 @@
 #include <boost/type_traits.hpp>
 #include <boost/range/size.hpp>
 #include <boost/range/size_type.hpp>
+#include <boost/call_traits.hpp>
 
 #include "libecs/Defs.hpp"
 #include "libecs/Exceptions.hpp"
@@ -389,6 +391,37 @@ public:
         return boost::numeric_cast<NEW>( aValue );
     }
 };
+
+
+template< class OP >
+class SecondBinder: public std::unary_function< typename OP::result_type, typename OP::first_argument_type >
+{
+public:
+    typedef typename OP::result_type result_type;
+    typedef typename OP::first_argument_type argument_type;
+
+public:
+	SecondBinder( OP const& anOp, typename boost::call_traits< typename OP::second_argument_type >::param_type aBoundValue )
+        : theOp( anOp ), theBoundValue( aBoundValue )
+    {
+    }
+
+    result_type operator()( typename boost::call_traits< typename OP::first_argument_type >::param_type aFirstArgValue ) const
+    {
+        return theOp( aFirstArgValue, theBoundValue );
+    }
+
+private:
+    OP theOp;
+    typename OP::second_argument_type theBoundValue;
+};
+
+template< class OP >
+SecondBinder< OP > BindSecond( OP const& anOp,
+                               typename boost::call_traits< typename OP::second_argument_type >::param_type aBoundValue )
+{
+	return SecondBinder< OP >( anOp, aBoundValue );
+}
 
 } // namespace libecs
 
