@@ -43,7 +43,7 @@
 #include "QuasiDynamicFluxProcessInterface.hpp"
 
 LIBECS_DM_CLASS_EXTRA_1( QuasiDynamicFluxProcess, libecs::ContinuousProcess,
-                         QuasiDynamicFluxProcessInteface )
+                         QuasiDynamicFluxProcessInterface )
 {
 public:
 

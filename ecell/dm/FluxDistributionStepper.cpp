@@ -51,9 +51,7 @@
 #include <libecs/Stepper.hpp>
 #include <libecs/DifferentialStepper.hpp>
 
-#define DM_IMPORTS
-#include "QuasiDynamicFluxProcess.hpp"
-#undef DM_IMPORTS
+#include "QuasiDynamicFluxProcessInterface.hpp"
 
 USE_LIBECS;
 
@@ -71,12 +69,12 @@ private:
     DynamicCaster< Tnew_, Tgiven_ > dc_;
 };
 
-typedef Caster< QuasiDynamicFluxProcess*, Process* > QDFPCaster;
+typedef Caster< QuasiDynamicFluxProcessInterface*, Process* > QDFPCaster;
 
 DECLARE_VECTOR( QDFPCaster::result_type, QuasiDynamicFluxProcessVector );
     
 LIBECS_DM_CLASS( FluxDistributionStepper, DifferentialStepper )
-{    
+{
 public:
     
     LIBECS_DM_OBJECT( FluxDistributionStepper, DifferentialStepper )

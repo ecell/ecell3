@@ -31,7 +31,7 @@
 
 #include <libecs/libecs.hpp>
 
-struct QuasiDynamicFluxProcessInteface
+struct QuasiDynamicFluxProcessInterface
 {
     virtual libecs::VariableReferenceVector getFluxDistributionVector() = 0;
 
