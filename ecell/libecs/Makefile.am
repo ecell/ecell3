@@ -2,8 +2,6 @@ abs_top_builddir=@abs_top_builddir@
 
 libdir=@libdir@
 
-SHLEXT = @LTDL_SHLIB_EXT@
-
 SUBDIRS = scripting . tests
 
 ECELL_DIRNAME=@ECELL_DIRNAME@
@@ -109,7 +107,7 @@ osif.h\
 VVector.h
 
 ECELL_STAGING_HOME=$(abs_top_builddir)/tmp
-OUTPUT=$(ECELL_STAGING_HOME)$(libdir)/libecs$(SHLEXT)
+OUTPUT=$(ECELL_STAGING_HOME)$(libdir)/libecs$(LTDL_SHLIB_EXT)
 all-local: $(OUTPUT)
 
 $(OUTPUT): libecs.la
