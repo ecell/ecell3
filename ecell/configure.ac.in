@@ -140,6 +140,7 @@ dnl
 ECELL_CHECK_GSL
 AM_CHECK_PYMOD(numpy,,,[AC_MSG_ERROR([could not find Python numpy module])])
 AM_CHECK_PYMOD(xml,,,[AC_MSG_ERROR([could not find Python xml module])])
+AM_CHECK_PYMOD(ply,,,[AC_MSG_ERROR([could not find Python ply module])])
 
 if test "$enable_gui" = 'yes'; then
    AM_CHECK_PYMOD(pygtk,,,[AC_MSG_ERROR([could not find Python pygtk module])])
