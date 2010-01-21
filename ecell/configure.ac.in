@@ -146,9 +146,6 @@ if test "$enable_gui" = 'yes'; then
    AM_CHECK_PYMOD(gtk,,,[AC_MSG_ERROR([could not find Python gtk module])])
    AM_CHECK_PYMOD(gtk.gdk,,,
                 [AC_MSG_ERROR([could not find Python gtk.gdk module])])
-   AM_CHECK_PYMOD(gtk.glade,,,
-                [AC_MSG_ERROR([could not find Python gtk.glade module])])
-   AM_CHECK_PYMOD(gnome.ui,,[AC_SUBST([GNOME_INSTALLED],yes)],[AC_SUBST([GNOME_INSTALLED],no)])
    AM_CHECK_PYMOD(gnomecanvas,,,[AC_MSG_WARN(could not find gnomecanvas module. model-editor will not work. )])
    AM_CHECK_PYMOD(xml.dom.minidom,,,[AC_MSG_WARN(could not find xml.dom.minidom module. model-editor will not work.)])
 fi
