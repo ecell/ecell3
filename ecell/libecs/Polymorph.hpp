@@ -535,29 +535,16 @@ public:
     }
 
     /** @deprecated */
-    LIBECS_DEPRECATED const String asString() const
-    { 
-        return as<String>(); 
-    }
+    LIBECS_DEPRECATED const String asString() const;
 
     /** @deprecated */
-    LIBECS_DEPRECATED const Real   asReal() const
-    { 
-        return as<Real>(); 
-    }
+    LIBECS_DEPRECATED const Real   asReal() const;
   
     /** @deprecated */
-    LIBECS_DEPRECATED const Integer asInteger() const
-    { 
-        return as<Integer>();
-    }
+    LIBECS_DEPRECATED const Integer asInteger() const;
 
     /** @deprecated */
-    LIBECS_DEPRECATED const PolymorphVector asPolymorphVector() const
-    { 
-        return as<PolymorphVector>();
-    }
-
+    LIBECS_DEPRECATED const PolymorphVector asPolymorphVector() const;
 
     Polymorph const& operator=( Polymorph const& rhs )
     {
@@ -1813,6 +1800,27 @@ template<>
 inline const Polymorph nullValue()
 {
     return Polymorph();
+}
+
+
+inline const String Polymorph::asString() const
+{ 
+    return as<String>(); 
+}
+
+inline const Real   Polymorph::asReal() const
+{ 
+    return as<Real>(); 
+}
+  
+inline const Integer Polymorph::asInteger() const
+{ 
+    return as<Integer>();
+}
+
+inline const PolymorphVector Polymorph::asPolymorphVector() const
+{ 
+    return as<PolymorphVector>();
 }
 
 } // namespace libecs
