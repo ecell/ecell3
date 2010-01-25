@@ -497,20 +497,20 @@ public:
     explicit Polymorph( PolymorphValue::Handle aHandle )
         : theValue( aHandle ) { }
 
-    Polymorph( StringCref    aValue ) 
+    explicit Polymorph( String const& aValue ) 
         : theValue( PolymorphValue::create( aValue ) ) { }
 
-    Polymorph( const char* ptr,
+    explicit Polymorph( const char* ptr,
                std::size_t sz = static_cast< std::size_t >( -1 ) ) 
         : theValue( PolymorphValue::create( ptr, sz ) ) { }
 
-    Polymorph( RealParam aValue )            
+    explicit Polymorph( RealParam aValue )            
         : theValue( PolymorphValue::create( aValue ) ) { }
 
-    Polymorph( IntegerParam aValue )            
+    explicit Polymorph( IntegerParam aValue )            
         : theValue( PolymorphValue::create( aValue ) ) { }
 
-    Polymorph( PolymorphVectorCref aValue )
+    Polymorph( PolymorphVector const& aValue )
         : theValue( PolymorphValue::create( aValue ) ) { }
 
     Polymorph( StringVector const& aValue )
@@ -553,6 +553,13 @@ public:
             theValue = rhs.theValue;
         }
     
+        return *this;
+    }
+
+    template< typename T_ >
+    Polymorph const& operator=( T_ const& rhs )
+    {
+        theValue = PolymorphValue::create( rhs );
         return *this;
     }
 

@@ -296,7 +296,7 @@ public:\
    @param FIELDVALUE the value of the field.
 */
 #define CLASS_INFO( FIELDNAME, FIELDVALUE) \
-    aPropertyInterface->setInfoField( FIELDNAME, FIELDVALUE )
+    aPropertyInterface->setInfoField( FIELDNAME, libecs::Polymorph( FIELDVALUE ) )
 
 
 /** 

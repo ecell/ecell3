@@ -63,7 +63,7 @@ GET_METHOD_DEF( Polymorph, SystemList, System )
     for( SystemMapConstIterator i = theSystemMap.begin() ;
          i != theSystemMap.end() ; ++i )
     {
-        aVector.push_back( i->second->getID() );
+        aVector.push_back( Polymorph( i->second->getID() ) );
     }
 
     return aVector;
@@ -78,7 +78,7 @@ GET_METHOD_DEF( Polymorph, VariableList, System )
     for( VariableMapConstIterator i( theVariableMap.begin() );
          i != theVariableMap.end() ; ++i )
     {
-        aVector.push_back( i->second->getID() );
+        aVector.push_back( Polymorph( i->second->getID() ) );
     }
 
     return aVector;
@@ -93,7 +93,7 @@ GET_METHOD_DEF( Polymorph, ProcessList, System )
     for( ProcessMapConstIterator i( theProcessMap.begin() );
          i != theProcessMap.end() ; ++i )
     {
-        aVector.push_back( i->second->getID() );
+        aVector.push_back( Polymorph( i->second->getID() ) );
     }
 
     return aVector;

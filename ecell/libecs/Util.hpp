@@ -334,18 +334,17 @@ inline const String nullValue()
 
 
 template< class NEW, class GIVEN >
-class StaticCaster: std::unary_function< GIVEN, NEW >
+class StaticCaster: public std::unary_function< GIVEN, NEW >
 {
 public:
     inline NEW operator()( const GIVEN& aValue )
     {
-        BOOST_STATIC_ASSERT( ( boost::is_convertible<GIVEN,NEW>::value ) );
         return static_cast<NEW>( aValue );
     }
 };
 
 template< class NEW, class GIVEN >
-class DynamicCaster: std::unary_function< GIVEN, NEW >
+class DynamicCaster: public std::unary_function< GIVEN, NEW >
 {
 public:
     NEW operator()( const GIVEN& aPtr )
@@ -369,7 +368,7 @@ inline NEW SafeDynamicCast( const GIVEN& aPtr )
 }
 
 template< class NEW, class GIVEN >
-class LexicalCaster: std::unary_function< GIVEN, NEW >
+class LexicalCaster: public std::unary_function< GIVEN, NEW >
 {
 public:
     const NEW operator()( const GIVEN& aValue )
@@ -381,9 +380,7 @@ public:
 
 
 template< class NEW, class GIVEN >
-class NumericCaster
-    :
-    std::unary_function< GIVEN, NEW >
+class NumericCaster: public std::unary_function< GIVEN, NEW >
 {
 public:
     inline NEW operator()( GIVEN aValue )

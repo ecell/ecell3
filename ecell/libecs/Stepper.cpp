@@ -296,7 +296,7 @@ GET_METHOD_DEF( Polymorph, SystemList, Stepper )
     for( SystemVectorConstIterator i( getSystemVector().begin() );
          i != getSystemVector().end() ; ++i )
     {
-        aVector.push_back( ( *i )->getFullID().asString() );
+        aVector.push_back( Polymorph( ( *i )->getFullID().asString() ) );
     }
 
     return aVector;
@@ -311,6 +311,7 @@ void Stepper::registerSystem( System* aSystemPtr )
         theSystemVector.push_back( aSystemPtr );
     }
 }
+
 
 void Stepper::unregisterSystem( System* aSystemPtr )
 { 
@@ -471,7 +472,7 @@ GET_METHOD_DEF( Polymorph, WriteVariableList, Stepper )
     for( VariableVector::size_type c( 0 ); 
          c != theReadOnlyVariableOffset; ++c )
     {
-        aVector.push_back( theVariableVector[c]->getFullID().asString() );
+        aVector.push_back( Polymorph( theVariableVector[c]->getFullID().asString() ) );
     }
     
     return aVector;
@@ -486,7 +487,7 @@ GET_METHOD_DEF( Polymorph, ReadVariableList, Stepper )
     for( VariableVector::size_type c( theReadWriteVariableOffset ); 
          c != theVariableVector.size(); ++c )
     {
-        aVector.push_back( theVariableVector[c]->getFullID().asString() );
+        aVector.push_back( Polymorph( theVariableVector[c]->getFullID().asString() ) );
     }
     
     return aVector;
@@ -500,7 +501,7 @@ GET_METHOD_DEF( Polymorph, ProcessList, Stepper )
     for( ProcessVectorConstIterator i( theProcessVector.begin() );
          i != theProcessVector.end() ; ++i )
     {
-        aVector.push_back( (*i)->getFullID().asString() );
+        aVector.push_back( Polymorph( (*i)->getFullID().asString() ) );
     }
     
     return aVector;
