@@ -53,7 +53,7 @@ namespace libecs
 class LIBECS_API Logger
 {
 public:
-    DECLARE_TYPE( PhysicalLogger::size_type, size_type );
+    DECLARE_TYPE( PhysicalLogger::size_type, size_type )
     
     class Policy
     {

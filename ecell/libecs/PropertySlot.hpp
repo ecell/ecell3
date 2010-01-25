@@ -130,10 +130,10 @@ public:
     }
 
 #define _PROPERTYSLOT_SETMETHOD( TYPE )\
-    virtual void set ## TYPE( T& anObject, Param<libecs::TYPE>::type value ) const = 0;
+    virtual void set ## TYPE( T& anObject, Param<libecs::TYPE>::type value ) const = 0
 
 #define _PROPERTYSLOT_GETMETHOD( TYPE )\
-    virtual const libecs::TYPE get ## TYPE( const T& anObject ) const = 0;
+    virtual const libecs::TYPE get ## TYPE( const T& anObject ) const = 0
 
     _PROPERTYSLOT_SETMETHOD( Polymorph );
     _PROPERTYSLOT_GETMETHOD( Polymorph );
@@ -177,7 +177,7 @@ class ConcretePropertySlot: public PropertySlot<T>
 
 public:
 
-    DECLARE_TYPE( SlotType_, SlotType );
+    DECLARE_TYPE( SlotType_, SlotType )
 
     typedef typename Param<SlotType>::type SetType;
     typedef const SlotType GetType;
@@ -299,7 +299,7 @@ template< class T, typename SlotType_ >
 class LoadSaveConcretePropertySlot: public ConcretePropertySlot<T,SlotType_>
 {
 public:
-    DECLARE_TYPE( SlotType_, SlotType );
+    DECLARE_TYPE( SlotType_, SlotType )
 
     typedef ConcretePropertySlot<T,SlotType> BaseType;
 

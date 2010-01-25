@@ -46,8 +46,8 @@ class LIBECS_API PhysicalLogger
     typedef vvector< DataPoint > Vector;
 
 public:
-    DECLARE_TYPE( size_t, VectorIterator );
-    DECLARE_TYPE( size_t, size_type );
+    DECLARE_TYPE( size_t, VectorIterator )
+    DECLARE_TYPE( size_t, size_type )
 
     PhysicalLogger();
     virtual ~PhysicalLogger();

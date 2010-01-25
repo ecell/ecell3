@@ -146,7 +146,7 @@ namespace libecs
   /**
      Declare a new type and its pointer,
      const pointer, reference, and const reference types. For example
-     DECLARE_TYPE( Dword, VeryLongTime );
+     DECLARE_TYPE( Dword, VeryLongTime )
      @param mydecl The base type
      @param mytype The new type
   */
@@ -202,7 +202,7 @@ typedef const mytype & mytype ## Cref;
      @param type The type object the collection manages
   */
 #define DECLARE_LIST( type, name )                            \
-      DECLARE_TYPE(std::list<type>,name);                       \
+      DECLARE_TYPE(std::list<type>,name)                       \
       typedef name::iterator name ## Iterator;                  \
       typedef name::iterator& name ## IteratorRef;              \
       typedef name::iterator* name ## IteratorPtr;              \
@@ -222,7 +222,7 @@ typedef const mytype & mytype ## Cref;
      @param type The type for the vector
   */
 #define DECLARE_VECTOR( type, name )                            \
-   DECLARE_TYPE(std::vector<type>,name);                       \
+   DECLARE_TYPE(std::vector<type>,name)                       \
    typedef name::iterator name ## Iterator;                    \
    typedef name::iterator& name ## IteratorRef;                \
    typedef name::iterator* name ## IteratorPtr;                \
@@ -343,7 +343,7 @@ typedef const mytype & mytype ## Cref;
      @param type The type to be queued
   */
 #define DECLARE_QUEUE( type, name )                          \
-      DECLARE_TYPE(std::deque<type>,name);                     \
+      DECLARE_TYPE(std::deque<type>,name)                     \
       typedef name::iterator name ## Iterator;                 \
       typedef name::iterator& name ## IteratorRef;             \
       typedef name::iterator* name ## IteratorPtr;             \
@@ -412,32 +412,32 @@ typedef const mytype & mytype ## Cref;
 
   // String
 
-  DECLARE_TYPE( std::string, String );
+  DECLARE_TYPE( std::string, String )
 
-  DECLARE_TYPE( const char* const, StringLiteral );
+  DECLARE_TYPE( const char* const, StringLiteral )
 
   // Numeric types
 
-  DECLARE_TYPE( long int, Integer );
-  DECLARE_TYPE( unsigned long int, UnsignedInteger );
+  DECLARE_TYPE( long int, Integer )
+  DECLARE_TYPE( unsigned long int, UnsignedInteger )
   typedef Param<Integer>::type IntegerParam;
   typedef Param<UnsignedInteger>::type UnsignedIntegerParam;
 
 
   // these can cause problem when used as template parameters
-  //  DECLARE_TYPE( int64_t, Integer );
-  //  DECLARE_TYPE( uint64_t, UnsignedInteger );
+  //  DECLARE_TYPE( int64_t, Integer )
+  //  DECLARE_TYPE( uint64_t, UnsignedInteger )
 
-  //  DECLARE_TYPE( double, Real );
-  DECLARE_TYPE( double, Real );
+  //  DECLARE_TYPE( double, Real )
+  DECLARE_TYPE( double, Real )
   typedef Param<Real>::type RealParam;
 
-  DECLARE_TYPE( @HIGHREAL_TYPE@, HighReal );
+  DECLARE_TYPE( @HIGHREAL_TYPE@, HighReal )
 # define HIGHREAL_IS_REAL @HIGHREAL_IS_REAL@
   typedef Param<HighReal>::type HighRealParam;
     
-  //  DECLARE_TYPE( HighReal, Time );
-  DECLARE_TYPE( Real, Time );
+  //  DECLARE_TYPE( HighReal, Time )
+  DECLARE_TYPE( Real, Time )
   typedef Param<Time>::type TimeParam;
     
   //! Infinity.
