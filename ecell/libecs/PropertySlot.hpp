@@ -404,7 +404,7 @@ ConcretePropertySlot< T, SlotType_ >::SetMethod( SetMethodPtr aSetMethodPtr )
 {
     if( aSetMethodPtr == NULLPTR )
     {
-        return &EcsObject::nullSet<SlotType>;
+        return static_cast< SetMethodPtr >( &EcsObject::nullSet<SlotType> );
     }
     else
     {
@@ -418,7 +418,7 @@ ConcretePropertySlot< T, SlotType_ >::GetMethod( GetMethodPtr aGetMethodPtr )
 {
     if( aGetMethodPtr == NULLPTR )
     {
-        return &EcsObject::nullGet<SlotType>;
+        return static_cast< GetMethodPtr >( &EcsObject::nullGet<SlotType> );
     }
     else
     {
