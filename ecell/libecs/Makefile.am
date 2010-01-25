@@ -18,7 +18,7 @@ lib_LTLIBRARIES = libecs.la
 AM_CXXFLAGS = $(CXXFLAGS)
 
 libecs_la_LDFLAGS= -version-info 2:0:0 -no-undefined
-libecs_la_LIBADD=  -lstdc++ $(LIBLTDL) $(GSL_LIBADD) scripting/libecs-scripting.la
+libecs_la_LIBADD=  $(LIBLTDL) $(GSL_LIBADD) scripting/libecs-scripting.la
 libecs_la_SOURCES=\
 libecs.cpp\
 Util.cpp\
