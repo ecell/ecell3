@@ -268,11 +268,11 @@ struct PolymorphRetriever
     {
         if( PyFloat_Check( aPyObjectPtr ) )
         {
-            return PyFloat_AS_DOUBLE( aPyObjectPtr );
+            return Polymorph( PyFloat_AS_DOUBLE( aPyObjectPtr ) );
         }
         else if( PyInt_Check( aPyObjectPtr ) )
         {
-            return PyInt_AS_LONG( aPyObjectPtr );
+            return Polymorph( PyInt_AS_LONG( aPyObjectPtr ) );
         }
         else if( PyString_Check( aPyObjectPtr ) )
         {

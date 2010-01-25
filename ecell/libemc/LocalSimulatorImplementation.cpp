@@ -132,7 +132,7 @@ const libecs::Polymorph LocalSimulatorImplementation::getStepperList() const
     for( libecs::Model::StepperMap::const_iterator i( aStepperMap.begin() );
          i != aStepperMap.end(); ++i )
     {
-        aPolymorphVector.push_back( (*i).first );
+        aPolymorphVector.push_back( libecs::Polymorph( (*i).first ) );
     }
 
     return aPolymorphVector;
@@ -390,7 +390,7 @@ const libecs::Polymorph LocalSimulatorImplementation::getLoggerList() const
             i( aLoggerBroker.begin() ), end( aLoggerBroker.end() );
          i != end; ++i )
     {
-        aLoggerList.push_back( (*i).first.asString() );
+        aLoggerList.push_back( libecs::Polymorph( (*i).first.asString() ) );
     }
 
     return aLoggerList;
