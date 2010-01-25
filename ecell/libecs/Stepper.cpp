@@ -315,7 +315,7 @@ void Stepper::registerSystem( System* aSystemPtr )
 
 void Stepper::unregisterSystem( System* aSystemPtr )
 { 
-    SystemVectorIterator i( find( theSystemVector.begin(), 
+    SystemVectorIterator i( std::find( theSystemVector.begin(), 
                                   theSystemVector.end(),
                                   aSystemPtr ) );
     
@@ -351,7 +351,7 @@ void Stepper::registerProcess( Process* aProcess )
 
 void Stepper::unregisterProcess( ProcessPtr aProcess )
 { 
-    ProcessVectorIterator ip( find( theProcessVector.begin(), 
+    ProcessVectorIterator ip( std::find( theProcessVector.begin(), 
                                     theProcessVector.end(),
                                     aProcess ) );
     
