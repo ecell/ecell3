@@ -193,7 +193,7 @@ public:
             thePropertyMap.find( aPropertyName ) );
 
         if ( aPropertyMapIterator != thePropertyMap.end() ) {
-            return aPropertyMapIterator->second;
+            return libecs::Polymorph( aPropertyMapIterator->second );
         } else {
             THROW_EXCEPTION_ECSOBJECT( libecs::NoSlot,
                              static_cast< Tmixin_ const* >( this )->asString() +

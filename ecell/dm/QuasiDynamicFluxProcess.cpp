@@ -79,7 +79,7 @@ GET_METHOD_DEF( libecs::Polymorph, FluxDistributionList, QuasiDynamicFluxProcess
           i != theFluxDistributionVector.end() ; ++i )
     {
         libecs::FullID aFullID( (*i).getVariable()->getFullID() );
-        aVector.push_back( aFullID.asString() );
+        aVector.push_back( libecs::Polymorph( aFullID.asString() ) );
     }
 
     return aVector;
