@@ -386,7 +386,7 @@ namespace libecs
 template< class T, typename SlotType_ >
 const bool ConcretePropertySlot< T, SlotType_ >::isSetableMethod( const SetMethodPtr aSetMethodPtr )
 {
-    const SetMethodPtr aNullMethodPtr( &EcsObject::nullSet<SlotType> );
+    const SetMethodPtr aNullMethodPtr( static_cast< SetMethodPtr >( &EcsObject::nullSet<SlotType> ) );
     return aSetMethodPtr != aNullMethodPtr;
 }
 
@@ -394,7 +394,7 @@ template< class T, typename SlotType_ >
 const bool ConcretePropertySlot< T, SlotType_ >::isGetableMethod( const GetMethodPtr aGetMethodPtr )
 {
     const GetMethodPtr
-        aNullMethodPtr( &EcsObject::nullGet<SlotType> );
+        aNullMethodPtr( static_cast< GetMethodPtr >( &EcsObject::nullGet<SlotType> ) );
     return aGetMethodPtr != aNullMethodPtr;
 }
 
