@@ -727,17 +727,11 @@ public:
 
     /// @internal
     template <typename Type>
-    void nullSet( typename Param<Type>::type )
-    {
-        throwNotSetable();
-    }
+    void nullSet( typename Param<Type>::type );
 
     /// @internal
     template <typename Type>
-    const Type nullGet() const
-    {
-        throwNotGetable();
-    }
+    const Type nullGet() const;
 
 private:
 
@@ -749,6 +743,19 @@ protected:
     Handle   theHandle;
     bool     disposed_;
 };
+
+template <typename Type>
+inline void EcsObject::nullSet( typename Param<Type>::type )
+{
+    throwNotSetable();
+}
+
+template <typename Type>
+inline const Type EcsObject::nullGet() const
+{
+    throwNotGetable();
+}
+
 
 // these specializations of nullSet/nullGet are here to avoid spreading
 // inline copies of them around.    This reduces sizes of DM .so files a bit.
