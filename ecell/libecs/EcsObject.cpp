@@ -100,8 +100,7 @@ StringCref EcsObject::getClassName() const
 
 String EcsObject::asString() const
 {
-    return ( boost::format( "%s[#%p]" ) % boost::io::group(
-            getPropertyInterface().getClassName(), this ) ).str();
+    return ( boost::format( "%s[#%p]" ) % getPropertyInterface().getClassName() % this ).str();
 }
 
 void EcsObject::dispose()
