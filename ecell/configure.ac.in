@@ -225,18 +225,19 @@ AC_SUBST([PYTHON_LIBS])
 ECELL_CHECK_BOOST(, [AC_MSG_ERROR([could not find Boost C++ library])])
 ECELL_CHECK_BOOST_PYTHON(, [AC_MSG_ERROR([could not find Boost.Python library])])
 
+USE_COMPILER_EXTENSIONS=no
 AC_MSG_CHECKING( if use of compiler specific features are allowed )
 
 AC_ARG_ENABLE( compiler-extensions,,
-               USE_COMPILER_EXTENSIONS=$enable_compiler_features,
-               USE_COMPILER_EXTENSIONS=yes
+               USE_COMPILER_EXTENSIONS=yes,
+               USE_COMPILER_EXTENSIONS=no
                )
 AC_MSG_RESULT( $USE_COMPILER_EXTENSIONS )
 
 if test "$USE_COMPILER_EXTENSIONS" != no ; then
-  AC_MSG_CHECKING( for special compiler options )
+  AC_MSG_CHECKING( for gcc-specific optimization )
   AC_SUBST(USE_COMPILER_EXTENSIONS)
-  AC_DEFINE([USE_COMPILER_EXTENSIONS],1,[make use of compiler specific language features])
+  AC_DEFINE([USE_COMPILER_EXTENSIONS],1,[make use of gcc specific features])
   CXXFLAGS="$CXXFLAGS -Wno-pmf-conversions"
   AC_SUBST(CXXFLAGS)
   AC_MSG_RESULT( $CXXFLAGS )
