@@ -171,6 +171,7 @@ def main():
 
     compiler = new_compiler( verbose=opts.verbose )
     compiler.customize( None, need_cxx=1 )
+    compiler = compiler.cxx_compiler()
 
     if opts.verbose:
         old_spawn = compiler.spawn
