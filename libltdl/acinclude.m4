@@ -84,7 +84,7 @@ AC_DEFUN([AC_LIBLTDL_INSTALLABLE],
 # choose between a shipped copy of the ltdl sources or a preinstalled
 # version of the library.
 AC_DEFUN([AC_WITH_LTDL],
-[AC_REQUIRE([AC_LIB_LTDL])
+[AC_REQUIRE([AC__LIB_LTDL])
 AC_SUBST([LIBLTDL])
 AC_SUBST([INCLTDL])
 
@@ -126,11 +126,11 @@ AC_CONFIG_SUBDIRS([libltdl])
 ])# AC_WITH_LTDL
 
 
-# AC_LIB_LTDL
+# AC__LIB_LTDL
 # -----------
 # Perform all the checks necessary for compilation of the ltdl objects
 #  -- including compiler checks and header checks.
-AC_DEFUN([AC_LIB_LTDL],
+AC_DEFUN([AC__LIB_LTDL],
 [AC_PREREQ(2.50)
 AC_REQUIRE([AC_PROG_CC])
 AC_REQUIRE([AC_C_CONST])
@@ -159,7 +159,7 @@ AC_CHECK_FUNCS([strrchr rindex], [break])
 AC_CHECK_FUNCS([memcpy bcopy], [break])
 AC_CHECK_FUNCS([memmove strcmp])
 AC_CHECK_FUNCS([closedir opendir readdir])
-])# AC_LIB_LTDL
+])# AC__LIB_LTDL
 
 
 # AC_LTDL_ENABLE_INSTALL
