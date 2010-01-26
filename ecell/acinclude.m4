@@ -1,6 +1,8 @@
 dnl $Id$ -*- autoconf -*-
 dnl
 dnl
+sinclude(libtool_overrides.m4)
+
 AC_DEFUN([_SUBST_DEFINE],
 [
 $1=$2
