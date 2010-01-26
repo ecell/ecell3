@@ -6,8 +6,8 @@ import sys
 import os
 import glob
 from optparse import OptionParser, IndentedHelpFormatter, BadOptionError, make_option
+from numpy.distutils.ccompiler import new_compiler
 from distutils.sysconfig import get_config_var, customize_compiler
-from distutils.ccompiler import new_compiler
 from distutils.errors import CompileError, LinkError
 from distutils.util import split_quoted
 
@@ -170,13 +170,13 @@ def main():
     shlflags = split_quoted( get_config_var('CCSHARED') )
 
     compiler = new_compiler( verbose=opts.verbose )
-    customize_compiler( compiler )
+    compiler.customize( None, need_cxx=1 )
 
     if opts.verbose:
         old_spawn = compiler.spawn
-        def new_spawn( self, cmd ):
+        def new_spawn( self, cmd, *arg, **kwarg ):
             print ' '.join( cmd )
-            old_spawn( cmd )
+            old_spawn( cmd, *arg, **kwarg )
         compiler.__class__.spawn = new_spawn
     if opts.include_dir is not None:
         map( compiler.add_include_dir, opts.include_dir )
