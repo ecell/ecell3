@@ -1,12 +1,16 @@
-ecell-3.2.0RC3: 18-Jan-2009
+ecell-3.2.0RC3: 27-Jan-2009
 
  * Modified libecs::Stepper::log() so that it can be compiled with older
    version of Boost.
 
+ * Added our version of std::bind2nd() to Utils.hpp for better compatibility.
+
+ * For the rest of the changes, see the entries for 3.1.108RC3.
+
 
 ecell-3.2.0RC2: 16-Jan-2009
 
- * See the entry for 3.1.108RC2
+ * See the entries for 3.1.108RC2
 
 
 ecell-3.2.0RC1: 13-Jan-2009
@@ -200,6 +204,17 @@ ecell-3.2.0RC1: 13-Jan-2009
 
    - Added two class constants ELLIPSIS and ELLIPSIS_PREFIX to
      ecell._ecs.Simulator.
+
+
+ecell-3.1.108RC3: 27-Jan-2010
+
+ * Fixed dmcompile so that it would choose the right compiler.
+
+ * Fixed libltdl autoconf script in order to get it work with newer versions
+   of libtool.
+
+ * libtool_overrides.m4 that overrides several internal functions of the
+   libtool autoconf script to support Fujitsu C++ compiler.
 
 
 ecell-3.1.108RC2: 15-Jan-2010
