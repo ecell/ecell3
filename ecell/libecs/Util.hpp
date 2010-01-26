@@ -51,6 +51,7 @@
 #include <boost/range/size.hpp>
 #include <boost/range/size_type.hpp>
 #include <boost/call_traits.hpp>
+#include <boost/type_traits/remove_const.hpp>
 
 #include "libecs/Defs.hpp"
 #include "libecs/Exceptions.hpp"
@@ -403,7 +404,12 @@ public:
     {
     }
 
-    result_type operator()( typename boost::call_traits< typename OP::first_argument_type >::param_type aFirstArgValue ) const
+    result_type operator()( typename boost::remove_const< typename OP::first_argument_type >::type const& aFirstArgValue ) const
+    {
+        return theOp( aFirstArgValue, theBoundValue );
+    }
+
+    result_type operator()( typename boost::remove_const< typename OP::first_argument_type >::type& aFirstArgValue ) const
     {
         return theOp( aFirstArgValue, theBoundValue );
     }

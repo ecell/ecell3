@@ -56,7 +56,7 @@ public:
         // force unset isAccessor flag of all variablereferences.
         std::for_each( theVariableReferenceVector.begin(),
                        theVariableReferenceVector.end(),
-                       std::bind2nd( std::mem_fun_ref(
+                       libecs::BindSecond( std::mem_fun_ref(
                             &VariableReference::setIsAccessor ), false ) );
     }
 
