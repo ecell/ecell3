@@ -1,3 +1,14 @@
+ecell-3.1.108RC3: 27-Jan-2010
+
+ * Fixed dmcompile so that it would choose the right compiler.
+
+ * Fixed libltdl autoconf script in order to get it work with newer versions
+   of libtool.
+
+ * libtool_overrides.m4 that overrides several internal functions of the
+   libtool autoconf script to support Fujitsu C++ compiler.
+
+
 ecell-3.1.108RC2: 15-Jan-2010
 
  * Fixed ecell3-dmc so that it accepts -o (--output=) option so that users
