@@ -61,7 +61,7 @@ namespace libecs
   /** @file */
 
 
-  //  DECLARE_TYPE( std::valarray<Real>, RealValarray );
+  //  DECLARE_TYPE( std::valarray<Real>, RealValarray )
 
   DECLARE_VECTOR( Real, RealVector );
   typedef VariableVector::size_type VariableIndex;

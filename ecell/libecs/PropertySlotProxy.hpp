@@ -162,7 +162,7 @@ namespace libecs
 
   public:
 
-    DECLARE_TYPE( PropertySlot<T>, PropertySlotType );
+    DECLARE_TYPE( PropertySlot<T>, PropertySlotType )
 
     DM_IF ConcretePropertySlotProxy( T& anObject, 
 			       PropertySlotTypeRef aPropertySlot )

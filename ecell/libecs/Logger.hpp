@@ -73,7 +73,7 @@ namespace libecs
 
   public:
 
-    DECLARE_TYPE( PhysicalLogger::size_type, size_type );
+    DECLARE_TYPE( PhysicalLogger::size_type, size_type )
     
     // enumeration for logging policy
     enum Policy

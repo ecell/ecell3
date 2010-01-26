@@ -47,7 +47,7 @@ namespace libecs
   /** @file */
 
 
-  DECLARE_TYPE( size_t, DataPointVectorIterator );
+  DECLARE_TYPE( size_t, DataPointVectorIterator )
 
   DECLARE_SHAREDPTR( DataPointVector );
 

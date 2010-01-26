@@ -88,7 +88,7 @@ namespace libecs
 
   public:
 
-    DECLARE_TYPE( PropertySlot<T>, PropertySlotType );
+    DECLARE_TYPE( PropertySlot<T>, PropertySlotType )
 
     DECLARE_ASSOCVECTOR_TEMPLATE( String, PropertySlotTypePtr,
 				  std::less<const String>, PropertySlotTypeMap );

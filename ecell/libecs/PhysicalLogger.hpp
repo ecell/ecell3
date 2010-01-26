@@ -52,15 +52,15 @@ namespace libecs
   class LIBECS_API PhysicalLogger
   {
 
-    //    DECLARE_TYPE( _DATAPOINT, DATAPOINT );
+    //    DECLARE_TYPE( _DATAPOINT, DATAPOINT )
     //    typedef vvector<DATAPOINT> Vector;
 
     typedef vvector<DataPoint> Vector;
     
   public:
 
-    DECLARE_TYPE( size_t, VectorIterator );
-    DECLARE_TYPE( size_t, size_type );
+    DECLARE_TYPE( size_t, VectorIterator )
+    DECLARE_TYPE( size_t, size_type )
 
     PhysicalLogger();
     virtual ~PhysicalLogger();

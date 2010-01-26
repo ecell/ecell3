@@ -110,10 +110,10 @@ namespace libecs
 
 
 #define _PROPERTYSLOT_SETMETHOD( TYPE )\
-    virtual void set ## TYPE( T& anObject, Param<TYPE>::type value ) = 0;
+    virtual void set ## TYPE( T& anObject, Param<TYPE>::type value ) = 0
 
 #define _PROPERTYSLOT_GETMETHOD( TYPE )\
-    virtual const TYPE get ## TYPE( const T& anObject ) const = 0;
+    virtual const TYPE get ## TYPE( const T& anObject ) const = 0
 
     _PROPERTYSLOT_SETMETHOD( Polymorph );
     _PROPERTYSLOT_GETMETHOD( Polymorph );
@@ -156,7 +156,7 @@ namespace libecs
 
   public:
 
-    DECLARE_TYPE( SlotType_, SlotType );
+    DECLARE_TYPE( SlotType_, SlotType )
 
     typedef typename Param<SlotType>::type  SetType;
     typedef const SlotType                  GetType;
@@ -299,7 +299,7 @@ namespace libecs
 
   public:
 
-    DECLARE_TYPE( SlotType_, SlotType );
+    DECLARE_TYPE( SlotType_, SlotType )
 
     typedef ConcretePropertySlot<T,SlotType> ConcretePropertySlotType;
 

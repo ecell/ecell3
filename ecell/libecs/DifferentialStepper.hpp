@@ -55,7 +55,7 @@ namespace libecs
   //  DECLARE_VECTOR( RealVector, RealMatrix );
   
   typedef boost::multi_array<Real, 2> RealMatrix_;
-  DECLARE_TYPE( RealMatrix_, RealMatrix );
+  DECLARE_TYPE( RealMatrix_, RealMatrix )
 
   typedef std::pair< VariableIndex, Integer > ExprComponent;
   typedef std::vector< ExprComponent > VariableReferenceList;
