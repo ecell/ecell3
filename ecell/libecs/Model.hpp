@@ -189,7 +189,7 @@ namespace libecs
     */
 
 
-    SystemPtr getSystem( SystemPathCref aSystemPath ) const;;
+    SystemPtr getSystem( SystemPathCref aSystemPath ) const;
 
 
     /**
