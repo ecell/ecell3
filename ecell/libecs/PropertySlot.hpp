@@ -244,14 +244,13 @@ namespace libecs
 
     static const bool isSetableMethod( const SetMethodPtr aSetMethodPtr )
     {
-      const SetMethodPtr aNullMethodPtr( &PropertiedClass::nullSet<SlotType> );
+      const SetMethodPtr aNullMethodPtr( static_cast< SetMethodPtr >( &PropertiedClass::nullSet<SlotType> ) );
       return aSetMethodPtr != aNullMethodPtr;
     }
 
     static const bool isGetableMethod( const GetMethodPtr aGetMethodPtr )
     {
-      const GetMethodPtr
-	aNullMethodPtr( &PropertiedClass::nullGet<SlotType> );
+      const GetMethodPtr aNullMethodPtr( static_cast< GetMethodPtr >( &PropertiedClass::nullGet<SlotType> ) );
       return aGetMethodPtr != aNullMethodPtr;
     }
 
@@ -260,7 +259,7 @@ namespace libecs
     {
       if( aSetMethodPtr == NULLPTR )
 	{
-	  return &PropertiedClass::nullSet<SlotType>;
+	  return static_cast< SetMethodPtr >( &PropertiedClass::nullSet<SlotType> );
 	}
       else
 	{
@@ -272,7 +271,7 @@ namespace libecs
     {
       if( aGetMethodPtr == NULLPTR )
 	{
-	  return &PropertiedClass::nullGet<SlotType>;
+	  return static_cast< GetMethodPtr >( &PropertiedClass::nullGet<SlotType> );
 	}
       else
 	{

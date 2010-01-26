@@ -397,7 +397,7 @@ namespace libecs
 
   void Stepper::removeSystem( SystemPtr aSystemPtr )
   { 
-    SystemVectorIterator i( find( theSystemVector.begin(), 
+    SystemVectorIterator i( std::find( theSystemVector.begin(), 
 				  theSystemVector.end(),
 				  aSystemPtr ) );
     
@@ -427,7 +427,7 @@ namespace libecs
 
   void Stepper::removeProcess( ProcessPtr aProcessPtr )
   { 
-    ProcessVectorIterator i( find( theProcessVector.begin(), 
+    ProcessVectorIterator i( std::find( theProcessVector.begin(), 
 				   theProcessVector.end(),
 				   aProcessPtr ) );
     

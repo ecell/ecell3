@@ -26,6 +26,8 @@
 //END_HEADER
 #include "libecs.hpp"
 
+#include <boost/foreach.hpp>
+
 #include "ContinuousProcess.hpp"
 
 USE_LIBECS;
@@ -56,11 +58,10 @@ LIBECS_DM_CLASS( ConstantFluxProcess, ContinuousProcess )
     Process::initialize();
   
     // force unset isAccessor flag of all variablereferences.
-    std::for_each( theVariableReferenceVector.begin(),
-		   theVariableReferenceVector.end(),
-		   std::bind2nd
-		   ( std::mem_fun_ref
-		     ( &VariableReference::setIsAccessor ), false ) );
+    BOOST_FOREACH( VariableReference& aVarRef, theVariableReferenceVector )
+      {
+	aVarRef.setIsAccessor( false );
+      }
   }  
 
   virtual void fire()

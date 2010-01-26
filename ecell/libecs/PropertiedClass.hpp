@@ -406,18 +406,12 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, PROPERTYSLOT_SET_METHOD_PTR( TYPE, SETMETHOD
     /// @internal
 
     template <typename Type>
-    void nullSet( typename Param<Type>::type )
-    {
-      throwNotSetable();
-    }
+    void nullSet( typename Param<Type>::type );
 
     /// @internal
 
     template <typename Type>
-    const Type nullGet() const
-    {
-      throwNotGetable();
-    }
+    const Type nullGet() const;
 
   private:
 
@@ -429,6 +423,20 @@ CLASSPROPERTY_INFO( # NAME, # TYPE, PROPERTYSLOT_SET_METHOD_PTR( TYPE, SETMETHOD
     LoggerVector theLoggerVector;
 
   };
+
+  template <typename Type>
+  inline void PropertiedClass::nullSet( typename Param<Type>::type )
+  {
+    throwNotSetable();
+  }
+
+  /// @internal
+
+  template <typename Type>
+  inline const Type PropertiedClass::nullGet() const
+  {
+    throwNotGetable();
+  }
 
 
 
