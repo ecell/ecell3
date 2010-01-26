@@ -92,7 +92,7 @@ namespace libecs
 
   void PropertiedClass::removeLogger( LoggerPtr aLoggerPtr )
   {
-    LoggerVectorIterator i( find( theLoggerVector.begin(), 
+    LoggerVectorIterator i( std::find( theLoggerVector.begin(), 
 				  theLoggerVector.end(),
 				  aLoggerPtr ) );
     
