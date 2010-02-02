@@ -125,38 +125,6 @@ System::~System()
 {
 }
 
-void System::dispose()
-{
-    if ( !disposed_ )
-    {
-        if( getStepper() )
-        {
-            getStepper()->unregisterSystem( this );
-        }
-
-        std::for_each( theProcessMap.begin(), theProcessMap.end(),
-                ComposeUnary(
-                    boost::bind( &Process::setSuperSystem, _1,
-                                 static_cast< System* >( NULLPTR ) ),
-                    SelectSecond< ProcessMap::value_type >() ) );
-        theProcessMap.clear();
-        std::for_each( theVariableMap.begin(), theVariableMap.end(),
-                ComposeUnary(
-                    boost::bind( &Variable::setSuperSystem, _1,
-                                 static_cast< System* >( NULLPTR ) ),
-                    SelectSecond< VariableMap::value_type >() ) );
-        theVariableMap.clear();
-        std::for_each( theSystemMap.begin(), theSystemMap.end(),
-                ComposeUnary(
-                    boost::bind( &System::setSuperSystem, _1,
-                                 static_cast< System* >( NULLPTR ) ),
-                    SelectSecond< SystemMap::value_type >() ) );
-        theSystemMap.clear();
-    }
-
-    Entity::dispose();
-}
-
 Variable const* System::findSizeVariable() const
 {
     try
