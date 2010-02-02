@@ -75,10 +75,6 @@ typedef intobjargproc ssizeobjargproc;
 typedef intintobjargproc ssizessizeobjargproc;
 typedef int Py_ssize_t;
 
-namespace boost { namespace python {
-typedef ::Py_ssize_t ssize_t;
-} } // namespace boost::python
-
 #endif
 
 using namespace libecs;
@@ -1370,13 +1366,13 @@ protected:
 
         py::handle<> aKeyList( PyMapping_Items( aSelfDict.get() ) );
         BOOST_ASSERT( PyList_Check( aKeyList.get() ) );
-        for ( py::ssize_t i( 0 ), e( PyList_GET_SIZE( aKeyList.get() ) ); i < e; ++i )
+        for ( Py_ssize_t i( 0 ), e( PyList_GET_SIZE( aKeyList.get() ) ); i < e; ++i )
         {
             py::handle<> aKeyValuePair( py::borrowed( PyList_GET_ITEM( aKeyList.get(), i ) ) );
             BOOST_ASSERT( PyTuple_Check( aKeyValuePair.get() ) && PyTuple_GET_SIZE( aKeyValuePair.get() ) == 2 );
             py::handle<> aKey( py::borrowed( PyTuple_GET_ITEM( aKeyValuePair.get(), 0 ) ) );
             BOOST_ASSERT( PyString_Check( aKey.get() ) );
-            if ( PyString_GET_SIZE( aKey.get() ) >= static_cast< py::ssize_t >( aPrivPrefix.size() )
+            if ( PyString_GET_SIZE( aKey.get() ) >= static_cast< Py_ssize_t >( aPrivPrefix.size() )
                     && memcmp( PyString_AS_STRING( aKey.get() ), aPrivPrefix.data(), aPrivPrefix.size() ) == 0 )
             {
                 continue;
@@ -1419,7 +1415,7 @@ protected:
             return;
         }
 
-        for ( py::ssize_t i( 0 ), ie( PyTuple_GET_SIZE( aBasesList.get() ) ); i < ie; ++i )
+        for ( Py_ssize_t i( 0 ), ie( PyTuple_GET_SIZE( aBasesList.get() ) ); i < ie; ++i )
         {
             py::handle<> aBase( py::borrowed( PyTuple_GET_ITEM( aBasesList.get(), i ) ) );
             appendDictToSet( retval, aPrivPrefix, aBase.get() );
@@ -1443,7 +1439,7 @@ protected:
             return;
         }
 
-        for ( py::ssize_t i( 0 ), ie( PyTuple_GET_SIZE( aBasesList.get() ) ); i < ie; ++i )
+        for ( Py_ssize_t i( 0 ), ie( PyTuple_GET_SIZE( aBasesList.get() ) ); i < ie; ++i )
         {
             py::handle<> aBase( py::borrowed( PyTuple_GET_ITEM( aBasesList.get(), i ) ) );
             removeAttributesFromBases( retval, aBase.get() );
@@ -1462,7 +1458,7 @@ protected:
 
             py::handle<> aKeyList( PyMapping_Keys( aBaseDict.get() ) );
             BOOST_ASSERT( PyList_Check( aKeyList.get() ) );
-            for ( py::ssize_t j( 0 ), je( PyList_GET_SIZE( aKeyList.get() ) ); j < je; ++j )
+            for ( Py_ssize_t j( 0 ), je( PyList_GET_SIZE( aKeyList.get() ) ); j < je; ++j )
             {
                 py::handle<> aKey( py::borrowed( PyList_GET_ITEM( aKeyList.get(), i ) ) );
                 BOOST_ASSERT( PyString_Check( aKey.get() ) );
@@ -2334,7 +2330,7 @@ private:
             }
 
 
-            for ( py::ssize_t i( 0 ), ie( PyTuple_GET_SIZE( aBasesList.get() ) ); i < ie; ++i )
+            for ( Py_ssize_t i( 0 ), ie( PyTuple_GET_SIZE( aBasesList.get() ) ); i < ie; ++i )
             {
                 py::object aBase( py::borrowed( PyTuple_GET_ITEM( aBasesList.get(), i ) ) );
                 EntityType aResult( ( *this )( aBase ) );
