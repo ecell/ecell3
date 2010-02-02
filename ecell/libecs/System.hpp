@@ -65,8 +65,6 @@ public:
     System();
     virtual ~System();
 
-    virtual void dispose();
-
     virtual const EntityType getEntityType() const
     {
         return EntityType( EntityType::SYSTEM );
