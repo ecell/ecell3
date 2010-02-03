@@ -330,7 +330,7 @@ class DMInfo:
         proc = Popen( ['python', '-'] + list(ecell.config.dm_path), 0, sys.executable, PIPE, PIPE, None )
         proc.stdin.write( testText % ( aType, aName, mode ) )
         proc.stdin.close()
-        result = proc.stdout.read()
+        result = proc.stdout.read().replace("\r\n", "\n")
         proc.stdout.close()
         if proc.wait() != 0:
             return None
