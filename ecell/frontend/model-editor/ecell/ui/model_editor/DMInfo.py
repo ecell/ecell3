@@ -28,6 +28,7 @@
 import os
 import os.path
 import sys
+from subprocess import Popen, PIPE
 
 import ecell.emc
 
@@ -60,6 +61,15 @@ INFO_LOADABLE = 3
 INFO_SAVEABLE = 4
 INFO_DEFAULT_VALUE = 5
 
+PROLOGUE = '''
+import sys
+from ecell.ecs import Simulator
+import ecell.config
+
+theSimulator = Simulator()
+theSimulator.setDMSearchPath(Simulator.DM_SEARCH_PATH_SEPARATOR.join(sys.argv[1:]))
+'''
+
 TESTCODE ='\
     if mode == "instantiate":\n\
         if aType == "Stepper":\n\
@@ -86,15 +96,13 @@ TESTCODE ='\
         except:\n\
             pass\n'
 
-TESTFILE = 'import sys\n\
-print "started"\n\
+TESTFILE = 'print "started"\n\
 aType="%s"\n\
 aClass="%s"\n\
 mode = "%s"\n\
 if True:\n' + TESTCODE 
 
-MASSTESTFILE = 'import sys\n\
-typeList=%s\n\
+MASSTESTFILE = 'typeList=%s\n\
 classList=%s\n\
 mode="%s"\n\
 for i in range( 0, len( typeList ) ):\n\
@@ -284,25 +292,23 @@ class DMInfo:
         
         
     def __testFile( self, aType, aName, mode):
+        testText = PROLOGUE
         if type( aType ) == type( [] ):
             aType = '["' +  '","'.join( aType ) + '"]'
             aName = '["' + '","'.join( aName ) + '"]'
-            testText = MASSTESTFILE
+            testText += MASSTESTFILE
         else:
-            testText = TESTFILE
-        testFileName = "__checkBinary___" + str(os.getpid())
-        resultFileName = "__checkResult___" + str(os.getpid())
+            testText += TESTFILE
 
-        tf=open( testFileName , "w" )
-        tf.write( testText%( aType, aName, mode) )
-        tf.close()
-        os.system( 'ecell3-session "' + testFileName + '" > "' + resultFileName + '"' )
-        os.unlink( testFileName )
-        rf=open( resultFileName , 'r' )
-        result = rf.readlines()
-        rf.close()
-        os.unlink( resultFileName )
-        return result
+        proc = Popen( ['python', '-'] + list(ecell.config.dm_path), 0, sys.executable, PIPE, PIPE, None )
+        proc.stdin.write( testText % ( aType, aName, mode ) )
+        proc.stdin.close()
+        result = proc.stdout.read()
+        proc.stdout.close()
+        if proc.wait() != 0:
+            return None
+        else:
+            return result
     
 
     def loadModule( self, aType, aName, builtin = False, aFlags = None ):
