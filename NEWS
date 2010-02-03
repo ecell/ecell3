@@ -1,4 +1,15 @@
-ecell-3.2.0RC3: 27-Jan-2009
+ecell-3.2.0RC4: 3-Feb-2010
+
+ * Fixed the release dates in NEWS file.
+
+ * Removed System::dispose() that used to do the same clean-up process as
+   System::detach() that is eventually called via EcsObject::dispose().
+   This caused long-standing problem on Windows with MSVC.
+ 
+ * Fixed typo in the MSVC build file for pyecell.
+
+
+ecell-3.2.0RC3: 27-Jan-2010
 
  * Modified libecs::Stepper::log() so that it can be compiled with older
    version of Boost.
@@ -8,7 +19,7 @@ ecell-3.2.0RC3: 27-Jan-2009
  * For the rest of the changes, see the entries for 3.1.108RC3.
 
 
-ecell-3.2.0RC2: 16-Jan-2009
+ecell-3.2.0RC2: 16-Jan-2010
 
  * See the entries for 3.1.108RC2
 
