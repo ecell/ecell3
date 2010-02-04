@@ -283,15 +283,6 @@ AC_DEFUN([ECELL_CHECK_BOOST], [
 AC_DEFUN([ECELL_CHECK_BOOST_PYTHON], [
   AC_REQUIRE([AM_CHECK_PYTHON_HEADERS])
 
-  BOOST_PYTHON_LIBNAME=boost_python
-  AC_ARG_WITH(boost-python-libname,
-    AC_HELP_STRING([--with-boost-python-libname=LIBNAME],
-                   [specify the library name of Boost.Python [[boost_python]]]
-                  ),
-    [BOOST_PYTHON_LIBNAME=$withval]
-  )
-  AC_SUBST(BOOST_PYTHON_LIBNAME)
-
   ac_save_CPPFLAGS="$CPPFLAGS"
   CPPFLAGS="$CPPFLAGS $PYTHON_INCLUDES"
   AC_CHECK_HEADER([boost/python.hpp], [

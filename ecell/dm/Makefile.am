@@ -91,10 +91,10 @@ dmso_DATA = ${DESCS}
 all-local: $(SOS)
 
 PythonFluxProcess$(LTDL_SHLIB_EXT) : PythonFluxProcess.cpp
-	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L$(abs_top_builddir)/tmp$(libdir) $(PYTHON_LIBS) $(LIBS)" --cxxflags='${CPPFLAGS} ${CXXFLAGS} -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} -I${top_srcdir}/../libltdl  ${PYTHON_INCLUDES} ' $< 
+	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L$(abs_top_builddir)/tmp$(libdir) $(PYTHON_LIBS) -l$(BOOST_PYTHON_LIBNAME) $(LIBS)" --cxxflags='${CPPFLAGS} ${CXXFLAGS} -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} -I${top_srcdir}/../libltdl  ${PYTHON_INCLUDES} ' $< 
 
 PythonProcess$(LTDL_SHLIB_EXT) : PythonProcess.cpp
-	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L$(abs_top_builddir)/tmp$(libdir) $(PYTHON_LIBS) $(LIBS)" --cxxflags='${CPPFLAGS} ${CXXFLAGS} -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} -I${top_srcdir}/../libltdl  ${PYTHON_INCLUDES} ' $< 
+	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L$(abs_top_builddir)/tmp$(libdir) $(PYTHON_LIBS) -l$(BOOST_PYTHON_LIBNAME) $(LIBS)" --cxxflags='${CPPFLAGS} ${CXXFLAGS} -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} -I${top_srcdir}/../libltdl  ${PYTHON_INCLUDES} ' $< 
 
 .cpp$(LTDL_SHLIB_EXT):
 	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L$(abs_top_builddir)/tmp$(libdir) $(LIBS)" --cxxflags='${CPPFLAGS} ${CXXFLAGS} -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} -I${top_srcdir}/../libltdl  ${PYTHON_INCLUDES} ' $< 
