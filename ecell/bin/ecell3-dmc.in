@@ -64,7 +64,6 @@ def main():
     # -------------------------------------
     prefix = r'''@PREFIX@'''
     ecell3dir = r'''@ECELL_DIRNAME@'''
-    BOOST_LIBRARIES = r'''-l@BOOST_PYTHON_LIBNAME@'''
     exec_prefix = prefix
     BINDIR = exec_prefix + os.sep + 'bin'
     STDLIBDIRS = [ '-L' + exec_prefix + os.sep + 'lib' ]
@@ -173,7 +172,6 @@ def main():
   
     LDFLAGS.append( '-lecs' )
     LDFLAGS.append( '-lgsl' )
-    LDFLAGS.extend( split_quoted( BOOST_LIBRARIES ) )
 
     cmdList.extend( STDINCLUDE )
     cmdList.extend( CXXFLAGS )

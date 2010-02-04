@@ -20,6 +20,11 @@ AC_ARG_ENABLE([gui],
                  [build ecell without gui frontends.]), [],
   [enable_gui=yes])
 
+AC_ARG_ENABLE([pyecell],
+  AC_HELP_STRING([--disable-pyecell],
+                 [build ecell without Python binding.]), [],
+  [enable_pyecell=yes])
+
 AC_ARG_WITH([boost-python-libname],
   AC_HELP_STRING([--with-boost-python-libname=LIBNAME],
                  [specify the library name of Boost.Python [[boost_python]]]))
