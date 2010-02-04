@@ -33,6 +33,7 @@
 #define __VARIABLE_HPP
 
 #include <utility>
+#include <iostream>
 
 #include "libecs/Defs.hpp"
 #include "libecs/Entity.hpp"
@@ -113,7 +114,7 @@ public:
     /** 
        Integrate.
     */
-    virtual void integrate( RealParam aTime )
+    void integrate( RealParam aTime )
     {
         if( isFixed() == false ) 
         {
