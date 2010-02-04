@@ -126,7 +126,7 @@ namespace libecs
 	Integrate.
     */
 
-    virtual void integrate( RealParam aTime )
+    void integrate( RealParam aTime )
     {
       if( isFixed() == false ) 
 	{
