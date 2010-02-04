@@ -224,6 +224,9 @@ ecell-3.2.0RC1: 13-Jan-2009
 
 ecell-3.1.108: 5-Feb-2010
 
+ * Added --disable-pyecell configure option to disable building python binding
+   at all.  It will still need a python binary to compile DM's.
+
  * Fixed model-editor to not create temporary files under the current directory.
    This change solves permission-related problems on Windows and boosts up
    the start-up speed as well.
