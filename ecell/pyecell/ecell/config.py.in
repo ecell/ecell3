@@ -39,7 +39,9 @@ __all__ = (
     'user_prefs_dir',
     'bin_dir',
     'lib_dir',
+    '_lib_dir',
     'data_dir',
+    '_data_dir',
     'datarootdir',
     'doc_dir',
     'conf_dir',
@@ -116,10 +118,11 @@ datarootdir = expand_shell_variables( datarootdir, locals() )
 if len( datarootdir ) == 0 or not os.path.isdir( datarootdir ):
     datarootdir = os.path.join( prefix, 'share' )
 
-data_dir = '''@datadir@'''
-data_dir = expand_shell_variables( data_dir, locals() )
-if len( data_dir ) == 0 or not os.path.isdir( data_dir ):
-    data_dir = os.path.join( datarootdir, per_app_dir_name )
+_data_dir = '''@datadir@'''
+_data_dir = expand_shell_variables( _data_dir, locals() )
+if len( _data_dir ) == 0 or not os.path.isdir( _data_dir ):
+    _data_dir = datarootdir
+data_dir = os.path.join( _data_dir, per_app_dir_name )
 
 _conf_dir = '''@sysconfdir@'''
 _conf_dir = expand_shell_variables( _conf_dir, locals() )
