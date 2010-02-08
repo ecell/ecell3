@@ -1,3 +1,13 @@
+ecell-3.2.0p1: 8-Feb-2010
+
+ * Fixed the build system so that resource files for the GUI tools are
+   correctly installed under the package data directory.
+
+ * Fixed FileSelection combatibility wrapper so that they can present
+   the text box for the filename entry.  Because of this bug, models could not
+   be saved in session-monitor or model editor.
+
+
 ecell-3.2.0: 5-Feb-2010
 
  * See the entries for 3.1.108.
