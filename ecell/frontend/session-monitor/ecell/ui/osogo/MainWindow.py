@@ -453,30 +453,35 @@ class MainWindow(OsogoWindow):
                             aPixbuf16, aPixbuf32)
             # when 'Load Model' is selected
             if aType == 'Load' and aTarget == 'Model':
+                self.theFileSelection.action = 'open'
                 self.theFileSelection.ok_button.connect('clicked', self.__loadData, aTarget)
                 self.theFileSelection.complete( '*.'+ MODEL_FILE_EXTENSION )
                 self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,MODEL_FILE_EXTENSION) )
 
             # when 'Load Script' is selected
             elif aType == 'Load' and aTarget == 'Script':
+                self.theFileSelection.action = 'open'
                 self.theFileSelection.ok_button.connect('clicked', self.__loadData, aTarget)
                 self.theFileSelection.complete( '*.'+ SCRIPT_FILE_EXTENSION )
                 self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,SCRIPT_FILE_EXTENSION) )
 
             # when 'Save Model' is selected
             elif aType == 'Save' and aTarget == 'Model':
+                self.theFileSelection.action = 'save'
                 self.theFileSelection.ok_button.connect('clicked', self.__saveModel)
                 self.theFileSelection.complete( '*.'+ MODEL_FILE_EXTENSION )
                 self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,MODEL_FILE_EXTENSION) )
 
             # when 'Import SBML' is selected
             elif aType == 'Load' and aTarget == 'SBML':
+                self.theFileSelection.action = 'open'
                 self.theFileSelection.ok_button.connect('clicked', self.__loadData, aTarget)
                 self.theFileSelection.complete( '*.'+ MODEL_FILE_EXTENSION )
                 self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,MODEL_FILE_EXTENSION) )
 
             # when 'Save Model' is selected
             elif aType == 'Save' and aTarget == 'SBML':
+                self.theFileSelection.action = 'save'
                 self.theFileSelection.ok_button.connect('clicked', self.__exportSBML)
                 self.theFileSelection.complete( '*.'+ MODEL_FILE_EXTENSION )
                 self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,MODEL_FILE_EXTENSION) )

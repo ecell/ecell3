@@ -244,7 +244,7 @@ class MEMainWindow( ListWindow ):
 
 
         if saveAsFlag or not self.theModelEditor.modelHasName or not self.theModelEditor.isNameConfirmed:
-            aFileName = self.__getFileSelection( self.theModelEditor.saveDirName )
+            aFileName = self.__getFileSelection( self.theModelEditor.saveDirName, save=True )
 
             # Convert All FileExtensions to Lower Case here
             if aFileName != None and aFileName != '':
@@ -430,7 +430,7 @@ class MEMainWindow( ListWindow ):
         self.theModelEditor.createAboutModelEditor()
         #self.theModelEditor.printMessage("Sorry, not implemented !", ME_ERROR )
    
-    def __getFileSelection ( self, aDirname, aFileName = '' ):
+    def __getFileSelection ( self, aDirname, aFileName = '', save=False ):
         """
         in: str aDirname, str aFileName
         returns None if dir is selected, or cancel is pressed
@@ -443,6 +443,10 @@ class MEMainWindow( ListWindow ):
 
         # set init path for dialog
         aDialog.set_filename( defaultName )
+
+        if save:
+            aDialog.action = 'save'
+
         aPixbuf16 = gtk.gdk.pixbuf_new_from_file(
             os.path.join( config.GLADEFILE_PATH, "modeleditor.png" ) )
         aPixbuf32 = gtk.gdk.pixbuf_new_from_file(
