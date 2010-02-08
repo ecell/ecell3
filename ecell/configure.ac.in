@@ -86,6 +86,13 @@ AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
+AC_LTDL_SHLIBEXT
+if test -n "$shrext_cmds"; then
+  eval LTDL_SHLIB_EXT=$shrext_cmds
+elif test -n "$shrext"; then
+  eval LTDL_SHLIB_EXT=$shrext
+fi
+AC_SUBST(LTDL_SHLIB_EXT)
 
 dnl to circumvent libltdl weirdness (already fixed in the newer versions)
 case $host_os in
@@ -98,40 +105,6 @@ rm -f conftest
 ./libtool --config > conftest
 . ./conftest
 rm -f conftest
-
-dnl compatibility for libtool 1.5.6
-
-LTDL_SHLIB_EXT=""
-if test -n "$shrext_cmds"; then
-    module=yes eval LTDL_SHLIB_EXT=\"$shrext_cmds\"
-dnl compatibility for libtool 1.5.0
-elif test -n "$shrext"; then
-    LTDL_SHLIB_EXT=$shrext
-dnl compatibility for libtool 1.4.x
-else
-  AC_CACHE_CHECK([which extension is used for shared libraries],
-    libltdl_cv_shlibext, [dnl
-  (
-    last=
-    for spec in $library_names_spec; do
-      last="$spec"
-    done
-  changequote(, )
-    echo "$last" | sed 's/\[.*\]//;s/^[^.]*//;s/\$.*$//;s/\.$//' > conftest
-  changequote([, ])
-  )
-  libltdl_cv_shlibext=`cat conftest`
-  rm -f conftest
-  ])
-  if test -n "$libltdl_cv_shlibext"; then
-    LTDL_SHLIB_EXT=$libltdl_cv_shlibext
-  fi
-fi
-
-AC_SUBST(LTDL_SHLIB_EXT)
-AC_DEFINE_UNQUOTED([LTDL_SHLIB_EXT]. ["$LTDL_SHLIB_EXT"],
-  [Define to the extension used for shared libraries])
-
 
 if test "$enable_pyecell" = "yes"; then
   AM_PATH_PYTHON(2.2)
