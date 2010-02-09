@@ -68,15 +68,11 @@ version_info = {
     'revision': '@ECELL_PACKAGE_REVISION@'
 }
 
-prefix = '''@PREFIX@'''
+prefix = '''@prefix@'''
 if len( prefix ) == 0 or not os.path.isdir( prefix ):
     prefix = os.path.dirname(
         os.path.dirname( get_running_executable() )
         )
-
-exec_prefix = '''@EXEC_PREFIX@'''
-if len( exec_prefix ) == 0 or not os.path.isdir( exec_prefix ):
-    exec_prefix = prefix
 
 if os.name == 'nt':
     try:
@@ -101,6 +97,11 @@ def expand_shell_variables( val, vars ):
     import re
     return re.compile( r'\$\{([^}]+)\}' ).sub(
         lambda m: vars[ m.group( 1 ) ], val )
+
+exec_prefix = '''@exec_prefix@'''
+exec_prefix = expand_shell_variables( exec_prefix, locals() )
+if len( exec_prefix ) == 0 or not os.path.isdir( exec_prefix ):
+    exec_prefix = prefix
 
 bin_dir = '''@bindir@'''
 bin_dir = expand_shell_variables( bin_dir, locals() )
