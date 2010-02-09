@@ -309,7 +309,6 @@ AC_CONFIG_FILES([
     frontend/model-editor/glade/Makefile
     frontend/model-editor/plugins/Makefile
 ])
-AC_CONFIG_FILES([bin/ecell3-dmc], [chmod +x bin/ecell3-dmc])
 AC_CONFIG_FILES([pyecell/ecell3-python], [chmod +x pyecell/ecell3-python])
 AC_CONFIG_FILES([pyecell/ecell3-em2eml], [chmod +x pyecell/ecell3-em2eml])
 AC_CONFIG_FILES([pyecell/ecell3-eml2em], [chmod +x pyecell/ecell3-eml2em])

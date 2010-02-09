@@ -40,7 +40,6 @@ var buildInfo = {
 var tasks = {
     installScripts: function() {
         var dmcFile = this.projectDir + 'ecell\\bin\\ecell3-dmc';
-        BuildHelper.processTemplate(dmcFile, dmcFile + '.in', buildInfo);
         BuildHelper.copy(dmcFile, this.distBinDir);
         this.makePythonLauncher(this.distBinDir + '\\ecell3-dmc');
     },
