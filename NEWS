@@ -1,4 +1,4 @@
-ecell-3.2.0p1: 8-Feb-2010
+ecell-3.2.0p1: 9-Feb-2010
 
  * Fixed the build system so that resource files for the GUI tools are
    correctly installed under the package data directory.
@@ -6,6 +6,10 @@ ecell-3.2.0p1: 8-Feb-2010
  * Fixed FileSelection combatibility wrapper so that they can present
    the text box for the filename entry.  Because of this bug, models could not
    be saved in session-monitor or model editor.
+
+ * Made ecell3-dmc and dmcompile available on Windows.
+
+ * Fixed a bug in System::detach() that causes random segfault on cleanup.
 
 
 ecell-3.2.0: 5-Feb-2010
