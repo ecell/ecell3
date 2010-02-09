@@ -40,7 +40,7 @@ var buildInfo = {
 var tasks = {
     installScripts: function() {
         var dmcFile = this.projectDir + 'ecell\\bin\\ecell3-dmc';
-        BuildHelper.processTemplate(dmcFile, dmcFile + '.in', buildInfo);
+        BuildHelper.processTemplate(dmcFile, dmcFile + '.in', buildInfo.env);
         BuildHelper.copy(dmcFile, this.distBinDir);
         this.makePythonLauncher(this.distBinDir + '\\ecell3-dmc');
     },
@@ -137,7 +137,7 @@ var tasks = {
         BuildHelper.copy(dmToolDir + '*.hpp', destDir);
 
         var dmcompileFile = dmToolDir + 'dmcompile';
-        BuildHelper.processTemplate(dmcompileFile, dmcompileFile + '.in', buildInfo);
+        BuildHelper.processTemplate(dmcompileFile, dmcompileFile + '.in', buildInfo.env);
         BuildHelper.copy(dmcompileFile, this.distBinDir);
         this.makePythonLauncher(this.distBinDir + '\\dmcompile');
     },
