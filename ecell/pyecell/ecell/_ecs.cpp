@@ -2504,11 +2504,6 @@ public:
         theEventHandler = anEventHandler;
     }
 
-    const std::string getDMSearchPath() const
-    {
-        return getDMSearchPath();
-    }
-
     void addPythonDM( py::object obj )
     {
         if ( !PyType_Check( obj.ptr() ) )
