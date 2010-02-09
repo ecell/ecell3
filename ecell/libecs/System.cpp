@@ -472,25 +472,35 @@ void System::unregisterEntity( EntityType const& anEntityType, String const& anI
 
 void System::detach()
 {
+    typedef std::vector< Entity* > EntityVector;
+    EntityVector entitiesToDetach;
+
     for ( SystemMap::iterator i( theSystemMap.begin() ),
                               e( theSystemMap.end() );
           i != e; ++i )
     {
-        ( *i ).second->detach();
+        entitiesToDetach.push_back( ( *i ).second );
     }
 
     for ( ProcessMap::iterator i( theProcessMap.begin() ),
                                e( theProcessMap.end() );
           i != e; ++i )
     {
-        ( *i ).second->detach();
+        entitiesToDetach.push_back( ( *i ).second );
     }
 
     for ( VariableMap::iterator i( theVariableMap.begin() ),
                                 e( theVariableMap.end() );
           i != e; ++i )
     {
-        ( *i ).second->detach();
+        entitiesToDetach.push_back( ( *i ).second );
+    }
+
+    for ( EntityVector::iterator i( entitiesToDetach.begin() ),
+                                 e( entitiesToDetach.end() );
+          i != e; ++i )
+    {
+        ( *i )->detach();
     }
 
     if ( theStepper )
