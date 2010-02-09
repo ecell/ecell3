@@ -41,6 +41,8 @@ DMS = \
 	PythonProcess.cpp \
 	QuasiDynamicFluxProcess.cpp \
 	SSystemProcess.cpp \
+	BooleanStepper.cpp \
+	BooleanProcess.cpp \
 	TauLeapProcess.cpp \
 	TauLeapStepper.cpp
 
@@ -53,6 +55,8 @@ DMH = \
 	ExpressionCompiler.hpp \
 	GillespieProcess.hpp \
 	QuasiDynamicFluxProcess.hpp \
+	BooleanStepper.hpp \
+	BooleanProcess.hpp \
 	TauLeapProcess.hpp
 
 DESCS =  \

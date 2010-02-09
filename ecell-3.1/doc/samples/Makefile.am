@@ -13,6 +13,7 @@ SAMPLES = \
 	ga \
 	heatshock \
 	session_manager \
+	boolean \
 	simple \
 	tauleap
 
