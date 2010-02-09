@@ -6,8 +6,6 @@
 # authors: Tomoya Kitayama <tomo@e-cell.org>
 #          Satya Arjunan <satya@sfc.keio.ac.jp>
 
-#PACKAGE=bin
-#VERSION=0.0
 
 import sys
 import os
@@ -15,7 +13,69 @@ import getopt
 import operator
 from glob import glob
 from distutils.util import split_quoted
-import ecell.config as config
+
+# Inspired by BTL::platform::get_module_filename
+def get_running_executable():
+    if getattr( sys, 'frozen', '' ) == 'windows_exe':
+        import win32api
+        return win32api.GetModuleFileName( 0 )
+    else:
+        return os.path.abspath( sys.argv[0] )
+
+per_app_dir_name = "@ECELL_DIRNAME@"
+
+prefix = '''@prefix@'''
+if len( prefix ) == 0 or not os.path.isdir( prefix ):
+    prefix = os.path.dirname(
+        os.path.dirname( get_running_executable() )
+        )
+
+if os.name == 'nt':
+    try:
+        from win32com.shell import shell, shellcon
+        home_dir = shell.SHGetPathFromIDList(
+            shell.SHGetSpecialFolderLocation( 0, shellcon.CSIDL_PROFILE )
+            )
+        user_prefs_dir = os.path.join(
+            shell.SHGetPathFromIDList(
+                shell.SHGetSpecialFolderLocation( 0, shellcon.CSIDL_APPDATA )
+                ),
+            per_app_dir_name
+            )
+    except:
+        home_dir = os.environ['USERPROFILE']
+        user_prefs_dir = os.environ['APPDATA']
+else:
+    home_dir = os.path.expanduser( '~' )
+    user_prefs_dir = os.path.join( home_dir, '.' + per_app_dir_name )
+
+def expand_shell_variables( val, vars ):
+    import re
+    return re.compile( r'\$\{([^}]+)\}' ).sub(
+        lambda m: vars[ m.group( 1 ) ], val )
+
+exec_prefix = '''@exec_prefix@'''
+exec_prefix = expand_shell_variables( exec_prefix, locals() )
+if len( exec_prefix ) == 0 or not os.path.isdir( exec_prefix ):
+    exec_prefix = prefix
+
+bin_dir = '''@bindir@'''
+bin_dir = expand_shell_variables( bin_dir, locals() )
+if len( bin_dir ) == 0 or not os.path.isdir( bin_dir ):
+    bin_dir = os.path.join( prefix, 'bin' )
+
+_include_dir = '''@includedir@'''
+_include_dir = expand_shell_variables( _include_dir, locals() )
+if len( _include_dir ) == 0 or not os.path.isdir( _include_dir ):
+    _include_dir = os.path.join( prefix, 'include' )
+include_dir = os.path.join( _include_dir, per_app_dir_name  )
+
+_lib_dir = '''@libdir@'''
+_lib_dir = expand_shell_variables( _lib_dir, locals() )
+if len( _lib_dir ) == 0 or not os.path.isdir( _lib_dir ):
+    _lib_dir = os.path.join( prefix, 'lib' )
+lib_dir = os.path.join( _lib_dir, per_app_dir_name  )
+
     
 DMCOMPILE = 'dmcompile'
 CLASS_NAME_MACRO_NAME = '_ECELL3_DM_CLASSNAME'
@@ -87,17 +147,14 @@ elif os.name == 'nt':
 
 
 def main():
-
+    _lib_dir = '@LIBDIR@'
     # -------------------------------------
     # initialize file names
     # -------------------------------------
-    STDLIBDIRS = [ '-L' + config._lib_dir, '-L' + config.lib_dir ]
-    INCLUDE = os.path.join(config.prefix, 'include')
-    ECELL_INCLUDE = os.path.join(INCLUDE, config.per_app_dir_name)
-    LIBECS_INCLUDE = os.path.join(ECELL_INCLUDE, 'libecs')
-    STDINCLUDE = [ '-I' + INCLUDE,
-                   '-I' + ECELL_INCLUDE,
-                   '-I' + LIBECS_INCLUDE ]
+    STDLIBDIRS = [ '-L' + _lib_dir, '-L' + lib_dir ]
+    STDINCLUDE = [ '-I' + _include_dir,
+                   '-I' + include_dir,
+                   '-I' + os.path.join(include_dir, 'libecs') ]
     SRC = None
 
 
