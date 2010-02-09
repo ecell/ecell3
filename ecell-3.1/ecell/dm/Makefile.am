@@ -105,7 +105,9 @@ SOS = \
 	QuasiDynamicFluxProcess$(LTDL_SHLIB_EXT) \
 	ExpressionFluxProcess$(LTDL_SHLIB_EXT) \
 	ExpressionAlgebraicProcess$(LTDL_SHLIB_EXT) \
-	ExpressionAssignmentProcess$(LTDL_SHLIB_EXT)
+	ExpressionAssignmentProcess$(LTDL_SHLIB_EXT) \
+	BooleanProcess$(LTDL_SHLIB_EXT) \
+	BooleanStepper$(LTDL_SHLIB_EXT)
 
 if HAVE_PYTHON_LIB
 SOS += \
