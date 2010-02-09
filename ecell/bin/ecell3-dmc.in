@@ -147,7 +147,6 @@ elif os.name == 'nt':
 
 
 def main():
-    _lib_dir = '@LIBDIR@'
     # -------------------------------------
     # initialize file names
     # -------------------------------------
