@@ -34,6 +34,13 @@ var buildInfo = {
     <script language="JScript" src="info.js" />
     <script language="JScript"><![CDATA[
 var tasks = {
+    installScripts: function() {
+        var dmcFile = this.projectDir + 'ecell\\bin\\ecell3-dmc';
+        BuildHelper.processTemplate(dmcFile, dmcFile + '.in', buildInfo.env);
+        BuildHelper.copy(dmcFile, this.distBinDir);
+        this.makePythonLauncher(this.distBinDir + '\\ecell3-dmc');
+    },
+
     installECS: function() {
         var ecsDir = this.projectDir + 'ecell\\libecs\\';
         var destDir;
@@ -48,6 +55,19 @@ var tasks = {
 
         BuildHelper.mkdir(this.distBinDir);
         BuildHelper.copy(this.vcOutDir + 'ecs.dll', this.distBinDir);
+        BuildHelper.copy(this.vcOutDir + 'ecs.pdb', this.distBinDir);
+    },
+
+    installLTDL: function() {
+        var ltdlDir = this.projectDir + 'libltdl\\';
+        var destDir;
+
+        destDir = this.distIncludeDir;
+        BuildHelper.mkdir(destDir);
+        BuildHelper.copy(ltdlDir + 'ltdl.h', destDir);
+
+        BuildHelper.mkdir(this.distLibDir);
+        BuildHelper.copy(this.vcOutDir + 'ltdl.lib', this.distLibDir);
     },
 
     installPyECell: function() {
@@ -87,7 +107,6 @@ var tasks = {
         destDir = this.distLibEcellDir + 'dms\\';
         BuildHelper.mkdir(destDir);
         BuildHelper.copy(this.vcOutDir + 'dm\\*.dll', destDir);
-        BuildHelper.copy(dmObjectsDir + '*.desc', destDir);
     },
 
     installEMC: function() {
@@ -103,6 +122,7 @@ var tasks = {
 
         BuildHelper.mkdir(this.distBinDir);
         BuildHelper.copy(this.vcOutDir + 'emc.dll', this.distBinDir);
+        BuildHelper.copy(this.vcOutDir + 'emc.pdb', this.distBinDir);
     },
 
     installDMTool: function() {
@@ -111,6 +131,11 @@ var tasks = {
 
         BuildHelper.mkdir(destDir);
         BuildHelper.copy(dmToolDir + '*.hpp', destDir);
+
+        var dmcompileFile = dmToolDir + 'dmcompile';
+        BuildHelper.processTemplate(dmcompileFile, dmcompileFile + '.in', buildInfo.env);
+        BuildHelper.copy(dmcompileFile, this.distBinDir);
+        this.makePythonLauncher(this.distBinDir + '\\dmcompile');
     },
 
     installSessionMonitor: function() {
@@ -186,6 +211,8 @@ var tasks = {
     },
 
     install: function() {
+        this.installLTDL();
+        this.installScripts();
         this.installECS();
         this.installEMC();
         this.installDMTool();

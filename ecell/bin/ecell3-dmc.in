@@ -6,8 +6,6 @@
 # authors: Tomoya Kitayama <tomo@e-cell.org>
 #          Satya Arjunan <satya@sfc.keio.ac.jp>
 
-#PACKAGE=bin
-#VERSION=0.0
 
 import sys
 import os
@@ -15,6 +13,69 @@ import getopt
 import operator
 from glob import glob
 from distutils.util import split_quoted
+
+# Inspired by BTL::platform::get_module_filename
+def get_running_executable():
+    if getattr( sys, 'frozen', '' ) == 'windows_exe':
+        import win32api
+        return win32api.GetModuleFileName( 0 )
+    else:
+        return os.path.abspath( sys.argv[0] )
+
+per_app_dir_name = "@ECELL_DIRNAME@"
+
+prefix = '''@prefix@'''
+if len( prefix ) == 0 or not os.path.isdir( prefix ):
+    prefix = os.path.dirname(
+        os.path.dirname( get_running_executable() )
+        )
+
+if os.name == 'nt':
+    try:
+        from win32com.shell import shell, shellcon
+        home_dir = shell.SHGetPathFromIDList(
+            shell.SHGetSpecialFolderLocation( 0, shellcon.CSIDL_PROFILE )
+            )
+        user_prefs_dir = os.path.join(
+            shell.SHGetPathFromIDList(
+                shell.SHGetSpecialFolderLocation( 0, shellcon.CSIDL_APPDATA )
+                ),
+            per_app_dir_name
+            )
+    except:
+        home_dir = os.environ['USERPROFILE']
+        user_prefs_dir = os.environ['APPDATA']
+else:
+    home_dir = os.path.expanduser( '~' )
+    user_prefs_dir = os.path.join( home_dir, '.' + per_app_dir_name )
+
+def expand_shell_variables( val, vars ):
+    import re
+    return re.compile( r'\$\{([^}]+)\}' ).sub(
+        lambda m: vars[ m.group( 1 ) ], val )
+
+exec_prefix = '''@exec_prefix@'''
+exec_prefix = expand_shell_variables( exec_prefix, locals() )
+if len( exec_prefix ) == 0 or not os.path.isdir( exec_prefix ):
+    exec_prefix = prefix
+
+bin_dir = '''@bindir@'''
+bin_dir = expand_shell_variables( bin_dir, locals() )
+if len( bin_dir ) == 0 or not os.path.isdir( bin_dir ):
+    bin_dir = os.path.join( prefix, 'bin' )
+
+_include_dir = '''@includedir@'''
+_include_dir = expand_shell_variables( _include_dir, locals() )
+if len( _include_dir ) == 0 or not os.path.isdir( _include_dir ):
+    _include_dir = os.path.join( prefix, 'include' )
+include_dir = os.path.join( _include_dir, per_app_dir_name  )
+
+_lib_dir = '''@libdir@'''
+_lib_dir = expand_shell_variables( _lib_dir, locals() )
+if len( _lib_dir ) == 0 or not os.path.isdir( _lib_dir ):
+    _lib_dir = os.path.join( prefix, 'lib' )
+lib_dir = os.path.join( _lib_dir, per_app_dir_name  )
+
     
 DMCOMPILE = 'dmcompile'
 CLASS_NAME_MACRO_NAME = '_ECELL3_DM_CLASSNAME'
@@ -22,7 +83,6 @@ CLASS_NAME_MACRO_NAME = '_ECELL3_DM_CLASSNAME'
 progname = os.path.basename( sys.argv[ 0 ] )
 
 def usage():
-    global progname
     print '''
 %(progname)s -- Compile dynamic modules for E-Cell Simulation Environment Version 3.
 
@@ -32,7 +92,6 @@ Usage:
     ''' % dict( progname = progname )
 
 def help():
-    global progname
     usage()
     print '''
 %(progname)s options:
@@ -57,21 +116,44 @@ def msg( outstr ):
     global progname
     print "%s: %s" % ( progname, outstr )
 
-def main():
+spawnvp = os.spawnv
 
+if hasattr(os, 'spawnvp'):
+    spawnvp = os.spawnvp
+elif os.name == 'nt':
+    def lookup_executable_path_nt(path, file):
+        for p in path:
+            for ext in ('', '.exe', '.cmd', '.bat'):
+                _file = os.path.join(p, file) + ext
+                try:
+                    stat = os.stat(_file)
+                    if stat.st_mode & 0500 == 0500:
+                        return _file
+                except:
+                    pass
+        return None
+
+    def spawnvp(mode, file, args):
+        if os.path.dirname(file) == '':
+            path = os.environ.get('PATH', None)
+            if path is not None:
+                path = path.split(os.pathsep)
+            else:
+                path = os.defpath
+            _file = lookup_executable_path_nt(path, file)
+            if _file is not None:
+                file = _file
+        return os.spawnv(mode, file, args)
+
+
+def main():
     # -------------------------------------
     # initialize file names
     # -------------------------------------
-    prefix = r'''@PREFIX@'''
-    ecell3dir = r'''@ECELL_DIRNAME@'''
-    exec_prefix = prefix
-    BINDIR = exec_prefix + os.sep + 'bin'
-    STDLIBDIRS = [ '-L' + exec_prefix + os.sep + 'lib' ]
-    ECELL_INCLUDE = prefix + os.sep + 'include' + os.sep + ecell3dir
-    LIBECS_INCLUDE = ECELL_INCLUDE + os.sep + 'libecs'
-    STDINCLUDE = [ '-I' + prefix + os.sep + 'include',
-                   '-I' + ECELL_INCLUDE,
-                   '-I' + LIBECS_INCLUDE ]
+    STDLIBDIRS = [ '-L' + _lib_dir, '-L' + lib_dir ]
+    STDINCLUDE = [ '-I' + _include_dir,
+                   '-I' + include_dir,
+                   '-I' + os.path.join(include_dir, 'libecs') ]
     SRC = None
 
 
@@ -139,6 +221,7 @@ def main():
             else:
                 dmcompile = anArg
 
+        # set output file
         if anOption in ( "-o", "--output" ):
             OUTPUT = anArg
 
@@ -153,7 +236,7 @@ def main():
     if VERBOSE:
         cmdList.append( '-v' )
 
-    if OUTPUT is not None:
+    if OUTPUT:
         cmdList += [ '-o', OUTPUT ]
 
     # on MS-Windows, command line doesn't expand *.cpp automatically
@@ -187,7 +270,7 @@ def main():
             
         # Need to us os.spawnv because of problems in MS-Windows with os.sytem
         # when the dmcompile path contains whitespaces even if we force quotes
-        ret = os.spawnvp( os.P_WAIT, cmdList[0], argList )
+        ret = spawnvp( os.P_WAIT, cmdList[0], argList )
         if ret != 0:
             msg( '%s returned error status: %d' % ( cmdList[0], ret ) )
             return 1

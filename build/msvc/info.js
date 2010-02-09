@@ -16,7 +16,11 @@ buildInfo.env = (function() {
         VERSION: sh.env.ECELL_VERSION_NUMBER,
         INCLTDL: '/I' + buildInfo.projectDir + '\\libltdl',
         DMTOOL_INCLUDE_DIR: buildInfo.projectDir,
-        NUMPY_INCLUDE_DIR: buildInfo.pythonHome + '\\lib\\site-packages\\numpy\\core\\include'
+        NUMPY_INCLUDE_DIR: buildInfo.pythonHome + '\\lib\\site-packages\\numpy\\core\\include',
+        LTDL_SHLIB_EXT: '.dll',
+        CXXFLAGS: '',
+        CPPFLAGS: '-DBOOST_ALL_NO_LIB=1 -DWIN32=1 -D_WIN32=1 -D__STDC__=1 -D_WIN32_WINNT=0x500 -D_SECURE_SCL=0',
+        LDFLAGS: ''
     });
 })();
 

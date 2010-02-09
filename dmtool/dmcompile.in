@@ -7,13 +7,10 @@ import os
 import glob
 from optparse import OptionParser, IndentedHelpFormatter, BadOptionError, make_option
 from numpy.distutils.ccompiler import new_compiler
-from distutils.sysconfig import get_config_var, customize_compiler
+from distutils.sysconfig import get_config_vars, customize_compiler
 from distutils.errors import CompileError, LinkError
 from distutils.util import split_quoted
 
-# prefix='@prefix@'
-# exec_prefix='@exec_prefix@'
-# libdir='@libdir@'
 OBJECT_EXTS = ['.so', '.o', '.obj', '.a', '.lib'];
 
 ORIG_CXXFLAGS = '@CXXFLAGS@'
@@ -167,7 +164,7 @@ def main():
         for flag in opts.unknown:
             cxxflags.append( flag )
 
-    shlflags = split_quoted( get_config_var('CCSHARED') )
+    shlflags = split_quoted( get_config_vars().get( 'CCSHARED', '' ) )
 
     compiler = new_compiler( verbose=opts.verbose )
     compiler.customize( None, need_cxx=1 )
@@ -210,11 +207,10 @@ def main():
         compiler.linker_so = [ arg for arg in compiler.linker_so if arg != '-shard' ]
 
     dlflags = []
-    dlflags.extend(
-        split_quoted(
-            get_config_var( 'LDSHARED' ).replace(
-                get_config_var( 'LINKCC' ), '' ).replace(
-                    get_config_var( 'LDFLAGS' ), '' ) ) )
+    dlflags.extend( split_quoted(
+        get_config_vars().get( 'LDSHARED', '' )
+            .replace( get_config_vars().get( 'LINKCC', '' ), '' )
+            .replace( get_config_vars().get( 'LDFLAGS', '' ), '' ) ) )
 
     try:
         try:
