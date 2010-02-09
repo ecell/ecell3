@@ -7,6 +7,10 @@
     <script language="JScript" src="buildhelper.js" />
     <script language="JScript"><![CDATA[
 var buildInfo = {
+    LTDL_SHLIB_EXT: '.dll',
+    CXXFLAGS: '',
+    CPPFLAGS: '-DBOOST_ALL_NO_LIB=1 -DWIN32=1 -D_WIN32=1 -D__STDC__=1 -D_WIN32_WINNT=0x500 -D_SECURE_SCL=0',
+    LDFLAGS: '',
     debugBuild: false
 };
 
@@ -34,6 +38,13 @@ var buildInfo = {
     <script language="JScript" src="info.js" />
     <script language="JScript"><![CDATA[
 var tasks = {
+    installScripts: function() {
+        var dmcFile = this.projectDir + 'ecell\\bin\\ecell3-dmc';
+        BuildHelper.processTemplate(dmcFile, dmcFile + '.in', buildInfo);
+        BuildHelper.copy(dmcFile, this.distBinDir);
+        this.makePythonLauncher(this.distBinDir + '\\ecell3-dmc');
+    },
+
     installECS: function() {
         var ecsDir = this.projectDir + 'ecell\\libecs\\';
         var destDir;
@@ -124,6 +135,11 @@ var tasks = {
 
         BuildHelper.mkdir(destDir);
         BuildHelper.copy(dmToolDir + '*.hpp', destDir);
+
+        var dmcompileFile = dmToolDir + 'dmcompile';
+        BuildHelper.processTemplate(dmcompileFile, dmcompileFile + '.in', buildInfo);
+        BuildHelper.copy(dmcompileFile, this.distBinDir);
+        this.makePythonLauncher(this.distBinDir + '\\dmcompile');
     },
 
     installSessionMonitor: function() {
@@ -200,6 +216,7 @@ var tasks = {
 
     install: function() {
         this.installLTDL();
+        this.installScripts();
         this.installECS();
         this.installEMC();
         this.installDMTool();

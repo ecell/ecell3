@@ -15,6 +15,7 @@ import getopt
 import operator
 from glob import glob
 from distutils.util import split_quoted
+import ecell.config as config
     
 DMCOMPILE = 'dmcompile'
 CLASS_NAME_MACRO_NAME = '_ECELL3_DM_CLASSNAME'
@@ -55,19 +56,46 @@ def msg( outstr ):
     global progname
     print "%s: %s" % ( progname, outstr )
 
+spawnvp = os.spawnv
+
+if hasattr(os, 'spawnvp'):
+    spawnvp = os.spawnvp
+elif os.name == 'nt':
+    def lookup_executable_path_nt(path, file):
+        for p in path:
+            for ext in ('', '.exe', '.cmd', '.bat'):
+                _file = os.path.join(p, file) + ext
+                try:
+                    stat = os.stat(_file)
+                    if stat.st_mode & 0500 == 0500:
+                        return _file
+                except:
+                    pass
+        return None
+
+    def spawnvp(mode, file, args):
+        if os.path.dirname(file) == '':
+            path = os.environ.get('PATH', None)
+            if path is not None:
+                path = path.split(os.pathsep)
+            else:
+                path = os.defpath
+            _file = lookup_executable_path_nt(path, file)
+            if _file is not None:
+                file = _file
+        return os.spawnv(mode, file, args)
+
+
 def main():
 
     # -------------------------------------
     # initialize file names
     # -------------------------------------
-    prefix = r'''@PREFIX@'''
-    ecell3dir = r'''@ECELL_DIRNAME@'''
-    exec_prefix = prefix
-    BINDIR = exec_prefix + os.sep + 'bin'
-    STDLIBDIRS = [ '-L' + exec_prefix + os.sep + 'lib' ]
-    ECELL_INCLUDE = prefix + os.sep + 'include' + os.sep + ecell3dir
-    LIBECS_INCLUDE = ECELL_INCLUDE + os.sep + 'libecs'
-    STDINCLUDE = [ '-I' + prefix + os.sep + 'include',
+    STDLIBDIRS = [ '-L' + config._lib_dir, '-L' + config.lib_dir ]
+    INCLUDE = os.path.join(config.prefix, 'include')
+    ECELL_INCLUDE = os.path.join(INCLUDE, config.per_app_dir_name)
+    LIBECS_INCLUDE = os.path.join(ECELL_INCLUDE, 'libecs')
+    STDINCLUDE = [ '-I' + INCLUDE,
                    '-I' + ECELL_INCLUDE,
                    '-I' + LIBECS_INCLUDE ]
     SRC = None
@@ -186,7 +214,7 @@ def main():
             
         # Need to us os.spawnv because of problems in MS-Windows with os.sytem
         # when the dmcompile path contains whitespaces even if we force quotes
-        ret = os.spawnvp( os.P_WAIT, cmdList[0], argList )
+        ret = spawnvp( os.P_WAIT, cmdList[0], argList )
         if ret != 0:
             msg( '%s returned error status: %d' % ( cmdList[0], ret ) )
             return 1
