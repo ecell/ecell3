@@ -11,6 +11,8 @@ ecell-3.2.0p1: 9-Feb-2010
 
  * Fixed a bug in System::detach() that causes random segfault on cleanup.
 
+ * Fixed infinite recursion in ecell._ecs.Simulator.getDMSearchPath().
+
 
 ecell-3.2.0: 5-Feb-2010
 
