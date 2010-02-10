@@ -168,7 +168,11 @@ def main():
 
     compiler = new_compiler( verbose=opts.verbose )
     compiler.customize( None, need_cxx=1 )
-    compiler = compiler.cxx_compiler()
+    if hasattr( compiler, 'cxx_compiler' ):
+        compiler = compiler.cxx_compiler()
+    else:
+        compiler.compiler_so[0] = compiler.compiler_cxx[0]
+        compiler.linker_so[0] = compiler.compiler_cxx[0]
 
     if opts.verbose:
         old_spawn = compiler.spawn
