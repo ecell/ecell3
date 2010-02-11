@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -25,82 +25,89 @@
 # 
 #END_HEADER
 
-from OsogoWindow import *
-from constants import *
-from utils import *
-
 import gtk
-from ecell.ecssupport import *
 import gobject
-
-import string
 import copy
 
+from ecell.ecssupport import *
+
+from ecell.ui.osogo.OsogoWindow import *
+from ecell.ui.osogo.OsogoUtil import *
+
 class PluginInstanceSelection(OsogoWindow):
-    """
-    PluginInstanceSelection
-    """
+	"""PluginInstanceSelection
+	"""
 
-    def __init__( self, aSession, anEntityListWindow ):
-        """
-        Constructor
-        aSession         ---   a reference to Session (Session)
-        anEntityListWindow  ---   a reference to EntityListWindow (EntityListWindow)
-        """
-        # calls superclass's constructor 
-        OsogoWindow.__init__( self, aSession )
-        self.theEntityListWindow = anEntityListWindow
+	def __init__( self, aSession, anEntityListWindow ):
+		"""Constructor
+		aSession         ---   a reference to Session (Session)
+		anEntityListWindow  ---   a reference to EntityListWindow (EntityListWindow)
+		"""
 
-    def initUI( self ):
-        # calls superclass's openWindow
-        OsogoWindow.initUI( self )
+		# calls superclass's constructor 
+		OsogoWindow.__init__( self, aSession )
 
-        # add handers
-        self.addHandlers( { 
-        'on_ok_button_plugin_selection_clicked'      : \
-        self.theEntityListWindow.appendData,\
-        'on_cancel_button_plugin_selection_clicked'  : \
-        self.theEntityListWindow.closePluginInstanceSelectionWindow,\
-                           } )
-        self.__initializePluginInstanceSelectonWindow()
-        self[ self.__class__.__name__ ].connect(
-            'delete_event',
-            self.theEntityListWindow.closePluginInstanceSelectionWindow )
+		self.theEntityListWindow = anEntityListWindow
+		self.thePluginManager = aSession.thePluginManager
 
-    def deleted( self, *arg ):
-        self['PluginInstanceSelection'].hide_all()
-        return False
 
-    def update( self ):
-        """
-        updates list 
-        Returns None
-        """
+	# ====================================================================
+	def openWindow( self ):
 
-        self.thePluginInstanceListStore.clear()
-        for aPluginInstance in self.thePluginmanager.theInstanceList:
-            if aPluginInstance.theViewType == MULTIPLE:
-                aPluginInstanceTitle = aPluginInstance.getTitle()
-                iter = self.thePluginInstanceListStore.append()
-                self.thePluginInstanceListStore.set_value(
-                    iter, 0, aPluginInstanceTitle )
-                self.thePluginInstanceListStore.set_data(
-                    aPluginInstanceTitle, aPluginInstanceTitle )
+		# calls superclass's openWindow
+		OsogoWindow.openWindow( self )
 
-    def __initializePluginInstanceSelectonWindow( self ):
-        """
-        initializes PluginInstanceSelectionWindow
-        Returns None
-        """
+		# add handers
+		self.addHandlers( { 
+		'on_ok_button_plugin_selection_clicked'      : \
+		self.theEntityListWindow.appendData,\
+		'on_cancel_button_plugin_selection_clicked'  : \
+		self.theEntityListWindow.closePluginInstanceSelectionWindow,\
+		                   } )
+		self.__initializePluginInstanceSelectonWindow()
+		self[self.__class__.__name__].connect('delete_event', self.theEntityListWindow.closePluginInstanceSelectionWindow )
+		self.show_all()
 
-        column = gtk.TreeViewColumn( 'Plugin List', gtk.CellRendererText(), text=0 )
-        self['plugin_tree'].append_column(column)
-        self.thePluginInstanceListStore=gtk.ListStore( gobject.TYPE_STRING )
-        self['plugin_tree'].get_selection().set_mode( gtk.SELECTION_MULTIPLE )
-        self['plugin_tree'].set_model( self.thePluginInstanceListStore )
-        column = gtk.TreeViewColumn( 'Plugin List', gtk.CellRendererText(), text=0 )
+	# ====================================================================
+	def deleted( self, *arg ):
+		self['PluginInstanceSelection'].hide_all()
+		#self.theEntityListWindow.closePluginInstanceSelectionWindow()
+		return False
 
-    def plugin_select_func(self,tree,path,iter):
-        key=self.thePluginInstanceListStore.get_value(iter,0)
-        aTitle = self.thePluginInstanceListStore.get_data( key )
-        self.theEntityListWindow.theSelectedPluginInstanceList.append( aTitle )
+	# ====================================================================
+	def update( self ):
+		"""updates list 
+		Returns None
+		"""
+
+		self.thePluginInstanceListStore.clear()
+		aPluginInstanceList = self.thePluginManager.thePluginTitleDict.keys()
+		for aPluginInstance in aPluginInstanceList:
+			if aPluginInstance.theViewType == MULTIPLE:
+				aPluginInstanceTitle = self.thePluginManager.thePluginTitleDict[aPluginInstance]
+				iter = self.thePluginInstanceListStore.append()
+				self.thePluginInstanceListStore.set_value( iter, 0, aPluginInstanceTitle )
+				self.thePluginInstanceListStore.set_data( aPluginInstanceTitle, aPluginInstanceTitle )
+
+	
+	# ====================================================================
+	def __initializePluginInstanceSelectonWindow( self ):
+		"""initializes PluginInstanceSelectionWindow
+		Returns None
+		"""
+
+		column = gtk.TreeViewColumn( 'Plugin List', gtk.CellRendererText(), text=0 )
+		self['plugin_tree'].append_column(column)
+		self.thePluginInstanceListStore=gtk.ListStore( gobject.TYPE_STRING )
+		self['plugin_tree'].get_selection().set_mode( gtk.SELECTION_MULTIPLE )
+		self['plugin_tree'].set_model( self.thePluginInstanceListStore )
+		column = gtk.TreeViewColumn( 'Plugin List', gtk.CellRendererText(), text=0 )
+
+	# ========================================================================
+	def plugin_select_func(self,tree,path,iter):
+		key=self.thePluginInstanceListStore.get_value(iter,0)
+		aTitle = self.thePluginInstanceListStore.get_data( key )
+		self.theEntityListWindow.theSelectedPluginInstanceList.append( aTitle )
+
+
+

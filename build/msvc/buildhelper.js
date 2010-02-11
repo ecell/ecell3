@@ -47,6 +47,11 @@ Object.prototype.map = function(f) {
     return Object.map(this, f);
 };
 
+Array.prototype.apply = function(f) {
+    for (var i = 0; i < this.length; ++i)
+        f(this[i]);
+};
+
 var BuildHelper = function () {
     this.initialize.apply(this, arguments);
 };
@@ -83,6 +88,40 @@ BuildHelper.prototype = {
 
     execPythonScript: function(args) {
         BuildHelper.exec(this.pythonHome + 'python', 'unixlike', args);
+    },
+
+    getPythonVersion: function() {
+        return BuildHelper.invoke(
+                this.pythonHome + 'python', 'unixlike',
+                ['-c', 'import sys; print sys.version[0:3]']);
+    },
+
+    makePythonLauncher: function(path) {
+        var flavor = 'python';
+        var use_launcher = 0;
+        if (arguments.length > 1)
+            flavor = arguments[1];
+        if (arguments.length > 2)
+            use_launcher = arguments[2];
+        var script_file_name = path + ".cmd";
+        WScript.Echo("Creating launcher script " + script_file_name);
+        var scr = '';
+        scr += '@ECHO OFF\n';
+        scr += 'SETLOCAL\n';
+        scr += 'SET PWD=%~dp0\n';
+        scr += 'IF "%ECELL_HOME%" == "" SET ECELL_HOME=%PWD%\\..\n';
+        scr += 'SET PYTHONPATH=%PYTHONPATH%;%ECELL_HOME%\\lib\\site-packages\n';
+        scr += 'SET PATH=%PWD%;%PATH%\n';
+        if (use_launcher > 0) {
+            scr += 'START "' + FileSystemObject.GetFileName(path) + '" ';
+            if ((use_launcher & 2) != 0)
+                scr += '/MIN ';
+        }
+        scr += '"%PYTHONHOME%\\' + flavor + '" "%PWD%\\'
+                + FileSystemObject.GetFileName(path) + '" %*\n';
+        var f = FileSystemObject.OpenTextFile(script_file_name, 2, true);
+        f.Write(scr);
+        f.Close();
     },
 
     run: function(tasks, method) {
@@ -252,6 +291,48 @@ BuildHelper.exec = function(prog, flavor, args) {
         throw "Failed to execute " + prog;
 };
 
+BuildHelper.invoke = function(prog, flavor, args) {
+    var cmdline = BuildHelper.CommandlineArgumentEscapers.winstd(prog);
+    var escapeCommandlineArgument = BuildHelper.CommandlineArgumentEscapers[flavor];
+ 
+    for (var i = 0; i < args.length; i++) {
+        cmdline += ' ' + escapeCommandlineArgument(args[i]);
+    }
+
+    var retval = '';
+    var ex = WshShell.Exec(cmdline);
+    while (ex.Status == 0) {
+        WScript.Echo(cmdline);
+        if (!ex.StdOut.AtEndOfStream)
+            retval += ex.StdOut.ReadAll();
+        if (!ex.StdErr.AtEndOfStream)
+            WScript.Echo(ex.StdErr.ReadAll());
+        WScript.Sleep(100);
+    }
+
+    if (ex.Status != 1)
+        throw "Failed to execute " + prog;
+        
+    return retval;
+};
+
+BuildHelper.getShortPath = function(path) {
+    if (FileSystemObject.FileExists(path))
+        return FileSystemObject.GetFile(path).ShortPath;
+    else if (FileSystemObject.FolderExists(path))
+        return FileSystemObject.GetFolder(path).ShortPath;
+    var comps = [];
+    var parent = FileSystemObject.GetAbsolutePathName(path); 
+    do {
+        comps.push(FileSystemObject.GetFileName(parent));
+        parent = FileSystemObject.GetParentFolderName(parent);
+    } while (!FileSystemObject.FolderExists(parent));
+    var retval = FileSystemObject.GetFolder(parent).ShortPath;
+    for (var i = comps.length; --i >= 0; )
+        retval = FileSystemObject.BuildPath(retval, comps[i]);
+    return retval;
+};
+
 BuildHelper.ArgsParser = function() {
     this.initialize.apply(this, arguments);
 };
@@ -320,7 +401,7 @@ BuildHelper.ArgsParser.prototype = {
                         opt_name = tmp[1];
                         if (this.long_opt_map[opt_name] === undefined)
                             return 'Unknown option --' + opt_name;
-                        opt = long_opt_map[opt_name];
+                        opt = this.long_opt_map[opt_name];
                         if (tmp[2] !== undefined) {
                             switch (opt.operand) {
                             case 0:

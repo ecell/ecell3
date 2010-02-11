@@ -2,8 +2,9 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
+//
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -34,52 +35,224 @@
 #define __LOGGER_BROKER_HPP
 
 #include <map>
+#include <utility>
+#include <boost/noncopyable.hpp>
+#include <boost/mpl/if.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/type_traits/add_const.hpp>
+#include <boost/range/begin.hpp>
+#include <boost/range/end.hpp>
+#include <boost/range/iterator_range.hpp>
+#include <boost/iterator/transform_iterator.hpp>
 
-#include "libecs.hpp"
-#include "FullID.hpp"
-#include "Logger.hpp"
+#include "libecs/Defs.hpp"
+#include "libecs/FullID.hpp"
+#include "libecs/Logger.hpp"
 
 namespace libecs
 {
-  // forward declaration
-  class Model;
+// forward declaration
+class Model;
 
-  /** @addtogroup logging
-   *@{
-   */
+/**
+   LoggerBroker creates and administrates Loggers in a model.
 
-  /** @file */
+   This class creates, holds in a map which associates FullPN with a Logger,
+   and responds to requests to Loggers.
 
-  /**
-     LoggerBroker creates and administrates Loggers in a model.
+   @see FullPN
+   @see Logger
+*/
+class LIBECS_API LoggerBroker
+{
+    friend class Entity;
+public:
+    typedef std::map< const FullID, std::map< String, Logger* >,
+                      std::less< const FullID > > LoggerMap;
 
-     This class creates, holds in a map which associates FullPN with a Logger,
-     and responds to requests to Loggers.
+    typedef LoggerMap::value_type::second_type PerFullIDMap;
 
-     @see FullPN
-     @see Logger
+    template< typename Tderived_, typename Tconstness_ >
+    struct iterator_base
+    {
+        typedef std::bidirectional_iterator_tag iterator_category;
+        typedef std::ptrdiff_t difference_type;
+        typedef std::pair<
+            FullPN const,
+            typename boost::mpl::if_<
+                Tconstness_,
+                typename boost::add_const< Logger >::type,
+                Logger >::type* > value_type;
+        typedef void pointer;
+        typedef std::pair<
+            FullPN const,
+            typename boost::mpl::if_<
+                Tconstness_,
+                typename boost::add_const< Logger >::type,
+                Logger >::type* > reference;
 
-  */
+        typedef typename boost::mpl::if_< Tconstness_,
+            typename LoggerMap::const_iterator,
+            typename LoggerMap::iterator >::type
+            outer_iterator_type;
+        typedef typename boost::mpl::if_< Tconstness_,
+            typename outer_iterator_type::value_type::second_type::const_iterator,
+            typename outer_iterator_type::value_type::second_type::iterator >::type
+            inner_iterator_type;
+        typedef std::pair< outer_iterator_type, inner_iterator_type >
+            iterator_pair;
 
-  class LIBECS_API LoggerBroker
-  {
+        typedef iterator_base base_type;
+ 
+        template< typename Trange_ > 
+        iterator_base( iterator_pair const& aPair, Trange_& anOuterRange,
+                       inner_iterator_type const& aNullInnerIterator )
+            : thePair( aPair ), theOuterRange( boost::begin( anOuterRange ),
+                                               boost::end( anOuterRange )),
+              theNullInnerIterator( aNullInnerIterator ) {}
 
-  public:
+        Tderived_& operator++()
+        {
+            if ( theNullInnerIterator == thePair.second )
+            {
+                if ( theOuterRange.begin() == thePair.first &&
+                     theOuterRange.begin() != theOuterRange.end() )
+                {
+                    thePair.second = thePair.first->second.begin();
+                }
+            }
+            else
+            {
+                ++thePair.second;
+                if ( thePair.first->second.end() == thePair.second )
+                {
+                    ++thePair.first;
+                    if ( theOuterRange.end() == thePair.first )
+                    {
+                        thePair.second = theNullInnerIterator;
+                    }
+                    else
+                    {
+                        thePair.second = thePair.first->second.begin();
+                    }
+                }
+            }
 
-    DECLARE_MAP( const FullPN, LoggerPtr, std::less<const FullPN>, LoggerMap );
+            return *static_cast< Tderived_* >( this );
+        }
 
-    LoggerBroker();
+        Tderived_ operator++(int)
+        {
+            Tderived_ retval( *this );
+            ++(*this);
+            return retval;
+        }
+
+        Tderived_& operator--()
+        {
+            if ( thePair.first->second.begin() == thePair.second
+                 || theOuterRange.end() == thePair.first )
+            {
+                if ( theOuterRange.begin() != thePair.first )
+                {
+                    --thePair.first;
+                    thePair.second = thePair.first->second.end();
+                    --thePair.second;
+                }
+                else
+                {
+                    thePair.second = theNullInnerIterator;
+                }
+            }
+            else
+            {
+                --thePair.second;
+            }
+
+            return *static_cast< Tderived_* >( this );
+        }
+
+        Tderived_ operator--(int)
+        {
+            Tderived_ retval( *this );
+            --(*this);
+            return retval;
+        }
+
+        template< typename T_ >
+        bool operator==(T_ const& rhs) const
+        {
+            return thePair.first == rhs.thePair.first &&
+                    ( thePair.first == theOuterRange.end()
+                      || thePair.second == rhs.thePair.second );
+        }
+
+        template< typename T_ >
+        bool operator!=(T_ const& rhs) const
+        {
+            return !operator==(rhs);
+        }
+
+        reference operator*()
+        {
+            return std::make_pair(
+                FullPN( thePair.first->first, thePair.second->first ), 
+                thePair.second->second );
+        }
+
+    public:
+        iterator_pair thePair;
+        boost::iterator_range< outer_iterator_type > theOuterRange;
+        inner_iterator_type theNullInnerIterator;
+    };
+
+    struct iterator
+        : iterator_base< iterator, boost::mpl::bool_< false > >
+    {
+        iterator( base_type const& that ): base_type( that ) {}
+
+        template< typename Trange_ >
+        iterator( iterator_pair const& aPair, Trange_& anOuterRange,
+                  inner_iterator_type const& aNullInnerIterator )
+            : base_type( aPair, anOuterRange, aNullInnerIterator ) {}
+    };
+
+    struct const_iterator
+        : iterator_base< const_iterator, boost::mpl::bool_< true > >
+    {
+        const_iterator( base_type const& that ): base_type( that ) {}
+
+        const_iterator( iterator const& that )
+            : base_type( that.thePair, that.theOuterRange,
+                         that.theNullInnerIterator ) {}
+
+        template< typename Trange_ >
+        const_iterator( iterator_pair const& aPair,
+                        Trange_ const& anOuterRange,
+                        inner_iterator_type const& aNullInnerIterator )
+            : base_type( aPair, anOuterRange, aNullInnerIterator ) {}
+    };
+
+    typedef boost::transform_iterator<
+        SelectSecond< PerFullIDMap::iterator::value_type >,
+        PerFullIDMap::iterator > PerFullIDLoggerIterator;
+
+    typedef boost::transform_iterator<
+        SelectSecond< PerFullIDMap::const_iterator::value_type >,
+        PerFullIDMap::const_iterator > PerFullIDLoggerConstIterator;
+
+    typedef boost::iterator_range< PerFullIDLoggerIterator > LoggersPerFullID;
+
+    typedef boost::iterator_range< PerFullIDLoggerConstIterator > ConstLoggersPerFullID;
+
+public:
+    LoggerBroker( Model const& aModel );
 
     ~LoggerBroker();
 
-    void setModel( Model* model )
+    Model const& getModel() const
     {
-      theModel = model;
-    }
-
-    Model* getModel()
-    {
-      return theModel;
+        return theModel;
     }
 
     /**
@@ -87,71 +260,93 @@ namespace libecs
 
        This method first look for a Logger object which is logging
        the specified PropertySlot, and if it is found, returns the
-       Logger.  If there is no Logger connected to the PropertySlot yet,
-       it creates and returns a new Logger.  
+       Logger.    If there is no Logger connected to the PropertySlot yet,
+       it creates and returns a new Logger.    
 
        FIXME: doc for interval needed
 
-       @param aFullPN     a FullPN of the requested FullPN
-       @param anInterval  a logging interval
+       @param aFullPN         a FullPN of the requested FullPN
+       @param anInterval    a logging interval
        @return a borrowed pointer to the Logger
        
     */
 
     LoggerPtr getLogger( FullPNCref aFullPN ) const;
 
-    LoggerPtr createLogger( FullPNCref aFullPN, PolymorphVectorCref aParamList );
+    LoggerPtr createLogger( FullPNCref aFullPN, Logger::Policy const& aParamList );
+
+    void removeLogger( FullPNCref aFullPN );
 
     /**
        Flush the data in all the Loggers immediately.
 
-       Usually Loggers record data with logging intervals.  This method
+       Usually Loggers record data with logging intervals.    This method
        orders every Logger to write the data immediately ignoring the
        logging interval.
-    
+   
     */
-
     void flush();
 
-
-    /**
-       Get a const reference to the LoggerMap.
-
-       Use this method for const operations such as LoggerMap::size() 
-       and LoggerMap::begin().
-
-       @return a const reference to the LoggerMap.
-    */
-
-    LoggerMapCref getLoggerMap() const
+    iterator begin()
     {
-      return theLoggerMap;
+        return iterator(
+            iterator::iterator_pair(
+                theLoggerMap.begin(),
+                theLoggerMap.begin() == theLoggerMap.end() ?
+                    theEmptyPerFullIDMap.begin():
+                    theLoggerMap.begin()->second.begin() ),
+            theLoggerMap, theEmptyPerFullIDMap.begin() );
     }
 
-  private:
-    
-    Model* getModel() const
+    iterator end()
     {
-      return theModel;
+        return iterator(
+            iterator::iterator_pair(
+                theLoggerMap.end(),
+                theLoggerMap.begin() == theLoggerMap.end() ?
+                    theEmptyPerFullIDMap.begin():
+                    theLoggerMap.begin()->second.end() ),
+            theLoggerMap, theEmptyPerFullIDMap.begin() );
     }
 
+    const_iterator begin() const
+    {
+        return const_iterator(
+            const_iterator::iterator_pair(
+                theLoggerMap.begin(),
+                theLoggerMap.begin() == theLoggerMap.end() ?
+                    theEmptyPerFullIDMap.begin():
+                    theLoggerMap.begin()->second.begin() ),
+            theLoggerMap, theEmptyPerFullIDMap.begin() );
+    }
 
-    // prevent copy
-    LoggerBroker( LoggerBrokerCref );
-    LoggerBrokerRef operator=( const LoggerBroker& );
+    const_iterator end() const
+    {
+        return const_iterator(
+            const_iterator::iterator_pair(
+                theLoggerMap.end(),
+                theLoggerMap.begin() == theLoggerMap.end() ?
+                    theEmptyPerFullIDMap.begin():
+                    theLoggerMap.begin()->second.end() ),
+            theLoggerMap, theEmptyPerFullIDMap.begin() );
+    }
 
-  private:
+    LoggersPerFullID getLoggersByFullID( FullID const& aFullID );
 
+    ConstLoggersPerFullID getLoggersByFullID( FullID const& aFullID ) const;
+
+    void removeLoggersByFullID( FullID const& aFullID );
+
+private:
+    /// non-copyable
+    LoggerBroker( LoggerBroker const& );
+
+private:
     LoggerMap     theLoggerMap;
-    Model*        theModel;
+    PerFullIDMap  theEmptyPerFullIDMap;
+    Model const&  theModel;
+};
 
-  };
-
-  //@}
-  
 } // namespace libecs
 
-#endif
-
-
-
+#endif /* __LOGGER_BROKER_HPP */

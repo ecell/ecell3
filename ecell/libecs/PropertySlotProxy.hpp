@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -34,162 +34,131 @@
 
 #include <functional>
 
-#include "libecs.hpp"
-#include "Util.hpp"
-#include "PropertySlot.hpp"
-#include "convertTo.hpp"
-#include "Polymorph.hpp"
+#include "libecs/Defs.hpp"
+#include "libecs/Util.hpp"
+#include "libecs/PropertySlot.hpp"
+#include "libecs/convertTo.hpp"
+#include "libecs/Polymorph.hpp"
 
 namespace libecs
 {
 
+class LIBECS_API PropertySlotProxy
+{
 
-  /** @addtogroup property
-      
-  @ingroup libecs
-  @{
-  */
-
-  /** @file */
-
-
-  class LIBECS_API PropertySlotProxy
-  {
-
-  public:
+public:
 
     PropertySlotProxy()
     {
-      ; // do nothing
+        ; // do nothing
     }
     
     virtual ~PropertySlotProxy();
 
-    virtual SET_METHOD( Polymorph, Polymorph ) = 0;
-    virtual GET_METHOD( Polymorph, Polymorph ) = 0;
+    virtual void setPolymorph( Polymorph ) = 0;
+    virtual Polymorph getPolymorph() const = 0;
 
-    virtual SET_METHOD( Real, Real ) = 0;
-    virtual GET_METHOD( Real, Real ) = 0;
+    virtual void setReal( Real ) = 0;
+    virtual Real getReal() const = 0;
 
-    virtual SET_METHOD( Integer, Integer ) = 0;
-    virtual GET_METHOD( Integer, Integer ) = 0;
+    virtual void setInteger( Integer ) = 0;
+    virtual Integer getInteger() const = 0;
 
-    virtual SET_METHOD( String, String ) = 0;
-    virtual GET_METHOD( String, String ) = 0;
+    virtual void setString( String ) = 0;
+    virtual String getString() const = 0;
     
     virtual const bool isSetable() const = 0;
     virtual const bool isGetable() const = 0;
 
     template < typename Type >
     inline void set( typename Param<Type>::type aValue );
-    //    {
-    //      DefaultSpecializationInhibited();
-    //    }
 
     template < typename Type >
     inline const Type get() const;
-    //    {
-    //      DefaultSpecializationInhibited();
-    //    }
+};
 
 
-  protected:
-
-  };
-
-
-
-  template <>
-  inline void 
-  PropertySlotProxy::set<Polymorph>( Param<Polymorph>::type aValue )
-  {
+template <>
+inline void 
+PropertySlotProxy::set<Polymorph>( Param<Polymorph>::type aValue )
+{
     setPolymorph( aValue );
-  }
+}
 
-  template <>
-  inline void PropertySlotProxy::set<Real>( Param<Real>::type aValue )
-  {
+template <>
+inline void PropertySlotProxy::set<Real>( Param<Real>::type aValue )
+{
     setReal( aValue );
-  }
+}
 
-  template <>
-  inline void PropertySlotProxy::set<Integer>( Param<Integer>::type aValue )
-  {
+template <>
+inline void PropertySlotProxy::set<Integer>( Param<Integer>::type aValue )
+{
     setInteger( aValue );
-  }
+}
 
-  template <>
-  inline void PropertySlotProxy::set<String>( Param<String>::type aValue )
-  {
+template <>
+inline void PropertySlotProxy::set<String>( Param<String>::type aValue )
+{
     setString( aValue );
-  }
+}
 
-  template <>
-  inline const Polymorph PropertySlotProxy::get() const
-  {
+template <>
+inline const Polymorph PropertySlotProxy::get() const
+{
     return getPolymorph();
-  }
+}
 
-  template <>
-  inline const String PropertySlotProxy::get() const
-  {
+template <>
+inline const String PropertySlotProxy::get() const
+{
     return getString();
-  }
+}
 
-  template <>
-  inline const Real PropertySlotProxy::get() const
-  {
+template <>
+inline const Real PropertySlotProxy::get() const
+{
     return getReal();
-  }
+}
 
 
-  template <>
-  inline const Integer PropertySlotProxy::get() const
-  {
+template <>
+inline const Integer PropertySlotProxy::get() const
+{
     return getInteger();
-  }
+}
 
 
-
-  template
-  < 
-    class T
-  >
-  class ConcretePropertySlotProxy
-    :
-    public PropertySlotProxy
-  {
-
-  public:
-
+template< class T >
+class ConcretePropertySlotProxy: public PropertySlotProxy
+{
+public:
     typedef PropertySlot<T> PropertySlot_;
-    DECLARE_TYPE( PropertySlot_, PropertySlot );
 
     DM_IF ConcretePropertySlotProxy( T& anObject, 
-			       PropertySlotRef aPropertySlot )
-      :
-      theObject( anObject ),
-      thePropertySlot( aPropertySlot )
+                                     PropertySlot_ const& aPropertySlot )
+        : theObject( anObject ),
+          thePropertySlot( aPropertySlot )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
     DM_IF virtual ~ConcretePropertySlotProxy()
     {
-      ; // do nothing
+        ; // do nothing
     }
 
 
 #define _PROPERTYSLOT_SETMETHOD( TYPE )\
-    virtual SET_METHOD( TYPE, TYPE )\
+    virtual void set ## TYPE( TYPE value )\
     {\
-      thePropertySlot.set ## TYPE( theObject, value );\
+        thePropertySlot.set ## TYPE( theObject, value );\
     }
 
 #define _PROPERTYSLOT_GETMETHOD( TYPE )\
-    virtual GET_METHOD( TYPE, TYPE )\
+    virtual TYPE get ## TYPE() const\
     {\
-      return thePropertySlot.get ## TYPE( theObject );\
+        return thePropertySlot.get ## TYPE( theObject );\
     }
 
     _PROPERTYSLOT_SETMETHOD( Polymorph );
@@ -210,25 +179,22 @@ namespace libecs
 
     DM_IF virtual const bool isSetable() const
     {
-      return thePropertySlot.isSetable();
+        return thePropertySlot.isSetable();
     }
 
     DM_IF virtual const bool isGetable() const
     {
-      return thePropertySlot.isGetable();
+        return thePropertySlot.isGetable();
     }
 
-  private:
+private:
 
-    DM_IF ConcretePropertySlotProxy();
+    ConcretePropertySlotProxy() {}
 
-    T&               theObject;
-    PropertySlotRef  thePropertySlot;
+    T&                   theObject;
+    PropertySlot_ const& thePropertySlot;
+};
 
-  };
-
-  /** @}*/
-}
-
+} // namespace libecs
 
 #endif /* __PROPERTYSLOT_HPP */

@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -25,18 +25,18 @@
 # 
 #END_HEADER
 
+import operator
+from math import *
+import re
 import numpy as nu
 import gtk
 import gtk.gdk
 import pango
 import gobject
-import re
-from string import *
-from math import *
-import operator
-from ecell.ui.osogo.DataGenerator import *
-from ecell.ecs_constants import *
+
 from ecell.ecssupport import *
+
+from ecell.ui.osogo.DataGenerator import *
 
 #class Plot,
  
@@ -59,28 +59,21 @@ PEN_COLOR = "black"
 BACKGROUND_COLOR = "grey"
 PLOTAREA_COLOR = "light grey"
 
-ColorList = [
-    "pink",
-    "cyan",
-    "yellow",
-    "navy",
-    "brown",
-    "white",
-    "purple",
-    "black",
-    "green",
-    "orange",
-    "blue",
-    "red"
-    ]
-theMeasureDictionary = [
-    [ SYSTEM,   'Size' ,      'size'         ],
-    [ VARIABLE, 'MolarConc',  'molar conc.'  ],
-    [ VARIABLE, 'NumberConc', 'number conc.' ],
-    [ VARIABLE, 'Value',      'value'        ],
-    [ VARIABLE, 'Velocity',   'velocity'     ],
-    [ PROCESS,  'Activity',   'activity'     ]
-    ]
+PLOT_MINIMUM_WIDTH = 400
+PLOT_MINIMUM_HEIGHT = 250
+
+
+ColorList=["pink","cyan","yellow","navy",
+           "brown","white","purple","black",
+           "green", "orange","blue","red"]
+theMeasureDictionary = \
+                     [['System', 'Size' , 'size'],
+                      ['Variable', 'MolarConc', 'molar conc.' ],
+                      ['Variable', 'NumberConc', 'number conc.' ],
+                      ['Variable', 'Value', 'value'],
+                      ['Variable', 'Velocity', 'velocity' ],
+                      ['Process', 'Activity', 'activity'  ]]
+
             
 def num_to_sci( num ):
     if (num<0.00001 and num>-0.00001 and num!=0) or num >999999 or num<-9999999:
@@ -91,11 +84,12 @@ def num_to_sci( num ):
             num=-num
         ex=floor(log10(num))
         m=float(num)/pow(10,ex)
-        t=join([si,str(m)[0:4],'e',str(ex)],'')
+        t=''.join([si,str(m)[0:4],'e',str(ex)])
         return str(t[0:8])
                 
     else:
         return str(num)[0:8]
+
 
 def sign( num ):
     if int( num ) == 0:
@@ -103,33 +97,33 @@ def sign( num ):
     return int( num / abs( num ) )
 
 class Axis:
-    def __init__( self, aParent, aType, aRangeRetreiver ):
+    def __init__( self, aParent, aType, anOrientation ):
         """ aParent = Plot instance
         aType = PLOT_TIME_AXIS or PLOT_VALUE_AXIS
         anOrientation = PLOT_HORIZONTAL_AXIS or PLOT_VERTICAL_AXIS
         aBindingBox = list of the [upperleftx, upperlefty, lowerleftx, lowerlefty]
         """
        
+        self.theOrientation = anOrientation
         self.theScaleType = SCALE_LINEAR
+        self.theMeasureLabel = ''
         self.theFrame = [0,0]
         self.theGrid = [0,0]
-        self.theFullPN = "Time"
+        self.theFullPNString = "Time"
         self.setType( aType )
-        self.theLength = 0
         self.theParent = aParent
-        self.theMaxTicks = 0
-        self.theLabelArea = [ 0, 0, 0, 0 ]
-        self.theRangeRetriever = aRangeRetreiver
 
-    def getFullPN( self ):
-        return self.theFullPN
 
-    def setFullPN( self, aFullPN ):
-        self.theFullPN = aFullPN
-        if aFullPN == TIME_AXIS:
-            self.setType( PLOT_TIME_AXIS )
+    def getFullPNString ( self ):
+        return self.theFullPNString
+
+    def setFullPNString ( self, aFullPNString ):
+        self.theFullPNString = aFullPNString
+        if aFullPNString == TIME_AXIS:
+            self.setType ( PLOT_TIME_AXIS )
         else:
             self.setType( PLOT_VALUE_AXIS )
+
 
     def setType( self, aType ):
         self.theType = aType
@@ -144,50 +138,117 @@ class Axis:
             self.rescalingFrameMin = 0
             self.rescalingFrameMax = 0.5
 
+
     def getType ( self ):
         return self.theType
 
+
+    def recalculateSize( self ):
+        if self.theOrientation == PLOT_HORIZONTAL_AXIS:
+            self.theLength = self.theParent.thePlotArea[2]
+            self.theBoundingBox =  [ 0, self.theParent.theOrigo[1] + 1, self.theParent.thePlotWidth, 
+                                    10 + self.theParent.theFontHeight ]
+            self.theMaxTicks = int( self.theParent.thePlotWidth / 100 )
+            self.theMeasureLabelPosition = [ self.theParent.thePlotAreaBox[2] , self.theBoundingBox[1] + self.theBoundingBox[3]-3 ]
+        else:
+            self.theLength = self.theParent.thePlotArea[3]
+            self.theBoundingBox = [ 0, 0, self.theParent.theOrigo[0], self.theParent.theOrigo[1] + 5 ]
+            self.theMaxTicks = int( self.theParent.thePlotHeight / 150 ) * 5
+            self.theMeasureLabelPosition = [ self.theParent.theOrigo[0] - 50, 0 ]
+
+
     def clearLabelArea(self):
-        self.theParent.drawBox(
-            BACKGROUND_COLOR,
-            self.theLabelArea[0],
-            self.theLabelArea[1],
-            self.theLabelArea[2],
-            self.theLabelArea[3]
-            )
+        self.theParent.drawBox( BACKGROUND_COLOR, self.theBoundingBox[0], self.theBoundingBox[1],
+                                    self.theBoundingBox[2], self.theBoundingBox[3] )
+
 
     def draw(self):
-        self.redrawLabels()
+        self.reprintLabels()
         self.drawMeasures()
 
-    def redrawLabels(self):
+
+    def printLabel( self, num ):
+        if self.theOrientation == PLOT_HORIZONTAL_AXIS:
+            text = num_to_sci(num)
+            x = self.convertNumToCoord( num )
+            y = self.theParent.theOrigo[1] + 10
+            layout = pango.Layout( self.theParent.theWidget.get_pango_context() )
+            layout.set_text( text )
+            width, height = layout.get_pixel_size()
+            self.theParent.drawText( PEN_COLOR, x - width / 2, y, text )
+            self.theParent.drawLine( PEN_COLOR, x, self.theParent.theOrigo[1], x, self.theParent.theOrigo[1] + 5 )
+        else:
+            text = num_to_sci(num)
+            layout = pango.Layout( self.theParent.theWidget.get_pango_context() )
+            layout.set_text( text )
+            width, height = layout.get_pixel_size()
+            x = self.theParent.theOrigo[0] - 5 - width
+            y = self.convertNumToCoord( num )
+            self.theParent.drawText( PEN_COLOR, x, y - 7, text )
+            self.theParent.drawLine( PEN_COLOR, self.theParent.theOrigo[0] - 5, y, self.theParent.theOrigo[0], y )
+
+
+    def convertNumToCoord( self, aNumber ):
+        if self.theScaleType == SCALE_LINEAR:
+            relativeCoord = round( ( aNumber - self.theFrame[0] ) / float( self.thePixelSize ) )
+        else:
+            relativeCoord = round( (log10( aNumber ) - log10( self.theFrame[0] ) ) / self.thePixelSize )
+
+        if self.theOrientation == PLOT_HORIZONTAL_AXIS:
+            absoluteCoord = self.theParent.theOrigo[0] + relativeCoord
+        else:
+            absoluteCoord = self.theParent.theOrigo[1] - relativeCoord
+        return absoluteCoord
+
+
+    def convertCoordToNumber( self, aCoord ):
+        if self.theOrientation == PLOT_HORIZONTAL_AXIS:
+            relativeCoord = aCoord - self.theParent.theOrigo[0]
+        else:
+            relativeCoord = self.theParent.theOrigo[1] - aCoord
+        if self.theScaleType == SCALE_LINEAR:
+            aNumber = float( relativeCoord ) * self.thePixelSize + self.theFrame[0]
+        else:
+            aNumber = pow(10, float ( relativeCoord ) * self.thePixelSize ) * self.theFrame[0]
+        return aNumber
+
+
+    def reprintLabels(self):
         #clears ylabel area
         self.clearLabelArea()
         tick=1
         if self.theScaleType == SCALE_LINEAR:
             for tick in range( int( self.theTickNumber + 1 ) ):
                 tickvalue = self.theGrid[0] + tick * self.theTickStep
-                self.drawLabel( tickvalue )
+                self.printLabel( tickvalue )
         else:
             tickvalue = self.theGrid[1]
             while tickvalue > self.theGrid[0]:
-                self.drawLabel( tickvalue )
+                self.printLabel( tickvalue )
                 tickvalue=tickvalue / self.theTickStep
-            self.drawLabel( self.theGrid[0] )
+            self.printLabel( self.theGrid[0] )
+
 
     def reframe( self ):  #no redraw!
-        rangesMin, rangesMax = self.theRangeRetriever()
+        #get max and min from databuffers
+        self.theParent.getRanges()
+        if self.theOrientation == PLOT_HORIZONTAL_AXIS:
+            rangesMin = self.theParent.theRanges[ 2 ]
+            rangesMax = self.theParent.theRanges[ 3 ]
+        else:
+            rangesMin = self.theParent.theRanges[ 0 ]
+            rangesMax = self.theParent.theRanges[ 1 ]
 
-        isStripTimeAxis = \
-            self.theParent.theStripMode == MODE_STRIP and \
-                self.theType == PLOT_TIME_AXIS
+        isStripTimeAxis = ( self.theParent.theStripMode == MODE_STRIP and self.theType == PLOT_TIME_AXIS )
+        isOutOfBounds = self.isOutOfFrame( rangesMin, rangesMax )
         if isStripTimeAxis :
+
             self.theFrame[0] = rangesMin
-            self.theFrame[1] = self.theFrame[0] + \
-                               self.theParent.theStripInterval
+            self.theFrame[1] = self.theFrame[0] + self.theParent.theStripInterval
             if ( self.theFrame[1] + self.theFrame[0] ) / 2  < rangesMax:
                 self.theFrame[0] = rangesMax - self.theParent.theStripInterval / 2
                 self.theFrame[1] = self.theFrame[0] + self.theParent.theStripInterval
+
 
         if self.theParent.theZoomLevel == 0 and not isStripTimeAxis:
             if rangesMin == rangesMax:
@@ -201,9 +262,8 @@ class Axis:
             #calculate yframemin, max
             if self.theScaleType == SCALE_LINEAR:
                 aRange = ( rangesMax - rangesMin ) / \
-                         ( self.rescalingFrameMax - self.rescalingFrameMin )
-                self.theFrame[1] = rangesMax + \
-                                   ( 1 - self.rescalingFrameMax ) * aRange
+                             ( self.rescalingFrameMax - self.rescalingFrameMin )
+                self.theFrame[1] = rangesMax + ( 1 - self.rescalingFrameMax ) * aRange
                 if rangesMin < 0:
                     self.theFrame[0] = rangesMin - ( self.rescalingFrameMin * aRange )
                 else:
@@ -263,9 +323,7 @@ class Axis:
 
                 if rangesMin <= 0 or rangesMax <= 0:
                     self.theParent.theOwner.theSession.message("non positive value in data, fallback to linear scale!\n")
-                    self.setScaleType( SCALE_LINEAR )
-                    self.reframe()
-                    self.theParent.totalRedraw()
+                    self.theParent.changeScale( self.theOrientation, SCALE_LINEAR )
                     return
 
                 self.theFrame[1] = pow( 10, ceil( log10( rangesMax ) ) )
@@ -283,7 +341,7 @@ class Axis:
             self.theGrid[0] = self.theFrame[0]
             self.theGrid[1] = self.theFrame[1]
 
-        else:
+        else: #if isOutOfBounds: # if zoomlevel > 0
             if self.theScaleType == SCALE_LINEAR:
                 ticks=0
                 if self.theFrame[1] == self.theFrame[0]:
@@ -323,202 +381,96 @@ class Axis:
                         self.theTickStep = pow( 10, ceil( diff / self.theMaxTicks ) )
                 else:
                     self.theParent.theOwner.theSession.message("non positive value in range, falling back to linear scale")
-                    self.setScaleType( SCALE_LINEAR )
-                    self.reframe()
-                    self.theParent.totalRedraw()
+                    self.theParent.changeScale( self.theOrientation, SCALE_LINEAR )
                     return
 
         if self.theScaleType == SCALE_LINEAR:
             self.thePixelSize = float( self.theFrame[1] - self.theFrame[0] ) / self.theLength
 
         else:
-            self.thePixelSize = float( log10( self.theFrame[1] ) - log10( self.theFrame[0] ) ) / self.theLength
+            self.thePixelSize  =float( log10( self.theFrame[1] ) - log10( self.theFrame[0] ) ) / self.theLength
+         #reprint_ylabels
+         #self.reprintLabels()
         return 0
+
 
     def setScaleType( self, aScaleType ):
         self.theScaleType = aScaleType
         self.reframe()
+        self.draw()
+
 
     def getScaleType( self ):
         return self.theScaleType
+
 
     def isOutOfFrame( self, aMin, aMax ):
         aRange = self.theFrame[1] - self.theFrame[0]
         return  ( aMin < self.theFrame[0] + aRange * self.rescaleTriggerMin )  or \
                   ( aMax > self.theFrame[0] + aRange * self.rescaleTriggerMax )
 
-    def findMeasure( self, aFullPN ):
+
+
+    def findMeasure( self, aFullPNString ):
+        anArray = aFullPNString.split(':')
+        aType = anArray[0]
+        aProperty = anArray[3]
+        aMeasure = "??"
         for aMeasureItem in theMeasureDictionary:
-            if aMeasureItem[0] == aFullPN.fullID.typeCode and \
-               aMeasureItem[1] == aFullPN.propertyName:
-                aMeasure = aMeasureItem[2]
+            if aMeasureItem[0]==aType and aMeasureItem[1]==aProperty:
+                aMeasure= aMeasureItem[2]
                 break
         return aMeasure
 
-    def recalculateSize( self ):
-        raise "override me!"
-
-    def convertNumToRelativeCoord( self, aNumber ):
-        if self.theScaleType == SCALE_LINEAR:
-            relativeCoord = round( ( aNumber - self.theFrame[0] ) / float( self.thePixelSize ) )
-        else:
-            relativeCoord = round( (log10( aNumber ) - log10( self.theFrame[0] ) ) / self.thePixelSize )
-        return relativeCoord
-
-    def convertRelativeCoordToNumber( self, relativeCoord ):
-        if self.theScaleType == SCALE_LINEAR:
-            aNumber = float( relativeCoord ) * self.thePixelSize + self.theFrame[0]
-        else:
-            aNumber = pow(10, float ( relativeCoord ) * self.thePixelSize ) * self.theFrame[0]
-        return aNumber
-
-    def convertNumToCoord( self, aNumber ):
-        return self.convertRelativeToAbsoluteCoord(
-            self.convertNumToRelativeCoord( aNumber ) )
-
-    def convertCoordToNumber( self, aCoord ):
-        return self.convertRelativeCoordToNumber(
-            self.convertAbsoluteToRelativeCoord( aCoord ) )
-
-    def drawLabel( self, num ):
-        raise "override me!"
-
-    def drawMeasures( self ):
-        raise "override me!"
-
-    def getOrientation( self ):
-        raise "override me!"
-
-class XAxis( Axis ):
-    def getOrientation():
-        return PLOT_HORIZONTAL_AXIS
-
-    def recalculateSize( self ):
-        self.theLength = self.theParent.thePlotArea[2]
-        self.theLabelArea =  [
-            0,
-            self.theParent.thePlotHeight - self.theParent.theMargin[2],
-            self.theParent.thePlotWidth, 
-            self.theParent.theMargin[2]
-            ]
-        self.theMaxTicks = int( self.theParent.thePlotWidth / 100 )
-
-    def convertAbsoluteToRelativeCoord( self, aCoord ):
-        return aCoord - self.theParent.theOrigo[0];
-
-    def convertRelativeToAbsoluteCoord( self, aCoord ):
-        return self.theParent.theOrigo[0] + aCoord
-
-    def drawLabel( self, num ):
-        text = str( num_to_sci(num) )
-        x = self.convertNumToCoord( num )
-        y = self.theParent.theOrigo[1] + 10
-        aPangoLayout = self.theParent.createPangoLayout( text )
-        [ w, h ] = map( pango.PIXELS, aPangoLayout.get_size() )
-        self.theParent.drawLayout( PEN_COLOR,
-            x - w / 2, y, aPangoLayout )
-        self.theParent.drawLine( PEN_COLOR,
-            x, self.theParent.theOrigo[1],
-            x, self.theParent.theOrigo[1] + 5 )
-
-    def drawMeasures ( self ):
-        if self.theType == PLOT_TIME_AXIS:
-            aMeasureLabel = 'sec'
-        elif self.theFullPN == "":
-            aMeasureLabel = "no trace"
-        else:
-            aMeasureLabel = self.findMeasure( self.theFullPN )
-
-        # add scale information
-        scaleLabel = self.theScaleType + " scale"
-
-        # right top corner
-        aLabelPosition = (
-            self.theParent.thePlotWidth - self.theParent.theMargin[1],
-            self.theLabelArea[1] + 10 + self.theParent.getLineHeight()
-            )
-        aPangoLayout = self.theParent.createPangoLayout(
-            aMeasureLabel + " (" + scaleLabel + ")" )
-        [ bboxWidth, bboxHeight ] = map( pango.PIXELS, aPangoLayout.get_size() )
-        self.theParent.drawBox( BACKGROUND_COLOR,
-            aLabelPosition[0] - bboxWidth, aLabelPosition[1],
-            bboxWidth, bboxHeight )
-        self.theParent.drawLayout( PEN_COLOR,
-            aLabelPosition[0] - bboxWidth, 
-            aLabelPosition[1], aPangoLayout )
-
-class YAxis( Axis ):
-    def getOrientation():
-        return PLOT_VERTICAL_AXIS
-
-    def recalculateSize( self ):
-        self.theLength = self.theParent.thePlotArea[3]
-        self.theLabelArea = [
-            0,
-            self.theParent.theMargin[0] - self.theParent.getLineHeight() / 2,
-            self.theParent.theMargin[3],
-            self.theParent.thePlotHeight - self.theParent.theMargin[0] - \
-                self.theParent.theMargin[2] + self.theParent.getLineHeight() ]
-        self.theMaxTicks = int( self.theParent.thePlotHeight / 150 ) * 5
-
-    def convertAbsoluteToRelativeCoord( self, aCoord ):
-        return self.theParent.theOrigo[1] - aCoord;
-
-    def convertRelativeToAbsoluteCoord( self, aCoord ):
-        return self.theParent.theOrigo[1] - aCoord
-
-    def drawLabel( self, num ):
-        text = str( num_to_sci(num) )
-        aPangoLayout = self.theParent.createPangoLayout( text )
-        [ w, h ] = map( pango.PIXELS, aPangoLayout.get_size() )
-        x = self.theParent.theOrigo[0] - 10 - w
-        y = self.convertNumToCoord( num )
-        self.theParent.drawLayout( PEN_COLOR,
-            x, y - self.theParent.getLineHeight() / 2, aPangoLayout )
-        self.theParent.drawLine( PEN_COLOR,
-            self.theParent.theOrigo[0] - 5, y,
-            self.theParent.theOrigo[0], y )
 
     def drawMeasures ( self ):
         # xmes is sec
-        if self.theParent.getSeriesCount() == 1:
+        if self.theOrientation == PLOT_HORIZONTAL_AXIS:
+            if self.theType == PLOT_TIME_AXIS:
+                self.theMeasureLabel = 'sec'
+            elif self.theFullPNString == "":
+                self.theMeasureLabel = "no trace"
+            else:
+                self.theMeasureLabel = self.findMeasure( self.theFullPNString )
+
+        elif self.theParent.getSeriesCount() == 1:
             for aSeries in self.theParent.getDataSeriesList():
                 if aSeries.isOn():
-                    aMeasureLabel = self.findMeasure( aSeries.getFullPN() )
+                    self.theMeasureLabel = self.findMeasure( aSeries.getFullPNString() )
                     break
         else:
-            aMeasureLabel = "mixed traces"
+            self.theMeasureLabel = "mixed traces"
 
         # add scale information
         scaleLabel = self.theScaleType + " scale"
-
-        aLabelPosition = [
-            self.theLabelArea[2],
-            self.theLabelArea[1] - self.theParent.getLineHeight(), 
-            ]
+        self.theMeasureLabel += "  " + scaleLabel
 
         # delete x area
-        aMeasureLabelLayout = self.theParent.createPangoLayout( aMeasureLabel )
-        [ measureLabelWidth, bboxHeight ] = map( pango.PIXELS, aMeasureLabelLayout.get_size() )
-        aScaleLabelLayout = self.theParent.createPangoLayout(
-                " (" + scaleLabel  + ")" )
-        [ scaleLabelWidth, bboxHeight ] = map( pango.PIXELS, aScaleLabelLayout.get_size() )
-        self.theParent.drawBox( BACKGROUND_COLOR,
-            aLabelPosition[0] - measureLabelWidth,
-            aLabelPosition[1],
-            measureLabelWidth + scaleLabelWidth, bboxHeight )
-        self.theParent.drawLayout( PEN_COLOR,
-            aLabelPosition[0] - measureLabelWidth, 
-            aLabelPosition[1], aMeasureLabelLayout )
-        self.theParent.drawLayout( PEN_COLOR,
-            aLabelPosition[0], 
-            aLabelPosition[1], aScaleLabelLayout )
+        if self.theOrientation == PLOT_HORIZONTAL_AXIS:
+            layout = pango.Layout( self.theParent.theWidget.get_pango_context() )
+            layout.set_text( self.theMeasureLabel )
+            textLength, height = layout.get_pixel_size()
+
+            self.theParent.drawBox(BACKGROUND_COLOR, self.theMeasureLabelPosition[0] - 200, 
+                self.theMeasureLabelPosition[1], 200, 20)
+
+            self.theParent.drawText(PEN_COLOR, self.theMeasureLabelPosition[0] - textLength, 
+                self.theMeasureLabelPosition[1], self.theMeasureLabel )
+        else:
+            self.theParent.drawBox(BACKGROUND_COLOR, self.theMeasureLabelPosition[0], self.theMeasureLabelPosition[1], 140, 20)
+    
+            # drawText xmes
+            self.theParent.drawText(PEN_COLOR, self.theMeasureLabelPosition[0], self.theMeasureLabelPosition[1],
+                        self.theMeasureLabel )
+                
+
 
 class DataSeries:
-    def __init__( self, aFullPN, aDataSource, aPlot, aColor ):
-        self.theFullPN = aFullPN
+
+    def __init__( self, aFullPNString, aDataSource, aPlot, aColor ):
+        self.theFullPNString = aFullPNString
         self.isOnFlag = True
-        self.theShortName = self.theFullPN.propertyName
+        self.theShortName = self.__getShortName ( self.theFullPNString )
         self.theLastXmax = None
         self.theLastXmin = None
         self.theLastYmin = None
@@ -532,17 +484,23 @@ class DataSeries:
         self.reset()
 
     def getXAxis ( self ):
-        return self.thePlot.getXAxisFullPN()
+        return self.thePlot.getXAxisFullPNString()
+
                   
-    def getFullPN( self ):
-        return self.theFullPN
+    def getFullPNString( self ):
+        return self.theFullPNString
+
 
     def reset( self ):
         self.theOldData = nu.zeros( ( 0 , 5 ) ) 
         self.theNewData = nu.zeros( ( 0 , 5 ) )
 
+    def getPixBuf( self ):
+        return self.thePixmap
+
     def setColor( self, aColor ):
         self.theColor = aColor
+        self.thePixmap = self.thePlot.thePixmapDict[ aColor ]
             
     def getColor( self ):
         return self.theColor
@@ -552,6 +510,13 @@ class DataSeries:
 
     def setSource( self, aSource ):
         self.theSource = aSource
+
+    def __getShortName(self, aFullPNString ):
+        IdString = str( aFullPNString[ID] )
+        PropertyString = str( aFullPNString[PROPERTY] )
+        if PropertyString != 'Value':
+           IdString += '/' + PropertyString[:2]
+        return IdString
             
     def isOn( self ):
         return self.isOnFlag
@@ -564,7 +529,10 @@ class DataSeries:
 
     def addPoints( self, newPoints):
         """ newPoints: Numeric array of new points ( x, y, avg, max, min )"""
+
         self.theNewData = nu.concatenate( (self.theNewData, newPoints) )
+
+
 
     def replacePoints( self, newPoints):
         """ replace all datapoints """
@@ -587,10 +555,14 @@ class DataSeries:
     def getNewData( self ):
         return self.theNewData
 
+    
+
     def drawNewPoints( self ):
         self.drawTrace( self.getNewData() )
         self.theOldData = self.getAllData()
         self.theNewData = nu.zeros( ( 0,5 ) )
+
+        
 
     def drawAllPoints( self ):
         #get databuffer, for each point draw
@@ -598,10 +570,10 @@ class DataSeries:
         self.theLastYmin = None
         self.theLastYmax = None
         self.theLastY = None
-        retrievedData = self.getAllData()
-        self.drawTrace( retrievedData )
-        self.theOldData = retrievedData
+        self.drawTrace( self.getAllData() )
+        self.theOldData = self.getAllData()
         self.theNewData = nu.zeros( ( 0,5 ) )
+
 
     def drawTrace( self, aPoints ):
         for aDataPoint in aPoints:
@@ -609,6 +581,7 @@ class DataSeries:
 
             if not self.isOn():
                 return 0
+
             x=self.thePlot.theXAxis.convertNumToCoord( aDataPoint[ DP_TIME ] )
             y=self.thePlot.theYAxis.convertNumToCoord( aDataPoint[ DP_VALUE ] )
             ymax=self.thePlot.theYAxis.convertNumToCoord( aDataPoint[ DP_MAX ] )
@@ -624,12 +597,15 @@ class DataSeries:
             self.theLastY = y
             self.theLastYmax = ymax
             self.theLastYmin = ymin
-            if x == lastx and y == lasty and \
-               ymax == lastymax and ymin == lastymin:
+            if x == lastx and y==lasty and ymax==lastymax and ymin==lastymin:
                 continue
+
             if self.thePlot.getDisplayMinMax():
                 self.drawMinMax( self.getColor(), x, ymax, ymin )
+
             self.drawPoint( self.getColor(), x, y, lastx, lasty )
+
+
 
     def drawMinMax(self, aColor, x, ymax, ymin):
         #first check x
@@ -648,9 +624,12 @@ class DataSeries:
         # draw line
         self.thePlot.drawLine( aColor, x, ymin, x, ymax)
 
-    def withinFrames( self, point ):
+
+
+    def withinframes( self, point ):
         return point[0] < self.thePlot.thePlotAreaBox[2]  and point[0] > self.thePlot.thePlotAreaBox[0]  and\
                point[1] < self.thePlot.thePlotAreaBox[3]  and point[1] > self.thePlot.thePlotAreaBox[1] 
+
 
     def __adjustLimits( self, y0, y1, upLimit, downLimit ):
         if y0 < upLimit and y1 < upLimit:
@@ -670,6 +649,7 @@ class DataSeries:
             y1 = downLimit
         return [ y0, y1 ]
 
+
     def drawPoint(self, aColor, x, y, lastx, lasty ):
         #get datapoint x y values
 
@@ -678,33 +658,39 @@ class DataSeries:
         else:
             dx = 0
 
-        cur_point_within_frame = self.withinFrames( [ x , y ] )
-        last_point_within_frame = self.withinFrames( [ lastx, lasty ] )
+        cur_point_within_frame=self.withinframes( [ x , y ] )
+        last_point_within_frame=self.withinframes( [ lastx, lasty ] )
 
         if lasty != None:
             dy = abs( lasty - y )
         else:
             dy = 0
-        if dx < 2 and dy < 2 or not self.thePlot.getConnectPoints():
-            # draw just a point
+        if ( dx<2 and dy<2 ) or not self.thePlot.getConnectPoints():
+            #draw just a point
             if cur_point_within_frame:
-                self.thePlot.drawPoint( self.getColor() ,x, y )
+                self.thePlot.drawpoint_on_plot( self.getColor() ,x, y )
+
         elif self.thePlot.getConnectPoints():
-            # draw line
+            #draw line
             x0 = lastx
             y0 = lasty
             x1 = x
             y1 = y
-            if not cur_point_within_frame or not last_point_within_frame:
-                # either current or last point gets out of frame
-                # do interpolation:
+            if cur_point_within_frame and last_point_within_frame:
+                #if both points are in frame no interpolation needed
+                pass
+            else:
                 upLimit = self.thePlot.thePlotAreaBox[1] + 1
                 downLimit = self.thePlot.thePlotAreaBox[3] - 1
                 leftLimit = self.thePlot.thePlotAreaBox[0] + 1
                 rightLimit = self.thePlot.thePlotAreaBox[2] - 1
-
-                # there are 2 boundary cases x0=x1 and y0=y1
+                #either current or last point out of frame, do interpolation
+                    
+                #interpolation section begins - only in case lastpoint or current point is off limits
+                
+                #there are 2 boundary cases x0=x1 and y0=y1
                 if x0 == x1: 
+
                     if x0 < leftLimit or x0 > rightLimit:
                         return
                     #adjust y if necessary
@@ -713,7 +699,9 @@ class DataSeries:
                         return
                     else:
                         y0, y1 = result
+
                 elif y0 == y1: 
+
                     if y0 < downLimit or y0 > upLimit:
                         return
                     result = self.__adjustLimits( x0, x1, leftLimit, rightLimit )
@@ -721,6 +709,7 @@ class DataSeries:
                         return
                     else:
                         x0, x1 = result
+
                 else:
                     #create coordinate equations
                     mx = float( y1 - y0 ) / float( x1 - x0 )
@@ -750,6 +739,7 @@ class DataSeries:
                             x0 = xi + round( ( y0 - yi ) * my )
                         if x0 < leftLimit or x0 > rightLimit or x0 < xi or x0 > x1:
                             return
+
                     #repeat it with x1 and y1, but compare to left side
                     if x1 > rightLimit:
                         if x0 > rightLimit:
@@ -769,7 +759,10 @@ class DataSeries:
                             x1 = xi + round( ( y1 - yi ) * my )
                         if x1 < leftLimit or x1 > rightLimit or x1 < x0 or x1 > xe:
                             return
+
+                #interpolation section ends
             self.thePlot.drawLine( self.getColor(), x0, y0, x1, y1 )
+
 
     def changeColor( self ):
         aColor = self.theColor
@@ -784,31 +777,69 @@ class DataSeries:
         self.setColor( newColor )
         self.thePlot.drawWholePlot()
 
-class Plot( gtk.DrawingArea ):
-    def __init__( self ):
-        gtk.DrawingArea.__init__( self )
-        self.theGC = None
-        self.theColorMap = {} 
+
+class Plot:
+
+
+    def __init__( self, owner, root, aDrawingArea ):
+    # ------------------------------------------------------
+
+        self.theGCColorMap={} 
+
         self.theSeriesMap = {} #list of displayed fullpnstrings
+         
         self.theAvailableColors = ColorList[:]
-        self.theOwner = None
 
+        self.thePixmapDict={} #key is color, value pixmap
+
+        self.theRoot=root[root.__class__.__name__]
+
+        #creates widget
+        self.theWidget = aDrawingArea
+
+        if self.theWidget.get_ancestor( gtk.Window) != None:
+            self.theWidget.unrealize()   
         #add buttonmasks to widget
-        self.set_events(
-            gtk.gdk.EXPOSURE_MASK | \
-            gtk.gdk.BUTTON_PRESS_MASK | \
-            gtk.gdk.LEAVE_NOTIFY_MASK | \
-            gtk.gdk.POINTER_MOTION_MASK | \
-            gtk.gdk.BUTTON_RELEASE_MASK \
-            )
-        self.theStripMode = MODE_STRIP
+        self.theWidget.set_events(gtk.gdk.EXPOSURE_MASK|gtk.gdk.BUTTON_PRESS_MASK|
+                                    gtk.gdk.LEAVE_NOTIFY_MASK|gtk.gdk.POINTER_MOTION_MASK|
+                                    gtk.gdk.BUTTON_RELEASE_MASK)
+        if self.theWidget.get_ancestor( gtk.Window) != None:
+            self.theWidget.realize()
 
-        self.theXAxis = XAxis( self, PLOT_TIME_AXIS, lambda: self.getRanges()[2:4] )
-        self.theYAxis = YAxis( self, PLOT_VALUE_AXIS, lambda: self.getRanges()[0:2] )
+        anAllocation = self.theWidget.get_allocation()
+        self.thePlotWidth = max( anAllocation[2], PLOT_MINIMUM_WIDTH )
+        self.thePlotHeight = max( anAllocation[3], PLOT_MINIMUM_HEIGHT )
+
+        self.theColorMap=self.theWidget.get_colormap()
+        self.theGCColorMap[ PEN_COLOR ] = self.getGC( PEN_COLOR )
+        self.theGCColorMap[ BACKGROUND_COLOR ] = self.getGC( BACKGROUND_COLOR )
+        self.theGCColorMap[ PLOTAREA_COLOR ] = self.getGC( PLOTAREA_COLOR )
+
+        self.theStyle=self.theWidget.get_style()
+        pctx = self.theWidget.get_pango_context()
+        self.theFont = pctx.load_font( self.theStyle.font_desc )
+        metrics = self.theFont.get_metrics()
+        self.theFontHeight = pango.PIXELS( metrics.get_ascent() + metrics.get_descent() )
+        self.thePixmapBuffer=gtk.gdk.Pixmap(self.theRoot.window,self.thePlotWidth,self.thePlotHeight,-1)
+        self.theSecondaryBuffer=gtk.gdk.Pixmap(self.theRoot.window,self.thePlotWidth,self.thePlotHeight,-1)
+
+        newpm = gtk.gdk.Pixmap(self.theRoot.window,10,10,-1)
+        for aColor in ColorList:
+            newgc = self.getGC ( aColor )
+            self.theGCColorMap[ aColor ] = newgc
+            newpm.draw_rectangle(newgc,True,0,0,10,10)
+            pb=gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,True,8,10,10)
+            newpb=pb.get_from_drawable(newpm,self.theColorMap,0,0,0,0,10,10)
+            self.thePixmapDict[ aColor ]=newpb
+
+        self.theXAxis = Axis( self, PLOT_TIME_AXIS, PLOT_HORIZONTAL_AXIS )
+        self.theYAxis = Axis ( self, PLOT_VALUE_AXIS, PLOT_VERTICAL_AXIS )
+        self.recalculateSize()          
         self.theZoomLevel = 0
         self.theZoomBuffer = []
         self.theZoomKeyPressed = False
-        self.theOwner = None
+        self.theButtonTimeStampp = None
+        self.theOwner = owner
         self.isControlShown = True
         #initializes variables
         self.theStripInterval = 1000
@@ -816,123 +847,81 @@ class Plot( gtk.DrawingArea ):
         self.doesDisplayMinMax = True
         # stripinterval/pixel
         self.doesRequireScaling=True
+        
+        #initialize data buffers
+        self.theStripMode = MODE_STRIP
+        self.theZoomLevel = 0    
 
-        self.thePangoCtx = self.get_pango_context()
-        self.thePangoCtx.set_language( pango.Language( 'en' ) )
-        self.setFont( self.thePangoCtx.get_font_description() )
-        self.theMargin = [
-            self.getLineHeight() + 16,
-            30,
-            self.getLineHeight() * 2 + 16, 
-            70
-            ]
+        self.totalRedraw()
+        
+        self.theWidget.connect('expose-event',self.expose)
+        self.theWidget.connect('button-press-event',self.press)
+        self.theWidget.connect('motion-notify-event',self.motion)
+        self.theWidget.connect('button-release-event',self.release)
 
-        self.thePlotWidth = -1
-        self.thePlotHeight = -1
-        self.thePlotMinWidth = 400
-        self.thePlotMinHeight = 150
-        self.thePixmapBuffer = None
-        self.theSecondaryBuffer = None
-
-        self.connect_after( 'show', self.onRealize )
-        self.connect( 'expose-event', self.expose )
-        self.connect( 'button-press-event', self.onButtonPressed )
-        self.connect( 'motion-notify-event', self.motion )
-        self.connect( 'button-release-event', self.onButtonReleased )
-        self.connect( 'size-allocate', self.onAllocate )
-
-        self.resize( self.thePlotMinWidth, self.thePlotMinHeight )
-
-    def setOwner( self, anOwner ):
-        self.theOwner = anOwner
-
-    def getGC( self ):
-        if self.theGC == None:
-            self.theGC = self.createGC()
-        return self.theGC
-
-    def getColorFor( self, aColor ):
-        if self.theColorMap.has_key( aColor ):
-            aColorObj = self.theColorMap[ aColor ]
-        else:
-            aColorObj = self.getGC().get_colormap().alloc_color( aColor )
-            self.theColorMap[ aColor ] = aColorObj
-        return aColorObj
-
-    def createGC( self ):
-        return self.get_root_window().new_gc()
-
-    def createPixmapBuffer( self ):
-        return gtk.gdk.Pixmap(
-            self.get_root_window(), self.thePlotWidth, self.thePlotHeight )
-
-    def onRealize( self, *args ):
-        self.resize( self.allocation.width, self.allocation.height )
-
-    def size_request( self ):
-        return ( self.thePlotMinWidth, self.thePlotMinHeight )
-
+        
     def showControl( self, aState ):
         self.isControlShown = aState
         self.printTraceLabels()
 
+        
     def getWidget( self ):
-        return self 
+        return self.theWidget 
 
     def getMaxTraces( self ):
         return len( ColorList )
 
-    def getXAxisFullPN( self ):
-        return self.theXAxis.getFullPN()
+    def getXAxisFullPNString ( self ):
+        return self.theXAxis.getFullPNString()
 
-    def setXAxis( self, aFullPN ):
-        oldFullPN = self.theXAxis.getFullPN()
+    def setXAxis( self, aFullPNString ):
+        oldFullPN = self.theXAxis.getFullPNString()
         if oldFullPN != TIME_AXIS:
+            #self.theSeriesMap[ oldFullPN ].switchOn()
             pass
-        if aFullPN == TIME_AXIS:
+        if aFullPNString == TIME_AXIS:
             self.doesConnectPoints = True
         else:
+            #self.theSeriesMap[ aFullPNString ].switchOff()
             self.doesConnectPoints = False
-        self.theXAxis.setFullPN( aFullPN )
+        self.theXAxis.setFullPNString( aFullPNString )
        # take this out if phase plotting history is supported in datagenerator
         self.setStripMode( self.theStripMode )
 
-    def getScaleType( self, anOrientation ):
-        if anOrientation == PLOT_HORIZONTAL_AXIS:
-            anAxis = self.theXAxis
-        else:
-            anAxis = self.theYAxis
-        return anAxis.getScaleType()
 
-    def changeScale( self, anOrientation, aScaleType ):
+    def changeScale(self, anOrientation, aScaleType ):
         #change variable
         if anOrientation == PLOT_HORIZONTAL_AXIS:
             anAxis = self.theXAxis
         else:
             anAxis = self.theYAxis
+            
         anAxis.setScaleType( aScaleType )
-        self.theXAxis.draw()
-        self.theYAxis.draw()
+        if anAxis.reframe() == None:
+            return
+        anAxis.draw()
         self.drawWholePlot()
 
+
     def totalRedraw( self ):
-        if self.get_property('visible'):
-            self.clearPlot()
-            self.drawAxes()
-            self.drawWholePlot()
+        self.clearPlot()
+        self.drawAxes()
+        self.drawWholePlot()
+
 
     def update( self ):
         if self.theZoomLevel > 0:
             return
         self.requestNewData()
-        ranges = self.getRanges()
+        self.getRanges()
 
         redrawFlag = False
-        if self.theYAxis.isOutOfFrame( ranges[0], ranges[1] ):
+        if self.theYAxis.isOutOfFrame( self.theRanges[0], self.theRanges[1] ):
             self.theYAxis.reframe()
             self.theYAxis.draw()
             redrawFlag = True
-        if self.theXAxis.isOutOfFrame( ranges[2], ranges[3] ):
+
+        if self.theXAxis.isOutOfFrame( self.theRanges[2], self.theRanges[3] ):
             redrawFlag = True
             if self.theXAxis.getType() == PLOT_TIME_AXIS:
                 if self.theStripMode == MODE_STRIP:
@@ -941,8 +930,8 @@ class Plot( gtk.DrawingArea ):
                 else:
                     self.requestData()
             self.theXAxis.reframe()
-            self.theXAxis.draw()
 
+            self.theXAxis.draw()
         if redrawFlag:
             self.drawWholePlot()
         else:
@@ -957,14 +946,15 @@ class Plot( gtk.DrawingArea ):
             aSeries.replacePoints( zeros ( ( 0, 5) ) )
 
     def setStripMode(self, aMode):
+
         self.theStripMode = aMode
-        if self.getXAxisFullPN() == TIME_AXIS:
-            self.requestData()
+        if self.getXAxisFullPNString() == TIME_AXIS:
+            self.requestData( )
             if aMode == MODE_STRIP:
         
-                ranges = self.getRanges()
-                self.theOwner.requestDataSlice( ranges[3] - self.theStripInterval,
-                    ranges[3] - self.theStripInterval / 2, 
+                self.getRanges()
+                self.theOwner.requestDataSlice( self.theRanges[3] - self.theStripInterval,
+                    self.theRanges[3] - self.theStripInterval / 2, 
                     self.theStripInterval / self.theXAxis.theLength )
         else:
             if aMode == MODE_HISTORY:
@@ -977,69 +967,81 @@ class Plot( gtk.DrawingArea ):
         self.theZoomKeyPressed = False
         self.totalRedraw()
 
+
     def getDataSeriesList( self ):
         return self.theSeriesMap.values()
         
-    def getDataSeries( self, aFullPN ):
-        return self.theSeriesMap[ aFullPN ]
+        
+    def getDataSeries( self, aFullPNString ):
+        return self.theSeriesMap[ aFullPNString ]
+
 
     def getDataSeriesNames( self ):
         return self.theSeriesMap.keys()
         
-    def addTrace( self, aFullPN ):
-        aColor = self.allocateColor( )
-        if aColor == None:
-            raise RuntimeError( "Cannot allocate a color" )
+        
+    def addTrace( self, aFPNStringList ):
+        return_list = []
+        if len( aFPNStringList ) == 0:
+            return []
+        for aFullPNString in aFPNStringList:
+            #checks whether there's room for new traces
+            #allocates a color
 
-        aSeries = DataSeries( aFullPN, self.theOwner, self, aColor )
-        self.theSeriesMap[ aFullPN ] = aSeries
-        return aSeries
+            aColor = self.allocateColor( )
+            if aColor != None:
+                aSeries = DataSeries( aFullPNString, self.theOwner, self, aColor )
+                self.theSeriesMap[ aFullPNString ] = aSeries
+                return_list.append( aFullPNString )
+        #if mode is strip
+        if self.theStripMode == MODE_STRIP:
+            self.requestData( ) 
 
-    def removeTrace( self, aFullPNList ):
+        elif self.theZoomLevel == 0:
+            #if mode is history and zoom level 0, set xframes
+            self.requestData( )
+
+        else: #just get data from loggers
+            self.requestDataSlice( self.theXAxis.theFrame[0], self.theXAxis.theFrame[1] )
+        self.totalRedraw( )
+        return return_list
+
+
+    
+    def removeTrace(self, FullPNStringList):
         #call superclass
         #redraw
-        for aFullPN in aFullPNList:
-            self.releaseColor( self.theSeriesMap[ aFullPN ].getColor() )
-            del self.theSeriesMap[ aFullPN ]
+        for fpn in FullPNStringList:
+            self.releaseColor ( self.theSeriesMap[ fpn ].getColor() )
+            self.theSeriesMap.__delitem__( fpn )
         self.totalRedraw()
+
   
     def getStripInterval(self):
         return self.theStripInterval
     
+
     def setStripInterval( self, newinterval ):
         #calulates new xframes, if there are more data in buffer
         self.theStripInterval = newinterval
         if self.theStripMode == MODE_STRIP:
             self.totalRedraw()
 
-    def requestData( self ):
-        self.theOwner.requestData( self.theXAxis.theLength * 2 )
 
-    def sync( self ):
-        #if mode is strip
-        if self.theStripMode == MODE_STRIP or self.theZoomLevel == 0:
-            self.requestData() 
-        else:
-            self.requestDataSlice(
-                self.theXAxis.theFrame[0],
-                self.theXAxis.theFrame[1] )
-                
-        if self.window != None:
-            self.totalRedraw()
+    def requestData(self ):
+        self.theOwner.requestData( self.theXAxis.theLength * 2 )
+        
 
     def requestDataSlice( self, aStart, anEnd ):
-        self.theOwner.requestDataSlice(
-            aStart,
-            anEnd,
-            ( anEnd - aStart ) / ( self.theXAxis.theLength * 2 )
-            )
+        self.theOwner.requestDataSlice( aStart, anEnd, ( anEnd - aStart ) / ( self.theXAxis.theLength*2) )
 
     def requestNewData ( self ):
         self.theOwner.requestNewData( self.getRequiredTimeResolution() )
 
+
     def getRequiredTimeResolution( self ):
-        return ( self.theXAxis.theFrame[1] - self.theXAxis.theFrame[0] ) / \
-               ( self.theXAxis.theLength * 2 )
+        return ( self.theXAxis.theFrame[1] - self.theXAxis.theFrame[0] ) / (self.theXAxis.theLength * 2)
+        
         
     def doConnectPoints( self, aBool ):
         self.doesConnectPoints = aBool
@@ -1053,48 +1055,43 @@ class Plot( gtk.DrawingArea ):
     def getDisplayMinMax( self ):
         return self.doesDisplayMinMax
 
+
     def isTimePlot( self ):
         return self.theXAxis.getType() == PLOT_TIME_AXIS
 
+
+    def getGC ( self, aColor ):
+        newgc = self.theRoot.window.new_gc()
+        newgc.set_foreground( self.theColorMap.alloc_color( aColor ) )
+        return newgc
+
+
     def recalculateSize(self):
-        self.theOrigo=[
-            self.theMargin[3],
-            self.thePlotHeight - self.theMargin[2]
-            ]
-        self.thePlotArea=[
-            self.theOrigo[0],
-            self.theMargin[0],
-            self.thePlotWidth - self.theMargin[1] - self.theOrigo[0],
-            self.theOrigo[1] - self.theMargin[0]
-            ]
-        self.thePlotAreaBox=[
-            self.thePlotArea[0], self.thePlotArea[1],
-            self.thePlotArea[2] + self.thePlotArea[0],
-            self.thePlotArea[3] + self.thePlotArea[1]
-            ]
-        self.persistentCoordArea = [
-            200, 5, self.thePlotWidth / 2 - 100, self.getLineHeight() ]
-        self.temporaryCoordArea = [
-            100 + self.thePlotWidth / 2 , 5, self.thePlotWidth / 2 -100,
-            self.getLineHeight() ]
-        aPangoLayout = self.create_pango_layout( MODE_HISTORY )
-        aPangoLayout.set_font_description( self.theFontDescription )
-        [ w, h ] = map( pango.PIXELS, aPangoLayout.get_size() )
-        self.historyArea = [
-            5, self.thePlotHeight - self.getLineHeight(), w, h
-            ]
+        self.theOrigo=[70,self.thePlotHeight-35]
+        self.thePlotArea=[self.theOrigo[0],30,\
+            self.thePlotWidth-20-self.theOrigo[0],\
+            self.theOrigo[1]-30]
+        self.thePlotAreaBox=[self.thePlotArea[0],self.thePlotArea[1],\
+            self.thePlotArea[2]+self.thePlotArea[0],\
+            self.thePlotArea[3]+self.thePlotArea[1]]
+        self.persistentCoordArea = [200, 5, self.thePlotWidth / 2 - 100, self.theFontHeight ]
+        self.temporaryCoordArea = [ 100 + self.thePlotWidth / 2 , 5, self.thePlotWidth / 2 -100, self.theFontHeight ]
+        layout = pango.Layout( self.theWidget.get_pango_context() )
+        layout.set_text( MODE_HISTORY )
+        width, height = layout.get_pixel_size()
+        self.historyArea = [ 5, self.thePlotHeight - self.theFontHeight, width, self.theFontHeight ]
         self.theXAxis.recalculateSize()
         self.theYAxis.recalculateSize()
 
-    def expose(self, obj, event):
-        obj.window.draw_drawable(
-            self.thePixmapBuffer.new_gc(), self.thePixmapBuffer,
-            event.area[0], event.area[1],
-            event.area[0], event.area[1], event.area[2], event.area[3] )
 
-    def onAllocate( self, widget, rec ):
+    def expose(self, obj, event):
+
+        obj.window.draw_drawable( self.thePixmapBuffer.new_gc(), self.thePixmapBuffer, event.area[0], event.area[1],
+                                    event.area[0], event.area[1], event.area[2], event.area[3] )
         # check for resize
-        self.resize( rec.width, rec.height )
+        anAllocation = self.theWidget.get_allocation()
+        self.resize( anAllocation[2], anAllocation[3] )
+
 
     def allocateColor( self ):             
         #checks whether there's room for new traces
@@ -1105,9 +1102,11 @@ class Plot( gtk.DrawingArea ):
         else:
             return None
 
+
     def registerColor( self, aColor ):
         if aColor in self.theAvailableColors:
             self.theAvailableColors.remove( aColor )
+
 
     def releaseColor(self, aColor ):
         #remove from colorlist
@@ -1116,14 +1115,17 @@ class Plot( gtk.DrawingArea ):
                 return
         self.theAvailableColors.insert( 0, aColor )
 
-    def clearPlotArea(self):
+
+    def clearPlotarea(self):
         self.drawBox( PLOTAREA_COLOR, self.thePlotArea[0] + 1, self.thePlotArea[1] + 1,
                       self.thePlotArea[2] - 1, self.thePlotArea[3] -1 )
+        
 
     def clearPlot(self):
-        self.drawBox( BACKGROUND_COLOR,
-            0, 0, self.thePlotWidth, self.thePlotHeight )
+        self.drawBox( BACKGROUND_COLOR, 0, 0, self.thePlotWidth, self.thePlotHeight )
         
+        
+
     def drawAxes(self):
         # reframe too!!!
         self.theXAxis.reframe()
@@ -1131,87 +1133,50 @@ class Plot( gtk.DrawingArea ):
         self.theXAxis.draw()
         self.theYAxis.draw()
 
-    def drawPoint( self, aColor, x, y ):
+        
+    def drawpoint_on_plot( self, aColor, x, y ):
         #uses raw plot coordinates!
-        x = int( x )
-        y = int( y )
-        aGC = self.getGC()
-        aGC.set_foreground( self.getColorFor( aColor ) )
-        self.thePixmapBuffer.draw_point( aGC, x, y )
-        self.queue_draw_area( int(x), int(y), 1, 1 )
+        self.thePixmapBuffer.draw_point( self.theGCColorMap[aColor], int(x), int(y) )
+        self.theWidget.queue_draw_area( int(x), int(y), 1, 1 )
+    
         
     def drawLine(self, aColor, x0, y0, x1, y1):
         #uses raw plot coordinates!     
-        x0 = int( x0 )
-        y0 = int( y0 )
-        x1 = int( x1 )
-        y1 = int( y1 )
-        aGC = self.getGC()
-        aGC.set_foreground( self.getColorFor( aColor ) )
-        self.thePixmapBuffer.draw_line( aGC, x0, y0, x1, y1 )
-        self.queue_draw_area(
-            min(x0, x1), min(y0, y1),
-            abs(x1 - x0) + 1, abs(y1 - y0) + 1 )
-        return [x1, y1]
+        self.thePixmapBuffer.draw_line(self.theGCColorMap[aColor],int(x0),int(y0),\
+            int(x1),int(y1))
+        self.theWidget.queue_draw_area(int(min(x0,x1)),int(min(y0,y1)),\
+            int(abs(x1-x0)+1),int(abs(y1-y0)+1))
+        return [x1,y1]
 
-    def drawBox( self, aColor, x0, y0, width, height ):
-        x0 = int( x0 )
-        y0 = int( y0 )
-        width = int( width )
-        height = int( height )
+    def drawBox(self, aColor, x0,y0,width,height):
         #uses raw plot coordinates!
-        aGC = self.getGC()
-        aGC.set_foreground( self.getColorFor( aColor ) )
-        self.thePixmapBuffer.draw_rectangle( aGC, True, x0, y0, width, height)
-        self.queue_draw_area( x0, y0, width, height )
+        self.thePixmapBuffer.draw_rectangle(self.theGCColorMap[aColor],True,x0,y0,width,height)
+        self.theWidget.queue_draw_area(x0,y0,width,height)
 
-    def drawInvertedBox(self,x0,y0,x1,y1):
-        x0 = int( x0 )
-        y0 = int( y0 )
-        x1 = int( x1 )
-        y1 = int( y1 )
-        if x0 > x1:
-            t = x0
-            x0 = x1
-            x1 = t
-        if y0 > y1:
-            t = y0
-            y0 = y1
-            y1 = t
-        aGC = self.getGC()
-        aGC.set_function( gtk.gdk.INVERT )
-        self.thePixmapBuffer.draw_rectangle( aGC, True,
-            x0, y0, x1 - x0, y1 - y0 )
-        aGC.set_function( gtk.gdk.COPY )
-        self.queue_draw_area( x0, y0, x1 - x0, y1 - y0 )
+    def drawxorbox(self,x0,y0,x1,y1):
+        newgc=self.thePixmapBuffer.new_gc()
+        newgc.set_function(gtk.gdk.INVERT)
+        self.thePixmapBuffer.draw_rectangle(newgc,True,int(x0),int(y0),int(x1-x0),int(y1-y0))
+        self.theWidget.queue_draw_area(int(x0),int(y0),int(x1),int(y1))
 
-    def drawLayout( self, aColor, x0, y0, aPangoLayout ):
-        x0 = int( x0 )
-        y0 = int( y0 )
-        aGC = self.getGC()
-        aGC.set_foreground( self.getColorFor( aColor ) )
-        self.thePixmapBuffer.draw_layout( aGC,
-            x0, y0, aPangoLayout )
-        self.queue_draw_area(
-            x0, y0, *aPangoLayout.get_pixel_size() )
-
-    def createPangoLayout( self, text ):
-        text = str( text )
-        aPangoLayout = self.create_pango_layout( text )
-        aPangoLayout.set_font_description( self.theFontDescription )
-        return aPangoLayout
-
-    def drawText( self, aColor, x0, y0, text ):
-        self.drawLayout( aColor, x0, y0, self.createPangoLayout( text ) )
+    def drawText(self,aColor,x0,y0,text):
+        layout = pango.Layout( self.theWidget.get_pango_context() )
+        layout.set_text( text )
+        self.thePixmapBuffer.draw_layout(
+            self.theGCColorMap[aColor], int( x0 ), int( y0 ), layout
+            )
+        width, height = layout.get_pixel_size()
+        self.theWidget.queue_draw_area(
+            int( x0 ), int( y0 ), width, height )
 
     def shiftPlot( self ):
-        ranges = self.getRanges()
-        halfPoint =  ranges[3] - int( self.theStripInterval / 2 ) 
+        halfPoint =  self.theRanges[3] - int( self.theStripInterval / 2 ) 
         self.cutSeries( halfPoint )
 
     def cutSeries( self, aThreshold ):
         for aSeries in self.theSeriesMap.values():
             aSeries.deletePoints( aThreshold )
+
 
     def getRanges(self):
         self.theRanges = [ 0, 0, 0, 0 ]
@@ -1227,16 +1192,26 @@ class Plot( gtk.DrawingArea ):
             self.theRanges[1] = anArray[ nu.argmax( anArray[:,DP_MAX]), DP_MAX] #maximum value of all
             self.theRanges[2] = anArray[ nu.argmin( anArray[:,DP_TIME] ), DP_TIME ] # minimum time
             self.theRanges[3] = anArray[ nu.argmax( anArray[:,DP_TIME] ), DP_TIME ] # maximum time
-        return self.theRanges
 
-    def onButtonPressed(self,obj, event):
+  
+    def press(self,obj, event):
         x = event.x
         y = event.y
         button=event.button
-        if button == 1: # left-clicked 
+        #if button is 1
+        if button==1:
             self.showPersistentCoordinates( x, y )
-            if self.theStripMode==MODE_HISTORY and \
-               self.theXAxis.getFullPN() == TIME_AXIS:
+            # if inside plotarea, display 
+            tstamp=event.get_time()
+            if self.theButtonTimeStampp == tstamp: 
+                if not self.isControlShown:
+                    self.maximize()
+                else:
+                    self.minimize()
+                return
+
+            self.theButtonTimeStampp=tstamp                 
+            if self.theStripMode==MODE_HISTORY and self.theXAxis.getFullPNString() == TIME_AXIS:
                 #check that mode is history 
                 self.theZoomKeyPressed=True
                 self.x0 = x
@@ -1251,12 +1226,84 @@ class Plot( gtk.DrawingArea ):
                 self.realx1 = self.x0
                 self.realy0 = self.y0
                 self.realy1 = self.y0
+            #create self.x0, y0
+        #if button is 3 and zoomlevel>0
+        elif button==3:
+            self.showMenu()
+            #call zoomOut
+
+    def showMenu( self ):
+        theMenu = gtk.Menu()
+        if self.theZoomLevel > 0:
+            zoomUt = gtk.MenuItem( "Zoom out" )
+            zoomUt.connect ("activate", self.__zoomOut )
+            theMenu.append( zoomUt )
+            theMenu.append( gtk.SeparatorMenuItem() )
+
+        if self.isControlShown:
+            guiMenuItem = gtk.MenuItem( "Hide Control" )
+            guiMenuItem.connect ( "activate", self.__minimize_action )
+        else:
+            guiMenuItem = gtk.MenuItem( "Show Control" )
+            guiMenuItem.connect ( "activate", self.__maximize_action )
+         
+        xToggle = gtk.MenuItem ( "Toggle X axis" )
+        xToggle.connect( "activate", self.__toggleXAxis )
+        yToggle = gtk.MenuItem ( "Toggle Y axis" )
+        yToggle.connect( "activate", self.__toggleYAxis )
+        #take this condition out if phase plotting works for history
+        if self.theOwner.allHasLogger():
+            if self.theStripMode == MODE_STRIP:
+                toggleStrip = gtk.MenuItem("History mode")
+            else:
+                toggleStrip = gtk.MenuItem( "Strip mode" )
+            toggleStrip.connect( "activate", self.__toggleStripMode )
+            theMenu.append( toggleStrip )
+            theMenu.append( gtk.SeparatorMenuItem() )   
+        theMenu.append( xToggle )
+        theMenu.append( yToggle )
+        theMenu.append( gtk.SeparatorMenuItem() )
+        theMenu.append( guiMenuItem )
+        theMenu.show_all()
+        theMenu.popup( None, None, None, 1, 0 )
+
+    def __zoomOut( self, *args ):
+        self.zoomOut()
+
+
+    def __toggleStripMode( self, *args ):
+        if self.theStripMode == MODE_STRIP:
+            self.setStripMode( MODE_HISTORY )
+        else:
+            self.setStripMode( MODE_STRIP )
+
+
+    def __toggleXAxis( self, *args ):
+        if self.theXAxis.theScaleType == SCALE_LINEAR:
+            self.changeScale( PLOT_HORIZONTAL_AXIS, SCALE_LOG10) 
+        else:
+            self.changeScale( PLOT_HORIZONTAL_AXIS, SCALE_LINEAR )
+
+            
+    def __toggleYAxis( self, *args ):
+        if self.theYAxis.theScaleType == SCALE_LINEAR:
+            self.changeScale( PLOT_VERTICAL_AXIS, SCALE_LOG10) 
+        else:
+            self.changeScale( PLOT_VERTICAL_AXIS, SCALE_LINEAR )
+            
+
+    def __minimize_action( self, *args ):
+        self.minimize()
+
+    def __maximize_action( self, *args ):
+        self.maximize()
 
     def showPersistentCoordinates( self, x, y ):
         self.displayCoordinates( x, y, self.persistentCoordArea )
 
     def showTempCoordinates( self, x, y ):
         self.displayCoordinates( x, y, self.temporaryCoordArea )
+
 
     def displayCoordinates( self, x, y, aBox ):
         # displays coordinates at the top of chart
@@ -1268,6 +1315,8 @@ class Plot( gtk.DrawingArea ):
             text = num_to_sci( aCoords[0] ) + "  x  " + num_to_sci( aCoords[1] )
             self.drawText( PEN_COLOR, aBox[0], aBox[1], text )
             
+  
+
     def convertPlotCoordinates( self, x, y ):
         # retunrs [xcoord, ycoord] or None if outside
         realCoords = [0,0]
@@ -1280,13 +1329,14 @@ class Plot( gtk.DrawingArea ):
             return None
         return realCoords
 
+
     def motion(self,obj,event):
         x=event.x
         y=event.y
         self.showTempCoordinates( x, y )
         #if keypressed undo previous  one
         if self.theZoomKeyPressed:
-            self.drawInvertedBox(self.realx0,self.realy0,self.realx1,self.realy1)
+            self.drawxorbox(self.realx0,self.realy0,self.realx1,self.realy1)
             #check whether key is still being pressed, if not cease selection
             state=event.state
             if not (gtk.gdk.BUTTON1_MASK & state):
@@ -1304,27 +1354,27 @@ class Plot( gtk.DrawingArea ):
                 self.realy0=min(self.y0,self.y1)
                 self.realy1=max(self.y0,self.y1)
                 #draw new rectangle
-                self.drawInvertedBox(self.realx0,self.realy0,self.realx1,self.realy1)
+                self.drawxorbox(self.realx0,self.realy0,self.realx1,self.realy1)
 
-    def onButtonReleased( self, obj, event ):
-        # check if this has been left-clicked
-        if self.theZoomKeyPressed and event.button == 1:
-            #draw old inverted rectangle
-            self.drawInvertedBox(
-                self.realx0, self.realy0,
-                self.realx1, self.realy1)
+
+    def release(self,obj,event):
+        #check that button 1 is released and previously keypressed was set
+        if self.theZoomKeyPressed and event.button==1:
+            #draw old inverz rectangle
+            self.drawxorbox(self.realx0,self.realy0,self.realx1,self.realy1)
+
             #call zoomIn    
-            self.theZoomKeyPressed = False            
+            self.theZoomKeyPressed=False            
             if self.realx0 < self.realx1 and self.realy0 < self.realy1:
-                coords0 = self.convertPlotCoordinates(
-                    self.realx0, self.realy0 )
-                coords1 = self.convertPlotCoordinates(
-                    self.realx1, self.realy1 )
+                coords0 = self.convertPlotCoordinates( self.realx0, self.realy0 )
+                coords1 = self.convertPlotCoordinates( self.realx1, self.realy1 )
 
                 if coords0 != None and coords1 != None:
                     newxframe = [ coords0[0], coords1[0] ]
                     newyframe = [ coords0[1], coords1[1] ]
-                    self.zoomIn( newxframe, newyframe )
+                    self.zoomIn(newxframe,newyframe)
+
+        
 
     def zoomIn(self, newxframe, newyframe):
         #increase zoomlevel
@@ -1339,6 +1389,7 @@ class Plot( gtk.DrawingArea ):
         self.theYAxis.theFrame[1] = newyframe[0]
         self.requestDataSlice( newxframe[0], newxframe[1] ) 
         self.totalRedraw()
+        
 
     def zoomOut(self):
         #if zoomlevel 0 do nothing
@@ -1355,6 +1406,8 @@ class Plot( gtk.DrawingArea ):
             self.theYAxis.theFrame = newframes[1]
             self.requestDataSlice( self.theXAxis.theFrame[0],  self.theXAxis.theFrame[1] )
         self.totalRedraw()
+            
+
 
     def getStripMode(self):
         return self.theStripMode
@@ -1366,11 +1419,12 @@ class Plot( gtk.DrawingArea ):
                 seriesCount += 1
         return seriesCount
 
+
     def printTraceLabels(self):
         #FIXME goes to 2ndary layer
         if self.isControlShown:
             return
-        textShift = self.theAscent + self.theDescent + 5
+        textShift = self.theFontHeight
         seriesCount = self.getSeriesCount()
         if seriesCount == 0:
             return
@@ -1381,24 +1435,23 @@ class Plot( gtk.DrawingArea ):
         for aSeries in self.theSeriesMap.values():
             if not aSeries.isOn():
                 continue
-            for ox in range(-2, 2):
-                for oy in range(-2, 2):
-                    self.drawText(
-                        BACKGROUND_COLOR, x + ox, y + oy,
-                        aSeries.getFullPN() )
-            self.drawText( aSeries.getColor(), x, y, aSeries.getFullPN() )
+            self.drawText( BACKGROUND_COLOR, x +1, y, aSeries.getFullPNString() )
+            self.drawText( aSeries.getColor(), x, y, aSeries.getFullPNString() )
             y += textShift
 
+
     def drawWholePlot(self):
+
         #clears plotarea
-        self.clearPlotArea()
+        self.clearPlotarea()
         self.drawFrame()
 
         #go trace by trace and redraws plot
         for aSeries in self.theSeriesMap.values():
             if aSeries.isOn():
                 aSeries.drawAllPoints()
-        self.printTraceLabels()
+        self. printTraceLabels()
+
 
     def drawFrame( self ):
         x0 = self.theOrigo[0]
@@ -1412,34 +1465,27 @@ class Plot( gtk.DrawingArea ):
         self.drawBox( BACKGROUND_COLOR, self.historyArea[0], self.historyArea[1], self.historyArea[2], self.historyArea[3] )
         self.drawText( PEN_COLOR, self.historyArea[0], self.historyArea[1], self.theStripMode )
 
+    def minimize(self):
+        self.theOwner.minimize()           
+
+    
+    def maximize(self):
+        self.theOwner.maximize()
+
     def resize( self, newWidth, newHeight ):
-        if newWidth < self.thePlotMinWidth:
-            newWidth = self.thePlotMinWidth
-        if newHeight < self.thePlotMinHeight:
-            newHeight = self.thePlotMinHeight
+        if newWidth < PLOT_MINIMUM_WIDTH:
+            newWidth = PLOT_MINIMUM_WIDTH
+        if newHeight < PLOT_MINIMUM_HEIGHT:
+            newHeight = PLOT_MINIMUM_HEIGHT
         if newWidth == self.thePlotWidth and newHeight == self.thePlotHeight: 
             return
         self.thePlotWidth = newWidth
-        self.thePlotHeight = newHeight
-        self.thePixmapBuffer = self.createPixmapBuffer()
-        self.theSecondaryBuffer = self.createPixmapBuffer()
+        self.thePlotHeight  =newHeight
+        self.thePixmapBuffer = gtk.gdk.Pixmap( self.theRoot.window, self.thePlotWidth, self.thePlotHeight, -1)
+        self.theSecondaryBuffer = gtk.gdk.Pixmap(self.theRoot.window, self.thePlotWidth, self.thePlotHeight, -1)
         self.recalculateSize()
         self.totalRedraw()
 
-    def setFont( self, aFontDescription ):
-        aFont = self.thePangoCtx.load_font( aFontDescription )
-        aMetrics = aFont.get_metrics( self.thePangoCtx.get_language() )
-        self.theAscent = pango.PIXELS( aMetrics.get_ascent() )
-        self.theDescent = pango.PIXELS( aMetrics.get_descent() )
-        self.theFontDescription = aFontDescription
 
-    def getAscent( self ):
-        return self.theAscent
+# plot display coordinates
 
-    def getDescent( self ):
-        return self.theDescent
-
-    def getLineHeight( self ):
-        return self.theAscent + self.theDescent
-
-gobject.type_register( Plot, 'ecell-ui-osogo-Plot' )

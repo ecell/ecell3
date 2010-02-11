@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -35,43 +35,64 @@
 # E-Cell Project, Lab. for Bioinformatics, Keio University.
 #
 
-import os
-import string
+
 import sys
-import gtk
 
-from SeparativePane import SeparativePane
-import constants
+from ecell.ecssupport import *
+from ecell.ui.osogo.Window import *
 
-class PluginWindow( SeparativePane ):
-    def __init__( self, aDirname, aSession, aRootWidgetName = 'top_frame' ):
-        """
-        Constructor
+class PluginWindow( Window ):
+    """has some plugin functions
+    """
+
+    def __init__( self, aDirname, aPluginManager, aRoot=None ):
+        """Constructor
         aDirname        -- a directory name (str:absolute path/relative path)
-        aSession        -- a reference to SessionFacade
-        aRootWidgetName -- a root property (str)
+        aPluginManager  -- a reference to PluginManager (an instance of PluginManager)
+        aRoot           -- a root property (str)
         """
+
+        # creates glade file name (str)
+        aGladeFile = os.path.join( aDirname , self.__class__.__name__ + ".glade" )
+
         # calls superclass's constructor
-        SeparativePane.__init__(
-            self,
-            os.path.join( aDirname, self.__class__.__name__ + ".glade" ),
-            aRootWidgetName )
-        self.theSession = aSession
+        Window.__init__( self, aGladeFile, aRoot )
 
-    def setTitle( self, aTitle ):
-        if not self.theSession.onPluginWindowTitleChanging( self, aTitle ):
-            return False
-        aOldTitle = self.theTitle
-        if not SeparativePane.setTitle( self, aTitle ):
-            return False
-        self.theSession.onPluginWindowTitleChanged( self, aOldTitle )
-        return True
+        self.thePluginManager = aPluginManager  # PluginManager
 
-    def getName( self ):
-        return self.__class__.__name__
+    def openWindow( self ):
+        """openWindow
+        Returns None
+        """
 
-    def __str__( self ):
-        return "Instance of %s (title=%s)" % (
-            self.__class__.__name__, self.theTitle )
+        # calls superclass's method
+        Window.openWindow( self )
+
+    def update( self ):
+        """(Abstract method)
+        update this window
+        Returns None
+        """
+
+        import inspect
+        caller = inspect.getouterframes(inspect.currentframe())[0][3]
+        raise NotImplementedError(caller + 'must be implemented in subclass')
+
+    def exit( self, *arg ):
+        """remove this window from PluginManager
+        Returns None
+        """
+
+        self.thePluginManager.removeInstance( self )
+    
+    def close( self ):
+        """ closes pluginwindow """
+        self.exit( None )	
+
+    def getParent( self ):
+       if self.theParent == None:
+           return self
+       return self.theParent
+       
 # end of PluginWindow
 

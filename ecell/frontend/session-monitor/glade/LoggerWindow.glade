@@ -11,14 +11,14 @@
   <property name="events">GDK_BUTTON_PRESS_MASK</property>
   <property name="title" translatable="yes">LoggerWindow</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
-  <property name="window_position">GTK_WIN_POS_CENTER</property>
+  <property name="window_position">GTK_WIN_POS_NONE</property>
   <property name="modal">False</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
   <property name="icon">icon_logger.png</property>
 
   <child>
-    <widget class="GtkVBox" id="top_frame">
+    <widget class="GtkVBox" id="vbox9">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
       <property name="spacing">0</property>
@@ -125,8 +125,8 @@
 				      <property name="enable_arrow_keys">True</property>
 				      <property name="enable_arrows_always">False</property>
 
-				      <child internal-child="entry">
-					<widget class="GtkEntry" id="datatype_combo">
+				      <child>
+					<widget class="GtkEntry" id="datatype_combo_entry">
 					  <property name="visible">True</property>
 					  <property name="can_focus">True</property>
 					  <property name="editable">False</property>
@@ -139,7 +139,7 @@
 					</widget>
 				      </child>
 
-				      <child internal-child="list">
+				      <child>
 					<widget class="GtkList" id="convertwidget3">
 					  <property name="visible">True</property>
 					  <property name="selection_mode">GTK_SELECTION_BROWSE</property>
@@ -319,7 +319,7 @@
 			      </child>
 
 			      <child>
-				<widget class="GtkLabel" id="label9">
+				<widget class="GtkLabel" id="label10">
 				  <property name="visible">True</property>
 				  <property name="label" translatable="yes">Save directory</property>
 				  <property name="use_underline">False</property>
@@ -466,7 +466,7 @@
 			      </child>
 
 			      <child>
-				<widget class="GtkLabel" id="label10">
+				<widget class="GtkLabel" id="label11">
 				  <property name="visible">True</property>
 				  <property name="label" translatable="yes">data interval</property>
 				  <property name="use_underline">False</property>
@@ -626,7 +626,7 @@
 				  </child>
 
 				  <child>
-				    <widget class="GtkLabel" id="label11">
+				    <widget class="GtkLabel" id="label12">
 				      <property name="visible">True</property>
 				      <property name="label" translatable="yes">Specify the time to save</property>
 				      <property name="use_underline">False</property>

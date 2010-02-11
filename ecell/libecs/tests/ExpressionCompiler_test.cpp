@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -43,53 +43,57 @@
 #include "VariableReference.hpp"
 
 #include <iostream>
+#include <cmath>
 
 using namespace libecs;
 
-template<typename T>
-inline bool isReal(const T&)
+template< typename T >
+inline bool isReal( const T& )
 {
     return false;
 }
 
 template<>
-inline bool isReal(const Real&)
+inline bool isReal( const Real& )
 {
     return true;
 }
 
 
-template<typename T, bool can_cast = boost::is_floating_point<T>::value >
+template< typename T, bool can_cast = boost::is_floating_point< T >::value >
 struct _toReal
 {
-    Real operator ()(const T& val) const {
+    Real operator ()( const T& val ) const {
         return 0;
     }    
 };
 
-template<typename T>
-struct _toReal<T, true>
+template< typename T >
+struct _toReal< T, true >
 {
-    Real operator ()(const T& val) const {
+    Real operator ()( const T& val ) const {
         return val;
     }    
 };
 
-template<typename T>
-inline Real toReal(const T& val)
+template< typename T >
+inline Real toReal( const T& val )
 {
     return _toReal<T>()( val );
 }
 
 
-#define CHECK_INSTRUCTION(pc, op, oper) do { \
-    BOOST_REQUIRE_EQUAL( op, reinterpret_cast<const scripting::InstructionHead*>(pc)->getOpcode() ); \
-    if (isReal(oper)) { \
-        BOOST_CHECK_CLOSE_FRACTION( toReal(oper), toReal(reinterpret_cast<const scripting::Instruction<op>*>(pc)->getOperand()), 50 ); \
-    } else { \
-        BOOST_REQUIRE_EQUAL( oper, reinterpret_cast<const scripting::Instruction<op>*>(pc)->getOperand() ); \
+#define CHECK_INSTRUCTION( pc, op, oper ) do { \
+    BOOST_REQUIRE_EQUAL( op, reinterpret_cast< const scripting::InstructionHead* >(pc)->getOpcode() ); \
+    if ( isReal( oper ) ) \
+    { \
+        BOOST_CHECK_CLOSE_FRACTION( toReal( oper ), toReal( reinterpret_cast< const scripting::Instruction< op >* >( pc )->getOperand() ), 50 ); \
     } \
-    pc += sizeof( scripting::Instruction<op> ); \
+    else \
+    { \
+        BOOST_REQUIRE_EQUAL( oper, reinterpret_cast< const scripting::Instruction<op>* >( pc )->getOperand() ); \
+    } \
+    pc += sizeof( scripting::Instruction< op > ); \
 } while (0)
 
 BOOST_AUTO_TEST_CASE(testBasic)
@@ -171,6 +175,17 @@ BOOST_AUTO_TEST_CASE(testBasic)
         CHECK_INSTRUCTION( pc, scripting::PUSH_REAL, 1e-20 );
         CHECK_INSTRUCTION( pc, scripting::MUL, scripting::NoOperand() );
         CHECK_INSTRUCTION( pc, scripting::SUB, scripting::NoOperand() );
+        CHECK_INSTRUCTION( pc, scripting::RET, scripting::NoOperand() );
+        BOOST_CHECK_EQUAL( eoc, pc );
+    }
+
+    {
+        std::auto_ptr<const scripting::Code> code(
+             ec.compileExpression("sin(0)" ) );
+
+        const unsigned char* pc = code->data();
+        const unsigned char* eoc = &*code->end();
+        CHECK_INSTRUCTION( pc, scripting::PUSH_REAL, 0. );
         CHECK_INSTRUCTION( pc, scripting::RET, scripting::NoOperand() );
         BOOST_CHECK_EQUAL( eoc, pc );
     }
@@ -380,8 +395,7 @@ BOOST_AUTO_TEST_CASE(testVariableReferenceResolver)
         CHECK_INSTRUCTION( pc, scripting::ADD, scripting::NoOperand() );
         CHECK_INSTRUCTION( pc, scripting::OBJECT_METHOD_REAL, (
                 scripting::RealObjectMethodProxy::create<
-                    VariableReference, &VariableReference::getValue >(
-                        &aVarRefResolver.a ) ) );
+                    Variable, &Variable::getValue >( 0 ) ) );
         CHECK_INSTRUCTION( pc, scripting::ADD, scripting::NoOperand() );
         CHECK_INSTRUCTION( pc, scripting::RET, scripting::NoOperand() );
         BOOST_CHECK_EQUAL(eoc, pc);

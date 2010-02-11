@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -42,7 +42,7 @@
 
 namespace libecs { namespace scripting {
 
-class Assembler
+class LIBECS_API Assembler
 {
 public:
     Assembler( Code* code )
@@ -61,12 +61,12 @@ public:
 
     void
     appendVariableReferenceMethodInstruction(
-            libecs::VariableReferencePtr aVariableReference,
-            libecs::StringCref aMethodName );
+            libecs::VariableReference* aVariableReference,
+            const libecs::String& aMethodName );
 
     void
-    appendSystemMethodInstruction( libecs::SystemPtr aSystemPtr,
-                                   libecs::StringCref aMethodName );
+    appendSystemMethodInstruction( libecs::System* aSystemPtr,
+                                   const libecs::String& aMethodName );
 
 private:
     Code* theCode;

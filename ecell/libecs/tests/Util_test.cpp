@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -42,9 +42,16 @@
 
 #include <iostream>
 
-BOOST_AUTO_TEST_CASE(test)
+BOOST_AUTO_TEST_CASE(testEraseWhiteSpaces)
 {
     std::string str( "  \t  a bcde f\tghi\n\t jkl\n \tmnopq     \n   \t " );
     libecs::eraseWhiteSpaces( str );
     BOOST_CHECK_EQUAL(str, "abcdefghijklmnopq");
-};
+}
+
+BOOST_AUTO_TEST_CASE(testStringCast)
+{
+    using namespace libecs;
+
+    std::cout << stringCast< Real >( "123" ) << std::endl;
+}

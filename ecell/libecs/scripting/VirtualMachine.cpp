@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -32,9 +32,9 @@
 // E-Cell Project.
 //
 
-#include "libecs.hpp"
-#include "Exceptions.hpp"
-#include "scripting/VirtualMachine.hpp"
+#include "libecs/libecs.hpp"
+#include "libecs/Exceptions.hpp"
+#include "libecs/scripting/VirtualMachine.hpp"
 
 namespace libecs { namespace scripting {
 using namespace libecs;
@@ -153,7 +153,7 @@ const Real VirtualMachine::execute( CodeCref aCode )
  
     LightweightStack<StackElement, 100> aStack;
 
-    const unsigned char* aPC( aCode.data() );
+    const unsigned char* aPC( &aCode.front() );
 
     for (;;) {
         switch ( FETCH_OPCODE() ) {
@@ -256,7 +256,8 @@ const Real VirtualMachine::execute( CodeCref aCode )
             return aStack.peek< 0 >().theReal;
 
         default:
-            THROW_EXCEPTION( UnexpectedError, "Invalid instruction." );
+            THROW_EXCEPTION( UnexpectedError,
+                             ": invalid instruction" );
 
         }
     }

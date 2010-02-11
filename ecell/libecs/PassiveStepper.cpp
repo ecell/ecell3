@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -28,6 +28,7 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -36,34 +37,40 @@
 
 #include "PassiveStepper.hpp"
 
-
 namespace libecs
 {
 
-  LIBECS_DM_INIT_STATIC( PassiveStepper, Stepper );
+LIBECS_DM_INIT_STATIC( PassiveStepper, Stepper );
 
-  PassiveStepper::PassiveStepper()
-  {
+PassiveStepper::PassiveStepper()
+{
     // gcc3 doesn't currently support numeric_limits::infinity.
     // using max() instead.
-      const Real anInfinity( std::numeric_limits<Real>::infinity() );
+    const Real anInfinity( std::numeric_limits<Real>::infinity() );
     setStepInterval( anInfinity );
-  }
+}
 
-  void PassiveStepper::initialize()
-  {
+void PassiveStepper::initialize()
+{
     Stepper::initialize();
-  }
+}
 
+void PassiveStepper::step()
+{
+    fireProcesses();
+    theNextTime = INF;
+}
+
+void PassiveStepper::interrupt( TimeParam aTime )
+{
+    setCurrentTime( aTime );
+    theNextTime = aTime;
+}
+
+SET_METHOD_DEF( Real, NextTime, PassiveStepper )
+{
+    // skip range check
+    theNextTime = value;
+}
 
 } // namespace libecs
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/
-

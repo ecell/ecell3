@@ -3,8 +3,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -38,8 +38,6 @@ __copyright__ = ''
 __license__ = ''
 
 
-import string
-
 from util import RELATIVE_PERTURBATION, ABSOLUTE_PERTURBATION, allzero, createIndependentGroupList
 
 import numpy
@@ -62,7 +60,7 @@ def getElasticityArray( pathwayProxy, fullPN ):
     elasticityArray = numpy.zeros( size, float )
     
     aSession = pathwayProxy.theEmlSupport.createSession()
-    aSession.step()
+    aSession.theSimulator.initialize()
     for i in range( size ):
         elasticityArray[ i ] = aSession.theSimulator.getEntityProperty( processList[ i ] + ':Activity' )
     
@@ -73,7 +71,7 @@ def getElasticityArray( pathwayProxy, fullPN ):
     aPerturbation = RELATIVE_PERTURBATION * value + ABSOLUTE_PERTURBATION
 
     aSession.theSimulator.setEntityProperty( fullPN, value + aPerturbation )
-    aSession.step()
+    aSession.theSimulator.initialize()
 
     for c in range( size ):
         elasticityArray[ c ] = ( aSession.theSimulator.getEntityProperty( processList[ c ] + ':Activity' ) - elasticityArray[ c ] ) / aPerturbation
@@ -104,7 +102,7 @@ def getAcculateElasticityArray( pathwayProxy, fullPN ):
     aPerturbation = RELATIVE_PERTURBATION * value + ABSOLUTE_PERTURBATION
 
     aSession.theSimulator.setEntityProperty( fullPN, value - 2.0 * aPerturbation )
-    aSession.step()
+    aSession.theSimulator.initialize()
 
     for c in range( size ):
         elasticityArray[ c ] = aSession.theSimulator.getEntityProperty( processList[ c ] + ':Activity' )
@@ -112,21 +110,21 @@ def getAcculateElasticityArray( pathwayProxy, fullPN ):
     # second step    
     aSession = pathwayProxy.theEmlSupport.createSession()
     aSession.theSimulator.setEntityProperty( fullPN, value - aPerturbation )
-    aSession.step()
+    aSession.theSimulator.initialize()
     for c in range( size ):
         elasticityArray[ c ] -= 8.0 * aSession.theSimulator.getEntityProperty( processList[ c ] + ':Activity' )
 
     # third step    
     aSession = pathwayProxy.theEmlSupport.createSession()
     aSession.theSimulator.setEntityProperty( fullPN, value + aPerturbation )
-    aSession.step()
+    aSession.theSimulator.initialize()
     for c in range( size ):
         elasticityArray[ c ] += 8.0 * aSession.theSimulator.getEntityProperty( processList[ c ] + ':Activity' )
 
     # last(fourth) step
     aSession = pathwayProxy.theEmlSupport.createSession()
     aSession.theSimulator.setEntityProperty( fullPN, value + 2.0 * aPerturbation )
-    aSession.step()
+    aSession.theSimulator.initialize()
     for c in range( size ):
         elasticityArray[ c ] -= aSession.theSimulator.getEntityProperty( processList[ c ] + ':Activity' )
 
@@ -175,11 +173,11 @@ def convertToScaled( pathwayProxy, fullPN, elasticityArray ):
 
     aSession = pathwayProxy.theEmlSupport.createSession()
     try:
-        value = string.atof( pathwayProxy.theEmlSupport.getEntityProperty( fullPN )[ -1 ] )
+        value = float( pathwayProxy.theEmlSupport.getEntityProperty( fullPN )[ -1 ] )
     except:
         value = aSession.theSimulator.getEntityProperty( fullPN )
 
-    aSession.step()
+    aSession.theSimulator.initialize()
 
     for i in range( size ):
 
@@ -317,7 +315,7 @@ def getEpsilonElasticityMatrix2( pathwayProxy ):
 
     aSession = pathwayProxy.theEmlSupport.createSession()
 
-    aSession.step()
+    aSession.theSimulator.initialize()
     for i in range( len( processList ) ):
         activityBuffer[ i ] = aSession.theSimulator.getEntityProperty( processList[ i ] + ':Activity' )
     
@@ -333,7 +331,7 @@ def getEpsilonElasticityMatrix2( pathwayProxy ):
             perturbationList.append( aPerturbation )
             aSession.theSimulator.setEntityProperty( fullPN, value + aPerturbation )
 
-        aSession.step()
+        aSession.theSimulator.initialize()
 
         for c in range( len( groupList ) ):
             i = groupList[ c ]
@@ -383,5 +381,5 @@ if __name__ == '__main__':
     if len( sys.argv ) > 1:
         main( sys.argv[ 1 ] )
     else:
-        filename = '../../../../doc/sample/Heinrich/Heinrich.eml'
+        filename = '../../../../doc/samples/Heinrich/Heinrich.eml'
         main( os.path.abspath( filename ), 'Variable:/CELL/CYTOPLASM:A13P2G:Value' )

@@ -2,8 +2,6 @@ abs_top_builddir=@abs_top_builddir@
 
 libdir=@libdir@
 
-SHLEXT = @LTDL_SHLIB_EXT@
-
 SUBDIRS = scripting . tests
 
 ECELL_DIRNAME=@ECELL_DIRNAME@
@@ -14,27 +12,25 @@ DMTOOL_INCLUDE = -I@DMTOOL_INCLUDE_DIR@
 INCLTDL = @INCLTDL@
 LIBLTDL = @LIBLTDL@
 
-INCLUDES = -I$(top_srcdir) $(DMTOOL_INCLUDE) $(INCLTDL)
+INCLUDES = -I$(top_srcdir)  -I$(top_srcdir)/.. $(DMTOOL_INCLUDE) $(INCLTDL)
 lib_LTLIBRARIES = libecs.la
 
 AM_CXXFLAGS = $(CXXFLAGS)
 
 libecs_la_LDFLAGS= -version-info 2:0:0 -no-undefined
-libecs_la_LIBADD=  -lstdc++ $(LIBLTDL) $(GSL_LIBADD) scripting/libecs-scripting.la
+libecs_la_LIBADD=  $(LIBLTDL) $(GSL_LIBADD) scripting/libecs-scripting.la
 libecs_la_SOURCES=\
 libecs.cpp\
 Util.cpp\
-Polymorph.cpp\
 FullID.cpp\
 PropertySlot.cpp\
 PropertySlotProxy.cpp\
 PropertyInterface.cpp\
-PropertiedClass.cpp\
-ProcessMaker.cpp\
+EcsObject.cpp\
 Variable.cpp\
-VariableMaker.cpp\
 Stepper.cpp\
 DifferentialStepper.cpp\
+AdaptiveDifferentialStepper.cpp\
 DiscreteTimeStepper.cpp\
 DiscreteEventStepper.cpp\
 PassiveStepper.cpp\
@@ -46,8 +42,6 @@ System.cpp\
 Entity.cpp\
 Process.cpp\
 ContinuousProcess.cpp\
-StepperMaker.cpp\
-SystemMaker.cpp\
 DataPoint.cpp\
 DataPointVector.cpp\
 VVector.cpp\
@@ -58,10 +52,11 @@ PhysicalLogger.cpp\
 VariableReference.cpp\
 LoggerBroker.cpp\
 Exceptions.cpp\
-PropertiedObjectMaker.cpp
+StepperEvent.cpp
 
-libecs_ladir=${ECELL_INCLUDE_DIR}/libecs
-libecs_la_HEADERS=\
+
+libecsdir=$(ECELL_INCLUDE_DIR)/libecs
+libecs_HEADERS=\
 AssocVector.h\
 libecs.hpp\
 Defs.hpp\
@@ -71,15 +66,14 @@ FullID.hpp\
 PropertySlot.hpp\
 PropertySlotProxy.hpp\
 PropertyInterface.hpp\
-PropertiedClass.hpp\
-ProcessMaker.hpp\
+EcsObject.hpp\
 Variable.hpp\
-VariableMaker.hpp\
 Stepper.hpp\
 ProcessEvent.hpp\
 StepperEvent.hpp\
 EventScheduler.hpp\
 DifferentialStepper.hpp\
+AdaptiveDifferentialStepper.hpp\
 DiscreteTimeStepper.hpp\
 DiscreteEventStepper.hpp\
 PassiveStepper.hpp\
@@ -91,8 +85,6 @@ System.hpp\
 Entity.hpp\
 Process.hpp\
 ContinuousProcess.hpp\
-StepperMaker.hpp\
-SystemMaker.hpp\
 DataPoint.hpp\
 DataPointVector.hpp\
 PhysicalLogger.hpp\
@@ -103,17 +95,19 @@ Exceptions.hpp\
 Util.hpp\
 VariableReference.hpp\
 DynamicPriorityQueue.hpp\
-FluxProcess.hpp\
 MethodProxy.hpp\
-PropertiedObjectMaker.hpp\
-PropertySlotProxyLoggerAdapter.hpp
+EcsObjectMaker.hpp\
+PropertySlotProxyLoggerAdapter.hpp\
+PropertyAttributes.hpp\
+Handle.hpp\
+RealMath.hpp
 
 noinst_HEADERS=\
 osif.h\
 VVector.h
 
 ECELL_STAGING_HOME=$(abs_top_builddir)/tmp
-OUTPUT=$(ECELL_STAGING_HOME)$(libdir)/libecs$(SHLEXT)
+OUTPUT=$(ECELL_STAGING_HOME)$(libdir)/libecs$(LTDL_SHLIB_EXT)
 all-local: $(OUTPUT)
 
 $(OUTPUT): libecs.la

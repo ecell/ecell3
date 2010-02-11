@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -29,39 +29,24 @@
 #if !defined(__LOGGERADAPTER_HPP)
 #define __LOGGERADAPTER_HPP
 
-#include "libecs.hpp"
+#include "libecs/Defs.hpp"
 
 namespace libecs
 {
-  /**@addtogroup logging The Data Logging Module.
-      The Data Logging Module.
 
-      @ingroup libecs
-      @{ 
-  */ 
-
-  /** @file */
-
-  class LIBECS_API LoggerAdapter
-  {
-
-  public:
+class LIBECS_API LoggerAdapter
+{
+public:
 
     virtual ~LoggerAdapter();
 
     virtual const Real getValue() const = 0;
 
-  protected:
+protected:
 
     LoggerAdapter();
-
-  };
-
-
-  /** @} */ // logging module
+};
 
 } // namespace libecs
 
-
 #endif /* __LOGGERADAPTER_HPP */
-

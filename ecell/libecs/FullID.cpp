@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -28,6 +28,7 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -42,206 +43,317 @@
 namespace libecs
 {
 
-  ///////////////////////  SystemPath
+///////////////////////    SystemPath
 
-  void SystemPath::parse( StringCref systempathstring )
-  {
+void SystemPath::parse( StringCref systempathstring )
+{
     if( systempathstring.empty() )
-      {
-	return;
-      }
+    {
+        return;
+    }
 
     String aString( systempathstring );
     eraseWhiteSpaces( aString );
     
-    String::size_type aFieldStart( 0 );
+    String::size_type aCompStart( 0 );
     
     // absolute path ( start with '/' )
-    if( aString[0] == DELIMITER )
-       {
-	 //insert(end(), String( 1, DELIMITER ) );
-	 push_back( String( 1, DELIMITER ) );
+    if( aString[ 0 ] == DELIMITER )
+    {
+        push_back( String( 1, DELIMITER ) );
+        ++aCompStart;
+    }
 
-	 if( aString.size() == 1 )
-	   {
-	     return;
-	   }
+    for ( String::size_type aCompEnd; aCompStart < aString.size();
+            aCompStart = aCompEnd + 1 )
+    {
+        aCompEnd = aString.find_first_of( DELIMITER, aCompStart );
+        if ( aCompEnd == String::npos )
+        {
+            aCompEnd = aString.size();
+        }
 
-	 ++aFieldStart;
-       }
+        String aComponent( aString.substr( aCompStart, aCompEnd - aCompStart ) );
+        if ( aComponent == ".." )
+        {
+            if ( theComponents.size() == 1 &&
+                    theComponents.front()[ 0 ] == DELIMITER )
+            {
+                THROW_EXCEPTION( BadSystemPath, 
+                                 "Too many levels of retraction with .." );
+            }
+            else if ( theComponents.empty() || theComponents.back() == ".." )
+            {
+                theComponents.push_back( aComponent );
+            }
+            else 
+            {
+                theComponents.pop_back();
+            }
+        }
+        else if ( !aComponent.empty() && aComponent != "." )
+        {
+            theComponents.push_back( aComponent );
+        }
+    }
 
-    String::size_type aFieldEnd( aString.find_first_of( DELIMITER, 
-							aFieldStart ) );
-    //    insert(end(), aString.substr( aFieldStart, 
-    //			       aFieldEnd - aFieldStart ) );
-    push_back( aString.substr( aFieldStart, 
-			       aFieldEnd - aFieldStart ) );
+    if ( !aString.empty() && theComponents.empty() )
+    {
+        theComponents.push_back( "." );
+    }
+}
 
-    while( aFieldEnd != String::npos  )
-      {
-	aFieldStart = aFieldEnd + 1;
-	aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
-	
-	insert(end(), aString.substr( aFieldStart, 
-				      aFieldEnd - aFieldStart ) );
-      }
-
-  }
-
-  const String SystemPath::getString() const
-  {
-    StringList::const_iterator i = begin();
+String SystemPath::asString() const
+{
+    StringList::const_iterator i = theComponents.begin();
     String aString;
 
     if( isAbsolute() )
-      {
-	if( size() == 1 )
-	  {
-	    return "/";
-	  }
-	else
-	  {
-	    ; // do nothing
-	  }
-      }
+    {
+        if( theComponents.size() == 1 )
+        {
+            return "/";
+        }
+        else
+        {
+            ; // do nothing
+        }
+    }
     else
-      {
-	// isAbsolute() == false implies that this can be empty
-	if( empty() )
-	  {
-	    return aString;
-	  }
-	else
-	  {
-	    aString = *i;
-	  }
-      }
+    {
+        // isAbsolute() == false implies that this can be empty
+        if( theComponents.empty() )
+        {
+            return aString;
+        }
+        else
+        {
+            aString = *i;
+        }
+    }
 
-    if( i == end() ) {
+    if( i == theComponents.end() )
+    {
         return aString;
     }
 
     ++i;
 
-    while( i != end() )
-      {
-	aString += '/';
-	aString += *i;
-	++i;
-      }
+    while( i != theComponents.end() )
+    {
+        aString += '/';
+        aString += *i;
+        ++i;
+    }
 
     return aString;
-  }
+}
+
+void SystemPath::canonicalize()
+{
+    StringList aNewPathComponents;
+
+    for ( StringList::const_iterator i( theComponents.begin() );
+           i != theComponents.end(); ++i )
+    {
+        if ( *i == "." )
+        {
+            continue;
+        }
+        else if ( *i == ".." )
+        {
+            if ( aNewPathComponents.empty() )
+            {
+                break;
+            }
+            aNewPathComponents.pop_back();
+        }
+        else
+        {
+            aNewPathComponents.push_back( *i );
+        }
+    }
+
+    theComponents.swap( aNewPathComponents );
+}
+
+SystemPath SystemPath::toRelative( SystemPath const& aBaseSystemPath ) const
+{
+    // 1. "" (empty) means Model itself, which is invalid for this method.
+    // 2. Not absolute is invalid (not absolute implies not empty).
+    if( ! isAbsolute() || isModel() )
+    {
+        return *this;
+    }
+
+    if( ! aBaseSystemPath.isAbsolute() || aBaseSystemPath.isModel() )
+    {
+        THROW_EXCEPTION( BadSystemPath, 
+                         "[" + aBaseSystemPath.asString() +
+                         "] is not an absolute SystemPath" );
+    }
+
+    SystemPath aThisPathCopy;
+    SystemPath const* thisPath;
+
+    if ( !isCanonicalized() )
+    {
+        aThisPathCopy = *this;
+        aThisPathCopy.canonicalize();
+        thisPath = &aThisPathCopy;
+    }
+    else
+    {
+        thisPath = this;
+    }
+
+    SystemPath aBaseSystemPathCopy;
+    SystemPath const* aCanonicalizedBaseSystemPath;
+    if ( !aBaseSystemPath.isCanonicalized() )
+    {
+        aCanonicalizedBaseSystemPath = &aBaseSystemPath;
+    }
+    else
+    {
+        aBaseSystemPathCopy = aBaseSystemPath;
+        aBaseSystemPathCopy.canonicalize();
+        aCanonicalizedBaseSystemPath = &aBaseSystemPathCopy;
+    }
+
+    SystemPath aRetval;
+    StringList::const_iterator j( thisPath->theComponents.begin() ),
+                               je( thisPath->theComponents.end() );
+    StringList::const_iterator
+        i( aCanonicalizedBaseSystemPath->theComponents.begin() ),
+        ie( aCanonicalizedBaseSystemPath->theComponents.end() );
+
+    while ( i != ie && j != je )
+    {
+        String const& aComp( *i );
+        if ( aComp != *j )
+        {
+            break;
+        }
+        ++i, ++j;
+    }
+    if ( i != ie )
+    {
+        while ( i != ie )
+        {
+            aRetval.theComponents.push_back( ".." );
+            ++i;
+        }
+    }
+    std::copy( j, je, std::back_inserter( aRetval.theComponents ) );
+
+    if ( aRetval.theComponents.empty() )
+    {
+        aRetval.theComponents.push_back( "." );
+    }
+
+    return aRetval; 
+}
 
 
+///////////////// FullID
 
-  ///////////////// FullID
-
-  void FullID::parse( StringCref fullidstring )
-  {
+void FullID::parse( StringCref fullidstring )
+{
     // empty FullID string is invalid
     if( fullidstring == "" )
-      {
-	THROW_EXCEPTION( BadID, "Empty FullID string." );
-      }
+    {
+        THROW_EXCEPTION( BadID, "empty FullID string" );
+    }
 
     String aString( fullidstring );
     eraseWhiteSpaces( aString );
 
     // ignore leading white spaces
     String::size_type aFieldStart( 0 );
-    String::size_type aFieldEnd( aString.find_first_of( DELIMITER,
-							aFieldStart ) );
+    String::size_type aFieldEnd( aString.find_first_of( DELIMITER, aFieldStart ) );
     if( aFieldEnd == String::npos )
-      {
-	THROW_EXCEPTION( BadID, 
-			 "No ':' in the FullID string [" + aString + "]." );
-      }
+    {
+        THROW_EXCEPTION( BadID, 
+                         "no ':' in the FullID string [" + aString + "]" );
+    }
 
-    String aTypeString( aString.substr( aFieldStart, 
-					aFieldEnd - aFieldStart ) );
+    String aTypeString( aString.substr( aFieldStart, aFieldEnd - aFieldStart ) );
     theEntityType = EntityType( aTypeString );
     
     aFieldStart = aFieldEnd + 1;
     aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
     if( aFieldEnd == String::npos )
-      {
-	THROW_EXCEPTION( BadID, 
-			 "Only one ':' in the FullID string [" 
-			 + aString + "]." );
-      }
+    {
+        THROW_EXCEPTION( BadID, "only one ':' in the FullID string [" 
+                                + aString + "]" );
+    }
 
-    theSystemPath = 
-      SystemPath( aString.substr( aFieldStart, 
-				  aFieldEnd - aFieldStart ) );
+    
+    theSystemPath = SystemPath( aString.substr( aFieldStart, 
+                                aFieldEnd - aFieldStart ) );
     
     aFieldStart = aFieldEnd + 1;
 
-    // drop trailing string after extra ':'(if this is  FullPN),
+    // drop trailing string after extra ':'(if this is    FullPN),
     // or go to the end
     aFieldEnd = aString.find_first_of( DELIMITER, aFieldStart );
 
     theID = aString.substr( aFieldStart, aFieldEnd - aFieldStart );
-  }    
+}
 
-  const String FullID::getString() const
-  {
-    return theEntityType.getString() + FullID::DELIMITER 
-      + theSystemPath.getString() + FullID::DELIMITER + theID;
-  }
+String FullID::asString() const
+{
+    if ( theID.empty() )
+    {
+        return String( "(invalid)" );
+    }
 
-  bool FullID::isValid() const
-  {
+    return theEntityType.asString() + FullID::DELIMITER 
+        + theSystemPath.asString() + FullID::DELIMITER + theID;
+}
+
+bool FullID::isValid() const
+{
     bool aFlag( theSystemPath.isValid() );
     aFlag &= ! theID.empty();
 
     return aFlag;
-  }
+}
 
 
-  ///////////////// FullPN
+///////////////// FullPN
 
 
-  FullPN::FullPN( StringCref fullpropertynamestring )
-    :
-    theFullID( fullpropertynamestring )
-  {
+FullPN::FullPN( StringCref fullpropertynamestring )
+    : theFullID( fullpropertynamestring )
+{
 
     String::size_type aPosition( 0 );
 
     for( int i( 0 ) ; i < 3 ; ++i )
-      {
-	aPosition = fullpropertynamestring.
-	  find_first_of( FullID::DELIMITER, aPosition );
-	if( aPosition == String::npos ) 
-	  {
-	    THROW_EXCEPTION( BadID,
-			     "Not enough fields in FullPN string [" +
-			     fullpropertynamestring + "]." );
-	  }
-	++aPosition;
-      }
+    {
+        aPosition = fullpropertynamestring.
+            find_first_of( FullID::DELIMITER, aPosition );
+        if( aPosition == String::npos ) 
+        {
+            THROW_EXCEPTION( BadID, "not enough fields in FullPN string [" +
+                                    fullpropertynamestring + "]" );
+        }
+        ++aPosition;
+    }
 
     thePropertyName = fullpropertynamestring.substr( aPosition, String::npos );
     eraseWhiteSpaces( thePropertyName );
-  }
+}
 
-  const String FullPN::getString() const
-  {
-    return theFullID.getString() + FullID::DELIMITER + thePropertyName;
-  }
+String FullPN::asString() const
+{
+    return theFullID.asString() + FullID::DELIMITER + thePropertyName;
+}
 
-  bool FullPN::isValid() const
-  {
+bool FullPN::isValid() const
+{
     return theFullID.isValid() & ! thePropertyName.empty();
-  }
+}
 
 } // namespace libecs
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

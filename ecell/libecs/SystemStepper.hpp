@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -32,47 +32,26 @@
 #ifndef __SYSTEMSTEPPER_HPP
 #define __SYSTEMSTEPPER_HPP
 
-#include "libecs.hpp"
-
-#include "Stepper.hpp"
-
-
+#include "libecs/Defs.hpp"
+#include "libecs/Stepper.hpp"
 
 namespace libecs
 {
 
-  /** @addtogroup stepper
-   *@{
-   */
-
-  /** @file */
-
-
-  /**
-
-
-  */
-
-
-  LIBECS_DM_CLASS( SystemStepper, Stepper )
-  {
-
-  public:
-
+LIBECS_DM_CLASS( SystemStepper, Stepper )
+{
+public:
     LIBECS_DM_OBJECT( SystemStepper, Stepper )
-      {
-	INHERIT_PROPERTIES( Stepper );
-	
-      }
-
-
+    {
+        INHERIT_PROPERTIES( Stepper );
+    }
 
     SystemStepper(); 
     virtual ~SystemStepper();
 
     virtual GET_METHOD( Real, TimeScale )
     {
-      return 0.0;
+        return 0.0;
     }
 
 
@@ -84,28 +63,17 @@ namespace libecs
 
     virtual void interrupt( TimeParam aTime )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
 
-  protected:
+protected:
 
     void integrateVariablesRecursively( SystemPtr const aSystem,
-					RealParam aTime );
+                                        RealParam aTime );
 
-  };
-
+};
 
 } // namespace libecs
 
 #endif /* __SYSTEMSTEPPER_HPP */
-
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

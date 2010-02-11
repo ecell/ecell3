@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -29,88 +29,43 @@
 // E-Cell Project.
 //
 
-#include "libecs/Variable.hpp"
-#include "libecs/DifferentialStepper.hpp"
+#include <libecs/Variable.hpp>
 
-using namespace libecs;
+#include <libecs/DifferentialStepper.hpp>
 
+USE_LIBECS;
 
 LIBECS_DM_CLASS( FixedODE1Stepper, DifferentialStepper )
 {
 
 public:
 
-  LIBECS_DM_OBJECT( FixedODE1Stepper, Stepper )
+    LIBECS_DM_OBJECT( FixedODE1Stepper, Stepper )
     {
-      INHERIT_PROPERTIES( DifferentialStepper );
+        INHERIT_PROPERTIES( DifferentialStepper );
     }
 
-  FixedODE1Stepper( void );
-  
-  virtual ~FixedODE1Stepper( void );
+    FixedODE1Stepper()
+    {
+        ; // do nothing
+    }
 
-  virtual void step();
+    virtual ~FixedODE1Stepper()
+    {
+        ; // do nothing
+    }
 
-protected:
+    virtual void updateInternalState( Real aStepInterval )
+    {
+        const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
+        clearVariables();
+
+        fireProcesses();
+        setVariableVelocity( theTaylorSeries[ 0 ] );
+
+        DifferentialStepper::updateInternalState( aStepInterval );
+    }
 };
 
-
 LIBECS_DM_INIT( FixedODE1Stepper, Stepper );
-
-FixedODE1Stepper::FixedODE1Stepper()
-{
-  ; // do nothing
-}
-	    
-FixedODE1Stepper::~FixedODE1Stepper()
-{
-  ; // do nothing
-}
-
-void FixedODE1Stepper::step()
-{
-  const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
-
-  clearVariables();
-
-  setStepInterval( getNextStepInterval() );
-
-  fireProcesses();
-  setVariableVelocity( theTaylorSeries[ 0 ] );
-
-  /**
-  for( VariableVector::size_type c( 0 ); c < aSize; ++c )
-    {
-      VariablePtr const aVariable( theVariableVector[ c ] );
-      //      theTaylorSeries[ 0 ][ c ] = aVariable->getVelocity();
-    }
-  */
-
-  /**
-     avoid negative value
-
-     FOR_ALL( VariableVector, theVariableVector )
-     {
-     while ( (*i)->checkRange( getStepInterval() ) == false )
-     {
-     //FIXME:
-     setStepInterval( getStepInterval() * 0.5 );
-     }
-     }
-  */
-
-  /**
-     if ( getStepInterval() < getTolerableStepInterval() )
-     {
-     setNextStepInterval( getStepInterval() * 2.0 );
-     }
-     else 
-     {
-     setNextStepInterval( getStepInterval() );
-     }
-  */
-
-  setNextStepInterval( getTolerableStepInterval() );
-}
-

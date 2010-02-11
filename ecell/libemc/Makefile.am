@@ -19,7 +19,7 @@ AM_CXXFLAGS = $(CXXFLAGS)
 
 libemc_la_LDFLAGS= -version-info 2:0:0 -no-undefined
 
-libemc_la_LIBADD=$(LIBECS) -lstdc++ 
+libemc_la_LIBADD=$(LIBECS)
 libemc_la_DEPENDENCIES=$(LIBECS)
 libemc_la_SOURCES=\
 libemc.cpp\
@@ -32,8 +32,7 @@ libemc_HEADERS=\
 libemc.hpp\
 LocalSimulatorImplementation.hpp\
 Simulator.hpp\
-SimulatorImplementation.hpp\
-SimulatorMaker.hpp
+SimulatorImplementation.hpp
 
 ECELL_STAGING_HOME=$(abs_top_builddir)/tmp
 OUTPUT=$(ECELL_STAGING_HOME)$(libdir)/libemc$(SHLEXT)

@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -28,35 +28,94 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
 #include "Exceptions.hpp"
+#include "EcsObject.hpp"
+#include "Model.hpp"
 
 namespace libecs
 {
 
-  Exception::~Exception() throw()
-  {
+Exception::Exception( String const& method, String const& message, EcsObject const* object )
+    : theMethod( method ), 
+      theMessage( message ),
+      theEcsObjectHandle( object ? object->getHandle(): Handle::INVALID_HANDLE_VALUE ),
+      theModel( object ? object->getModel(): 0 ),
+      theWhatMsg()
+{
     ; // do nothing
-  }
+}
 
-  const String& Exception::message() const
-  {
-    return theMessage;
-  }
+Exception::~Exception() throw()
+{
+    ; // do nothing
+}
 
-  const char* Exception::what() const throw()
-  {
+EcsObject const* Exception::getEcsObject() const throw()
+{
+    EcsObject const* object( 0 );
+
+    if ( theModel && theEcsObjectHandle != Handle::INVALID_HANDLE_VALUE )
+    {
+        try { object = theModel->getObject( theEcsObjectHandle ); }
+        catch ( std::exception const& ) {}
+    }
+
+    return object;
+}
+
+const char* Exception::what() const throw()
+{
     if (theWhatMsg.empty())
     {
-#ifdef DEBUG
-      theWhatMsg = theMethod + ":\n" + String( getClassName() ) + ": " + theMessage + "\n";
-#else
-      theWhatMsg = String( getClassName() ) + ": " + theMessage + "\n";
-#endif /* DEBUG */
+        String whatMsg( getClassName() );
+        whatMsg += ": " + theMessage;
+        EcsObject const* object( getEcsObject() );
+        if ( object )
+        {
+            whatMsg += " (";
+            whatMsg += object->asString();
+            whatMsg += ")";
+        }
+        theWhatMsg = whatMsg;
     }
     return theWhatMsg.c_str();
-  }
+}
+
+DEFINE_EXCEPTION_METHOD_BODIES( UnexpectedError );
+DEFINE_EXCEPTION_METHOD_BODIES( NotFound );
+DEFINE_EXCEPTION_METHOD_BODIES( IOException );
+DEFINE_EXCEPTION_METHOD_BODIES( NotImplemented ); 
+DEFINE_EXCEPTION_METHOD_BODIES( Instantiation );
+
+DEFINE_EXCEPTION_METHOD_BODIES( AssertionFailed );
+DEFINE_EXCEPTION_METHOD_BODIES( AlreadyExist );
+DEFINE_EXCEPTION_METHOD_BODIES( ValueError );
+DEFINE_EXCEPTION_METHOD_BODIES( TypeError );
+DEFINE_EXCEPTION_METHOD_BODIES( OutOfRange );
+DEFINE_EXCEPTION_METHOD_BODIES( IllegalOperation );
+DEFINE_EXCEPTION_METHOD_BODIES( TooManyItems );
+
+// simulation errors
+DEFINE_EXCEPTION_METHOD_BODIES( SimulationError );
+DEFINE_EXCEPTION_METHOD_BODIES( InitializationFailed );
+DEFINE_EXCEPTION_METHOD_BODIES( RangeError );
+
+// PropertySlot errors
+DEFINE_EXCEPTION_METHOD_BODIES( PropertyException );
+DEFINE_EXCEPTION_METHOD_BODIES( NoSlot );
+DEFINE_EXCEPTION_METHOD_BODIES( AttributeError );
+
+// Introspection errors
+DEFINE_EXCEPTION_METHOD_BODIES( NoInfoField );
+
+// FullID errors
+DEFINE_EXCEPTION_METHOD_BODIES( BadID ); 
+DEFINE_EXCEPTION_METHOD_BODIES( BadSystemPath );
+DEFINE_EXCEPTION_METHOD_BODIES( InvalidEntityType );
+
 } // namespace libecs

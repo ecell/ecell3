@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -32,85 +32,45 @@
 #ifndef __PASSIVESTEPPER_HPP
 #define __PASSIVESTEPPER_HPP
 
-#include "libecs.hpp"
+#include "libecs/Defs.hpp"
 
-#include "Stepper.hpp"
-
+#include "libecs/Stepper.hpp"
 
 namespace libecs
 {
+/**
+   PassiveStepper steps only when triggered by incoming interruptions from
+   other Steppers.
 
-  /** @addtogroup stepper
-   *@{
-   */
+   Note that this Stepper DOES dispatch interruptions to other Steppers
+   when it steps.
 
-  /** @file */
-
-
-  /**
-     PassiveStepper steps only when triggered by incoming interruptions from
-     other Steppers.
-
-     Note that this Stepper DOES dispatch interruptions to other Steppers
-     when it steps.
-
-     The step interval of this Stepper is usually infinity -- which
-     means that this doesn't step spontaneously.  However, when
-     interrupted by another Stepper, the step interval will be
-     set zero, and this Stepper will step immediately after the
-     currently stepping Stepper, at the same time point.
-
-  */
-
-  LIBECS_DM_CLASS( PassiveStepper, Stepper )
-  {
-
-  public:
-
+   The step interval of this Stepper is usually infinity -- which
+   means that this doesn't step spontaneously.    However, when
+   interrupted by another Stepper, the step interval will be
+   set zero, and this Stepper will step immediately after the
+   currently stepping Stepper, at the same time point.
+*/
+LIBECS_DM_CLASS( PassiveStepper, Stepper )
+{
+public:
     LIBECS_DM_OBJECT( PassiveStepper, Stepper )
-      {
-	INHERIT_PROPERTIES( Stepper );
-      }
-
+    {
+        INHERIT_PROPERTIES( Stepper );
+    }
 
     PassiveStepper();
     ~PassiveStepper() {}
     
     virtual void initialize();
 
-    virtual void step()
-    {
-      fireProcesses();
+    virtual void step();
 
-      setStepInterval( INF );
-    }
+    virtual void interrupt( TimeParam aTime );
 
-    virtual void interrupt( TimeParam aTime )
-    {
-      setCurrentTime( aTime );
-      setStepInterval( 0.0 );
-    }
-
-    virtual SET_METHOD( Real, StepInterval )
-    {
-      // skip range check
-      loadStepInterval( value );
-    }
-
-
-  };
-
+    virtual SET_METHOD( Real, NextTime );
+};
 
 } // namespace libecs
 
 #endif /* __PASSIVESTEPPER_HPP */
-
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

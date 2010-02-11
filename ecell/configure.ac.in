@@ -1,5 +1,6 @@
 AC_REVISION([$Id$])dnl
 
+sinclude([../libltdl/acinclude.m4])
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT([ecell], [@ECELL_VERSION_NUMBER@])
@@ -39,11 +40,9 @@ fi
 
 AC_SUBST([PREFIX])
 
-AC_ARG_ENABLE([gui], [
-  AC_HELP_STRING([--disable-gui],
-                 [build ecell without gui frontends.])
-  ], [],
-  [enable_gui=yes]
+AC_ARG_ENABLE([gui], [AC_HELP_STRING([--disable-gui],
+                      [build ecell without gui frontends.])],
+  [], [enable_gui=yes]
 )
 
 AC_MSG_CHECKING([whether to build GUI frontends])
@@ -54,6 +53,20 @@ else
 fi
 
 AM_CONDITIONAL([ENABLE_GUI], [test "$enable_gui" = "yes"])
+
+AC_ARG_ENABLE([pyecell], [AC_HELP_STRING([--disable-pyecell],
+                          [build ecell without Python binding.])],
+  [], [enable_pyecell=yes]
+)
+
+AC_MSG_CHECKING([whether to build Python binding / API])
+if test "$enable_pyecell" = "yes"; then
+  AC_MSG_RESULT([yes])
+else
+  AC_MSG_RESULT([no])
+fi
+
+AM_CONDITIONAL([ENABLE_PYECELL], [test "$enable_pyecell" = "yes"])
 dnl
 
 dnl Checks for programs.
@@ -73,6 +86,13 @@ AC_SUBST(INCLTDL)
 AC_SUBST(LIBLTDL)
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
+AC_LTDL_SHLIBEXT
+if test -n "$shrext_cmds"; then
+  eval LTDL_SHLIB_EXT=$shrext_cmds
+elif test -n "$shrext"; then
+  eval LTDL_SHLIB_EXT=$shrext
+fi
+AC_SUBST(LTDL_SHLIB_EXT)
 
 dnl to circumvent libltdl weirdness (already fixed in the newer versions)
 case $host_os in
@@ -86,41 +106,11 @@ rm -f conftest
 . ./conftest
 rm -f conftest
 
-dnl compatibility for libtool 1.5.6
-
-LTDL_SHLIB_EXT=""
-if test -n "$shrext_cmds"; then
-    module=yes eval LTDL_SHLIB_EXT=\"$shrext_cmds\"
-    AC_SUBST(LTDL_SHLIB_EXT)
-dnl compatibility for libtool 1.5.0
-elif test -n "$shrext"; then
-    LTDL_SHLIB_EXT=$shrext
-    AC_SUBST(LTDL_SHLIB_EXT)
-dnl compatibility for libtool 1.4.x
+if test "$enable_pyecell" = "yes"; then
+  AM_PATH_PYTHON(2.2)
 else
-  AC_CACHE_CHECK([which extension is used for shared libraries],
-    libltdl_cv_shlibext, [dnl
-  (
-    last=
-    for spec in $library_names_spec; do
-      last="$spec"
-    done
-  changequote(, )
-    echo "$last" | sed 's/\[.*\]//;s/^[^.]*//;s/\$.*$//;s/\.$//' > conftest
-  changequote([, ])
-  )
-  libltdl_cv_shlibext=`cat conftest`
-  rm -f conftest
-  ])
-  if test -n "$libltdl_cv_shlibext"; then
-    LTDL_SHLIB_EXT=$libltdl_cv_shlibext
-    AC_SUBST(LTDL_SHLIB_EXT)
-  fi
+  PYTHON=echo
 fi
-
-
-
-AM_PATH_PYTHON(2.2)
 AC_SUBST(PYTHON)
 
 AC_LANG([C++])
@@ -137,21 +127,20 @@ AC_SUBST(LIBC)
 dnl
 
 ECELL_CHECK_GSL
-AM_CHECK_PYMOD(numpy,,,[AC_MSG_ERROR([could not find Python numpy module])])
-AM_CHECK_PYMOD(xml,,,[AC_MSG_ERROR([could not find Python xml module])])
+if test "$enable_pyecell" = "yes"; then
+  AM_CHECK_PYMOD(numpy,,,[AC_MSG_ERROR([could not find Python numpy module])])
+  AM_CHECK_PYMOD(xml,,,[AC_MSG_ERROR([could not find Python xml module])])
+  AM_CHECK_PYMOD(ply,,,[AC_MSG_ERROR([could not find Python ply module])])
 
-if test "$enable_gui" = 'yes'; then
-   AM_CHECK_PYMOD(pygtk,,,[AC_MSG_ERROR([could not find Python pygtk module])])
-   AM_CHECK_PYMOD(gtk,,,[AC_MSG_ERROR([could not find Python gtk module])])
-   AM_CHECK_PYMOD(gtk.gdk,,,
-                [AC_MSG_ERROR([could not find Python gtk.gdk module])])
-   AM_CHECK_PYMOD(gtk.glade,,,
-                [AC_MSG_ERROR([could not find Python gtk.glade module])])
-   AM_CHECK_PYMOD(gnome.ui,,[AC_SUBST([GNOME_INSTALLED],yes)],[AC_SUBST([GNOME_INSTALLED],no)])
-   AM_CHECK_PYMOD(gnomecanvas,,,[AC_MSG_WARN(could not find gnomecanvas module. model-editor will not work. )])
-   AM_CHECK_PYMOD(xml.dom.minidom,,,[AC_MSG_WARN(could not find xml.dom.minidom module. model-editor will not work.)])
+  if test "$enable_gui" = 'yes'; then
+    AM_CHECK_PYMOD(pygtk,,,[AC_MSG_ERROR([could not find Python pygtk module])])
+    AM_CHECK_PYMOD(gtk,,,[AC_MSG_ERROR([could not find Python gtk module])])
+    AM_CHECK_PYMOD(gtk.gdk,,,
+                   [AC_MSG_ERROR([could not find Python gtk.gdk module])])
+    AM_CHECK_PYMOD(gnomecanvas,,,[AC_MSG_WARN(could not find gnomecanvas module. model-editor will not work. )])
+    AM_CHECK_PYMOD(xml.dom.minidom,,,[AC_MSG_WARN(could not find xml.dom.minidom module. model-editor will not work.)])
+  fi
 fi
-
 
 dnl Checks for header files.
 
@@ -218,26 +207,40 @@ fi
 AC_SUBST(DMTOOL_DIR)
 AC_SUBST(DMTOOL_INCLUDE_DIR)
 
-AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR([Failed to find Python headers.])])
-ECELL_CHECK_PYTHON_LIBS
+ECELL_CHECK_BOOST(, [AC_MSG_ERROR([could not find Boost C++ library])])
+
+USE_COMPILER_EXTENSIONS=no
+AC_MSG_CHECKING( if use of compiler specific features are allowed )
+
+if test "$enable_pyecell" = "yes"; then
+  AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR([Failed to find Python headers.])])
+  ECELL_CHECK_PYTHON_LIBS
+  BOOST_PYTHON_LIBNAME=boost_python
+  AC_ARG_WITH(boost-python-libname,
+    AC_HELP_STRING([--with-boost-python-libname=LIBNAME],
+                   [specify the library name of Boost.Python [[boost_python]]]
+                  ),
+    [BOOST_PYTHON_LIBNAME=$withval]
+  )
+  ECELL_CHECK_BOOST_PYTHON(, [AC_MSG_ERROR([could not find Boost.Python library])])
+else
+  BOOST_PYTHON_LIBNAME=
+fi
+AC_SUBST(BOOST_PYTHON_LIBNAME)
+
 AM_CONDITIONAL([HAVE_PYTHON_LIB], [test ! -z "$PYTHON_LIBS"])
 AC_SUBST([PYTHON_LIBS])
 
-ECELL_CHECK_BOOST(, [AC_MSG_ERROR([could not find Boost C++ library])])
-ECELL_CHECK_BOOST_PYTHON(, [AC_MSG_ERROR([could not find Boost.Python library])])
-
-AC_MSG_CHECKING( if use of compiler specific features are allowed )
-
 AC_ARG_ENABLE( compiler-extensions,,
-               USE_COMPILER_EXTENSIONS=$enable_compiler_features,
-               USE_COMPILER_EXTENSIONS=yes
+               USE_COMPILER_EXTENSIONS=yes,
+               USE_COMPILER_EXTENSIONS=no
                )
 AC_MSG_RESULT( $USE_COMPILER_EXTENSIONS )
 
 if test "$USE_COMPILER_EXTENSIONS" != no ; then
-  AC_MSG_CHECKING( for special compiler options )
+  AC_MSG_CHECKING( for gcc-specific optimization )
   AC_SUBST(USE_COMPILER_EXTENSIONS)
-  AC_DEFINE([USE_COMPILER_EXTENSIONS],1,[make use of compiler specific language features])
+  AC_DEFINE([USE_COMPILER_EXTENSIONS],1,[make use of gcc specific features])
   CXXFLAGS="$CXXFLAGS -Wno-pmf-conversions"
   AC_SUBST(CXXFLAGS)
   AC_MSG_RESULT( $CXXFLAGS )
@@ -285,14 +288,6 @@ AC_TYPE_SIGNAL
 AC_CHECK_FUNCS(mkdir select strdup strerror strtod uname modf modfl)
 AC_CHECK_FUNCS(strdup strstr)
 
-AM_CHECK_PYMOD([em], [usage], [], [
-    AC_MSG_ERROR([``empy'' python module is not installed.])
-])
-
-AM_CHECK_PYMOD([ply], [], [], [
-    AC_MSG_ERROR([``ply'' python module is not installed.])
-])
-
 AC_CONFIG_FILES([
     Makefile
     bin/Makefile
@@ -307,8 +302,19 @@ AC_CONFIG_FILES([
     pyecell/ecell/config.py
     frontend/Makefile
     frontend/session-monitor/Makefile
-    frontend/session-monitor/plugins/Makefile
     frontend/session-monitor/glade/Makefile
+    frontend/session-monitor/plugins/Makefile
+    frontend/model-editor/Makefile
+    frontend/model-editor/doc/Makefile
+    frontend/model-editor/glade/Makefile
+    frontend/model-editor/plugins/Makefile
 ])
 AC_CONFIG_FILES([bin/ecell3-dmc], [chmod +x bin/ecell3-dmc])
+AC_CONFIG_FILES([pyecell/ecell3-python], [chmod +x pyecell/ecell3-python])
+AC_CONFIG_FILES([pyecell/ecell3-em2eml], [chmod +x pyecell/ecell3-em2eml])
+AC_CONFIG_FILES([pyecell/ecell3-eml2em], [chmod +x pyecell/ecell3-eml2em])
+AC_CONFIG_FILES([pyecell/ecell3-eml2sbml], [chmod +x pyecell/ecell3-eml2sbml])
+AC_CONFIG_FILES([pyecell/ecell3-sbml2eml], [chmod +x pyecell/ecell3-sbml2eml])
+AC_CONFIG_FILES([pyecell/ecell3-session], [chmod +x pyecell/ecell3-session])
+AC_CONFIG_FILES([pyecell/ecell3-session-manager], [chmod +x pyecell/ecell3-session-manager])
 AC_OUTPUT

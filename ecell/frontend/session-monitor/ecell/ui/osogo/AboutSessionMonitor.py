@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -25,24 +25,69 @@
 # 
 #END_HEADER
 
-import os
-import config
 import gtk
-from Dialog import Dialog
+import os
+import gtk.gdk
 
-class AboutSessionMonitor( Dialog ):
-    def __init__( self ):
-        """
-        sets up a modal dialogwindow displaying 
-        the AboutSessionMonitor window
+import ecell.ui.osogo.config as config
+from ecell.ui.osogo.MainWindow import *
+import ecell.ui.osogo.glade_compat as glade
+
+class AboutSessionMonitor:
+	
+	#######################
+	#    GENERAL CASES    #
+	#######################
+
+	def __init__( self, aMainWindow ):
+		"""
+		sets up a modal dialogwindow displaying 
+		the AboutSessionMonitor window
              
-        """ 
-        Dialog.__init__( self )
+		""" 
+		self.theMainWindow = aMainWindow	
+		
+		filename = os.path.join( config.GLADEFILE_PATH, "AboutSessionMonitor.glade" )
+		widgets = glade.XML(filename,"attachment_box")
+		att_box = widgets.get_widget("attachment_box")
 
-    def initUI( self ):
-        Dialog.initUI( self )
-        self.addHandlersAuto()
-        self['version_label'].set_text( "Version: " + config.version )
+		# Create the Dialog
+		self.win = gtk.Dialog('AboutSessionMonitor' , None)
+		self.win.connect("destroy",self.destroy)
 
-    def doClose( self ):
-        self.response( gtk.RESPONSE_OK )
+		# Sets size and position
+		self.win.set_border_width(2)
+		self.win.set_default_size(300,75)
+		self.win.set_position(gtk.WIN_POS_MOUSE)
+
+		# appends ok button
+		ok_button = gtk.Button("  OK  ")
+		self.win.action_area.pack_start(ok_button,False,False,)
+		ok_button.set_flags(gtk.CAN_DEFAULT)
+		ok_button.grab_default()
+		ok_button.show()
+		ok_button.connect("clicked",self.destroy)
+		self.win.vbox.pack_start( att_box )
+		# Sets title
+		self.win.set_title('About Session Monitor')
+		aPixbuf16 = gtk.gdk.pixbuf_new_from_file(
+            os.path.join( config.GLADEFILE_PATH, 'ecell.png') )
+		aPixbuf32 = gtk.gdk.pixbuf_new_from_file(
+            os.path.join( config.GLADEFILE_PATH, 'ecell32.png') )
+		self.win.set_icon_list(aPixbuf16, aPixbuf32)
+		widgets.get_widget("label1").set_markup("<b>E-Cell Session Monitor Version " + config.version + "</b>")
+		self.win.show_all()
+		
+		self.theMainWindow.toggleAboutSessionMonitor(True,self)
+		
+
+		
+	
+	def destroy( self, *arg ):
+		"""destroy dialog
+		"""
+		
+		self.win.destroy()
+
+		self.theMainWindow.toggleAboutSessionMonitor(False,None)
+		

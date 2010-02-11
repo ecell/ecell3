@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -28,6 +28,7 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -37,104 +38,70 @@
 #include "Exceptions.hpp"
 #include "EntityType.hpp"
 
-
 namespace libecs
 {
 
-  StringCref EntityType::EntityTypeStringOfNone()
-  {
-    const static String aString;
-    return aString;
-  }
+const String EntityType::entityTypeStringOfNone( "" );
 
-  StringCref EntityType::EntityTypeStringOfEntity()
-  {
-    const static String aString( "Entity" );
-    return aString;
-  }
+const String EntityType::entityTypeStringOfEntity( "Entity" );
 
-  StringCref EntityType::EntityTypeStringOfProcess()
-  {
-    const static String aString( "Process" );
-    return aString;
-  }
-  
-  StringCref EntityType::EntityTypeStringOfVariable()
-  {
-    const static String aString( "Variable" );
-    return aString;
-  }
-  
-  StringCref EntityType::EntityTypeStringOfSystem()
-  { 
-    const static String aString( "System" );
-    return aString;
-  }
+const String EntityType::entityTypeStringOfProcess( "Process" );
 
+const String EntityType::entityTypeStringOfVariable( "Variable" );
 
+const String EntityType::entityTypeStringOfSystem( "System" );
 
-  EntityType::EntityType( StringCref aTypeString )
-  {
-    // linear search may well work here;  n < 8.
+EntityType::EntityType( StringCref aTypeString )
+{
+    // linear search may well work here;    n < 8.
 
     if( aTypeString.empty() )
-      {
-	theType = NONE;
-      }
-    else if( aTypeString == EntityTypeStringOfVariable() )
-      {
-	theType = VARIABLE;
-      }
-    else if( aTypeString == EntityTypeStringOfProcess() )
-      {
-	theType = PROCESS;
-      }
-    else if( aTypeString == EntityTypeStringOfSystem() )
-      {
-	theType = SYSTEM;
-      }
-    else if( aTypeString == EntityTypeStringOfEntity() )
-      {
-	theType = ENTITY;
-      }
+    {
+        theType = NONE;
+    }
+    else if( aTypeString == entityTypeStringOfVariable )
+    {
+        theType = VARIABLE;
+    }
+    else if( aTypeString == entityTypeStringOfProcess )
+    {
+        theType = PROCESS;
+    }
+    else if( aTypeString == entityTypeStringOfSystem )
+    {
+        theType = SYSTEM;
+    }
+    else if( aTypeString == entityTypeStringOfEntity )
+    {
+        theType = ENTITY;
+    }
     else
-      {
-	THROW_EXCEPTION( InvalidEntityType,
-			 "Can not convert the typestring [" + aTypeString
-			 + "] to EntityType." );
-      }
-  }
+    {
+        THROW_EXCEPTION( InvalidEntityType,
+                         "cannot convert the typestring [" + aTypeString
+                         + "] to EntityType" );
+    }
+}
 
-  EntityType::EntityType( const int number )
-    :
-    theType( static_cast<const Type>( number ) )
-  {
-    if( number > 4 || number <= 0 )
-      {
-	THROW_EXCEPTION( InvalidEntityType,
-			 "Invalid EntityType number" );
-      }
-  }
-
-  StringCref EntityType::getString() const
-  {
+StringCref EntityType::asString() const
+{
     switch( theType )
-      {
-      case NONE:
-	return EntityTypeStringOfNone();
-      case VARIABLE:
-	return EntityTypeStringOfVariable();
-      case PROCESS:
-	return EntityTypeStringOfProcess();
-      case SYSTEM:
-	return EntityTypeStringOfSystem();
-      case ENTITY:
-	return EntityTypeStringOfEntity();
-      default:
-	THROW_EXCEPTION( InvalidEntityType,
-			 "unexpected EntityType::Type." );
-      }
-  }
+    {
+    case NONE:
+        return entityTypeStringOfNone;
+    case VARIABLE:
+        return entityTypeStringOfVariable;
+    case PROCESS:
+        return entityTypeStringOfProcess;
+    case SYSTEM:
+        return entityTypeStringOfSystem;
+    case ENTITY:
+        return entityTypeStringOfEntity;
+    default:
+        THROW_EXCEPTION( InvalidEntityType,
+                         "unexpected EntityType::Type" );
+    }
+}
 
 } // namespace libecs
 

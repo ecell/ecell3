@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -36,59 +36,94 @@
 #include "FullID.hpp"
 
 #include "Entity.hpp"
-
+#include "Model.hpp"
 
 namespace libecs
 {
 
-  LIBECS_DM_INIT_STATIC( Entity, Entity );
+LIBECS_DM_INIT_STATIC( Entity, Entity );
+
+Entity::Entity()
+    : theSuperSystem( NULLPTR ),
+      theID( "" ),
+      theName( "" ),
+      theLoggerMap( NULLPTR )
+{
+
+}
 
 
-  Entity::Entity()
-    : 
-    theSuperSystem( NULLPTR ),
-    theID( "" ),
-    theName( "" ) 
-  {
-
-  }
-
-
-  Entity::~Entity()
-  {
+Entity::~Entity()
+{
     ; // do nothing
-  }
+}
 
-  const FullID Entity::getFullID() const
-  {
+const FullID Entity::getFullID() const
+{
     return FullID( getEntityType(), getSystemPath(), getID() );
-  }
+}
 
-  const String Entity::getFullIDString() const
-  {
-    return getFullID().getString();
-  }
+const SystemPath Entity::getSystemPath() const
+{
+    System* aSystem( getSuperSystem() );
 
-  const SystemPath Entity::getSystemPath() const
-  {
-    SystemPtr aSystemPtr( getSuperSystem() );
+    if ( !aSystem )
+    {
+        THROW_EXCEPTION( IllegalOperation, "no system is associated" );
+    }
 
-    if( aSystemPtr == NULLPTR )
-      {
-	return SystemPath();
-      }
+    if ( aSystem == this )
+    {
+        return SystemPath();
+    }
 
-    SystemPath aSystemPath( aSystemPtr->getSystemPath() );
-    aSystemPath.push_back( aSystemPtr->getID() );
+    SystemPath aSystemPath( aSystem->getSystemPath() );
+    aSystemPath.push_back( aSystem->getID() );
     return aSystemPath;
-  }
+}
+
+LoggerBroker::LoggersPerFullID
+Entity::getLoggers() const
+{
+    LoggerBroker::PerFullIDMap* aLoggerMap(
+        theLoggerMap ? theLoggerMap:
+            &getModel()->getLoggerBroker().theEmptyPerFullIDMap );
+    return LoggerBroker::LoggersPerFullID(
+        LoggerBroker::PerFullIDLoggerIterator(
+            aLoggerMap->begin(),
+            SelectSecond< LoggerBroker::PerFullIDMap::value_type >() ),
+        LoggerBroker::PerFullIDLoggerIterator(
+            aLoggerMap->end(),
+            SelectSecond< LoggerBroker::PerFullIDMap::value_type >() )
+    );
+    // return getModel()->getLoggerBroker().getLoggersByFullID( getFullID() );
+}
+
+
+String Entity::asString() const
+{
+    return getPropertyInterface().getClassName() + "["
+            + ( theSuperSystem ? getFullID().asString():
+                                 "unbound: " + getID() ) + "]";
+}
+
+
+void Entity::detach()
+{
+    if ( theSuperSystem )
+    {
+        if ( theModel )
+        {
+            try { theModel->getLoggerBroker().removeLoggersByFullID( getFullID() ); }
+            catch ( NotFound const& ) {}
+        }
+
+        try { theSuperSystem->unregisterEntity( this ); }
+        catch ( NotFound const& ) {}
+    }
+    theSuperSystem = NULLPTR;
+    EcsObject::detach();
+}
+
 
 } // namespace libecs
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

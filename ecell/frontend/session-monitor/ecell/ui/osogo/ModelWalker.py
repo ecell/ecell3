@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -24,8 +24,8 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # 
 #END_HEADER
+
 from ecell.ecssupport import *
-import ecell.identifiers as identifiers
         
 def getNextInList(  aList, actualID ):
     if actualID == None:
@@ -37,7 +37,7 @@ def getNextInList(  aList, actualID ):
         return None
     else:
         return aList[idx + 1]
-
+        
 def getPreviousInList(  aList, actualID ):
     if actualID == None:
         idx = len(aList)
@@ -48,41 +48,48 @@ def getPreviousInList(  aList, actualID ):
         return None
     else:
         return aList[idx - 1]
-    
+
 class ModelWalker:
-    def __init__( self, aModel ):
+    def __init__( self, aModel  ):
         """ aModel can be any that complies the ecell3 Simulator API"""
 
-        self.theSession = aModel
+        self.theModel = aModel
         self.theTreeWalker = TreeWalker( aModel )
         self.reset()
         
+        
+        
     def moveTo( self, aFullID ):
-        assert isinstance( aFullID, identifiers.FullID )
-        self.theActualID = aFullID
+        self.theActualID = list( aFullID )
         if self.theActualID[TYPE] == SYSTEM:
             self.theTreeWalker.moveTo( self.theActualID )
         else:
-            self.theTreeWalker.moveTo(
-                self.theActualID.getSuperSystemPath().toFullID() )
-        self.__getEntityLists()
+            self.theTreeWalker.moveTo( createFullIDFromSystemPath( self.theActualID[SYSTEMPATH]  ) )
+        self.__getEntityLists( )
+         
         
-    def reset( self ):
-        self.moveTo( identifiers.FullID( SYSTEM, '', '/'  ) )
+        
+    def reset ( self ):
+        self.moveTo( [ SYSTEM, '', '/' ] )
+
         
     def getCurrentFullID( self ):
         return self.theActualID
 
+
+        
     def getNextFullID ( self ):
         """
         moves to next FullID
         gives None if reaches end of tree """
-        previousID = identifiers.FullID( self.theActualID )
+        previousID = self.theActualID[:]
         self.__moveToNextEntity()
-        if self.theActualID == identifiers.FullID( 'System::/' ):
+        if createFullIDString( self.theActualID ) == 'System::/':
             self.moveTo( previousID)
             return None
         return self.getCurrentFullID()
+        
+        
         
     def getPreviousFullID( self ):
         """ 
@@ -93,38 +100,43 @@ class ModelWalker:
         self.__moveToPreviousEntity()
         return self.getCurrentFullID()
         
+        
     def __moveToPreviousEntity( self ):
         # order :  System, Process, Variable , System up 
         if self.theActualID[TYPE] == SYSTEM:
-            self.theActualID = identifiers.FullID(
-                self.theTreeWalker.getPreviousSystemFullID() )
+            self.theActualID = self.theTreeWalker.getPreviousSystemFullID()[:]
             self.__getEntityLists()
             actualID = None
-            systemPath = self.theActualID.toSystemPath()
+            systemPath = createSystemPathFromFullID( self.theActualID )
+
         else:
-            actualID = self.theActualID.id
-            systemPath = self.theActualID.getSuperSystemPath()
+            actualID = self.theActualID[ID]
+            systemPath = self.theActualID[SYSTEMPATH]
         
-        if self.theActualID.typeCode in ( PROCESS, SYSTEM ):
+        if self.theActualID[TYPE] in [ PROCESS, SYSTEM ]:
             actualID = getPreviousInList( self.theProcessList, actualID  )
             if actualID != None:
-                self.theActualID = identifiers.FullID(
-                    PROCESS, systemPath, actualID )
+                self.theActualID[ID] = actualID
+                self.theActualID[SYSTEMPATH] = systemPath
+                self.theActualID[TYPE] = PROCESS
                 return
                 
-        actualID = getPreviousInList( self.theVariableList, actualID )
+        actualID = getPreviousInList( self.theVariableList, actualID  )
         if actualID != None:
-            self.theActualID = identifiers.FullID(
-                    VARIABLE, systemPath, actualID )
+            self.theActualID[ID] = actualID
+            self.theActualID[SYSTEMPATH] = systemPath
+            self.theActualID[TYPE] = VARIABLE
             return
         # move to actual system
-        self.theActualID = systemPath.toFullID()
+        self.theActualID = createFullIDFromSystemPath( systemPath )
+
+    
 
     def __moveToNextEntity( self ):
-        # order : Variable, Process, System, System insid
+        # order : Variable, Process, System, System inside
         if self.theActualID[TYPE] == SYSTEM:
             actualID = None
-            systemPath = convertFullIDToSystemPath( self.theActualID )
+            systemPath = createSystemPathFromFullID( self.theActualID )
         else:
             actualID = self.theActualID[ID]
             systemPath = self.theActualID[SYSTEMPATH]
@@ -147,46 +159,45 @@ class ModelWalker:
             self.theActualID[TYPE] = PROCESS
             return
         # move to next system
-        self.theActualID = identifiers.FullID(
-            self.theTreeWalker.getNextSystemFullID() )
+        self.theActualID = self.theTreeWalker.getNextSystemFullID()[:]
         self.__getEntityLists()
         
+
+        
     def __getEntityLists( self ):
-        if self.theActualID.typeCode == SYSTEM:
-            systemPath = self.theActualID.toSystemPath()
+        if self.theActualID[TYPE] == SYSTEM:
+            systemPath = createSystemPathFromFullID( self.theActualID )
         else:
-            systemPath = self.theActualID.getSuperSystemPath()
-        self.theProcessList = list(
-            self.theSession.getEntityList(
-                ENTITYTYPE_STRING_LIST[ PROCESS ], systemPath ) )
-        self.theVariableList = list(
-            self.theSession.getEntityList(
-                ENTITYTYPE_STRING_LIST[VARIABLE], systemPath ) )
+            systemPath = self.theActualID[SYSTEMPATH]
+        self.theProcessList = list( self.theModel.getEntityList( ENTITYTYPE_STRING_LIST[PROCESS], systemPath ) )
+        self.theVariableList = list( self.theModel.getEntityList( ENTITYTYPE_STRING_LIST[VARIABLE], systemPath ) )
 
 class TreeWalker:
     def __init__( self, aModel ):
         """ aModel can be any that cvomplies the ecell3 Simulator API"""
-        self.theSession = aModel
+        self.theModel = aModel
         self.reset()
 
     def moveTo( self, aSystemFullID ):
-        self.theActualID = identifiers.FullID( aSystemFullID )
+        self.theActualID = aSystemFullID[:]
         self.__getLists()
         
     def reset( self ):
-        self.moveTo( identifiers.FullID( SYSTEM, '', '/' ) )
+        self.moveTo( [ SYSTEM, '', '/' ] )
+        
         
     def getNextSystemFullID( self ):
         #try to go down
         newID = getNextInList( self.theChildren, None )           
         if newID != None:
 
-            self.theActualID = identifiers.FullID( SYSTEM, convertFullIDToSystemPath( self.theActualID ), newID )
+            self.theActualID = [ SYSTEM, createSystemPathFromFullID( self.theActualID ), newID ]
             self.__getLists()
             return self.theActualID
 
         # go up and forward recursively
         return self.__goForwardAndUp()
+        
     
     def getPreviousSystemFullID( self ):
 
@@ -203,10 +214,11 @@ class TreeWalker:
             # already on top
             return self.theActualID
 
-        self.theActualID = convertSystemPathToFullID( self.theActualID[SYSTEMPATH]  )
+        self.theActualID = createFullIDFromSystemPath( self.theActualID[SYSTEMPATH]  )
         self.__getLists()
 
         return self.theActualID
+        
         
     def __goForwardAndUp( self ):
         #try to go forwards
@@ -222,18 +234,18 @@ class TreeWalker:
             return self.theActualID
 
         # move up
-        self.theActualID = convertSystemPathToFullID( self.theActualID[SYSTEMPATH]  )
+        self.theActualID = createFullIDFromSystemPath( self.theActualID[SYSTEMPATH]  )
         self.__getLists()
 
         # go up and forward recursively
         return self.__goForwardAndUp()
         
+        
     def __goDownAndForward( self ):
         # go down
         newID = getNextInList( self.theChildren, None )           
         if newID != None:
-            ## self.theActualID = [ SYSTEM, convertFullIDToSystemPath( self.theActualID ), newID ]
-            self.theActualID = identifiers.FullID( SYSTEM, convertFullIDToSystemPath( self.theActualID ), newID )
+            self.theActualID = [ SYSTEM, createSystemPathFromFullID( self.theActualID ), newID ]
             self.__getLists()
 
             #get last forwards
@@ -245,27 +257,24 @@ class TreeWalker:
 
         return self.theActualID
 
+
+
     def __getLists( self ):
-        assert isinstance( self.theActualID, identifiers.FullID )
-        if self.theActualID.systemPathString == '':
+        if self.theActualID[SYSTEMPATH] == '':
             self.theParentSiblings = []
-        elif self.theActualID.systemPathString == '/':
+        elif self.theActualID[SYSTEMPATH] == '/':
             self.theParentSiblings = ['/']
         else:
-            self.theParentSiblings = list(
-                self.theSession.getEntityList(
-                    ENTITYTYPE_STRING_LIST[ SYSTEM ], 
-                    self.theActualID.getSuperSystemPath().getSuperSystemPath() ) )
+            parentID = createFullIDFromSystemPath( self.theActualID[SYSTEMPATH] )
+            self.theParentSiblings = list( self.theModel.getEntityList( ENTITYTYPE_STRING_LIST[SYSTEM], 
+                                        parentID[SYSTEMPATH] ) )
         if self.theActualID[SYSTEMPATH] == '':
             self.theSiblings = ['/']
         else:
-            self.theSiblings = list(
-                self.theSession.getEntityList(
-                    ENTITYTYPE_STRING_LIST[ SYSTEM ], 
-                    self.theActualID.getSuperSystemPath() ) )
+            self.theSiblings =  list( self.theModel.getEntityList( ENTITYTYPE_STRING_LIST[SYSTEM], 
+                                            self.theActualID[SYSTEMPATH] ) )
 
-        self.theChildren = list(
-            self.theSession.getEntityList(
-                ENTITYTYPE_STRING_LIST[ SYSTEM ],
-                convertFullIDToSystemPath( self.theActualID ) ) )
-
+        self.theChildren = list( self.theModel.getEntityList( ENTITYTYPE_STRING_LIST[SYSTEM],
+                         createSystemPathFromFullID( self.theActualID ) ) )
+        
+    

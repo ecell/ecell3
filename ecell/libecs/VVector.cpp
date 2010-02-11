@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -135,13 +135,14 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif /* HAVE_SYS_STAT_H */
 
 #ifdef _MSC_VER
-#define strdup( x ) _strdup( x )
+#define snprintf _snprintf
 #endif /* _MSC_VER */
 
 #if defined( WIN32 ) && !defined( __CYGWIN__ )
@@ -163,9 +164,9 @@
 namespace libecs {
 
 int vvectorbase::_serialNumber = 0;
-char const *vvectorbase::_defaultDirectory = NULL;
+std::string vvectorbase::_defaultDirectory;
 int vvectorbase::_directoryPriority = 999;
-std::vector<char const *> vvectorbase::_tmp_name;
+std::vector<std::string> vvectorbase::_tmp_name;
 std::vector<int> vvectorbase::_file_desc_read;
 std::vector<int> vvectorbase::_file_desc_write;
 bool vvectorbase::_atexitSet = false;
@@ -240,15 +241,15 @@ static const char* get_temp_dir()
 
 vvectorbase::vvectorbase()
 {
-  if (_defaultDirectory == NULL) {
+  if (_defaultDirectory.empty()) {
     char const *envVal = getenv("VVECTORTMPDIR");
     if (envVal != NULL) {
-      _defaultDirectory = strdup(envVal);
+      _defaultDirectory = envVal;
       _directoryPriority = 3;
     }
     else
     {
-	  _defaultDirectory = strdup( get_temp_dir() );
+	  _defaultDirectory = get_temp_dir();
 	  _directoryPriority = 4;
     }
   }
@@ -279,11 +280,7 @@ vvectorbase::~vvectorbase()
 
 void vvectorbase::unlinkfile()
 {
-  if (_file_name) {
-    unlink(_file_name); // ignore error
-    free(_file_name);
-    _file_name = NULL;
-  }
+  unlink(_file_name.c_str()); // ignore error
 }
 
 
@@ -293,18 +290,13 @@ void vvectorbase::setTmpDir(char const * const dirname, int priority)
   assert(dirname[0] != '\0');
   if (priority < _directoryPriority) {
     _directoryPriority = priority;
-    if (_defaultDirectory != NULL) {
-      free(const_cast<char*>(_defaultDirectory));
-    }
-    _defaultDirectory = strdup(dirname);
+    _defaultDirectory = dirname;
   }
 }
 
 
 void vvectorbase::removeTmpFile()
 {
-  std::vector<char const *>::iterator iii;
-
 #ifndef OPEN_WHEN_ACCESS
   std::vector<int>::iterator ii;
   for (ii = _file_desc_read.begin(); ii != _file_desc_read.end(); ii++) {
@@ -323,38 +315,39 @@ void vvectorbase::removeTmpFile()
 #endif /* OPEN_WHEN_ACCESS */
 
 
-  for (iii = _tmp_name.begin(); iii != _tmp_name.end(); iii++) {
-
-    unlink (*iii);
+  for (std::vector<std::string>::iterator iii= _tmp_name.begin();
+       iii != _tmp_name.end(); iii++) {
+    unlink ((*iii).c_str());
   }
 }
 
 
 void vvectorbase::initBase(char const * const dirname)
 {
-  char pathname[256];
-  char filename[256];
+  std::string pathname;
   if (dirname != NULL) {
-    strcpy(pathname, dirname);
+    pathname = dirname;
   } else {
-    strcpy(pathname, _defaultDirectory);
+    pathname = _defaultDirectory;
   }
-  if (pathname[strlen(pathname) - 1] != PATH_SEPARATOR) {
-    static const char sep[2] = { PATH_SEPARATOR, 0 };
-    strcat(pathname, sep);
+  if ( pathname.size() == 0 || pathname[ pathname.size() - 1 ] != PATH_SEPARATOR) {
+    pathname += PATH_SEPARATOR;
   }
-  if (osif_is_dir(pathname) == 0) {
+  if (osif_is_dir( pathname.c_str() ) == 0) {
     throw vvector_init_error();
   }
-  checkDiskFull(pathname, 1);
-  sprintf(filename, "vvector-%ld-%04d",
-	  osif_get_pid(), _myNumber);
-  strcat(pathname, filename);
-  _file_name = strdup(pathname);
-  _tmp_name.push_back(_file_name);
+  checkDiskFull(pathname.c_str(), 1);
+  {
+    char filename[256];
+    snprintf(filename, sizeof(filename) - 1, "vvector-%ld-%04d",
+        osif_get_pid(), _myNumber);
+    pathname += filename;
+  }
+  _file_name = pathname;
+  _tmp_name.push_back(pathname);
 
-  _fdw = open(_file_name, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY |O_LARGEFILE, 0600);
-  _fdr = open(_file_name, O_RDONLY | O_BINARY | O_LARGEFILE );
+  _fdw = open(_file_name.c_str(), O_WRONLY | O_CREAT | O_TRUNC | O_BINARY |O_LARGEFILE, 0600);
+  _fdr = open(_file_name.c_str(), O_RDONLY | O_BINARY | O_LARGEFILE );
 
   if (_fdw < 0) 
     {
@@ -366,27 +359,23 @@ void vvectorbase::initBase(char const * const dirname)
         throw vvector_init_error();
     }
 
- #ifndef OPEN_WHEN_ACCESS
+#ifndef OPEN_WHEN_ACCESS
   _file_desc_write.push_back(_fdr);
   _file_desc_write.push_back(_fdw);
- #endif /*OPEN_WHEN_ACCESS*/
-
- #ifdef OPEN_WHEN_ACCES
+#else
  close(_fdw);
  _fdw = -1;
  close(_fdr);
  _fdr = -1;
- #endif /*OPEN_WHEN_ACCESS*/
+#endif /*OPEN_WHEN_ACCESS*/
  
-
-
 }
 
 
 void vvectorbase::my_open_to_append()
 {
-  checkDiskFull(_file_name, 0);
-  _fdw = open(_file_name, O_WRONLY | O_BINARY |O_LARGEFILE);
+  checkDiskFull(_file_name.c_str(), 0);
+  _fdw = open(_file_name.c_str(), O_WRONLY | O_BINARY |O_LARGEFILE);
   if (_fdw < 0) 
    {
       throw vvector_write_error();
@@ -402,7 +391,7 @@ void vvectorbase::my_open_to_append()
 void vvectorbase::my_open_to_read(off_t offset)
 {
   if (_fdr<0) {
-    _fdr = open(_file_name, O_RDONLY | O_BINARY|O_LARGEFILE );
+    _fdr = open(_file_name.c_str(), O_RDONLY | O_BINARY|O_LARGEFILE );
   }
   if (_fdr < 0) {
         throw vvector_read_error();

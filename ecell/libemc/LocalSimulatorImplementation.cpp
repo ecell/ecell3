@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -39,10 +39,6 @@
 #include "libecs/Process.hpp"
 #include "libecs/Variable.hpp"
 #include "libecs/LoggerBroker.hpp"
-#include "libecs/StepperMaker.hpp"
-#include "libecs/ProcessMaker.hpp"
-#include "libecs/SystemMaker.hpp"
-#include "libecs/VariableMaker.hpp"
 #include "libecs/SystemStepper.hpp"
 
 #ifdef _DLL_EXPORT
@@ -55,640 +51,693 @@
 namespace libemc
 {
 
-  using namespace libecs;
-
-  LocalSimulatorImplementation::LocalSimulatorImplementation()
-    :
-    theRunningFlag( false ),
-    theDirtyFlag( true ),
-    theEventCheckInterval( 20 ),
-    theEventChecker(),
-    theEventHandler(),
-    thePropertiedObjectMaker(),
-    theModel( thePropertiedObjectMaker )
-  {
+LocalSimulatorImplementation::LocalSimulatorImplementation()
+    : theRunningFlag( false ),
+      theDirtyFlag( true ),
+      theEventCheckInterval( 20 ),
+      theEventChecker(),
+      theEventHandler(),
+      thePropertiedObjectMaker( libecs::createDefaultModuleMaker() ),
+      theModel( *thePropertiedObjectMaker )
+{
     clearEventChecker();
-  }
+}
 
-  LocalSimulatorImplementation::~LocalSimulatorImplementation()
-  {
-  }
 
-  inline LoggerPtr LocalSimulatorImplementation::
-  getLogger( libecs::StringCref aFullPNString ) const
-  {
+LocalSimulatorImplementation::~LocalSimulatorImplementation()
+{
+    delete thePropertiedObjectMaker;
+}
+
+
+libecs::LoggerPtr LocalSimulatorImplementation::getLogger(
+        libecs::StringCref aFullPNString ) const
+{
     return getModel().getLoggerBroker().getLogger( aFullPNString );
-  }
+}
 
-  void LocalSimulatorImplementation::
-  createStepper( libecs::StringCref          aClassname, 
-		 libecs::StringCref          anId )
-  {
+
+void LocalSimulatorImplementation::createStepper(
+        libecs::StringCref aClassname, 
+        libecs::StringCref anId )
+{
     if( theRunningFlag )
-      {
-	THROW_EXCEPTION( libecs::Exception, 
-			 "Cannot create a Stepper while running." );
-      }
+    {
+        THROW_EXCEPTION( libecs::Exception, 
+                         "cannot create a Stepper during simulation" );
+    }
 
     setDirty();
     getModel().createStepper( aClassname, anId );
-  }
+}
 
-  void LocalSimulatorImplementation::deleteStepper( libecs::StringCref anID )
-  {
-    THROW_EXCEPTION( libecs::NotImplemented,
-		     "deleteStepper() method is not supported yet." );
 
+inline libecs::Polymorph LocalSimulatorImplementation::buildPolymorph( const libecs::Logger::Policy& pol )
+{
+    return libecs::Polymorph(
+        boost::make_tuple( pol.getMinimumStep(), pol.getMinimumTimeInterval(),
+                           static_cast< libecs::Integer >(
+                               pol.doesContinueOnError() ),
+                           pol.getMaxSpace() ) );
+}
+
+
+inline libecs::Polymorph LocalSimulatorImplementation::buildPolymorph( const libecs::PropertyAttributes& attrs )
+{
+    using namespace libecs;
+    return libecs::Polymorph(
+        boost::make_tuple( static_cast< Integer >( attrs.isSetable() ),
+                           static_cast< Integer >( attrs.isGetable() ),
+                           static_cast< Integer >( attrs.isLoadable() ),
+                           static_cast< Integer >( attrs.isSavable() ),
+                           static_cast< Integer >( attrs.isDynamic() ),
+                           static_cast< Integer >( attrs.getType() ) ) ); 
+}
+
+
+void LocalSimulatorImplementation::deleteStepper( libecs::StringCref anID )
+{
+    getModel().deleteStepper( anID );
     setDirty();
-  }
+}
 
-  const libecs::Polymorph LocalSimulatorImplementation::getStepperList() const
-  {
-    StepperMapCref aStepperMap( getModel().getStepperMap() );
 
-    PolymorphVector aPolymorphVector; 
+const libecs::Polymorph LocalSimulatorImplementation::getStepperList() const
+{
+    libecs::Model::StepperMap const& aStepperMap( getModel().getStepperMap() );
+
+    libecs::PolymorphVector aPolymorphVector; 
     aPolymorphVector.reserve( aStepperMap.size() );
     
-    for( StepperMapConstIterator i( aStepperMap.begin() );
-	 i != aStepperMap.end(); ++i )
-      {
-	aPolymorphVector.push_back( String( (*i).first ) );
-      }
+    for( libecs::Model::StepperMap::const_iterator i( aStepperMap.begin() );
+         i != aStepperMap.end(); ++i )
+    {
+        aPolymorphVector.push_back( libecs::Polymorph( (*i).first ) );
+    }
 
     return aPolymorphVector;
-  }
+}
 
 
-  const libecs::Polymorph LocalSimulatorImplementation::
-  getStepperPropertyList( StringCref aStepperID ) const
-  {
-    StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+const libecs::Polymorph
+LocalSimulatorImplementation::getStepperPropertyList(
+        libecs::StringCref aStepperID ) const
+{
+    libecs::StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
     
     return aStepperPtr->getPropertyList();
-  }
-  
-  const libecs::Polymorph LocalSimulatorImplementation::
-  getStepperPropertyAttributes( libecs::StringCref aStepperID, 
-				libecs::StringCref aPropertyName ) const
-  {
-    StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+}
 
-    return aStepperPtr->getPropertyAttributes( aPropertyName );
-  }
-  
+const libecs::Polymorph
+LocalSimulatorImplementation::getStepperPropertyAttributes(
+        libecs::StringCref aStepperID, 
+        libecs::StringCref aPropertyName ) const
+{
+    libecs::StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+    return buildPolymorph( aStepperPtr->getPropertyAttributes( aPropertyName ) );
+}
 
-  void LocalSimulatorImplementation::
-  setStepperProperty( libecs::StringCref          aStepperID,
-		      libecs::StringCref          aPropertyName,
-		      libecs::PolymorphCref aValue )
-  {
-    StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+
+void LocalSimulatorImplementation::setStepperProperty(
+        libecs::StringCref aStepperID,
+        libecs::StringCref aPropertyName,
+        libecs::PolymorphCref aValue )
+{
+    libecs::StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
     
     setDirty();
     aStepperPtr->setProperty( aPropertyName, aValue );
-  }
+}
 
-  const libecs::Polymorph LocalSimulatorImplementation::
-  getStepperProperty( libecs::StringCref aStepperID,
-		      libecs::StringCref aPropertyName ) const
-  {
-    StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
-
-//     clearDirty();
+const libecs::Polymorph LocalSimulatorImplementation::getStepperProperty(
+        libecs::StringCref aStepperID,
+        libecs::StringCref aPropertyName ) const
+{
+    libecs::StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
 
     return aStepperPtr->getProperty( aPropertyName );
-  }
+}
 
-  void LocalSimulatorImplementation::
-  loadStepperProperty( libecs::StringCref          aStepperID,
-		       libecs::StringCref          aPropertyName,
-		       libecs::PolymorphCref aValue )
-  {
-    StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
+void LocalSimulatorImplementation::loadStepperProperty(
+        libecs::StringCref aStepperID,
+        libecs::StringCref aPropertyName,
+        libecs::PolymorphCref aValue )
+{
+    libecs::StepperPtr aStepperPtr( getModel().getStepper( aStepperID ) );
     
     setDirty();
     aStepperPtr->loadProperty( aPropertyName, aValue );
-  }
+}
 
-  const libecs::Polymorph LocalSimulatorImplementation::
-  saveStepperProperty( libecs::StringCref aStepperID,
-		       libecs::StringCref aPropertyName ) const
-  {
-    StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
-
-    clearDirty();
+const libecs::Polymorph LocalSimulatorImplementation::saveStepperProperty(
+        libecs::StringCref aStepperID,
+        libecs::StringCref aPropertyName ) const
+{
+    libecs::StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
 
     return aStepperPtr->saveProperty( aPropertyName );
-  }
+}
 
-  const libecs::String LocalSimulatorImplementation::
-  getStepperClassName( libecs::StringCref aStepperID ) const
-  {
-    StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
+const libecs::String LocalSimulatorImplementation::getStepperClassName(
+        libecs::StringCref aStepperID ) const
+{
+    libecs::StepperCptr aStepperPtr( getModel().getStepper( aStepperID ) );
 
-    return aStepperPtr->getClassNameString();
-  }
+    return aStepperPtr->getPropertyInterface().getClassName();
+}
 
 
-  const libecs::PolymorphMap 
-  LocalSimulatorImplementation::getClassInfo( libecs::StringCref aClasstype,
-					      libecs::StringCref aClassname, const libecs::Integer forceReload )
-  {
-    return getModel().getClassInfo( aClasstype, aClassname, forceReload );
-  }
-  
-  void LocalSimulatorImplementation::createEntity( StringCref aClassname,
-						   StringCref aFullIDString )
-  {
+void LocalSimulatorImplementation::createEntity(
+        libecs::StringCref aClassname, libecs::StringCref aFullIDString )
+{
     if( theRunningFlag )
-      {
-	THROW_EXCEPTION( libecs::Exception, 
-			 "Cannot create an Entity while running." );
-      }
+    {
+        THROW_EXCEPTION( libecs::Exception, 
+                         "cannot create an Entity during simulation" );
+    }
 
     setDirty();
-    getModel().createEntity( aClassname, FullID( aFullIDString ) );
-  }
+    getModel().createEntity( aClassname, libecs::FullID( aFullIDString ) );
+}
 
-  void LocalSimulatorImplementation::deleteEntity( StringCref aFullIDString )
-  {
-    THROW_EXCEPTION( libecs::NotImplemented,
-		     "deleteEntity() method is not supported yet." );
+void LocalSimulatorImplementation::deleteEntity(
+        libecs::StringCref aFullIDString )
+{
+    getModel().deleteEntity( libecs::FullID( aFullIDString ) );
+}
 
-    setDirty();
-  }
-
-  const libecs::Polymorph LocalSimulatorImplementation::
-  getEntityList( libecs::StringCref anEntityTypeString,
-		 libecs::StringCref aSystemPathString ) const
-  {
+const libecs::Polymorph LocalSimulatorImplementation::getEntityList(
+        libecs::StringCref anEntityTypeString,
+        libecs::StringCref aSystemPathString ) const
+{
     const libecs::EntityType anEntityType( anEntityTypeString );
     const libecs::SystemPath aSystemPath( aSystemPathString );
 
     if( aSystemPath.size() == 0 )
-      {
-	PolymorphVector aVector;
-	if( anEntityType == libecs::EntityType::SYSTEM )
-	  {
-	    aVector.push_back( Polymorph( "/" ) );
-	  }
-	return aVector;
-      }
+    {
+        libecs::PolymorphVector aVector;
+        if( anEntityType == libecs::EntityType::SYSTEM )
+        {
+            aVector.push_back( libecs::Polymorph( "/" ) );
+        }
+        return aVector;
+    }
 
     const libecs::SystemCptr aSystemPtr( getModel().getSystem( aSystemPath ) );
 
     switch( anEntityType )
-      {
-      case libecs::EntityType::VARIABLE:
-	return aSystemPtr->getVariableList();
-      case libecs::EntityType::PROCESS:
-	return aSystemPtr->getProcessList();
-      case libecs::EntityType::SYSTEM:
-	return aSystemPtr->getSystemList();
-      }
+    {
+    case libecs::EntityType::VARIABLE:
+        return aSystemPtr->getVariableList();
+    case libecs::EntityType::PROCESS:
+        return aSystemPtr->getProcessList();
+    case libecs::EntityType::SYSTEM:
+        return aSystemPtr->getSystemList();
+    }
 
     NEVER_GET_HERE;
-  }
+}
 
 
-  const libecs::Polymorph LocalSimulatorImplementation::
-  getEntityPropertyList( libecs::StringCref aFullIDString ) const
-  {
-    FullID aFullID( aFullIDString );
-    EntityCptr anEntityPtr( getModel().getEntity( aFullID ) );
+const libecs::Polymorph LocalSimulatorImplementation::getEntityPropertyList(
+        libecs::StringCref aFullIDString ) const
+{
+    libecs::EntityCptr anEntityPtr( getModel().getEntity( libecs::FullID( aFullIDString ) ) );
 
     return anEntityPtr->getPropertyList();
-  }
+}
 
 
-  const bool LocalSimulatorImplementation::
-  isEntityExist( libecs::StringCref aFullIDString ) const
-  {
+const bool LocalSimulatorImplementation::entityExists(
+        libecs::StringCref aFullIDString ) const
+{
     try
-      {
-	IGNORE_RETURN getModel().getEntity( FullID( aFullIDString ) );
-      }
+    {
+        IGNORE_RETURN getModel().getEntity( libecs::FullID( aFullIDString ) );
+    }
     catch( const libecs::NotFound& )
-      {
-	return false;
-      }
+    {
+        return false;
+    }
 
     return true;
-  }
+}
 
 
-  void LocalSimulatorImplementation::
-  setEntityProperty( StringCref aFullPNString, PolymorphCref aValue )
-  {
-    FullPN aFullPN( aFullPNString );
-    EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+void LocalSimulatorImplementation::setEntityProperty(
+        libecs::StringCref aFullPNString, libecs::PolymorphCref aValue )
+{
+    libecs::FullPN aFullPN( aFullPNString );
+    libecs::EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
     setDirty();
     anEntityPtr->setProperty( aFullPN.getPropertyName(), aValue );
-  }
+}
 
 
-  const Polymorph LocalSimulatorImplementation::
-  getEntityProperty( StringCref aFullPNString ) const
-  {
-    FullPN aFullPN( aFullPNString );
-    EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
-	
-    clearDirty();
-
+const libecs::Polymorph LocalSimulatorImplementation::getEntityProperty(
+        libecs::StringCref aFullPNString ) const
+{
+    libecs::FullPN aFullPN( aFullPNString );
+    libecs::EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+            
     return anEntityPtr->getProperty( aFullPN.getPropertyName() );
-  }
+}
 
-  void LocalSimulatorImplementation::
-  loadEntityProperty( StringCref aFullPNString, PolymorphCref aValue )
-  {
-    FullPN aFullPN( aFullPNString );
-    EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+void LocalSimulatorImplementation::loadEntityProperty(
+        libecs::StringCref aFullPNString, libecs::PolymorphCref aValue )
+{
+    libecs::FullPN aFullPN( aFullPNString );
+    libecs::EntityPtr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
     setDirty();
     anEntityPtr->loadProperty( aFullPN.getPropertyName(), aValue );
-  }
+}
 
-  const Polymorph LocalSimulatorImplementation::
-  saveEntityProperty( StringCref aFullPNString ) const
-  {
-    FullPN aFullPN( aFullPNString );
-    EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
-
-    clearDirty();
+const libecs::Polymorph LocalSimulatorImplementation::saveEntityProperty(
+        libecs::StringCref aFullPNString ) const
+{
+    libecs::FullPN aFullPN( aFullPNString );
+    libecs::EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
     return anEntityPtr->saveProperty( aFullPN.getPropertyName() );
-  }
+}
 
-  const libecs::Polymorph LocalSimulatorImplementation::
-  getEntityPropertyAttributes( libecs::StringCref aFullPNString ) const
-  {
-    FullPN aFullPN( aFullPNString );
-    EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
+const libecs::Polymorph LocalSimulatorImplementation::
+getEntityPropertyAttributes( libecs::StringCref aFullPNString ) const
+{
+    libecs::FullPN aFullPN( aFullPNString );
+    libecs::EntityCptr anEntityPtr( getModel().getEntity( aFullPN.getFullID() ) );
 
-    return anEntityPtr->getPropertyAttributes( aFullPN.getPropertyName() );
-  }
+    return buildPolymorph( anEntityPtr->getPropertyAttributes( aFullPN.getPropertyName() ) );
+}
 
-  const libecs::String LocalSimulatorImplementation::
-  getEntityClassName( libecs::StringCref aFullIDString ) const
-  {
-    FullID aFullID( aFullIDString );
-    EntityCptr anEntityPtr( getModel().getEntity( aFullID ) );
+const libecs::String LocalSimulatorImplementation::
+getEntityClassName( libecs::StringCref aFullIDString ) const
+{
+    libecs::FullID aFullID( aFullIDString );
+    libecs::EntityCptr anEntityPtr( getModel().getEntity( aFullID ) );
 
-    return anEntityPtr->getClassNameString();
-  }
+    return anEntityPtr->getPropertyInterface().getClassName();
+}
 
 
-  void LocalSimulatorImplementation::
-  createLogger( libecs::StringCref aFullPNString )
-  {
+void LocalSimulatorImplementation::
+createLogger( libecs::StringCref aFullPNString )
+{
     libecs::PolymorphVector aVector;
-    aVector.push_back( Integer( 1 ) );
-    aVector.push_back( Real( 0.0 )  );
-    aVector.push_back( Integer( 0 ) );
-    aVector.push_back( Integer( 0 ) );
-    createLogger( aFullPNString, libecs::Polymorph(aVector) );
-  }
+    createLogger( aFullPNString, boost::make_tuple( 1l, 0.0, 0l, 0l ) );
+}
 
 
-  void LocalSimulatorImplementation::
-  createLogger( libecs::StringCref aFullPNString, 
-		libecs::Polymorph aParamList )
-  {
+void LocalSimulatorImplementation::createLogger(
+        libecs::StringCref aFullPNString, 
+        libecs::Polymorph aParamList )
+{
+    typedef libecs::PolymorphValue::Tuple Tuple;
+
     if( theRunningFlag )
-      {
-	THROW_EXCEPTION( libecs::Exception, 
-			 "Cannot create a Logger while running." );
-      }
+    {
+        THROW_EXCEPTION( libecs::Exception, 
+                         "cannot create a Logger during simulation" );
+    }
 
-    if ( aParamList.getType() != libecs::Polymorph::POLYMORPH_VECTOR )
-      {
-	THROW_EXCEPTION( libecs::Exception,
-			 "2nd argument of createLogger must be a list.");
-      }
+    if ( aParamList.getType() != libecs::PolymorphValue::TUPLE
+         || aParamList.as< Tuple const& >().size() != 4 )
+    {
+        THROW_EXCEPTION( libecs::Exception,
+                         "second argument must be a tuple of 4 items");
+    }
 
-    FullPN aFullPN( aFullPNString );
-
-    clearDirty();
-
-    getModel().getLoggerBroker().
-      createLogger( aFullPN, aParamList.asPolymorphVector() );
+    getModel().getLoggerBroker().createLogger(
+        libecs::FullPN( aFullPNString ),
+        libecs::Logger::Policy(
+            aParamList.as< Tuple const& >()[ 0 ].as< libecs::Integer >(),
+            aParamList.as< Tuple const& >()[ 1 ].as< libecs::Real >(),
+            aParamList.as< Tuple const& >()[ 2 ].as< libecs::Integer >(),
+            aParamList.as< Tuple const& >()[ 3 ].as< libecs::Integer >() != 0 ? true: false ) );
 
     setDirty();
-  }
+}
 
-  const Polymorph LocalSimulatorImplementation::getLoggerList() const
-  {
-    PolymorphVector aLoggerList;
-    aLoggerList.reserve( getModel().getLoggerBroker().getLoggerMap().size() );
+const libecs::Polymorph LocalSimulatorImplementation::getLoggerList() const
+{
+    libecs::PolymorphVector aLoggerList;
 
-    LoggerBroker::LoggerMapCref 
-      aLoggerMap( getModel().getLoggerBroker().getLoggerMap() );
+    libecs::LoggerBroker const& aLoggerBroker( getModel().getLoggerBroker() );
 
-    for( LoggerBroker::LoggerMapConstIterator i( aLoggerMap.begin() );
-	 i != aLoggerMap.end(); ++i )
-      {
-	FullPNCref aFullPN( (*i).first );
-	aLoggerList.push_back( aFullPN.getString() );
-      }
+    for( libecs::LoggerBroker::const_iterator
+            i( aLoggerBroker.begin() ), end( aLoggerBroker.end() );
+         i != end; ++i )
+    {
+        aLoggerList.push_back( libecs::Polymorph( (*i).first.asString() ) );
+    }
 
     return aLoggerList;
-  }
+}
 
 
-  const libecs::DataPointVectorSharedPtr LocalSimulatorImplementation::
-  getLoggerData( libecs::StringCref aFullPNString ) const
-  {
+const boost::shared_ptr< libecs::DataPointVector >
+LocalSimulatorImplementation::getLoggerData(
+        libecs::StringCref aFullPNString ) const
+{
     return getLogger( aFullPNString )->getData();
-  }
+}
 
-  const libecs::DataPointVectorSharedPtr LocalSimulatorImplementation::
-  getLoggerData( libecs::StringCref aFullPNString, 
-		 libecs::RealCref aStartTime, 
-		 libecs::RealCref anEndTime ) const
-  {
+const boost::shared_ptr< libecs::DataPointVector >
+LocalSimulatorImplementation::getLoggerData(
+        libecs::StringCref aFullPNString, 
+        libecs::RealCref aStartTime, 
+        libecs::RealCref anEndTime ) const
+{
     return getLogger( aFullPNString )->getData( aStartTime, anEndTime );
-  }
+}
 
 
-  const libecs::DataPointVectorSharedPtr LocalSimulatorImplementation::
-  getLoggerData( libecs::StringCref aFullPNString, 
-		 libecs::RealCref aStartTime, 
-		 libecs::RealCref anEndTime,
-		 libecs::RealCref anInterval ) const
-  {
-    return getLogger( aFullPNString )->getData( aStartTime, anEndTime, 
-						anInterval );
-  }
+const boost::shared_ptr< libecs::DataPointVector >
+LocalSimulatorImplementation::getLoggerData(
+        libecs::StringCref aFullPNString, 
+        libecs::RealCref aStartTime, 
+        libecs::RealCref anEndTime,
+        libecs::RealCref anInterval ) const
+{
+    return getLogger( aFullPNString )->getData( aStartTime, anEndTime, anInterval );
+}
 
-  const libecs::Real LocalSimulatorImplementation::
-  getLoggerStartTime( libecs::StringCref aFullPNString ) const
-  {
+const libecs::Real
+LocalSimulatorImplementation::getLoggerStartTime(
+        libecs::StringCref aFullPNString ) const
+{
     return getLogger( aFullPNString )->getStartTime();
-  }
+}
 
-  const libecs::Real LocalSimulatorImplementation::
-  getLoggerEndTime( libecs::StringCref aFullPNString ) const
-  {
+const libecs::Real LocalSimulatorImplementation::getLoggerEndTime(
+        libecs::StringCref aFullPNString ) const
+{
     return getLogger( aFullPNString )->getEndTime();
-  }
+}
 
-  void LocalSimulatorImplementation::
-  setLoggerMinimumInterval( libecs::StringCref aFullPNString, 
-			    libecs::RealCref anInterval )
-  {
-    getLogger( aFullPNString )->setMinimumInterval( anInterval );
-  }
+void LocalSimulatorImplementation::setLoggerPolicy(
+        libecs::StringCref aFullPNString, 
+        libecs::Polymorph aParamList )
+{
+    typedef libecs::PolymorphValue::Tuple Tuple;
 
-  const libecs::Real LocalSimulatorImplementation::
-  getLoggerMinimumInterval( libecs::StringCref aFullPNString ) const
-  {
-    return getLogger( aFullPNString )->getMinimumInterval();
-  }
+    if( aParamList.getType() != libecs::PolymorphValue::TUPLE
+        || aParamList.as< Tuple const& >().size() != 4 )
+    {
+        THROW_EXCEPTION( libecs::Exception,
+                         "second parameter must be a tuple of 4 items");
+    }
+
+    getLogger( aFullPNString )->setLoggerPolicy(
+        libecs::Logger::Policy(
+            aParamList.as< Tuple const& >()[ 0 ].as< libecs::Integer >(),
+            aParamList.as< Tuple const& >()[ 1 ].as< libecs::Real >(),
+            aParamList.as< Tuple const& >()[ 2 ].as< libecs::Integer >(),
+            aParamList.as< Tuple const& >()[ 3 ].as< libecs::Integer >() != 0 ? true: false ) );
+}
 
 
-  void LocalSimulatorImplementation::
-  setLoggerPolicy( libecs::StringCref aFullPNString, 
-		   libecs::Polymorph aParamList )
-  {
-    if( aParamList.getType() != libecs::Polymorph::POLYMORPH_VECTOR )
-      {
-	THROW_EXCEPTION( libecs::Exception,
-			 "2nd parameter of logger policy must be a list.");
-      }
+const libecs::Polymorph
+LocalSimulatorImplementation::getLoggerPolicy(
+        libecs::StringCref aFullPNString ) const
+{
+    return buildPolymorph( getLogger( aFullPNString )->getLoggerPolicy() );
+}
 
-    getLogger( aFullPNString )->setLoggerPolicy( aParamList );
-  }
 
-  const libecs::Polymorph LocalSimulatorImplementation::
-  getLoggerPolicy( libecs::StringCref aFullPNString ) const
-  {
-    return getLogger( aFullPNString )->getLoggerPolicy();
-  }
-
-  const libecs::Logger::size_type LocalSimulatorImplementation::
-  getLoggerSize( libecs::StringCref aFullPNString ) const
-  {
+const libecs::Logger::size_type LocalSimulatorImplementation::
+getLoggerSize( libecs::StringCref aFullPNString ) const
+{
     return getLogger( aFullPNString )->getSize();
-  }
+}
 
-  const libecs::Polymorph LocalSimulatorImplementation::
-  getNextEvent() const
-  {
+
+const libecs::Polymorph
+LocalSimulatorImplementation::getNextEvent() const
+{
     libecs::StepperEventCref aNextEvent( getModel().getTopEvent() );
 
-    PolymorphVector aVector;
-    aVector.push_back( static_cast<Real>( aNextEvent.getTime() ) );
-    aVector.push_back( aNextEvent.getStepper()->getID() );
-    return aVector;
-  }
+    return boost::make_tuple(
+        static_cast< libecs::Real >( aNextEvent.getTime() ),
+        aNextEvent.getStepper()->getID() );
+}
 
-  void LocalSimulatorImplementation::initialize() const
-  {
+
+void LocalSimulatorImplementation::initialize() const
+{
     // calling the model's initialize(), which is non-const,
     // is semantically a const operation at the simulator level.
-    const_cast<LocalSimulatorImplementation*>( this )->
-      getModel().initialize();
-  }
+    const_cast< LocalSimulatorImplementation* >( this )->getModel().initialize();
+}
 
-  const libecs::Real LocalSimulatorImplementation::getCurrentTime() const
-  {
+
+const libecs::Real LocalSimulatorImplementation::getCurrentTime() const
+{
     return getModel().getCurrentTime();
-  }
+}
 
 
 
-  void LocalSimulatorImplementation::step( const libecs::Integer aNumSteps )
-  {
+void LocalSimulatorImplementation::step( const libecs::Integer aNumSteps )
+{
     if( aNumSteps <= 0 )
-      {
-	THROW_EXCEPTION( libecs::Exception,
-			 "step( n ): n must be 1 or greater. (" +
-			 libecs::stringCast( aNumSteps ) + " given.)" );
-      }
+    {
+        THROW_EXCEPTION( libecs::Exception,
+                         "step( n ): n must be 1 or greater ("
+                         + libecs::stringCast( aNumSteps ) + " given)" );
+    }
 
     start();
 
     libecs::Integer aCounter( aNumSteps );
     do
-      {
-	getModel().step();
-	
-	--aCounter;
-	
-	if( aCounter == 0 )
-	  {
-	    stop();
-	    break;
-	  }
+    {
+        getModel().step();
+        
+        --aCounter;
+        
+        if( aCounter == 0 )
+        {
+            stop();
+            break;
+        }
 
-	if( aCounter % theEventCheckInterval == 0 )
-	  {
-	    handleEvent();
+        if( aCounter % theEventCheckInterval == 0 )
+        {
+            handleEvent();
 
-	    if( ! theRunningFlag )
-	      {
-		break;
-	      }
-	  }
-      }	while( 1 );
+            if( ! theRunningFlag )
+            {
+                break;
+            }
+        }
+    }
+    while( 1 );
 
-  }
+}
 
-  void LocalSimulatorImplementation::run()
-  {
+void LocalSimulatorImplementation::run()
+{
     if( ! ( typeid( *theEventChecker ) != 
-	    typeid( DefaultEventChecker ) && 
-	    theEventHandler.get() != NULLPTR ) )
-      {
-	THROW_EXCEPTION( libecs::Exception,
-			 "Both EventChecker and EventHandler must be "
-			 "set before run without duration." ) ;
-      }
+            typeid( DefaultEventChecker ) && 
+            theEventHandler.get() != NULLPTR ) )
+    {
+        THROW_EXCEPTION( libecs::Exception,
+                         "both EventChecker and EventHandler must be "
+                         "set before run without duration" ) ;
+    }
 
     start();
 
     do
-      {
-	unsigned int aCounter( theEventCheckInterval );
-	do
-	  {
-	    getModel().step();
-	    --aCounter;
-	  }
-	while( aCounter != 0 );
-	
-	handleEvent();
+    {
+        unsigned int aCounter( theEventCheckInterval );
+        do
+        {
+            getModel().step();
+            --aCounter;
+        }
+        while( aCounter != 0 );
+        
+        handleEvent();
 
-      }	while( theRunningFlag );
-  }
+    }
+    while( theRunningFlag );
+}
 
-  void LocalSimulatorImplementation::run( const libecs::Real aDuration )
-  {
+void LocalSimulatorImplementation::run( const libecs::Real aDuration )
+{
     if( aDuration <= 0.0 )
-      {
-	THROW_EXCEPTION( libecs::Exception,
-			 "run( l ): l must be > 0.0. (" + 
-			 libecs::stringCast( aDuration ) + " given.)" );
-      }
+    {
+        THROW_EXCEPTION( libecs::Exception,
+                         "duration must be greater than 0 ("
+                         + libecs::stringCast( aDuration ) + " given)" );
+    }
 
     start();
 
-    const libecs::Real aStopTime( getModel().getCurrentTime() + aDuration );
+    const libecs::Real aCurrentTime( getModel().getCurrentTime() );
+    const libecs::Real aStopTime( aCurrentTime + aDuration );
 
     // setup SystemStepper to step at aStopTime
 
     //FIXME: dirty, ugly!
-    StepperPtr aSystemStepper( getModel().getSystemStepper() );
-    aSystemStepper->setCurrentTime( aStopTime );
-    aSystemStepper->setStepInterval( 0.0 );
+    libecs::StepperPtr aSystemStepper( getModel().getSystemStepper() );
+    aSystemStepper->setCurrentTime( aCurrentTime );
+    aSystemStepper->setNextTime( aStopTime );
 
     getModel().getScheduler().updateEvent( 0, aStopTime );
 
 
-    if( typeid( *theEventChecker ) != 
-	typeid( DefaultEventChecker ) && 
-	theEventHandler.get() != NULLPTR )
-      {
-	runWithEvent();
-      }
+    if( typeid( *theEventChecker ) != typeid( DefaultEventChecker ) &&
+        theEventHandler.get() != NULLPTR )
+    {
+        runWithEvent( aStopTime );
+    }
     else
-      {
-	runWithoutEvent();
-      }
+    {
+        runWithoutEvent( aStopTime );
+    }
 
-  }
+}
 
-  void LocalSimulatorImplementation::runWithEvent()
-  {
-    StepperCptr const aSystemStepper( getModel().getSystemStepper() );
+void LocalSimulatorImplementation::runWithEvent( libecs::Real const aStopTime )
+{
+    do
+    {
+        unsigned int aCounter( theEventCheckInterval );
+        do 
+        {
+            if( getModel().getTopEvent().getTime() > aStopTime )
+            {
+                stop();
+                return;
+            }
+            
+            getModel().step();
+
+            --aCounter;
+        }
+        while( aCounter != 0 );
+
+        handleEvent();
+
+    }
+    while( theRunningFlag );
+}
+
+void LocalSimulatorImplementation::runWithoutEvent( libecs::Real const aStopTime )
+{
+    libecs::StepperCptr const aSystemStepper( getModel().getSystemStepper() );
 
     do
-      {
-	unsigned int aCounter( theEventCheckInterval );
-	do 
-	  {
-	    if( getModel().getTopEvent().getStepper() == aSystemStepper )
-	      {
-		getModel().step();
-		stop();
-		return;
-	      }
-	    
-	    getModel().step();
+    {
+        if( getModel().getTopEvent().getTime() > aStopTime )
+        {
+            stop();
+            return;    // the only exit
+        }
 
-	    --aCounter;
-	  } while( aCounter != 0 );
+        getModel().step();
 
-	handleEvent();
+    }
+    while( 1 );
+}
 
-      }	while( theRunningFlag );
-
-    return;  // the exit
-  }
-
-  void LocalSimulatorImplementation::runWithoutEvent()
-  {
-    StepperCptr const aSystemStepper( getModel().getSystemStepper() );
-
-    do
-      {
-	if( getModel().getTopEvent().getStepper() == aSystemStepper )
-	  {
-	    getModel().step();
-	    stop();
-	    return;  // the only exit
-	  }
-
-	getModel().step();
-
-      }	while( 1 );
-
-  }
-
-  void LocalSimulatorImplementation::stop()
-  {
+void LocalSimulatorImplementation::stop()
+{
     theRunningFlag = false;
 
     getModel().flushLoggers();
-  }
+}
 
-  void LocalSimulatorImplementation::
-  setEventChecker( EventCheckerSharedPtrCref anEventChecker )
-  {
+void LocalSimulatorImplementation::
+setEventChecker( EventCheckerSharedPtrCref anEventChecker )
+{
     theEventChecker = anEventChecker;
-  }
+}
 
-  void LocalSimulatorImplementation::
-  setEventHandler( EventHandlerSharedPtrCref anEventHandler )
-  {
+void LocalSimulatorImplementation::
+setEventHandler( EventHandlerSharedPtrCref anEventHandler )
+{
     theEventHandler = anEventHandler;
-  }
+}
 
-  void LocalSimulatorImplementation::clearEventChecker()
-  {
+void LocalSimulatorImplementation::clearEventChecker()
+{
     setEventChecker( EventCheckerSharedPtr( new DefaultEventChecker() ) );
-  }
+}
 
-  const libecs::Polymorph LocalSimulatorImplementation::getDMInfo()
-  {
+const libecs::PolymorphMap 
+LocalSimulatorImplementation::getClassInfo( libecs::StringCref aClassname ) const
+{
+    libecs::PolymorphMap aBuiltInfoMap;
+    for ( DynamicModuleInfo::EntryIterator* anInfo(
+          getModel().getPropertyInterface( aClassname ).getInfoFields() );
+          anInfo->next(); )
+    {
+        aBuiltInfoMap.insert( std::make_pair( anInfo->current().first,
+                              *reinterpret_cast< const libecs::Polymorph* >(
+                                anInfo->current().second ) ) );
+    }
+    return aBuiltInfoMap;
+}
+
+const libecs::PolymorphMap
+LocalSimulatorImplementation::getPropertyInfo( libecs::StringCref aClassname ) const
+{
+    typedef libecs::PropertyInterfaceBase::PropertySlotMap PropertySlotMap;
+    libecs::PolymorphMap retval;
+    const PropertySlotMap& slots( getModel().getPropertyInterface( aClassname ).getPropertySlotMap() );
+
+    for( PropertySlotMap::const_iterator i( slots.begin() );
+         i != slots.end(); ++i)
+    {
+        retval.insert( std::make_pair( i->first,
+                buildPolymorph( *i->second ) ) );
+    }
+
+    return retval;
+}
+
+const libecs::PolymorphVector LocalSimulatorImplementation::getDMInfo() const
+{
+    typedef ModuleMaker< libecs::EcsObject >::ModuleMap ModuleMap;
     libecs::PolymorphVector aVector;
+    const ModuleMap& modules( thePropertiedObjectMaker->getModuleMap() );
 
-    for( libecs::PropertiedObjectMaker::ModuleMap::const_iterator
-	   i( thePropertiedObjectMaker.getModuleMap().begin() ); 
-	 i != thePropertiedObjectMaker.getModuleMap().end(); ++i )
-      {
-	libecs::PolymorphVector anInnerVector;
+    for( ModuleMap::const_iterator i( modules.begin() );
+                i != modules.end(); ++i )
+    {
+        libecs::PolymorphVector anInnerVector;
+        const libecs::PropertyInterfaceBase* info(
+            reinterpret_cast< const libecs::PropertyInterfaceBase *>(
+                i->second->getInfo() ) );
+        const char* aFilename( i->second->getFileName() );
 
-	anInnerVector.push_back( Polymorph( i->second->getTypeName() ) );
-	anInnerVector.push_back( Polymorph( i->first ) );
-	anInnerVector.push_back( Polymorph( i->second->getFileName() ) );
-
-	aVector.push_back( anInnerVector );
-      }
+        aVector.push_back( boost::make_tuple(
+            info->getTypeName(), i->second->getModuleName(),
+            libecs::String( aFilename ? aFilename: "" ) ) );
+    }
 
     return aVector;
-  }
+}
 
+const char LocalSimulatorImplementation::getDMSearchPathSeparator() const
+{
+    return libecs::Model::PATH_SEPARATOR;
+}
+
+const std::string LocalSimulatorImplementation::getDMSearchPath() const
+{
+    return theModel.getDMSearchPath();
+}
+
+void LocalSimulatorImplementation::setDMSearchPath( const std::string& aDMSearchPath )
+{
+    theModel.setDMSearchPath( aDMSearchPath );
+}
 
 } // namespace libemc,

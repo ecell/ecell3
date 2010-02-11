@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -12,17 +12,17 @@
 // modify it under the terms of the GNU General Public
 // License as published by the Free Software Foundation; either
 // version 2 of the License, or (at your option) any later version.
-//
+// 
 // E-Cell System is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU General Public License for more details.
-//
+// 
 // You should have received a copy of the GNU General Public
 // License along with E-Cell System -- see the file COPYING.
 // If not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-//
+// 
 //END_HEADER
 //
 // authors:
@@ -38,27 +38,29 @@
 #include <cassert>
 #include <limits>
 
-#include "libecs/libecs.hpp"
-#include "libecs/Process.hpp"
-#include "libecs/AssocVector.h"
-#include "libecs/scripting/ExpressionCompiler.hpp"
-#include "libecs/scripting/VirtualMachine.hpp"
+#include <libecs/libecs.hpp>
+#include <libecs/Process.hpp>
+#include <libecs/AssocVector.h>
+#include <libecs/scripting/ExpressionCompiler.hpp>
+#include <libecs/scripting/VirtualMachine.hpp>
 
-DECLARE_ASSOCVECTOR(
-    libecs::String,
-    libecs::Real,
-    std::less<const libecs::String>,
-    PropertyMap
-);
-
-LIBECS_DM_CLASS( ExpressionProcessBase, libecs::Process )
+template< typename Tmixin_ >
+class ExpressionProcessBase
 {
+protected:
+    DECLARE_ASSOCVECTOR(
+        libecs::String,
+        libecs::Real,
+        std::less<const libecs::String>,
+        PropertyMap
+    );
+
 private:
     class PropertyAccess
           : public libecs::scripting::PropertyAccess
     {
     public:
-        PropertyAccess( ExpressionProcessBase& outer )
+        PropertyAccess( Tmixin_& outer )
             : outer_( outer )
         {
         }
@@ -70,7 +72,7 @@ private:
         }
 
     private:
-        ExpressionProcessBase& outer_;
+        Tmixin_& outer_;
     };
     friend class PropertyAccess;
 
@@ -78,7 +80,7 @@ private:
           : public libecs::scripting::EntityResolver
     {
     public:
-        EntityResolver( ExpressionProcessBase& outer )
+        EntityResolver( Tmixin_& outer )
             : outer_( outer )
         {
         }
@@ -95,7 +97,7 @@ private:
         }
 
     private:
-        ExpressionProcessBase& outer_;
+        Tmixin_& outer_;
     };
     friend class EntityResolver;
 
@@ -103,7 +105,7 @@ private:
           : public libecs::scripting::VariableReferenceResolver
     {
     public:
-        VariableReferenceResolver( ExpressionProcessBase& outer )
+        VariableReferenceResolver( Tmixin_& outer )
             : outer_( outer )
         {
         }
@@ -119,7 +121,7 @@ private:
         }
 
     private:
-        ExpressionProcessBase& outer_;
+        Tmixin_& outer_;
     };
     friend class VariableReferenceResolver;
 
@@ -127,7 +129,7 @@ private:
           : public libecs::scripting::ErrorReporter
     {
     public:
-        ErrorReporter( ExpressionProcessBase& outer )
+        ErrorReporter( Tmixin_& outer )
             : outer_( outer )
         {
         }
@@ -135,27 +137,24 @@ private:
         virtual void error( const libecs::String& type,
                 const libecs::String& _msg ) const
         {
-            libecs::String msg = _msg + " in "
-                    + outer_.getClassName() + " [" + outer_.getID() + "]";
+            libecs::String msg = outer_.asString() + ": " +  _msg;
             if ( type == "NoSlot" )
-                THROW_EXCEPTION( libecs::NoSlot, msg );
+                THROW_EXCEPTION_ECSOBJECT( libecs::NoSlot, msg, &outer_ );
             else if ( type == "NotFound" )
-                THROW_EXCEPTION( libecs::NotFound, msg );
+                THROW_EXCEPTION_ECSOBJECT( libecs::NotFound, msg, &outer_ );
             else
-                THROW_EXCEPTION( libecs::UnexpectedError, msg );
+                THROW_EXCEPTION_ECSOBJECT( libecs::UnexpectedError, msg, &outer_ );
         }
 
     private:
-        ExpressionProcessBase& outer_;
+        Tmixin_& outer_;
     };
     friend class ErrorReporter;
 
 public:
 
-    LIBECS_DM_OBJECT_ABSTRACT( ExpressionProcessBase )
+    LIBECS_DM_OBJECT_MIXIN( ExpressionProcessBase, Tmixin_ )
     {
-        INHERIT_PROPERTIES( libecs::Process );
-
         PROPERTYSLOT_SET_GET( libecs::String, Expression );
     }
 
@@ -166,7 +165,7 @@ public:
         // ; do nothing
     }
 
-    virtual ~ExpressionProcessBase()
+    ~ExpressionProcessBase()
     {
         delete theCompiledCode;
     }
@@ -182,67 +181,58 @@ public:
         return theExpression;
     }
 
-    void defaultSetProperty( libecs::StringCref aPropertyName,
+    void defaultSetProperty( libecs::String const& aPropertyName,
                              libecs::PolymorphCref aValue )
     {
-        thePropertyMap[ aPropertyName ] = aValue.asReal();
+        thePropertyMap[ aPropertyName ] = aValue.as< libecs::Real >();
     }
 
-    const libecs::Polymorph defaultGetProperty( libecs::StringCref aPropertyName ) const
+    const libecs::Polymorph defaultGetProperty( libecs::String const& aPropertyName ) const
     {
         PropertyMapConstIterator aPropertyMapIterator(
             thePropertyMap.find( aPropertyName ) );
 
         if ( aPropertyMapIterator != thePropertyMap.end() ) {
-            return aPropertyMapIterator->second;
+            return libecs::Polymorph( aPropertyMapIterator->second );
         } else {
-            THROW_EXCEPTION( libecs::NoSlot, getClassNameString() +
-                             " : property [" + aPropertyName +
-                             "] is not defined" );
+            THROW_EXCEPTION_ECSOBJECT( libecs::NoSlot,
+                             static_cast< Tmixin_ const* >( this )->asString() +
+                             ": property [" + aPropertyName +
+                             "] is not defined",
+                             static_cast< Tmixin_ const* >( this ) );
         }
     }
 
-    const libecs::Polymorph defaultGetPropertyList() const
+    const libecs::StringVector defaultGetPropertyList() const
     {
-        libecs::PolymorphVector aVector;
+        libecs::StringVector aVector;
 
-        for ( PropertyMapConstIterator aPropertyMapIterator(
-                thePropertyMap.begin() );
-                aPropertyMapIterator != thePropertyMap.end();
-                ++aPropertyMapIterator ) {
-            aVector.push_back( aPropertyMapIterator->first );
-        }
+        std::transform( thePropertyMap.begin(), thePropertyMap.end(),
+                std::back_inserter( aVector ),
+                libecs::SelectFirst< PropertyMap::value_type >() );
 
         return aVector;
     }
 
-    const libecs::Polymorph
-    defaultGetPropertyAttributes( libecs::StringCref aPropertyName ) const
+    const libecs::PropertyAttributes
+    defaultGetPropertyAttributes( libecs::String const& aPropertyName ) const
     {
-        libecs::PolymorphVector aVector;
-
-        libecs::Integer aPropertyFlag( 1 );
-
-        aVector.push_back( aPropertyFlag ); // isSetable
-        aVector.push_back( aPropertyFlag ); // isGetable
-        aVector.push_back( aPropertyFlag ); // isLoadable
-        aVector.push_back( aPropertyFlag ); // isSavable
-
-        return aVector;
+        return libecs::PropertyAttributes( libecs::PropertySlotBase::POLYMORPH,
+                true, true, true, true, true );
     }
 
     void compileExpression()
     {
-        ErrorReporter anErrorReporter( *this );
-        PropertyAccess aPropertyAccess( *this );
-        EntityResolver anEntityResolver( *this );
-        VariableReferenceResolver aVarRefResolver( *this );
+        ErrorReporter anErrorReporter( *static_cast< Tmixin_* >( this ) );
+        PropertyAccess aPropertyAccess( *static_cast< Tmixin_* >( this ) );
+        EntityResolver anEntityResolver( *static_cast< Tmixin_* >( this ) );
+        VariableReferenceResolver aVarRefResolver( *static_cast< Tmixin_*>( this ) );
         libecs::scripting::ExpressionCompiler theCompiler(
                 anErrorReporter, aPropertyAccess, anEntityResolver,
                 aVarRefResolver );
 
         delete theCompiledCode;
-        // it is possible that compileExpression throws an expression and
+        // it is possible that compileExpression throws an exception and
         // "theCompiledCode" remains uninitialized
         theCompiledCode = 0;
 
@@ -254,12 +244,18 @@ public:
         return thePropertyMap;
     }
 
-    virtual void initialize()
+    void initialize()
     {
-        libecs::Process::initialize();
-
-        if ( theRecompileFlag ) {
-            compileExpression();
+        if ( theRecompileFlag )
+        {
+            try
+            {
+                compileExpression();
+            }
+            catch ( libecs::Exception const& e )
+            {
+                throw libecs::InitializationFailed( e, static_cast< Tmixin_ * >( this ) );
+            }
             theRecompileFlag = false;
         }
     }
@@ -271,7 +267,6 @@ protected:
         return thePropertyMap;
     }
 
-
 protected:
     libecs::String    theExpression;
 
@@ -282,9 +277,6 @@ protected:
 
     PropertyMap thePropertyMap;
 };
-
-
-LIBECS_DM_INIT_STATIC( ExpressionProcessBase, Process );
 
 #endif /* __EXPRESSIONPROCESSBASE_HPP */
 

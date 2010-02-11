@@ -11,9 +11,8 @@ LIBLTDL = @LIBLTDL@
 INCLUDES = -I.. -I$(top_srcdir) $(DMTOOL_INCLUDE) $(INCLTDL)
 noinst_LTLIBRARIES = libecs-scripting.la
 
-AM_CXXFLAGS = @CXXFLAGS@
+AM_CXXFLAGS = $(CXXFLAGS)
 
-libecs_scripting_la_CXXFLAGS=@CXXFLAGS@
 libecs_scripting_la_SOURCES =\
 ExpressionCompiler.cpp\
 Assembler.cpp\

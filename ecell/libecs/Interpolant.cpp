@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -28,6 +28,7 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -36,32 +37,12 @@
 
 #include "Interpolant.hpp"
 
-
 namespace libecs
 {
-  
-  Interpolant::Interpolant( VariablePtr const aVariable )
-    :
-    theVariable( aVariable )
-  {
-    //    theVariable->registerInterpolant( this );
-  }
 
-
-  Interpolant::~Interpolant()
-  {
-    //    if( theVariable != NULLPTR )
-    //      {
-    //	theVariable->removeInterpolant( this );
-    //      }
-  }
+Interpolant::~Interpolant()
+{
 
 }
 
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/
+} // namespace libecs

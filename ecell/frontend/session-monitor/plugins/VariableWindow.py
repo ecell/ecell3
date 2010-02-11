@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -25,13 +25,13 @@
 # 
 #END_HEADER
 
-import string
-import operator
 import os
-from ecell.ui.osogo.utils import *
-import ecell.util as util
+import operator
+
+from ecell.ecssupport import *
+
 import ecell.ui.osogo.config as config
-from ecell.ui.osogo.OsogoPluginWindow import OsogoPluginWindow
+from ecell.ui.osogo.OsogoPluginWindow import *
 
 class VariableWindow( OsogoPluginWindow ):
     """VariableWindow
@@ -39,90 +39,109 @@ class VariableWindow( OsogoPluginWindow ):
     - Value and Fixed Property can be changed.
     """
 
-    def __init__( self, aDirName, aData, aPluginManager ):
-        """
-        Constructor
-        [Note] When the entity has not Value, MolarConc and Fixed Property,
+    def __init__( self, aDirName, aData, aPluginManager, aRoot=None ):
+        """Constructor
+        [Note]:When the entity has not Value, MolarConc and Fixed Property,
                throws exception (TypeError).
         """
-
+    
         # calls constructor of superclass
-        OsogoPluginWindow.__init__(
-            self, aDirName, aData, aPluginManager.theSession )
+        OsogoPluginWindow.__init__( self, aDirName, aData, aPluginManager, aRoot )
 
         # creates EntityStub
         self.theSession = aPluginManager.theSession
-        self.theFullIDString = util.createFullIDString( self.getFullID() )
-        self.theStub = self.theSession.createEntityStub(
-            util.createFullID( self.theFullIDString ) )
+        self.theFullIDString = createFullIDString( self.theFullID() )
+        self.theStub = self.theSession.createEntityStub( self.theFullIDString )
 
         # initializes flags for validation of Property
-        aValueFlag = False
+        aValueFlag = False 
         aMolarConcFlag = False
         aFixedFlag = False
 
+        # --------------------------------------------------------------------
         # [1] Checks this entity have Value, MolarConc, Fixed property.
-        for aProperty in self.theStub.getPropertyList():
+        # --------------------------------------------------------------------
+        
+        for aProperty in self.theStub.getPropertyList(): # for(1)
+        
             if aProperty == 'Value':
-                    aValueFlag = True
+                aValueFlag = True
             elif aProperty == 'MolarConc':
-                    aMolarConcFlag = True
+                aMolarConcFlag = True
             elif aProperty == 'Fixed':
-                    aFixedFlag = True
+                aFixedFlag = True
+        # end of for(1)
+
         # If this entity does not have 'Value', does not create instance 
-        if aValueFlag == False:
+        if not aValueFlag:
             aMessage = "Error: %s does not have \"Value\" property" %self.theFullIDString
-            showPopupMessage( OK_MODE, aMessage, 'Error')
+            #self.thePluginManager.printMessage( aMessage )
+            aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
             raise TypeError( aMessage )
 
         # If this entity does not have 'MolarConc', does not create instance 
-        if aMolarConcFlag == False:
+        if not aMolarConcFlag:
             aMessage = "Error: %s does not have \"MolarConc\" property" %self.theFullIDString
-            showPopupMessage( OK_MODE, aMessage, 'Error' )
+            #self.thePluginManager.printMessage( aMessage )
+            aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
             raise TypeError( aMessage )
 
         # If this entity does not have 'Fixed', does not create instance 
-        if aFixedFlag == False:
+        if not aFixedFlag:
             aMessage = "Error: %s does not have \"Fixed\" property" %self.theFullIDString
-            showPopupMessage( OK_MODE, aMessage, 'Error' )
+            #self.thePluginManager.printMessage( aMessage )
+            aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
             raise TypeError( aMessage )
 
 
+        # --------------------------------------------------------------------
         #  [2] Checks Value and MolarConc is Number
+        # --------------------------------------------------------------------
+
         # If Value is not Number
-        if not operator.isNumberType( self.theStub.getProperty('Value') ):
+        if operator.isNumberType( self.theStub.getProperty('Value') ):
+            pass
+        else:
             aMessage = "Error: \"Value\" property is not number" 
-            showPopupMessage( OK_MODE, aMessage, 'Error' )
+            #self.thePluginManager.printMessage( aMessage )
+            aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
             raise TypeError( aMessage )
 
         # If MolarConc is not Number
-        if not operator.isNumberType( self.theStub.getProperty('MolarConc') ):
+        if operator.isNumberType( self.theStub.getProperty('MolarConc') ):
+            pass
+        else:
             aMessage = "Error: \"MolarConc\" property is not number" 
-            showPopupMessage( OK_MODE, aMessage, 'Error' )
+            #self.thePluginManager.printMessage( aMessage )
+            aDialog = ConfirmWindow(OK_MODE, aMessage, 'Error!')
             raise TypeError( aMessage )
 
-    def initUI( self ):
+        # --------------------------------------------------------------------
+        #  [3] Creates this instance
+        # --------------------------------------------------------------------
+        # registers this instance to plugin manager
+        self.thePluginManager.appendInstance( self )    
+
+    def openWindow(self):
         """overwriets superclass's method
         """
 
         # calls superclass's method
-        OsogoPluginWindow.initUI( self )
+        OsogoPluginWindow.openWindow(self)
 
         # adds handers
-        self.addHandlers(
-            {
-                'on_fix_checkbox_toggled'             : self.changeFixFlag,
-                'on_value_spinbutton_activate'        : self.changeValue,
-                'on_value_spinbutton_focus_out_event' : self.changeValue,
-                'on_value_spinbutton_changed'   : self.changeValueByButton,
-                }
-            )
+        self.addHandlers( { \
+             'on_fix_checkbox_toggled'         : self.changeFixFlag,
+             'on_value_spinbutton_activate'    : self.changeValue,
+             'on_value_spinbutton_focus_out_event' : self.changeValue,
+             'on_value_spinbutton_changed'     : self.changeValueByButton,
+                    })
 
         # sets FULLID to label 
         self["id_label"].set_text( self.theFullIDString )
         self.setIconList(
-            os.path.join( config.glade_dir, "ecell.png" ),
-            os.path.join( config.glade_dir, "ecell32.png" ) )
+            os.path.join( config.GLADEFILE_PATH, "ecell.png" ),
+            os.path.join( config.GLADEFILE_PATH, "ecell32.png" ) )
         # sets value to each entry and fix_checkbox
         self.update()
 
@@ -149,7 +168,7 @@ class VariableWindow( OsogoPluginWindow ):
         self.theStub.setProperty( 'Fixed', self['fix_checkbox'].get_active() )
 
         # updates plugin manager
-        self.theSession.updateUI()
+        self.thePluginManager.updateAllWindows()    
 
     def changeValue( self, *arg ):
         """When enter is pressed on value entry, this method is called.
@@ -157,7 +176,7 @@ class VariableWindow( OsogoPluginWindow ):
         """
 
         # gets text
-        aText = string.strip( self['value_spinbutton'].get_text() )
+        aText = self['value_spinbutton'].get_text().strip()
 
         # The following 2 lines are needed for initialize this window.
         # When openWindow is called, this method must be called but value_spinbutton
@@ -167,21 +186,24 @@ class VariableWindow( OsogoPluginWindow ):
 
         # Convert inputted text to number
         try:
-            aNumber = string.atof(aText)
+            aNumber = float(aText)
 
         # When it is not number
         except:
             self['value_spinbutton'].set_text( str(self.theStub.getProperty('Value')) )
+
             # displays confirm window
-            showPopupMessage( OK_MODE, "Input number.", 'Error' )
+            ConfirmWindow(OK_MODE,"Input number.","Value Error!")
 
         # When it is number
         else:
+
             # sets value
             self.theStub.setProperty( 'Value', aNumber )
+
             # updates all window
             # not only plugin managers, but also EntityWindow
-            self.theSession.updateUI()
+            self.thePluginManager.updateAllWindows()    
 
     def changeValueByButton( self, *arg ):
         """When a button of value spinbutton is pressed, this method is called.
@@ -191,20 +213,21 @@ class VariableWindow( OsogoPluginWindow ):
         # converts inputted text into number.
         # When it is number, sets it to EntityStub.
         try:
-            aText = string.strip( self['value_spinbutton'].get_text() )
+            aText = self['value_spinbutton'].get_text().strip()
+
             # The following 2 lines are needed for initialize this window.
             # When openWindow is called, this method must be called but value_spinbutton
             # is empty. The validation of it should be ignored.
             if len(aText) == 0:
                 return None
 
-            aNumber = string.atof(aText)
+            aNumber = float(aText)
+
             self.theStub.setProperty( 'Value', aNumber )
-            self.theSession.updateUI()
+            self.thePluginManager.updateAllWindows()    
+
         # When it is not number, sets previous value to value spinbutton.
         except:
             self['value_spinbutton'].set_text( str(self.theStub.getProperty('Value')) )
 
 # end of class VariableWindow
-
-

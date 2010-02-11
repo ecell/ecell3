@@ -1,14 +1,11 @@
 AC_REVISION([$Id$])
+sinclude([libltdl/acinclude.m4])
 AC_INIT([ecell], [@ECELL_VERSION_NUMBER@])
 AC_CONFIG_SRCDIR([autogen.sh])
-
-dnl AC_CONFIG_AUX_DIR()
 
 AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE([filename-length-max=255 tar-ustar dist-bzip2])
 AC_PROG_MAKE_SET
-
-dnl AC_LIBLTDL_INSTALLABLE
 
 AC_LIBLTDL_CONVENIENCE
 AC_SUBST(INCLTDL)
@@ -21,11 +18,16 @@ AC_CONFIG_SUBDIRS([libltdl dmtool ecell])
 AC_ARG_ENABLE([gui],
   AC_HELP_STRING([--disable-gui],
                  [build ecell without gui frontends.]), [],
-  [enable_gui=yes]
-)
-AC_ARG_WITH([numpy-includes],
-  AC_HELP_STRING([--with-numpy-includes=DIR],
-                 [specify the numpy header location]),,)
+  [enable_gui=yes])
+
+AC_ARG_ENABLE([pyecell],
+  AC_HELP_STRING([--disable-pyecell],
+                 [build ecell without Python binding.]), [],
+  [enable_pyecell=yes])
+
+AC_ARG_WITH([boost-python-libname],
+  AC_HELP_STRING([--with-boost-python-libname=LIBNAME],
+                 [specify the library name of Boost.Python [[boost_python]]]))
 
 AC_ARG_ENABLE([compiler-extensions],
   AC_HELP_STRING([--disable-compiler-extensions],

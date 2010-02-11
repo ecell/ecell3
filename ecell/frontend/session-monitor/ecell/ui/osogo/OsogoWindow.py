@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -35,97 +35,176 @@ import os
 
 import gtk
 import gtk.gdk
-import gtk.glade
 
-import config
-from Window import *
-from utils import *
+from ecell.ui.osogo.Window import *
+
+from ecell.ui.osogo.config import *
+
+from ecell.ui.osogo.ConfirmWindow import *
+from ecell.ui.osogo.OsogoUtil import *
 
 class OsogoWindow(Window):
-    """OsogoWindow
-    - manages existance status.
-    """
-    def __init__( self, aGladeFile = None, aRootWidget = None ):
-        """constructor
-        aSession  -- a reference to Session (Session)
-        aGladeFile   -- a glade file name (str)
-        """
-        # calls superclass's constructor
-        Window.__init__( self, aGladeFile, aRootWidget )
-        self.theSession = None
+	"""OsogoWindow
+	- manages existance status.
+	- is iconized when 'delede_event' is catched.
+	"""
 
-    def setSession( self, aSession ):
-        # saves a reference to Session
-        self.theSession = aSession
+	def __init__( self, session = None, gladeFile=None, rootWidget=None ):
+		"""constructor
+		aSession  -- a reference to Session (Session)
+		aGladeFile   -- a glade file name (str)
+		"""
+		if gladeFile == None:
+			gladeFile = self.__class__.__name__ + '.glade'
 
-    def present( self ):
-        """moves this window to the top of desktop.
-        When glade file is not loaded yet or already deleted, does nothing.
-        Returns None
-        """
-        # When glade file is not loaded yet or already deleted, does nothing
-        # calla present() method of Window widget of this window.
-        if self.exists():
-            self.theRootWidget.present()
+		# calls superclass's constructor
+		Window.__init__(
+			self,
+			os.path.join( GLADEFILE_PATH, gladeFile ),
+			rootWidget=rootWidget
+			)
 
-    def iconify( self ):
-        """
-        moves this window to the taskbar.
-        When glade file is not loaded yet or already deleted, does nothing.
-        Returns None
-        """
-        # If glade file is not loaded yet or already deleted, does nothing
-        # calls iconify() method of Window widget of this window.
-        if self.exists():
-            self.theRootWidget.iconify()
+		# saves a reference to Session
+		self.theSession = session
 
-    def move( self, xpos, ypos ):
-        """
-        moves this window on the desktop to (xpos,ypos).
-        When glade file is not loaded yet or already deleted, does nothing.
-        Returns None
-        """
-        # If glade file is not loaded yet or already deleted, does nothing
-        if self.exists():
-            self.theRootWidget.move( xpos, ypos)
+		# initializes exist flag
+		self.__theExist = False
 
-    def resize( self, width, height ):
-        """
-        resizes this window according to width and heigth.
-        When glade file is not loaded yet or already deleted, does nothing.
-        Returns None
-        """
-        # If glade file is not loaded yet or already deleted, do nothing.
-        if self.exists():
-            self.theRootWidget.resize( width, height )
+		# set top the widget 
+		self.setTopWidgetName( rootWidget )
 
-    def handleDeleteEvent( self, *arg ):
-        """
-        Called when 'delete_event' signal is dispatched
-        (for example, [X] button is clicked )
-        """
-        # close this window
-        self.destroy()
 
-    def initUI( self ):
-        """
-        overwrite super class's method
-        When glade file is not loaded yet or already deleted, calls superclass's
-        initUI() method and connects 'delete_event' and self.delete() method.
-        Returns None
-        """
-        Window.initUI(self)
-        # connects 'delete_event' and self.handleDeleteEvent() method.
-        self.theRootWidget.connect( 'delete_event', self.handleDeleteEvent )
-        self.setIconList(
-            os.path.join( config.glade_dir, "ecell.png" ),
-            os.path.join( config.glade_dir, "ecell32.png" )
-            )
+	def setTopWidgetName( self, rootWidget ):
 
-    def update( self ):
-        """
-        Returns None
-        """
+		if( rootWidget != None ):
+			self.theTopWidget = rootWidget
+		else:
+			self.theTopWidget = self.__class__.__name__
+		
 
-    def handleSessionEvent( self, event ):
-        pass
+	def exists( self ):
+		"""Returns True:When glade file is loaded and does not deleted.
+		        False:When glade file is not loaded yet or already deleted.
+		"""
+
+		return self.__theExist
+
+
+
+	def present( self ):
+		"""moves this window to the top of desktop.
+		When glade file is not loaded yet or already deleted, does nothing.
+		Returns None
+		"""
+
+	
+		# When glade file is not loaded yet or already deleted, does nothing
+		# calla present() method of Window widget of this window.
+		if self.exists():
+
+			self[self.theTopWidget].present()
+
+	def iconify( self ):
+		"""moves this window to the taskbar.
+		When glade file is not loaded yet or already deleted, does nothing.
+		Returns None
+		"""
+
+	
+		# When glade file is not loaded yet or already deleted, does nothing
+		# calls iconify() method of Window widget of this window.
+		if self.exists():
+
+			self[self.theTopWidget].iconify()
+
+	def move( self, xpos, ypos ):
+		"""moves this window on the desktop to (xpos,ypos).
+		When glade file is not loaded yet or already deleted, does nothing.
+		Returns None
+		"""
+
+	
+		# When glade file is not loaded yet or already deleted, does nothing
+		# calls move(x,y) method of Window widget of this window.
+		if self.exists():
+
+			self[self.theTopWidget].move( xpos, ypos)
+
+	def resize( self, width, heigth ):
+		"""resizes this window according to width and heigth.
+		When glade file is not loaded yet or already deleted, does nothing.
+		Returns None
+		"""
+
+	
+		# When glade file is not loaded yet or already deleted, does nothing
+		# calls resize(width,heigth) method of Window widget of this window.
+		if self.exists():
+
+			self[self.theTopWidget].resize( width, heigth)
+
+	def deleted( self, *arg ):
+		""" When 'delete_event' signal is chatcked( for example, [X] button is clicked ),
+		iconize this window.
+		Returns True
+		[Note]: 'return True' means when 'delete_event' signal is checked, does not 
+		        delete widgets of this class. If you'd like to delete widget, overwrite
+		        this method that returns False. And in the method you must set 
+		        self.__theExist = FASLE.
+		        example of subclass's method.
+
+				def deleted( self, *arg ):
+		            self.__theExist = False
+		            return False
+
+		"""
+
+		# iconizes this window
+		self.close()
+
+		# does not widgets
+		return True
+
+
+
+	def openWindow( self ):
+		"""overwrite super class's method
+		When glade file is not loaded yet or already deleted, calls superclass's
+		openWindow() method and connects 'delete_event' and self.delete() method.
+		Returns None
+		"""
+
+		# when glade file is not loaded yet or already deleted.
+		if not self.__theExist:
+
+			# sets __theExist flag is True
+			self.__theExist = True
+
+			# calls superclass's method 
+			Window.openWindow(self)
+
+			# connects 'delete_event' and self.delete() method.
+			self[self.theTopWidget].show_all()
+			self[self.theTopWidget].connect('delete_event',self.deleted)
+
+
+
+	def update( self ):
+		"""
+		Returns None
+		"""
+
+		pass
+
+	def close ( self ):
+		""" destroys Widgets and sets __theExist False"""
+		if self.exists():
+			self[self.theTopWidget].destroy()
+			self.__theExist = False
+			self.widgets = None
+			self.theSession.theMainWindow.update()
+#			self.theSession.updateFundamentalWindows()
+
+
+
+

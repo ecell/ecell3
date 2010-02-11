@@ -3,8 +3,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -26,12 +26,11 @@
 # 
 #END_HEADER
 
-from OsogoWindow import *
-from BoardWindow import BoardWindow
-import gtk
+from gtk import *
 import gobject
-import ecell.util as util
-from string import *
+
+from ecell.ecssupport import *
+from ecell.ui.osogo.OsogoWindow import *
 
 # Constants for plugin instance list
 TITLE  = 0
@@ -40,194 +39,242 @@ FULLPN = 2
 
 
 class InterfaceWindow( OsogoWindow ):
-    """
-    InterfaceWindow
-    - displays the list of plugin instance
-    - A title of plugin instance can be changed.
-    - A plugin instance can be deleted.
-    - A plugin instance can be moved to the top of desktop.
-    """
-    def __init__( self ):
-        """Constructor
-        aSession   ---  a reference to Session (Session)
-        """
-        # calls superclass's constructor
-        OsogoWindow.__init__( self )
-        # initializes row selection attributes
-        self.theSelectedRow = None
+	"""InterfaceWindow
+	- displays the list of plugin instance
+	- A title of plugin instance can be changed.
+	- A plugin instance can be deleted.
+	- A plugin instance can be moved to the top of desktop.
+	"""
+    
+	# ==========================================================================
+	def __init__( self, aSession ):
+		"""Constructor
+		aSession   ---  a reference to Session (Session)
+		"""
 
-    def initUI( self ):
-        """
-        overwrites superclass's method
-        Returns None
-        """
-        # calls superclass's method
-        OsogoWindow.initUI( self )
+		# calls superclass's constructor
+		OsogoWindow.__init__( self, aSession )
 
-        # sets up plugin instance list
-        self.theInterfaceListWidget = self[ 'InterfaceCList' ]
-        aListStore = gtk.ListStore( gobject.TYPE_STRING,\
-                        gobject.TYPE_STRING,\
-                        gobject.TYPE_STRING )
-        self.theInterfaceListWidget.set_model( aListStore )
-        column=gtk.TreeViewColumn('Title',gtk.CellRendererText(),text=TITLE)
-        column.set_resizable(True)
-        self.theInterfaceListWidget.append_column(column)
-        column=gtk.TreeViewColumn('Class',gtk.CellRendererText(),text=CLASS)
-        column.set_resizable(True)
-        self.theInterfaceListWidget.append_column(column)
-        column=gtk.TreeViewColumn('FullPN',gtk.CellRendererText(),text=FULLPN)
-        column.set_resizable(True)
-        self.theInterfaceListWidget.append_column(column)
-        # initialize row selection
-        self.theSelectedRow = None
-        # appends signal handers
-        self.addHandlers( { 'interfacelist_select_row' : self.rowSelected,
-                            'ShowButton_clicked'       : self.showWindow,
-                            'SaveButton_clicked'       : self.setTitle,
-                            'DeleteButton_clicked'     : self.deleteWindow } )
-        self.update()
+		# saves reference to PluginManager
+		self.thePluginManager = aSession.thePluginManager
 
-    def destroy( self ):
-        self.theInterfaceListWidget = None
-        OsogoWindow.destroy(self )
+		# initializes row selection attributes
+		self.theSelectedRow = None
 
-    def handleSessionEvent( self, event ):
-        """
-        overwrites superclass's method
-        Returns None
-        """
-   
-        if event.type == 'plugin_instance_created' or \
-           event.type == 'plugin_instance_removed' or \
-           event.type == 'plugin_window_title_changed':
-            self.update()
 
-    def update( self ):
-        if not self.exists():
-            return
+	# ==========================================================================
+	def openWindow( self ):
+		"""overwrites superclass's method
+		Returns None
+		"""
 
-        aModel = self.theInterfaceListWidget.get_model()
-        aModel.clear()
+		# calls superclass's method
+		OsogoWindow.openWindow(self)
 
-        # gets
-        for anInstance in self.theSession.getPluginInstanceList():
-            if anInstance.getParent() != None and \
-               anInstance.getParent().__class__ != BoardWindow:
-                continue
-            aTitle = anInstance.getTitle()
-            aClass =  anInstance.__class__.__name__
-            aFullPN = util.createFullPNString( anInstance.getFullPN() )
+		# sets up plugin instance list
+		self.theInterfaceListWidget = self[ 'InterfaceCList' ]
+		aListStore = gtk.ListStore( gobject.TYPE_STRING,\
+					    gobject.TYPE_STRING,\
+					    gobject.TYPE_STRING )
+		self.theInterfaceListWidget.set_model( aListStore )
+		column=gtk.TreeViewColumn('Title',gtk.CellRendererText(),text=TITLE)
+		column.set_resizable(True)
+		self.theInterfaceListWidget.append_column(column)
+		column=gtk.TreeViewColumn('Class',gtk.CellRendererText(),text=CLASS)
+		column.set_resizable(True)
+		self.theInterfaceListWidget.append_column(column)
+		column=gtk.TreeViewColumn('FullPN',gtk.CellRendererText(),text=FULLPN)
+		column.set_resizable(True)
+		self.theInterfaceListWidget.append_column(column)
 
-            anIter = aModel.append()
-            aModel.set(
-                anIter,
-                TITLE, aTitle,
-                CLASS, aClass,
-                FULLPN, aFullPN
-                )
+		# initialize row selection
+		self.theSelectedRow = None
 
-    def setTitle( self, *arg ):
-        """
-        edits title of plugin list
-        Returns None
-        """
-        # if no data is selected, show error message.
-        if self.theSelectedRow == None:
-            anErrorMessage='No data is selected.'
-            showPopupMessage( OK_MODE, anErrorMessage, "Error" )
-            return
-        # if a data is selected, then remove it.
-        else:
-            # gets inputted title
-            aNewTitle = self[ "SelectedTitle" ].get_text() 
-            aNewTitle = strip( aNewTitle )
-            # checks the length of inputted title.
-            if len( aNewTitle ) == 0:
-                anErrorMessage='Title is empty.'
-                showPopupMessage( OK_MODE, anErrorMessage, "Error" )
-                return
-            # gets current title
-            aTitle =  self['InterfaceCList'].get_model().get_value(self.theSelectedRow,TITLE)
-            # sets new title 
-            anInstance = self.theSession.findPluginInstanceByTitle( aTitle )
-            if anInstance == None:
-                # should not happen...
-                return
-            if not anInstance.setTitle( aNewTitle ):
-                showPopupMessage(
-                    OK_MODE,
-                    "Failed to change the window title to \"%s\"" % aNewTitle,
-                    "Error!")
+		# appends signal handers
+		self.addHandlers( { 'interfacelist_select_row' : self.rowSelected,
+		                    'ShowButton_clicked'       : self.showWindow,
+		                    'SaveButton_clicked'       : self.editTitle,
+		                    'DeleteButton_clicked'     : self.deleteWindow } )
+		self.update()
 
-    def rowSelected( self, arg ):
-        """selectes one row.
-        Returns None
-        """
+	def close( self ):
+		self.theInterfaceListWidget = None
+		OsogoWindow.close(self )
 
-        # gets selected row
-        row=self['InterfaceCList'].get_selection().get_selected()[1]
-        self.theSelectedRow = row
-        
-        # updates bottom text field
-        aText =  self['InterfaceCList'].get_model().get_value( row, TITLE )
-        self[ "SelectedTitle" ].set_text( aText )
+	# ==========================================================================
+	def update( self ):
+		"""overwrites superclass's method
+		Returns None
+		"""
+	
+		try:
+			aModel = self.theInterfaceListWidget.get_model()
+		except:
+			return None
 
-    def showWindow( self , *arg ):
-        """
-        move a plugin instance to the top of desktop
-        Returns None
-        """
-        # show an Instance
+		if aModel != None:
+			aModel.clear()
 
-        # if no data is selected, show error message.
-        if self.theSelectedRow == None:
-            anErrorMessage = 'Nothing is selected.'
-            showPopupMessage( OK_MODE, anErrorMessage, "Error!" )
-            return None
+		# gets
+		anInstanceList = self.theSession.thePluginManager.theInstanceList
+		for anInstance in anInstanceList:
+			aTitle = anInstance.getTitle()
+			aClass =  anInstance.__class__.__name__
+			aFullPN = createFullPNString( anInstance.theFullPN() )
 
-        aTitle =  self['InterfaceCList'].get_model().get_value(self.theSelectedRow,TITLE)
-        anInstance = self.theSession.findPluginInstanceByTitle( aTitle )
-        if anInstance != None:
-            anInstance.present()
-            
-    def deleteWindow( self , *arg ):
-        """
-        delete a plugin instance
-        Returns None
-        """
-        # delete an Instance
-        # if no data is selected, show error message.
-        if self.theSelectedRow == None:
-            anErrorMessage = 'Nothing is selected.'
-            showPopupMessage( 0, anErrorMessage, "Error" )
-            return None
-        # if a data is selected, then remove it.
-        else:
-            aTitle =  self['InterfaceCList'].get_model().get_value( self.theSelectedRow ,0 )
-            self.theSession.getFundamentalWindow('BoardWindow').deletePluginWindowByTitle( aTitle )
-            anInstance = self.theSession.findPluginInstanceByTitle( aTitle )
-            assert anInstance != None
-            self.removePluginInstance( ainInstance )
+			if self.exists():
 
-            # clear select status
-            self.theSelectedRow = None
-        # update list
-        self.update()
+				anIter = aModel.append()
+				aModel.set( anIter,  \
+				        TITLE, aTitle,\
+					    CLASS, aClass,\
+					    FULLPN, aFullPN )
 
-    def selectPlugin (self, aPluginTitle ):
-        """
-        selects Plugin with aPluginTitle title on the list
-        returns True if successful, False if not
-        """
-        #iterate through all rows
-        anIter=self['InterfaceCList'].get_model().get_iter_first()
-        while True:
-            if anIter == None:
-                break
-            aTitle = self['InterfaceCList'].get_model().get_value(anIter, TITLE )
-            if aTitle == aPluginTitle:
-                aPath = self['InterfaceCList'].get_model().get_path ( anIter )
-                self['InterfaceCList'].set_cursor( aPath )
-                break
-            anIter=self['InterfaceCList'].get_model().iter_next( anIter )
+
+	# ==========================================================================
+	def editTitle( self , *arg ):
+		"""edits title of plugin list
+		Returns None
+		"""
+		
+		# if no data is selected, show error message.
+		if self.theSelectedRow == None:
+			anErrorMessage='\nNo data is selected!\n'
+			aWarningWindow = ConfirmWindow(OK_MODE,anErrorMessage,"Error!")
+			return None
+
+		# if a data is selected, then remove it.
+		else:
+
+			# gets inputted title
+			aNewTitle = self[ "SelectedTitle" ].get_text() 
+			aNewTitle = aNewTitle.strip()
+	
+			# checks the length of inputted title.
+			if len(aNewTitle) == 0:
+				anErrorMessage='\nTitle is empty!\n'
+				aWarningWindow = ConfirmWindow(OK_MODE,anErrorMessage,"Error!")
+				return None
+
+			# gets current title
+			aTitle =  self['InterfaceCList'].get_model().get_value(self.theSelectedRow,TITLE)
+
+			# sets new title 
+			self.theSession.thePluginManager.editInstanceTitle( aTitle, aNewTitle )
+
+		# updates all fundamental windows
+		self.theSession.updateWindows()
+
+                    
+	# ==========================================================================
+	def rowSelected( self , arg ):
+		"""selectes one row.
+		Returns None
+		"""
+
+		# gets selected row
+		row=self['InterfaceCList'].get_selection().get_selected()[1]
+		self.theSelectedRow = row
+		
+		# updates bottom text field
+		aText =  self['InterfaceCList'].get_model().get_value( row, TITLE )
+		self[ "SelectedTitle" ].set_text( aText )
+
+
+	# ==========================================================================
+	def showWindow( self , *arg ):
+		"""move a plugin instance to the top of desktop
+		Returns None
+		"""
+
+		# -------------------------------------------
+		# show an Instance
+		# -------------------------------------------
+
+		# if no data is selected, show error message.
+		if self.theSelectedRow == None:
+			anErrorMessage='\nNothing is selected!\n'
+			aWarningWindow = ConfirmWindow(OK_MODE,anErrorMessage,"Error!")
+			return None
+
+		# if a data is selected, then remove it.
+		else:
+
+			aTitle =  self['InterfaceCList'].get_model().get_value(self.theSelectedRow,TITLE)
+			aTitleDict = self.theSession.thePluginManager.thePluginTitleDict
+
+			anInstanceList = self.theSession.thePluginManager.theInstanceList
+			for anInstance in anInstanceList:
+				if aTitle == aTitleDict[ anInstance ]:
+					self.theSession.thePluginManager.showPlugin( anInstance )
+			
+
+	# end of showWindow
+
+                    
+	# ==========================================================================
+	def deleteWindow( self , *arg ):
+		"""delete a plugin instance
+		Returns None
+		"""
+
+		# -------------------------------------------
+		# delete an Instance
+		# -------------------------------------------
+
+		# if no data is selected, show error message.
+		if self.theSelectedRow == None:
+			anErrorMessage='\nNothing is selected.!\n'
+			#self.theSession.message( anErrorMessage )
+			aWarningWindow = ConfirmWindow(0,anErrorMessage,"!")
+			return None
+
+		# if a data is selected, then remove it.
+		else:
+
+			aTitle =  self['InterfaceCList'].get_model().get_value( self.theSelectedRow ,0 )
+			self.theSession.getWindow('BoardWindow').deletePluginWindowByTitle( aTitle )
+			self.thePluginManager.removeInstanceByTitle( aTitle )
+
+			# clear select status
+			self.theSelectedRow = None
+
+		# -------------------------------------------
+		# update list
+		# -------------------------------------------
+		self.update()
+
+	# end of deleteWindow
+
+
+	def selectPlugin (self, aPluginTitle ):
+		""" selects Plugin with aPluginTitle title on the list
+			returns True if successful, False if not
+		"""
+
+		#iterate through all rows
+		anIter=self['InterfaceCList'].get_model().get_iter_first()
+		while True:
+			if anIter == None:
+				break
+			aTitle = self['InterfaceCList'].get_model().get_value(anIter, TITLE )
+			if aTitle == aPluginTitle:
+				aPath = self['InterfaceCList'].get_model().get_path ( anIter )
+				self['InterfaceCList'].set_cursor( aPath )
+				break
+			anIter=self['InterfaceCList'].get_model().iter_next( anIter )
+					
+
+if __name__ == "__main__":
+
+
+	def mainLoop():
+		gtk.main()
+
+	def main():
+			aWindow = InterfaceWindow( 'InterfaceWindow.glade' )
+			mainLoop()
+
+	main()
+
+

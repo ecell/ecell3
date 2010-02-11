@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -25,55 +25,49 @@
 // 
 //END_HEADER
 
-#include "libecs/libecs.hpp"
+#include <libecs/libecs.hpp>
 
-#include "libecs/ContinuousProcess.hpp"
+#include <libecs/ContinuousProcess.hpp>
 
-using namespace libecs;
+USE_LIBECS;
 
 LIBECS_DM_CLASS( ConstantFluxProcess, ContinuousProcess )
 {
-
- public:
-
-  LIBECS_DM_OBJECT( ConstantFluxProcess, Process )
+public:
+    LIBECS_DM_OBJECT( ConstantFluxProcess, Process )
     {
-      INHERIT_PROPERTIES( ContinuousProcess );
-
-      PROPERTYSLOT_SET_GET( Real, k);
+        INHERIT_PROPERTIES( ContinuousProcess );
+        CLASS_DESCRIPTION("ConstantFluxProcess");
+        PROPERTYSLOT_SET_GET( Real, k);
     }
 
-  ConstantFluxProcess()
-    :
-    k( 0.0 )
+    ConstantFluxProcess()
+        : k( 0.0 )
     {
-      ; // do nothing
+        ; // do nothing
     }
-  
-  SIMPLE_SET_GET_METHOD( Real, k );
-  
-  virtual void initialize()
-  {
-    Process::initialize();
-  
-    // force unset isAccessor flag of all variablereferences.
-    std::for_each( theVariableReferenceVector.begin(),
-		   theVariableReferenceVector.end(),
-		   std::bind2nd
-		   ( std::mem_fun_ref
-		     ( &VariableReference::setIsAccessor ), false ) );
-  }  
-
-  virtual void fire()
-  {
-    // constant flux
-    setFlux( k );
-  }
-  
- protected:
-  
-  Real k;
     
+    SIMPLE_SET_GET_METHOD( Real, k );
+    
+    virtual void initialize()
+    {
+        Process::initialize();
+    
+        // force unset isAccessor flag of all variablereferences.
+        std::for_each( theVariableReferenceVector.begin(),
+                       theVariableReferenceVector.end(),
+                       libecs::BindSecond( std::mem_fun_ref(
+                            &VariableReference::setIsAccessor ), false ) );
+    }
+
+    virtual void fire()
+    {
+        // constant flux
+        setFlux( k );
+    }
+    
+protected:
+    Real k;
 };
 
 LIBECS_DM_INIT( ConstantFluxProcess, Process );

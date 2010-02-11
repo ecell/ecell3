@@ -1,6 +1,8 @@
 dnl $Id$ -*- autoconf -*-
 dnl
 dnl
+sinclude(libtool_overrides.m4)
+
 AC_DEFUN([_SUBST_DEFINE],
 [
 $1=$2
@@ -57,8 +59,9 @@ AC_MSG_CHECKING(for headers required to compile python extensions)
 dnl deduce PYTHON_INCLUDES
 py_prefix=`$PYTHON -c "import sys; print sys.prefix"`
 py_exec_prefix=`$PYTHON -c "import sys; print sys.exec_prefix"`
-PYTHON_INCLUDES="-I${py_prefix}/include/python${PYTHON_VERSION}"
-if test "$py_prefix" != "$py_exec_prefix"; then
+if test -x "$PYTHON_PREFIX/bin/python-config"; then
+  PYTHON_INCLUDES=`$PYTHON_PREFIX/bin/python-config --includes`
+else
   PYTHON_INCLUDES="$PYTHON_INCLUDES -I${py_exec_prefix}/include/python${PYTHON_VERSION}"
 fi
 AC_SUBST(PYTHON_INCLUDES)
@@ -80,7 +83,7 @@ AC_DEFUN([ECELL_CHECK_PYTHON_LIBS], [
   PYTHON_LIBNAME=`$PYTHON -c 'import sys; print "python%d.%d" % (sys.hexversion >> 24, (sys.hexversion >> 16) & 0xff)'`
   PYTHON_PREFIX=`$PYTHON -c 'import sys; print sys.prefix'`
   if test -x "$PYTHON_PREFIX/bin/python-config"; then
-    PYTHON_LIBS=`$PYTHON_PREFIX/bin/python-config --ldflags`
+    PYTHON_LIBS="-L$PYTHON_PREFIX/lib `$PYTHON_PREFIX/bin/python-config --ldflags`"
   else
     PYTHON_LIBS="-L$PYTHON_PREFIX/lib -l$PYTHON_LIBNAME"
   fi
@@ -279,12 +282,13 @@ AC_DEFUN([ECELL_CHECK_BOOST], [
 
 AC_DEFUN([ECELL_CHECK_BOOST_PYTHON], [
   AC_REQUIRE([AM_CHECK_PYTHON_HEADERS])
+
   ac_save_CPPFLAGS="$CPPFLAGS"
   CPPFLAGS="$CPPFLAGS $PYTHON_INCLUDES"
   AC_CHECK_HEADER([boost/python.hpp], [
     ac_save_LIBS="$LIBS"
-    LIBS="$LIBS -lboost_python $PYTHON_LIBS"
-    AC_MSG_CHECKING([for Boost.Python runtime library avaiability])
+    LIBS="$LIBS -l$BOOST_PYTHON_LIBNAME $PYTHON_LIBS"
+    AC_MSG_CHECKING([for Boost.Python runtime library availability])
     AC_TRY_LINK([
 #include <boost/python/module.hpp>
     ], [

@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2008 Keio University
-#       Copyright (C) 2005-2008 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -29,6 +29,7 @@ import sys
 
 __all__ = (
     'PACKAGE',
+    'PACKAGE_TARNAME',
     'per_app_dir_name',
     'version',
     'version_info',
@@ -38,7 +39,9 @@ __all__ = (
     'user_prefs_dir',
     'bin_dir',
     'lib_dir',
+    '_lib_dir',
     'data_dir',
+    '_data_dir',
     'datarootdir',
     'doc_dir',
     'conf_dir',
@@ -55,23 +58,21 @@ def get_running_executable():
         return os.path.abspath( sys.argv[0] )
 
 PACKAGE = "@PACKAGE@"
+PACKAGE_TARNAME = "@PACKAGE_TARNAME@"
 per_app_dir_name = "@ECELL_DIRNAME@"
 version = "@VERSION@"
 version_info = {
     'major': @ECELL_MAJOR_VERSION@,
     'minor': @ECELL_MINOR_VERSION@,
-    'micro': @ECELL_MICRO_VERSION@
+    'micro': @ECELL_MICRO_VERSION@,
+    'revision': '@ECELL_PACKAGE_REVISION@'
 }
 
-prefix = '''@PREFIX@'''
+prefix = '''@prefix@'''
 if len( prefix ) == 0 or not os.path.isdir( prefix ):
     prefix = os.path.dirname(
         os.path.dirname( get_running_executable() )
         )
-
-exec_prefix = '''@EXEC_PREFIX@'''
-if len( exec_prefix ) == 0 or not os.path.isdir( exec_prefix ):
-    exec_prefix = prefix
 
 if os.name == 'nt':
     try:
@@ -97,11 +98,15 @@ def expand_shell_variables( val, vars ):
     return re.compile( r'\$\{([^}]+)\}' ).sub(
         lambda m: vars[ m.group( 1 ) ], val )
 
+exec_prefix = '''@exec_prefix@'''
+exec_prefix = expand_shell_variables( exec_prefix, locals() )
+if len( exec_prefix ) == 0 or not os.path.isdir( exec_prefix ):
+    exec_prefix = prefix
+
 bin_dir = '''@bindir@'''
 bin_dir = expand_shell_variables( bin_dir, locals() )
 if len( bin_dir ) == 0 or not os.path.isdir( bin_dir ):
     bin_dir = os.path.join( prefix, 'bin' )
-bin_dir = os.path.join( bin_dir, per_app_dir_name  )
 
 _lib_dir = '''@libdir@'''
 _lib_dir = expand_shell_variables( _lib_dir, locals() )
@@ -114,10 +119,11 @@ datarootdir = expand_shell_variables( datarootdir, locals() )
 if len( datarootdir ) == 0 or not os.path.isdir( datarootdir ):
     datarootdir = os.path.join( prefix, 'share' )
 
-data_dir = '''@datadir@'''
-data_dir = expand_shell_variables( data_dir, locals() )
-if len( data_dir ) == 0 or not os.path.isdir( data_dir ):
-    data_dir = os.path.join( datarootdir, per_app_dir_name )
+_data_dir = '''@datadir@'''
+_data_dir = expand_shell_variables( _data_dir, locals() )
+if len( _data_dir ) == 0 or not os.path.isdir( _data_dir ):
+    _data_dir = datarootdir
+data_dir = os.path.join( _data_dir, per_app_dir_name )
 
 _conf_dir = '''@sysconfdir@'''
 _conf_dir = expand_shell_variables( _conf_dir, locals() )

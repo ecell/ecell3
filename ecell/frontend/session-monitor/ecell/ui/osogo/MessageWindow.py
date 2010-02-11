@@ -3,8 +3,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -35,59 +35,84 @@
 # E-Cell Project, Lab. for Bioinformatics, Keio University.
 #
 
-import string
 import gtk
 
-from Pane import Pane
+from ecell.ui.osogo.config import *
+from ecell.ui.osogo.OsogoWindow import *
 
-class MessageWindow( Pane ):
-    '''
-    MessageWindow
-    '''
-    def __init__( self ):
-        Pane.__init__( self )
-        self.isShown = False
-        self.messageBuffer = gtk.TextBuffer(None)
-        self.__updateEndMark()
 
-    def printMessage( self, message ):
-        '''
-        This method appends a message at the end of the message area.
+class MessageWindow( Window ):
+	'''
+	MessageWindow
+	'''
 
-        message can be a string, a string list or a string tuple.
-        '''
-        # join the strings if it is a list
-        if type( message ) == list or type( message ) == tuple:  
-            # print message list
-            messageString = string.join( message )
-        else:  # anything else is stringified.
-            messageString = str( message )
+	def __init__( self ):
+		Window.__init__( self,
+			os.path.join( GLADEFILE_PATH, 'MessageWindow.glade' ),
+			'top_frame' )
+		self.isShown = False
+		self.messageBuffer = gtk.TextBuffer(None)
+		self.__updateEndMark()
 
-        if len( messageString ) > 0 and messageString[0] != '\n':
-                messageString = '\n' + messageString
-        
-        iter = self.messageBuffer.get_iter_at_mark( self.endMark )
-        self.messageBuffer.insert( iter, messageString,
-                                   len( messageString ) )
-        if self.isShown:
-            self.messageBox.scroll_to_mark( self.endMark, 0 )
+	def printMessage( self, message ):
+		'''
+		This method appends a message at the end of the message area.
 
-    def initUI( self ):
-        Pane.initUI( self )
-        self.messageBox = self[ 'textview1' ]
-        self.messageBox.set_buffer(self.messageBuffer)
-        self.__updateEndMark()
-        self.isShown = True
+		message can be a string, a string list or a string tuple.
+		'''
 
-    def getActualSize( self ):
-        allocation = self['scrolledwindow1'].get_allocation()
-        return allocation[2], allocation[3]
-    
-    def updateSize( self ):
-        currentSize = self.getActualSize()
-        self['scrolledwindow1'].set_size_request(
-            currentSize[0], currentSize[1] )
+		# join the strings if it is a list
+		if type( message ) == list or type( message ) == tuple:  
+			
+			# print message list
+			messageString = '\n'.join( message )
 
-    def __updateEndMark( self ):
-        endIter=self.messageBuffer.get_end_iter()
-        self.endMark=self.messageBuffer.create_mark( 'EM', endIter, False )
+		else:  # anything else is stringified.
+			messageString = str( message )
+
+
+		if len( messageString ) > 0 and messageString[0] != '\n':
+			messageString = '\n' + messageString
+		
+		iter = self.messageBuffer.get_iter_at_mark( self.endMark )
+		self.messageBuffer.insert( iter, messageString,\
+					   len( messageString ) )
+
+		if self.isShown:
+			self.messageBox.scroll_to_mark( self.endMark, 0 )
+
+	def openWindow( self ):
+
+		self.isShown=True
+		Window.openWindow( self )
+		self.messageBox = self[ 'textview1' ]
+		self.messageBox.set_buffer(self.messageBuffer)
+		self.__updateEndMark()
+
+
+	def getActualSize( self ):
+
+		allocation = self['scrolledwindow1'].get_allocation()
+		return allocation[2], allocation[3]
+	
+	def updateSize( self ):
+		currentSize = self.getActualSize()
+		self['scrolledwindow1'].set_size_request(\
+			currentSize[0], currentSize[1] )
+
+	def __updateEndMark( self ):
+
+		endIter=self.messageBuffer.get_end_iter()
+		self.endMark=self.messageBuffer.create_mark( 'EM', endIter, False )
+
+
+if __name__ == "__main__":
+
+	def mainLoop():
+		gtk.main()
+
+	def main():
+		aWindow = MessageWindow()
+		mainLoop()
+
+	main()

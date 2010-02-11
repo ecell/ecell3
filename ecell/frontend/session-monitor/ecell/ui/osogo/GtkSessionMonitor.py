@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -25,230 +25,210 @@
 # 
 #END_HEADER
 #
-#'Design: Kenta Hashimoto <kem@e-cell.org>',
-#'Design and application Framework: Koichi Takahashi <shafi@e-cell.org>',
-#'Programming: Yuki Fujita',
-#             'Yoshiya Matsubara',
-#             'Yuusuke Saito'
-#           'Masahiro Sugimoto <sugi@bioinformatics.org>' 
-#           'Gabor Bereczki <gabor.bereczki@talk21.com>' at
-# E-Cell Project, Lab. for Bioinformatics, Keio University.
+# Design: Kenta Hashimoto <kem@e-cell.org>
+# Design and application Framework: Koichi Takahashi <shafi@e-cell.org>
+# Programming:
+#    Yuki Fujita
+#    Yoshiya Matsubara
+#    Yuusuke Saito
+#    Masahiro Sugimoto <sugi@bioinformatics.org>'
+#    Gabor Bereczki <gabor.bereczki@talk21.com>
+# at E-Cell Project, Lab. for Bioinformatics, Keio University.
 #
 
 import os
+import os.path
 import sys
+import traceback
+import ConfigParser
+
 import gtk
 import gobject 
-import thread
-from sets import Set
-from time import time
-import re
 
-import config
-from constants import *
+from ecell.Session import *
 
-from ecell.Session import Session
-import ecell.util as util
-import ecell.identifiers as identifiers
+from ecell.ui.osogo.config import *
+from ecell.ui.osogo.ModelWalker import *
+import ecell.ui.osogo.MainWindow as MainWindow
+import ecell.ui.osogo.EntityListWindow as EntityListWindow
+import ecell.ui.osogo.LoggerWindow as LoggerWindow
+import ecell.ui.osogo.InterfaceWindow as InterfaceWindow
+import ecell.ui.osogo.StepperWindow as StepperWindow
+import ecell.ui.osogo.BoardWindow as BoardWindow
+import ecell.ui.osogo.LoggingPolicy as LoggingPolicy
+import ecell.ui.osogo.OsogoPluginManager as OsogoPluginManager
 
-from ModelWalker import *
-from DataGenerator import DataGenerator
-from MainWindow import MainWindow
-from LoggerWindow import LoggerWindow
-from InterfaceWindow import InterfaceWindow
-from StepperWindow import StepperWindow
-from BoardWindow import BoardWindow
-from EntityListWindow import EntityListWindow
-from OsogoWindow import OsogoWindow
-from ConfigParser import ConfigParser
-from OsogoPluginManager import OsogoPluginManager
-
-import traceback
-
-class GtkSessionMonitor:
-    def __init__( self ):
-        self.theAliveSessions = Set()
-
-    def beginSession( self ):
-        aSession = Session()
-        aBroadcaster = GtkSessionEventBroadcaster()
-        aSession.setMessageMethod(
-            lambda m: aBroadcaster.fire( 'message', content = m ) )
-        aSessionFacade = GtkSessionFacade( self, aSession, aBroadcaster )
-        aBroadcaster.addObserver( aSessionFacade )
-        self.theAliveSessions.add( aSessionFacade )
-        return aSessionFacade
-
-    def closeSession( self, aSession ):
-        if aSession in self.theAliveSessions:
-            self.theAliveSessions.remove( aSession )
-            if len( self.theAliveSessions ) == 0:
-                self.quitEventLoop()
-
-    def enterEventLoop( self ):
-        gobject.threads_init()
-        gtk.main()
-
-    def quitEventLoop( self ):
-        self.theAliveSessions.clear()
-        gtk.main_quit()
-
-class GtkSessionEvent:
-    def __init__( self, type, options ):
-        self.type = type
-        self.options = options
-
-    def __getattr__( self, key ):
-        if not self.options.has_key( key ):
-            raise AttributeError( key )
-        return self.options[ key ]
-
-    def __setattr__( self, key, val ):
-        if key in ('type', 'options'):
-            self.__dict__[ key ] = val
-        else:
-            self.options[ key ] = val
-
-class GtkSessionEventBroadcaster:
-    def __init__( self ):
-        self.handlers = Set()
-
-    def addObserver( self, aHandler ):
-        self.handlers.add( aHandler )
-
-    def removeObserver( self, aHandler ):
-        self.handlers.discard( aHandler )
-
-    def fire( self, type, **options ):
-        def broadcaster():
-            event = GtkSessionEvent( type, options )
-            for aHandler in self.handlers:
-                aHandler.handleSessionEvent( event )
-        gobject.idle_add( broadcaster )
-
-class GtkSessionFacade:
-    def findUserPrefsDir( self ):
-        if not self.theUserPreferencesDir:
-            path_list = (
-                config.user_prefs_dir,
-                config.home_dir
-                )
-            for parent_dir in path_list:
-                path = os.path.join( parent_dir, CONFIG_FILE_NAME )
-                if os.path.isfile( path ):
-                    self.theUserPreferencesDir = parent_dir
-            self.theUserPreferencesDir = path_list[0]
-        return self.theUserPreferencesDir
-
-    def findIniFile( self ):
-        path_list = ( self.findUserPrefsDir(), ) + (
-            config.conf_dir,
-            config.lib_dir
-            )
-        for parent_dir in path_list:
-            path = os.path.join( parent_dir, CONFIG_FILE_NAME )
-            if os.path.isfile( path ):
-                return path
-        return None
-
-    def __init__( self, aSessionMonitor, aSession, aBroadcaster ):
+class GtkSessionMonitor(Session):
+#
+# GtkSessionMonitor class functions
+#
+    # ==========================================================================
+    def __init__(self, aSimulator = None ):
         """sets up the osogo session, creates Mainwindow and other fundamental
         windows but doesn't show them"""
 
-        self.theSessionMonitor = aSessionMonitor
-        self.theSession = aSession
-        self.theModelWalker = None
-        self.theMessageListenerSet = Set()
-        self.theManagedWindowSet = Set()
-        self.theBroadcaster = aBroadcaster
+        #calls superclass
+        Session.__init__(self, aSimulator )
 
-        self.theUserPreferencesDir = None
-
+        if aSimulator == None:
+            self.theModelWalker = None
+        else:
+            self.theModelWalker = ModelWalker( aSimulator )
+        self.updateCallbackList = []
+        # -------------------------------------
         # reads defaults from osogo.ini 
-        aIniFileName = self.findIniFile()
-        aConfigDB = ConfigParser()
-        if aIniFileName != None:
-            aConfigDB.read( aIniFileName )
-        self.theConfigDB = aConfigDB
-        self.theIniFileName = aIniFileName
+        # -------------------------------------
+        self.theConfigDB=ConfigParser.ConfigParser()
 
-        self.theUpdateInterval = 0.25
+        self.theIniFileName = os.path.join( home_dir, '.ecell', 'osogo.ini' )
+        theDefaultIniFileName = os.path.join( conf_dir, 'osogo.ini' )
+        if not os.path.isfile( self.theIniFileName ):
+            # get from default
+            self.theConfigDB.read( theDefaultIniFileName )
+            # try to write into home dir
+            self.saveParameters()
+        else:
+            # read from default
+            self.theConfigDB.read(self.theIniFileName)
+
+
+        self.theUpdateInterval = 150
         self.stuckRequests = 0
         self.theStepSizeOrSec = 1.0
         self.theRunningFlag = False
-        self.theTimer = None
 
+        # -------------------------------------
         # creates PluginManager
-        self.thePluginPath = config.plugin_path
-        self.thePluginManager = OsogoPluginManager( self.thePluginPath, self )
-        self.theDataGenerator = DataGenerator( self.theSession )
-        self.theBroadcaster.addObserver( self.theDataGenerator )
-        self.thePluginInstanceList = []
-        self.thePluginWindowTitleMap = {}
-        self.thePluginWindowPerTypeMap = {}
-        self.theTitleFormat = "%s (%d)"
-        # key is instance, value is None
-        self.thePropertyWindowOnEntityListWindows = {}
+        # -------------------------------------
+        self.thePluginManager = OsogoPluginManager.OsogoPluginManager( self )
+        self.thePluginManager.loadAll()
 
+        # -------------------------------------
+        # creates FundamentalWindow
+        # -------------------------------------
+        
         # key:window name(str) value:window instance
         self.theFundamentalWindows = {}
 
+        # creates fundamental windows
+        aLoggerWindow     = LoggerWindow.LoggerWindow(  self )
+        anInterfaceWindow = InterfaceWindow.InterfaceWindow( self )
+        aStepperWindow    = StepperWindow.StepperWindow(  self )
+        aBoardWindow      = BoardWindow.BoardWindow(  self )
+        aMainWindow	      = MainWindow.MainWindow( self ) 
+
+        # saves them to map
+        self.theFundamentalWindows['LoggerWindow'] = aLoggerWindow
+        self.theFundamentalWindows['InterfaceWindow'] = anInterfaceWindow
+        self.theFundamentalWindows['StepperWindow'] = aStepperWindow
+        self.theFundamentalWindows['BoardWindow'] = aBoardWindow
+        self.theFundamentalWindows['MainWindow'] = aMainWindow
+
+        # key:EntityListWindow instance value:None
+        # In deleteEntityListWindow method, an instance of EntityListWindow is
+        # accessed directory. The sequence information of EntityListWindow does
+        # not need. So the references to EntityListWindow instances should be 
+        # held dict's key. Values of dict are not also imported.
+
+        self.theEntityListInstanceMap = {}  
+
+        # -------------------------------------
         # initializes for run method 
-        self.theSession.setEventChecker( gtk.events_pending )
-        self.theSession.setEventHandler( gtk.main_iteration )
+        # -------------------------------------
+        self.theSimulator.setEventHandler( lambda:
+            gtk.events_pending() and gtk.main_iteration()  )
 
-        self.thePluginManager.loadAllPlugins()
+        # -------------------------------------
+        # creates MainWindow
+        # -------------------------------------
+    
+        self.theMainWindow = aMainWindow
 
-        self.theMainWindow = self.createManagedWindow( MainWindow )
-        self.theFundamentalWindows['MainWindow'] = self.theMainWindow
 
-        for aWindow in self.theFundamentalWindows.values():
-            aWindow.initUI()
+    # ==========================================================================
+    def GUI_interact(self):
+        "hands over controlto the user (gtk.main_loop())"
 
-        self.theMainWindow.show()
+        gtk.main()
 
-    def __del__( self ):
-        for anInstance in self.theManagedWindowSet:
-            anInstance.destroy()
-        for anInstance in self.thePluginInstanceList:
-            anInstance.destroy()
+    # ==========================================================================
+    def QuitGUI( self ):
+        """ quits gtk.main_loop() after saving changes """
+        gtk.main_quit()
 
-    def terminate( self ):
-        self.stop()
-        self.theSessionMonitor.closeSession( self )
+    # ==========================================================================
+    def doesExist( self, aWindowName):
+        """ aWindowName: (str) name of Window
+             returns True if window is opened
+                 False if window is not opened
+             checks both plugin and fundamental windows 
+        """
 
-    def openFundamentalWindow( self, aWindowName ):
+        # check fundamentalwindows
+        if self.theFundamentalWindows.has_key(aWindowName):
+            return self.theFundamentalWindows[ aWindowName ].exists()
+
+        # check entity list windows
+        if aWindowName == 'EntityListWindow' and len( self.theEntityListInstanceMap>0):
+            return True
+        # check pluginwindow instances
+        
+        aPluginInstanceList = self.thePluginManager.thePluginTitleDict.keys()
+
+        for aPluginInstance in aPluginInstanceList:
+            if aWindowName == self.thePluginManager.thePluginTitleDict[aPluginInstance]:
+                return True
+        return False
+
+
+    # ==========================================================================
+    def openWindow( self, aWindowName, rootWidget = None, rootWindow = None ): 
         """opens up window and returns aWindowname instance
         aWindowName   ---  Window name (str)
         Returns FundamentalWindow or EntityListWindow list
         """
-        if aWindowName != 'MainWindow' and not self.theSession.isModelLoaded():
-            self.message( "Model has not yet been loaded. Can't open windows." )
+        if len(self.theModelName) == 0 and aWindowName != 'MainWindow':
+            message ( "Model has not yet been loaded. Can't open windows." )
             return None
         # When the WindowName does not match, create nothing.
         if self.theFundamentalWindows.has_key( aWindowName ):
-            aWindow = self.theFundamentalWindows[ aWindowName ]
+            if rootWidget == None:
+                self.theFundamentalWindows[ aWindowName ].openWindow()
+            else:
+                self.theFundamentalWindows[ aWindowName ].openWindow(rootWidget, rootWindow)
+            self.theMainWindow.updateButtons()
+            return self.theFundamentalWindows[ aWindowName ]
+        elif aWindowName == 'EntityListWindow':
+            return self.createEntityListWindow()
         else:
-            self.message( "No such WindowType (%s) " %aWindowName )
+            message( "No such WindowType (%s) " %aWindowName )
             return None
 
-        aWindow.show()
-
-        if type( aWindow ) == OsogoWindow:
-            aWindow.present()
-        return aWindow
-
-    def getFundamentalWindow( self, aWindowName ):
+    # ==========================================================================
+    def getWindow( self, aWindowName ):
         """
         aWindowName   ---  Window name (str)
-        Returns FundamentalWindow
+        Returns FundamentalWindow or EntityListWindow list
         """
 
         # check fundamentalwindows
-        if self.theFundamentalWindows.has_key( aWindowName ):
-            return self.theFundamentalWindows[ aWindowName ]
+        if self.theFundamentalWindows.has_key(aWindowName):
+            return self.theFundamentalWindows[aWindowName]
+
+        # check entity list windows
+        if aWindowName == 'EntityListWindow':
+            return self.theEntityListInstanceMap.keys()
+        # check pluginwindow instances
+        
+        aPluginInstanceList = self.thePluginManager.thePluginTitleDict.keys()
+
+        for aPluginInstance in aPluginInstanceList:
+            aWindowName = self.thePluginManager.thePluginTitleDict[aPluginInstance]
+            return aPluginInstance
         return None
 
+
+    # ==========================================================================
     def displayWindow( self, aWindowName ):
         """When the Window is not created, calls its openWidow() method.
         When already created, move it to the top of desktop.
@@ -256,150 +236,227 @@ class GtkSessionFacade:
         Return None
         [None]:When the WindowName does not matched, creates nothing.
         """
-        self.setFundamentalWindowVisibility( aWindowName, True )
 
-    def isFundamentalWindowShown( self, aWindowName ):
-        return self.theFundamentalWindows.has_key( aWindowName )
+        # When the WindowName does not match, creates nothing.
+        if not self.theFundamentalWindows.has_key( aWindowName ):
+            message ( "No such WindowType (%s) " %aWindowName )
+            return None
 
-    def setFundamentalWindowVisibility( self, aWindowName, visible ):
-        if visible:
-            if not self.theFundamentalWindows.has_key( aWindowName ):
-                aWindow = self.openManagedWindow( globals()[ aWindowName ] )
-                def onFundamentalWindowDestroyed( aWindow ):
-                    del self.theFundamentalWindows[ aWindowName ]
-                    self.fireEvent(
-                        'fundamental_window_destroyed',
-                        window_name = aWindowName )
-                aWindow.registerDestroyHandler( onFundamentalWindowDestroyed )
-                self.theFundamentalWindows[ aWindowName ] = aWindow
+        # When the Window is already created, move it to the top of desktop
+        if self.theFundamentalWindows[aWindowName].exists():
+            self.theFundamentalWindows[aWindowName].present()
+            pass
+        else:
+            self.theFundamentalWindows[aWindowName].openWindow()
+            self.theFundamentalWindows[aWindowName].update()
+    
+    # ==========================================================================
+    def toggleWindow( self, aWindowName, aNewState=None ):
+        aState = self.theFundamentalWindows[aWindowName].exists()
+        if aNewState is None:
+            aNewState = not aState
+        if aState != aNewState:
+            if aNewState:
+                self.theFundamentalWindows[aWindowName].openWindow()
+                self.theFundamentalWindows[aWindowName].update()
             else:
-                aWindow = self.theFundamentalWindows[ aWindowName ]
-            aWindow.show()
-            aWindow.present()
-            self.fireEvent(
-                'fundamental_window_created',
-                window_name = aWindowName )
-        else:
-            if self.theFundamentalWindows.has_key( aWindowName ):
-                self.theFundamentalWindows[ aWindowName ].destroy()
+                self.theFundamentalWindows[aWindowName].close()
+        if self.theFundamentalWindows['MainWindow'].exists():
+            self.theFundamentalWindows['MainWindow'].update()
 
-    def onPluginWindowTitleChanging( self, aPluginWindow, aNewTitle ):
-        return not self.thePluginWindowTitleMap.has_key( aNewTitle )
-
-    def onPluginWindowTitleChanged( self, aPluginWindow, aOldTitle ):
-        if self.thePluginWindowTitleMap.has_key( aOldTitle ):
-            del self.thePluginWindowTitleMap[ aOldTitle ]
-        self.thePluginWindowTitleMap[ aPluginWindow.getTitle() ] = aPluginWindow
-        self.fireEvent( 'plugin_window_title_changed', 
-                        instance = aPluginWindow, old_title = aOldTitle )
-
-    def createPluginWindow( self, aType, aFullPNList ):
-        """
-        opens and returns _PluginWindow instance of aType showing aFullPNList 
-        returns None if pluginwindow could not have been created
-        """
-        anInstance = self.instantiatePlugin( aType, aFullPNList )
-        anInstance.registerDestroyHandler( self.removePluginInstance )
-        self.manageWindow( anInstance )
+    # ==========================================================================
+    def createPluginWindow(self, aType, aFullPNList):
+        """ opens and returns _PluginWindow instance of aType showing aFullPNList 
+            returns None if pluginwindow could not have been created """
+        anInstance = self.thePluginManager.createInstance( aType, aFullPNList)
+        if anInstance == None:
+            self.message ( 'Pluginwindow has not been created. %s may not be a valid plugin type' %aType )
         return anInstance
 
-    def openPluginWindow( self, aType, aFullPNList ):
-        """
-        opens and returns _PluginWindow instance of aType showing aFullPNList 
-        returns None if pluginwindow could not have been created
-        """
-        plugin = self.loadModule( aType )
-        anInstanceClass = plugin.getClass()
 
-        if not self.thePluginWindowPerTypeMap.has_key( anInstanceClass ):
-            aPluginWindowSet = Set()
-            self.thePluginWindowPerTypeMap[ anInstanceClass ] = aPluginWindowSet
-        else:
-            aPluginWindowSet = self.thePluginWindowPerTypeMap[ anInstanceClass ]
-        if anInstanceClass.theViewType == MULTIPLE:
-            anInstance = plugin.createInstance( aFullPNList )
-            aSerialNum = 1
-            while True:
-                aTitle = self.theTitleFormat % (
-                    anInstance.getName(), aSerialNum )
-                if anInstance.setTitle( aTitle ):
-                    break
-                aSerialNum += 1
-        else:
-            if len( aPluginWindowSet ) > 0:
-                return None
-            anInstance = plugin.createInstance( aFullPNList )
-            assert anInstance.setTitle( anInstance.getName() )
-
-        aPluginWindowSet.add( anInstance )
-        anInstance.registerDestroyHandler( self.removePluginInstance )
-        self.thePluginInstanceList.append( anInstance )
-        self.fireEvent( 'plugin_instance_created', instance = anInstance )
-        self.manageWindow( anInstance )
-        anInstance.initUI()
-        anInstance.setParent( None )
-        anInstance.show()
-        return anInstance
-
-    def manageWindow( self, anInstance ):
-        self.fireEvent( 'window_managed', window = anInstance )
-        anInstance.registerDestroyHandler( self.unmanageWindow )
-        self.theManagedWindowSet.add( anInstance )
-        self.theBroadcaster.addObserver( anInstance )
-
-    def unmanageWindow( self, anInstance ):
-        self.theBroadcaster.removeObserver( anInstance )
-        self.theManagedWindowSet.discard( anInstance )
-        self.fireEvent( 'window_unmanaged', window = anInstance )
-
-    def createPluginOnBoard(self, aType, aFullPNList):    
+    # ==========================================================================
+    def createPluginOnBoard(self, aType, aFullPNList):
         """ creates and adds plugin to pluginwindow and returns plugininstance """
-        aBoardWindow = self.getWindow( 'BoardWindow' )
+        aBoardWindow = self.getWindow('BoardWindow')
         if aBoardWindow == None:
             self.message('Board Window does not exist. Plugin cannot be added.')
             return None
-        return aBoardWindow.addPluginWindows( aType, aFullPNList )
+        return aBoardWindow.addPluginWindows( aType, aFullPNList)
 
-    def createManagedWindow( self, aManagedWindowType ):
-        aManagedWindow = aManagedWindowType()
-        aManagedWindow.setSession( self )
-        self.manageWindow( aManagedWindow )
-        return aManagedWindow
 
-    def openManagedWindow( self, aManagedWindowType ):
-        aManagedWindow = self.createManagedWindow( aManagedWindowType )
-        aManagedWindow.initUI()
-        aManagedWindow.setParent( None )
-        aManagedWindow.show()
-        return aManagedWindow
-
-    def getMainWindow( self ):
-        return self.theMainWindow
-
-    def getStatusBar( self ):
-        assert self.theMainWindow != None
-        return self.theMainWindow.getStatusBar()
-
-    def fireEvent( self, type, **options ):
-        self.theBroadcaster.fire( type, **options )
-
-    def updateUI( self ):
-        # updates all entity list windows
-        for aManagedWindow in self.theManagedWindowSet:
-            aManagedWindow.update()
-
-    def setUpdateInterval(self, secs):
-        "plugins are refreshed every secs seconds"
-        self.theUpdateInterval = secs
-        self.fireEvent( 'update_interval_changed', interval = secs )
-    
-    def getUpdateInterval( self ):
-        "returns the rate by plugins are refreshed "
-        return self.theUpdateInterval
-
-    def getParameter(self, aParameter):
+    # ==========================================================================
+    def openLogPolicyWindow(self,  aLogPolicy, aTitle ="Set log policy" ):
+        """ pops up a modal dialog window
+            with aTitle (str) as its title
+            and displaying loggingpolicy
+            and with an OK and a Cancel button
+            users can set logging policy
+            returns:
+            logging policy if OK is pressed
+            None if cancel is pressed
         """
-        tries to get a parameter from ConfigDB
+        aLogPolicyWindow = LoggingPolicy.LoggingPolicy( self, aLogPolicy, aTitle )
+        return aLogPolicyWindow.return_result()
+        
+    # ==========================================================================
+    def createEntityListWindow( self, rootWidget = 'EntityListWindow', aStatusBar=None ):
+        """creates and returns an EntityListWindow
+        """
+        anEntityListWindow = None
+
+        # when Model is already loaded.
+        if len(self.theModelName) > 0:
+            # creates new EntityListWindow instance
+            anEntityListWindow = EntityListWindow.EntityListWindow( self, rootWidget, aStatusBar )
+            anEntityListWindow.openWindow()
+            
+            # saves the instance into map
+            self.theEntityListInstanceMap[ anEntityListWindow ] = None
+            
+            # updates all fundamental windows
+            self.updateFundamentalWindows()
+
+        else:
+            anEntityListWindow = EntityListWindow.EntityListWindow( self, rootWidget, aStatusBar )
+
+            anEntityListWindow.openWindow()
+            
+            # saves the instance into map
+            self.theEntityListInstanceMap[ anEntityListWindow ] = None
+            
+            
+        return anEntityListWindow
+
+    # ==========================================================================
+    def registerUpdateCallback( self, aFunction ):
+        self.updateCallbackList.append( aFunction )        
+
+
+    # ==========================================================================
+    def deleteEntityListWindow( self, anEntityListWindow ):
+        """deletes the reference to the instance of EntityListWindow
+        anEntityListWindow   ---  an instance of EntityListWindow(EntityListWindow)
+        Return None
+        [Note]: When the argument is not anEntityListWindow, throws exception.
+                When this has not the reference to the argument, does nothing.
+        """
+
+        # When the argument is not anEntityListWindow, throws exception.
+        if anEntityListWindow.__class__.__name__ != 'EntityListWindow':
+            raise "(%s) must be EntityListWindow" %anEntityListWindow
+
+        # deletes the reference to the PropertyWindow instance on the EntityListWindow
+
+        self.thePluginManager.deletePropertyWindowOnEntityListWinsow( anEntityListWindow.thePropertyWindow )
+
+        # deletes the reference to the EntityListWindow instance
+        if self.theEntityListInstanceMap.has_key( anEntityListWindow ):
+            anEntityListWindow.close()
+            del self.theEntityListInstanceMap[ anEntityListWindow ]
+    
+    # ==========================================================================
+    def __updateByTimeOut( self, arg ):
+        """when time out, calls updates method()
+        Returns None
+        """
+        if not gtk.events_pending():
+            self.updateWindows()
+            if self.stuckRequests > 0:
+                self.stuckRequests -= 1
+            elif self.theUpdateInterval >=225:
+                self.theUpdateInterval /=1.5
+        else:
+            self.stuckRequests +=1
+            if self.stuckRequests >6:
+                self.theUpdateInterval *= 1.5
+                self.stuckRequests = 3
+        self.theTimer = gobject.timeout_add( int(self.theUpdateInterval), self.__updateByTimeOut, 0 )
+
+
+    # ==========================================================================
+    def __removeTimeOut( self ):
+        """removes time out
+        Returns None
+        """
+
+        gobject.source_remove( self.theTimer )
+
+    # ==========================================================================
+    def updateWindows( self ):
+        self.theMainWindow.update()
+        self.updateFundamentalWindows()
+        # updates all plugin windows
+        self.thePluginManager.updateAllPluginWindow()
+        for aFunction in self.updateCallbackList:
+            apply( aFunction )
+     
+
+    # ==========================================================================
+    def setUpdateInterval(self, Secs):
+        "plugins are refreshed every secs seconds"
+        self.theMainWindow.theUpdateInterval = Secs
+    
+    # ==========================================================================
+    def getUpdateInterval(self ):        #
+        "returns the rate by plugins are refreshed "
+        return self.theMainWindow.theUpdateInterval 
+
+
+    # ==========================================================================
+    def updateFundamentalWindows( self ):
+        """updates fundamental windows
+        Return None
+        """
+
+        # updates all fundamental windows
+        for aFundamentalWindow in self.theFundamentalWindows.values():
+            aFundamentalWindow.update()
+
+        # updates all EntityListWindow
+        for anEntityListWindow in self.theEntityListInstanceMap.keys():
+            anEntityListWindow.update()
+
+        #update MainWindow
+        self.theMainWindow.update()
+
+
+    # ==========================================================================
+    def __readIni(self,aPath):
+        """read osogo.ini file
+        an osogo.ini file may be in the given path
+        that have an osogo section or others but no default
+        argument may be a filename as well
+        """
+
+        # first delete every section apart from default
+        for aSection in self.theConfigDB.sections():
+            self.theConfigDB.remove(aSection)
+
+        # gets pathname
+        if not os.path.isdir( aPath ):
+            aPath=os.path.dirname( aPath )
+
+        # checks whether file exists
+        aFilename = os.path.join( aPath, 'osogo.ini' )
+        if not os.path.isfile( aFilename ):
+            # self.message('There is no osogo.ini file in this directory.\n Falling back to system defauls.\n')
+            return None
+
+        # tries to read file
+
+        try:
+            self.message('Reading osogo.ini file from directory [%s]' %aPath)
+            self.theConfigDB.read( aFilename )
+
+        # catch exceptions
+        except:
+            self.message(' error while executing ini file [%s]' %aFileName)
+            anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback ) )
+            self.message(anErrorMessage)
+
+    # ==========================================================================
+    def getParameter(self, aParameter):
+        """tries to get a parameter from ConfigDB
         if the param is not present in either osogo or default section
         raises exception and quits
         """
@@ -412,9 +469,9 @@ class GtkSessionFacade:
         # gets it from default
         return self.theConfigDB.get('DEFAULT',aParameter)
 
+    # ==========================================================================
     def setParameter(self, aParameter, aValue):
-        """
-        tries to set a parameter in ConfigDB
+        """tries to set a parameter in ConfigDB
         if the param is not present in either osogo or default section
         raises exception and quits
         """
@@ -427,23 +484,36 @@ class GtkSessionFacade:
             # sets it in default
             self.theConfigDB.set('DEFAULT',aParameter, str(aValue))
 
+    # ==========================================================================
     def saveParameters( self ):
-        """
-        tries to save all parameters to a config file in home directory
+        """tries to save all parameters into a config file in home directory
         """
         try:
-            if not os.path.exists( self.theUserPreferencesDir ):
-                os.mkdir( self.theUserPreferencesDir ) 
-            aConfigFilePath = os.path.join(
-                self.theUserPreferencesDir,
-                CONFIG_FILE_NAME
-                )
-            fp = open( aConfigFilePath, 'w' )
+            aDirName = os.path.dirname( self.theIniFileName )
+            if not os.path.exists( aDirName ):
+                os.makedirs( aDirName )
+            fp = open( self.theIniFileName, 'w' )
             self.theConfigDB.write( fp )
-            self.message("Preferences were saved to file %s." % aConfigFilePath )
         except:
-            self.message("Failed to save preferences to file %s.\nPlease check permissions for home directory." % aConfigFilePath )
+            self.message("Couldnot save preferences into file %s.\n Please check permissions for home directory.\n"%self.theIniFileName)
+            
+    #-------------------------------------------------------------------
+    def createLoggerWithPolicy( self, fullpn, logpolicy = None ):
+        """creates logger for fullpn with logpolicy. if logpolicy parameter is not given, gets parameters from 
+        config database        
+        """
+        # if logpolicy is None get it from parameters
+        if logpolicy == None:
+            logpolicy = self.getLogPolicyParameters()
+        self.theSimulator.createLogger( fullpn, logpolicy )
 
+    #-------------------------------------------------------------------
+    def changeLoggerPolicy( self, fullpn, logpolicy ):
+        """changes logging policy for a given logger
+        """
+        self.theSimulator.setLoggerPolicy( fullpn, logpolicy )
+        
+    #-------------------------------------------------------------------
     def getLogPolicyParameters( self ):
         """
         gets logging policy from config database
@@ -457,45 +527,56 @@ class GtkSessionFacade:
             logPolicy[0]=1
         return logPolicy
 
+    #-------------------------------------------------------------------
     def setLogPolicyParameters( self, logPolicy ):
         """
-        saves logging policy to config database
+        saves logging policy into config database
         """
+
         self.setParameter( 'logger_min_step', logPolicy[0] )
         self.setParameter( 'logger_min_interval', logPolicy[1] ) 
-        self.setParameter( 'end_policy', logPolicy[2] )
+        self.setParameter( 'end_policy' , logPolicy[2] )
         self.setParameter( 'available_space' ,logPolicy[3] )
         self.saveParameters()
 
-    def isModelLoaded( self ):
-        return self.theSession.isModelLoaded()
 
+#------------------------------------------------------------------------
+#IMPORTANT!
+#
+#Session methods to be used in interactive scripting shoould be overloaded here
+#-------------------------------------------------------------------------
+
+    #-------------------------------------------------------------------
     def loadScript( self, ecs, parameters={} ):
-        self.theSession.loadScript( ecs, parameters )
-        self.fireEvent( 'script_loaded' )
+        #self.__readIni( ecs )
+        Session.loadScript (self, ecs, parameters )
 
-    def loadModel( self, aFileName ):
-        assert not self.theSession.isModelLoaded()
-        self.theSession.loadModel( aFileName )
-        self.theModelWalker = ModelWalker( self )
-        self.fireEvent( 'model_loaded' )
+    #-------------------------------------------------------------------
+    def interact( self, parameters={} ):
+        Session.interact (self, parameters )
 
-    def saveModel( self, aFileName ):
-        self.theSession.saveModel( aFileName )
-        self.fireEvent( 'model_saved' )
+    #-------------------------------------------------------------------
+    def loadModel( self, aModel ):
+        #self.__readIni( aModel )
 
-    def handleSessionEvent( self, event ):
-        if event.type == 'message':
-            print event.content
-        elif event.type == 'simulation_started':
-            self.message( 'Simulation started on %f sec.' % event.simulationTime )
-        elif event.type == 'simulation_stopped':
-            self.message( 'Simulation stopped on %f sec.' % event.simulationTime )
+        Session.loadModel( self, aModel )
+        self.theModelWalker = ModelWalker( self.theSimulator )
 
+    #-------------------------------------------------------------------
+    def saveModel( self , aModel ):
+        Session.saveModel( self , aModel )
+
+    #-------------------------------------------------------------------
+    def setMessageMethod( self, aMethod ):
+        Session.setMessageMethod( self, aMethod )
+
+    #-------------------------------------------------------------------
     def message( self, message ):
-        self.theSession.message( message )
+        Session.message( self, message )
+        #self._synchronize()
 
-    def run( self, duration = None ):
+    #-------------------------------------------------------------------
+    def run( self , time = '' ):
         """ 
         if already running: do nothing
         if time is given, run for the given time
@@ -503,215 +584,137 @@ class GtkSessionFacade:
             if Mainwindow is not opened create a stop button
             set up a timeout rutin and Running Flag 
         """
+
         if self.theRunningFlag == True:
             return
+
+        if time == '' and not self.doesExist('MainWindow'):
+            self.openWindow('MainWindow')
+
         try:
             self.theRunningFlag = True
+            self.theTimer = gobject.timeout_add( self.theUpdateInterval, self.__updateByTimeOut, False )
 
-            def handleTimer():
-                if not self.theRunningFlag:
-                    return False
-                self.fireEvent(
-                    'simulation_updated',
-                    simulationTime = self.getCurrentTime() )
-                return True
+            aCurrentTime = self.getCurrentTime()
+            self.message("%15s"%aCurrentTime + ":Start\n" )
 
-            self.fireEvent(
-                'simulation_started',
-                simulationTime = self.getCurrentTime() )
-            gobject.timeout_add(
-                int( self.theUpdateInterval * 1000 ), handleTimer )
+            Session.run( self, time )
+            self.theRunningFlag = False
+            self.__removeTimeOut()
 
-            if duration:
-                self.theSession.run( duration )
-                self.theRunningFlag = False
-            else:
-                self.theSession.run()
-            self.fireEvent(
-                'simulation_stopped',
-                simulationTime = self.getCurrentTime() )
         except:
-            self.theRunningFlag = False
-            self.theSession.stop()
-            anErrorMessage = traceback.format_exception(
-                sys.exc_type, sys.exc_value, sys.exc_traceback )
+            anErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
             self.message(anErrorMessage)
+            self.theRunningFlag = False
+            self.__removeTimeOut()
 
+        self.updateWindows()
+
+    #-------------------------------------------------------------------
     def stop( self ):
+        """ stop Simulation, remove timeout, set Running flag to false
         """
-        stop Simulation, remove timeout, set Running flag to false
+
+
+        try:
+            if self.theRunningFlag == True:
+                Session.stop( self )
+
+                aCurrentTime = self.getCurrentTime()
+                self.message( ("%15s"%aCurrentTime + ":Stop\n" ))
+                self.__removeTimeOut()
+                self.theRunningFlag = False
+
+        except:
+            anErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
+            self.message(anErrorMessage)
+        self.updateWindows()
+        #self._synchronize()
+
+    #-------------------------------------------------------------------
+    def step( self, num = None ):
+        """ step according to num, if num is not given,
+            according to set step parameters
         """
         if self.theRunningFlag == True:
-            self.theRunningFlag = False
-            self.theSession.stop()
-
-    def step( self, num = 1 ):
-        """
-        step according to num, if num is not given,
-        according to set step parameters
-        """
-        if self.theRunningFlag:
             return
+
+        if num == None:
+            #set it to 1
+                num = 1
+                self.message( "Zero step value overridden to 1\n" )
+
         try:
             self.theRunningFlag = True
 
-            self.message( "Step" )
-            self.fireEvent(
-                'simulation_started',
-                simulationTime = self.getCurrentTime() )
-            self.theSession.step( int( num ) )
-            self.fireEvent( 'simulation_updated',
-                simulationTime = self.getCurrentTime() )
-            self.fireEvent(
-                'simulation_stopped',
-                simulationTime = self.getCurrentTime() )
+            self.message( "Step\n" )
+            self.theTimer = gobject.timeout_add( self.theUpdateInterval, self.__updateByTimeOut, 0 )
+
+            Session.step( self, int( num ) )
 
             self.theRunningFlag = False
+            self.__removeTimeOut()
+
         except:
             anErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
             self.message( anErrorMessage )
+            self.theRunningFlag = False
+
+        self.updateWindows()
+        #self._synchronize()
 
     def isRunning(self):
         return self.theRunningFlag
 
-    def getModelWalker( self ):
-        return self.theModelWalker
-
+    #-------------------------------------------------------------------
     def getNextEvent( self ):
-        return self.theSession.getNextEvent()
+        return Session.getNextEvent( self )
 
+    #-------------------------------------------------------------------
+    def getCurrentTime( self ):
+        return Session.getCurrentTime( self )
+
+    #-------------------------------------------------------------------
     def setEventChecker( self, event ):
-        self.theSession.setEventChecker( event )
+        Session.setEventChecker( self, event )
 
+    #-------------------------------------------------------------------
     def setEventHandler( self, event ):
-        self.theSession.setEventHandler( event )
+        Session.setEventHandler( self, event )
 
     def getStepperList( self ):
-        return self.theSession.getStepperList()
+        return Session.getStepperList( self )
 
+    #-------------------------------------------------------------------
     def createStepperStub( self, id ):
-        return self.theSession.createStepperStub( id )
+        return Session.createStepperStub( self, id )
 
+    #-------------------------------------------------------------------
     def getEntityList( self, entityType, systemPath ):
-        return self.theSession.getEntityList( entityType, systemPath )
+        return Session.getEntityList( self, entityType, systemPath )
 
+    #-------------------------------------------------------------------
     def createEntityStub( self, fullid ):
-        return self.theSession.createEntityStub( fullid )
+        return Session.createEntityStub( self, fullid )
 
+    #-------------------------------------------------------------------
     def getLoggerList( self ):
-        return self.theSession.getLoggerList()
+        return Session.getLoggerList( self )
 
-    def getLoggedPNList( self ):
-        return self.theSession.getLoggedPNList()
+    #-------------------------------------------------------------------
+    def createLogger( self, fullpn ):
+        Session.createLogger( self, fullpn )
+#FIXME        #remember refresh Tracer and Loggerwindows!!!
 
-    def createLogger( self, aFullPN ):
-        # XXX: remember refresh Tracer and Loggerwindows!!!
-        assert isinstance( aFullPN, identifiers.FullPN )
-        aStub = self.theSession.createLoggerStub( aFullPN )
-        if not aStub.exists():
-            aStub.create()
-            aStub.setLoggerPolicy( self.getLogPolicyParameters() )
-            self.fireEvent( 'logger_created', logger = aStub )
-        return aStub
 
-    def saveLoggerData( self, aFullPN, aSaveDirectory, aStartTime=-1, anEndTime=-1, anInterval=-1 ):
-        self.theSession.saveLoggerData( aFullPN, aSaveDirectory, aStartTime, anEndTime, anInterval )
 
-    def getDataGenerator( self ):
-        return self.theDataGenerator 
+    #-------------------------------------------------------------------
+    def createLoggerStub( self, fullpn ):
+        return Session.createLoggerStub( self, fullpn )
 
-    def loadModule( self, aClassName ):
-        pluginLoadedAhead = self.thePluginManager.isModuleLoaded( aClassName )
-        aPlugin = self.thePluginManager.loadModule( aClassName )
-        if not pluginLoadedAhead:
-            self.fireEvent(
-                'module_loaded',
-                class_name = aClassName )
-        return aPlugin
+    #-------------------------------------------------------------------
+    def saveLoggerData( self, fullpn=0, aSaveDirectory='./Data', aStartTime=-1, anEndTime=-1, anInterval=-1 ):
+        Session.saveLoggerData( self, fullpn, aSaveDirectory, aStartTime, anEndTime, anInterval )
 
-    def getLoadedModules( self ):
-        return self.thePluginManager.getLoadedModules()
-
-    def getPluginInstanceList( self ):
-        return list( self.thePluginInstanceList )
-
-    def instantiatePlugin( self, classname, data ):
-        """
-        classname  --- a class name of PluginWindow (str)
-        data       --- a RawFullPN (RawFullPN)
-        """
-        # XXX: should be checked earlier in the call chain
-        # if len(data) == 0:
-        #    self.theSession.message("Nothing is selected.")
-
-        plugin = self.loadModule( classname )
-        try:
-            instance = plugin.createInstance( data )
-        except TypeError:
-            # XXX: Should be caught in an upper frame
-            self.message( string.join(
-                traceback.format_exception(
-                    sys.exc_type,sys.exc_value,
-                    sys.exc_traceback ), '\n' ) )
-            return None
-        self.thePluginInstanceList.append( instance )
-        self.fireEvent(
-            'plugin_instance_created', instance = instance )
-        return instance
-
-    def findPluginInstanceByTitle( self, aTitle ):
-        if self.thePluginWindowTitleMap.has_key( aTitle ):
-            return self.thePluginWindowTitleMap[ aTitle ]
-        return None
-
-    def removePluginInstance( self, anInstance ):
-        try:
-            anInstanceClass = anInstance.__class__
-            if self.thePluginWindowPerTypeMap.has_key( anInstanceClass ):
-                self.thePluginWindowPerTypeMap[ anInstanceClass ].discard(
-                    anInstance )
-            if self.thePluginWindowTitleMap.has_key( anInstance.getTitle() ):
-                del self.thePluginWindowTitleMap[ anInstance.getTitle() ]
-            del self.thePluginInstanceList[
-                self.thePluginInstanceList.index( anInstance ) ]
-            self.fireEvent(
-                'plugin_instance_removed', instance = anInstance )
-        except ValueError:
-            self.message( str( anInstance ) + " is already removed" )
-
-    def getEntityPropertyAttributes( self, aFullPN ):
-        return self.theSession.theSimulator.getEntityPropertyAttributes(
-            util.createFullPNString( aFullPN ) )
-
-    def setEntityProperty( self, aFullPN, aValue ):
-        aFullPNString = str( aFullPN )
-        anAttribute = self.theSession.theSimulator.getEntityPropertyAttributes(
-            aFullPNString )
-
-        if anAttribute[ SETTABLE ]:
-            self.theSession.theSimulator.setEntityProperty(
-                aFullPNString, aValue )
-            self.fireEvent( 'entity_property_changed',
-                            fullPN = aFullPNString, value = aValue )
-        else:
-            self.message('%s is not settable' % aFullPNString )
-
-    def getEntityProperty( self, aFullPN ):
-        assert isinstance( aFullPN, identifiers.FullPN )
-        return self.theSession.theSimulator.getEntityProperty( str( aFullPN ) )
-
-    def createEntityStub( self, aFullID ):
-        return self.theSession.createEntityStub( aFullID )
-
-    def createStepperStub( self, aStepperID ):
-        return StepperStub( self.theSession.theSimulator, aStepperID )
-
-    def getEntityClassName( self, aFullID ):
-        assert isinstance( aFullID, identifiers.FullID )
-        return self.theSession.theSimulator.getEntityClassName(
-            str( aFullID ) )
-
-    def getCurrentTime( self ):
-        return self.theSession.getCurrentTime()
 
 

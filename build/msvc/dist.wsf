@@ -34,6 +34,13 @@ var buildInfo = {
     <script language="JScript" src="info.js" />
     <script language="JScript"><![CDATA[
 var tasks = {
+    installScripts: function() {
+        var dmcFile = this.projectDir + 'ecell\\bin\\ecell3-dmc';
+        BuildHelper.processTemplate(dmcFile, dmcFile + '.in', buildInfo.env);
+        BuildHelper.copy(dmcFile, this.distBinDir);
+        this.makePythonLauncher(this.distBinDir + '\\ecell3-dmc');
+    },
+
     installECS: function() {
         var ecsDir = this.projectDir + 'ecell\\libecs\\';
         var destDir;
@@ -48,24 +55,38 @@ var tasks = {
 
         BuildHelper.mkdir(this.distBinDir);
         BuildHelper.copy(this.vcOutDir + 'ecs.dll', this.distBinDir);
+        BuildHelper.copy(this.vcOutDir + 'ecs.pdb', this.distBinDir);
     },
 
-    installPyECS: function() {
-        var pyECSDir = this.projectDir + 'ecell\\pyecs\\';
-        BuildHelper.chdir(pyECSDir);
-        this.execPythonScript([
-                'setup.py',
-                'build',
-                '-b', this.vcOutDir + 'pyecs.build'
-            ].concat(this.debugBuild ? [ '-g' ]: []).concat([
-                'install',
-                '--prefix', '\\',
-                '--root', this.distDir
-            ]));
+    installLTDL: function() {
+        var ltdlDir = this.projectDir + 'libltdl\\';
+        var destDir;
+
+        destDir = this.distIncludeDir;
+        BuildHelper.mkdir(destDir);
+        BuildHelper.copy(ltdlDir + 'ltdl.h', destDir);
+
+        BuildHelper.mkdir(this.distLibDir);
+        BuildHelper.copy(this.vcOutDir + 'ltdl.lib', this.distLibDir);
     },
 
     installPyECell: function() {
         var pyECellDir = this.projectDir + 'ecell\\pyecell\\';
+        var destDir = this.distBinDir;
+        var pyECellDirScripts = [
+            'ecell3-em2eml',
+            'ecell3-eml2em',
+            'ecell3-session',
+            'ecell3-session-manager',
+            'ecell3-eml2sbml',
+            'ecell3-sbml2eml'
+        ];
+        BuildHelper.copyMultiple(
+            pyECellDir, destDir, pyECellDirScripts);
+        var self = this;
+        pyECellDirScripts.apply(function(fname) {
+                self.makePythonLauncher(destDir + '\\' + fname);
+            });
         BuildHelper.chdir(pyECellDir);
         this.execPythonScript(
             [
@@ -86,7 +107,6 @@ var tasks = {
         destDir = this.distLibEcellDir + 'dms\\';
         BuildHelper.mkdir(destDir);
         BuildHelper.copy(this.vcOutDir + 'dm\\*.dll', destDir);
-        BuildHelper.copy(dmObjectsDir + '*.desc', destDir);
     },
 
     installEMC: function() {
@@ -102,6 +122,7 @@ var tasks = {
 
         BuildHelper.mkdir(this.distBinDir);
         BuildHelper.copy(this.vcOutDir + 'emc.dll', this.distBinDir);
+        BuildHelper.copy(this.vcOutDir + 'emc.pdb', this.distBinDir);
     },
 
     installDMTool: function() {
@@ -110,26 +131,19 @@ var tasks = {
 
         BuildHelper.mkdir(destDir);
         BuildHelper.copy(dmToolDir + '*.hpp', destDir);
+
+        var dmcompileFile = dmToolDir + 'dmcompile';
+        BuildHelper.processTemplate(dmcompileFile, dmcompileFile + '.in', buildInfo.env);
+        BuildHelper.copy(dmcompileFile, this.distBinDir);
+        this.makePythonLauncher(this.distBinDir + '\\dmcompile');
     },
 
     installSessionMonitor: function() {
-        var sessionMonitorDir = this.projectDir + 'ecell\\model-editor\\';
+        var sessionMonitorDir = this.projectDir + 'ecell\\frontend\\session-monitor\\';
+        var sessionMonitorScripts = [
+            'ecell3-session-monitor'
+        ];
         BuildHelper.chdir(sessionMonitorDir);
-        this.execPythonScript(
-            [
-                'setup.py',
-                'build',
-                '-b', this.vcOutDir + 'model-editor.build'
-            ].concat(this.debugBuild ? [ '-g' ]: []).concat([
-                'install',
-                '--prefix', '\\',
-                '--root', this.distDir
-            ]));
-    },
-
-    installModelEditor: function() {
-        var modelEditorDir = this.projectDir + 'ecell\\session-monitor\\';
-        BuildHelper.chdir(modelEditorDir);
         this.execPythonScript(
             [
                 'setup.py',
@@ -138,19 +152,75 @@ var tasks = {
             ].concat(this.debugBuild ? [ '-g' ]: []).concat([
                 'install',
                 '--prefix', '\\',
+                '--install-scripts', 'bin',
                 '--root', this.distDir
             ]));
+        var self = this;
+        sessionMonitorScripts.apply(function(fname) {
+                self.makePythonLauncher(self.distBinDir + '\\' + fname, 'pythonw', true);
+            });
+    },
+
+    installModelEditor: function() {
+        var modelEditorDir = this.projectDir + 'ecell\\frontend\\model-editor\\';
+        var modelEditorScripts = [
+            'ecell3-model-editor'
+        ];
+        BuildHelper.chdir(modelEditorDir);
+        this.execPythonScript(
+            [
+                'setup.py',
+                'build',
+                '-b', this.vcOutDir + 'model-editor.build'
+            ].concat(this.debugBuild ? [ '-g' ]: []).concat([
+                'install',
+                '--prefix', '\\',
+                '--install-scripts', 'bin',
+                '--root', this.distDir
+            ]));
+        var self = this;
+        modelEditorScripts.apply(function(fname) {
+                self.makePythonLauncher(self.distBinDir + '\\' + fname, 'pythonw', true);
+            });
+    },
+
+    installDoc: function() {
+        var docDir = this.projectDir + 'doc\\';
+        var destDir;
+
+        destDir = this.distDocDir;
+        BuildHelper.mkdir(destDir);
+        BuildHelper.copyMultiple(
+            this.projectDir, destDir,
+            [
+                'README', 'AUTHORS', 'COPYING',
+                'COPYING.GPLv2', 'COPYING.GPLv3',
+                'COPYING.LGPLv2', 'COPYING.LGPLv3',
+                'INSTALL', 'NEWS', 'README', 'ChangeLog'
+            ]);
+
+        destDir = this.distDocDir+ 'samples\\';
+        BuildHelper.mkdir(destDir);
+        BuildHelper.copyRecursively(
+            docDir + 'samples\\', destDir,
+            [
+                '*.cpp', '*.em', '*.ecd', '*.py', '*.txt',
+                'README'
+            ],
+            [ '.svn' ]);
     },
 
     install: function() {
+        this.installLTDL();
+        this.installScripts();
         this.installECS();
         this.installEMC();
         this.installDMTool();
         this.installDMObjects();
-        this.installPyECS();
         this.installPyECell();
         this.installModelEditor();
         this.installSessionMonitor();
+        this.installDoc();
     }
 };
 

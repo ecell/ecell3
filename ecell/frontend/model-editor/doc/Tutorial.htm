@@ -1,0 +1,496 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE>E-Cell3 Model Editor Manual Instructions </TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 1.1.1  (Linux)">
+	<META NAME="AUTHOR" CONTENT="Administrator">
+	<META NAME="CREATED" CONTENT="20040325;20210000">
+	<META NAME="CHANGED" CONTENT="20040827;15482200">
+	<STYLE>
+	<!--
+		@page { size: 21.59cm 27.94cm; margin-left: 2.33cm; margin-right: 2.33cm; margin-top: 2.54cm; margin-bottom: 2.54cm }
+		P { direction: ltr; color: #000000; widows: 2; orphans: 2 }
+		P.western { font-family: "Times New Roman", serif; font-size: 12pt; so-language: en-US }
+		P.cjk { font-family: "MS Mincho", "ＭＳ 明朝", monospace; font-size: 12pt; so-language: ja-JP }
+		P.ctl { font-family: "Times New Roman", serif; font-size: 12pt; so-language: ar-SA }
+		PRE { direction: ltr; color: #000000; widows: 2; orphans: 2 }
+		PRE.western { font-family: "Luxi Mono", monospace; font-size: 10pt; so-language: en-US }
+		PRE.cjk { font-family: "Luxi Mono", monospace; font-size: 10pt; so-language: ja-JP }
+		PRE.ctl { font-family: "Luxi Mono", monospace; font-size: 10pt; so-language: ar-SA }
+		A:link { color: #000080; text-decoration: underline }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" TEXT="#000000" LINK="#000080" VLINK="#800000" DIR="LTR">
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=4 STYLE="font-size: 16pt">E-Cell3
+Model Editor Manual </FONT></FONT>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><B>Introduction</B></FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Ecell3
+ModelEditor is a graphical user interface utilizing python, gtk and
+gnome canvas for visualization, creation and modification of ecell3
+model files (.eml). ModelEditor is available both on Linux ( target
+platform </FONT></FONT>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><B>Download
+and Install</B></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-bottom: 0cm"><FONT SIZE=3><FONT FACE="Times New Roman, serif">ModelEditor
+source is part of the Ecell3 simulation environment code, once you
+install ecell3 you get ModelEditor installed, too. Source code can be
+found in the CVS repository of ecell project at
+</FONT></FONT><A HREF="http://sourceforge.net/projects/ecell"><FONT SIZE=3><FONT FACE="Times New Roman, serif">http://sourceforge.net/projects/ecell</FONT></FONT></A><FONT SIZE=3><FONT FACE="Times New Roman, serif">
+. </FONT></FONT>Binary RPM packages for Fedora Core 2 operating
+system, tarballs and source rpm packages are available from here.</P>
+<P CLASS="western" STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>To
+install ecell3 and ModelEditor, please follow instructions here:
+<A HREF="http://ecell.sourceforge.net/download.html">http://ecell.sourceforge.net/download.html</A>.</FONT></FONT></P>
+
+<P CLASS="western" STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>In
+the target Fedora Core 2 operational system only one package is not
+up-to date: gnome-python2-canvas-2.0.2. This package is in the
+development tree for FC3. Until then linux users can build it from
+source, the tarball is located at:</FONT></FONT></P>
+<P CLASS="western" STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><A HREF="ftp://ftp.gnome.org/pub/gnome/sources/gnome-python/2.0/gnome-python-2.0.3.tar.gz">ftp://ftp.gnome.org/pub/gnome/sources/gnome-python/2.0/gnome-python-2.0.3.tar.gz</A></FONT></FONT></P>
+
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><B>Invocation</B></FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>To
+start ModelEditor under Linux type:</FONT></FONT></P>
+
+<P STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Courier, monospace"><FONT SIZE=3>	ecell3-model-editor</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>optionally
+you can specify an eml file to be loaded upon startup by:</FONT></FONT></P>
+
+<P STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Courier, monospace"><FONT SIZE=3>	ecell3-model-editor
+-f filename</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><B>Operations
+on Main Window</B></FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><B>Load
+model:</B></FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>1.
+Using Main Window menu: click on File &gt; Open Model or File &gt;
+Open Recent</FONT></FONT></P>
+
+<OL START=2>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Using
+	Main Window buttons: click on the Open button</FONT></FONT></P>
+	<P STYLE="margin-bottom: 0cm"></P>
+</OL>
+<P STYLE="margin-bottom: 0cm"><IMG SRC="Tutorial_htm_m11d8617f.jpg" NAME="Graphic2" BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><B>Save
+model:</B></FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>1.
+Using Main Window menu: File &gt; Save Model or File &gt; Save Model
+As</FONT></FONT></P>
+<OL START=2>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Using
+	Main Window buttons: Click on the Save button</FONT></FONT></P>
+	<P STYLE="margin-bottom: 0cm"></P>
+</OL>
+<P STYLE="margin-bottom: 0cm"><IMG SRC="Tutorial_htm_m1305726a.jpg" NAME="Graphic3"  BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>3.
+Save model with new filename: File menu&gt; Save Model As</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><B>Undo/Redo:</B></FONT></FONT></P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Using
+	Main Window: click on the Undo button to undo an action or Redo
+	button to redo an action.</FONT></FONT></P>
+</OL>
+<P STYLE="margin-bottom: 0cm"><IMG SRC="Tutorial_htm_c6de307.jpg" NAME="Graphic5"  BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>2.
+Using PathwayEditor window: Right click on the Layout, a menu will be
+shown, click on Undo option to undo an action or Redo option to redo
+an action.</FONT></FONT></P>
+
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><B>LayoutManager
+Window</B></FONT></FONT></P>
+
+<P STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>On
+LayoutManager Window the user can create, delete, copy and show
+layouts. </FONT></FONT>
+</P>
+<P STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Layouts
+are abstract objects that contain the coordinate positions of
+entities of a model. One entity can appear on multiple layouts.
+Layouts can visualized on PathwayEditor windows.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>To
+pop up LayoutManager window, press on the big Layout button on
+MainWindow.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>1.
+Creating Layout: Click the Create button on the Layout Manager
+Window.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>2.
+Showing Layout: Select the layout from Layout Name list, click on the
+Show button.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>3.
+Renaming Layout: Select a layout to be renamed, enter a new Layout
+name.</FONT></FONT></P>
+<OL START=4>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Deleting
+	Layout: Select a layout name to be deleted, click the Delete button.</FONT></FONT></P>
+	<P STYLE="margin-bottom: 0cm"></P>
+</OL>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Copying
+a layout: not yet implemented.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><B>StepperWindow</B></FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>On
+StepperWindow the user can create, delete, rename steppers, change
+the class of the stepper and modify stepper properties.</FONT></FONT></P>
+
+<P STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>To
+invoke StepperWindow push on the Stepper button on MainWindow.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm; font-weight: medium"><BR>
+</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Creating
+	a stepper: In the Stepper Window click on the Add button to add a
+	new stepper.</FONT></FONT></P>
+	<P STYLE="margin-bottom: 0cm"></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Modify
+	stepper properties: Click on the PropertyList tab on the right side
+	of the window and the list of properties belonging to the stepper
+	can be seen. The list contains property name, value, flags, property
+	type. The value field can be edited if either the settable or
+	saveable flags are set. If the property type is INTEGER, FLOAT or
+	STRING the property values can be edited in the list where they
+	appear.  Properties of NESTED_LIST and MULTILINE type can be edited
+	on specific dialog windows. The special property editor windows can
+	be displayed by right clicking on the property and choosing “edit”
+	from the upcoming menu.</FONT></FONT></P>
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>If
+	the class of the stepper allows dynamic addition of properties the
+	Add button is sensitive and the user can add new properties to the
+	stepper.<BR>Delete flags are set for properties added by user
+	action. <BR></FONT></FONT><BR>
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Changing
+	class of a stepper: Select a stepper from StepperList. Under the
+	Summary tab, change the stepper class through the ClassName
+	dropdownlist.</FONT></FONT></P>
+</OL>
+
+<OL START=4>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Renaming
+	a stepper: </FONT></FONT>
+	</P>
+</OL>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>From
+	StepperList: Click on the stepper to be renamed from the
+	StepperList, enter a new name.</FONT></FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>From
+	Summary tab: Click on the stepper to be renamed in the StepperList,
+	enter a new name in the ID field.</FONT></FONT></P>
+</OL>
+<P STYLE="margin-bottom: 0cm"><IMG SRC="Tutorial_htm_dfb0ae5.jpg" NAME="Graphic1"  BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><B>PathwayEditor
+Window</B></FONT></FONT></P>
+<P CLASS="western" STYLE="margin-bottom: 0cm"><SPAN STYLE="font-weight: medium"><FONT SIZE=3><FONT FACE="Times New Roman, serif">On
+</FONT></FONT></SPAN>PathwayEditor window the user can create and
+modify 2D graphical representation of the model. Each PathwayEditor
+visualizes a layout consisting of systems, process, variables and
+connections between process and variables called variable references
+in ecell modeling language.</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>To
+invoke PathwayEditor with a brand new and empty layout push on the
+big Pathway button on Mainwindow.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>To
+invoke PathwayEditor with an already created layout, press Show
+button on LayoutManager window.</FONT></FONT></P>
+<P CLASS="western" STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Layouts
+contain only the entities of your choice but all layouts show the
+root system ('System::/') by default. Entities not shown on the
+layout can be displayed by right clicking on the canvas space and
+choose the “Show Variable”, “Show Process” or Show System”
+menupoints that contain all undisplayed entities belonging to the
+system whose canvasspace was clicked upon.</FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><B>Systems</B></FONT></FONT></P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Creating
+	a system: Click on the System button on the palette, then click on
+	the layout canvas.  If there is no space left on the canvas for a
+	new system, the system will not be created. </FONT></FONT>
+	</P>
+</OL>
+<OL START=2>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Renaming
+	a system: Double click on the system, the ObjectEditor window will
+	be popped up. Change the name by entering a new name in the ID
+	field.</FONT></FONT></P>
+</OL>
+<P STYLE="margin-left: 0.64cm; margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>ObjectEditor
+&gt; Summary &gt; ID</FONT></FONT></P>
+<OL START=3>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Resizing
+	a system:</FONT></FONT></P>
+	<OL>
+		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Double
+		click on the system, an ObjectEditor window will be popped up.
+		Click the ShapeProperty tab, enter a new width and height in the
+		width and height fields respectively.</FONT></FONT></P>
+	</OL>
+</OL>
+<P STYLE="margin-left: 1.27cm; margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>ObjectEditor
+&gt; ShapeProperty &gt; Width</FONT></FONT></P>
+<OL>
+	<OL START=2>
+		<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Drag
+		the outline of the system to the left, right, up, down, or
+		diagonally.</FONT></FONT></P>
+	</OL>
+</OL>
+<OL START=4>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Moving
+	a system: Drag the system to any available space within its parent
+	system.</FONT></FONT></P>
+</OL>
+<OL START=5>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Deleting
+	a system: Right click on the system, a pop up menu will be shown.
+	Click on “delete from layout” option to delete the system just
+	from the Layout, so the model will still contain it. Click on
+	“delete from model” option to delete it permanently from the
+	model.</FONT></FONT></P>
+</OL>
+<OL START=6>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Changing
+	system properties: Double click on the system, an ObjectEditor
+	window will be popped up.  Click on the PropertyList tab on the
+	ObjectEditor window and the list of properties belonging to the
+	system can be seen. The list contains propertyname, value, flags,
+	propertytype. The value field can be edited if either the settable
+	or saveable flags are set. </FONT></FONT>
+	</P>
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>If
+	the property type is INTEGER, FLOAT or STRING the property values
+	can be edited in the list where they appear.  Properties of
+	NESTED_LIST and MULTILINE type can be edited on specific dialog
+	windows. The special property editor windows can be displayed by
+	right clicking on the property and choosing “edit” from the
+	upcoming menu.</FONT></FONT></P>
+</OL>
+<IMG SRC="Tutorial_htm_m467f7435.jpg" NAME="Graphic4"  BORDER=0><BR CLEAR=LEFT>
+<IMG SRC="Tutorial_htm_m1846d5f6.jpg" NAME="Graphic12"  BORDER=0><BR CLEAR=LEFT>
+<IMG SRC="Tutorial_htm_23e557e7.jpg" NAME="Graphic13"  BORDER=0><BR CLEAR=LEFT>
+
+
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><B>Processes</B></FONT></FONT></P>
+
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Creating
+	a process: click on the Process button on the palette, click on the
+	layout. A default name will be given. </FONT></FONT>
+	</P>
+</OL>
+
+<OL START=2>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Changing
+	class for a process: Double click on the process, an ObjectEditor
+	window will be popped up. Change the process class using the
+	ClassName dropdownlist under the Summary tab.</FONT></FONT></P>
+</OL>
+<P STYLE="margin-left: 0.64cm; margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>ObjectEditor
+&gt; Summary &gt; ClassName</FONT></FONT></P>
+<OL START=3>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Deleting
+	a process: Right click on the process, a pop up menu will be
+	displayed. Click on delete from layout option to delete the process
+	from the Layout, or click on deletefrommodel option to delete it
+	permanently from the model.</FONT></FONT></P>
+</OL>
+<OL START=4>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Moving
+	a process: Drag the process to any available space within its parent
+	system.</FONT></FONT></P>
+</OL>
+<OL START=5>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Renaming
+	a process: In the ObjectEditor window, enter a new name in the ID
+	field under Summary tab.</FONT></FONT></P>
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>ObjectEditor
+	&gt; Summary &gt; ID</FONT></FONT></P>
+	<P STYLE="margin-bottom: 0cm"></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Change
+	process properties: Double click on the system, an ObjectEditor
+	window will be popped up.  Click on the PropertyList tab on the
+	ObjectEditor window and the list of properties belonging to the
+	process can be seen. The list contains propertyname, value, flags,
+	propertytype. The value field can be edited if either the settable
+	or saveable flags are set. If the property type is INTEGER, FLOAT or
+	STRING the property values can be edited in the list where they
+	appear.  Properties of NESTED_LIST and MULTILINE type can be edited
+	on specific dialog windows. The special property editor windows can
+	be displayed by right clicking on the property and choosing “edit”
+	from the upcoming menu. If the class of the process allows dynamic
+	addition of properties, the Add button is sensitive and the user can
+	add new properties to the process.<BR>Delete flags are set for
+	properties added by user action. </FONT></FONT>
+	</P>
+</OL>
+<UL>
+	<P STYLE="margin-bottom: 0cm"></P>
+</UL>
+<OL START=7>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Change
+	shape properties: In the ObjectEditor window, click the
+	ShapeProperty tab.</FONT></FONT></P>
+</OL>
+<P STYLE="margin-left: 0.64cm; margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>ObjectEditor
+&gt; ShapeProperty</FONT></FONT></P>
+
+<P STYLE="margin-bottom: 0cm"><IMG SRC="Tutorial_htm_m668b052.jpg" NAME="Graphic8"  BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><B>Variable</B></FONT></FONT></P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Creating
+	a variable: click on the Variable button on the palette, click on
+	the layout. </FONT></FONT>
+	</P>
+</OL>
+
+<OL START=2>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Deleting
+	a variable: Right click on the variable; a popup menu will be
+	displayed. </FONT></FONT>
+	</P>
+</OL>
+<P STYLE="margin-left: 0.64cm; margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Click
+on delete from layout option to delete the variable from the Layout,
+or click on deletefrommodel option to delete it permanently from the
+model.</FONT></FONT></P>
+
+<OL START=3>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Moving
+	a variable: Drag the variable to any available space.</FONT></FONT></P>
+</OL>
+
+<OL START=4>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Renaming
+	a variable: In the ObjectEditor window, enter a new name in the ID
+	field under the Summary tab.</FONT></FONT></P>
+</OL>
+<P STYLE="margin-left: 0.64cm; margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>ObjectEditor
+&gt; Summary &gt; ID</FONT></FONT></P>
+
+<OL START=5>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Change
+	variable properties: Double click on the variable, an ObjectEditor
+	window will be popped up.  Click on the PropertyList tab on the
+	ObjectEditor window and the list of properties belonging to the
+	variablecan be seen. The list contains propertyname, value, flags,
+	propertytype. The value field can be edited if either the settable
+	or saveable flags are set. If the property type is INTEGER, FLOAT or
+	STRING the property values can be edited in the list where they
+	appear.  Properties of NESTED_LIST and MULTILINE type can be edited
+	on specific dialog windows. The special property editor windows can
+	be displayed by right clicking on the property and choosing “edit”
+	from the upcoming menu.</FONT></FONT></P>
+</OL>
+
+<OL START=6>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Change
+	shape properties: In the ObjectEditor window, click the
+	ShapeProperty tab.</FONT></FONT></P>
+</OL>
+<P STYLE="margin-left: 0.64cm; margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>ObjectEditor
+&gt; ShapeProperty</FONT></FONT></P>
+<IMG SRC="Tutorial_htm_m3d6e2535.jpg" NAME="Graphic6"  BORDER=0><BR CLEAR=LEFT>
+
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><B>Connection</B></FONT></FONT></P>
+<P STYLE="margin-bottom: 0cm; font-weight: medium"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>A
+connection is the graphical representation of a variablereference,
+practically an arrow between a process and a variable. The direction
+of the arrow is determined by the coefficient of the
+variablereference, if the coefficient is negative, the arrow points
+toward the process, if the coefficient is positive, the arrow points
+toward the variable. </FONT></FONT>
+</P>
+
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Creating
+	a connection: Move the mouse over to one of the small dots on the
+	outline of a  process and then drag it over to a dot on any variable
+	outline. A connection will be shown between process and variable. </FONT></FONT>
+	</P>
+</OL>
+
+<OL START=2>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Change
+	varrefname (Variable reference name): Double click on the
+	connection, a ConnectionObjectEditor window will pop up. Change the
+	name by entering a new name in the Name field</FONT></FONT></P>
+</OL>
+<P STYLE="margin-left: 0.64cm; margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>ConnectionObjectEditor
+&gt; Variable Reference &gt; Name</FONT></FONT></P>
+
+<OL START=3>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Change
+	coefficient: In the ConnectionObjectEditor window, enter a new
+	coefficient in the Coefficient field.</FONT></FONT></P>
+</OL>
+<P STYLE="margin-left: 0.64cm; margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>ConnectionObjectEditor
+&gt; Variable Reference &gt; Coefficient</FONT></FONT></P>
+
+<OL START=4>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Change
+	line properties: </FONT></FONT>
+	</P>
+</OL>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Change
+	the Arrow Style: select the arrow style from the Arrow Style
+	dropdownlist</FONT></FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Change
+	the Arrow Type: select the arrow type from the Arrow Type
+	dropdownlist</FONT></FONT></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Change
+	the Arrow Color: Click on Select Color button, a color chooser will
+	be displayed </FONT></FONT>
+	</P>
+</OL>
+<P STYLE="margin-left: 0.64cm; margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>ConnectionObjectEditor
+&gt; Line Property </FONT></FONT>
+</P>
+<P STYLE="margin-bottom: 0cm"><IMG SRC="Tutorial_htm_m1d2b949b.jpg" NAME="Graphic9"  BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P CLASS="western" STYLE="margin-bottom: 0cm"><B>Preferences Window</B></P>
+<P CLASS="western" STYLE="margin-bottom: 0cm">Preferences Window is
+currently used only for setting Autosave parameters.</P>
+
+<P STYLE="margin-bottom: 0cm"><IMG SRC="Tutorial_htm_m13c8c45.jpg" NAME="Graphic7"  BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times New Roman, serif"><FONT SIZE=3><B>Desc
+Files</B></FONT></FONT></P>
+<PRE CLASS="western" STYLE="font-weight: medium"><FONT FACE="Times New Roman, serif"><FONT SIZE=3>Descriptor files are plain text files that contain important information about ecell3 entity and stepper classes, most importantly the propertylist, types of properties, default values of properties and attribute flags of properties. The descriptor filenames are classname.desc and are located in ecell/dm for built in classes. If you create your own process or stepper classes, you also have to create a .desc file to enable ModelEditor handle the new classes.</FONT></FONT>
+<FONT FACE="Times New Roman, serif"><FONT SIZE=3>Currently a descriptor file contains 3 entries a general string description of the class, a flag indicating whether the class allows creating properties other than the default properties of the class and a list of built in properties, type, access flags, default values of these properties.</FONT></FONT>
+<FONT FACE="Times New Roman, serif"><FONT SIZE=3>The format of the descriptor file can easily be explained through this example that is actually the descriptor file of the builtin class Variable.</FONT></FONT>
+
+
+
+
+
+<FONT FACE="Courier, monospace"><FONT SIZE=3>Variable.desc</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=3># general description of the class</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=3>DESCRIPTION=Variable</FONT></FONT>
+                                                                                
+<FONT FACE="Courier, monospace"><FONT SIZE=3># whether class allows new properties (other then the hardcoded ones) created by modeleditor</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=3>ACCEPTNEWPROPERTY=False</FONT></FONT>
+                                                                                
+<FONT FACE="Courier, monospace"><FONT SIZE=3># propertyname, type, defaultvalue, flags</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=3># flags are: (settable, gettable, loadable, saveable) 1 means True, 0 means false</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=3># type can be: NESTED_LIST, STRING, MULTILINE, INTEGER, FLOAT</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=3>PROPERTYLIST</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=3>Fixed, INTEGER, 0, 1111</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=3>MolarConc, FLOAT, 0.0, 1100</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=3>Name, STRING, &quot;&quot;, 1111</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=3>NumberConc, FLOAT, 0.0, 1100</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=3>TotalVelocity, FLOAT, 0.0, 0100</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=3>Value, FLOAT, 0.0, 1111</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=3>Velocity, FLOAT, 0.0, 0100</FONT></FONT>
+<FONT FACE="Courier, monospace"><FONT SIZE=3>END</FONT></FONT></PRE>
+</BODY>
+</HTML>

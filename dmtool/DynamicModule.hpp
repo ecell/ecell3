@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -28,240 +28,127 @@
 #ifndef __DYNAMICMODULE_HPP
 #define __DYNAMICMODULE_HPP
 
-#include <exception>
-#include <string>
-#include "ltdl.h"
-
-#if defined(WIN32) || defined(_WIN32)
-#undef GetClassInfo
-#endif /* _WIN32 */
+#include "dmtool/DMException.hpp"
+#include "dmtool/DynamicModuleDescriptor.hpp"
 
 /// doc needed
 
-#define SimpleAllocator( BASE ) BASE* (*)()
-typedef const void*(*InfoLoaderType)();
-
-/**
-   Exception class for dmtool.
-*/
-
-class DMException : public std::exception
+enum DynamicModuleType
 {
-public: 
-
-  DMException( const std::string& message ) 
-    : 
-    theMessage( message )
-  {
-    ; // do nothing
-  }
-
-  ~DMException() throw()
-  {
-    ; // do nothing
-  }
-
-  /**
-     Get dynamically created exception message.
-   */
-
-  const char* what() const throw()
-  { 
-    return theMessage.c_str();
-  }
-
-private:
-  
-  const std::string theMessage;
-
+    DM_TYPE_BUILTIN,
+    DM_TYPE_SHARED,
+    DM_TYPE_DYNAMIC
 };
+
+class DynamicModuleInfo;
 
 /**
   Common base class of DynamicModule and SharedDynamicModule
 */
   
-template <class Base,class _TAllocator = SimpleAllocator( Base )>
-class DynamicModuleBase
+template < class T >
+class DynamicModule
 {
-public:
+public:        
 
-  typedef _TAllocator DMAllocator;
+    DynamicModule( enum DynamicModuleType aType ): theType( aType )
+    {
+    }
 
-public:		
+    virtual ~DynamicModule() {}
+ 
+    virtual const char* getModuleName() const = 0;
 
-  DynamicModuleBase( const std::string& moduleName,
-                     DMAllocator allocator,
-                     InfoLoaderType infoLoader,
-                     const std::string& typeName = "" );
-  virtual ~DynamicModuleBase(){}
-  
-  const std::string& getModuleName() const
-  {
-    return this->theModuleName;
-  }
+    virtual const char* getFileName() const = 0;
 
-  virtual const std::string getFileName() const
-  {
-    return "";
-  }
+    virtual T* createInstance() const = 0;
 
-  const DMAllocator& getAllocator() const
-  {
-    return this->theAllocator;
-  }
+    virtual const DynamicModuleInfo* getInfo() const = 0;
 
-  const InfoLoaderType& getInfoLoader() const
-  {
-	return this->theInfoLoader;
-  }
-
-  const std::string getTypeName() const
-  {
-    return this->theTypeName;
-  }
+    enum DynamicModuleType getType() const
+    {
+        return theType;
+    }
 
 protected:
 
-  const std::string theModuleName;
-  DMAllocator theAllocator;
-  InfoLoaderType theInfoLoader;
-  const std::string theTypeName;
+    enum DynamicModuleType theType;
 };
 
 
-/**
-   DynamicModule instantiates objects of a single class.
-*/
-
-template <class Base,class Derived,class DMAllocator = SimpleAllocator( Base )>
-class DynamicModule
-  :
-  public DynamicModuleBase< Base, DMAllocator >
+template < class T >
+class StaticDynamicModule: public DynamicModule< T >
 {
-
 public:
 
-  DynamicModule( const std::string& moduleName,
-		 const std::string& typeName = "" );
-  virtual ~DynamicModule(){}
-};
+    typedef DynamicModule< T > Base;
 
+public:        
 
-
-/**
-   SharedDynamicModule loads a class from a shared object file
-   and instantiate objects of the loaded class.
-   It opens and loads a shared object(.so) file into memory
-   when constructed. It closes the file when deleted.
-
-   The shared object must have followings:
-     - T* CreateObject()       - which returns a new object.
-   and
-     - void* GetClassInfo()    - which must be reinterpreted to PolymorphMap in libecs, sorry, 
-	 maybe later a pure string version should be implemented
-     - a full set of symbols needed to instantiate and use the class.
-*/
-
-template <class Base,class DMAllocator = SimpleAllocator( Base )>
-class SharedDynamicModule : public DynamicModuleBase< Base >
-{
-
-public:
-
-  SharedDynamicModule( const std::string& classname, DMAllocator allocator,
-                       InfoLoaderType infoLoader, const std::string& typeName,
-                       const std::string& fileName, lt_dlhandle handle );
-  virtual ~SharedDynamicModule();
-  const std::string getFileName() const;
-
-private:
-
-  lt_dlhandle theHandle;
-  std::string theFileName;
-  std::string theTypeName;
-};
-
-/**
-   comments needed
-*/
-
-#define NewDynamicModule( BASE, DERIVED )\
-addClass( new DynamicModule< BASE, DERIVED >( #DERIVED, DERIVED::getTypeName() ) )
-
-/**
-   comments needed
-*/
-
-#define NewDynamicModuleWithAllocator( BASE, DERIVED, ALLOC )\
-addClass( new DynamicModule< BASE, DERIVED, ALLOC >( #DERIVED ) )
-
-
-//////////////////////////// begin implementation
-
-template < class Base, class DMAllocator >
-DynamicModuleBase< Base, DMAllocator >::
-DynamicModuleBase( const std::string& moduleName,
-		   DMAllocator allocator, InfoLoaderType infoLoader,
-		   const std::string& typeName )
-  : 
-  theModuleName( moduleName ),
-  theAllocator( allocator ),
-  theInfoLoader( infoLoader ),
-  theTypeName( typeName )
-{
-  ; // do nothing
-}
-
-template < class Base, class Derived, class DMAllocator >
-DynamicModule< Base, Derived, DMAllocator >::
-DynamicModule( const std::string& moduleName, const std::string& typeName )
-  : 
-  DynamicModuleBase<Base,DMAllocator>( moduleName,
-				       reinterpret_cast< DMAllocator >(
-                         &Derived::createInstance ),
-				       &Derived::getClassInfoPtr,
-				       typeName )
-{
-  ; // do nothing
-}
-
-template < class Base, class DMAllocator >
-SharedDynamicModule< Base, DMAllocator >::
-SharedDynamicModule( const std::string& classname, DMAllocator allocator,
-                     InfoLoaderType infoLoader, const std::string& typeName,
-                     const std::string& fileName, lt_dlhandle handle )
-  :
-  DynamicModuleBase<Base,DMAllocator>( classname, allocator, infoLoader,
-                                       typeName ), 
-  theFileName( fileName ),
-  theHandle( handle )
-{
-}
-
-template < class Base, class DMAllocator >
-SharedDynamicModule<Base,DMAllocator>::~SharedDynamicModule()
-{
-
-  if( this->theHandle != NULL )
+    StaticDynamicModule( enum DynamicModuleType aType,
+                   DynamicModuleDescriptor const& desc )
+        : Base( aType ), theDescriptor( &desc )
     {
-      lt_dlclose( this->theHandle );
+        theDescriptor->moduleInitializer();
     }
-}
+
+    virtual ~StaticDynamicModule()
+    {
+        if ( theDescriptor )
+        {
+            ( *theDescriptor->moduleFinalizer )();
+        }
+    }
+
+    const DynamicModuleDescriptor& getDescriptor()
+    {
+        return *theDescriptor;
+    }
+ 
+    virtual const char* getModuleName() const
+    {
+        return theDescriptor->moduleName;
+    }
+
+    virtual T* createInstance() const
+    {
+        return reinterpret_cast< T* >( ( *theDescriptor->allocator )() );
+    }
+
+    virtual const DynamicModuleInfo* getInfo() const
+    {
+        return ( *theDescriptor->infoLoader )();
+    }
+
+protected:
+
+    DynamicModuleDescriptor const* theDescriptor;
+};
 
 
-
-template < class Base, class DMAllocator >
-const std::string SharedDynamicModule<Base,DMAllocator>::getFileName() const
+/**
+   BuiltinDynamicModule is a class statically linked to the binary
+   that utilizes ModuleMaker
+ */
+template < class T >
+class BuiltinDynamicModule : public StaticDynamicModule< T >
 {
-  return this->theFileName;
-}
+public:
+
+    typedef StaticDynamicModule< T > Base;
+
+public:
+
+    BuiltinDynamicModule( DynamicModuleDescriptor const& desc )
+        : Base( DM_TYPE_BUILTIN, desc )
+    {
+        ; // do nothing
+    }
+
+    virtual const char* getFileName() const
+    {
+        return "<builtin>";
+    }
+};
 
 #endif /* __DYNAMICMODULE_HPP */
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

@@ -8,7 +8,7 @@
 #include "Variable.hpp"
 #include "Interpolant.hpp"
 
-using namespace libecs;
+USE_LIBECS;
 
 LIBECS_DM_CLASS( MakesignalProcess, Process )
 {

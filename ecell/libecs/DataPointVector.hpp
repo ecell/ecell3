@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -32,30 +32,20 @@
 #if !defined( __DATAPOINTVECTOR_HPP )
 #define __DATAPOINTVECTOR_HPP
 
-#include "DataPoint.hpp"
-#include "Defs.hpp"
+#include "libecs/Defs.hpp"
+#include "libecs/DataPoint.hpp"
 #include <sys/types.h>
-
 
 namespace libecs
 {
 
-  /** @addtogroup logging
-   *@{
-   */
+DECLARE_TYPE( size_t, DataPointVectorIterator )
 
-  /** @file */
+DECLARE_SHAREDPTR( DataPointVector );
 
-
-  DECLARE_TYPE( size_t, DataPointVectorIterator );
-
-  DECLARE_SHAREDPTR( DataPointVector );
-
-  class LIBECS_API DataPointVector
-  {
-
-  public:
-
+class LIBECS_API DataPointVector
+{
+public:
     DataPointVector( DataPointVectorIterator, int aPointSize );
 
     ~DataPointVector();
@@ -70,27 +60,26 @@ namespace libecs
 
     DataPointVectorIterator getSize() const
     {
-      return theSize;
+        return theSize;
     }
 
     size_t getElementSize() const;
-	
+            
     DataPointVectorIterator begin() const
     {
-      return 0;
+        return 0;
     }
-	
+            
     DataPointVectorIterator end() const
     {
-      return getSize();
+        return getSize();
     }
-	
+            
     const void* getRawArray() const;
 
     Integer getPointSize();
 
-  private:
-
+private:
     DataPointVectorIterator theSize;
 
     Integer thePointSize;
@@ -98,12 +87,8 @@ namespace libecs
     DataPoint* theRawArray;
 
     LongDataPoint* theRawArrayLong;
-
-  };
-
-  //@}
+};
 
 } // namespace libecs
-
 
 #endif /* __DATAPOINTVECTOR_HPP */

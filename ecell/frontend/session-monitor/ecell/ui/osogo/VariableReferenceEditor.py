@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -24,16 +24,16 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # 
 #END_HEADER
+
 import operator
 
 import gobject
 import gtk
 import gtk.gdk
 
-import ecell.util as util
+from ecell.ecssupport import *
 
-from Pane import Pane
-from utils import *
+from ecell.ui.osogo.ConfirmWindow import *
 
 VARREF_NAME = 0
 VARREF_FULLID = 1
@@ -43,62 +43,59 @@ NAME_COLUMN = 0
 FULLID_COLUMN = 1
 COEF_COLUMN = 2
 EDITABLE_COLUMN = 3
+COLOR_COLUMN = 4
 
-class VariableReferenceEditor( Pane ):
-    columnSpecList = [
-        {
-            'type': gobject.TYPE_STRING,
-            'column': NAME_COLUMN,
-            'visible': True,
-            'label': 'Name',
-            },
-        {
-            'type': gobject.TYPE_STRING,
-            'column': NAME_COLUMN,
-            'visible': True,
-            'label': 'FullID',
-            },
-        {
-            'type': gobject.TYPE_STRING,
-            'column': FULLID_COLUMN,
-            'visible': True,
-            'label': 'Coefficient',
-            },
-        {
-            'type': gobject.TYPE_BOOLEAN,
-            'column': EDITABLE_COLUMN,
-            'visible': False,
-            'label': '',
-            },
-        ]
 
-    def __init__( self ):
-        Pane.__init__( self )
-        self.theFullID = None
+class VariableReferenceEditor:
+    
+    def __init__( self, aParent, attachmentPoint ):
+        self.theParent = aParent
+        self.theSession = self.theParent.theSession
 
-    def initUI( self ):
-        Pane.initUI( self )
-        self.theTreeView = self.theRootWidget
-        self.theListStore = gtk.ListStore(
-            *map( lambda x: x['type'], self.columnSpecList ) )
+        self.theListStore = gtk.ListStore( gobject.TYPE_STRING,
+                                            gobject.TYPE_STRING,
+                                            gobject.TYPE_STRING,
+                                            gobject.TYPE_BOOLEAN )
+        self.theTreeView = gtk.TreeView()
+        self.theTreeView.show()
         self.theTreeView.set_model( self.theListStore )
-        for columnSpec in self.columnSpecList:
-            rdr = gtk.CellRendererText()
-            rdr.connect(
-                'edited', self.__cellEdited, columnSpec['column'])
-            col = gtk.TreeViewColumn(
-                columnSpec['label'], rdr,
-                text = columnSpec['column'], editable = EDITABLE_COLUMN )
-            col.set_visible( columnSpec['visible'] )
-            col.set_resizable( True )
-            col.set_reorderable( True )
-            col.set_sort_column_id = columnSpec['column']
-            self.theTreeView.append_column( col )
-        self.theTreeView.size_allocate( gtk.gdk.Rectangle( 0, 0, 100, 1000 ) )
-        self.theTreeView.connect( "button-press-event", self.__buttonPressed )
 
+        rendererName = gtk.CellRendererText( )
+        rendererName.connect('edited', self.__cellEdited, NAME_COLUMN)
+        columnName=gtk.TreeViewColumn( "Name", rendererName, text=NAME_COLUMN, editable = EDITABLE_COLUMN)
+        columnName.set_visible( True )
+        columnName.set_resizable( True )
+        columnName.set_reorderable( True )
+        columnName.set_sort_column_id = NAME_COLUMN
+        
+        rendererFullID = gtk.CellRendererText()
+        rendererFullID.connect('edited', self.__cellEdited, FULLID_COLUMN)
+        columnFullID =gtk.TreeViewColumn( "FullID", rendererFullID, text=FULLID_COLUMN, editable=EDITABLE_COLUMN)
+        columnFullID.set_visible( True )
+        columnFullID.set_resizable( True )
+        columnFullID.set_reorderable( True )
+        columnFullID.set_sort_column_id ( FULLID_COLUMN )
+        
+        rendererCoef = gtk.CellRendererText()
+        rendererCoef.connect('edited', self.__cellEdited, COEF_COLUMN)
+        columnCoef=gtk.TreeViewColumn( "Coefficient", rendererCoef, text=COEF_COLUMN, editable=EDITABLE_COLUMN)
+        columnCoef.set_visible( True )
+        columnCoef.set_resizable( True )
+        columnCoef.set_reorderable( True )
+        columnCoef.set_sort_column_id ( COEF_COLUMN )
+        
+        self.theTreeView.append_column( columnName )
+        self.theTreeView.append_column( columnFullID )
+        self.theTreeView.append_column( columnCoef )
+        self.theTreeView.connect( "button-press-event", self.__buttonPressed )
+        attachmentPoint.add( self.theTreeView )
+        self.setDisplayedFullID ( self.theParent.theFullID() )
+        
+        
     def setDisplayedFullID ( self, aFullID ):
         self.theFullID = aFullID
+        self.theFullIDString = createFullIDString( self.theFullID )
+        self.theFullPNString = createFullIDString( self.theFullID ) + ":VariableReferenceList"
         self.update()
         
     def getProcessFullID( self ):
@@ -106,8 +103,7 @@ class VariableReferenceEditor( Pane ):
         
     def update( self ):
         # gets varreflist
-        theValue = self.theParent.theSession.getEntityProperty(
-                self.theFullID.createFullPN( 'VariableReferenceList' ) )
+        theValue = self.theSession.theSimulator.getEntityProperty( self.theFullPNString )
         
         #redraw whole list
         self.theListStore.clear()
@@ -115,16 +111,12 @@ class VariableReferenceEditor( Pane ):
 
         for aVariableReference in theValue:
             aName = aVariableReference[VARREF_NAME]
-            aFullIDString = aVariableReference[VARREF_FULLID]
+            aFullID = aVariableReference[VARREF_FULLID]
             aCoef = aVariableReference[VARREF_COEF]
-            anIter = self.theListStore.append()
+            anIter = self.theListStore.append(  )
             # to make columns editable change False to True 
-            self.theListStore.set(
-                anIter,
-                NAME_COLUMN, aName,
-                FULLID_COLUMN, aFullIDString,
-                COEF_COLUMN, aCoef,
-                EDITABLE_COLUMN, False )
+            self.theListStore.set( anIter, 0, aName, 1, aFullID, 2, aCoef, 3, False )
+        
         
     def __setValue( self ):
         #take value from list and redraw
@@ -140,24 +132,22 @@ class VariableReferenceEditor( Pane ):
         aVarrefListTuple = tuple( aVarrefList )
 
         try:
-            self.theParent.theSession.setEntityProperty(
-                util.convertFullIDToFullPN(
-                    self.theFullID, 'VariableReferenceList' ),
-                aVarrefListTuple )
+            self.theSession.theSimulator.setEntityProperty( self.theFullPNString, aVarrefListTuple )
         except:
             # print out traceback
             import sys
             import traceback
-            anErrorMessage = string.join(
-                traceback.format_exception( 
-                    sys.exc_type,sys.exc_value,sys.exc_traceback ),
-                                            '\n' )
-            self.theParent.theSession.message(anErrorMessage)
+            anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback ) )
+            self.theSession.message("-----An error happens.-----")
+            self.theSession.message(anErrorMessage)
+            self.theSession.message("---------------------------")
     
             # creates and display error message dialog.
-            anErrorMessage = "Could not change variable references"
-            showPopupMessage( OK_MODE, anErrorMessage, "Error" )
+            anErrorMessage = "Couldnot change variablereference"
+            anErrorTitle = "Error"
+            anErrorWindow = ConfirmWindow(OK_MODE,anErrorMessage,anErrorTitle)
             self.update()
+            
         
     def __cellEdited( self, *args ):
         aNewValue = args[2]
@@ -167,13 +157,14 @@ class VariableReferenceEditor( Pane ):
         if column == COEF_COLUMN:
             #check whether it is integer
             if not operator.isNumberType( aNewValue):
-                showPopupMessage( OK_MODE,
-                    "Coefficient should be numeric.", "Error" )
+                anErrorWindow = ConfirmWindow(OK_MODE,"Coefficient should be numeric.","Error")
                 return
         self.theListStore.set_value( anIter, column, aNewValue )
         self.__setValue()
         
-    def __buttonPressed( self, widget, event ):
+    def __buttonPressed( self, *args ):
+
+        event = args[1]
         if event.type == gtk.gdk._2BUTTON_PRESS:
             realFullID = self.__getRealFullID()
             if realFullID != None:
@@ -186,9 +177,14 @@ class VariableReferenceEditor( Pane ):
         selectedFullID = self.__getSelectedFullID()
         if selectedFullID == None:
             return None
-        isFullIDReal = self.theParent.theSession.getEntityClassName(
-            selectedFullID )
-        return isFullIDReal != None and selectedFullID or None
+        else:
+            realFullID = self.__getAbsoluteReference( selectedFullID )
+            isFullIDReal = self.__doesExistEntity( realFullID )
+            if isFullIDReal:
+                return realFullID
+            else:
+                return None
+
 
     def __popUpMenu(self ):
         selectedIter = self.__getSelectedIter()
@@ -225,44 +221,99 @@ class VariableReferenceEditor( Pane ):
         aMenu.show_all()
         aMenu.popup( None, None, None, 1, 0 )
 
-    def __openNewAction( self, widget, aFullIDString ):
-        theFullPNList =  [
-            identifiers.FullPN( identifiers.FullID( aFullIDString ), '' )
-            ]
-        self.theParent.theSession.openPluginWindow(
-            "PropertyWindow", theFullPNList )
 
-    def __openAction ( self, widget, aFullIDString ):
-        theFullPNList =  [
-            identifiers.FullPN( identifiers.FullID( aFullIDString ), '' )
-            ]
+    def __openNewAction( self, *args ):
+        aFullIDString = args[1]
+
+        theFullPNList =  [convertFullIDToFullPN( createFullID( aFullIDString ) )]  
+        self.theSession.thePluginManager.createInstance( "PropertyWindow", 
+                       theFullPNList )
+
+
+    def __openAction ( self, *args ):
+        aFullIDString = args[1]
+        theFullPNList =  [convertFullIDToFullPN( createFullID( aFullIDString ) )]  
         self.theParent.theQueue.pushFullPNList( theFullPNList )
         self.theParent.update( True )
+    
     
     def __addAction ( self, *args ):
         pass
         
     def __deleteAction( self, *args ):
         pass
+                        
+    
+
 
     def __getSelectedFullID( self ):
         anIter = self.__getSelectedIter()
         if anIter == None:
             return None
-        aVarref = identifiers.FullID(
-            self.theListStore.get_value( anIter, FULLID_COLUMN ) )
-        return self.__getAbsoluteReference( aVarref )
+        aVarref = self.theListStore.get_value( anIter, FULLID_COLUMN )
+        return  self.__getAbsoluteReference( aVarref )
+        
     
     def __getSelectedIter( self ):
         anIter = self.theTreeView.get_selection().get_selected()[1]
         return anIter
         
-    def __getAbsoluteReference( self, aFullID ):
-        aVariableSystemPath = aFullID.getSuperSystemPath()
 
-        if aVariableSystemPath.isAbsolute():
-            aVariableSystemPath = aVariableSystemPath
+        
+    def __doesExistEntity( self, anEntity ):
+        try:
+            self.theSession.theSimulator.getEntityClassName( anEntity )
+        except:
+            return False
         else:
-            aVariableSystemPath = aVariableSystemPath.toAbsolute(
-                self.theFullID.getSuperSystemPath() )
-        return identifiers.FullID( VARIABLE, aVariableSystemPath, aFullID.id )
+            return True
+
+
+    def __getAbsoluteReference( self, aVariableRef ):
+        aVariable = aVariableRef.split(':')
+
+        if self.__isAbsoluteReference( aVariableRef ):
+            aVariable [0] = "Variable"
+            return ":".join( aVariable)
+        if aVariable[1][0] == '/':
+            # absolute ref
+            absolutePath = aVariable[1]
+        elif aVariable[1][0] == '.':
+            aProcess = self.theFullIDString.split(':')[1]
+            aProcessPath = aProcess.split('/')
+            while True:
+                if len(aProcessPath) == 0:
+                    break
+                if aProcessPath[0] == '':
+                    aProcessPath.__delitem__(0)
+                else:
+                    break
+            aVariablePath = aVariable[1].split('/')
+            absolutePath = ''
+            while aVariablePath != []:
+                pathString =  aVariablePath.pop()
+                if pathString == '.':
+                    break
+                elif pathString == '..':
+                    if len(aProcessPath) == 0:
+                        return aVariableRef
+                    aProcessPath.pop()
+                else:
+                    absolutePath =  pathString + '/' + absolutePath
+            oldPath = '/' + '/'.join(aProcessPath)
+            absolutePath = absolutePath.rstrip('/')
+            if oldPath != '/' and absolutePath != '':
+                oldPath +='/'
+            absolutePath =  oldPath + absolutePath
+    
+        else:
+            return aVariableRef
+    
+        return "Variable" + ':' + absolutePath + ':' + aVariable[2]
+    
+    
+    
+    def __isAbsoluteReference(self, aVariableRef ):
+        aList = aVariableRef.split(':')
+        return aList[1][0] == '/'
+    

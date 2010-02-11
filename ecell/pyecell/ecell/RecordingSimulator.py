@@ -1,9 +1,10 @@
+#!/usr/bin/env python
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -25,13 +26,13 @@
 # 
 #END_HEADER
 
+
 import ecell.emc
 
-__all__ = (
-    'RecordingSimulator'
-    )
 
+#FIXME: incomplete
 class RecordingSimulator( ecell.ecs.Simulator ):
+
     def __init__( self, filename ):
 
         Simulator.__init__( self )
@@ -41,11 +42,15 @@ class RecordingSimulator( ecell.ecs.Simulator ):
 
         self.theOutput.close()
 
+        
     def record( self, string ):
+
         self.theOutput.write( string )
         self.theOutput.write( "\n" )
 
+
     def run( self , time='' ):
+
         if not time:
             self.theStartTime = self.getCurrentTime()
             self.theSimulator.run()
@@ -60,32 +65,49 @@ class RecordingSimulator( ecell.ecs.Simulator ):
         self.record( 'aSession.run( %f )' % aRunTime )
 
     def step( self, num = 1 ):
+
         for i in range(num):
             self.theSimulator.step()
         self.record( 'for i in range( %d ):' % num )
         self.record( '    aSession.step()' )
 
     def initialize( self ):
+
         self.theSimulator.initialize()
 
     def createEntity( self, type, fullid, name ):
+
         self.theSimulator.createEntity( type, fullid, name )
         self.record( 'aSimulator.createEntity( \'%s\', %s, \'%s\' )' % (type, fullid, name) )
 
     def setEntityProperty( self, fullpn, value ):
+
         self.theSimulator.setEntityProperty(fullpn, value)
         self.record( 'aSimulator.setEntityProperty( %s, %s )' % (fullpn, value) )
         
     def getLogger( self, fullpn ):
+
         return self.theSimulator.getLogger( fullpn )
         self.record( 'aSimulator.setLogger( %s )' % fullpn )
 
     def setEventChecker( self, event ):
+
         self.theSimulator.setEventChecker( event )
         
     def setEventHandler( self, event ):
+
         self.theSimulator.setEventHandler( event )
 
 
 if __name__ == "__main__":
+
     aSimulator = Simulator()
+
+
+
+
+
+
+
+
+

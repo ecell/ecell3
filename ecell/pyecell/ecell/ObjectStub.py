@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -31,58 +31,82 @@
 # E-Cell Project, Lab. for Bioinformatics, Keio University.
 #
 
-__all__ = (
-    'ObjectStub'
-    )
 
+from ecs_constants import *
+
+# ---------------------------------------------------------------
+# ObjectStub
+#   - provides an object-oriented appearance to the ecs.Simulator's API
+#   - does not check validation of each argument.
+# ---------------------------------------------------------------
 class ObjectStub:
-    """
-    ObjectStub
-      - provides an object-oriented appearance to the ecs.Simulator's API
-      - does not check validation of each argument.
-    """
 
+
+    # ---------------------------------------------------------------
+    # Constructor (must be called in constructor of subclass)
+    #
+    # aSimulator    : a reference to a Simulator 
+    #
+    # return -> None
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
     def __init__( self, aSimulator ):
-        """
-        Constructor (must be called in constructor of subclass)
-        
-        aSimulator    : a reference to a Simulator 
-        
-        return -> None
-        This method may throw an exception.
-        """
+    
         self.theSimulator = aSimulator
+
+    # end of __init__
+
 
     def getName( self ):
-        raise NotImplementedError
+        
+        import inspect
+        caller = inspect.getouterframes(inspect.currentframe())[0][3]
+        raise NotImplementedError(caller + ' must be implemented in subclass')
+
+    # ---------------------------------------------------------------
+    # exists (abstract method)
+    #
+    # return -> exist:TRUE / not exist:FALSE
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
 
     def exists( self ):
-        """
-        exists (abstract method)
-        
-        return -> exist:TRUE / not exist:FALSE
-        This method may throw an exception.
-        """
-        raise NotImplementedError
 
+        import inspect
+        caller = inspect.getouterframes(inspect.currentframe())[0][3]
+        raise NotImplementedError(caller + ' must be implemented in subclass')
+
+    # end of exists
+
+
+    # ---------------------------------------------------------------
+    # setSimulator
+    #
+    # aSimulator    : the reference to Simulator to set
+    #
+    # return -> None
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
     def setSimulator( self, aSimulator ):
-        """
-        setSimulator
-        
-        aSimulator    : the reference to Simulator to set
-        
-        return -> None
-        This method may throw an exception.
-        """
+    
         self.theSimulator = aSimulator
 
+    # end of setSimulator
+
+
+    # ---------------------------------------------------------------
+    # getSimulator
+    #
+    # return -> the reference to Simulator
+    # This method can throw exceptions.
+    # ---------------------------------------------------------------
     def getSimulator( self ):
-        """
-        getSimulator
-        
-        return -> the reference to Simulator
-        This method may throw an exception.
-        """
+    
         return self.theSimulator
+
+    # end of getSimulator
+
+
+# end of EntityStub
 
 

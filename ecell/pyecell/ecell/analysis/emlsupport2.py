@@ -3,8 +3,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -114,5 +114,5 @@ if __name__ == '__main__':
     if len( sys.argv ) > 1:
         main( sys.argv[ 1 ] )
     else:
-        filename = '../../../../doc/sample/Heinrich/Heinrich.eml'
+        filename = '../../../../doc/samples/Heinrich/Heinrich.eml'
         main( os.path.abspath( filename ) )

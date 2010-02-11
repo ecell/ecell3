@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -32,7 +32,7 @@
 #
 
 import warnings
-from ecell.ObjectStub import ObjectStub
+from ObjectStub import *
 
 """
 - provides an object-oriented appearance to the ecs.Simulator's Logger API
@@ -62,15 +62,15 @@ class LoggerStub( ObjectStub ):
         if self.exists():
             return
         if self.theLoggingPolicy != None:
-            self.theSimulator.createLogger( str( self.theFullPNString ), self.theLoggingPolicy )
+            self.theSimulator.createLogger( self.theFullPNString, self.theLoggingPolicy )
         else:
-            self.theSimulator.createLogger( str( self.theFullPNString ) )
+            self.theSimulator.createLogger( self.theFullPNString )
 
     def delete( self ):
         """
         Deletes the logger created by create()
         """
-        self.theSimulator.deleteLogger( str( self.theFullPNString ) )
+        self.theSimulator.deleteLogger( self.theFullPNString )
 
     def exists( self ):
         """
@@ -79,10 +79,7 @@ class LoggerStub( ObjectStub ):
         """
         # When the FullPN of this instance exists in 
         # the FullPN list, returns TRUE
-        if str( self.theFullPNString ) in self.theSimulator.getLoggerList():
-            return True
-        else:
-            return False
+        return self.theFullPNString in self.theSimulator.getLoggerList()
 
     def getData( self, aStartTime=None, anEndTime=None, anInterval=None ):
         """
@@ -94,11 +91,11 @@ class LoggerStub( ObjectStub ):
         if anEndTime == None:
             anEndTime = self.getEndTime()
         if anInterval == None:
-            return self.theSimulator.getLoggerData( str( self.theFullPNString ),
+            return self.theSimulator.getLoggerData( self.theFullPNString,
                                                     aStartTime,
                                                     anEndTime )
         else:
-            return self.theSimulator.getLoggerData( str( self.theFullPNString ),
+            return self.theSimulator.getLoggerData( self.theFullPNString,
                                                     aStartTime,
                                                     anEndTime,
                                                     anInterval )
@@ -112,48 +109,33 @@ class LoggerStub( ObjectStub ):
         return self.getData( aStartTime, anEndTime, anInterval )
 
     def getStartTime( self ):
-        return self.theSimulator.getLoggerStartTime( str( self.theFullPNString ) )
+        return self.theSimulator.getLoggerStartTime( self.theFullPNString )
 
     def getEndTime( self ):
-        return self.theSimulator.getLoggerEndTime( str( self.theFullPNString ) )
+        return self.theSimulator.getLoggerEndTime( self.theFullPNString )
 
     def getSize( self ):
-        return self.theSimulator.getLoggerSize( str( self.theFullPNString ) )
-
-    def setMinimumInterval( self, anInterval ):
-        warnings.warn( "Use setLoggerPolicy instead", DeprecationWarning )
-        return self.theSimulator.setLoggerMinimumInterval(
-            str( self.theFullPNString, anInterval ) )
-
-    def getMinimumInterval( self ):
-        """
-        Returns the minimum interval
-        This method can throw exceptions.
-        """
-        warnings.warn( "Use getLoggerPolicy() instead", DeprecationWarning )
-        return self.theSimulator.getLoggerMinimumInterval(
-            str( self.theFullPNString ) )
+        return self.theSimulator.getLoggerSize( self.theFullPNString )
 
     def getLoggerPolicy( self ):
         """
         Returns the logger policy
         This method can throw exceptions.
         """
-        return self.theSimulator.getLoggerPolicy( str( self.theFullPNString ) )
+        return self.theSimulator.getLoggerPolicy( self.theFullPNString )
 
     def setLoggerPolicy( self, aLoggingPolicy ):
         """
         Takes a tuple of 4 numbers.
-          first number: minimum step count.
-          second number: minimum time interval.
-          third number: policy when disk space or allocataed storage is used up : 0 throw exeption, 1 overwrite old data.
+          first number: minimum step count
+          second number: minimum time interval
+          third number: policy when disk space or allocataed storage is used up : 0 throw exeption, 1 overwrite old data
           fourth number: max allocated space by logger in kilobytes.
-        Returns the logger policy.
+        Returns the logger policy
         This method can throw exceptions.
         """
         if self.exists():
-            self.theSimulator.setLoggerPolicy(
-                str( self.theFullPNString ), aLoggingPolicy )
+            self.theSimulator.setLoggerPolicy( self.theFullPNString, aLoggingPolicy)
         else:
             self.theLoggingPolicy = aLoggingPolicy
 

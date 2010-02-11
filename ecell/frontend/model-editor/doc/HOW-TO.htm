@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 1.1.1  (Linux)">
+	<META NAME="CREATED" CONTENT="20040826;10435900">
+	<META NAME="CHANGED" CONTENT="20040827;15013800">
+	<STYLE>
+	<!--
+		@page { size: 21cm 29.7cm; margin: 2cm }
+		P { margin-bottom: 0.21cm }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" LINK="#000080" VLINK="#800000" DIR="LTR">
+
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><FONT SIZE=4><B>Ecell3
+Model Editor  Step by step guide to model building</B></FONT></FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">The
+purpose of this tutorial is to lead the reader through the process of
+creating a simple model and get quickly accommodated to the use of
+Model Editor.</FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">Our
+example model is a Uni Uni mechanism with one transitory complex in a
+virtual test tube which we are going to simulate using ordinary
+differential equations.</FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="reaction_equation.gif" NAME="Graphic1" ALIGN=LEFT WIDTH=235 HEIGHT=42 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">The
+reaction should occur in a 10 ml solution of 0.01M Substrate and
+0.001 M Enzyme (initial concentration).</FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">The
+rate constants are:</FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="initial_values.gif" NAME="Graphic4" ALIGN=LEFT WIDTH=195 HEIGHT=139 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">In
+the reaction there are 4 substances : Enzyme, Substrate,
+Enzyme-Substrate complex, Product.</FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">There
+are two partial reactions: ES Complex formation and Product formation.</FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">The
+ES Complex formation rates can be described with the following
+differential equations ( these equations refer only to the partial reaction ):</FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="differential1.gif" NAME="Graphic2" ALIGN=LEFT WIDTH=468 HEIGHT=44 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">The
+Product formation rates can be described as:</FONT></P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><IMG SRC="differential2.gif" NAME="Graphic3" ALIGN=LEFT WIDTH=457 HEIGHT=44 BORDER=0><BR CLEAR=LEFT><BR>
+</P>
+<P ALIGN=LEFT STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">Therefore
+we have 4 Variables and 2 Processes.</FONT></P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><FONT SIZE=4 STYLE="font-size: 16pt"><B>Let's
+create a model in 10 steps! </B></FONT></FONT>
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B><FONT SIZE=3 STYLE="font-size: 13pt">Launch
+	ModelEditor</FONT></B><BR>You can do it by either:<BR><I><FONT SIZE=3><B>a)</B><SPAN STYLE="font-weight: medium">
+	</SPAN><B>Click on Modeleditor icon<BR>b) Type in a command prompt (
+	shell ):</B></FONT></I><BR><I>ecell3-model-editor</I><BR>
+<img src="howtoscreen1.jpg">
+<BR>As can
+	be seen a PathwayEditor window has already opened with an empty
+	white layout canvas. The RootSytem ('System::/') and a Default
+	Stepper as well as the SIZE variable for RootSystem is automatically
+	created.<BR></FONT><BR>
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>Create
+	4 variables:</B><BR><B><I>Click on the Variable selector button on
+	the Palette. <BR>Move the mouse over the layout canvas and place the
+	variables on the layout by mouseclick.</I></B><BR><img src="howtoscreen2.jpg"><BR></FONT><BR>
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>Create
+	2 processes</B><BR><B><I>Click on the Process selector button on the
+	Palette. <BR>Move the mouse over the layout sheet and place the
+	variables on the layout by mouseclick.</I></B><BR><img src="howtoscreen3.jpg"><BR></FONT><BR>
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>Rename
+	Variables:</B><BR><B><I>Doubleclick on Variable newVariable2, a
+	dialogwindow called “ObjectEditor” should pop up.<BR>Click on
+	the Summary tab of the dialogwindow ( if it is not already selected
+	) and overwrite “newVariable2” in the editbox to “Enzyme”.
+	Press ENTER.</I></B><br><img src="howtoscreen4.jpg"><BR>NewVariable2 will be renamed on the layout
+	canvas, too.<BR><B><I>Rename all the other variables and processes
+	accordingly:</I></B><BR>newVariable1 -&gt; Substrate<BR>newVariable3
+	-&gt; ES_Complex ( avoid using spaces! )<BR>newVariable4 -&gt;
+	Product<BR>newProcess1 -&gt; Complex_formation<BR>newProcess2 -&gt;
+	Product_formation<BR><img src="howtoscreen4a.jpg"><BR></FONT><BR>
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>Connect
+	Processes to Variables</B></FONT></P>
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B><I>At
+	first connect Complex_formation to Substrate<BR>Point the mouse to
+	the small rectangle at the right
+	side of variable Substrate and drag the mouse to the rectangle at the left side of the process
+	Complex_formation.</I></B><BR></FONT><img src="howtoscreen5.jpg"><BR>
+	A connection arrow is established between the variable and the process, with an automatically generated label - X0.
+	</P>
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">Let's then
+	connect all the other variables to their respective processes.
+<BR><B><I>Connect Complex_formation to Enzyme, Complex_formation to
+	ES_Complex, Product_formation to ES_Complex, Product_Formation to
+	Product and Product_formation to Enzyme.</I></B><BR><img src="howtoscreen5a.jpg"><BR></FONT><BR>
+	</P>
+	<P STYLE="margin-bottom: 0cm"></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>Set
+	the arrows in the right direction</B><BR>It may happen that the 
+	do not always point to the right direction of the
+	rate flux. <B><I>To correct it, double click on the arrow between
+	Complex_formation and Substrate.<BR>A dialogwindow called
+	ConnectionEditor comes up.</I></B></FONT></P>
+	<img src="howtoscreen6.jpg">
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><I><B>Set
+	the coefficient to -1, if it is not already -1.( the coefficient defines the direction of
+	flux as well as the stoichiometry ). Press ENTER. The arrow will now
+	point towards the ComplexFormation reaction. Rename the connection
+	to S.  The process will refer to the variable by the name of the
+	connection ( variablereference ). <BR>Rename and redirect all the
+	other arrows that are pointing into the wrong direction:</B></I></FONT></P>
+
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">Between
+	Enzyme and Complex_Formation: Coefficient -1, new name: E<BR>
+    Between
+	ES_Complex and Complex_Formation:  new name: ES<BR>Between
+	ES_Complex and Product_Formation: Coefficient -1, new name:
+	ES<BR>Between Enzyme and Product_Formation: new name: E<BR>Between
+	Product and Product_Formation: new name: P<BR>	<img src="howtoscreen6a.jpg"><br>Notice that
+	connections belonging to a process must have different names,
+	however connections belonging to different processes can have same
+	names.</FONT></P>
+
+	<P STYLE="margin-bottom: 0cm"></P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>Set
+	process class</B><BR>Now we have to set the class of the process
+	this will tell the Simulator which dynamic module it should use for
+	calculating the reaction rates. We are going to use
+	ExpressionFluxProcess, where differential equations can be freely
+	defined by the syntax and semantics of the C++ language
+	.<BR><B><I>Doubleclick on Product_Formation process. The
+	ObjectEditor window pops up, or if it was not closed changes its
+	content to the chosen process. <BR>Click on Summary tab.<BR>On the
+	Class drop down list select ExpressionFlux.<BR><img src="howtoscreen7.jpg"><BR>Repeat the operation
+	with the other process ( Product_Formation )</I></B><BR><BR></FONT><BR>
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>Enter
+	rate constants</B><BR>Now we have to create the property slots for
+	our rate constants.<BR><B><I>Doubleclick on Complex_Formation
+	process and select Property tab on the ObjectEditorWindow.<BR>Click
+	on Add button at the bottom of Property window. </I></B><SPAN STYLE="font-weight: medium"><SPAN STYLE="font-style: normal">A
+	new property slot will be added to the process.</SPAN></SPAN><B><I><BR>By
+	single mouse click both the new property and its value can be
+	edited. Rename the new property to k1 and its value should be
+	2.<BR>Create a new property in this process called k_1 and give its
+	value 1e-4.<BR><img src="howtoscreen8.jpg"><BR>Create the k2 and k_2 rate constants in process
+	Product_Formation and set their values 3e-3 and 4e-7 respectively.</I></B><BR><BR></FONT><BR>
+	</P>
+</OL>
+
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<OL START=9>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>Enter
+	equations</B><BR><B><I>Select Complex_Formation process on
+	ObjectEditor and select its Expression property on the Property
+	tab.<BR>Enter the differential
+	equation</I></B>:<BR><SPAN STYLE="text-decoration: none"><I><FONT SIZE=3 STYLE="font-size: 13pt">(E.MolarConc*S.MolarConc*k1-ES.MolarConc*k_1)*self.getSuperSystem().SizeN_A</FONT></I></SPAN></FONT></P>
+	<P STYLE="margin-bottom: 0cm; text-decoration: none"><FONT FACE="Times, serif">E.MolarConc
+	= [E], k1, k_1 are the rate constants, self.getSuperSystem().SizeN_A
+	is the system size ( volume ) multiplied by the Avogadro number. </FONT>
+	</P>
+<img src="howtoscreen9.jpg">
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">The	technical adjustment of multiplying with SizeN_A is necessary because ExpressionFlux is
+	expecting the reaction rate in number of molecules, not in molar
+	concentrations.</FONT></P>
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><I><B>Enter
+	the differential equation for the Product_Formation process,
+	too.<BR></b>(-P.MolarConc*E.MolarConc*k_2+ES.MolarConc*k2)*self.getSuperSystem().SizeN_A<BR></I></FONT><BR>
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>Enter
+	initial concentration values</B><BR><B><I>Enter solution volume for
+	the model.</I></B> This can be given as the Value property of the
+	variable SIZE. This variable cannot be seen on the Layout because it
+	was created not by us but the ModelEditor automatically.</FONT></P>
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B><I>To be
+	able to see it open up an EntityListWindow</I></B><BR><B><I>Click on
+	SIZE variable and then select the PropertyList tab on the right
+	side. Edit Value property, set it to 0.1 ( 100 mL).</I></B><BR><img src="howtoscreen10a.jpg"><BR><B><I>Either
+	on EntityWindow or PathwayEditor's ObjectWindow set the MolarConc
+	properties of Enzyme and Substrate to 0.01 and 0.001 respectively.</I></B><BR></FONT><img src="howtoscreen10b.jpg"><BR>
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>Save
+	model</B><BR>Our model is ready for running in the Simulator!<BR><B><I>Click
+	on save button and enter a filename like 'UniUni.eml'.</I></B><BR><img src="howtoscreen11.jpg"><BR>The
+	model will be saved.<BR></FONT><BR>
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>Load 
+	run and evaluate model in Session Monitor</B><BR><B><I>Launch the
+	Session Monitor application either from command prompt ( by typing gecell ) or
+	icon.<BR>Load the newly created model. Create a Tracer window by
+	selecting Enzyme, Product, ES_Complex and Substrate variables, and
+	clicking on “View Selected” button, then run the simulation for
+	about 6000 seconds ( set step size to 6000 secs and press on Step,
+	not Run ).</I></B><BR><img src="howtoscreen12.jpg"><BR></FONT><BR>
+	</P>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>Delete</B></FONT></P>
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">If we no
+	longer need, a process or a variable we can delete them:</FONT></P>
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">On the
+	PathwayEditor window- <B><I>right click on the object and select
+	“delete from model”</I></B>, if <B><I>“delete from layout”</I></B>
+	is selected the process or variable will only be deleted from the
+	layout but stay in the model. They can be shown again, by <B><I>right
+	clicking on the PathwayEditor and selecting the “Show variable”
+	or “Show process” options.</I></B></FONT></P>
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">On<B><I>
+	EntityWindow</I></B> <B><I>we can also delete Processes and
+	Variables, either by using  the “Delete” buttons or the
+	right-click menus.</I></B> Deletion on EntityWindow means deletion
+	from the Model and from all the Layouts.<BR></FONT><BR>
+	</P>
+</OL>
+
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<OL START=14>
+	<LI><P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif"><B>Redo
+	undo, autosave</B><BR>During editing many security options save us
+	from loosing our data.</FONT></P>
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">Any
+	operation can be undone and redone again (including deleting whole
+	systems ).</FONT></P>
+	<P STYLE="margin-bottom: 0cm"><FONT FACE="Times, serif">In
+	Preferences Window the user can set autosave options (e.g. interval
+	between recurrence of , the autosave files will be found in the same
+	directory to where the model was saved.</FONT></P>
+	<P STYLE="margin-bottom: 0cm"></P>
+</OL>
+</BODY>
+</HTML>

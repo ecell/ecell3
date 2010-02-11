@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -28,6 +28,7 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -39,57 +40,21 @@
 namespace libecs
 {
 
-  const String VariableReference::ELLIPSIS_PREFIX( "___" );
-  const String VariableReference::DEFAULT_NAME( "_" );
+const String VariableReference::ELLIPSIS_PREFIX( "___" );
+const String VariableReference::DEFAULT_NAME( "_" );
 
-  const bool VariableReference::isEllipsisNameString( StringCref aName )
-  {
-    if( aName.size() > 3 
-	&& ELLIPSIS_PREFIX == aName.substr( 0, 3 ) 
-	&& isdigit( aName[4] ) )
-      {
-	return true;
-      }
-    else
-      {
-	return false;
-      }
-  }
-  
-  const Integer VariableReference::getEllipsisNumber() const
-  {
+const Integer VariableReference::getEllipsisNumber() const
+{
     if( isEllipsisName() )
-      {
-	return stringCast<Integer>( theName.substr( 3 ) );
-      }
+    {
+        return stringCast<Integer>( theName.substr( 3 ) );
+    }
     else
-      {
-	THROW_EXCEPTION( ValueError, "VariableReference [" + theName
-			 + "] is not an Ellipsis (which starts from '___')." );
-      }
-  }
-  
-  const bool VariableReference::isDefaultNameString( StringCref aName )
-  {
-    if( aName == DEFAULT_NAME )
-      {
-	return true;
-      }
-    else
-      {
-	return false;
-      }
-  }
-  
-  
-  
+    {
+        THROW_EXCEPTION( ValueError,
+                         "VariableReference [" + theName
+                         + "] is not an Ellipsis (which starts from '___')" );
+    }
 }
 
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/
+} // namespace libecs

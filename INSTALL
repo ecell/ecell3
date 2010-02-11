@@ -6,13 +6,13 @@ Koichi Takahashi <shafi@e-cell.org>
 Getting the latest version of E-Cell 3
 ======================================
 
-1. Get tarball:
+1. Get a tarball:
 
    Official distributions can be found at:
 
      http://www.e-cell.org/software
 
-2. Get source code via Subversion:
+2. Or, get the latest source code via Subversion:
 
    Official development site of E-Cell 3 is:
 
@@ -39,8 +39,8 @@ Getting the latest version of E-Cell 3
 Supported Systems
 =================
 
-Will work in most modern Unix-like systems. Windows build is supported now
-with a separate build system that resides in build/msvc.
+Will work in most modern Unix-like systems. Windows build is now supported
+with a separate build system that resides under build/msvc.
 
 
 Building Prerequisite
@@ -54,7 +54,7 @@ Building Prerequisite
 
   http://www.python.org/
 
-3. Boost C++ libraries (version 1.33.0 or later)
+3. Boost C++ libraries (version 1.34.0 or later)
 
   http://www.boost.org/
 
@@ -66,7 +66,11 @@ Building Prerequisite
 
   http://numpy.scipy.org/
 
-6. (optional) PyGTK (version 2.0 or later, >= 2.6 is recommended)
+6. Ply (version 2.1 or later)
+
+  http://www.dabeaz.com/ply/
+
+7. (optional) PyGTK (version 2.4 or later, >= 2.6 is recommended)
    -- only needed to build GUI frontends. 
 
   http://www.pygtk.org/
@@ -81,12 +85,12 @@ Building Prerequisite
     ``--disable-gui`` option to configure script.  Otherwise
     configure will fail with an error in the check of PyGTK installation.
 
-7. (optional) GNOME-Python (version 2.0 or later, >= 2.6 is recommended)
+8. (optional) GNOME-Python (version 2.0 or later, >= 2.6 is recommended)
    -- only needed to build GUI frontends. 
 
   http://www.pygtk.org/
 
-8. (optional) libsbml (version 2.x) -- needed for SBML support.
+9. (optional) libsbml (version 2.x) -- needed for SBML support.
 
   http://sourceforge.net/projects/sbml
 
@@ -94,13 +98,13 @@ Building Prerequisite
 
   libsbml 3.x series are not supported due to significant API differences.
 
-9. (optional) doxygen -- neeeded to generate API reference
+10. (optional) doxygen -- neeeded to generate API reference
 
   http://www.stack.nl/~dimitri/doxygen/
 
   The documentation is currently incomplete.
 
-10. (optional) docbook-tools -- needed to generate users manual
+11. (optional) docbook-tools -- needed to generate users manual
 
   http://sources.redhat.com/docbook-tools/
 
@@ -117,11 +121,15 @@ Install
   you need to run ./autogen.sh before running configure in case you have
   obtained the source from the repository.
 
-You may find the following options to configure are useful.
+You may find the following configure options are useful.
+
+  ``--with-boost-python-libname=LIBNAME``
+     Specify the library name (the portion of the file name with
+     the `lib` prefix and the extension removed) of the Boost.Python,
+     which falls back to `boost_python`.
  
-  --with-numpy-includes=DIR    Specify this when numpy is installed
-                               under non-standard installation directory.
-  --disable-gui                Specify to disable building GUI frontends.
+  ``--disable-gui``
+     Specify this when you do not want GUI frontend.
 
 
 $Id$

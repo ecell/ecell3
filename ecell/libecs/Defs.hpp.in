@@ -2,7 +2,7 @@
 //
 //        This file is part of E-Cell Simulation Environment package
 //
-//                Copyright (C) 1996-2002 Keio University
+//                Copyright (C) 1996-2010 Keio University
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -36,8 +36,8 @@
 #define WIN32 __CYGWIN__
 #endif /* __CYGWIN __ */
 
-#if defined( WIN32 )
-#if defined(_MSC_VER)
+#if defined(  WIN32  )
+#if defined( _MSC_VER )
 #define _USE_MATH_DEFINES
 #if _MANAGED
 /* suppress __fastcall warnings */
@@ -71,6 +71,9 @@
 // stringifiers.  see preprocessor manual
 #define XSTR( S ) STR( S )
 #define STR( S ) #S
+
+
+#define USE_LIBECS using namespace libecs
 
 // 
 // If USE_COMPILER_EXTENSIONS is defined, the compiler's special
@@ -118,6 +121,14 @@
 #endif /* defined( USE_COMPILER_EXTENSIONS ) && defined( __GNUC__ ) */
 
 
+#if defined( __GNUC__ )
+#define LIBECS_DEPRECATED __attribute__((deprecated))
+#elif defined( _MSC_VER ) && _MSC_VER >= 1300
+#define LIBECS_DEPRECATED __declspec(deprecated)
+#else
+#define LIBECS_DEPRECATED
+#endif
+
 namespace libecs
 {
 
@@ -135,7 +146,7 @@ namespace libecs
   /**
      Declare a new type and its pointer,
      const pointer, reference, and const reference types. For example
-     DECLARE_TYPE( Dword, VeryLongTime );
+     DECLARE_TYPE( Dword, VeryLongTime )
      @param mydecl The base type
      @param mytype The new type
   */
@@ -191,7 +202,7 @@ typedef const mytype & mytype ## Cref;
      @param type The type object the collection manages
   */
 #define DECLARE_LIST( type, name )                            \
-      DECLARE_TYPE(std::list<type>,name);                       \
+      DECLARE_TYPE(std::list<type>,name)                       \
       typedef name::iterator name ## Iterator;                  \
       typedef name::iterator& name ## IteratorRef;              \
       typedef name::iterator* name ## IteratorPtr;              \
@@ -211,7 +222,7 @@ typedef const mytype & mytype ## Cref;
      @param type The type for the vector
   */
 #define DECLARE_VECTOR( type, name )                            \
-   DECLARE_TYPE(std::vector<type>,name);                       \
+   DECLARE_TYPE(std::vector<type>,name)                       \
    typedef name::iterator name ## Iterator;                    \
    typedef name::iterator& name ## IteratorRef;                \
    typedef name::iterator* name ## IteratorPtr;                \
@@ -332,7 +343,7 @@ typedef const mytype & mytype ## Cref;
      @param type The type to be queued
   */
 #define DECLARE_QUEUE( type, name )                          \
-      DECLARE_TYPE(std::deque<type>,name);                     \
+      DECLARE_TYPE(std::deque<type>,name)                     \
       typedef name::iterator name ## Iterator;                 \
       typedef name::iterator& name ## IteratorRef;             \
       typedef name::iterator* name ## IteratorPtr;             \
@@ -401,32 +412,32 @@ typedef const mytype & mytype ## Cref;
 
   // String
 
-  DECLARE_TYPE( std::string, String );
+  DECLARE_TYPE( std::string, String )
 
-  DECLARE_TYPE( const char* const, StringLiteral );
+  DECLARE_TYPE( const char* const, StringLiteral )
 
   // Numeric types
 
-  DECLARE_TYPE( long int, Integer );
-  DECLARE_TYPE( unsigned long int, UnsignedInteger );
+  DECLARE_TYPE( long int, Integer )
+  DECLARE_TYPE( unsigned long int, UnsignedInteger )
   typedef Param<Integer>::type IntegerParam;
   typedef Param<UnsignedInteger>::type UnsignedIntegerParam;
 
 
   // these can cause problem when used as template parameters
-  //  DECLARE_TYPE( int64_t, Integer );
-  //  DECLARE_TYPE( uint64_t, UnsignedInteger );
+  //  DECLARE_TYPE( int64_t, Integer )
+  //  DECLARE_TYPE( uint64_t, UnsignedInteger )
 
-  //  DECLARE_TYPE( double, Real );
-  DECLARE_TYPE( double, Real );
+  //  DECLARE_TYPE( double, Real )
+  DECLARE_TYPE( double, Real )
   typedef Param<Real>::type RealParam;
 
-  DECLARE_TYPE( @HIGHREAL_TYPE@, HighReal );
+  DECLARE_TYPE( @HIGHREAL_TYPE@, HighReal )
 # define HIGHREAL_IS_REAL @HIGHREAL_IS_REAL@
   typedef Param<HighReal>::type HighRealParam;
     
-  //  DECLARE_TYPE( HighReal, Time );
-  DECLARE_TYPE( Real, Time );
+  //  DECLARE_TYPE( HighReal, Time )
+  DECLARE_TYPE( Real, Time )
   typedef Param<Time>::type TimeParam;
     
   //! Infinity.
@@ -498,7 +509,81 @@ typedef const mytype & mytype ## Cref;
     BOOST_ASSERT(v == static_cast<Ts>( retval ));
     return retval;
   }
+} // namespace libecs
+
+#include <list>
+#include <vector>
+#include <map>
+
+namespace libecs
+{
  
+// string STL containers.
+typedef std::list<String> StringList;
+typedef std::vector<String> StringVector;
+typedef std::map<const String, String, std::less<const String> > StringMap;
+DECLARE_SHAREDPTR( StringList );
+DECLARE_SHAREDPTR( StringVector );
+
+
+// classes
+
+DECLARE_CLASS( System );
+DECLARE_CLASS( Entity );
+DECLARE_CLASS( EntityType );
+DECLARE_CLASS( SystemPath );
+DECLARE_CLASS( FullID );
+DECLARE_CLASS( FullPN );
+DECLARE_CLASS( VariableReference );
+DECLARE_CLASS( Process );
+DECLARE_CLASS( DiscreteEventProcess );
+DECLARE_CLASS( ProcessMaker );
+DECLARE_CLASS( Stepper );
+DECLARE_CLASS( SystemStepper );
+DECLARE_CLASS( Interpolant );
+DECLARE_CLASS( Model );
+DECLARE_CLASS( Scheduler );
+DECLARE_CLASS( StepperEvent );
+DECLARE_CLASS( StepperMaker );
+DECLARE_CLASS( Variable );
+DECLARE_CLASS( VariableMaker );
+DECLARE_CLASS( System );
+DECLARE_CLASS( SystemMaker );
+DECLARE_CLASS( PropertySlotBase );
+DECLARE_CLASS( PropertyInterfaceBase );
+DECLARE_CLASS( EcsObject );
+DECLARE_CLASS( PropertySlotProxy );
+DECLARE_CLASS( Polymorph );
+DECLARE_CLASS( LoggerBroker );
+DECLARE_CLASS( Logger );
+DECLARE_CLASS( LoggerAdapter );
+DECLARE_CLASS( DataPoint );
+DECLARE_CLASS( LongDataPoint );
+DECLARE_CLASS( DataPointAggregator );
+DECLARE_CLASS( DataPointVector );
+
+
+// containers
+DECLARE_VECTOR( Polymorph,        PolymorphVector );
+DECLARE_VECTOR( LoggerPtr,        LoggerVector );
+
+// exceptions
+DECLARE_CLASS( Exception );
+DECLARE_CLASS( UnexpectedError );
+DECLARE_CLASS( NotFound );
+DECLARE_CLASS( BadID );
+DECLARE_CLASS( CallbackFailed );
+DECLARE_CLASS( NoMethod );
+DECLARE_CLASS( NoSlot );
+DECLARE_CLASS( InvalidEntityType );
+
+DECLARE_MAP ( const String, Polymorph, std::less<const String>,
+              PolymorphMap);
+
+
+// other reference counted pointer types
+DECLARE_SHAREDPTR( PolymorphVector );
+DECLARE_SHAREDPTR( DataPointVector );
 
 } // namespace libecs
 
@@ -525,9 +610,9 @@ typedef const mytype & mytype ## Cref;
 
 /*
   Do not modify
-  $Author: moriyoshi $
-  $Revision: 2990 $
-  $Date: 2008-01-19 16:36:03 +0900 (土, 19  1月 2008) $
+  $Author$
+  $Revision$
+  $Date$
   $Locker$
 */
 

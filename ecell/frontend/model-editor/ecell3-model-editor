@@ -1,0 +1,10 @@
+#!/usr/bin/python
+
+import os
+import sys
+
+import ecell.ecs
+import ecell.config
+
+import ecell.ui.model_editor.opengui as opengui
+opengui.main()

@@ -6,7 +6,7 @@
 
 <widget class="GtkWindow" id="window1">
   <property name="visible">True</property>
-  <property name="title" translatable="no">window1</property>
+  <property name="title" translatable="yes">window1</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
   <property name="modal">False</property>
@@ -19,7 +19,7 @@
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
 
   <child>
-    <widget class="GtkHBox" id="top_frame">
+    <widget class="GtkHBox" id="hbox1">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
       <property name="spacing">0</property>

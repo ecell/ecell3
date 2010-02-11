@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -33,35 +33,63 @@
 
 #include "ExpressionProcessBase.hpp"
 
-using namespace libecs;
+USE_LIBECS;
 
-LIBECS_DM_CLASS( ExpressionAlgebraicProcess, ExpressionProcessBase )
+LIBECS_DM_CLASS_MIXIN( ExpressionAlgebraicProcess, Process,
+                       ExpressionProcessBase )
 {
- public:
-  
-  LIBECS_DM_OBJECT( ExpressionAlgebraicProcess, Process )
+public:
+    
+    LIBECS_DM_OBJECT( ExpressionAlgebraicProcess, Process )
     {
-      INHERIT_PROPERTIES( ExpressionProcessBase );
+        INHERIT_PROPERTIES( _LIBECS_MIXIN_CLASS_ );
+        INHERIT_PROPERTIES( Process );
     }
 
-  ExpressionAlgebraicProcess()
-  {
-    //FIXME: additional properties:
-    // Unidirectional   -> call declareUnidirectional() in initialize()
-    //                     if this is set
-  }
+    ExpressionAlgebraicProcess()
+    {
+        //FIXME: additional properties:
+        // Unidirectional     -> call declareUnidirectional() in initialize()
+        //                                         if this is set
+    }
 
-  virtual ~ExpressionAlgebraicProcess()
-  {
-    ; // do nothing
-  }
-  
-  
-  virtual void fire()
+    virtual ~ExpressionAlgebraicProcess()
+    {
+        ; // do nothing
+    }
+
+    virtual void defaultSetProperty( libecs::String const& aPropertyName,
+                             libecs::PolymorphCref aValue )
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultSetProperty( aPropertyName, aValue );
+    }
+
+    virtual const libecs::Polymorph defaultGetProperty( libecs::String const& aPropertyName ) const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetProperty( aPropertyName );
+    }
+
+    virtual const libecs::StringVector defaultGetPropertyList() const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetPropertyList();
+    }
+
+    virtual const libecs::PropertyAttributes
+    defaultGetPropertyAttributes( libecs::String const& aPropertyName ) const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetPropertyAttributes( aPropertyName );
+    }
+
+    virtual void initialize()
+    {
+        Process::initialize();
+        _LIBECS_MIXIN_CLASS_::initialize();
+    }
+
+    virtual void fire()
     { 
-      setActivity( theVirtualMachine.execute( *theCompiledCode ) );
+        setActivity( theVirtualMachine.execute( *theCompiledCode ) );
     }
-
 };
 
 LIBECS_DM_INIT( ExpressionAlgebraicProcess, Process );

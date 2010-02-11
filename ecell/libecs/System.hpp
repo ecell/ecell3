@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -32,45 +32,34 @@
 #ifndef __SYSTEM_HPP
 #define __SYSTEM_HPP
 
-#include "libecs.hpp"
+#include <boost/range/iterator_range.hpp>
 
-#include "Entity.hpp"
+#include "libecs/Defs.hpp"
+#include "libecs/Entity.hpp"
 
 namespace libecs
 {
 
-  /** @addtogroup entities
-   *@{
-   */
+LIBECS_DM_CLASS( System, Entity )
+{
+public:
+    // Maps used for entry lists
+    DECLARE_MAP( const String, Variable*, std::less<const String>, VariableMap );
+    DECLARE_MAP( const String, Process*, std::less<const String>, ProcessMap );
+    DECLARE_MAP( const String, System*, std::less<const String>, SystemMap );
 
-  /** @file */
+    typedef boost::iterator_range< VariableMap::iterator > Variables;
+    typedef boost::iterator_range< ProcessMap::iterator > Processes;
+    typedef boost::iterator_range< SystemMap::iterator > Systems;
 
-
-  // Maps used for entry lists
-  DECLARE_MAP( const String, VariablePtr, 
-	       std::less<const String>, VariableMap );
-  DECLARE_MAP( const String, ProcessPtr,   
-	       std::less<const String>, ProcessMap );
-  DECLARE_MAP( const String, SystemPtr,    
-	       std::less<const String>, SystemMap );
-
-
-  LIBECS_DM_CLASS( System, Entity )
-  {
-    
-  public:
-
+public:
     LIBECS_DM_BASECLASS( System );
 
     LIBECS_DM_OBJECT( System, System )
     {
-      INHERIT_PROPERTIES( Entity );
-      
-      //    PROPERTYSLOT_SET_GET( Real,      Dimension );
-      PROPERTYSLOT_SET_GET( String,    StepperID );
-      
-      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real,      Size );
-
+        INHERIT_PROPERTIES( Entity );
+        PROPERTYSLOT_SET_GET( String, StepperID );
+        PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, Size );
     }
 
     System();
@@ -78,8 +67,10 @@ namespace libecs
 
     virtual const EntityType getEntityType() const
     {
-      return EntityType( EntityType::SYSTEM );
+        return EntityType( EntityType::SYSTEM );
     }
+
+    virtual void preinitialize();
 
     virtual void initialize();
 
@@ -89,10 +80,9 @@ namespace libecs
        @return A pointer to a Stepper object that this System belongs or
        NULL pointer if it is not set.
     */
-
-    StepperPtr getStepper() const 
+    Stepper* getStepper() const 
     { 
-      return theStepper; 
+        return theStepper; 
     }
 
     /**
@@ -102,7 +92,6 @@ namespace libecs
 
        @param anID Stepper ID.
     */
-
     SET_METHOD( String, StepperID );
 
 
@@ -124,40 +113,41 @@ namespace libecs
 
     GET_METHOD( Real, SizeN_A )
     {
-      return getSize() * N_A;
+        return getSize() * N_A;
     }
 
-    template <class C>
-      const std::map<const String,C*,std::less<const String> >& getMap() const;
-    //    {
-    //      DEFAULT_SPECIALIZATION_INHIBITED();
-    //    }
+    template <class T_>
+    boost::iterator_range< typename std::map< const String, T_*, std::less<const String> >::iterator > getEntities() const;
 
-    VariableMapCref getVariableMap() const
+    Variables getVariables() const
     {
-      return theVariableMap;
+        return Variables(
+            const_cast< System* >( this )->theVariableMap.begin(),
+            const_cast< System* >( this )->theVariableMap.end() );
     }
 
-    ProcessMapCref  getProcessMap() const
+    Processes getProcesses() const
     {
-      return theProcessMap;
+        return Processes(
+            const_cast< System* >( this )->theProcessMap.begin(),
+            const_cast< System* >( this )->theProcessMap.end() );
     }
 
-    SystemMapCref    getSystemMap() const
+    Systems getSystems() const
     {
-      return theSystemMap;
+        return Systems(
+            const_cast< System* >( this )->theSystemMap.begin(),
+            const_cast< System* >( this )->theSystemMap.end() );
     }
-
 
     /**
-       Find a Process with given id in this System.  
+       Find a Process with given id in this System.    
        
        This method throws NotFound exception if it is not found.
 
        @return a borrowed pointer to a Process object in this System named @a id.
     */
-
-    ProcessPtr getProcess( StringCref anID ) const;
+    Process* getProcess( String const& anID ) const;
 
 
     /**
@@ -167,8 +157,7 @@ namespace libecs
 
        @return a borrowed pointer to a Variable object in this System named @a id.
     */
-
-    VariablePtr getVariable( StringCref anID ) const;
+    Variable* getVariable( String const& anID ) const;
 
     /**
        Find a System pointed by the given SystemPath relative to
@@ -184,8 +173,7 @@ namespace libecs
        @param aSystemPath A SystemPath object.
        @return a borrowed pointer to a System object pointed by aSystemPath.
     */
-
-    SystemPtr getSystem( SystemPathCref anID ) const;
+    System* getSystem( SystemPathCref anID ) const;
 
 
     /**
@@ -194,7 +182,7 @@ namespace libecs
        This method throws NotFound exception if it is not found.
 
        Unlike getSystem( SystemPath ) method, this method searches only
-       within this System.  In the other words this method doesn't 
+       within this System.    In the other words this method doesn't 
        conduct a recursive search.
 
        @param anID An ID string of a System.
@@ -202,143 +190,124 @@ namespace libecs
        @return a borrowed pointer to a System object in this System
        whose ID is anID.
     */
+    System* getSystem( String const& id ) const;
 
-    SystemPtr getSystem( StringCref id ) const;
+
+    /**
+       Register a Variable object to this System.
+
+       This method steals ownership of the given pointer.
+    */
+    void registerEntity( Variable* aVariable );
 
 
     /**
-       Register a Process object in this System.
+       Register a Process object to this System.
 
-       This method steals ownership of the given pointer, and deletes
-       it if there is an error.
+       This method steals ownership of the given pointer.
     */
+    void registerEntity( Process* aProcess );
 
-    void registerProcess( ProcessPtr aProcess );
-  
 
     /**
-       Register a Variable object in this System.
+       Register a System object to this System.
 
-       This method steals ownership of the given pointer, and deletes
-       it if there is an error.
+       This method steals ownership of the given pointer.
     */
+    void registerEntity( System* aSystem );
 
-    void registerVariable( VariablePtr aVariable );
-  
 
     /**
-       Register a System object in this System.
+       Register an Entity object to this System.
 
-       This method steals ownership of the given pointer, and deletes
-       it if there is an error.
-    */
+       This method steals ownership of the given pointer.
+     */
+    void registerEntity( Entity* anEntity );
 
-    void registerSystem( SystemPtr aSystem );
+
+    /**
+       Unregister the specified Entity object from this System.
+     */
+    void unregisterEntity( Entity* anEntity );
+
+
+    /**
+       Unregister the Entity specified by anEntityType and anID
+       from this System.
+       @param anEntityType The type of the entity,
+       @param anID         The ID of the entity.
+     */
+    void unregisterEntity( EntityType const& anEntityType, String const& anID  );
+
 
     /**
        Check if this is a root System.
 
-
        @return true if this is a Root System, false otherwise.
     */
-
     bool isRootSystem() const
     {
-      return ( getSuperSystem() == this );
+        return ( getSuperSystem() == this );
     }
 
     /**
        @see Entity::getSystePath()
     */
-
     virtual const SystemPath getSystemPath() const;
 
-
-    /**
-       Get a Model object to which this System belongs.
-
-       @return a borrowed pointer to the Model.
-    */
-
-    ModelPtr getModel() const
-    {
-      return theModel;
-    }
-
-    void setModel( ModelPtr const aModel )
-    {
-      theModel = aModel;
-    }
-
-    VariableCptr const getSizeVariable() const
-    {
-      return theSizeVariable;
-    }
+    Variable const* getSizeVariable() const;
 
     void notifyChangeOfEntityList();
 
-    VariableCptr const findSizeVariable() const;
+    Variable const* findSizeVariable() const;
 
     void configureSizeVariable();
 
-  public: // property slots
+    virtual void detach();
 
+public: // property slots
     GET_METHOD( Polymorph, SystemList );
     GET_METHOD( Polymorph, VariableList );
     GET_METHOD( Polymorph, ProcessList );
 
-  protected:
+private:
+    void unregisterEntity( SystemMap::iterator const& );
 
-    StepperPtr   theStepper;
+    void unregisterEntity( ProcessMap::iterator const& );
 
-  private:
+    void unregisterEntity( VariableMap::iterator const& );
 
-    ModelPtr     theModel;
+protected:
+    String          theStepperID;
+    Stepper*        theStepper;
 
-    VariableMap  theVariableMap;
-    ProcessMap   theProcessMap;
-    SystemMap    theSystemMap;
+private:
+    VariableMap     theVariableMap;
+    ProcessMap      theProcessMap;
+    SystemMap       theSystemMap;
 
-    VariableCptr  theSizeVariable;
-
-    bool         theEntityListChanged;
-
-  };
-
-
-
-  template <>
-  inline VariableMapCref System::getMap() const
-  {
-    return getVariableMap();
-  }
-
-  template <>
-  inline ProcessMapCref   System::getMap() const
-  {
-    return getProcessMap();
-  }
-
-  template <>
-  inline SystemMapCref    System::getMap() const
-  {
-    return getSystemMap();
-  }
+    Variable const* theSizeVariable;
+};
 
 
+template <>
+inline System::Variables System::getEntities< Variable >() const
+{
+    return getVariables();
+}
 
-  /*@}*/
+template <>
+inline System::Processes System::getEntities< Process >() const
+{
+    return getProcesses();
+}
+
+template <>
+inline System::Systems   System::getEntities< System >() const
+{
+    return getSystems();
+}
 
 } // namespace libecs
 
-
 #endif /* __SYSTEM_HPP */
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

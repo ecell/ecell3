@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -24,23 +24,3 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # 
 #END_HEADER
-
-__version__ = '1.0'
-
-# __all__ = [ 'ControlCoefficient', 'ecdsupport', 'emlsupport', 'emlsupport2', 'Elasticity', 'Jacobian', 'MatrixIO', 'PathwayProxy', 'Structure', 'util', 'SBMLImporter', 'SBMLExporter', 'sbmlsupport' ]
-__all__ = [ 'ControlCoefficient', 'ecdsupport', 'emlsupport', 'emlsupport2', 'Elasticity', 'Jacobian', 'MatrixIO', 'PathwayProxy', 'Structure', 'util' ]
-
-from ControlCoefficient import *
-from ecdsupport import *
-from emlsupport import *
-from emlsupport2 import *
-from Elasticity import *
-from Jacobian import *
-from MatrixIO import *
-from PathwayProxy import *
-from Structure import *
-from util import *
-
-# from SBMLImporter import *
-# from SBMLExporter import *
-# from sbmlsupport import *

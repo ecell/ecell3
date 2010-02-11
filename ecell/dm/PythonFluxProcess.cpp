@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -32,33 +32,105 @@
 // E-Cell Project.
 //
 
-#include "libecs/FullID.hpp"
+#include <libecs/FullID.hpp>
+#include <libecs/ContinuousProcess.hpp>
+#include "PythonProcessBase.hpp"
 
-#include "PythonFluxProcess.hpp"
+USE_LIBECS;
 
-using namespace libecs;
-
-LIBECS_DM_INIT( PythonFluxProcess, Process );
-  
-void PythonFluxProcess::fire()
+LIBECS_DM_CLASS_MIXIN( PythonFluxProcess, ContinuousProcess,
+                       PythonProcessBase )
 {
-  python::handle<> 
-    aHandle( PyEval_EvalCode( reinterpret_cast<PyCodeObject*>
-			      ( theCompiledExpression.ptr() ),
-			      theGlobalNamespace.ptr(), 
-			      theLocalNamespace.ptr() ) );
-
-  python::object aResultObject( aHandle );
-  
-  // do not use extract<double> for efficiency
-  if( ! PyFloat_Check( aResultObject.ptr() ) )
+public:
+    LIBECS_DM_OBJECT( PythonFluxProcess, Process )
     {
-      THROW_EXCEPTION( SimulationError, 
-		       "[" + getFullID().getString() + 
-		       "]: The expression gave a non-float object." );
+        INHERIT_PROPERTIES( _LIBECS_MIXIN_CLASS_ );
+        INHERIT_PROPERTIES( ContinuousProcess );
+
+        PROPERTYSLOT_SET_GET( String, Expression );
     }
 
-  const Real aFlux( PyFloat_AS_DOUBLE( aResultObject.ptr() ) );
+    PythonFluxProcess()
+    {
+        //FIXME: additional properties:
+        // Unidirectional     -> call declareUnidirectional() in initialize()
+        //                                         if this is set
+    }
 
-  setFlux( aFlux );
-}
+    virtual ~PythonFluxProcess()
+    {
+        ; // do nothing
+    }
+
+    SET_METHOD( String, Expression )
+    {
+        theExpression = value;
+
+        theCompiledExpression = compilePythonCode(
+                theExpression, asString() + ":Expression",
+                Py_eval_input );
+    }
+
+    GET_METHOD( String, Expression )
+    {
+        return theExpression;
+    }
+
+    virtual void defaultSetProperty( libecs::String const& aPropertyName,
+                             libecs::PolymorphCref aValue )
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultSetProperty( aPropertyName, aValue );
+    }
+
+    virtual const libecs::Polymorph defaultGetProperty( libecs::String const& aPropertyName ) const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetProperty( aPropertyName );
+    }
+
+    virtual const libecs::StringVector defaultGetPropertyList() const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetPropertyList();
+    }
+
+    virtual const libecs::PropertyAttributes
+    defaultGetPropertyAttributes( libecs::String const& aPropertyName ) const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetPropertyAttributes( aPropertyName );
+    }
+
+    virtual void initialize()
+    {
+        _LIBECS_MIXIN_CLASS_::initialize();
+        ContinuousProcess::initialize();
+    }
+
+    virtual void fire()
+    {
+        boost::python::handle<> aHandle(
+            PyEval_EvalCode(
+                reinterpret_cast< PyCodeObject* >( theCompiledExpression.get() ),
+                theGlobalNamespace.ptr(), theLocalNamespace.ptr() ) );
+
+        boost::python::object aResultObject( aHandle );
+        
+        // do not use extract<double> for efficiency
+        if( ! PyFloat_Check( aResultObject.ptr() ) )
+        {
+            THROW_EXCEPTION_INSIDE( SimulationError, 
+                             asString() + ": "
+                             "The expression gave a non-float object." );
+        }
+
+        const Real aFlux( PyFloat_AS_DOUBLE( aResultObject.ptr() ) );
+
+        setFlux( aFlux );
+    }
+
+protected:
+
+    String        theExpression;
+
+    boost::python::handle<> theCompiledExpression;
+};
+
+LIBECS_DM_INIT( PythonFluxProcess, Process );

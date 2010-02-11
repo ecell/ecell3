@@ -44,7 +44,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GSL_DLL;BOOST_ALL_NO_LIB;__STDC__=1;_WIN32_WINNT=0x500"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GSL_DLL;BOOST_ALL_NO_LIB;__STDC__=1;_WIN32_WINNT=0x500;_SECURE_SCL=0"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -64,7 +64,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib gsl.lib python25_d.lib boost_python-gd.lib"
+				AdditionalDependencies="ecs.lib gsl.lib python*_d.lib $(BOOST_PYTHON_LIBNAME)-gd.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				IgnoreDefaultLibraryNames=""
@@ -124,7 +124,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GSL_DLL;BOOST_ALL_NO_LIB;__STDC__=1;_WIN32_WINNT=0x500"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GSL_DLL;BOOST_ALL_NO_LIB;__STDC__=1;_WIN32_WINNT=0x500;_SECURE_SCL=0"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -144,9 +144,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib gsl.lib python25_d.lib boost_python-gd.lib"
+				AdditionalDependencies="ecs.lib gsl.lib python*_d.lib $(BOOST_PYTHON_LIBNAME)-gd.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -203,7 +203,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GSL_DLL;BOOST_ALL_NO_LIB;__STDC__=1;_WIN32_WINNT=0x500"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GSL_DLL;BOOST_ALL_NO_LIB;__STDC__=1;_WIN32_WINNT=0x500;_SECURE_SCL=0"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -221,7 +221,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib gsl.lib python25.lib boost_python.lib"
+				AdditionalDependencies="ecs.lib gsl.lib python*.lib $(BOOST_PYTHON_LIBNAME).lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				GenerateDebugInformation="true"
@@ -282,7 +282,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\..\libltdl;..\..\..\osdep\win32;..\..\..\ecell\libecs;..\..\..;..\..\..\ecell;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GSL_DLL;BOOST_ALL_NO_LIB;__STDC__=1;_WIN32_WINNT=0x500"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GSL_DLL;BOOST_ALL_NO_LIB;__STDC__=1;_WIN32_WINNT=0x500;_SECURE_SCL=0"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -300,9 +300,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ecs.lib gsl.lib python25.lib boost_python.lib"
+				AdditionalDependencies="ecs.lib gsl.lib python*.lib $(BOOST_PYTHON_LIBNAME).lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB64)"
+				AdditionalLibraryDirectories="$(SolutionDir)$(PlatformName)\$(ConfigurationName);$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\lib;$(LIB)"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -358,16 +358,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\..\ecell\dm\PythonProcess.hpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Descriptor Files"
-			>
-			<File
-				RelativePath="..\..\..\ecell\dm\PythonProcess.desc"
-				DeploymentContent="true"
+				RelativePath="..\..\..\ecell\dm\PythonProcessBase.hpp"
 				>
 			</File>
 		</Filter>

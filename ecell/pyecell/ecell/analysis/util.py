@@ -3,8 +3,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -38,7 +38,6 @@ __copyright__ = ''
 __license__ = ''
 
 
-import string
 import re
 
 from ecell.ecssupport import *
@@ -133,7 +132,7 @@ def createVariableReferenceFullID( fullIDString, processID ):
     return tuple( ENTITYTYPE, system path, variable name )
     '''
 
-    fullID = string.split( fullIDString, ':' )
+    fullID = fullIDString.split( ':' )
     if fullID[ 0 ] == '':
         fullID[ 0 ] = 'Variable'
     try:
@@ -145,7 +144,7 @@ def createVariableReferenceFullID( fullIDString, processID ):
         raise ValueError( 'EntityType must be \'Variable\' (\'%s\' given)' % ( ENTITYTYPE_STRING_LIST[ fullID[ 0 ] ] ) )
 
     if fullID[ 1 ] == '.':
-        processFullID = string.split( processID, ':' )
+        processFullID = processID.split( ':' )
         if len( processFullID ) != 3:
             raise ValueError( 'processID has 3 fields. ( %d given )' % ( len( processFullID ) ) )
         fullID[ 1 ] = processFullID[ 1 ]

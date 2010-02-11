@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -25,6 +25,7 @@
 // 
 //END_HEADER
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -34,5 +35,5 @@
 
 namespace libecs
 {
-  LIBECS_DM_INIT_STATIC( ContinuousProcess, Process );
+LIBECS_DM_INIT_STATIC( ContinuousProcess, Process );
 }

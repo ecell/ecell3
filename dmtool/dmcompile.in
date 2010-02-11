@@ -1,113 +1,234 @@
 #!/usr/bin/env python
 
-# usage: dcompile cfile [[cflags]... ]
+# usage: dmcompile cfile [[cflags]... ]
 
 import sys
 import os
 import glob
-import string
-import getopt
+from optparse import OptionParser, IndentedHelpFormatter, BadOptionError, make_option
+from numpy.distutils.ccompiler import new_compiler
+from distutils.sysconfig import get_config_vars, customize_compiler
+from distutils.errors import CompileError, LinkError
+from distutils.util import split_quoted
 
-# prefix='@prefix@'
-# exec_prefix='@exec_prefix@'
-# libdir='@libdir@'
+OBJECT_EXTS = ['.so', '.o', '.obj', '.a', '.lib'];
+
 ORIG_CXXFLAGS = '@CXXFLAGS@'
 ORIG_CPPFLAGS = '@CPPFLAGS@'
 ORIG_LDFLAGS = '@LDFLAGS@'
 SHLEXT = os.popen('echo @LTDL_SHLIB_EXT@').readline().rstrip()
-CXX = '@CXX@'
 CXXSUFFIX = '.cpp'
 CXXFLAGS = os.environ.get('CXXFLAGS','')
+CPPFLAGS = os.environ.get('CPPFLAGS','')
 LDFLAGS =  os.environ.get('LDFLAGS','')
-VERBOSE = False
+PROLOGUE = '''%prog -- Compile dynamic modules for E-Cell SE Version 3'''
+USAGE = '''%prog [-vh] [-o file] <compiler / linker options> source.cpp'''
+OPTIONS = [
+    make_option('-v', '--verbose', action='store_true', dest='verbose'),
+    make_option('-I', action='append', type='string', dest='include_dir'),
+    make_option('-D', action='append', type='string', dest='macro'),
+    make_option('-L', action='append', type='string', dest='library_dir'),
+    make_option('-l', action='append', type='string', dest='library'),
+    make_option('-o', '--output', type='string', dest='out')
+]
 
-def help():
-    ext = os.path.basename( sys.argv[0] )
-    aProgramName, ext = os.path.splitext( ext )
-    print '''
-%s -- Compile dynamic modules for E-Cell Simulation Environment Version 3
+class CustomizedHelpFormatter( IndentedHelpFormatter ):
+    def format_prolog( self, prolog ):
+        if prolog:
+            return self._format_text( prolog ) + "\n"
+        else:
+            return ""
 
-Usage:
-       %s [-v|--verbose] <source.cpp> [compile options]
-       %s [-h|--help]
-    '''% ( aProgramName, aProgramName, aProgramName )
+
+if sys.hexversion < 0x02050000:
+    _old_OptionParser = OptionParser
+    class OptionParser(_old_OptionParser):
+        def __init__(self, *arg, **kwarg):
+            self.translate2exc = None
+            _old_OptionParser.__init__(self, *arg, **kwarg)
+
+        def _process_short_opts(self, rargs, values):
+            self.translate2exc = (
+                BadOptionError,
+                "no such option: %s"
+                )
+            try:
+                return _old_OptionParser._process_short_opts(self, rargs, values)
+            finally:
+                self.translate2exc = None
+
+        def error(self, msg):
+            if self.translate2exc is not None:
+                # XXX: ugh, but it should be ok
+                import re
+                from gettext import gettext
+                matched = re.match(
+                    gettext(self.translate2exc[1]).replace('%s', '(\S+)'), msg)
+                if matched:
+                    raise self.translate2exc[0](matched.group(1))
+            else:
+                _old_OptionParser.error(self, msg)
+
+
+class CustomizedOptionParser( OptionParser ):
+    def __init__( self, prolog=None, formatter=None, *arg, **kwarg ):
+        self.prolog = prolog
+        if formatter is None:
+            formatter = CustomizedHelpFormatter()
+        OptionParser.__init__( self, formatter=formatter, *arg, **kwarg )
+
+    def get_default_values( self ):
+        retval = OptionParser.get_default_values( self )
+        retval.unknown = None
+        return retval
+
+    def get_prolog( self ):
+        if self.prolog is None:
+            return None
+        else:
+            return self.expand_prog_name( self.prolog )
+
+    def format_prolog( self, formatter ):
+        return formatter.format_prolog( self.get_prolog() )
+
+    def format_help( self, formatter=None ):
+        if formatter is None:
+            formatter = self.formatter
+        return self.format_prolog( formatter ) + \
+                OptionParser.format_help( self, formatter )
+
+    def _process_long_opt(self, rargs, values):
+        arg = rargs[ 0 ]
+        argname, = arg.split( '=', 1 )
+        try:
+            OptionParser._process_long_opt( self, rargs, values )
+        except BadOptionError:
+            sys.stderr.write( 
+                "%s: unknown option '%s'; passing it through to the compiler\n" % ( self.get_prog_name(), argname ) )
+            if values.unknown is None:
+                values.unknown = []
+            values.unknown.append( arg )
+
+    def _process_short_opts(self, rargs, values):
+        arg = rargs[ 0 ]
+        try:
+            OptionParser._process_short_opts( self, rargs, values )
+        except BadOptionError:
+            sys.stderr.write( 
+                "%s: unknown option '%s'; passing it through to the compiler\n" % ( self.get_prog_name(), arg ) )
+            if values.unknown is None:
+                values.unknown = []
+            values.unknown.append( arg )
+
+progname = os.path.basename( sys.argv[0] )
 
 def msg( outstr ):
-    print "E-Cell3 dmcompile: " + outstr
+    global progname
+    print "%s: %s" % ( progname, outstr )
 
-def execute( cmdstr ):
-    if VERBOSE:
-	print cmdstr
-    return os.system( cmdstr )
-
-def compile( CXX, CXXCOMPILEFLAGS, SRC ):
-    return execute( CXX + ' ' + CXXCOMPILEFLAGS + ' -fPIC -c ' + SRC )
-
-def link( CXX, CPPFLAGS, OBJ, SOBJ, LDFLAGS ):
-	cflags = CPPFLAGS
-	if sys.platform == 'darwin':
-			cflags = cflags + ' -dynamiclib -install_name ' + SOBJ
-	else:
-			cflags = cflags + ' -shared -Wl,-soname=\"' + SOBJ + '\" ' 
-
-	return execute( CXX + ' ' + cflags + ' ' + OBJ + ' -o ' + SOBJ + ' ' + LDFLAGS)
-
-def cleanup( OBJ ):
-    if os.path.isfile( OBJ ):
-	os.remove( OBJ )
-    
 def main():
-    opts , args = getopt.getopt( sys.argv[1:], "hv", ["help", "verbose"])   
-    global VERBOSE
-    
-    for anOption, anArg in opts:
-
-	# print help message
-        if anOption in ( "-h", '--help' ):
-            help()
-            sys.exit(0)
-      
-  	# be verbose
-        if anOption in ( "-v", '--verbose'):
-	    VERBOSE = True
+    global ORIG_CXXFLAGS, ORIG_CPPFLAGS, ORIG_LDFLAGS, SHLEXT, \
+           CXXSUFFIX, CXXFLAGS, CPPFLAGS, LDFLAGS, PROLOGUE, USAGE, OPTIONS
+    parser = CustomizedOptionParser(prolog=PROLOGUE, usage=USAGE, option_list=OPTIONS)
+    opts, args = parser.parse_args( sys.argv[1:] )
+  
+    out = opts.out
 
     # check if source file is given
     if len( args ) < 1:
-	help()
-	msg( "Error: source file was not given." )
-	sys.exit(1)
+        parser.error( "no source file was given." )
+        return 255 
 
-    # check if source file is valid
-    if len( glob.glob ( args[0].replace( '\"', '' ) ) ) < 1:
-	msg( "Error: source file "+ args[0] + " was not found." )
-	sys.exit(1)
-		
-    SRC = args[0]
-    ext = os.path.basename(SRC)
-    CLASSNAME, ext = os.path.splitext( ext.replace( '\"', '' ) )
-    OBJ = CLASSNAME + '.o'
-    SOBJ = CLASSNAME + SHLEXT
-    if len(args) > 0:
-        ARGS = ' \"' + string.join( args[1:], '\" \"' ) + '\"'
+    if out == None:
+        if len( args ) == 1:
+            out, dummy  = os.path.splitext( args[ 0 ] )
+            out += SHLEXT
+        else:
+            msg( "specify the output filename." )
+            return 255 
     else:
-        ARGS = ' '
+        path_without_ext, ext = os.path.splitext( out )
+        if ext == '':
+            out = path_without_ext + SHLEXT
 
-	# compiler: use env + autoconf + plus anything that was given on the cmd line (?) -- FIXME
-    CXXCOMPILEFLAGS = CXXFLAGS + ' ' + ORIG_CXXFLAGS + ' ' + ORIG_CPPFLAGS + ' ' + ARGS
-
+    # compiler: use env + autoconf + plus anything that was given on the cmd line (?) -- FIXME
+    cxxflags = split_quoted( ORIG_CXXFLAGS ) + \
+        split_quoted( CXXFLAGS )
+    cppflags = split_quoted( ORIG_CPPFLAGS ) + \
+        split_quoted( CPPFLAGS )
     # linker: use env + autoconf (?) -- FIXME
-    LINKFLAGS = LDFLAGS + ' ' + ORIG_LDFLAGS
-    
-    if compile( CXX, CXXCOMPILEFLAGS, "\"" + SRC + "\"" ) or not os.path.isfile( OBJ ):
-	msg( "Error: The compiler failed to create " + OBJ )
-	sys.exit(1)
-	
-    if link( CXX, CXXCOMPILEFLAGS, '\"' + OBJ + '\"' , '\"' + SOBJ + '\"', LINKFLAGS ) or not os.path.isfile( SOBJ ):
-	msg( "Error: The compiler failed to create " + SOBJ )
-	sys.exit(1)
-    
-    cleanup( OBJ )
+    ldflags = split_quoted( ORIG_LDFLAGS ) + \
+        split_quoted( LDFLAGS )
+
+    if opts.unknown is not None:
+        for flag in opts.unknown:
+            cxxflags.append( flag )
+
+    shlflags = split_quoted( get_config_vars().get( 'CCSHARED', '' ) )
+
+    compiler = new_compiler( verbose=opts.verbose )
+    compiler.customize( None, need_cxx=1 )
+    if hasattr( compiler, 'cxx_compiler' ):
+        compiler = compiler.cxx_compiler()
+    else:
+        compiler.compiler_so[0] = compiler.compiler_cxx[0]
+        compiler.linker_so[0] = compiler.compiler_cxx[0]
+
+    if opts.verbose:
+        old_spawn = compiler.spawn
+        def new_spawn( self, cmd, *arg, **kwarg ):
+            print ' '.join( cmd )
+            old_spawn( cmd, *arg, **kwarg )
+        compiler.__class__.spawn = new_spawn
+    if opts.include_dir is not None:
+        map( compiler.add_include_dir, opts.include_dir )
+    if opts.library_dir is not None:
+        map( compiler.add_library_dir, opts.library_dir )
+    if opts.library is not None:
+        map( compiler.add_library, opts.library )
+    if opts.macro is not None:
+        for val in opts.macro:
+            compiler.define_macro( *( val.split( '=', 1 ) ) )
+
+    extra_objects = []
+    objects = None
+    sources = []
+    for i in args:
+        _, ext = os.path.splitext(i)
+        ext = ext.lower()
+        if ext in OBJECT_EXTS:
+            extra_objects.append(i)
+        else:
+            sources.append(i)
+
+    try:
+        objects = compiler.compile( sources, extra_preargs = shlflags + cxxflags + cppflags )
+    except CompileError, e:
+        msg( "failed to compile the specified source files: " + repr( e ) )
+        return 1 
+
+    if sys.platform == 'darwin':
+        compiler.linker_so = [ arg for arg in compiler.linker_so if arg != '-shard' ]
+
+    dlflags = []
+    dlflags.extend( split_quoted(
+        get_config_vars().get( 'LDSHARED', '' )
+            .replace( get_config_vars().get( 'LINKCC', '' ), '' )
+            .replace( get_config_vars().get( 'LDFLAGS', '' ), '' ) ) )
+
+    try:
+        try:
+            compiler.link( output_filename = out,
+                    target_desc = compiler.SHARED_OBJECT,
+                    objects = objects + extra_objects,
+                    extra_preargs = ldflags + dlflags,
+                    target_lang = 'c++' )
+        except LinkError, e:
+            msg( "failed to link the object files: " + repr( e ) )
+            return 1 
+    finally:
+        map( os.unlink, objects )
 
 if __name__ == '__main__':
-	main()
+    sys.exit( main() )
 

@@ -3,8 +3,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -37,7 +37,6 @@ __license__ = ''
 
 
 import re
-import string
 import exceptions
 import xml.dom.minidom
 
@@ -53,6 +52,9 @@ ODE_STEPPER_ID = 'DES01'
 PASSIVE_STEPPER_ID = 'PS01'
 
 ROOT_SYSTEM_ID = 'default'
+
+AVOGADRO_CONSTANT = 6.0221367e+23
+
 
 class SBMLConvertError( exceptions.Exception ):
 
@@ -82,7 +84,7 @@ def createIdFromFullID( fullIDString ):
         return ROOT_SYSTEM_ID
     elif fullID[ 0 ] == ecell.ecssupport.VARIABLE and fullID[ 2 ] == 'SIZE':
         # WARNING: recursive call
-        fullID = ecell.ecssupport.convertSystemPathToFullID( fullID[ 1 ] )
+        fullID = ecell.ecssupport.createFullIDFromSystemPath( fullID[ 1 ] )
         fullIDString = ecell.ecssupport.createFullIDString( fullID )
         return createIdFromFullID( fullIDString )
     else:
@@ -274,7 +276,7 @@ class SBMLIdManager:
         fullID = ecell.ecssupport.createFullID( fullIDString )
 
         if fullID[ 0 ] == ecell.ecssupport.VARIABLE and fullID[ 2 ] == 'SIZE':
-            fullID = ecell.ecssupport.convertSystemPathToFullID( fullID[ 1 ] )
+            fullID = ecell.ecssupport.createFullIDFromSystemPath( fullID[ 1 ] )
             fullIDString = ecell.ecssupport.createFullIDString( fullID )
 
         if fullID[ 0 ] == ecell.ecssupport.SYSTEM:
@@ -351,7 +353,7 @@ class SBMLIdManager:
             idDict[ fullIDString ] = ( id, libsbml.SBML_COMPARTMENT )
 
             fullID = ecell.ecssupport.createFullID( fullIDString )
-            systemPath = ecell.ecssupport.convertFullIDToSystemPath( fullID )
+            systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
             idDict[ 'Variable:%s:SIZE' % ( systemPath ) ] \
                     = ( id, libsbml.SBML_COMPARTMENT )
             
@@ -464,7 +466,7 @@ class SBMLIdManager:
             fullIDString = self.__createCompartmentFullID( aModel, outsideId )
 
         fullID = ecell.ecssupport.createFullID( fullIDString )
-        systemPath = ecell.ecssupport.convertFullIDToSystemPath( fullID )
+        systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
 
         return 'System:%s:%s' % ( systemPath, self.__createSObjectID( aCompartment, self.theXMLNamespaceList ) )
 
@@ -483,7 +485,7 @@ class SBMLIdManager:
             raise SBMLConvertError, 'Compartment [%s] is not found' % ( aSpecies.getCompartment() )
         
         fullID = ecell.ecssupport.createFullID( fullIDString )
-        systemPath = ecell.ecssupport.convertFullIDToSystemPath( fullID )
+        systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
 
         return 'Variable:%s:%s' % ( systemPath, self.__createSObjectID( aSpecies, self.theXMLNamespaceList ) )
 
@@ -504,7 +506,7 @@ class SBMLIdManager:
             fullIDString = self.getNamespace()
 
         fullID = ecell.ecssupport.createFullID( fullIDString )
-        systemPath = ecell.ecssupport.convertFullIDToSystemPath( fullID )
+        systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
             
         return 'Variable:%s:%s' % ( systemPath, self.__createSObjectID( aParameter, self.theXMLNamespaceList ) )
 
@@ -524,7 +526,7 @@ class SBMLIdManager:
             fullIDString = self.getNamespace()
 
         fullID = ecell.ecssupport.createFullID( fullIDString )
-        systemPath = ecell.ecssupport.convertFullIDToSystemPath( fullID )
+        systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
             
         return 'Process:%s:%s' % ( systemPath, self.__createSObjectID( aReaction, self.theXMLNamespaceList ) )
 
@@ -544,7 +546,7 @@ class SBMLIdManager:
             fullIDString = self.getNamespace()
 
         fullID = ecell.ecssupport.createFullID( fullIDString )
-        systemPath = ecell.ecssupport.convertFullIDToSystemPath( fullID )
+        systemPath = ecell.ecssupport.createSystemPathFromFullID( fullID )
         
         return 'Process:%s:%s' % ( systemPath, self.__createSObjectID( aRule, self.theXMLNamespaceList, 'Rule%s' % ( i ) ) )
     

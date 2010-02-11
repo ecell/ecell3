@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -30,12 +30,8 @@
 #
 # E-Cell Project, Lab. for Bioinformatics, Keio University.
 #
-from ecell.ObjectStub import ObjectStub
-import ecell.identifiers as identifiers
 
-__all__ = (
-    'EntityStub'
-    )
+from ecell.ObjectStub import *
 
 class EntityStub( ObjectStub ):
     """
@@ -43,10 +39,8 @@ class EntityStub( ObjectStub ):
       - provides an object-oriented appearance to the ecs.Simulator's Entity API
       - does not check validation of each argument.
     """
-    def __init__( self, aSimulator, aFullID ):
+    def __init__( self, aSimulator, aFullIDString ):
         """
-        Constructor
-        
         aSimulator    : a reference to a Simulator 
         aFullIDString : a FullID of the Entity as a String.
         
@@ -54,19 +48,13 @@ class EntityStub( ObjectStub ):
         This method can throw exceptions.
         """
         ObjectStub.__init__( self, aSimulator )
-        self.theFullID = identifiers.FullID( aFullID )
-        self.theFullIDString = str( self.theFullID )
-
-    def getFullID( self ):
-        return self.theFullID
+        self.theFullIDString = aFullIDString
 
     def getName( self ):
         return self.theFullIDString
 
     def create( self, aClassname ):
-        """
-        create
-        
+        """ 
         return -> None
         This method can throw exceptions.
         """
@@ -75,8 +63,6 @@ class EntityStub( ObjectStub ):
 
     def delete( self ):
         """
-        delete
-        
         return -> None
         This method can throw exceptions.
         """
@@ -84,26 +70,22 @@ class EntityStub( ObjectStub ):
 
     def getClassname( self ):
         """
-        getClassname
-        
         return -> None
         This method can throw exceptions.
         """
-        return self.theSimulator.getEntityClassName( self.theFullIDString )
+        return self.theSimulator.\
+               getEntityClassName( self.theFullIDString )
 
     def getPropertyList( self ):
         """
-        getPropertyList
-        
         return -> a list of property names
         This method can throw exceptions.
         """
-        return self.theSimulator.getEntityPropertyList( self.theFullIDString )
+        return self.theSimulator.\
+               getEntityPropertyList( self.theFullIDString )
 
     def exists( self ):
         """
-        exists
-        
         return -> exist:TRUE / not exist:FALSE
         This method can throw exceptions.
         """
@@ -111,21 +93,18 @@ class EntityStub( ObjectStub ):
 
     def setProperty( self, aPropertyName, aValue ):
         """
-        setProperty
-        
         aPropertyName : name of the property to set
         aValue        : the value to set
         
         return -> None
         This method can throw exceptions.
         """
-        aFullPN = self.theFullID.createFullPN( aPropertyName )
-        self.theSimulator.setEntityProperty( str( aFullPN ), aValue )
+        aFullPN = self.theFullIDString + ':' + aPropertyName	
+        self.theSimulator.setEntityProperty( aFullPN, aValue )
+        self.theSimulator.markDirty()
 
     def __setitem__( self, aPropertyName, aValue ):
         """
-        __setitem__ ( = setProperty )
-        
         see setProperty().
         
         This method can throw exceptions.
@@ -134,20 +113,16 @@ class EntityStub( ObjectStub ):
 
     def getProperty( self, aPropertyName ):
         """
-        getProperty
-        
         aPropertyName : name of the property to get
         
         return -> the property value
         This method can throw exceptions.
         """
-        aFullPN = self.theFullID.createFullPN( aPropertyName )
-        return self.theSimulator.getEntityProperty( str( aFullPN ) )
+        aFullPN = self.theFullIDString + ':' + aPropertyName
+        return self.theSimulator.getEntityProperty( aFullPN )
 
     def __getitem__( self, aPropertyName ):
         """
-        __getitem__ ( = getProperty )
-        
         see getProperty().
         
         This method can throw exceptions.
@@ -156,14 +131,14 @@ class EntityStub( ObjectStub ):
 
     def getPropertyAttributes( self, aPropertyName ):
         """
-        getPropertyAttributes
-        
         aPropertyName : name of the property to get
         
         return -> boolean 2-tuple ( setable, getable )
         This method can throw exceptions.
         """
-        aFullPN = self.theFullID.createFullPN( aPropertyName )
-        return self.theSimulator.getEntityPropertyAttributes( str( aFullPN ) )
+        aFullPN = self.theFullIDString + ':' + aPropertyName
+        return self.theSimulator.getEntityPropertyAttributes( aFullPN )
+
+# end of EntityStub
 
 

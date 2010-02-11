@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -31,36 +31,35 @@
 // modified by Masayuki Okayama <smash@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
 
 #include "PropertyInterface.hpp"
 
-//#include "Logger.hpp"
 #include "Exceptions.hpp"
 #include "Polymorph.hpp"
 
 #include "PropertySlot.hpp"
 
-
 namespace libecs
 {
 
-  PropertySlotBase::~PropertySlotBase()
-  {
+PropertySlotBase::~PropertySlotBase()
+{
     ; // do nothing
-  }
+}
 
-  const bool PropertySlotBase::isLoadable() const
-  {
+const bool PropertySlotBase::isLoadable() const
+{
     return isSetable();
-  }
+}
 
-  const bool PropertySlotBase::isSavable() const
-  {
+const bool PropertySlotBase::isSavable() const
+{
     return isGetable();
-  }
-  
+}
+    
 }
 

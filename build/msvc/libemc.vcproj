@@ -44,7 +44,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\libltdl;..\..\osdep\win32;..\..\ecell\libemc;..\..\ecell;..\..;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBEMC_EXPORTS;__STDC__=1;_WIN32_WINNT=0x500"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBEMC_EXPORTS;_SECURE_SCL=0;__STDC__=1;_WIN32_WINNT=0x500"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -124,7 +124,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\libltdl;..\..\osdep\win32;..\..\ecell\libemc;..\..\ecell;..\..;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBEMC_EXPORTS;__STDC__=1;_WIN32_WINNT=0x500"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;LIBEMC_EXPORTS;_SECURE_SCL=0;__STDC__=1;_WIN32_WINNT=0x500"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -203,7 +203,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\libltdl;..\..\osdep\win32;..\..\ecell\libemc;..\..\ecell;..\..;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBEMC_EXPORTS;__STDC__=1;_WIN32_WINNT=0x500"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBEMC_EXPORTS;_SECURE_SCL=0;__STDC__=1;_WIN32_WINNT=0x500"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -283,7 +283,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="..\..\libltdl;..\..\osdep\win32;..\..\ecell\libemc;..\..\ecell;..\..;$(ECELL_STAGING_HOME)\$(PlatformName)\$(ConfigurationName)\include;$(INCLUDE)"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBEMC_EXPORTS;__STDC__=1;_WIN32_WINNT=0x500"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;LIBEMC_EXPORTS;_SECURE_SCL=0;__STDC__=1;_WIN32_WINNT=0x500"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -361,10 +361,6 @@
 				RelativePath="..\..\ecell\libemc\SimulatorImplementation.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\..\ecell\libemc\SimulatorMaker.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -385,10 +381,6 @@
 			</File>
 			<File
 				RelativePath="..\..\ecell\libemc\SimulatorImplementation.hpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\ecell\libemc\SimulatorMaker.hpp"
 				>
 			</File>
 		</Filter>

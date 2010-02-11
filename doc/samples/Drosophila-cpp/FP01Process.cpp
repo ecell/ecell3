@@ -1,7 +1,7 @@
 #include "libecs.hpp"
 #include "ContinuousProcess.hpp"
 
-using namespace libecs;
+USE_LIBECS;
 
 LIBECS_DM_CLASS( FP01Process, ContinuousProcess )
 {

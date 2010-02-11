@@ -1,6 +1,15 @@
-AUTOMAKE_OPTIONS=foreign
+AUTOMAKE_OPTIONS = foreign
 
-pkginclude_HEADERS=DynamicModule.hpp ModuleMaker.hpp DMObject.hpp
+pkginclude_HEADERS = \
+	DynamicModule.hpp\
+	DynamicModuleInfo.hpp\
+	DynamicModuleDescriptor.hpp\
+	DMException.hpp\
+	ModuleMaker.hpp\
+	SharedDynamicModule.hpp\
+	SharedModuleMaker.hpp\
+	SharedModuleMakerInterface.hpp\
+	DMObject.hpp 
 
 bin_SCRIPTS = dmcompile
 

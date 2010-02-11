@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -32,126 +32,112 @@
 #ifndef __ENTITYTYPE_HPP 
 #define __ENTITYTYPE_HPP 
 
-#include "libecs.hpp"
+#include "libecs/Defs.hpp"
 
 
 namespace libecs
 {
 
-  /** @addtogroup identifier
-   *
-   *@{
-   */
+class LIBECS_API EntityType
+{
 
-  /** @file */
-
-
-  /**
-
-  */
-
-  class LIBECS_API EntityType
-  {
-
-  public:
-    
+public:
     enum Type
-      {
-	NONE      = 0,
-	ENTITY    = 1,
-	VARIABLE  = 2,
-	PROCESS   = 3,
-	SYSTEM    = 4
-      };
+    {
+        NONE        = 0,
+        ENTITY      = 1,
+        VARIABLE    = 2,
+        PROCESS     = 3,
+        SYSTEM      = 4
+    };
 
-    EntityType( StringCref typestring );
+
+    EntityType( String const& typestring );
+
 
     EntityType( const int number );
 
+
     EntityType( const Type type )
-      :
-      theType( type )
+        : theType( type )
     {
-      ; // do nothing
+        ; // do nothing
     }
+
 
     EntityType( EntityTypeCref primitivetype )
-      :
-      theType( primitivetype.getType() )
+        : theType( primitivetype.getType() )
     {
-      ; // do nothing
+        ; // do nothing
     }
+
 
     EntityType()
-      :
-      theType( NONE )
+        : theType( NONE )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
-      
-    StringCref getString() const;
+        
+    String const& asString() const;
 
-    operator StringCref() const
+    /** @deprecated use asString() instead. */
+    LIBECS_DEPRECATED String const& getString()
     {
-      return getString();
+        return asString();
+    }
+
+    operator String const&() const
+    {
+        return asString();
     }
 
     const Type& getType() const
     {
-      return theType;
+        return theType;
     }
 
     operator const Type&() const
     {
-      return getType();
+        return getType();
     }
-
-    //    operator const int&() const
-    //    {
-    //      return static_cast<const int&>( getType() ); 
-    //    }
 
     bool operator<( EntityTypeCref rhs ) const
     {
-      return theType < rhs.getType();
+        return theType < rhs.getType();
     }
 
     bool operator<( const Type rhs ) const
     {
-      return theType < rhs;
+        return theType < rhs;
     }
 
     bool operator==( EntityTypeCref rhs ) const
     {
-      return theType == rhs.getType();
+        return theType == rhs.getType();
     }
 
     bool operator==( const Type rhs ) const
     {
-      return theType == rhs;
+        return theType == rhs;
     }
 
 
-    static StringCref  EntityTypeStringOfNone();
+    static const String entityTypeStringOfNone;
 
-    static StringCref  EntityTypeStringOfEntity();
+    static const String entityTypeStringOfEntity;
 
-    static StringCref  EntityTypeStringOfProcess();
+    static const String entityTypeStringOfProcess;
     
-    static StringCref  EntityTypeStringOfVariable();
+    static const String entityTypeStringOfVariable;
     
-    static StringCref  EntityTypeStringOfSystem();
+    static const String entityTypeStringOfSystem;
 
-  private:
+private:
 
     Type theType;
-
-  };
-
-  /*@}*/
+};
 
 } // namespace libecs
-
 
 #endif /* __ENTITYTYPE_HPP */

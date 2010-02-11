@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -52,47 +52,48 @@ namespace libecs { namespace scripting {
  
 void
 Assembler::appendVariableReferenceMethodInstruction(
-        libecs::VariableReferencePtr aVariableReference,
-        libecs::StringCref aMethodName )
+        libecs::VariableReference* aVariableReference,
+        const libecs::String& aMethodName )
 {
 
     if ( aMethodName == "MolarConc" ) {
-        APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
+        APPEND_OBJECT_METHOD_REAL( aVariableReference->getVariable(),
+                                   Variable,
                                    getMolarConc );
     } else if ( aMethodName == "NumberConc" ) {
-        APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
+        APPEND_OBJECT_METHOD_REAL( aVariableReference->getVariable(),
+                                   Variable,
                                    getNumberConc );
     } else if ( aMethodName == "Value" ) {
-        APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
+        APPEND_OBJECT_METHOD_REAL( aVariableReference->getVariable(),
+                                   Variable,
                                    getValue );
     } else if ( aMethodName == "Velocity" ) {
-        APPEND_OBJECT_METHOD_REAL( aVariableReference, VariableReference,
+        APPEND_OBJECT_METHOD_REAL( aVariableReference->getVariable(),
+                                   Variable,
                                    getVelocity );
     } else if ( aMethodName == "Coefficient" ) {
-        APPEND_OBJECT_METHOD_INTEGER( aVariableReference, VariableReference,
+        APPEND_OBJECT_METHOD_INTEGER( aVariableReference,
+                                      VariableReference,
                                       getCoefficient );
     } else {
-        THROW_EXCEPTION(
-            NotFound, 
-            String( "No such VariableReference attribute: " )
-            + aMethodName
-        );
+        THROW_EXCEPTION( NotFound, 
+                         String( "no such VariableReference attribute [" )
+                         + aMethodName + "]" );
     }
 }
 
 void
 Assembler::appendSystemMethodInstruction(
-        libecs::SystemPtr aSystemPtr, libecs::StringCref aMethodName )
+        libecs::System* aSystemPtr, const libecs::String& aMethodName )
 {
     if ( aMethodName == "Size" ) {
         APPEND_OBJECT_METHOD_REAL( aSystemPtr, System, getSize );
     } else if ( aMethodName == "SizeN_A" ) {
         APPEND_OBJECT_METHOD_REAL( aSystemPtr, System, getSizeN_A );
     } else {
-        THROW_EXCEPTION(
-            NotFound,
-            String( "No such property: " ) + aMethodName
-        );
+        THROW_EXCEPTION( NotFound,
+                         String( "no such property [" ) + aMethodName + "]" );
     }
 
 }

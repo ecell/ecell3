@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -143,6 +143,7 @@
 #define	__VVECTOR_H__
 
 #include <vector>
+#include <string>
 
 #if !defined(HAVE_SSIZE_T)
 typedef int ssize_t;
@@ -150,6 +151,7 @@ typedef int ssize_t;
 
 #include <string.h>
 #include <assert.h>
+#include <stdio.h>
 
 #ifdef WIN32
 #include "fcntl.h"
@@ -173,41 +175,40 @@ const unsigned int VVECTOR_READ_CACHE_INDEX_SIZE = 2;
 const unsigned int VVECTOR_WRITE_CACHE_INDEX_SIZE = 2;
 
 class vvector_full : public std::exception { 
-  public:
-
-   virtual char const* what() throw()
-        {
-            return "Total disk space or allocated space is full.\n";
-        } 
-    };
+public:
+  virtual char const* what() throw()
+  {
+    return "Total disk space or allocated space is full.\n";
+  } 
+};
 
 class vvector_write_error : public std::exception { 
-  public:
+public:
 
-   virtual char const* what() throw()
-        {
-            return "I/O error while attempting to write on disk.\n";
-        } 
-    };
+  virtual char const* what() throw()
+  {
+    return "I/O error while attempting to write on disk.\n";
+  } 
+};
 
 class vvector_read_error : public std::exception { 
-  public:
+public:
 
-   virtual char const* what() throw()
-        {
-            return "I/O error while attempting to read from disk.\n";
-        } 
-    };
+  virtual char const* what() throw()
+  {
+    return "I/O error while attempting to read from disk.\n";
+  } 
+};
 
 
 class vvector_init_error : public std::exception { 
-  public:
+public:
 
-   virtual char const* what() throw()
-        {
-            return "VVector initialization error.\n";
-        } 
-    };
+  virtual char const* what() throw()
+  {
+    return "VVector initialization error.\n";
+  } 
+};
 
 class vvectorbase {
   // types
@@ -216,10 +217,10 @@ class vvectorbase {
   // private valiables
  private:
   static int _serialNumber;
-  static char const *_defaultDirectory;
+  static std::string _defaultDirectory;
   static int _directoryPriority;
 
-  static std::vector<char const *> _tmp_name;
+  static std::vector<std::string> _tmp_name;
   static std::vector<int> _file_desc_read;
   static std::vector<int> _file_desc_write;
 
@@ -231,7 +232,7 @@ class vvectorbase {
   // protected variables
  protected:
   int _myNumber;
-  char *_file_name;
+  std::string _file_name;
   int _fdr,_fdw;
   void unlinkfile();
 
@@ -241,6 +242,9 @@ class vvectorbase {
   void my_open_to_read(off_t offset);
   void my_close_read();
   void my_close_write();
+
+ private:
+  vvectorbase( vvectorbase const& );
 
   // constructor, destructor
  public:
@@ -287,8 +291,10 @@ template<class T> class vvector : public vvectorbase {
   // other public methods
  public:
   void push_back(const value_type & x);
-  value_type const & operator [] (size_type i);
-  value_type const & at(size_type i);
+  value_type const & operator [] (size_type i) const;
+  value_type& operator [] (size_type i);
+  value_type const & at(size_type i) const;
+  value_type & at(size_type i);
   size_type size() const { return _size; };
   void clear();
   static void setDiskFullCB(void(*)());
@@ -378,13 +384,13 @@ template<class T> void vvector<T>::push_back(const T & x)
       // first try to append
       if (!size_fixed)
 	{
-	#ifdef OPEN_WHEN_ACCESS
+#ifdef OPEN_WHEN_ACCESS
 	   my_open_to_append();
-	#endif /*OPEN_WHEN_ACCESS*/
+#endif /*OPEN_WHEN_ACCESS*/
 	  red_bytes = write( _fdw, _cacheWV, sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
-	#ifdef OPEN_WHEN_ACCESS
+#ifdef OPEN_WHEN_ACCESS
 	  my_close_write();
-    #endif /*OPEN_WHEN_ACCESS*/
+#endif /*OPEN_WHEN_ACCESS*/
 
 	  write_successful = ( red_bytes == sizeof(T) * VVECTOR_WRITE_CACHE_SIZE );
 	  if ( (!write_successful )  || ( _size == max_size ) )
@@ -446,13 +452,17 @@ template<class T> void vvector<T>::push_back(const T & x)
 }
 
 
-template<class T>  T const & vvector<T>::operator [] (size_type i)
+template<class T>  T const & vvector<T>::operator [] (size_type i) const
 {
   return at(i);
 }
 
+template<class T>  T& vvector<T>::operator [] (size_type i)
+{
+  return at(i);
+}
 
-template<class T>  T const & vvector<T>::at(size_type i)
+template<class T>  T& vvector<T>::at(size_type i)
 {
 
   assert(i < _size);
@@ -505,13 +515,13 @@ template<class T>  T const & vvector<T>::at(size_type i)
   else{
     phys_read_start=i2;
   }
-   #ifdef OPEN_WHEN_ACCESS
-     my_open_to_read( off_t( phys_read_start * sizeof(T) ));
-    #endif /*OPEN_WHEN_ACCESS*/
+#ifdef OPEN_WHEN_ACCESS
+   my_open_to_read( off_t( phys_read_start * sizeof(T) ));
+#endif /*OPEN_WHEN_ACCESS*/
   num_red = read(_fdr, _cacheRV, num_to_read * sizeof(T));
-   #ifdef OPEN_WHEN_ACCESS
+#ifdef OPEN_WHEN_ACCESS
   my_close_read();
-    #endif /*OPEN_WHEN_ACCESS*/
+#endif /*OPEN_WHEN_ACCESS*/
   if (num_red < 0) {
     throw vvector_read_error();
 
@@ -524,6 +534,10 @@ template<class T>  T const & vvector<T>::at(size_type i)
   return _buf;
 }
 
+template<class T>  T const& vvector<T>::at(size_type i) const
+{
+  return const_cast<vvector*>( this )->at(i);
+}
 
 template<class T> void vvector<T>::clear()
 {
@@ -532,4 +546,4 @@ template<class T> void vvector<T>::clear()
 
 } // namespace libecs
 
-#endif	/* __VVECTOR_H__ */
+#endif /* __VVECTOR_H__ */

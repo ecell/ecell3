@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -44,69 +44,60 @@
 namespace libecs
 {
 
-  LIBECS_DM_INIT_STATIC( SystemStepper, Stepper );
+LIBECS_DM_INIT_STATIC( SystemStepper, Stepper );
 
-  ////////////////////////// Stepper
+////////////////////////// Stepper
 
-  SystemStepper::SystemStepper() 
-  {
+SystemStepper::SystemStepper() 
+{
     setCurrentTime( INF );
     setMaxStepInterval( INF );
-    setStepInterval( INF );
+    setMinStepInterval( 0.0 );
+    setNextTime( INF );
     setPriority( (std::numeric_limits<Integer>::max)() ); 
-  }
+}
 
 
-  SystemStepper::~SystemStepper()
-  {
+SystemStepper::~SystemStepper()
+{
     ; // do nothing
-  }
+}
 
-  void SystemStepper::step()
-  {
+void SystemStepper::step()
+{
     setStepInterval( INF );
-  }
+}
 
-  void SystemStepper::integrate( RealParam aTime )
-  {
+void SystemStepper::integrate( RealParam aTime )
+{
     integrateVariablesRecursively( getModel()->getRootSystem(), aTime );
     setCurrentTime( aTime );
-  }
+}
 
-  void SystemStepper::integrateVariablesRecursively( SystemPtr const aSystem,
-						     RealParam aTime )
-  {
-    FOR_ALL( VariableMap, aSystem->getVariableMap() )
-      {
-	VariablePtr const aVariable( i->second );
-	
-	if( aVariable->isIntegrationNeeded() )
-	  {
-	    aVariable->integrate( aTime );
-	  }
-      }
+void SystemStepper::integrateVariablesRecursively( System* aSystem,
+                                                   RealParam aTime )
+{
+    FOR_ALL( System::Variables, aSystem->getVariables() )
+    {
+        Variable* aVariable( i->second );
+        
+        if( aVariable->isIntegrationNeeded() )
+        {
+            aVariable->integrate( aTime );
+        }
+    }
 
-    FOR_ALL( SystemMap, aSystem->getSystemMap() )
-      {
-	SystemPtr const aSubSystem( i->second );
-	integrateVariablesRecursively( aSubSystem, aTime );
-      }
-  }
+    FOR_ALL( System::Systems, aSystem->getSystems() )
+    {
+        System* aSubSystem( i->second );
+        integrateVariablesRecursively( aSubSystem, aTime );
+    }
+}
 
-  void SystemStepper::initialize()
-  {
+void SystemStepper::initialize()
+{
     ; // do nothing
-  }
+}
 
 
 } // namespace libecs
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/
-

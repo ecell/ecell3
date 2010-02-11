@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -32,7 +32,7 @@
 #ifndef __DYNAMICPRIORITYQUEUE_HPP
 #define __DYNAMICPRIORITYQUEUE_HPP
 
-#include "Defs.hpp"
+#include "libecs/Defs.hpp"
 
 #include <functional>
 #include <vector>
@@ -51,7 +51,6 @@
 namespace libecs
 {
 
-
 class PersistentIDPolicy
 {
 
@@ -65,8 +64,7 @@ public:
 #if defined( HAVE_UNORDERED_MAP ) || defined( HAVE_TR1_UNORDERED_MAP )
 
     class IDHasher
-        : 
-        public std::unary_function<ID, std::size_t>
+        : public std::unary_function<ID, std::size_t>
     {
 
     public:
@@ -607,7 +605,6 @@ void
 DynamicPriorityQueue< Item, IDPolicy >::moveDownPos( const Index position )
 {
     const Index index( this->heap[ position ] );
-    const Item& item( this->itemVector[ index ] );
 
     const Index size( getSize() );
     

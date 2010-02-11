@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -34,197 +34,413 @@
 # modified by Masahiro Sugimoto <sugi@bioinformatics.org> at
 # E-Cell Project, Lab. for Bioinformatics, Keio University.
 
-import os
-
-from gtk import *
-import string
 import sys
+import os
+from gtk import *
 import traceback
-from warnings import *
 
 from ecell.ecs_constants import *
-import ecell.util as util
+from ecell.ecssupport import *
+from ecell.ui.osogo.PluginWindow import *
 
-from constants import *
-from PluginWindow import *
-from utils import *
+from ecell.ui.osogo.config import *
+from ecell.ui.osogo.OsogoUtil import *
+from ecell.ui.osogo.ConfirmWindow import *
 
 class OsogoPluginWindow(PluginWindow):
-    """
-    OsogoPluginWindow
-    This class has the following attribute and methods.
+	"""OsogoPluginWindow
+	This class has the following attribute and methods.
 
-    self.theRawFullPNList : [ FullPN1, FullID2, FullPN3, , , ]
-    getFullPNList()       : [ FullPN1, FullPN2, FullPN3, , , ]
-    getFullIDList()       : [ FullID1, FullID2, FullID3, , , ]
-    getFullPN()           : FullPN1
-    getFullID()           : FullID1
-    [Note]:When the Property of FullPN is wrong, the constructor of subclass
-           should throw TypeError. PluginManager will catch this Error,
-           display error message and create nothing.    
-    """
+	self.theRawFullPNList : [ FullPN1, FullID2, FullPN3, , , ]
+	theFullPNList()       : [ FullPN1, FullPN2, FullPN3, , , ]
+	theFullIDList()       : [ FullID1, FullID2, FullID3, , , ]
+	theFullPN()           : FullPN1
+	theFullID()           : FullID1
+	[Note]:When the Property of FullPN is wrong, the constructor of subclass
+	       should throw TypeError. PluginManager will catch this Error,
+	       display error message and create nothing.	
+	"""
 
-    # If the window displays multiple FullPN/FullID, theViewType is MULTIPLE
-    theViewType = SINGLE  # default
+	# If the window displays multiple FullPN/FullID, theViewType is MULTIPLE
+	theViewType = SINGLE  # default
 
-    def __init__( self, dirName, aRawFullPNList, aSession, aRootWidgetName = None ):
-        """Constructor
-        dirName         -- a directory name including plugin module
-                           (str:absolute path/relative path)
-        aRawFullPNList  -- a RawFullPNList (RawFullPNList)
-        aSession        -- reference to SessionFacade
-        aRootWidgetName -- a root widget (str or None)
-        """
-        PluginWindow.__init__( self, dirName, aSession, aRootWidgetName )
 
-        self.theSelectedFullPNIndex = 0
-        self.theRawFullPNList = aRawFullPNList
+	def __init__( self, dirName, data, pluginManager, rootWidget=None ):
+		"""Constructor
+		dirName        --  a directory name including plugin module
+		                    (str:absolute path/relative path)
+		data           --  a RawFullPNList (RawFullPNList)
+		pluginManager  --  a reference to PluginManager (PluginManager)
+		rootWidget      --  a root widget (str or None)
+		"""
 
-    def setRawFullPNList( self, aRawFullPNList ):
-        """
-        sets RawFullPNList
-        aRawFullPNList  --  a RawFullPNList to be set (RawFullPNList)
-        Returns None
-        """
+		#self.theFullPNListClipBoard = []
+		self.theSelectedFullPNIndex = 0
 
-        self.theRawFullPNList = aRawFullPNList
+		# calls superclass's constructor
+		PluginWindow.__init__( self, dirName, pluginManager, rootWidget )
 
-    def appendRawFullPNList( self, aRawFullPNList ):
-        """
-        appneds RawFullPNList
-        aRawFullPNList  --  a RawFullPNList to be appned (RawFullPNList)
-        Returns None
-        """
+		self.theSession = self.thePluginManager.theSession 
+		self.theRawFullPNList = data
 
-        self.theRawFullPNList += aRawFullPNList 
+		# sets default title
+		self.theTitle = self.__class__.__name__
 
-    def getRawFullPNList( self ):
-        """
-        - return RawFullPNList
-        return -> RawFullPNList
-        This method can throw an exception.
-        """
-        return self.theRawFullPNList 
 
-    def getFullPNList( self ):
-        """
-        getFullPNList
-          - return FullPNList
-        
-        return -> FullPNList
-        This method can throw an exception.
-        """
-        return map( self.supplementFullPN, self.theRawFullPNList )
+	def openWindow( self ):
+		"""overwrites superclass's method
+		Returns None
+		[Note]:When this is top window, appends 'destroy' signal handler.
+		"""
 
-    def getFullIDList( self ):
-        """
-        - return FullIDList
-        return -> FullIDList
-        This method can throw an exception.
-        """
-        return map( util.convertFullPNToFullID, self.theRawFullPNList )
+		# calls superclass's method
+		PluginWindow.openWindow( self )
 
-    def getFullPN( self ):
-        """
-        - return FullPN
-        
-        return -> FullPN
-        This method can throw an exception.
-        """
-        if len( self.theRawFullPNList ) <= self.theSelectedFullPNIndex:
-            return None
+		# When this is top window, appends 'destroy' signal handler.
+		#		if self.theRoot == None:
+		topWindow = self[self.__class__.__name__]
+		if topWindow != None:
+			self[self.__class__.__name__].connect('destroy',self.exit)
 
-        return self.supplementFullPN(
-            self.theRawFullPNList[ self.theSelectedFullPNIndex ] )
 
-    def getFullID( self ):
-        """
-        theFullID
-          - return FullID
-        
-        return -> FullID
-        This method can throw an exception.
-        """
-        warn( 'DEPRECATED', DeprecationWarning, stacklevel = 2 )
-        aFullPN = self.getFullPN()
-        return aFullPN != None and aFullPN.fullID
+	def setRawFullPNList( self, aRawFullPNList ):
+		"""sets RawFullPNList
+		aRawFullPNList  --  a RawFullPNList to be set (RawFullPNList)
+		Returns None
+		"""
 
-    def supplementFullPN( self, aFullPN ):
-        """
-        supplementFullID
-          - supplements default parameter to FullID
-          - return the supplemented FullID
-        
-        return -> supplemented FullID
-        """
-        if aFullPN.propertyName != '' :
-            return aFullPN
-        else:
-            if aFullPN[TYPE] == VARIABLE:
-                aPropertyName = DEFAULT_VARIABLE_PROPERTY
-            elif aFullPN[TYPE] == PROCESS:
-                aPropertyName = DEFAULT_PROCESS_PROPERTY
-            elif aFullPN[TYPE] == SYSTEM:
-                aPropertyName = DEFAULT_SYSTEM_PROPERTY
-            return aFullPN.fullID.createFullPN( aPropertyName )
+		self.theRawFullPNList = aRawFullPNList
 
-    def getValue( self, aFullPN ):
-        """
-        getValue from the session.simulator
-          - return a value
-        
-        aFullPN : FullPN
-        return -> attribute map 
-        This method can throw an exception.
-        """
-        return self.theSession.getEntityProperty( aFullPN )
 
-    def setValue( self, aFullPN, aValue ):
-        """
-        - sets value to the session.simulator
-        
-        aFullPN : FullPN
-        aValue  : one element or tuple
-        
-        return -> None
-        """
-        return self.theSession.setEntityProperty( aFullPN, aValue )
+	def appendRawFullPNList( self, aRawFullPNList ):
+		"""appneds RawFullPNList
+		aRawFullPNList  --  a RawFullPNList to be appned (RawFullPNList)
+		Returns None
+		"""
 
-    def createLogger( self, *objects ):
-        """
-        createLogger
-          - create Logger of theFullPN
-        
-        *objects : dammy objects
-        
-        return -> None
-        """
-        for aFullPN in self.getFullPNList():
-            self.theSession.createLogger( aFullPN )
+		self.theRawFullPNList += aRawFullPNList 
 
-    def changeFullPN( self, anObject ):
-        """
-        anObject : the FullID that this instance will show
-        
-        return -> None
-        This method can throw an exception.
-        """
-        index = 0
-        for aFullPN in self.getFullPNList():
-            aFullPNString = util.createFullPNString( aFullPN )
-            if aFullPNString == anObject.get_name():
-                break
-            index = index + 1
+	# ---------------------------------------------------------------
+	# getRawFullPNList
+	#   - return RawFullPNList
+	#
+	# return -> RawFullPNList
+	# This method throws exceptions.
+	# ---------------------------------------------------------------
+	def getRawFullPNList( self ):
+		return self.theRawFullPNList 
 
-        self.theSelectedFullPNIndex = index
-        self.theSession.updateUI()
+	# ---------------------------------------------------------------
+	# theFullPNList
+	#   - return FullPNList
+	#
+	# return -> FullPNList
+	# This method throws exceptions.
+	# ---------------------------------------------------------------
+	def theFullPNList( self ):
 
-    def isStandAlone(self):
-        """
-        returns True if plugin is in a separate window
-        False if it is on a BoardWindow
-        """
-        return self.getParent() == None
+		return map( self.supplementFullPN, self.theRawFullPNList )
 
-    def handleSessionEvent( self, *args ):
-        pass
+	# end of theFullPNList
+
+
+	# ---------------------------------------------------------------
+	# theFullIDList
+	#   - return FullIDList
+	#
+	# return -> FullIDList
+	# This method throws exceptions.
+	# ---------------------------------------------------------------
+	def theFullIDList( self ):
+
+		return map( convertFullPNToFullID, self.theRawFullPNList )
+
+	# end of theFullIDList
+
+
+	# ---------------------------------------------------------------
+	# theFullPN
+	#   - return FullPN
+	#
+	# return -> FullPN
+	# This method throws exceptions.
+	# ---------------------------------------------------------------
+	def theFullPN( self ):
+
+		return self.supplementFullPN( self.theRawFullPNList[self.theSelectedFullPNIndex] )
+
+	# end of theFullPN
+
+
+	# ---------------------------------------------------------------
+	# theFullID
+	#   - return FullID
+	#
+	# return -> FullID
+	# This method throws exceptions.
+	# ---------------------------------------------------------------
+	def theFullID( self ):
+
+		return convertFullPNToFullID( self.theFullPN() )
+
+	# end of theFullID
+
+
+	# ---------------------------------------------------------------
+	# supplementFullID
+	#   - supplements default parameter to FullID
+	#   - return the supplemented FullID
+	#
+	# return -> supplemented FullID
+	# This method throws exceptions.
+	# ---------------------------------------------------------------
+	def supplementFullPN( self, aFullPN ):
+		if aFullPN[PROPERTY] != '' :
+			return aFullPN
+		else :
+			if aFullPN[TYPE] == VARIABLE :
+				aPropertyName = 'Value'
+			elif aFullPN[TYPE] == PROCESS :
+				aPropertyName = 'Activity'
+			elif aFullPN[TYPE] == SYSTEM :
+				aPropertyName = 'Size'
+			aNewFullPN = convertFullIDToFullPN( convertFullPNToFullID(aFullPN), aPropertyName )
+			return aNewFullPN
+
+	# end of supplementFullPN
+
+
+	# ---------------------------------------------------------------
+	# getValue from the session.simulator
+	#   - return a value
+	#
+	# aFullPN : FullPN
+	# return -> attribute map 
+	# This method throws exceptions.
+	# ---------------------------------------------------------------
+	def getValue( self, aFullPN ):
+
+		return self.theSession.theSimulator.getEntityProperty( createFullPNString( aFullPN ) )
+
+	# getValue
+
+
+	# ---------------------------------------------------------------
+	# setValue 
+	#   - sets value to the session.simulator
+	#
+	# aFullPN : FullPN
+	# aValue  : one element or tuple
+	#
+	# return -> None
+	# This method throws exceptions.
+	# ---------------------------------------------------------------
+	def setValue( self, aFullPN, aValue ):
+
+		aFullID = convertFullPNToFullID( aFullPN )
+		aPropertyList = self.theSession.theSimulator.getEntityPropertyList( createFullIDString( aFullID ) )
+		anAttribute = self.theSession.theSimulator.getEntityPropertyAttributes( createFullPNString( aFullPN ) )
+
+		if anAttribute[ SETTABLE ]:
+			self.theSession.theSimulator.setEntityProperty( createFullPNString( aFullPN ), aValue )
+
+			self.thePluginManager.updateAllPluginWindow()
+			self.thePluginManager.theSession.updateFundamentalWindows()
+
+			#return None
+		else:
+			aFullPNString = createFullPNString( aFullPN )
+			self.theSession.message('%s is not settable' % aFullPNString )
+			#return None
+	
+	# end of setValue
+
+
+	# ---------------------------------------------------------------
+	# exit
+	#   - call exit method of superclass 
+	#
+	# *objects  : dammy element of arguments
+	#
+	# return -> None
+	# This method throws exceptions.
+	# ---------------------------------------------------------------
+	def exit( self, *objects ):
+
+		# call exit method of superclass 
+		PluginWindow.exit(self, *objects)
+
+	# end of exit
+
+
+	# ---------------------------------------------------------------
+	# copyFullPNList
+	#   - copies FullPNList to clipboard
+	#
+	# *objects  : dammy element of arguments
+	#
+	# return -> None
+	# This method throws exceptions.
+	# ---------------------------------------------------------------
+	#def copyFullPNList(self, *objects ):
+
+	#	self.theFullPNListClipBoard = self.theRawFullPNList
+
+	# end of copyFullPNList
+	
+
+	# ---------------------------------------------------------------
+	# pasteFullPNList
+	#   - pastes FullPNList to clipboard
+	#
+	# *objects  : dammy element of arguments
+	#
+	# return -> None
+	# This method throws exceptions.
+	# ---------------------------------------------------------------
+	#def pasteFullPNList(self, *objects ):
+
+	#	self.theRawFullPNList = self.theFullPNListClipBoard
+	#	self.initialize()
+
+	# end of pasteFullPNList
+
+
+	# ---------------------------------------------------------------
+	# addFullPNList
+	#   - adds FullPNList to clipboard
+	#
+	# *objects  : dammy element of arguments
+	#
+	# return -> None
+	# This method throws exceptions.
+	# ---------------------------------------------------------------
+	#def addFullPNList(self, *objects ):
+
+	#	self.theRawFullPNList.extend( self.theFullPNListClipBoard )
+
+	# end of addFullPNList
+
+	# ---------------------------------------------------------------
+	# createNewPluginWindow
+	#
+	# anObject  :  the plugin window that this instance will change to
+	#
+	# return -> None
+	# This method throws exceptions.
+	# ---------------------------------------------------------------
+	#def createNewPluginWindow( self, anObject ):
+
+	#	aPluginName = anObject.get_name()
+	#	self.thePluginManager.createInstance( aPluginName, self.getRawFullPNList() )
+
+	# end of changePluginWindow
+
+
+	# ---------------------------------------------------------------
+	# createLogger
+	#   - create Logger of theFullPN
+	#
+	# *objects : dammy objects
+	#
+	# return -> None
+	# This method throws exceptions.
+	# ---------------------------------------------------------------
+	def createLogger( self, *objects ):
+		aLogPolicy = self.theSession.getLogPolicyParameters()
+		try:
+			for aFullPN in self.theFullPNList():
+
+				aFullPNString = createFullPNString(aFullPN)
+			
+				# creates loggerstub and call its create method.
+				aLoggerStub = self.theSession.createLoggerStub( aFullPNString )
+				if not aLoggerStub.exists():
+					aLoggerStub.create()
+					aLoggerStub.setLoggerPolicy( aLogPolicy )
+
+		except:
+
+			# When to create log is failed, display error message on MessageWindow.
+			anErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
+			self.thePluginManager.printMessage( anErrorMessage )
+
+		# updates fandamental windows.
+		self.thePluginManager.updateFundamentalWindows()
+
+	# end of createLogger
+
+
+	# ---------------------------------------------------------------
+	# changeFullPN
+	#
+	# anObject : the FullID that this instance will show
+	#
+	# return -> None
+	# This method throws exceptions.
+	# ---------------------------------------------------------------
+	def changeFullPN( self, anObject ):
+
+		index = 0
+		for aFullPN in self.theFullPNList():
+			aFullPNString = createFullPNString( aFullPN )
+			if aFullPNString == anObject.get_name():
+				break
+			index = index + 1
+
+		self.theSelectedFullPNIndex = index
+
+		self.update()
+		self.thePluginManager.updateAllPluginWindow()
+		self.thePluginManager.updateFundamentalWindows()
+
+	# end of changeFullPN
+
+	# ========================================================================
+	def isStandAlone(self):
+		""" returns True if plugin is in a separate window
+			False if it is on a BoardWindow
+		"""
+		return self.getParent().__class__.__name__.startswith( self.__class__.__name__)
+		
+
+
+	# ========================================================================
+	def present( self ):
+		"""moves this window to the top of desktop.
+		if plugin is on BoardWindow, does nothing.
+		Returns None
+		"""
+
+		if self.isStandAlone():
+			self[self.__class__.__name__].present()
+
+	# ========================================================================
+	def iconify( self ):
+		"""moves this window to the taskbar.
+		When it is on Boardwindow, does nothing.
+		Returns None
+		"""
+	
+		if self.isStandAlone():
+			self[self.__class__.__name__].iconify()
+
+	# ========================================================================
+	def move( self, xpos, ypos ):
+		"""moves this window on the desktop to (xpos,ypos).
+		When it is on Boardwindow, does nothing.
+		Returns None
+		"""
+
+		if self.isStandAlone():
+			self[self.__class__.__name__].move( xpos, ypos)
+
+	# ========================================================================
+	def resize( self, width, heigth ):
+		"""resizes this window according to width and heigth.
+		Returns None
+		"""
+		self[self.__class__.__name__].resize( width, heigth)
+
+
+# end of OsogoPluginWindow

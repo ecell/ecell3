@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -35,6 +35,7 @@
 #include <boost/assert.hpp>
 
 #include "Util.hpp"
+#include "RealMath.hpp"
 #include "scripting/ExpressionCompiler.hpp"
 #include "scripting/Assembler.hpp"
 
@@ -42,6 +43,7 @@ namespace libecs { namespace scripting {
 
 using namespace boost::spirit;
 using namespace libecs;
+using namespace libecs::math;
 
 typedef boost::spirit::tree_match<const char*> TreeMatch;
 typedef TreeMatch::tree_iterator TreeIterator;
@@ -279,20 +281,20 @@ struct CompilerConfig
         theFunctionMap1["sec"]   = sec;
         theFunctionMap1["csc"]   = csc;
         theFunctionMap1["cot"]   = cot;
-        theFunctionMap1["not"]   = libecs::real_not;
+        theFunctionMap1["not"]   = real_not;
 
 
         // set ExpressionCompiler::FunctionMap2
         theFunctionMap2["pow"]   = pow;
-        theFunctionMap2["and"]   = libecs::real_and;
-        theFunctionMap2["or"]    = libecs::real_or;
-        theFunctionMap2["xor"]   = libecs::real_xor;
-        theFunctionMap2["eq"]    = libecs::real_eq;
-        theFunctionMap2["neq"]   = libecs::real_neq;
-        theFunctionMap2["gt"]    = libecs::real_gt;
-        theFunctionMap2["lt"]    = libecs::real_lt;
-        theFunctionMap2["geq"]   = libecs::real_geq;
-        theFunctionMap2["leq"]   = libecs::real_leq;
+        theFunctionMap2["and"]   = real_and;
+        theFunctionMap2["or"]    = real_or;
+        theFunctionMap2["xor"]   = real_xor;
+        theFunctionMap2["eq"]    = real_eq;
+        theFunctionMap2["neq"]   = real_neq;
+        theFunctionMap2["gt"]    = real_gt;
+        theFunctionMap2["lt"]    = real_lt;
+        theFunctionMap2["geq"]   = real_geq;
+        theFunctionMap2["leq"]   = real_leq;
     }
 };
 
@@ -931,11 +933,14 @@ ExpressionCompiler::compileExpression( StringCref anExpression )
     CompilerHelper<CompilerConfig> helper(
             anExpression, anAssembler, theErrorReporter, thePropertyAccess,
             theEntityResolver, theVarRefResolver );
-    try {
+    try
+    {
         helper.compile();
-    } catch (const std::exception& e ) {
+    }
+    catch ( const std::exception& )
+    {
         delete code;
-        throw e;
+        throw;
     }
     return code;
 }

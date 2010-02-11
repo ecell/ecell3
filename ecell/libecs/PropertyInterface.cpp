@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -31,6 +31,7 @@
 // modified by Masayuki Okayama <smash@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -40,58 +41,40 @@
 namespace libecs
 {
 
-  void PropertyInterfaceBase::throwNoSlot( StringCref aClassName, 
-					   StringCref aPropertyName )
-  {
+void PropertyInterfaceBase::throwNoSlot( String const& aPropertyName ) const
+{
     THROW_EXCEPTION( NoSlot,
-		     aClassName + 
-		     String( " has no [" ) +
-		     aPropertyName + String( "] property.\n" ) );	  
-  }
+                     getClassName() + 
+                     ": has no such property [" +
+                     aPropertyName + String( "]" ) );
+}
 
-  void PropertyInterfaceBase::throwNotLoadable( PropertiedClassCref anObject,
-						StringCref aPropertyName )
-  {
-    THROW_EXCEPTION( NoSlot,
-		     anObject.getClassNameString() + 
-		     String( ": property [" ) +
-		     aPropertyName + String( "] is not loadable.\n" ) );
-  }
+void PropertyInterfaceBase::throwNoSlot( EcsObject const& obj, String const& aPropertyName ) const
+{
+    THROW_EXCEPTION_ECSOBJECT( NoSlot,
+                     getClassName() + 
+                     ": has no such property [" +
+                     aPropertyName + String( "]" ),
+                     &obj );
+}
 
-  void PropertyInterfaceBase::throwNotSavable( PropertiedClassCref anObject,
-					       StringCref aPropertyName )
-  {
-    THROW_EXCEPTION( NoSlot,
-		     anObject.getClassNameString() + 
-		     String( ": property [" ) +
-		     aPropertyName + String( "] is not savable.\n" ) );
-  }
+void PropertyInterfaceBase::throwNotLoadable( EcsObject const& obj, String const& aPropertyName ) const
+{
+    THROW_EXCEPTION_ECSOBJECT( NoSlot,
+                    getClassName() + 
+                    ": property [" +
+                    aPropertyName + String( "] is not loadable" ),
+                    &obj );
+}
 
 
-  /*
-  void PropertyInterfaceBase::setInfoField( StringMapRef anInfoMap,
-					    StringCref aFieldName, 
-					    StringCref anInfoString )
-  {
-    anInfoMap[ aFieldName ] = anInfoString;
-
-    //    anInfoMap.insert( std::make_pair( aFieldName, anInfoString ) );
-  }
-
-  const Polymorph 
-  PropertyInterfaceBase::convertInfoMapToPolymorph( StringMap const& anInfoMap )
-  {
-    return convertStringMapToPolymorph( anInfoMap );
-  }
-  */
+void PropertyInterfaceBase::throwNotSavable( EcsObject const& obj, String const& aPropertyName ) const
+{
+    THROW_EXCEPTION_ECSOBJECT( NoSlot,
+                     getClassName() + 
+                     ": property [" +
+                     aPropertyName + String( "] is not savable" ),
+                     &obj );
+}
 
 } // namespace libecs
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

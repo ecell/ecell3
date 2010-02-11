@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -24,97 +24,66 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
+//
 
-#include "libecs/libecs.hpp"
-#include "libecs/ContinuousProcess.hpp"
-#include "libecs/Util.hpp"
-#include "libecs/FullID.hpp"
-#include "libecs/PropertyInterface.hpp"
-#include "libecs/System.hpp"
-#include "libecs/Stepper.hpp"
-#include "libecs/Variable.hpp"
-#include "libecs/Interpolant.hpp"
+#ifndef __QUASIDYNAMICFLUXPROCESS_HPP
+#define __QUASIDYNAMICFLUXPROCESS_HPP
 
-LIBECS_DM_CLASS( QuasiDynamicFluxProcess, libecs::ContinuousProcess )
+#include <libecs/libecs.hpp>
+#include <libecs/ContinuousProcess.hpp>
+#include <libecs/Util.hpp>
+#include <libecs/FullID.hpp>
+#include <libecs/PropertyInterface.hpp>
+
+#include <libecs/System.hpp>
+#include <libecs/Stepper.hpp>
+#include <libecs/Variable.hpp>
+#include <libecs/Interpolant.hpp>
+
+#include "QuasiDynamicFluxProcessInterface.hpp"
+
+LIBECS_DM_CLASS_EXTRA_1( QuasiDynamicFluxProcess, libecs::ContinuousProcess,
+                         QuasiDynamicFluxProcessInterface )
 {
+public:
 
- public:
+    LIBECS_DM_OBJECT( QuasiDynamicFluxProcess, libecs::Process );
 
-  LIBECS_DM_OBJECT( QuasiDynamicFluxProcess, Process )
+    QuasiDynamicFluxProcess()
+        : irreversible_( 0 ),
+          vmax_( 0 )
     {
-      INHERIT_PROPERTIES( libecs::ContinuousProcess );
-      PROPERTYSLOT_SET_GET( libecs::Integer, Irreversible );
-      PROPERTYSLOT_SET_GET( libecs::Real, Vmax );
-      PROPERTYSLOT_SET_GET( libecs::Polymorph, FluxDistributionList );
+        theFluxDistributionVector.reserve( 0 );
     }
 
-  QuasiDynamicFluxProcess()
-    :    
-    Irreversible( 0 ),
-    Vmax( 0 )
+    ~QuasiDynamicFluxProcess()
     {
-      theFluxDistributionVector.reserve( 0 );
+        ; // do nothing
     }
 
-  ~QuasiDynamicFluxProcess()
-    {
-      ; // do nothing
-    }
+    SET_METHOD( libecs::Integer, Irreversible );
 
-  SIMPLE_SET_GET_METHOD( libecs::Integer, Irreversible );
-  SIMPLE_SET_GET_METHOD( libecs::Real, Vmax );
+    virtual GET_METHOD( libecs::Integer, Irreversible );
 
-  SET_METHOD( libecs::Polymorph, FluxDistributionList )
-    {
-      const libecs::PolymorphVector aVector( value.asPolymorphVector() );
-      
-      theFluxDistributionVector.clear();
-      for( libecs::PolymorphVectorConstIterator i( aVector.begin() );
-	   i != aVector.end(); ++i )
-	{
-	  theFluxDistributionVector.push_back( ( *( findVariableReference( (*i).asString() ) ) ) );
-	}      
-    }
-  
-  GET_METHOD( libecs::Polymorph, FluxDistributionList )
-    {
-      libecs::PolymorphVector aVector;
-      for( libecs::VariableReferenceVectorConstIterator
-	     i( theFluxDistributionVector.begin() );
-	   i != theFluxDistributionVector.end() ; ++i )
-	{
-	  libecs::FullID aFullID( (*i).getVariable()->getFullID() );
-	  aVector.push_back( aFullID.getString() );
-	}
+    SET_METHOD( libecs::Real, Vmax );
 
-      return aVector;
-    }
+    virtual GET_METHOD( libecs::Real, Vmax );
 
-  libecs::VariableReferenceVector getFluxDistributionVector()
-    {
-      return theFluxDistributionVector;
-    }
+    SET_METHOD( libecs::Polymorph, FluxDistributionList );
 
-  virtual void initialize()
-    {
-      libecs::Process::initialize();      
-      if( theFluxDistributionVector.empty() )
-	{
-	  theFluxDistributionVector = theVariableReferenceVector;
-	} 
-    }
+    GET_METHOD( libecs::Polymorph, FluxDistributionList );
 
-  virtual void fire()
-    {
-      ; // do nothing
-    }
-  
- protected:
+    virtual void initialize();
 
-  libecs::VariableReferenceVector theFluxDistributionVector;
-  libecs::Integer Irreversible;
-  libecs::Real Vmax;
+    virtual void fire();
 
+    virtual libecs::VariableReferenceVector getFluxDistributionVector();
+
+protected:
+
+    libecs::VariableReferenceVector theFluxDistributionVector;
+    libecs::Integer irreversible_;
+    libecs::Real vmax_;
 };
 
-
+#endif /* __QUASIDYNAMICFLUXPROCESS_HPP */

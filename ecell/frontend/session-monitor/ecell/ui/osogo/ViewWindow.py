@@ -3,8 +3,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -26,19 +26,21 @@
 # 
 #END_HEADER
 
-from Window import *
-
-import string
 import sys
+
 from ecell.ecssupport import *
+
+from ecell.ui.osogo.config import *
+from ecell.ui.osogo.Window import *
 
 class ViewWindow( Window ):
 
     theFullPNListClipBoard = []
 
     def __init__( self, gladefile=None, rootWidget=None ):
-
-        self.theGladeFile = gladefile
+        if gladefile == None:
+            gladefile = self.__class__.__name__ + '.glade'
+        self.theGladeFile = os.path.join( GLADEFILE_PATH, gladefile )
         self.theRoot = root
         
 

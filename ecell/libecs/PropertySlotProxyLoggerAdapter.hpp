@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -29,50 +29,34 @@
 #if !defined(__PROPERTYSLOTLOGGERADAPTER_HPP)
 #define __PROPERTYSLOTLOGGERADAPTER_HPP
 
-#include "PropertySlotProxy.hpp"
-#include "LoggerAdapter.hpp"
+#include "libecs/PropertySlotProxy.hpp"
+#include "libecs/LoggerAdapter.hpp"
 
 namespace libecs
 {
-  /** @addtogroup property
-      
-  @ingroup libecs
-  @{
-  */
 
-  /** @file */
-
-  class PropertySlotProxyLoggerAdapter
-    :
-    public LoggerAdapter
-  {
-
-  public:
-
-    DM_IF PropertySlotProxyLoggerAdapter( PropertySlotProxyPtr aPropertySlotProxy )
-      :
-      thePropertySlotProxy( aPropertySlotProxy )
+class LIBECS_API PropertySlotProxyLoggerAdapter: public LoggerAdapter
+{
+public:
+    PropertySlotProxyLoggerAdapter( PropertySlotProxyPtr aPropertySlotProxy )
+        : thePropertySlotProxy( aPropertySlotProxy )
     {
-      ; // do nothing
+        ; // do nothing
     }
 
-    DM_IF virtual ~PropertySlotProxyLoggerAdapter()
+    virtual ~PropertySlotProxyLoggerAdapter()
     {
-      delete thePropertySlotProxy;
+        delete thePropertySlotProxy;
     }
 
-    DM_IF virtual const Real getValue() const
+    virtual const Real getValue() const
     {
-      return thePropertySlotProxy->getReal();
+        return thePropertySlotProxy->getReal();
     }
 
-  private:
-
+private:
     PropertySlotProxyPtr thePropertySlotProxy;
-
-  };
-
-  /** @} */ // logging module
+};
 
 } // namespace libecs
 

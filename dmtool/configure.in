@@ -1,14 +1,15 @@
 AC_REVISION([$Id$])
 dnl
-AC_INIT(dmcompile.in)
+AC_INIT([dmtool], [0.2])
+AC_CONFIG_SRCDIR([dmcompile.in])
 dnl AC_CONFIG_AUX_DIR()
 dnl
 dnl dummy
-AC_CONFIG_HEADER( config.h )
+AC_CONFIG_HEADER(config.h)
 dnl
 dnl 
 AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE(dmtool,0.1)
+AM_INIT_AUTOMAKE
 AC_PROG_MAKE_SET
 AC_CHECK_PROGS(BASENAME,basename)
 if test -z $BASENAME ; then
@@ -77,6 +78,7 @@ dnl AM_CONFIG_HEADER(config.h)
 dnl
 dnl Create the top-level Makefile.
 dnl
-AC_OUTPUT(Makefile dmcompile,chmod +x dmcompile)
-
+AC_CONFIG_FILES(dmcompile, [chmod +x dmcompile])
+AC_CONFIG_FILES(Makefile)
+AC_OUTPUT
 

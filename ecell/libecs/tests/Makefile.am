@@ -29,6 +29,21 @@ VVector_test_CPPFLAGS=-DBOOST_TEST_DYN_LINK=1
 check_PROGRAMS += Util_test
 Util_test_SOURCES = Util_test.cpp
 
+check_PROGRAMS += Polymorph_test
+Polymorph_test_SOURCES = Polymorph_test.cpp
+
+check_PROGRAMS += System_test
+System_test_SOURCES = System_test.cpp
+
+check_PROGRAMS += Process_test
+Process_test_SOURCES = Process_test.cpp
+
+check_PROGRAMS += LoggerBroker_test
+LoggerBroker_test_SOURCES = LoggerBroker_test.cpp
+
+check_PROGRAMS += Model_test
+Model_test_SOURCES = Model_test.cpp
+
 check_PROGRAMS += ExpressionCompiler_test
 ExpressionCompiler_test_SOURCES = ExpressionCompiler_test.cpp
 

@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -32,101 +32,83 @@
 #ifndef __INTERPOLANT_HPP
 #define __INTERPOLANT_HPP
 
-#include "libecs.hpp"
+#include "libecs/Defs.hpp"
 
 namespace libecs
 {
-
-  class LIBECS_API Interpolant
-  {
+class LIBECS_API Interpolant
+{
     friend class libecs::Stepper;
 
-
-  public:
-
+public:
     class VariablePtrCompare
     {
     public:
-      bool operator()( InterpolantCptr const aLhs, 
-		       InterpolantCptr const aRhs ) const
-      {
-	return compare( aLhs->getVariable(), aRhs->getVariable() );
-      }
+        bool operator()( Interpolant const* aLhs, 
+                         Interpolant const* aRhs ) const
+        {
+            return compare( aLhs->getVariable(), aRhs->getVariable() );
+        }
 
-      bool operator()( InterpolantCptr const aLhs,
-		       VariableCptr const aRhs ) const
-      {
-	return compare( aLhs->getVariable(), aRhs );
-      }
+        bool operator()( Interpolant const* aLhs,
+                         Variable const* aRhs ) const
+        {
+            return compare( aLhs->getVariable(), aRhs );
+        }
 
-      bool operator()( VariableCptr const aLhs, 
-		       InterpolantCptr const aRhs ) const
-      {
-	return compare( aLhs, aRhs->getVariable() );
-      }
+        bool operator()( Variable const* aLhs, 
+                         Interpolant const* aRhs ) const
+        {
+            return compare( aLhs, aRhs->getVariable() );
+        }
 
     private:
-
-      // if statement can be faster than returning an expression directly
-      inline static bool compare( VariableCptr const aLhs, 
-				  VariableCptr const aRhs )
-      {
-	if( aLhs < aRhs )
-	  {
-	    return true;
-	  }
-	else
-	  {
-	    return false;
-	  }
-      }
-
-
+        // if statement can be faster than returning an expression directly
+        static bool compare( Variable const* aLhs, 
+                             Variable const* aRhs )
+        {
+            return aLhs < aRhs;
+        }
     };
 
 
-    Interpolant( VariablePtr const aVariable );
+    Interpolant( Variable const* aVariable, Stepper const* aStepper )
+        : theVariable( aVariable ), theStepper( aStepper )
+    {
+        // do nothing
+    }
+
 
     virtual ~Interpolant();
     
-    virtual 
-    const Real getVelocity( RealParam aTime ) const
+    virtual const Real getVelocity( RealParam aTime ) const
     {
-      return 0.0;
+        return 0.0;
     }
     
-    virtual 
-    const Real getDifference( RealParam aTime, RealParam anInterval ) const
+    virtual const Real getDifference( RealParam aTime, RealParam anInterval ) const
     {
-      return 0.0;
+        return 0.0;
     }
      
-   VariablePtr const getVariable() const
+    Variable const* getVariable() const
     {
-      return theVariable;
+        return theVariable;
     }
 
-  private:
+    Stepper const* getStepper() const
+    {
+        return theStepper;
+    }
 
-    VariablePtr const theVariable;
-    
-  };
+protected:
+    Variable const* theVariable;
+    Stepper const* theStepper;
+};
 
 
-  DECLARE_VECTOR( InterpolantPtr, InterpolantVector );
+DECLARE_VECTOR( InterpolantPtr, InterpolantVector );
 
-}
-
-
+} // namespace libecs
 
 #endif /* __INTERPOLANT_HPP */
-
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/

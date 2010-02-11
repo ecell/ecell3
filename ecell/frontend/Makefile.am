@@ -1,4 +1,4 @@
 SUBDIRS =
 if ENABLE_GUI
-SUBDIRS += session-monitor
+SUBDIRS += session-monitor model-editor
 endif

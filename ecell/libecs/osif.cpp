@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -42,7 +42,7 @@
  :    Kouichi -> Koichi
  :
  :    Revision 1.10  2005/07/13 15:20:06  shafi
- :    support for BSD contributedby Hisham Zarka.
+ :    support for BSD contributed by Hisham Zarka.
  :    
  :    Revision 1.9  2004/06/17 16:55:30  shafi
  :    copyright updates
@@ -78,7 +78,7 @@
  :    osif_is_dir()
  :    
  :    Revision 1.7  2001/10/15 17:17:18  ishikawa
- :    WIN32API for free disk space
+ :    WIN32 API for free disk space
  :    
  :    Revision 1.6  2001/10/08 10:14:58  ishikawa
  :    WIN32 API for free disk space

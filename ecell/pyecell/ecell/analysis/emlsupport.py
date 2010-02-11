@@ -3,8 +3,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -44,7 +44,6 @@ import ecell.emc
 import ecell.Session
 
 import os
-import string
 
 import numpy
 
@@ -84,7 +83,7 @@ class EmlSupport( ecell.eml.Eml ):
         '''
         
         aSimulator = ecell.emc.Simulator()
-        aSession = ecell.Session( aSimulator )
+        aSession = ecell.Session.Session( aSimulator )
         # aSession.loadModel( self )
 
         ##
@@ -230,7 +229,7 @@ class EmlSupport( ecell.eml.Eml ):
         '''
         '''
 
-        fullID = string.split( fullIDString, ':' )
+        fullID = fullIDString.split( ':' )
         if ( len( fullID ) == 4 ):
             self.deleteEntityProperty( fullID[ 0 ] + ':' + fullID[ 1 ] + ':' + fullID[ 2 ], fullID[ 3 ] )
             self.setEntityProperty( fullID[ 0 ] + ':'+ fullID[ 1 ] + ':' + fullID[ 2 ], fullID[ 3 ], [ '%.8e' % value ] )
@@ -266,5 +265,5 @@ if __name__ == '__main__':
     if len( sys.argv ) > 1:
         main( sys.argv[ 1 ] )
     else:
-        filename = '../../../../doc/sample/Heinrich/Heinrich.eml'
+        filename = '../../../../doc/samples/Heinrich/Heinrich.eml'
         main( os.path.abspath( filename ) )

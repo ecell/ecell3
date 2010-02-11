@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -29,31 +29,31 @@
 // E-Cell Project.
 //
 
-#include "libecs/Variable.hpp"
-#include "libecs/DifferentialStepper.hpp"
+#include <libecs/Variable.hpp>
+#include <libecs/AdaptiveDifferentialStepper.hpp>
 
-using namespace libecs;
+USE_LIBECS;
 
 LIBECS_DM_CLASS( ODE23Stepper, AdaptiveDifferentialStepper )
 {
 
 public:
 
-  LIBECS_DM_OBJECT( ODE23Stepper, Stepper )
+    LIBECS_DM_OBJECT( ODE23Stepper, Stepper )
     {
-      INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
+        INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
     }
-
-  ODE23Stepper( void );  
-  virtual ~ODE23Stepper( void );
-
-  virtual void initialize();
-  virtual bool calculate();
-
-  virtual GET_METHOD( Integer, Stage ) { return 3; }
-
-  void interIntegrate2();
-
+  
+    ODE23Stepper( void );  
+    virtual ~ODE23Stepper( void );
+  
+    virtual void initialize();
+    virtual bool calculate( Real aStepInterval );
+  
+    virtual GET_METHOD( Integer, Stage ) { return 3; }
+  
+    void interIntegrate2();
+  
 protected:
 
 };
@@ -62,120 +62,117 @@ LIBECS_DM_INIT( ODE23Stepper, Stepper );
 
 ODE23Stepper::ODE23Stepper()
 {
-  ; // do nothing
+    ; // do nothing
 }
-	    
+                        
 ODE23Stepper::~ODE23Stepper()
 {
-  ; // do nothing
+    ; // do nothing
 }
 
 void ODE23Stepper::initialize()
 {
-  AdaptiveDifferentialStepper::initialize();
+    AdaptiveDifferentialStepper::initialize();
 
-  // theVelocityBuffer can be replaced by theK2
-  // ODE23Stepper doesn't need it, but ODE45Stepper does for the efficiency 
+    // theVelocityBuffer can be replaced by theK2
+    // ODE23Stepper doesn't need it, but ODE45Stepper does for the efficiency 
 }
 
 void ODE23Stepper::interIntegrate2()
 {
-  Real const aCurrentTime( getCurrentTime() );
+    Real const aCurrentTime( getCurrentTime() );
 
-  for( VariableVector::size_type c( 0 );
-       c != theVariableVector.size(); ++c )
+    for( VariableVector::size_type c( 0 );
+         c != theVariableVector.size(); ++c )
     {
-      VariablePtr const aVariable( theVariableVector[ c ] );
+        VariablePtr const aVariable( theVariableVector[ c ] );
 
-      aVariable->loadValue( theValueBuffer[ c ] );
-      aVariable->interIntegrate( aCurrentTime );
+        aVariable->setValue( theValueBuffer[ c ] );
+        aVariable->interIntegrate( aCurrentTime );
     }
 }
 
-bool ODE23Stepper::calculate()
+bool ODE23Stepper::calculate( Real aStepInterval )
 {
-  const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+    const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
-  const Real eps_rel( getTolerance() );
-  const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
-  const Real a_y( getStateToleranceFactor() );
-  const Real a_dydt( getDerivativeToleranceFactor() );
+    const Real eps_rel( getTolerance() );
+    const Real eps_abs( getTolerance() * getAbsoluteToleranceFactor() );
+    const Real a_y( getStateToleranceFactor() );
+    const Real a_dydt( getDerivativeToleranceFactor() );
 
-  const Real aCurrentTime( getCurrentTime() );
-  const Real aStepInterval( getStepInterval() );
+    const Real aCurrentTime( getCurrentTime() );
 
-  theStateFlag = true;
+    theStateFlag = true;
 
-  theTaylorSeries.reindex( 0 );
+    theTaylorSeries.reindex( 0 );
 
-  // ========= 1 ===========
-  interIntegrate2();
-  fireProcesses();
-  setVariableVelocity( theTaylorSeries[ 0 ] );
+    // ========= 1 ===========
+    interIntegrate2();
+    fireProcesses();
+    setVariableVelocity( theTaylorSeries[ 0 ] );
 
-  // ========= 2 ===========
-  setCurrentTime( aCurrentTime + aStepInterval );
-  interIntegrate2();
-  fireProcesses();
-  setVariableVelocity( theTaylorSeries[ 1 ] );
+    // ========= 2 ===========
+    setCurrentTime( aCurrentTime + aStepInterval );
+    interIntegrate2();
+    fireProcesses();
+    setVariableVelocity( theTaylorSeries[ 1 ] );
 
-  for( VariableVector::size_type c( 0 ); c < aSize; ++c )
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
     {
-      theTaylorSeries[ 1 ][ c ] -= theTaylorSeries[ 0 ][ c ];
+        theTaylorSeries[ 1 ][ c ] -= theTaylorSeries[ 0 ][ c ];
     }
 
-  // ========= 3 ===========
-  setCurrentTime( aCurrentTime + aStepInterval * 0.5 );
-  interIntegrate2();
-  fireProcesses();
-  setVariableVelocity( theTaylorSeries[ 2 ] );
+    // ========= 3 ===========
+    setCurrentTime( aCurrentTime + aStepInterval * 0.5 );
+    interIntegrate2();
+    fireProcesses();
+    setVariableVelocity( theTaylorSeries[ 2 ] );
 
-  Real maxError( 0.0 );
+    Real maxError( 0.0 );
 
-  // restore theValueBuffer
-  for( VariableVector::size_type c( 0 ); c < aSize; ++c )
+    // restore theValueBuffer
+    for( VariableVector::size_type c( 0 ); c < aSize; ++c )
     {
-      theTaylorSeries[ 1 ][ c ] *= 0.5;
-      const Real anExpectedVelocity( theTaylorSeries[ 0 ][ c ]
-      				     + theTaylorSeries[ 1 ][ c ] );
+        theTaylorSeries[ 1 ][ c ] *= 0.5;
+        const Real anExpectedVelocity( theTaylorSeries[ 0 ][ c ]
+                                                                                 + theTaylorSeries[ 1 ][ c ] );
 
-      // ( k1 + k2 + k3 * 4 ) / 6 for ~Yn+1
-      // ( k1 + k2 - k3 * 2 ) / 3 for ( Yn+1 - ~Yn+1 ) as a local error
-      const Real anEstimatedError
-	( fabs( ( anExpectedVelocity - theTaylorSeries[ 2 ][ c ] ) 
-		* ( 2.0 / 3.0 ) ) * aStepInterval );
+        // ( k1 + k2 + k3 * 4 ) / 6 for ~Yn+1
+        // ( k1 + k2 - k3 * 2 ) / 3 for ( Yn+1 - ~Yn+1 ) as a local error
+        const Real anEstimatedError(
+            fabs( ( anExpectedVelocity - theTaylorSeries[ 2 ][ c ] ) 
+                  * ( 2.0 / 3.0 ) ) * aStepInterval );
 
-      const Real aTolerance( eps_rel *
-			     ( a_y * fabs( theValueBuffer[ c ] ) 
-			       +  a_dydt * fabs( anExpectedVelocity ) * aStepInterval )
-			     + eps_abs );
+        const Real aTolerance( eps_rel *
+                               ( a_y * fabs( theValueBuffer[ c ] ) 
+                                 +  a_dydt * fabs( anExpectedVelocity ) * aStepInterval )
+                               + eps_abs );
 
-      //      const Real aTolerance( std::max( eps_rel * ( a_y * fabs( theValueBuffer[ c ] ) + 0.0 * fabs( anExpectedVelocity ) ), eps_abs ) );
+        const Real anError( anEstimatedError / aTolerance );
 
-      const Real anError( anEstimatedError / aTolerance );
+        if( anError > maxError )
+        {
+            maxError = anError;
+        }
 
-      if( anError > maxError )
-	{
-	  maxError = anError;
-	}
-
-      // restore x (original value)
-      theVariableVector[ c ]->loadValue( theValueBuffer[ c ] );
-      theTaylorSeries[ 2 ][ c ] = 0.0;
-    }
-    
-  setMaxErrorRatio( maxError );
-
-  // reset the stepper current time
-  setCurrentTime( aCurrentTime );
-  resetAll();
-
-  if ( maxError > 1.1 )
-    {
-      reset();
-      return false;
+        // restore x (original value)
+        theVariableVector[ c ]->setValue( theValueBuffer[ c ] );
+        theTaylorSeries[ 2 ][ c ] = 0.0;
     }
 
-  // set the error limit interval
-  return true;
+    setMaxErrorRatio( maxError );
+
+    // reset the stepper current time
+    setCurrentTime( aCurrentTime );
+    resetAll();
+
+    if ( maxError > 1.1 )
+    {
+        reset();
+        return false;
+    }
+
+    // set the error limit interval
+    return true;
 }

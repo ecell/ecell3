@@ -2,8 +2,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -24,64 +24,90 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # 
 #END_HEADER
+
 import gtk
 
-from Pane import Pane
+import ecell.ui.osogo.Window as Window
+from ecell.ui.osogo.config import *
 
-class FullPNQueue( Pane ):
-    def __init__( self, aFullPNList ):
-        Pane.__init__( self )
+class FullPNQueue:
+
+    def __init__( self, anAttachmentPoint, aFullPNList ):
         self.backwardQueue = []
         self.forwardQueue = []
         self.theRawFullPNList = aFullPNList
-        self.callbackList = []
-
-    def initUI( self ):
-        Pane.initUI( self )
-        self.backButton = self.getWidget( 'backbutton' )
-        self.forwardButton = self.getWidget( 'forwardbutton' )
+        aWindow = Window.Window(
+            os.path.join( GLADEFILE_PATH, self.__class__.__name__ + '.glade'),
+            "hbox1"
+            )
+        aWindow.openWindow()
+        aFrame = aWindow['hbox1']
+        self.backButton = aWindow['backbutton']
+        self.forwardButton = aWindow['forwardbutton']
+        anAttachmentPoint.add( aFrame )
         self.backButton.connect( "clicked", self.__goBack )
         self.forwardButton.connect( "clicked", self.__goForward )
+        self.callbackList = []
         self.__updateNavigatorButtons()
 
     def registerCallback( self, aFunction ):
         self.callbackList.append( aFunction )
-        aFunction( self.theRawFullPNList )
+        apply( aFunction, [self.theRawFullPNList] )
+
 
     def pushFullPNList( self, aRawFullPNList ):
-        self.backwardQueue.append( self.theRawFullPNList )
+        self.backwardQueue.append( self.__copyList ( self.theRawFullPNList  ) )
         self.forwardQueue = []
+
         self.__applyFullPNList( aRawFullPNList )
         self.__updateNavigatorButtons()
         
     def getActualFullPNList( self ):
-        return self.theRawFullPNList
+        return self.__copyList( self.theRawFullPNList )
 
     def __applyFullPNList( self, aRawFullPNList ):
-        self.theRawFullPNList = aRawFullPNList
+        self.theRawFullPNList = self.__copyList( aRawFullPNList )
         for aFunction in self.callbackList:
-            aFunction( aRawFullPNList )
+
+            apply( aFunction, [aRawFullPNList] )
+
 
     def applyFullPNList( self  ):
         for aFunction in self.callbackList:
-            aFunction( self.theRawFullPNList )
 
+            apply( aFunction, [self.theRawFullPNList] )
+
+
+
+    def __copyList( self, aList ):
+        newList = []
+        for anItem in aList:
+            if type( anItem ) in [type( [] ) , type( () ) ]:
+                newList.append( anItem )
+            else:
+                newList.append( self.__copyList( anItem ) )
+        return newList
+
+
+        
     def __goBack(self, *args):
         if len( self.backwardQueue ) == 0:
             return
         rawFullPNList = self.backwardQueue.pop()
-        self.forwardQueue.append( self.theRawFullPNList )
+        self.forwardQueue.append( self.__copyList( self.theRawFullPNList ) )
         self.__applyFullPNList( rawFullPNList )
         self.__updateNavigatorButtons()
 
+        
     def __goForward( self, *args ):
         if len( self.forwardQueue ) == 0:
             return
         rawFullPNList = self.forwardQueue.pop()
-        self.backwardQueue.append( self.theRawFullPNList )
+        self.backwardQueue.append( self.__copyList( self.theRawFullPNList ) )
         self.__applyFullPNList( rawFullPNList )
         self.__updateNavigatorButtons()
         
+
     def __updateNavigatorButtons( self ):
         if len( self.backwardQueue ) == 0:
             backFlag = False
@@ -93,3 +119,11 @@ class FullPNQueue( Pane ):
             forFlag = True
         self.forwardButton.set_sensitive( forFlag )
         self.backButton.set_sensitive( backFlag )
+        
+
+# read buttons fromfile
+# create from EntityList
+# create from ropertyWindow
+# selection functions in propwindow
+# treewalker
+# search

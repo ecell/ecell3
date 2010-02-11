@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -53,27 +53,44 @@ using libecs::InvalidEntityType;
 BOOST_AUTO_TEST_CASE(testConstruction)
 {
     {
-        SystemPath aSystemPath( "/A/B/C/" );
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
-                           "/A/B/C/" );
+        SystemPath aSystemPath( "/" );
+        BOOST_CHECK_EQUAL( aSystemPath.asString(), "/" );
+    }
+    {
+        SystemPath aSystemPath( "/A/B/C" );
+        BOOST_CHECK_EQUAL( aSystemPath.asString(), "/A/B/C" );
     }
     {
         SystemPath aSystemPath( "." );
-        BOOST_CHECK_EQUAL( aSystemPath.getString(), "." );
+        BOOST_CHECK_EQUAL( aSystemPath.asString(), "." );
     }
     {
         SystemPath aSystemPath( ".." );
-        BOOST_CHECK_EQUAL( aSystemPath.getString(), ".." );
+        BOOST_CHECK_EQUAL( aSystemPath.asString(), ".." );
+    }
+    {
+        SystemPath aSystemPath( "/A/../B/C" );
+        BOOST_CHECK_EQUAL( aSystemPath.asString(), "/B/C" );
+    }
+    {
+        BOOST_CHECK_THROW( SystemPath("/A/../.." ), libecs::BadSystemPath );
+    }
+    {
+        BOOST_CHECK_THROW( SystemPath( "/.." ), libecs::BadSystemPath );
+    }
+    {
+        SystemPath aSystemPath( "../.." );
+        BOOST_CHECK_EQUAL( aSystemPath.asString(), "../.." );
     }
     {
         SystemPath aSystemPath( "" );
-        BOOST_CHECK_EQUAL( aSystemPath.getString(), "" );
+        BOOST_CHECK_EQUAL( aSystemPath.asString(), "" );
     }
     {
         SystemPath aSystemPath(
             "   \t  /A/BB/CCC/../DDDD/EEEEEE    \t \n  " );
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
-                           "/A/BB/CCC/../DDDD/EEEEEE" );
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
+                           "/A/BB/DDDD/EEEEEE" );
     }
 }
 
@@ -81,72 +98,48 @@ BOOST_AUTO_TEST_CASE(testCopyConstruction)
 {
     SystemPath aSystemPath( "   \t  /A/BB/CCC/../DDDD/EEEEEE    \t \n  " );
     SystemPath aSystemPath2( aSystemPath );
-    BOOST_CHECK_EQUAL( aSystemPath2.getString(),
-                       "/A/BB/CCC/../DDDD/EEEEEE" );
-}
-
-BOOST_AUTO_TEST_CASE(testPopFront)
-{
-    {
-        SystemPath aSystemPath( "/A/BB/CCC/../DDDD/EEEEEE" );
-        aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
-                           "A/BB/CCC/../DDDD/EEEEEE" );
-        aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
-                           "BB/CCC/../DDDD/EEEEEE" );
-        aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
-                           "CCC/../DDDD/EEEEEE" );
-        aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
-                           "../DDDD/EEEEEE" );
-        aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
-                           "DDDD/EEEEEE" );
-        aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
-                           "EEEEEE" );
-        aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
-                           "" );
-    }
-
-    {
-        SystemPath aSystemPath( "/" );
-        aSystemPath.pop_front();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(), "" );
-    }
+    BOOST_CHECK_EQUAL( aSystemPath2.asString(),
+                       "/A/BB/DDDD/EEEEEE" );
 }
 
 BOOST_AUTO_TEST_CASE(testPopBack)
 {
     {
-        SystemPath aSystemPath( "/A/BB/CCC/../DDDD/EEEEEE" );
+        SystemPath aSystemPath( "/A/BB/CCC/DDD/EEEEEE" );
         aSystemPath.pop_back();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
-                           "/A/BB/CCC/../DDDD" );
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
+                           "/A/BB/CCC/DDD" );
         aSystemPath.pop_back();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
-                           "/A/BB/CCC/.." );
-        aSystemPath.pop_back();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "/A/BB/CCC" );
         aSystemPath.pop_back();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "/A/BB" );
         aSystemPath.pop_back();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(),
+        BOOST_CHECK_EQUAL( aSystemPath.asString(),
                            "/A" );
     }
 
     {
         SystemPath aSystemPath( "/" );
         aSystemPath.pop_back();
-        BOOST_CHECK_EQUAL( aSystemPath.getString(), "" );
+        BOOST_CHECK_EQUAL( aSystemPath.asString(), "" );
     }
 }
 
+BOOST_AUTO_TEST_CASE(testToRelative)
+{
+    BOOST_CHECK_EQUAL( SystemPath( "A/B/C" ).toRelative( SystemPath( "/A" ) ).asString(),
+                       "A/B/C" );
+    BOOST_CHECK_THROW( SystemPath( "/A/B/C" ).toRelative( SystemPath( "A" ) ),
+                       libecs::BadSystemPath );
+    BOOST_CHECK_EQUAL( SystemPath( "/A/B/C" ).toRelative( SystemPath( "/A" ) ).asString(),
+                       "B/C" );
+    BOOST_CHECK_EQUAL( SystemPath( "/A/B/C" ).toRelative( SystemPath( "/A/B/C/D" ) ).asString(),
+                       ".." );
+    BOOST_CHECK_EQUAL( SystemPath( "/A/B/C" ).toRelative( SystemPath( "/A/B/C/D/E" ) ).asString(),
+                       "../.." );
+}
 BOOST_AUTO_TEST_CASE(testIsAbsolute)
 {
     BOOST_CHECK( SystemPath( "/A/BB/CCC/../DDDD/EEEEEE" ).isAbsolute() );
@@ -154,14 +147,13 @@ BOOST_AUTO_TEST_CASE(testIsAbsolute)
     BOOST_CHECK( SystemPath( "/" ).isAbsolute() );
     BOOST_CHECK( SystemPath( "" ).isAbsolute() ); // XXX: is this OK?
     BOOST_CHECK( !SystemPath( ".." ).isAbsolute() );
-    BOOST_CHECK( SystemPath( "/.." ).isAbsolute() );
 }
 
 BOOST_AUTO_TEST_CASE(testFullID)
 {
     { 
         FullID aFullID( "       \t  \n  Variable:/A/B:S   \t   \n" );
-        BOOST_CHECK_EQUAL( aFullID.getString(), "Variable:/A/B:S" );
+        BOOST_CHECK_EQUAL( aFullID.asString(), "Variable:/A/B:S" );
         BOOST_CHECK_EQUAL( aFullID.getEntityType(), EntityType::VARIABLE ); 
         BOOST_CHECK( aFullID.getSystemPath() == SystemPath( "/A/B" ) ); 
         BOOST_CHECK_EQUAL( aFullID.getID(), "S" ); 
@@ -170,7 +162,7 @@ BOOST_AUTO_TEST_CASE(testFullID)
     BOOST_CHECK_THROW( FullID( "UNKNOWN:/UNKNOWN:" ), InvalidEntityType );
     { 
         FullID aFullID( "Process::/" );
-        BOOST_CHECK_EQUAL( aFullID.getString(), "Process::/" );
+        BOOST_CHECK_EQUAL( aFullID.asString(), "Process::/" );
         BOOST_CHECK_EQUAL( aFullID.getEntityType(), EntityType::PROCESS ); 
         BOOST_CHECK( aFullID.getSystemPath() == SystemPath( "" ) ); 
         BOOST_CHECK_EQUAL( aFullID.getID(), "/" ); 
@@ -184,7 +176,7 @@ BOOST_AUTO_TEST_CASE(testFullIDAssignment)
     FullID anAssignee( EntityType::NONE, "", "" );
 
     anAssignee = aFullID;
-    BOOST_CHECK_EQUAL( anAssignee.getString(), "Variable:/test:TEST" );
+    BOOST_CHECK_EQUAL( anAssignee.asString(), "Variable:/test:TEST" );
     BOOST_CHECK_EQUAL( anAssignee.getEntityType(), EntityType::VARIABLE ); 
     BOOST_CHECK( anAssignee.getSystemPath() == SystemPath( "/test" ) ); 
     BOOST_CHECK_EQUAL( anAssignee.getID(), "TEST" ); 

@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -31,39 +31,65 @@
 // E-Cell Project.
 //
 
+#include <libecs/ContinuousProcess.hpp>
 #include "ExpressionProcessBase.hpp"
 
-using namespace libecs;
+USE_LIBECS;
 
-LIBECS_DM_CLASS( ExpressionFluxProcess, ExpressionProcessBase )
+LIBECS_DM_CLASS_MIXIN( ExpressionFluxProcess, ContinuousProcess,
+                       ExpressionProcessBase )
 {
- public:
-  
-  LIBECS_DM_OBJECT( ExpressionFluxProcess, Process )
+public:
+    LIBECS_DM_OBJECT( ExpressionFluxProcess, Process )
     {
-      INHERIT_PROPERTIES( ExpressionProcessBase );
+        INHERIT_PROPERTIES( ContinuousProcess );
+        INHERIT_PROPERTIES( _LIBECS_MIXIN_CLASS_ );
+        CLASS_DESCRIPTION("ExpressionFluxProcess is designed for easy and efficient representations of continuous flux rate equations.    \"Expression\" property accepts a plain text rate expression.    The expression must be evaluated to give a flux rate in number per second, not concentration per second.");
     }
 
-  ExpressionFluxProcess()
-  {
-    //FIXME: additional properties:
-    // Unidirectional   -> call declareUnidirectional() in initialize()
-    //                     if this is set
-  }
+    ExpressionFluxProcess()
+    {
+        //FIXME: additional properties:
+        // Unidirectional     -> call declareUnidirectional() in initialize()
+        //                                         if this is set
+    }
 
-  virtual ~ExpressionFluxProcess()
-  {
-    ; // do nothing
-  }
-  
-  virtual void fire()
+    virtual ~ExpressionFluxProcess()
+    {
+        ; // do nothing
+    }
+
+    virtual void initialize()
+    {
+        _LIBECS_MIXIN_CLASS_::initialize();
+        ContinuousProcess::initialize();
+    }
+
+    virtual void defaultSetProperty( libecs::String const& aPropertyName,
+                             libecs::PolymorphCref aValue )
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultSetProperty( aPropertyName, aValue );
+    }
+
+    virtual const libecs::Polymorph defaultGetProperty( libecs::String const& aPropertyName ) const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetProperty( aPropertyName );
+    }
+
+    virtual const libecs::StringVector defaultGetPropertyList() const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetPropertyList();
+    }
+
+    virtual const libecs::PropertyAttributes
+    defaultGetPropertyAttributes( libecs::String const& aPropertyName ) const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetPropertyAttributes( aPropertyName );
+    }
+
+    virtual void fire()
     { 
-      setFlux( theVirtualMachine.execute( *theCompiledCode ) );
-    }
-
-  virtual const bool isContinuous() const
-    {
-      return true;
+        setFlux( theVirtualMachine.execute( *theCompiledCode ) );
     }
 };
 

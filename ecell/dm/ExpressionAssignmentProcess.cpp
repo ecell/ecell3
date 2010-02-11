@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -33,70 +33,89 @@
 
 #include "ExpressionProcessBase.hpp"
 
-using namespace libecs;
+USE_LIBECS;
 
-LIBECS_DM_CLASS( ExpressionAssignmentProcess, ExpressionProcessBase )
+LIBECS_DM_CLASS_MIXIN( ExpressionAssignmentProcess, Process,
+                       ExpressionProcessBase )
 {
- public:
-  
-  LIBECS_DM_OBJECT( ExpressionAssignmentProcess, Process )
+public:
+    LIBECS_DM_OBJECT( ExpressionAssignmentProcess, Process )
     {
-      INHERIT_PROPERTIES( ExpressionProcessBase );
-
-      PROPERTYSLOT_SET_GET( String, Variable );
+        INHERIT_PROPERTIES( _LIBECS_MIXIN_CLASS_ );
+        INHERIT_PROPERTIES( Process );
+        PROPERTYSLOT_SET_GET( String, Variable );
     }
-  
-  ExpressionAssignmentProcess()
-  {
-    //FIXME: additional properties:
-    // Unidirectional   -> call declareUnidirectional() in initialize()
-    //                     if this is set
-  }
 
-  virtual ~ExpressionAssignmentProcess()
-  {
-    // ; do nothing
-  }
-  
-
-  SET_METHOD( String, Variable )
+    ExpressionAssignmentProcess()
     {
-      theVariable = value;
+        //FIXME: additional properties:
+        // Unidirectional     -> call declareUnidirectional() in initialize()
+        //                                         if this is set
     }
-  
-  GET_METHOD( String, Variable )
-    {
-      return theVariable;
-    }
-  
 
-  virtual void initialize()
+    virtual ~ExpressionAssignmentProcess()
     {
-      ExpressionProcessBase::initialize();
-      
-      for( VariableReferenceVectorConstIterator
-	     i( getVariableReferenceVector().begin() );
-	   i != getVariableReferenceVector().end(); ++i )
-	{
-	  if( i->getCoefficient() != 0 )
-	    {
-	      theVariableReference = *i; 
-	    }
-	}
+        // ; do nothing
     }
-  
-  virtual void fire()
+ 
+    SET_METHOD( String, Variable )
+    {
+        theVariable = value;
+    }
+
+    GET_METHOD( String, Variable )
+    {
+        return theVariable;
+    }
+
+    virtual void defaultSetProperty( libecs::String const& aPropertyName,
+                             libecs::PolymorphCref aValue )
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultSetProperty( aPropertyName, aValue );
+    }
+
+    virtual const libecs::Polymorph defaultGetProperty( libecs::String const& aPropertyName ) const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetProperty( aPropertyName );
+    }
+
+    virtual const libecs::StringVector defaultGetPropertyList() const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetPropertyList();
+    }
+
+    virtual const libecs::PropertyAttributes
+    defaultGetPropertyAttributes( libecs::String const& aPropertyName ) const
+    {
+        return _LIBECS_MIXIN_CLASS_::defaultGetPropertyAttributes( aPropertyName );
+    }
+
+    virtual void initialize()
+    {
+        Process::initialize();
+        _LIBECS_MIXIN_CLASS_::initialize();
+            
+        for( VariableReferenceVectorConstIterator i(
+                    getVariableReferenceVector().begin() );
+             i != getVariableReferenceVector().end(); ++i )
+        {
+            if( i->getCoefficient() != 0 )
+            {
+                theVariableReference = *i; 
+            }
+        }
+    }
+
+    virtual void fire()
     { 
-      theVariableReference.setValue
-	( theVariableReference.getCoefficient() * 
-	  theVirtualMachine.execute( *theCompiledCode ) );
+        theVariableReference.getVariable()->setValue(
+            theVariableReference.getCoefficient() * 
+                theVirtualMachine.execute( *theCompiledCode ) );
     }
 
- private:
-
-  String theVariable;
-
-  VariableReference theVariableReference;
+private:
+    String theVariable;
+    VariableReference theVariableReference;
 };
 
 LIBECS_DM_INIT( ExpressionAssignmentProcess, Process );

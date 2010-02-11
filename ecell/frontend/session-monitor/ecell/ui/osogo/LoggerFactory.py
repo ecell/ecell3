@@ -3,8 +3,8 @@
 #
 #       This file is part of the E-Cell System
 #
-#       Copyright (C) 1996-2007 Keio University
-#       Copyright (C) 2005-2007 The Molecular Sciences Institute
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
 #
 #::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 #
@@ -30,42 +30,41 @@
 # E-Cell Project, Lab. for Bioinformatics, Keio University.
 #
 
-from string import *
-
+# ------------------------------------------------------------------
+# LoggerFactory print out a data to file.
+# Some data format can be created and printet out.
+# The formats are ECD and binary.
+# ------------------------------------------------------------------
 class LoggerFactory:
-    """
-    LoggerFactory print out a data to file.
-    Some data format can be created and printet out.
-    The formats are ECD and binary.
-    """
 
 	def __init__(self):
 		self.theECDExtension='ecd'
 
+	# ------------------------------------------------------------------
+	# print out ECD format data to file.
+	#
+	# aDataName(string) : the name of Data which is one item of ECD format
+	# aMatrixData(touple of touple of float)
+	#					    : matrix data (dimension is n(columns) * m(lines) )
+	# aDataName(string) : the dataname which is one item of ECD format
+	# aLabel(string)    : the label which is one item of ECD format
+	# aNote(string)     : the note which is one item of ECD format
+	#
+	# return  -> ECDFormatData
+	#
+	# This method is thorwable exception.
+	# ------------------------------------------------------------------
 	def printECDFormatDataToFile( self, aFileName, aMatrixData, 
 								aDataName='', aLabel='',
 								aNote=''):
-        """
-        print out ECD format data to file.
-        
-        aDataName(string) : the name of Data which is one item of ECD format
-        aMatrixData(touple of touple of float)
-          				    : matrix data (dimension is n(columns) * m(lines) )
-        aDataName(string) : the dataname which is one item of ECD format
-        aLabel(string)    : the label which is one item of ECD format
-        aNote(string)     : the note which is one item of ECD format
-        
-        return  -> ECDFormatData
-        
-        This method can throw an exception.
-        """
+
 		##print "1aFileName = %s" %aFileName
 		##print 'len = %d' %(len(self.theECDExtension))
 
 		if len(aFileName) == 0:
 			raise " Error(%s) : The length of file name is 0 !" %__name__
 
-		if rfind(aFileName,self.theECDExtension) == \
+		if aFileName.rfind( self.theECDExtension ) == \
 			len(aFileName)-len(self.theECDExtension):
 			pass
 		else:
@@ -117,16 +116,14 @@ class LoggerFactory:
 	#
 	# return  aFilename -> if sucseed
 	#
-	# This method can throw an exception.
+	# This method is thorwable exception.
 	# ------------------------------------------------------------------
 	def getECDFileNameFromFullPNString( self, aFullPNString ):
 
-		#aFilename=string.split(aFullPNString,'/')
-		aFilename=split(aFullPNString,'/')
-		aFilename=aFilename[-1]
-		#aFilename=string.split(aFilename,':')
-		aFilename=split(aFilename,':')
-		aFilename=aFilename[0] + '_' + aFilename[1] + '_' + aFilename [-1]
+		aFilename = aFullPNString.split('/')
+		aFilename = aFilename[-1]
+		aFilename = aFilename.split(':')
+		aFilename = aFilename[0] + '_' + aFilename[1] + '_' + aFilename [-1]
 		return aFilename + '.ecd'
 
 	# end of theECDFileName
@@ -139,14 +136,28 @@ class LoggerFactory:
 	# return  directoryname -> if sucseed
 	#         None          -> if some errors were catched.
 	# 
-	# This method can throw an exception.
+	# This method is thorwable exception.
 	# ------------------------------------------------------------------
 	def getDirectoryNameFromFullPNString( self, aFullPNString):
-		aDirectoryname=split(aFullPNString,':')
+		aDirectoryname=aFullPNString.split(':')
 		aDirectoryname=aDirectoryname[1]
-		aDirectoryname=split(aDirectoryname,'/')
+		aDirectoryname=aDirectoryname.split('/')
 		return aDirectoryname[-1]
 
 	# end of theDirectory
 
 
+# end of LoggerFactory
+
+
+if __name__ == "__main__":
+
+	def main():
+		data = [[0,1],[2,3],[4,5]]
+		#data = [[0],[2],[4]]
+		a = LoggerFactory()
+		#status = a.printECDFormatDataToFile('hoge',data,'dammy','no','aa')
+		status = a.printECDFormatDataToFile('hoge',data,'dammy','no')
+		print status
+
+	main()

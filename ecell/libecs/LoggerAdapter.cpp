@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -24,6 +24,7 @@
 // 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 // 
 //END_HEADER
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -33,19 +34,17 @@
 namespace libecs
 {
 
-  ///////////////////////////// LoggerAdapter
+///////////////////////////// LoggerAdapter
 
-  LIBECS_API LoggerAdapter::LoggerAdapter()
-  {
+LIBECS_API LoggerAdapter::LoggerAdapter()
+{
     ; // do nothing
-  }
+}
 
-  LIBECS_API LoggerAdapter::~LoggerAdapter()
-  {
+LIBECS_API LoggerAdapter::~LoggerAdapter()
+{
     ; // do nothing
-  }
-
-
+}
 
 } // namespace libecs
 

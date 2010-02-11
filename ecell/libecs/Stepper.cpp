@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2008 Keio University
-//       Copyright (C) 2005-2008 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -28,6 +28,7 @@
 // written by Koichi Takahashi <shafi@e-cell.org>,
 // E-Cell Project.
 //
+
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"
 #endif /* HAVE_CONFIG_H */
@@ -47,73 +48,56 @@
 
 #include "Stepper.hpp"
 
+#include "libecs.hpp"
 
 namespace libecs
 {
 
-  LIBECS_DM_INIT_STATIC( Stepper, Stepper );
+LIBECS_DM_INIT_STATIC( Stepper, Stepper );
 
-  ////////////////////////// Stepper
+////////////////////////// Stepper
 
-  Stepper::Stepper() 
-    :
-    theReadWriteVariableOffset( 0 ),
-    theReadOnlyVariableOffset( 0 ),
-    theDiscreteProcessOffset( 0 ),
-    theModel( NULLPTR ),
-    theSchedulerIndex( -1 ),
-    thePriority( 0 ),
-    theCurrentTime( 0.0 ),
-    theStepInterval( 0.001 ),
-    //    theMinStepInterval( std::numeric_limits<Real>::min() ),
-    //    theMaxStepInterval( std::numeric_limits<Real>::max() )
-    theMinStepInterval( 0.0 ),
-    theMaxStepInterval( std::numeric_limits<Real>::infinity() )
-  {
+Stepper::Stepper() 
+    : theReadWriteVariableOffset( 0 ),
+      theReadOnlyVariableOffset( 0 ),
+      theDiscreteProcessOffset( 0 ),
+      theSchedulerIndex( -1 ),
+      thePriority( 0 ),
+      theCurrentTime( 0.0 ),
+      theNextTime( 0.001 ),
+      theMinStepInterval( 1e-100 ),
+      theMaxStepInterval( std::numeric_limits<Real>::infinity() )
+{
     gsl_rng_env_setup();
 
     theRng = gsl_rng_alloc( gsl_rng_default );
 
     setRngSeed( "TIME" );
-  }
+}
 
-  Stepper::~Stepper()
-  {
+Stepper::~Stepper()
+{
     gsl_rng_free( theRng );
-  }
+}
 
 
-  void Stepper::initialize()
-  {
-    //    if( isEntityListChanged() )
-    //      {
-
+void Stepper::initialize()
+{
     //
-    // Update theVariableVector.  This also calls updateInterpolantVector.
+    // Update theVariableVector.    This also calls updateInterpolantVector.
     //
     updateVariableVector();
-
-
-    //    clearEntityListChanged();
-    //      }
 
     // size of the value buffer == the number of *all* variables.
     // (not just read or write variables)
     theValueBuffer.resize( theVariableVector.size() );
+}
 
-    updateLoggerVector();
 
-    
-    //  Don't call
-    //    createInterpolants();
-    //  here:  only DifferentialSteppers need this.
-  }
-
- 
-  void Stepper::updateProcessVector()
-  {
+void Stepper::updateProcessVector()
+{
     // lighter implementation of this method is 
-    // to merge this into registerProcess() and removeProcess() and
+    // to merge this into registerProcess() and unregisterProcess() and
     // find a position to insert/remove each time.
 
     // sort by memory address. this is an optimization.
@@ -121,496 +105,546 @@ namespace libecs
 
     // sort by Process priority, conserving the partial order in memory
     std::stable_sort( theProcessVector.begin(), theProcessVector.end(),
-		      Process::PriorityCompare() );
+                      Process::PriorityCompare() );
 
     // partition by isContinuous().
-    ProcessVectorConstIterator aDiscreteProcessIterator
-      ( std::stable_partition( theProcessVector.begin(),
-			       theProcessVector.end(),
-			       std::mem_fun( &Process::isContinuous ) ) );
+    ProcessVectorConstIterator aDiscreteProcessIterator(
+        std::stable_partition( theProcessVector.begin(),
+                               theProcessVector.end(),
+                               std::mem_fun( &Process::isContinuous ) ) );
 
-    theDiscreteProcessOffset = 
-      aDiscreteProcessIterator - theProcessVector.begin();
-  }
+    theDiscreteProcessOffset = aDiscreteProcessIterator - theProcessVector.begin();
+}
 
-  void Stepper::updateVariableVector()
-  {
+void Stepper::updateVariableVector()
+{
     DECLARE_MAP( VariablePtr, VariableReference, std::less<VariablePtr>,
-		 PtrVariableReferenceMap );
+                             PtrVariableReferenceMap );
 
     PtrVariableReferenceMap aPtrVariableReferenceMap;
 
     for( ProcessVectorConstIterator i( theProcessVector.begin());
-	 i != theProcessVector.end() ; ++i )
-      {
-	VariableReferenceVectorCref 
-	  aVariableReferenceVector( (*i)->getVariableReferenceVector() );
+         i != theProcessVector.end() ; ++i )
+    {
+        VariableReferenceVector const& aVariableReferenceVector(
+            (*i)->getVariableReferenceVector() );
 
-	// for all the VariableReferences
-	for( VariableReferenceVectorConstIterator 
-	       j( aVariableReferenceVector.begin() );
-	     j != aVariableReferenceVector.end(); ++j )
-	  {
-	    VariableReferenceCref aNewVariableReference( *j );
-	    VariablePtr aVariablePtr( aNewVariableReference.getVariable() );
+        // for all the VariableReferences
+        for( VariableReferenceVectorConstIterator j(
+                aVariableReferenceVector.begin() );
+             j != aVariableReferenceVector.end(); ++j )
+        {
+            VariableReference const& aNewVariableReference( *j );
+            VariablePtr aVariablePtr( aNewVariableReference.getVariable() );
 
-	    PtrVariableReferenceMapIterator 
-	      anIterator( aPtrVariableReferenceMap.find( aVariablePtr ) );
+            PtrVariableReferenceMapIterator 
+                anIterator( aPtrVariableReferenceMap.find( aVariablePtr ) );
 
-	    if( anIterator == aPtrVariableReferenceMap.end() )
-	      {
-		aPtrVariableReferenceMap.
-		  insert( PtrVariableReferenceMap::
-			  value_type( aVariablePtr, aNewVariableReference ) );
-	      }
-	    else
-	      {
-		VariableReferenceRef aVariableReference( anIterator->second );
+            if( anIterator == aPtrVariableReferenceMap.end() )
+            {
+                aPtrVariableReferenceMap.insert(
+                    PtrVariableReferenceMap::value_type(
+                        aVariablePtr, aNewVariableReference ) );
+            }
+            else
+            {
+                VariableReferenceRef aVariableReference( anIterator->second );
 
-		aVariableReference.
-		  setIsAccessor( aVariableReference.isAccessor() ||
-				 aNewVariableReference.isAccessor() );
-		
-		aVariableReference.
-		  setCoefficient( abs( aVariableReference.getCoefficient() )
-				  + abs( aNewVariableReference.
-					 getCoefficient() ) );
-	      }
-	  }
-      }
+                aVariableReference.setIsAccessor(
+                    aVariableReference.isAccessor()
+                    || aNewVariableReference.isAccessor() );
+                
+                aVariableReference.setCoefficient(
+                    abs( aVariableReference.getCoefficient() )
+                    + abs( aNewVariableReference.getCoefficient() ) );
+            }
+        }
+    }
 
     VariableReferenceVector aVariableReferenceVector;
     aVariableReferenceVector.reserve( aPtrVariableReferenceMap.size() );
 
     // I want select2nd... but use a for loop for portability.
     for( PtrVariableReferenceMapConstIterator 
-	   i( aPtrVariableReferenceMap.begin() );
-	 i != aPtrVariableReferenceMap.end() ; ++i )
-      {
-	aVariableReferenceVector.push_back( i->second );
-      }
+            i( aPtrVariableReferenceMap.begin() );
+         i != aPtrVariableReferenceMap.end() ; ++i )
+    {
+        aVariableReferenceVector.push_back( i->second );
+    }
     
     VariableReferenceVectorIterator aReadOnlyVariableReferenceIterator = 
-      std::partition( aVariableReferenceVector.begin(),
-		      aVariableReferenceVector.end(),
-		      std::mem_fun_ref( &VariableReference::isMutator ) );
+        std::partition( aVariableReferenceVector.begin(),
+                        aVariableReferenceVector.end(),
+                        std::mem_fun_ref( &VariableReference::isMutator ) );
 
     VariableReferenceVectorIterator aReadWriteVariableReferenceIterator = 
-      std::partition( aVariableReferenceVector.begin(),
-		      aReadOnlyVariableReferenceIterator,
-		      std::not1
-		      ( std::mem_fun_ref( &VariableReference::isAccessor ) )
-		      );
+        std::partition( aVariableReferenceVector.begin(),
+                        aReadOnlyVariableReferenceIterator,
+                        std::not1(
+                            std::mem_fun_ref( &VariableReference::isAccessor )
+                        ) );
 
     theVariableVector.clear();
     theVariableVector.reserve( aVariableReferenceVector.size() );
 
     std::transform( aVariableReferenceVector.begin(),
-		    aVariableReferenceVector.end(),
-		    std::back_inserter( theVariableVector ),
-		    std::mem_fun_ref( &VariableReference::getVariable ) );
+                    aVariableReferenceVector.end(),
+                    std::back_inserter( theVariableVector ),
+                    std::mem_fun_ref( &VariableReference::getVariable ) );
 
     theReadWriteVariableOffset = aReadWriteVariableReferenceIterator 
-      - aVariableReferenceVector.begin();
+        - aVariableReferenceVector.begin();
 
     theReadOnlyVariableOffset = aReadOnlyVariableReferenceIterator 
-      - aVariableReferenceVector.begin();
+        - aVariableReferenceVector.begin();
 
     VariableVectorIterator aReadWriteVariableIterator = 
-      theVariableVector.begin() + theReadWriteVariableOffset;
+        theVariableVector.begin() + theReadWriteVariableOffset;
     VariableVectorIterator aReadOnlyVariableIterator = 
-      theVariableVector.begin() + theReadOnlyVariableOffset;
+        theVariableVector.begin() + theReadOnlyVariableOffset;
 
     // For each part of the vector, sort by memory address. 
     // This is an optimization.
     std::sort( theVariableVector.begin(),  aReadWriteVariableIterator );
     std::sort( aReadWriteVariableIterator, aReadOnlyVariableIterator );
     std::sort( aReadOnlyVariableIterator,  theVariableVector.end() );
-  }
+}
 
 
-  void Stepper::updateIntegratedVariableVector()
-  {
+void Stepper::updateIntegratedVariableVector()
+{
     theIntegratedVariableVector.clear();
 
     // want copy_if()...
     for( VariableVectorConstIterator i( theVariableVector.begin() );
-	 i != theVariableVector.end(); ++i )
-      {
-	VariablePtr aVariablePtr( *i );
+         i != theVariableVector.end(); ++i )
+    {
+        VariablePtr aVariablePtr( *i );
 
-	if( aVariablePtr->isIntegrationNeeded() )
-	  {
-	    theIntegratedVariableVector.push_back( aVariablePtr );
-	  }
-      }
+        if( aVariablePtr->isIntegrationNeeded() )
+        {
+            theIntegratedVariableVector.push_back( aVariablePtr );
+        }
+    }
 
     // optimization: sort by memory address.
     std::sort( theIntegratedVariableVector.begin(), 
-	       theIntegratedVariableVector.end() );
-  }
+               theIntegratedVariableVector.end() );
+}
 
 
-  void Stepper::createInterpolants()
-  {
+void Stepper::createInterpolants()
+{
     // create Interpolants.
-    for( VariableVector::size_type c( 0 );  
-	 c != theReadOnlyVariableOffset; ++c )
-      {
-	VariablePtr aVariablePtr( theVariableVector[ c ] );
-	aVariablePtr->registerInterpolant( createInterpolant( aVariablePtr ) );
-      }
-  }
+    for( VariableVector::size_type c( 0 );    
+         c != theReadOnlyVariableOffset; ++c )
+    {
+        VariablePtr aVariablePtr( theVariableVector[ c ] );
+        aVariablePtr->registerInterpolant( createInterpolant( aVariablePtr ) );
+    }
+}
 
 
-  void Stepper::updateLoggerVector()
-  {
-    EntityVector anEntityVector;
-    anEntityVector.reserve( theProcessVector.size() + 
-			    getReadOnlyVariableOffset() +
-			    theSystemVector.size() );
-
-    // copy theProcessVector
-    std::copy( theProcessVector.begin(), theProcessVector.end(),
-	       std::back_inserter( anEntityVector ) );
-
-    // append theVariableVector
-    std::copy( theVariableVector.begin(), 
-	       theVariableVector.begin() + theReadOnlyVariableOffset,
-	       std::back_inserter( anEntityVector ) );
-
-    // append theSystemVector
-    std::copy( theSystemVector.begin(), theSystemVector.end(),
-	       std::back_inserter( anEntityVector ) );
-
-
-    theLoggerVector.clear();
-
-    // Scan all the relevant Entities, and find loggers
-    for( EntityVectorConstIterator i( anEntityVector.begin() );
-	 i != anEntityVector.end() ; ++i )
-      {
-	EntityPtr anEntityPtr( *i );
-
-	LoggerVectorCref aLoggerVector( anEntityPtr->getLoggerVector() );
-
-	if( ! aLoggerVector.empty() )
-	  {
-	    theLoggerVector.insert( theLoggerVector.end(),
-				    aLoggerVector.begin(),
-				    aLoggerVector.end() );
-	  }
-      }
-
-    // optimization: sort by memory address.
-    std::sort( theLoggerVector.begin(), theLoggerVector.end() );
-  }
-
-  const bool Stepper::isDependentOn( const StepperCptr aStepper )
-  {
+const bool Stepper::isDependentOn( Stepper const* aStepper )
+{
     // Every Stepper depends on the SystemStepper.
     // FIXME: UGLY -- reimplement SystemStepper in a different way
     if( typeid( *aStepper ) == typeid( SystemStepper ) )
-      {
-	return true;
-      }
+        {
+        return true;
+    }
 
-    VariableVectorCref aTargetVector( aStepper->getVariableVector() );
+    VariableVector const& aTargetVector( aStepper->getVariableVector() );
     
-    VariableVectorConstIterator aReadOnlyTargetVariableIterator
-      ( aTargetVector.begin() +
-	aStepper->getReadOnlyVariableOffset() );
+    VariableVectorConstIterator aReadOnlyTargetVariableIterator(
+        aTargetVector.begin() +
+            aStepper->getReadOnlyVariableOffset() );
 
-    VariableVectorConstIterator aReadWriteTargetVariableIterator
-      ( aTargetVector.begin() +
-	aStepper->getReadWriteVariableOffset() );
+    VariableVectorConstIterator aReadWriteTargetVariableIterator(
+        aTargetVector.begin() +
+            aStepper->getReadWriteVariableOffset() );
     
     // if at least one Variable in this::readlist appears in
     // the target::write list.
     for( VariableVectorConstIterator i( getVariableVector().begin() +
-					theReadWriteVariableOffset ); 
-	 i != getVariableVector().end(); ++i )
-      {
-	VariablePtr const aVariablePtr( *i );
-	
-	// search in target::write or readwrite lists.
-	if( std::binary_search( aTargetVector.begin(),  // write-only
-				aReadWriteTargetVariableIterator,
-				aVariablePtr ) ||       
-	    std::binary_search( aReadWriteTargetVariableIterator, // read-write
-				aReadOnlyTargetVariableIterator,
-				aVariablePtr ) )
-	  
-
-	  {
-	    return true;
-	  }
-      }
+                                        theReadWriteVariableOffset ); 
+         i != getVariableVector().end(); ++i )
+    {
+        VariablePtr const aVariablePtr( *i );
+        
+        // search in target::write or readwrite lists.
+        if( std::binary_search( aTargetVector.begin(),    // write-only
+                                aReadWriteTargetVariableIterator,
+                                aVariablePtr )
+            || std::binary_search( aReadWriteTargetVariableIterator,
+                                   aReadOnlyTargetVariableIterator,
+                                   aVariablePtr ) )
+        {
+            return true;
+        }
+    }
     
     return false;
-  }
+}
 
 
-  GET_METHOD_DEF( Polymorph, SystemList, Stepper )
-  {
+GET_METHOD_DEF( Polymorph, SystemList, Stepper )
+{
     PolymorphVector aVector;
     aVector.reserve( theSystemVector.size() );
 
     for( SystemVectorConstIterator i( getSystemVector().begin() );
-	 i != getSystemVector().end() ; ++i )
-      {
-	SystemCptr aSystemPtr( *i );
-	FullIDCref aFullID( aSystemPtr->getFullID() );
-	const String aFullIDString( aFullID.getString() );
-
-	aVector.push_back( aFullIDString );
-      }
+         i != getSystemVector().end() ; ++i )
+    {
+        aVector.push_back( Polymorph( ( *i )->getFullID().asString() ) );
+    }
 
     return aVector;
-  }
+}
 
 
-  /*
-  GET_METHOD_DEF( Polymorph, DependentStepperList, Stepper )
-  {
-    PolymorphVector aVector;
-    aVector.reserve( theDependentStepperVector.size() );
-
-    for( StepperVectorConstIterator i( getDependentStepperVector().begin() );
-	 i != getDependentStepperVector().end() ; ++i )
-      {
-	StepperCptr aStepperPtr( *i );
-
-	aVector.push_back( aStepperPtr->getID() );
-      }
-
-    return aVector;
-  }
-  */
-
-  void Stepper::registerSystem( SystemPtr aSystemPtr )
-  { 
+void Stepper::registerSystem( System* aSystemPtr )
+{ 
     if( std::find( theSystemVector.begin(), theSystemVector.end(), aSystemPtr )
-	== theSystemVector.end() )
-      {
-   	theSystemVector.push_back( aSystemPtr );
-      }
-  }
+            == theSystemVector.end() )
+    {
+        theSystemVector.push_back( aSystemPtr );
+    }
+}
 
-  void Stepper::removeSystem( SystemPtr aSystemPtr )
-  { 
-    SystemVectorIterator i( find( theSystemVector.begin(), 
-				  theSystemVector.end(),
-				  aSystemPtr ) );
+
+void Stepper::unregisterSystem( System* aSystemPtr )
+{ 
+    SystemVectorIterator i( std::find( theSystemVector.begin(), 
+                                  theSystemVector.end(),
+                                  aSystemPtr ) );
     
     if( i == theSystemVector.end() )
-      {
-	THROW_EXCEPTION( NotFound,
-			 getClassName() + String( ": " ) 
-			 + getID() + ": " 
-			 + aSystemPtr->getFullID().getString() 
-			 + " not found in this stepper. Can't remove." );
-      }
+    {
+        THROW_EXCEPTION_INSIDE( NotFound,
+                                asString() + ": Failed to dissociate [" +
+                                aSystemPtr->asString() + "] (no such System is "
+                                "associated to this stepper)" );
+    }
 
     theSystemVector.erase( i );
-  }
+}
 
 
-  void Stepper::registerProcess( ProcessPtr aProcessPtr )
-  { 
+void Stepper::unregisterAllSystems()
+{
+    theSystemVector.clear();
+}
+
+void Stepper::registerProcess( Process* aProcess )
+{ 
+    BOOST_ASSERT( aProcess != NULLPTR );
+
     if( std::find( theProcessVector.begin(), theProcessVector.end(), 
-		   aProcessPtr ) == theProcessVector.end() )
-      {
-   	theProcessVector.push_back( aProcessPtr );
-      }
+                   aProcess ) == theProcessVector.end() )
+    {
+        theProcessVector.push_back( aProcess );
+    }
 
     updateProcessVector();
-  }
+}
 
-  void Stepper::removeProcess( ProcessPtr aProcessPtr )
-  { 
-    ProcessVectorIterator i( find( theProcessVector.begin(), 
-				   theProcessVector.end(),
-				   aProcessPtr ) );
+void Stepper::unregisterProcess( ProcessPtr aProcess )
+{ 
+    ProcessVectorIterator ip( std::find( theProcessVector.begin(), 
+                                    theProcessVector.end(),
+                                    aProcess ) );
     
-    if( i == theProcessVector.end() )
-      {
-	THROW_EXCEPTION( NotFound,
-			 getClassName() + String( ": " ) 
-			 + getID() + ": " 
-			 + aProcessPtr->getFullID().getString() 
-			 + " not found in this stepper. Can't remove." );
-      }
+    if( ip == theProcessVector.end() )
+    {
+        THROW_EXCEPTION_INSIDE( NotFound,
+                                asString() + ": Failed to dissociate [" +
+                                aProcess->asString() + "] (no such Process is "
+                                "associated to this stepper)" );
+    }
 
-    theProcessVector.erase( i );
-  }
+    typedef std::set< Variable* > VariableSet;
+    VariableSet aVarSet;
+    VariableReferenceVector const& aVarRefVector(
+        aProcess->getVariableReferenceVector() );
+    std::transform( aVarRefVector.begin(), aVarRefVector.end(),
+                    inserter( aVarSet, aVarSet.begin() ),
+                    std::mem_fun_ref( &VariableReference::getVariable ) );
+
+    VariableVector aNewVector;
+    VariableVector::size_type aReadWriteVariableOffset,
+                             aReadOnlyVariableOffset;
+
+    for( VariableVector::iterator i( theVariableVector.begin() ),
+                                  e( theVariableVector.begin()
+                                     + theReadWriteVariableOffset );
+         i != e; ++i )
+    {
+        VariableSet::iterator j( aVarSet.find( *i ) );
+        if ( j != aVarSet.end() )
+            aVarSet.erase( j );
+        else
+            aNewVector.push_back( *i );
+    }
+
+    aReadWriteVariableOffset = aNewVector.size();
+
+    for( VariableVector::iterator i( theVariableVector.begin()
+                                     + theReadWriteVariableOffset ),
+                                  e( theVariableVector.begin()
+                                     + theReadOnlyVariableOffset );
+         i != e; ++i )
+    {
+        VariableSet::iterator j( aVarSet.find( *i ) );
+        if ( j != aVarSet.end() )
+            aVarSet.erase( j );
+        else
+            aNewVector.push_back( *i );
+    }
+
+    aReadOnlyVariableOffset = aNewVector.size();
+
+    for( VariableVector::iterator i( theVariableVector.begin()
+                                     + theReadOnlyVariableOffset ),
+                                  e( theVariableVector.end() );
+         i != e; ++i )
+    {
+        VariableSet::iterator j( aVarSet.find( *i ) );
+        if ( j != aVarSet.end() )
+            aVarSet.erase( j );
+        else
+            aNewVector.push_back( *i );
+    }
+
+    theVariableVector.swap( aNewVector );
+    theReadWriteVariableOffset = aReadWriteVariableOffset;
+    theReadOnlyVariableOffset = aReadOnlyVariableOffset;
+
+    theProcessVector.erase( ip );
+}
 
 
-  void Stepper::log()
-  {
-    // update loggers
-    FOR_ALL( LoggerVector, theLoggerVector )
-      {
-	(*i)->log( theCurrentTime );
-      }
-  }
+void Stepper::unregisterAllProcesses()
+{
+    theProcessVector.clear();
+    theVariableVector.clear();
+}
 
-  GET_METHOD_DEF( Polymorph, WriteVariableList, Stepper )
-  {
+void Stepper::log()
+{
+    for ( ProcessVector::const_iterator i( theProcessVector.begin() ),
+                                        end( theProcessVector.end() );
+          i != end; ++i )
+    {
+        LoggerBroker::LoggersPerFullID loggers( (*i)->getLoggers() );
+        std::for_each( loggers.begin(), loggers.end(),
+                       BindSecond( std::mem_fun( &Logger::log ),
+                                   theCurrentTime ) );
+    }
+
+    for ( VariableVector::const_iterator i( theVariableVector.begin() ),
+                                         end( theVariableVector.begin()
+                                              + theReadOnlyVariableOffset );
+          i != end; ++i )
+    {
+        LoggerBroker::LoggersPerFullID loggers( (*i)->getLoggers() );
+        std::for_each( loggers.begin(), loggers.end(),
+                       BindSecond( std::mem_fun( &Logger::log ),
+                                   theCurrentTime ) );
+    }
+
+    for ( SystemVector::const_iterator i( theSystemVector.begin() ),
+                                         end( theSystemVector.end() );
+          i != end; ++i )
+    {
+        LoggerBroker::LoggersPerFullID loggers( (*i)->getLoggers() );
+        std::for_each( loggers.begin(), loggers.end(),
+                       BindSecond( std::mem_fun( &Logger::log ),
+                                   theCurrentTime ) );
+    }
+}
+
+GET_METHOD_DEF( Polymorph, WriteVariableList, Stepper )
+{
     PolymorphVector aVector;
     aVector.reserve( theVariableVector.size() );
 
     for( VariableVector::size_type c( 0 ); 
-	 c != theReadOnlyVariableOffset; ++c )
-      {
-	aVector.push_back( theVariableVector[c]->getFullID().getString() );
-      }
+         c != theReadOnlyVariableOffset; ++c )
+    {
+        aVector.push_back( Polymorph( theVariableVector[c]->getFullID().asString() ) );
+    }
     
     return aVector;
-  }
+}
 
 
-  GET_METHOD_DEF( Polymorph, ReadVariableList, Stepper )
-  {
+GET_METHOD_DEF( Polymorph, ReadVariableList, Stepper )
+{
     PolymorphVector aVector;
     aVector.reserve( theVariableVector.size() );
     
     for( VariableVector::size_type c( theReadWriteVariableOffset ); 
-	 c != theVariableVector.size(); ++c )
-      {
-	aVector.push_back( theVariableVector[c]->getFullID().getString() );
-      }
+         c != theVariableVector.size(); ++c )
+    {
+        aVector.push_back( Polymorph( theVariableVector[c]->getFullID().asString() ) );
+    }
     
     return aVector;
-  }
-  
-  GET_METHOD_DEF( Polymorph, ProcessList, Stepper )
-  {
+}
+
+GET_METHOD_DEF( Polymorph, ProcessList, Stepper )
+{
     PolymorphVector aVector;
     aVector.reserve( theProcessVector.size() );
     
     for( ProcessVectorConstIterator i( theProcessVector.begin() );
-	 i != theProcessVector.end() ; ++i )
-      {
-	aVector.push_back( (*i)->getFullID().getString() );
-      }
+         i != theProcessVector.end() ; ++i )
+    {
+        aVector.push_back( Polymorph( (*i)->getFullID().asString() ) );
+    }
     
     return aVector;
-  }
-  
-  const VariableVector::size_type 
-  Stepper::getVariableIndex( VariableCptr const aVariable )
-  {
+}
+
+const Stepper::VariableVector::size_type 
+Stepper::getVariableIndex( Variable const* aVariable ) const
+{
     VariableVectorConstIterator
-      anIterator( std::find( theVariableVector.begin(), 
-			     theVariableVector.end(), 
-			     aVariable ) ); 
-
-    DEBUG_EXCEPTION( anIterator != theVariableVector.end() , NotFound, 
- 		     "Variable not found." );
-
+        anIterator( std::find( theVariableVector.begin(), 
+                               theVariableVector.end(), 
+                               aVariable ) ); 
     return anIterator - theVariableVector.begin();
-  }
+}
 
 
-  void Stepper::clearVariables()
-  {
+void Stepper::clearVariables()
+{
     const VariableVector::size_type aSize( theVariableVector.size() );
     for( VariableVector::size_type c( 0 ); c < aSize; ++c )
-      {
-	VariablePtr const aVariable( theVariableVector[ c ] );
+    {
+        VariablePtr const aVariable( theVariableVector[ c ] );
 
-	// save original value values
-	theValueBuffer[ c ] = aVariable->getValue();
-      }
+        // save original value values
+        theValueBuffer[ c ] = aVariable->getValue();
+    }
 
-  }
+}
 
-  void Stepper::initializeProcesses()
-  {
+void Stepper::fireProcesses()
+{
     FOR_ALL( ProcessVector, theProcessVector )
-      {
-	(*i)->initialize();
-      }
-  }
+    {
+        (*i)->fire();
+    }
+}
 
 
-  void Stepper::fireProcesses()
-  {
-    FOR_ALL( ProcessVector, theProcessVector )
-      {
-	(*i)->fire();
-      }
-  }
-
-
-  void Stepper::integrate( RealParam aTime )
-  {
+void Stepper::integrate( RealParam aTime )
+{
     //
     // Variable::integrate()
     //
-    //    FOR_ALL( VariableVector, theVariableVector )
+    //        FOR_ALL( VariableVector, theVariableVector )
     FOR_ALL( VariableVector, theIntegratedVariableVector )
-      {
-	(*i)->integrate( aTime );
-      }
+    {
+        (*i)->integrate( aTime );
+    }
 
-    // this must be after Variable::integrate()
+    Real const aStepInterval( getNextTime() - getCurrentTime() );
     setCurrentTime( aTime );
-  }
+    theNextTime = aTime + aStepInterval;
+}
 
 
-  void Stepper::reset()
-  {
+void Stepper::reset()
+{
     // restore original values and clear velocity of all the *write* variables.
     for( VariableVector::size_type c( 0 ); 
-	 c < getReadOnlyVariableOffset(); ++c )
-      {
-	VariablePtr const aVariable( theVariableVector[ c ] );
+         c < getReadOnlyVariableOffset(); ++c )
+    {
+        VariablePtr const aVariable( theVariableVector[ c ] );
 
-	// restore x (original value) and clear velocity
-	aVariable->setValue( theValueBuffer[ c ] );
-      }
-  }
+        // restore x (original value) and clear velocity
+        aVariable->setValue( theValueBuffer[ c ] );
+    }
+}
 
 
-  SET_METHOD_DEF( String, RngSeed, Stepper )
-  {
+SET_METHOD_DEF( String, RngSeed, Stepper )
+{
     UnsignedInteger aSeed( 0 );
     
     if( value == "TIME" )
-      {
-	// Using just time() still gives the same seeds to Steppers
-	// in multi-stepper model.  Stepper index is added to prevent this.
-	aSeed = static_cast<UnsignedInteger>( time( NULLPTR ) 
-					      + getSchedulerIndex() );
-      }
+    {
+        // Using just time() still gives the same seeds to Steppers
+        // in multi-stepper model.    Stepper index is added to prevent this.
+        aSeed = static_cast<UnsignedInteger>( time( NULLPTR )
+                + getSchedulerIndex() );
+    }
     else if( value == "DEFAULT" )
-      {
-	aSeed = gsl_rng_default_seed;
-      }
+    {
+        aSeed = gsl_rng_default_seed;
+    }
     else
-      {
-	aSeed = stringCast<UnsignedInteger>( value );
-      }
+    {
+        aSeed = stringCast<UnsignedInteger>( value );
+    }
 
     gsl_rng_set( getRng(), aSeed );
-  }
+}
 
-  GET_METHOD_DEF( String, RngType, Stepper )
-  {
+GET_METHOD_DEF( String, RngType, Stepper )
+{
     return gsl_rng_name( getRng() );
-  }
+}
 
+
+String Stepper::asString() const
+{
+    return getPropertyInterface().getClassName() + "[" + getID() + "]";
+}
+
+SET_METHOD_DEF( Real, NextTime, Stepper )
+{
+    Real const aStepInterval( value - getCurrentTime() );
+
+    if ( aStepInterval < getMinStepInterval() )
+    {
+        theNextTime = value;
+        THROW_EXCEPTION_INSIDE( SimulationError,
+                String( "The step interval for [" )
+                + asString() + "] ("
+                + stringCast( aStepInterval )
+                + ") is behind the error-limit step interval ("
+                + stringCast( getMinStepInterval() ) + ")" );
+    }
+    else
+    {
+        theNextTime = value;
+    }
+}
+
+GET_METHOD_DEF( Real, TimeScale, Stepper )
+{
+    return getStepInterval();
+}
+
+SET_METHOD_DEF( Real, MaxStepInterval, Stepper )
+{
+    theMaxStepInterval = value;
+}
+
+Interpolant* Stepper::createInterpolant( Variable const* aVariable ) const
+{
+    return new Interpolant( aVariable, this );
+}
+
+void Stepper::detach()
+{
+    unregisterAllSystems();
+    unregisterAllProcesses();
+    EcsObject::detach();
+}
 
 } // namespace libecs
-
-
-/*
-  Do not modify
-  $Author$
-  $Revision$
-  $Date$
-  $Locker$
-*/
-

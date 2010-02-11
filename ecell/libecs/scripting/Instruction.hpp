@@ -2,8 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2007 Keio University
-//       Copyright (C) 2005-2007 The Molecular Sciences Institute
+//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -38,7 +38,14 @@
 #include "libecs/libecs.hpp"
 #include "libecs/MethodProxy.hpp"
 
-namespace libecs { namespace scripting {
+namespace libecs {
+
+class System;
+class VariableReference;
+class Process;
+class Entity;
+
+ namespace scripting {
 
 enum Opcode { // the order of items is optimized. don't change.
     NOP,
@@ -59,9 +66,8 @@ enum Opcode { // the order of items is optimized. don't change.
     END = RET
 };
 
-
-typedef libecs::SystemPtr( libecs::VariableReference::*VariableReferenceSystemMethodPtr )() const;
-typedef libecs::SystemPtr( libecs::Process::* ProcessMethodPtr )() const;
+typedef libecs::System*( libecs::VariableReference::*VariableReferenceSystemMethodPtr )() const;
+typedef libecs::System*( libecs::Process::* ProcessMethodPtr )() const;
 typedef const libecs::Real( libecs::System::* SystemMethodPtr )() const;
 
 typedef libecs::Real( *RealFunc0 )();
@@ -182,7 +188,8 @@ SPECIALIZE_OPCODE2OPERAND( OBJECT_METHOD_INTEGER,    IntegerObjectMethodProxy );
 
 #undef SPECIALIZE_OPCODE2OPERAND
 
-} } // namespace libecs::scripting
+} // namespace scripting
+} // namespace libecs
 
 namespace std {
 
