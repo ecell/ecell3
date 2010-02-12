@@ -15,6 +15,7 @@ SAMPLES = \
 	session_manager \
 	boolean \
 	simple \
+	logistic \
 	tauleap
 
 EXTRA_DIST = $(SAMPLES)
