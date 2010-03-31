@@ -663,6 +663,14 @@ public:
         return new DataPointVectorWrapper( aVector ); 
     }
 
+    static PyObject* __get__shape( DataPointVectorWrapper* self )
+    {
+        PyObject* retval( PyTuple_New( 2 ) );
+        PyTuple_SET_ITEM( retval, 0, PyLong_FromUnsignedLong( self->theVector->getSize() ) );
+        PyTuple_SET_ITEM( retval, 1, PyLong_FromUnsignedLong( theNumOfElemsPerEntry ) );
+        return retval;
+    }
+
     static void __dealloc__( DataPointVectorWrapper* self )
     {
         delete self;
@@ -915,6 +923,7 @@ PySequenceMethods DataPointVectorWrapper< Tdp_ >::__seq__ = {
 template< typename Tdp_ >
 PyGetSetDef DataPointVectorWrapper< Tdp_ >::__getset__[] = {
     { const_cast< char* >( "__array_struct__" ), (getter)&DataPointVectorWrapper::__get___array__struct, NULL },
+    { const_cast< char* >( "shape" ), (getter)&DataPointVectorWrapper::__get__shape, NULL },
     { NULL }
 };
 
