@@ -70,7 +70,7 @@ public:
                 theVariableReferenceVector.begin() );
              s != theZeroVariableReferenceIterator; ++s )
         {
-            VariableReference aVariableReference( *s );
+            VariableReference const& aVariableReference( *s );
             Integer aCoefficient( aVariableReference.getCoefficient() );
             do
             {
