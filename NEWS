@@ -1,3 +1,9 @@
+ecell-3.2.0p2: 2-Apr-2010
+ * Fixed DataPointVector's python wrapper to have "shape" property that returns
+   the shape of the array.  That is required by TableIO module.
+   (notified by Erin Rachael Shellman. Thanks.)
+
+
 ecell-3.2.0p1: 9-Feb-2010
 
  * Fixed the build system so that resource files for the GUI tools are
