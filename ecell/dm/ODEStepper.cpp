@@ -624,7 +624,7 @@ Real ODEStepper::solve()
 std::pair< bool, Real > ODEStepper::calculateRadauIIA( Real const aStepInterval, Real const aPreviousStepInterval )
 {
     Real aNewStepInterval;
-    Real aNorm;
+    Real aNorm( 0. );
     Real theta( fabs( theJacobianRecalculateTheta ) );
 
     UnsignedInteger anIterator( 0 );
