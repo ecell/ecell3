@@ -54,7 +54,7 @@ public:
         }
     }
 
-    virtual const std::string getSearchPath() const
+    virtual std::string getSearchPath() const
     {
         typedef std::set< std::string > StringSet;
         std::string retval;

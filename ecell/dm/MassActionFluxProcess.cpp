@@ -66,7 +66,7 @@ public:
         Real velocity( k * N_A );
         velocity *= getSuperSystem()->getSize();
 
-        for( VariableReferenceVectorConstIterator s(
+        for( VariableReferenceVector::const_iterator s(
                 theVariableReferenceVector.begin() );
              s != theZeroVariableReferenceIterator; ++s )
         {

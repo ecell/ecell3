@@ -34,10 +34,10 @@
 
 #include <boost/assert.hpp>
 
-#include "Util.hpp"
-#include "RealMath.hpp"
-#include "scripting/ExpressionCompiler.hpp"
-#include "scripting/Assembler.hpp"
+#include "libecs/Util.hpp"
+#include "libecs/RealMath.hpp"
+#include "libecs/scripting/ExpressionCompiler.hpp"
+#include "libecs/scripting/Assembler.hpp"
 
 namespace libecs { namespace scripting {
 
@@ -50,28 +50,14 @@ typedef TreeMatch::tree_iterator TreeIterator;
 
 //  VariableReferenceMethodProxy;
 
-typedef void (*InstructionAppender)( CodeRef );
-    
-DECLARE_ASSOCVECTOR(
-    libecs::String,
-    libecs::Real(*)(libecs::Real),
-    std::less<const libecs::String>,
-    FunctionMap1
-);
-
-DECLARE_ASSOCVECTOR(
-    libecs::String,
-    libecs::Real(*)(libecs::Real, libecs::Real),
-    std::less<const libecs::String>,
-    FunctionMap2
-);
-
-DECLARE_ASSOCVECTOR(
-    libecs::String,
-    libecs::Real,
-    std::less<const libecs::String>,
-    ConstantMap
-);
+typedef void (*InstructionAppender)( Code& );
+   
+typedef Loki::AssocVector< String, Real(*)(Real),
+                           std::less<String> > FunctionMap1;
+typedef Loki::AssocVector< String,
+                           libecs::Real(*)(Real, Real),
+                           std::less<String> > FunctionMap2;   
+typedef Loki::AssocVector< String, Real, std::less<String> > ConstantMap;
 
 class Tokens
 {
@@ -318,7 +304,7 @@ public:
 
 public:
     CompilerHelper(
-        StringCref anExpression,
+        String const& anExpression,
         Assembler& anAssembler,
         ErrorReporter& anErrorReporter,
         PropertyAccess& aPropertyAccess,
@@ -340,10 +326,10 @@ protected:
 
     void compileSystemProperty(
         TreeIterator const& aTreeIterator,
-        SystemPtr aSystemPtr, const String aMethodName );
+        System* aSystemPtr, const String aMethodName );
 
 private:
-    StringCref theExpression;
+    String const& theExpression;
     PropertyAccess& thePropertyAccess;
     EntityResolver& theEntityResolver;
     VariableReferenceResolver& theVarRefResolver;
@@ -464,8 +450,8 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
 
             BOOST_ASSERT( aChildTreeSize != 0 );
 
-            FunctionMap1Iterator aFunctionMap1Iterator;
-            FunctionMap2Iterator aFunctionMap2Iterator;
+            FunctionMap1::const_iterator aFunctionMap1Iterator;
+            FunctionMap2::const_iterator aFunctionMap2Iterator;
 
 
             if ( aChildTreeSize == 1 ) {
@@ -590,7 +576,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
 
             BOOST_ASSERT( aTreeIterator->value.begin()[ 0 ] == '.' );
 
-            EntityPtr anEntityPtr( theEntityResolver[ aClassString ] );
+            Entity* anEntityPtr( theEntityResolver[ aClassString ] );
             if ( !anEntityPtr ) {
                 theErrorReporter(
                     "NotFound",
@@ -599,7 +585,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
                 return;
             }
 
-            SystemPtr const aSystemPtr( anEntityPtr->getSuperSystem() );
+            System* const aSystemPtr( anEntityPtr->getSuperSystem() );
 
             const String aMethodName(
                 ( aChildTreeIterator+aChildTreeSize - 1 )->value.begin(),
@@ -660,7 +646,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
                                              aTreeIterator->value.end() );
 
             do {
-                ConstantMapIterator aConstantMapIterator(
+                ConstantMap::iterator aConstantMapIterator(
                     theConfig.theConstantMap.find( anIdentifierString ) );
                 if ( aConstantMapIterator != theConfig.theConstantMap.end() ) {
                     theAssembler.appendInstruction(
@@ -899,7 +885,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
 template<typename Tconfig_> void
 CompilerHelper<Tconfig_>::compileSystemProperty(
     TreeIterator const& aTreeIterator,
-    SystemPtr aSystemPtr, const String aMethodName )
+    System* aSystemPtr, const String aMethodName )
 {
     TreeIterator const&
     aChildTreeIterator( aTreeIterator->children.begin() );
@@ -912,7 +898,7 @@ CompilerHelper<Tconfig_>::compileSystemProperty(
     if ( aChildString == "getSuperSystem" ) {
         theAssembler.appendSystemMethodInstruction( aSystemPtr, aMethodName );
     } else if ( aChildString == "." ) {
-        SystemPtr theSystemPtr( aSystemPtr->getSuperSystem() );
+        System* theSystemPtr( aSystemPtr->getSuperSystem() );
 
         compileSystemProperty( aChildTreeIterator, theSystemPtr, aMethodName );
     } else {
@@ -926,7 +912,7 @@ CompilerHelper<Tconfig_>::compileSystemProperty(
 // }}}
 
 const Code*
-ExpressionCompiler::compileExpression( StringCref anExpression )
+ExpressionCompiler::compileExpression( String const& anExpression )
 {
     Code* code = new Code();
     Assembler anAssembler( code );

@@ -52,7 +52,7 @@
 
 namespace libecs { namespace scripting {
 
-DECLARE_VECTOR( unsigned char, Code );
+typedef std::vector< unsigned char > Code;
 
 class PropertyAccess
 {
@@ -100,10 +100,6 @@ public:
 
 class LIBECS_API ExpressionCompiler
 {
-private:
-public:
-    DECLARE_VECTOR( char, CharVector );
-
 public:
 
     ExpressionCompiler( ErrorReporter& anErrorReporter,
@@ -122,7 +118,7 @@ public:
         ; // do nothing
     }
 
-    const Code* compileExpression( libecs::StringCref anExpression );
+    const Code* compileExpression( libecs::String const& anExpression );
 
 private:
     ErrorReporter& theErrorReporter;

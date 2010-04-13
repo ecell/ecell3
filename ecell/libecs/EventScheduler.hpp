@@ -38,8 +38,6 @@
 
 namespace libecs
 {
-DECLARE_CLASS( EventBase );
-
 
 /**
    EventBase
@@ -72,14 +70,14 @@ class LIBECS_API EventBase
 {
 
 public:
-    EventBase( TimeParam aTime )
+    EventBase( Time aTime )
         : theTime( aTime )
     {
         ; // do nothing
     }
 
 
-    void setTime( TimeParam aTime )
+    void setTime( Time aTime )
     {
         theTime = aTime;
     }
@@ -91,27 +89,27 @@ public:
     }
 
 
-    const bool operator< ( EventBaseCref rhs ) const
+    const bool operator< ( EventBase const& rhs ) const
     {
         return getTime() < rhs.getTime();
     }
 
-    const bool operator> ( EventBaseCref rhs ) const
+    const bool operator> ( EventBase const& rhs ) const
     {
         return getTime() > rhs.getTime();
     }
 
-    const bool operator>= ( EventBaseCref rhs ) const
+    const bool operator>= ( EventBase const& rhs ) const
     {
         return !(*this < rhs);
     }
 
-    const bool operator<= ( EventBaseCref rhs ) const
+    const bool operator<= ( EventBase const& rhs ) const
     {
         return !(*this > rhs);
     }
 
-    const bool operator!= ( EventBaseCref rhs ) const
+    const bool operator!= ( EventBase const& rhs ) const
     {
         return getTime() != rhs.getTime();
     }
@@ -188,13 +186,13 @@ public:
     }
 
 
-    const Event& getEvent( const EventID anID ) const
+    const Event& getEvent( EventID const& anID ) const
     {
         return theEventPriorityQueue.get( anID );
     }
 
 
-    Event& getEvent( const EventID anID )
+    Event& getEvent( EventID const& anID )
     {
         return theEventPriorityQueue.get( anID );
     }
@@ -222,7 +220,7 @@ public:
         }
     }
 
-    void updateAllEvents( TimeParam aCurrentTime )
+    void updateAllEvents( Time aCurrentTime )
     {
         typedef typename EventPriorityQueue::IDIterator IDIterator;
         for( IDIterator i( theEventPriorityQueue.begin() );
@@ -232,7 +230,7 @@ public:
         }
     }
 
-    void updateEvent( const EventID anID, TimeParam aCurrentTime )
+    void updateEvent( EventID const& anID, Time aCurrentTime )
     {
         Event& anEvent( theEventPriorityQueue.get( anID ) );
         const Time anOldTime( anEvent.getTime() );
@@ -253,7 +251,7 @@ public:
 
     void updateEventDependency();    // update all
 
-    void updateEventDependency( const EventID anID );
+    void updateEventDependency( EventID const& anID );
     
     void clear()
     {
@@ -261,7 +259,7 @@ public:
         theEventDependencyMap.clear();
     }
 
-    const EventID addEvent( const Event& anEvent )
+    const EventID addEvent( Event const& anEvent )
     {
         return theEventPriorityQueue.push( anEvent );
     }
@@ -269,7 +267,7 @@ public:
 
     // this is here for DiscreteEventStepper::log().
     // should be removed in future. 
-    const EventIDVector& getDependencyVector( const EventID& anID )
+    EventIDVector const& getDependencyVector( EventID const& anID )
     {
         return theEventDependencyMap[ anID ] ;
     }
@@ -292,7 +290,7 @@ inline void EventScheduler<Event>::updateEventDependency()
 }
 
 template < class Event >
-inline void EventScheduler<Event>::updateEventDependency( const EventID i1 )
+inline void EventScheduler<Event>::updateEventDependency( EventID const& i1 )
 {
     typedef typename EventPriorityQueue::IDIterator IDIterator;
     const Event& anEvent1( theEventPriorityQueue.get( i1 ) );

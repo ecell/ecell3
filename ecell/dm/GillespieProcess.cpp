@@ -95,12 +95,12 @@ GET_METHOD_DEF( Real, Propensity_R, GillespieProcess )
     }
 }
 
-const Real GillespieProcess::getPD( VariablePtr aVariable ) const
+Real GillespieProcess::getPD( Variable const* aVariable ) const
 {
     return ( this->*theGetPDMethodPtr )( aVariable );
 }
 
-const bool GillespieProcess::isContinuous() const
+bool GillespieProcess::isContinuous() const
 {
     return true;
 }
@@ -131,7 +131,7 @@ void GillespieProcess::fire()
     Real velocity( getk() * N_A );
     velocity *= getSuperSystem()->getSize();
 
-    for( VariableReferenceVectorConstIterator
+    for( VariableReferenceVector::const_iterator
                  s( theVariableReferenceVector.begin() );
              s != theZeroVariableReferenceIterator; ++s )
     {
@@ -159,17 +159,17 @@ LIBECS_DM_INIT_PROP_INTERFACE_DEF( GillespieProcess )
     PROPERTYSLOT_GET_NO_LOAD_SAVE( Integer,    Order );
 }
 
-const Real GillespieProcess::getZero() const
+Real GillespieProcess::getZero() const
 {
     return 0.0;
 }
 
-const Real GillespieProcess::getPD_Zero( VariablePtr aVariable ) const
+Real GillespieProcess::getPD_Zero( Variable const* aVariable ) const
 {
     return 0.0;
 }
 
-const Real GillespieProcess::getPD_SecondOrder_OneSubstrate( VariablePtr aVariable ) const
+Real GillespieProcess::getPD_SecondOrder_OneSubstrate( Variable const* aVariable ) const
 {
     if( theVariableReferenceVector[ 0 ].getVariable() == aVariable )
     {
@@ -190,12 +190,12 @@ const Real GillespieProcess::getPD_SecondOrder_OneSubstrate( VariablePtr aVariab
     }
 }
 
-const Real GillespieProcess::getMinValue_SecondOrder_OneSubstrate() const
+Real GillespieProcess::getMinValue_SecondOrder_OneSubstrate() const
 {
     return theVariableReferenceVector[ 0 ].getVariable()->getValue() * 0.5;
 }
 
-const Real GillespieProcess::getPropensity_SecondOrder_OneSubstrate() const
+Real GillespieProcess::getPropensity_SecondOrder_OneSubstrate() const
 {
     const Real aValue( theVariableReferenceVector[ 0 ].getVariable()->getValue() );
 
@@ -209,7 +209,7 @@ const Real GillespieProcess::getPropensity_SecondOrder_OneSubstrate() const
     }
 }
 
-const Real GillespieProcess::getPD_SecondOrder_TwoSubstrates( VariablePtr aVariable ) const
+Real GillespieProcess::getPD_SecondOrder_TwoSubstrates( Variable const* aVariable ) const
 {
     if ( theVariableReferenceVector[ 0 ].getVariable() == aVariable )
     {
@@ -225,7 +225,7 @@ const Real GillespieProcess::getPD_SecondOrder_TwoSubstrates( VariablePtr aVaria
     }
 }
 
-const Real GillespieProcess::getPropensity_FirstOrder() const
+Real GillespieProcess::getPropensity_FirstOrder() const
 {
     const Real aValue( theVariableReferenceVector[ 0 ].getVariable()->getValue() );
 
@@ -239,12 +239,12 @@ const Real GillespieProcess::getPropensity_FirstOrder() const
         }
 }
 
-const Real GillespieProcess::getMinValue_FirstOrder() const
+Real GillespieProcess::getMinValue_FirstOrder() const
 {
     return theVariableReferenceVector[ 0 ].getVariable()->getValue();
 }
 
-const Real GillespieProcess::getPD_FirstOrder( VariablePtr aVariable ) const
+Real GillespieProcess::getPD_FirstOrder( Variable const* aVariable ) const
 {
     if ( theVariableReferenceVector[ 0 ].getVariable() == aVariable )
     {
@@ -256,7 +256,7 @@ const Real GillespieProcess::getPD_FirstOrder( VariablePtr aVariable ) const
     }
 }
 
-const Real GillespieProcess::getPropensity_SecondOrder_TwoSubstrates() const
+Real GillespieProcess::getPropensity_SecondOrder_TwoSubstrates() const
 {
     const Real aValue1( theVariableReferenceVector[ 0 ].getVariable()->getValue() );
     const Real aValue2( theVariableReferenceVector[ 1 ].getVariable()->getValue() );
@@ -271,7 +271,7 @@ const Real GillespieProcess::getPropensity_SecondOrder_TwoSubstrates() const
     }
 }
 
-const Real GillespieProcess::getMinValue_SecondOrder_TwoSubstrates() const
+Real GillespieProcess::getMinValue_SecondOrder_TwoSubstrates() const
 {
     const Real aFirstValue( theVariableReferenceVector[ 0 ].getVariable()->getValue() );
     const Real aSecondValue( theVariableReferenceVector[ 1 ].getVariable()->getValue() );
@@ -283,7 +283,7 @@ void GillespieProcess::calculateOrder()
 {
     theOrder = 0;
         
-    for( libecs::VariableReferenceVectorConstIterator i(
+    for( VariableReferenceVector::const_iterator i(
             theVariableReferenceVector.begin() );
          i != theVariableReferenceVector.end() ; ++i )
     {

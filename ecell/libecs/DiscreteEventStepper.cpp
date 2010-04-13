@@ -56,7 +56,7 @@ GET_METHOD_DEF( String, LastProcess, DiscreteEventStepper )
 {
     if( theLastEventID != -1 )
     {
-        const ProcessCptr aLastProcess(
+        Process const* const aLastProcess(
                 theScheduler.getEvent( theLastEventID ).getProcess() );
         
         return aLastProcess->getFullID().asString();
@@ -87,10 +87,10 @@ void DiscreteEventStepper::initialize()
     // can this be done in registerProcess()?
 
     theScheduler.clear();
-    for( ProcessVectorConstIterator i( theProcessVector.begin() );
+    for( ProcessVector::const_iterator i( theProcessVector.begin() );
              i != theProcessVector.end(); ++i )
     {            
-        ProcessPtr aProcessPtr( *i );
+        Process* const aProcessPtr( *i );
         
         // register a Process (as an event generator) to 
         // the priority queue.
@@ -110,7 +110,7 @@ void DiscreteEventStepper::initialize()
     // by the scheduler with the new stepinterval.
     // That means, this Stepper doesn't necessary step immediately
     // after initialize().
-    ProcessEventCref aTopEvent( theScheduler.getTopEvent() );
+    ProcessEvent const& aTopEvent( theScheduler.getTopEvent() );
     theNextTime = aTopEvent.getTime();
 }
 
@@ -128,7 +128,7 @@ void DiscreteEventStepper::step()
 }
 
 
-void DiscreteEventStepper::interrupt( TimeParam aTime )
+void DiscreteEventStepper::interrupt( Time aTime )
 {
     // update current time, because the procedure below
     // is effectively a stepping.
@@ -147,7 +147,7 @@ void DiscreteEventStepper::log()
 
     const Real aCurrentTime( getCurrentTime() );
 
-    ProcessEventCref aLastEvent( theScheduler.getEvent( theLastEventID ) );
+    ProcessEvent const& aLastEvent( theScheduler.getEvent( theLastEventID ) );
     Process const* aLastProcess( aLastEvent.getProcess() );
 
     FOR_ALL( LoggerBroker::LoggersPerFullID,
@@ -168,7 +168,7 @@ void DiscreteEventStepper::log()
     for ( EventIDVector::const_iterator i( anEventIDVector.begin() );
             i != anEventIDVector.end(); ++i ) 
     {
-        ProcessEventCref aDependentEvent( theScheduler.getEvent( *i ) );
+        ProcessEvent const& aDependentEvent( theScheduler.getEvent( *i ) );
         Process const* aDependentProcess( aDependentEvent.getProcess() );
 
         FOR_ALL( LoggerBroker::LoggersPerFullID,
@@ -178,11 +178,11 @@ void DiscreteEventStepper::log()
         }
     }
 
-
-    VariableReferenceVectorCref aVariableReferenceVector(
+    typedef Process::VariableReferenceVector VariableReferenceVector;
+    VariableReferenceVector const& aVariableReferenceVector(
             aLastProcess->getVariableReferenceVector() );
 
-    for( VariableReferenceVectorConstIterator 
+    for( VariableReferenceVector::const_iterator
                  j( aVariableReferenceVector.begin() );
          j != aVariableReferenceVector.end(); ++j )
     {

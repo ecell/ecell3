@@ -59,7 +59,6 @@ public:
             PolymorphAssocVectorCrange;
     typedef ::Loki::AssocVector< String, PropertySlotBase*,
                                  std::less<const String> > PropertySlotMap;
-    typedef const PropertySlotMap& PropertySlotMapCref;
     typedef PropertySlotMap::const_iterator PropertySlotMapConstIterator;
 
 private:
@@ -114,7 +113,7 @@ public:
 
        @return a borrowed pointer to the PropertySlot with that name.
     */
-    const PropertySlotBasePtr getPropertySlot( StringCref aPropertyName ) const
+    PropertySlotBase const* getPropertySlot( String const& aPropertyName ) const
     {
         PropertySlotMapConstIterator i( findPropertySlot( aPropertyName ) );
 
@@ -127,9 +126,9 @@ public:
     }
 
 
-    const StringVector getPropertyList() const
+    std::vector< String > getPropertyList() const
     {
-        StringVector aVector;
+        std::vector< String > aVector;
 
         for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
              i != thePropertySlotMap.end() ; ++i )
@@ -142,9 +141,9 @@ public:
 
     
     void 
-    registerPropertySlot( PropertySlotBasePtr aPropertySlotPtr )
+    registerPropertySlot( PropertySlotBase* aPropertySlotPtr )
     {
-        StringCref aName( aPropertySlotPtr->getName() );
+        String const& aName( aPropertySlotPtr->getName() );
         if( findPropertySlot( aName ) != thePropertySlotMap.end() )
         {
             // it already exists. take the latter one.
@@ -157,13 +156,13 @@ public:
 
 
     const PropertyAttributes
-    getPropertyAttributes( StringCref aPropertyName ) const
+    getPropertyAttributes( String const& aPropertyName ) const
     {
         PropertySlotMapConstIterator i( findPropertySlot( aPropertyName ) );
 
         if( i != thePropertySlotMap.end() )
         {
-            PropertySlotBaseCptr aPropertySlotPtr( getPropertySlot( aPropertyName ) );
+            PropertySlotBase const* aPropertySlotPtr( getPropertySlot( aPropertyName ) );
             
             return PropertyAttributes( *aPropertySlotPtr );
         }
@@ -172,17 +171,17 @@ public:
     }
 
 
-    PropertySlotMapCref getPropertySlotMap() const
+    PropertySlotMap const& getPropertySlotMap() const
     {
         return thePropertySlotMap;
     }
 
-    void setInfoField( StringCref aFieldName, PolymorphCref aFieldValue )
+    void setInfoField( String const& aFieldName, Polymorph const& aFieldValue )
     {
         theInfoMap.insert( std::make_pair( aFieldName, aFieldValue ) );
     }
 
-    virtual const void* getInfoField( StringCref aFieldName ) const
+    virtual const void* getInfoField( String const& aFieldName ) const
     {
         PolymorphAssocVector::const_iterator i( theInfoMap.find( aFieldName ) );
         if( i == theInfoMap.end() )
@@ -195,12 +194,12 @@ public:
         return createEntryIterator( theInfoMap.begin(), theInfoMap.end() );
     }
 
-    StringCref getClassName() const
+    String const& getClassName() const
     {
         return theClassName;
     }
 
-    StringCref getTypeName() const
+    String const& getTypeName() const
     {
         return theTypeName;
     }
@@ -212,7 +211,7 @@ public:
 
 protected:
 
-    PropertyInterfaceBase( StringCref aClassName, String aTypeName )
+    PropertyInterfaceBase( String const& aClassName, String aTypeName )
         : theClassName( aClassName ), theTypeName( aTypeName )
     {
         ; // do nothing
@@ -220,7 +219,7 @@ protected:
 
 
     PropertySlotMapConstIterator 
-    findPropertySlot( StringCref aPropertyName ) const
+    findPropertySlot( String const& aPropertyName ) const
     {
         return thePropertySlotMap.find( aPropertyName );
     }
@@ -249,7 +248,7 @@ class PropertyInterface
     : public PropertyInterfaceBase
 {
 public:
-    PropertyInterface( StringCref aClassName, StringCref aTypeName )
+    PropertyInterface( String const& aClassName, String const& aTypeName )
         : PropertyInterfaceBase( aClassName, aTypeName )
     {
         T::initializePropertyInterface( this );
@@ -261,9 +260,9 @@ public:
     }
 
 
-    const StringVector getPropertyList( const T& anObject ) const
+    std::vector< String > getPropertyList( const T& anObject ) const
     {
-        StringVector aVector1;
+        std::vector< String > aVector1;
         // aVector.reserve( thePropertySlotMap.size() );
         
         for( PropertySlotMapConstIterator i( thePropertySlotMap.begin() ); 
@@ -272,9 +271,9 @@ public:
             aVector1.push_back( i->first );
         }
 
-        const StringVector& aVector2( anObject.defaultGetPropertyList() );
+        const std::vector< String > aVector2( anObject.defaultGetPropertyList() );
 
-        for( StringVector::const_iterator i( aVector2.begin() );
+        for( std::vector< String >::const_iterator i( aVector2.begin() );
              i != aVector2.end(); ++i )
         {
             aVector1.push_back( *i );
@@ -284,18 +283,18 @@ public:
     }
 
     
-    PropertySlotProxyPtr 
+    PropertySlotProxy*
     createPropertySlotProxy( T& anObject,
-                             StringCref aPropertyName ) const
+                             String const& aPropertyName ) const
     {
         try
         {
-            PropertySlotBaseCptr aPropertySlot( getPropertySlot( aPropertyName ) );
+            PropertySlotBase const* aPropertySlot( getPropertySlot( aPropertyName ) );
             return new ConcretePropertySlotProxy<T>(
                     anObject,
                     *static_cast< PropertySlot<T> const* >( aPropertySlot ) );
         }
-        catch( NoSlotCref )
+        catch( NoSlot const& )
         {
             throwNoSlot( anObject, aPropertyName );
         }
@@ -313,8 +312,8 @@ public:
        @param aValue the value to set as a Polymorph.
        @throw NoSlot 
     */
-    void setProperty( T& anObject, StringCref aPropertyName, 
-                                        PolymorphCref aValue ) const
+    void setProperty( T& anObject, String const& aPropertyName, 
+                                        Polymorph const& aValue ) const
     {
         PropertySlotMapConstIterator aPropertySlotMapIterator(
                 findPropertySlot( aPropertyName ) );
@@ -341,7 +340,7 @@ public:
        @throw NoSlot
     */
     const Polymorph getProperty( const T& anObject,
-                                 StringCref aPropertyName ) const
+                                 String const& aPropertyName ) const
     {
         PropertySlotMapConstIterator 
             aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
@@ -357,15 +356,15 @@ public:
     }
 
 
-    void loadProperty( T& anObject, StringCref aPropertyName, 
-                       PolymorphCref aValue ) const
+    void loadProperty( T& anObject, String const& aPropertyName, 
+                       Polymorph const& aValue ) const
     {
         PropertySlotMapConstIterator 
             aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
 
         if( aPropertySlotMapIterator != thePropertySlotMap.end() )
         {
-            PropertySlotBaseCptr aPropertySlotPtr( aPropertySlotMapIterator->second );
+            PropertySlotBase const* aPropertySlotPtr( aPropertySlotMapIterator->second );
 
             if( aPropertySlotPtr->isLoadable() )
             {
@@ -384,14 +383,14 @@ public:
     
 
     const Polymorph
-    saveProperty( const T& anObject, StringCref aPropertyName ) const
+    saveProperty( const T& anObject, String const& aPropertyName ) const
     {
         PropertySlotMapConstIterator 
             aPropertySlotMapIterator( findPropertySlot( aPropertyName ) );
 
         if( aPropertySlotMapIterator != thePropertySlotMap.end() )
         {
-            PropertySlotBaseCptr aPropertySlotPtr( aPropertySlotMapIterator->second );
+            PropertySlotBase const* aPropertySlotPtr( aPropertySlotMapIterator->second );
             if( aPropertySlotPtr->isSavable() )
             {
                 return static_cast< PropertySlot< T > const* >( aPropertySlotPtr )->savePolymorph( anObject );
@@ -410,13 +409,13 @@ public:
 
 
     const PropertyAttributes
-    getPropertyAttributes( const T& anObject, StringCref aPropertyName ) const
+    getPropertyAttributes( const T& anObject, String const& aPropertyName ) const
     {
         PropertySlotMapConstIterator i( findPropertySlot( aPropertyName ) );
 
         if( i != thePropertySlotMap.end() )
         {
-            PropertySlotBaseCptr aPropertySlotPtr( getPropertySlot( aPropertyName ) );
+            PropertySlotBase const* aPropertySlotPtr( getPropertySlot( aPropertyName ) );
             
             return PropertyAttributes( *aPropertySlotPtr );
         }

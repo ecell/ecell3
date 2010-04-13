@@ -92,11 +92,11 @@ GET_METHOD_DEF( Polymorph, VariableReferenceList, Process )
     PolymorphVector aVector;
     aVector.reserve( theVariableReferenceVector.size() );
 
-    for( VariableReferenceVectorConstIterator i(
+    for( VariableReferenceVector::const_iterator i(
             theVariableReferenceVector.begin() );
          i != theVariableReferenceVector.end() ; ++i )
     {
-        VariableReferenceCref aVariableReference( *i );
+        VariableReference const& aVariableReference( *i );
         FullID aFullID( aVariableReference.getVariable()->getFullID() );
         aFullID.setEntityType( EntityType::NONE );
 
@@ -107,7 +107,7 @@ GET_METHOD_DEF( Polymorph, VariableReferenceList, Process )
             aVariableReference.isAccessor() ) );
     }
 
-    return aVector;
+    return Polymorph( aVector );
 }
 
 SAVE_METHOD_DEF( Polymorph, VariableReferenceList, Process )
@@ -115,11 +115,11 @@ SAVE_METHOD_DEF( Polymorph, VariableReferenceList, Process )
     PolymorphVector aVector;
     aVector.reserve( theVariableReferenceVector.size() );
 
-    for( VariableReferenceVectorConstIterator i(
+    for( VariableReferenceVector::const_iterator i(
             theVariableReferenceVector.begin() );
          i != theVariableReferenceVector.end() ; ++i )
     {
-        VariableReferenceCref aVariableReference( *i );
+        VariableReference const& aVariableReference( *i );
 
         // (1) Variable reference name
 
@@ -170,7 +170,7 @@ SAVE_METHOD_DEF( Polymorph, VariableReferenceList, Process )
         }
     }
 
-    return aVector;
+    return Polymorph( aVector );
 }
 
 
@@ -179,7 +179,7 @@ Process::Process()
       thePositiveVariableReferenceIterator( theVariableReferenceVector.end() ),
       theActivity( 0.0 ),
       thePriority( 0 ),
-      theStepper( NULLPTR ),
+      theStepper( 0 ),
       theNextSerial( 1 )
 {
     ; // do nothing
@@ -193,7 +193,7 @@ Process::~Process()
 
 SET_METHOD_DEF( String, StepperID, Process )
 {
-    StepperPtr aStepperPtr( getModel()->getStepper( value ) );
+    Stepper* aStepperPtr( getModel()->getStepper( value ) );
 
     setStepper( aStepperPtr );
 }
@@ -205,11 +205,11 @@ GET_METHOD_DEF( String, StepperID, Process )
 }
 
 
-void Process::setStepper( StepperPtr const aStepper )
+void Process::setStepper( Stepper* aStepper )
 {
     if( theStepper != aStepper )
     {
-        if( aStepper != NULLPTR )
+        if( aStepper )
         {
             aStepper->registerProcess( this );
         }
@@ -222,10 +222,10 @@ void Process::setStepper( StepperPtr const aStepper )
     }
 }
 
-VariableReferenceCref
-Process::getVariableReference( IntegerParam anID ) const
+VariableReference const&
+Process::getVariableReference( Integer anID ) const
 {
-    VariableReferenceVectorConstIterator anIterator(
+    VariableReferenceVector::const_iterator anIterator(
             findVariableReference( anID ) );
 
     if( anIterator != theVariableReferenceVector.end() )
@@ -241,10 +241,10 @@ Process::getVariableReference( IntegerParam anID ) const
     }
 }
 
-VariableReferenceCref
-Process::getVariableReference( StringCref aVariableReferenceName ) const
+VariableReference const&
+Process::getVariableReference( String const& aVariableReferenceName ) const
 {
-    VariableReferenceVectorConstIterator anIterator(
+    VariableReferenceVector::const_iterator anIterator(
             findVariableReference( aVariableReferenceName ) );
 
     if( anIterator != theVariableReferenceVector.end() )
@@ -260,7 +260,7 @@ Process::getVariableReference( StringCref aVariableReferenceName ) const
     }
 }
 
-bool Process::removeVariableReference( IntegerParam anID, bool raiseException )
+bool Process::removeVariableReference( Integer anID, bool raiseException )
 {
     VariableReferenceVector::iterator i( findVariableReference( anID ) );
     if ( i == theVariableReferenceVector.end() )
@@ -339,9 +339,9 @@ bool Process::removeVariableReference( Variable const* aVariable, bool raiseExce
     return aIsRemoved;
 }
 
-const Integer Process::registerVariableReference( FullID const& aFullID,
-                                                  IntegerParam aCoefficient,
-                                                  const bool isAccessor )
+Integer Process::registerVariableReference( FullID const& aFullID,
+                                            Integer aCoefficient,
+                                            const bool isAccessor )
 {
     theVariableReferenceVector.push_back(
             VariableReference(
@@ -350,10 +350,10 @@ const Integer Process::registerVariableReference( FullID const& aFullID,
 }
 
 
-const Integer Process::registerVariableReference( StringCref aName,
-                                                  FullID const& aFullID,
-                                                  IntegerParam aCoefficient,
-                                                  const bool isAccessor )
+Integer Process::registerVariableReference( String const& aName,
+                                            FullID const& aFullID,
+                                            Integer aCoefficient,
+                                            const bool isAccessor )
 {
     theVariableReferenceVector.push_back(
             VariableReference(
@@ -362,9 +362,9 @@ const Integer Process::registerVariableReference( StringCref aName,
     return theNextSerial++;
 }
 
-const Integer Process::registerVariableReference( Variable* aVariable,
-                                                  IntegerParam aCoefficient,
-                                                  const bool isAccessor )
+Integer Process::registerVariableReference( Variable* aVariable,
+                                            Integer aCoefficient,
+                                            const bool isAccessor )
 {
     theVariableReferenceVector.push_back(
             VariableReference(
@@ -373,10 +373,10 @@ const Integer Process::registerVariableReference( Variable* aVariable,
 }
 
 
-const Integer Process::registerVariableReference( StringCref aName,
-                                                  Variable* aVariable,
-                                                  IntegerParam aCoefficient,
-                                                  const bool isAccessor )
+Integer Process::registerVariableReference( String const& aName,
+                                            Variable* aVariable,
+                                            Integer aCoefficient,
+                                            const bool isAccessor )
 {
     theVariableReferenceVector.push_back(
             VariableReference(
@@ -460,8 +460,8 @@ void Process::updateVariableReferenceVector()
 
     // find the first VariableReference whose coefficient is 0,
     // and the first VariableReference whose coefficient is positive.
-    std::pair <VariableReferenceVectorIterator,
-               VariableReferenceVectorIterator> aZeroRange(
+    std::pair< VariableReferenceVector::iterator,
+               VariableReferenceVector::iterator > aZeroRange(
         std::equal_range( theVariableReferenceVector.begin(), 
                           theVariableReferenceVector.end(), 
                           0, VariableReference::CoefficientLess() ) );
@@ -472,11 +472,11 @@ void Process::updateVariableReferenceVector()
 
 
 
-VariableReferenceVectorIterator 
-Process::findVariableReference( StringCref aVariableReferenceName )
+Process::VariableReferenceVector::iterator
+Process::findVariableReference( String const& aVariableReferenceName )
 {
     // well this is a linear search.. but this won't be used during simulation.
-    for( VariableReferenceVectorIterator i(
+    for( VariableReferenceVector::iterator i(
             theVariableReferenceVector.begin() );
          i != theVariableReferenceVector.end(); ++i )
     {
@@ -490,8 +490,8 @@ Process::findVariableReference( StringCref aVariableReferenceName )
 }
 
 
-VariableReferenceVectorConstIterator 
-Process::findVariableReference( StringCref aVariableReferenceName ) const
+Process::VariableReferenceVector::const_iterator 
+Process::findVariableReference( String const& aVariableReferenceName ) const
 {
     // well this is a linear search.. but this won't be used during simulation.
     for( VariableReferenceVector::const_iterator i(
@@ -507,11 +507,11 @@ Process::findVariableReference( StringCref aVariableReferenceName ) const
     return theVariableReferenceVector.end();
 }
 
-VariableReferenceVectorIterator 
-Process::findVariableReference( IntegerParam anID )
+Process::VariableReferenceVector::iterator
+Process::findVariableReference( Integer anID )
 {
     // well this is a linear search.. but this won't be used during simulation.
-    for( VariableReferenceVectorIterator i(
+    for( VariableReferenceVector::iterator i(
             theVariableReferenceVector.begin() );
          i != theVariableReferenceVector.end(); ++i )
     {
@@ -525,8 +525,8 @@ Process::findVariableReference( IntegerParam anID )
 }
 
 
-VariableReferenceVectorConstIterator 
-Process::findVariableReference( IntegerParam anID ) const
+Process::VariableReferenceVector::const_iterator 
+Process::findVariableReference( Integer anID ) const
 {
     // well this is a linear search.. but this won't be used during simulation.
     for( VariableReferenceVector::const_iterator i(
@@ -553,22 +553,22 @@ void Process::declareUnidirectional()
 
 
 
-const bool Process::isDependentOn( const ProcessCptr aProcessPtr ) const
+bool Process::isDependentOn( Process const* aProcessPtr ) const
 {
-    VariableReferenceVectorCref aVariableReferenceVector(
+    VariableReferenceVector const& aVariableReferenceVector(
             aProcessPtr->getVariableReferenceVector() );
     
-    for( VariableReferenceVectorConstIterator i(
+    for( VariableReferenceVector::const_iterator i(
             theVariableReferenceVector.begin() );
          i != theVariableReferenceVector.end() ; ++i )
     {
-        VariableReferenceCref aVariableReference1( *i );
+        VariableReference const& aVariableReference1( *i );
 
-        for( VariableReferenceVectorConstIterator j(
+        for( VariableReferenceVector::const_iterator j(
                 aVariableReferenceVector.begin() );
              j != aVariableReferenceVector.end(); ++j )
         {
-            VariableReferenceCref aVariableReference2( *j );
+            VariableReference const& aVariableReference2( *j );
             
             if( aVariableReference1.getVariable() == 
                     aVariableReference2.getVariable() && 
@@ -591,7 +591,7 @@ void Process::preinitialize()
 
 void Process::initialize()
 {
-    if( getStepper() == NULLPTR )
+    if( !getStepper() )
     {
         THROW_EXCEPTION_INSIDE( InitializationFailed,
                                 "No stepper is connected with [" +
@@ -599,12 +599,12 @@ void Process::initialize()
     }
 }
 
-void Process::addValue( VariableReference const& aVarRef, RealParam value )
+void Process::addValue( VariableReference const& aVarRef, Real value )
 {
     aVarRef.getVariable()->addValue( aVarRef.getCoefficient() * value );
 }
 
-void Process::addValue( RealParam aValue )
+void Process::addValue( Real aValue )
 {
     setActivity( aValue );
 

@@ -68,7 +68,7 @@ namespace libecs
         /**
            Do nothing.     This Stepper ignores interruption.
         */
-        virtual void interrupt( TimeParam )
+        virtual void interrupt( Time )
         {
             ; // do nothing -- ignore interruption
         }

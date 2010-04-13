@@ -271,11 +271,11 @@ public:
        
     */
 
-    LoggerPtr getLogger( FullPNCref aFullPN ) const;
+    Logger* getLogger( FullPN const& aFullPN ) const;
 
-    LoggerPtr createLogger( FullPNCref aFullPN, Logger::Policy const& aParamList );
+    Logger* createLogger( FullPN const& aFullPN, Logger::Policy const& aParamList );
 
-    void removeLogger( FullPNCref aFullPN );
+    void removeLogger( FullPN const& aFullPN );
 
     /**
        Flush the data in all the Loggers immediately.

@@ -63,7 +63,7 @@ public:
 
     virtual void initialize();
     virtual void step();
-    virtual void interrupt( TimeParam aTime );
+    virtual void interrupt( Time aTime );
     virtual void log();
 
 
@@ -84,7 +84,7 @@ public:
 
     GET_METHOD( String, LastProcess );
 
-    ProcessVectorCref getProcessVector() const
+    ProcessVector const& getProcessVector() const
     {
         return theProcessVector;
     }

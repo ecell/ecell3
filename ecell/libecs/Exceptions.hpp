@@ -65,7 +65,7 @@ class Model;
    @param MESSAGE the message attached to the exception.
  */
 #define THROW_EXCEPTION( CLASS, MESSAGE )\
-    THROW_EXCEPTION_ECSOBJECT( CLASS, MESSAGE, NULLPTR )
+    THROW_EXCEPTION_ECSOBJECT( CLASS, MESSAGE, 0 )
 
 /// Base exception class
 class LIBECS_API Exception: public std::exception 

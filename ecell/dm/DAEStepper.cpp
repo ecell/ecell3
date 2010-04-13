@@ -43,10 +43,10 @@
 
 USE_LIBECS;
 
-DECLARE_VECTOR( Integer, IntVector );
-
 LIBECS_DM_CLASS( DAEStepper, DifferentialStepper )
 {
+public:
+    typedef std::vector< Integer > IntegerVector;
 
 public:
 
@@ -67,27 +67,27 @@ public:
 
     DAEStepper( void )
         : theSystemSize( -1 ),
-          theJacobianMatrix1( NULLPTR ),
-          thePermutation1( NULLPTR ),
-          theVelocityVector1( NULLPTR ),
-          theSolutionVector1( NULLPTR ),
-          theJacobianMatrix2( NULLPTR ),
-          thePermutation2( NULLPTR ),
-          theVelocityVector2( NULLPTR ),
-          theSolutionVector2( NULLPTR ),
+          theContinuousVariableVector( 0 ),
+          theJacobianMatrix1( 0 ),
+          thePermutation1( 0 ),
+          theVelocityVector1( 0 ),
+          theSolutionVector1( 0 ),
+          theJacobianMatrix2( 0 ),
+          thePermutation2( 0 ),
+          theVelocityVector2( 0 ),
+          theSolutionVector2( 0 ),
           theMaxIterationNumber( 7 ),
+          theStoppingCriterion( 0.0 ),
           eta( 1.0 ),
           Uround( 1e-10 ),
           theAbsoluteTolerance( 1e-6 ),
           theRelativeTolerance( 1e-6 ),
-          theStoppingCriterion( 0.0 ),
           theFirstStepFlag( true ),
           theRejectedStepFlag( false ),
-          theJacobianCalculateFlag( true ),
           theAcceptedError( 0.0 ),
           theAcceptedStepInterval( 0.0 ),
-          theJacobianRecalculateTheta( 0.001 ),
-          theContinuousVariableVector( NULLPTR )
+          theJacobianCalculateFlag( true ),
+          theJacobianRecalculateTheta( 0.001 )
     {
         const Real pow913( pow( 9.0, 1.0 / 3.0 ) );
 
@@ -229,7 +229,7 @@ public:
                 if ( theJacobianMatrix1 )
                 {
                     gsl_matrix_free( theJacobianMatrix1 );
-                    theJacobianMatrix1 = NULLPTR;
+                    theJacobianMatrix1 = 0;
                 }
 
                 if ( aSize > 0 )
@@ -242,7 +242,7 @@ public:
                 if ( thePermutation1 )
                 {
                     gsl_permutation_free( thePermutation1 );
-                    thePermutation1 = NULLPTR;
+                    thePermutation1 = 0;
                 }
 
                 if ( aSize > 0 )
@@ -255,7 +255,7 @@ public:
                 if ( theVelocityVector1 )
                 {
                     gsl_vector_free( theVelocityVector1 );
-                    theVelocityVector1 = NULLPTR;
+                    theVelocityVector1 = 0;
                 }
                 if ( aSize > 0 )
                 {
@@ -267,7 +267,7 @@ public:
                 if ( theSolutionVector1 )
                 {
                     gsl_vector_free( theSolutionVector1 );
-                    theSolutionVector1 = NULLPTR;
+                    theSolutionVector1 = 0;
                 }
                 if ( aSize > 0 )
                 {
@@ -281,7 +281,7 @@ public:
                 if ( theJacobianMatrix2 )
                 {
                     gsl_matrix_complex_free( theJacobianMatrix2 );
-                    theJacobianMatrix2 = NULLPTR;
+                    theJacobianMatrix2 = 0;
                 }
                 if ( aSize > 0 )
                 {
@@ -293,7 +293,7 @@ public:
                 if ( thePermutation2 )
                 {
                     gsl_permutation_free( thePermutation2 );
-                    thePermutation2 = NULLPTR;
+                    thePermutation2 = 0;
                 }
                 if ( aSize > 0 )
                 {
@@ -305,7 +305,7 @@ public:
                 if ( theVelocityVector2 )
                 {
                     gsl_vector_complex_free( theVelocityVector2 );
-                    theVelocityVector2 = NULLPTR;
+                    theVelocityVector2 = 0;
                 }
                 if ( aSize > 0 )
                 {
@@ -318,7 +318,7 @@ public:
                 if ( theSolutionVector2 )
                 {
                     gsl_vector_complex_free( theSolutionVector2 );
-                    theSolutionVector2 = NULLPTR;
+                    theSolutionVector2 = 0;
                 }
                 if ( aSize > 0 )
                 {
@@ -332,7 +332,7 @@ public:
     {
         const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
         Real aNewStepInterval;
-        Real aNorm;
+        Real aNorm( 0. );
         Real theta( fabs( theJacobianRecalculateTheta ) );
 
         Integer anIterator( 0 );
@@ -609,22 +609,22 @@ public:
             aDiscreteProcessOffset( getDiscreteProcessOffset() );
         for ( ProcessVector::size_type c( 0 ); c < aDiscreteProcessOffset; c++ )
         {
-            ProcessPtr aProcess( theProcessVector[ c ] );
+            Process const* const aProcess( theProcessVector[ c ] );
 
-            VariableReferenceVectorCref aVariableReferenceVector(
+            Process::VariableReferenceVector const& aVariableReferenceVector(
                 aProcess->getVariableReferenceVector() );
 
-            const VariableReferenceVector::size_type
+            const Process::VariableReferenceVector::size_type
                 aPositiveVariableReferenceOffset(
                     aProcess->getPositiveVariableReferenceOffset() );
-            const VariableReferenceVector::size_type
+            const Process::VariableReferenceVector::size_type
                 aZeroVariableReferenceOffset(
                     aProcess->getZeroVariableReferenceOffset() );
 
             const bool aContinuity( aProcess->isContinuous() );
             if ( aContinuity )
             {
-                for ( VariableReferenceVector::size_type i( 0 );
+                for ( Process::VariableReferenceVector::size_type i( 0 );
                             i < aVariableReferenceVector.size(); i++)
                 {
                     if ( i == aZeroVariableReferenceOffset )
@@ -637,7 +637,7 @@ public:
                         i = aPositiveVariableReferenceOffset;
                     }
 
-                    VariablePtr const aVariable(
+                    Variable* const aVariable(
                             aVariableReferenceVector[ i ].getVariable() );
                     const VariableVector::size_type anIndex(
                             getVariableIndex( aVariable ) );
@@ -686,7 +686,7 @@ public:
                                                 theDiscreteActivityBuffer[ c - aDiscreteProcessOffset ] );                
             }
 
-        for ( IntVector::size_type c( 0 );
+        for ( IntegerVector::size_type c( 0 );
                     c < theContinuousVariableVector.size(); c++ )
             {
                 const std::size_t anIndex( theContinuousVariableVector[ c ] );
@@ -734,7 +734,7 @@ public:
                                 theProcessVector[ c ]->getActivity() );                
             }
 
-            for ( IntVector::size_type c( 0 );
+            for ( IntegerVector::size_type c( 0 );
                         c < theContinuousVariableVector.size(); c++ )
             {
                 const std::size_t anIndex( theContinuousVariableVector[ c ] );
@@ -774,7 +774,7 @@ public:
 
         for ( VariableVector::size_type i( 0 ); i < aSize; ++i )
         {
-            const VariablePtr aVariable( theVariableVector[ i ] );
+            Variable* const aVariable( theVariableVector[ i ] );
             const Real aValue( aVariable->getValue() );
 
             aPerturbation = sqrt( Uround * std::max( 1e-5, fabs( aValue ) ) );
@@ -798,7 +798,7 @@ public:
                         aPerturbation;
             }
 
-            for ( IntVector::size_type j( 0 );
+            for ( IntegerVector::size_type j( 0 );
                   j < theContinuousVariableVector.size(); ++j )
             {
                 // int as VariableVector::size_type
@@ -812,8 +812,6 @@ public:
 
     void setJacobianMatrix( Real const aStepInterval )
     {
-        VariableVector::size_type aSize( getReadOnlyVariableOffset() );
-
         const Real alphah( alpha / aStepInterval );
         const Real betah( beta / aStepInterval );
         const Real gammah( gamma / aStepInterval );
@@ -832,7 +830,7 @@ public:
             }
         }
 
-        for ( IntVector::size_type c( 0 );
+        for ( IntegerVector::size_type c( 0 );
                     c < theContinuousVariableVector.size(); c++ )
         {
             const std::size_t anIndex( theContinuousVariableVector[ c ] );
@@ -898,14 +896,14 @@ public:
         {
             const ProcessVector::size_type anIndex(
                     theContinuousVariableVector.size() + c - aDiscreteProcessOffset );
-            const ProcessPtr aProcess( theProcessVector[ c ] );
+            const Process* const aProcess( theProcessVector[ c ] );
 
             aTIF[ anIndex ] = aProcess->getActivity() * 4.3255798900631553510;
             aTIF[ anIndex + aSize ] = aProcess->getActivity() * -4.1787185915519047273;
             aTIF[ anIndex + aSize*2 ] = aProcess->getActivity() * -0.50287263494578687595;
         }
 
-        for ( IntVector::size_type c( 0 );
+        for ( IntegerVector::size_type c( 0 );
                c < theContinuousVariableVector.size(); c++ )
         {
             const std::size_t anIndex( theContinuousVariableVector[ c ] );
@@ -935,14 +933,14 @@ public:
         {
             const ProcessVector::size_type anIndex(
                     theContinuousVariableVector.size() + c - aDiscreteProcessOffset );
-            const ProcessPtr aProcess( theProcessVector[ c ] );
+            const Process* const aProcess( theProcessVector[ c ] );
 
             aTIF[ anIndex ] += aProcess->getActivity() * 0.33919925181580986954;
             aTIF[ anIndex + aSize ] -= aProcess->getActivity() * 0.32768282076106238708;
             aTIF[ anIndex + aSize*2 ] += aProcess->getActivity() * 2.5719269498556054292;
         }
 
-        for ( IntVector::size_type c( 0 );
+        for ( IntegerVector::size_type c( 0 );
                     c < theContinuousVariableVector.size(); c++ )
         {
             const std::size_t anIndex( theContinuousVariableVector[ c ] );
@@ -970,7 +968,7 @@ public:
         {
             const ProcessVector::size_type anIndex(
                     theContinuousVariableVector.size() + c - aDiscreteProcessOffset );
-            const ProcessPtr aProcess( theProcessVector[ c ] );
+            const Process* const aProcess( theProcessVector[ c ] );
 
             aTIF[ anIndex ] += aProcess->getActivity() * 0.54177053993587487119;
             aTIF[ anIndex + aSize ] += aProcess->getActivity() * 0.47662355450055045196;
@@ -983,7 +981,7 @@ public:
             gsl_vector_complex_set( theVelocityVector2, anIndex, comp );
         }
 
-        for ( IntVector::size_type c( 0 );
+        for ( IntegerVector::size_type c( 0 );
                 c < theContinuousVariableVector.size(); c++ )
         {
             const std::size_t anIndex( theContinuousVariableVector[ c ] );

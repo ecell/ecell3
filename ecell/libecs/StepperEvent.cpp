@@ -34,7 +34,7 @@
 namespace libecs
 {
 
-StepperEvent::StepperEvent( TimeParam aTime, StepperPtr aStepperPtr )
+StepperEvent::StepperEvent( Time aTime, Stepper* aStepperPtr )
     : EventBase( aTime ),
       theStepper( aStepperPtr )
 {
@@ -52,7 +52,7 @@ void StepperEvent::fire()
 }
 
 
-void StepperEvent::update( TimeParam aTime )
+void StepperEvent::update( Time aTime )
 {
     theStepper->interrupt( aTime );
 
@@ -66,7 +66,7 @@ void StepperEvent::reschedule()
 }
 
 
-const bool StepperEvent::isDependentOn( StepperEventCref anEvent ) const
+bool StepperEvent::isDependentOn( StepperEvent const& anEvent ) const
 {
     return theStepper->isDependentOn( anEvent.getStepper() );
 }

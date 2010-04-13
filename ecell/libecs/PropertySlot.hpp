@@ -51,13 +51,9 @@ class DM_IF PropertySlotBase
 public:
     enum Type
     {
-        Polymorph = 0,
         POLYMORPH = 0,
-        Real      = 1,
         REAL      = 1,
-        Integer   = 2,
         INTEGER   = 2,
-        String    = 3,
         STRING    = 3
     };
 
@@ -74,7 +70,7 @@ public:
     
     virtual ~PropertySlotBase();
 
-    virtual StringCref getName() const = 0;
+    virtual String const& getName() const = 0;
 
     virtual enum Type getType() const = 0;
 
@@ -116,7 +112,7 @@ template< class T >
 class PropertySlot: public PropertySlotBase
 {
 public:
-    typedef void  ( T::* SetPolymorphMethodPtr )( PolymorphCref );
+    typedef void  ( T::* SetPolymorphMethodPtr )( Polymorph const& );
     typedef const libecs::Polymorph ( T::* GetPolymorphMethodPtr )() const;
 
     PropertySlot()
@@ -151,7 +147,7 @@ public:
 #undef _PROPERTYSLOT_GETMETHOD
 
 
-    DM_IF virtual void loadPolymorph( T& anObject, Param<libecs::Polymorph>::type aValue ) const
+    DM_IF virtual void loadPolymorph( T& anObject, libecs::Polymorph const& aValue ) const
     {
         setPolymorph( anObject, aValue );
     }
@@ -177,15 +173,12 @@ class ConcretePropertySlot: public PropertySlot<T>
 
 public:
 
-    DECLARE_TYPE( SlotType_, SlotType )
+    typedef SlotType_ SlotType;
 
-    typedef typename Param<SlotType>::type SetType;
-    typedef const SlotType GetType;
+    typedef void ( T::* SetMethodPtr )( typename Param<SlotType>::type );
+    typedef SlotType ( T::* GetMethodPtr )() const;
 
-    typedef void ( T::* SetMethodPtr )( SetType );
-    typedef GetType ( T::* GetMethodPtr )() const;
-
-    ConcretePropertySlot( StringCref aName,
+    ConcretePropertySlot( String const& aName,
                           const SetMethodPtr aSetMethodPtr,
                           const GetMethodPtr aGetMethodPtr )
         : theName( aName ),
@@ -201,7 +194,7 @@ public:
         ; // do nothing
     }
 
-    DM_IF virtual StringCref getName() const
+    DM_IF virtual String const& getName() const
     {
         return theName;
     }
@@ -249,12 +242,12 @@ public:
 #undef _PROPERTYSLOT_GETMETHOD
 
 protected:
-    inline void callSetMethod( T& anObject, SetType aValue ) const
+    inline void callSetMethod( T& anObject, typename Param<SlotType>::type aValue ) const
     {
         ( anObject.*theSetMethodPtr )( aValue );
     }
 
-    inline GetType callGetMethod( const T& anObject ) const
+    inline SlotType callGetMethod( const T& anObject ) const
     {
         return ( anObject.*theGetMethodPtr )();
     }
@@ -299,21 +292,18 @@ template< class T, typename SlotType_ >
 class LoadSaveConcretePropertySlot: public ConcretePropertySlot<T,SlotType_>
 {
 public:
-    DECLARE_TYPE( SlotType_, SlotType )
+    typedef SlotType_ SlotType;
 
     typedef ConcretePropertySlot<T,SlotType> BaseType;
-
-    typedef typename BaseType::SetType SetType;
-    typedef typename BaseType::GetType GetType;
 
     typedef typename BaseType::SetMethodPtr SetMethodPtr;
     typedef typename BaseType::GetMethodPtr GetMethodPtr;
 
-    DM_IF LoadSaveConcretePropertySlot( StringCref aName,
-                                        const SetMethodPtr aSetMethodPtr,
-                                        const GetMethodPtr aGetMethodPtr,
-                                        const SetMethodPtr aLoadMethodPtr,
-                                        const GetMethodPtr aSaveMethodPtr )
+    DM_IF LoadSaveConcretePropertySlot( String const& aName,
+                                        SetMethodPtr aSetMethodPtr,
+                                        GetMethodPtr aGetMethodPtr,
+                                        SetMethodPtr aLoadMethodPtr,
+                                        GetMethodPtr aSaveMethodPtr )
         : BaseType( aName, aSetMethodPtr, aGetMethodPtr ),
           theLoadMethodPtr( SetMethod( aLoadMethodPtr ) ),
           theSaveMethodPtr( GetMethod( aSaveMethodPtr ) )
@@ -337,7 +327,7 @@ public:
         return isGetableMethod( theSaveMethodPtr );
     }
 
-    DM_IF virtual void loadPolymorph( T& anObject, Param< libecs::Polymorph >::type aValue ) const
+    DM_IF virtual void loadPolymorph( T& anObject, libecs::Polymorph const& aValue ) const
     {
         loadImpl( anObject, aValue );
     }
@@ -348,17 +338,17 @@ public:
     }
 
 protected:
-    inline void callLoadMethod( T& anObject, SetType aValue ) const
+    inline void callLoadMethod( T& anObject, typename Param<SlotType>::type const& aValue ) const
     {
         ( anObject.*theLoadMethodPtr )( aValue );
     }
 
-    inline GetType callSaveMethod( const T& anObject ) const
+    inline SlotType callSaveMethod( const T& anObject ) const
     {
         return ( anObject.*theSaveMethodPtr )();
     }
 
-    inline void loadImpl( T& anObject, PolymorphCref aValue ) const
+    inline void loadImpl( T& anObject, Polymorph const& aValue ) const
     {
         callLoadMethod( anObject, convertTo<SlotType>( aValue ) );
     }
@@ -402,7 +392,7 @@ template< class T, typename SlotType_ >
 typename ConcretePropertySlot< T, SlotType_ >::SetMethodPtr
 ConcretePropertySlot< T, SlotType_ >::SetMethod( SetMethodPtr aSetMethodPtr )
 {
-    if( aSetMethodPtr == NULLPTR )
+    if( !aSetMethodPtr )
     {
         return static_cast< SetMethodPtr >( &EcsObject::nullSet<SlotType> );
     }
@@ -416,7 +406,7 @@ template< class T, typename SlotType_ >
 typename ConcretePropertySlot< T, SlotType_ >::GetMethodPtr
 ConcretePropertySlot< T, SlotType_ >::GetMethod( GetMethodPtr aGetMethodPtr )
 {
-    if( aGetMethodPtr == NULLPTR )
+    if( !aGetMethodPtr )
     {
         return static_cast< GetMethodPtr >( &EcsObject::nullGet<SlotType> );
     }

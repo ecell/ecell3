@@ -40,30 +40,32 @@ template < class CLASS, typename RET, typename ARG1 = void >
 class MethodProxy;
 
 template < class CLASS, typename RET >
-class MethodProxy<CLASS,RET>
+class MethodProxy<CLASS, RET>
 {
 private:
-    typedef const RET (* Invoker )( CLASS* const );
+    typedef RET (* Invoker )( CLASS* );
 
 public:
-    const RET operator()( CLASS* const anObject ) const 
+    RET operator()( CLASS* anObject ) const 
     { 
         return theInvoker( anObject ); 
     }
 
-    const RET operator()( const CLASS* const anObject ) const 
+    RET operator()( CLASS const* anObject ) const 
     { 
-        return theInvoker( const_cast<CLASS* const>( anObject ) ); 
+        return theInvoker( const_cast<CLASS*>( anObject ) ); 
     }
 
-    template< const RET (CLASS::*METHOD)() const >
+    template< RET (CLASS::*METHOD)() >
     static MethodProxy create()
     {
-#if defined( LIBECS_USE_PMF_CONVERSIONS )
-        return MethodProxy( Invoker( METHOD ));
-#else    /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
-        return MethodProxy( invoke<METHOD> );
-#endif /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
+        return MethodProxy( &invoke<METHOD> );
+    }
+
+    template< RET (CLASS::*METHOD)() const >
+    static MethodProxy create()
+    {
+        return MethodProxy( &invoke<METHOD> );
     }
 
     inline bool operator==( MethodProxy const& that ) const
@@ -84,8 +86,14 @@ private:
         ; // do nothing
     }
 
-    template< const RET (CLASS::*METHOD)() const >
-    inline static const RET invoke( CLASS* const anObject )
+    template< RET (CLASS::*METHOD)() >
+    inline static RET invoke( CLASS* anObject )
+    {
+        return ( anObject->*METHOD )();
+    }
+
+    template< RET (CLASS::*METHOD)() const >
+    inline static RET invoke( CLASS* anObject )
     {
         return ( anObject->*METHOD )();
     }
@@ -102,22 +110,24 @@ template < typename RET >
 class ObjectMethodProxy<RET>
 {
 private:
-    typedef const RET (* Invoker )( void* const );
+    typedef RET (* Invoker )( void* );
 
 public:
-    const RET operator()() const 
+    RET operator()() const 
     { 
         return theInvoker( theObject ); 
     }
 
-    template < class T, const RET (T::*TMethod)() const >
-    static ObjectMethodProxy create( T* const anObject )
+    template < class T, RET (T::*TMethod)() >
+    static ObjectMethodProxy create( T* anObject )
     {
-#if defined( LIBECS_USE_PMF_CONVERSIONS )
-        return ObjectMethodProxy( Invoker( TMethod ), anObject );
-#else    /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
-        return ObjectMethodProxy( invoke<T,TMethod>, anObject );
-#endif /* defined( LIBECS_USE_PMF_CONVERSIONS ) */
+        return ObjectMethodProxy( &invoke<T,TMethod>, anObject );
+    }
+
+    template < class T, RET (T::*TMethod)() const >
+    static ObjectMethodProxy create( T* anObject )
+    {
+        return ObjectMethodProxy( &invoke<T,TMethod>, anObject );
     }
 
     inline bool operator==( ObjectMethodProxy const& that ) const
@@ -140,10 +150,16 @@ private:
         ; // do nothing
     }
 
-    template < class T, const RET (T::*TMethod)() const >
-    static const RET invoke( void* const anObject )
+    template < class T, RET (T::*TMethod)() >
+    static RET invoke( void* anObject )
     {
         return ( static_cast<T*>(anObject)->*TMethod )();
+    }
+
+    template < class T, RET (T::*TMethod)() const >
+    static RET invoke( void* anObject )
+    {
+        return ( static_cast<T const*>(anObject)->*TMethod )();
     }
 
 private:

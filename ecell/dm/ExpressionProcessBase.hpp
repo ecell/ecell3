@@ -48,12 +48,8 @@ template< typename Tmixin_ >
 class ExpressionProcessBase
 {
 protected:
-    DECLARE_ASSOCVECTOR(
-        libecs::String,
-        libecs::Real,
-        std::less<const libecs::String>,
-        PropertyMap
-    );
+    typedef Loki::AssocVector< libecs::String, libecs::Real,
+                               std::less<const libecs::String> > PropertyMap;
 
 private:
     class PropertyAccess
@@ -67,7 +63,7 @@ private:
 
         virtual libecs::Real* get( const libecs::String& name )
         {
-            PropertyMapIterator pos = outer_.thePropertyMap.find( name );
+            PropertyMap::iterator pos = outer_.thePropertyMap.find( name );
             return pos == outer_.thePropertyMap.end() ? 0: &(pos->second);
         }
 
@@ -160,7 +156,7 @@ public:
 
 
     ExpressionProcessBase()
-        : theRecompileFlag( true ), theCompiledCode( 0 )
+        : theCompiledCode( 0 ), theRecompileFlag( true )
     {
         // ; do nothing
     }
@@ -182,14 +178,14 @@ public:
     }
 
     void defaultSetProperty( libecs::String const& aPropertyName,
-                             libecs::PolymorphCref aValue )
+                             libecs::Polymorph const& aValue )
     {
         thePropertyMap[ aPropertyName ] = aValue.as< libecs::Real >();
     }
 
-    const libecs::Polymorph defaultGetProperty( libecs::String const& aPropertyName ) const
+    libecs::Polymorph defaultGetProperty( libecs::String const& aPropertyName ) const
     {
-        PropertyMapConstIterator aPropertyMapIterator(
+        PropertyMap::const_iterator aPropertyMapIterator(
             thePropertyMap.find( aPropertyName ) );
 
         if ( aPropertyMapIterator != thePropertyMap.end() ) {
@@ -203,9 +199,9 @@ public:
         }
     }
 
-    const libecs::StringVector defaultGetPropertyList() const
+    std::vector< libecs::String > defaultGetPropertyList() const
     {
-        libecs::StringVector aVector;
+        std::vector< libecs::String> aVector;
 
         std::transform( thePropertyMap.begin(), thePropertyMap.end(),
                 std::back_inserter( aVector ),
@@ -214,7 +210,7 @@ public:
         return aVector;
     }
 
-    const libecs::PropertyAttributes
+    libecs::PropertyAttributes
     defaultGetPropertyAttributes( libecs::String const& aPropertyName ) const
     {
         return libecs::PropertyAttributes( libecs::PropertySlotBase::POLYMORPH,
@@ -239,7 +235,7 @@ public:
         theCompiledCode = theCompiler.compileExpression( theExpression );
     }
 
-    PropertyMapCref getPropertyMap() const
+    PropertyMap const& getPropertyMap() const
     {
         return thePropertyMap;
     }
@@ -262,7 +258,7 @@ public:
 
 protected:
 
-    PropertyMapRef getPropertyMap()
+    PropertyMap& getPropertyMap()
     {
         return thePropertyMap;
     }

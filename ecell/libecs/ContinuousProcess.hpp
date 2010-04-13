@@ -50,7 +50,7 @@ public:
         ;
     }
 
-    virtual const bool isContinuous() const
+    virtual bool isContinuous() const
     {
         return true;
     }

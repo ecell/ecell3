@@ -33,8 +33,6 @@
 
 struct ESSYNSProcessInterface
 {
-    DECLARE_VECTOR( libecs::Real, RealVector );
-
     virtual const boost::multi_array< libecs::Real, 2 >& getESSYNSMatrix() = 0;
 
     virtual libecs::Integer getSystemSize() const = 0;

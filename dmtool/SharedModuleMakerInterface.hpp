@@ -38,7 +38,7 @@ public:
 
     virtual void setSearchPath( const std::string& path ) = 0;
 
-    virtual const std::string getSearchPath() const = 0;
+    virtual std::string getSearchPath() const = 0;
 
 public:
     static const char PATH_SEPARATOR = LT_PATHSEP_CHAR;

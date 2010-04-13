@@ -46,7 +46,7 @@ LIBECS_DM_CLASS_EXTRA_1( GillespieProcess, libecs::Process,
                          GillespieProcessInterface )
 {
     typedef libecs::MethodProxy< GillespieProcess, libecs::Real > RealMethodProxy;
-    typedef const libecs::Real( GillespieProcess::* PDMethodPtr )( libecs::Variable* ) const; 
+    typedef libecs::Real( GillespieProcess::* PDMethodPtr )( libecs::Variable const* ) const; 
     
 public:
     LIBECS_DM_OBJECT( GillespieProcess, Process );
@@ -65,9 +65,9 @@ public:
 
     GET_METHOD( libecs::Real, Propensity_R );
 
-    virtual const libecs::Real getPD( libecs::Variable* aVariable ) const;
+    virtual libecs::Real getPD( libecs::Variable const* aVariable ) const;
 
-    virtual const bool isContinuous() const;
+    virtual bool isContinuous() const;
 
     // The order of the reaction, i.e. 1 for a unimolecular reaction.
 
@@ -83,43 +83,42 @@ public:
 
 protected:
 
-    const libecs::Real getZero() const;
+    libecs::Real getZero() const;
 
-    const libecs::Real getPD_Zero( libecs::Variable* aVariable ) const;
+    libecs::Real getPD_Zero( libecs::Variable const* aVariable ) const;
 
     /**
          FirstOrder_OneSubstrate
      */
-    const libecs::Real getPropensity_FirstOrder() const;
+    libecs::Real getPropensity_FirstOrder() const;
 
-    const libecs::Real getMinValue_FirstOrder() const;
+    libecs::Real getMinValue_FirstOrder() const;
 
-    const libecs::Real getPD_FirstOrder( libecs::Variable* aVariable ) const;
+    libecs::Real getPD_FirstOrder( libecs::Variable const* aVariable ) const;
 
     /**
          SecondOrder_TwoSubstrates
      */
-    const libecs::Real getPropensity_SecondOrder_TwoSubstrates() const;
+    libecs::Real getPropensity_SecondOrder_TwoSubstrates() const;
 
-    const libecs::Real getMinValue_SecondOrder_TwoSubstrates() const;
+    libecs::Real getMinValue_SecondOrder_TwoSubstrates() const;
 
-    const libecs::Real getPD_SecondOrder_TwoSubstrates( libecs::Variable* aVariable ) const;
+    libecs::Real getPD_SecondOrder_TwoSubstrates( libecs::Variable const* aVariable ) const;
 
     /**
          SecondOrder_OneSubstrate
      */
-    const libecs::Real getPropensity_SecondOrder_OneSubstrate() const;
+    libecs::Real getPropensity_SecondOrder_OneSubstrate() const;
 
-    const libecs::Real getMinValue_SecondOrder_OneSubstrate() const;
+    libecs::Real getMinValue_SecondOrder_OneSubstrate() const;
 
-    const libecs::Real getPD_SecondOrder_OneSubstrate( libecs::Variable* aVariable ) const;
+    libecs::Real getPD_SecondOrder_OneSubstrate( libecs::Variable const* aVariable ) const;
 
 protected:
 
-    libecs::Real k;
-    libecs::Real c;
-
     libecs::Integer theOrder;
+    libecs::Real c;
+    libecs::Real k;
 
     RealMethodProxy theGetPropensityMethodPtr;    
     RealMethodProxy theGetMinValueMethodPtr;

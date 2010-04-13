@@ -52,7 +52,7 @@ public:
   
     ~VirtualMachine() {}
   
-    const libecs::Real execute( CodeCref aCode );
+    const libecs::Real execute( Code const& aCode );
 };
 
 } } // namespace libecs::scripting

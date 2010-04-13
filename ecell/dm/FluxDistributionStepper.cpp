@@ -71,7 +71,7 @@ private:
 
 typedef Caster< QuasiDynamicFluxProcessInterface*, Process* > QDFPCaster;
 
-DECLARE_VECTOR( QDFPCaster::result_type, QuasiDynamicFluxProcessVector );
+typedef std::vector< QDFPCaster::result_type > QuasiDynamicFluxProcessVector;
     
 LIBECS_DM_CLASS( FluxDistributionStepper, DifferentialStepper )
 {
@@ -84,12 +84,12 @@ public:
     }
     
     FluxDistributionStepper()
-        : theUnknownMatrix( NULLPTR ),
-          theInverseMatrix( NULLPTR ),
-          theVariableVelocityVector( NULLPTR ),
-          theFluxVector( NULLPTR ),
-          theIrreversibleFlag( false ),
-          Epsilon( 1e-6 )
+        : theUnknownMatrix( 0 ),
+          theInverseMatrix( 0 ),
+          theVariableVelocityVector( 0 ),
+          theFluxVector( 0 ),
+          Epsilon( 1e-6 ),
+          theIrreversibleFlag( false )
     {
         initializeStepInterval( INF );
     }
@@ -140,7 +140,7 @@ public:
             theMatrixSize = theVariableVector.size(); 
         }
 
-        if( theUnknownMatrix != NULLPTR )
+        if( theUnknownMatrix != 0 )
         { 
             gsl_matrix_free( theUnknownMatrix );
             gsl_vector_free( theVariableVelocityVector );
@@ -176,12 +176,12 @@ public:
         for( QuasiDynamicFluxProcessVector::size_type i( 0 );
              i < aProcessVectorSize; ++i )
         {        
-            VariableReferenceVector aVariableReferenceVector(
+            Process::VariableReferenceVector aVariableReferenceVector(
                 theQuasiDynamicFluxProcessVector[ i ].first->getFluxDistributionVector() );        
 
-            VariableReferenceVector::size_type aVariableReferenceVectorSize(
+            Process::VariableReferenceVector::size_type aVariableReferenceVectorSize(
                     aVariableReferenceVector.size() );    
-            for( VariableReferenceVector::size_type j( 0 ); j < aVariableReferenceVectorSize; ++j )
+            for( Process::VariableReferenceVector::size_type j( 0 ); j < aVariableReferenceVectorSize; ++j )
             {
                 gsl_matrix_set( theUnknownMatrix,
                                 theVariableMap.find(
@@ -216,7 +216,7 @@ public:
         // generate inverse matrix
         //
 
-        if( theInverseMatrix != NULLPTR )
+        if( theInverseMatrix != 0 )
         { 
             gsl_matrix_free( theInverseMatrix );
         }
@@ -224,7 +224,7 @@ public:
         theInverseMatrix = generateInverse( theUnknownMatrix , theMatrixSize );
     }
 
-    virtual void interrupt( StepperPtr const aCaller )
+    virtual void interrupt( Stepper* aCaller )
     {
         integrate( aCaller->getCurrentTime() );
 
@@ -276,9 +276,9 @@ public:
                             if ( gsl_vector_get( theFluxVector, i ) < 0 )
                             {
                                 aFlag = true;
-                                VariableReferenceVector aVariableReferenceVector( theQuasiDynamicFluxProcessVector[i].first->getFluxDistributionVector() );
-                                VariableReferenceVector::size_type aVariableReferenceVectorSize( aVariableReferenceVector.size() );    
-                                for ( VariableReferenceVector::size_type k( 0 ); k < aVariableReferenceVectorSize; ++k )
+                                Process::VariableReferenceVector aVariableReferenceVector( theQuasiDynamicFluxProcessVector[i].first->getFluxDistributionVector() );
+                                Process::VariableReferenceVector::size_type aVariableReferenceVectorSize( aVariableReferenceVector.size() );    
+                                for ( Process::VariableReferenceVector::size_type k( 0 ); k < aVariableReferenceVectorSize; ++k )
                                 {
                                     gsl_matrix_set( aTmpUnknownMatrix, theVariableMap.find( aVariableReferenceVector[k].getVariable() )->second, i, 0.0 );
                                 }
@@ -383,7 +383,7 @@ protected:
 
     Real Epsilon;
     
-    std::map< VariablePtr, VariableVector::size_type > theVariableMap;
+    std::map< Variable*, VariableVector::size_type > theVariableMap;
     std::size_t theMatrixSize;
     bool theIrreversibleFlag;
 

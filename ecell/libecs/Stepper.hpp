@@ -51,6 +51,10 @@ namespace libecs
 {
 
 class Model;
+class Logger;
+class Process;
+class System;
+class Variable;
 
 /**
    Stepper class defines and governs a computation unit in a model.
@@ -60,10 +64,10 @@ class Model;
 LIBECS_DM_CLASS( Stepper, EcsObject )
 {
 public:
-    DECLARE_VECTOR( Real, RealVector );
-    DECLARE_VECTOR( Variable*, VariableVector );
-    DECLARE_VECTOR( Process*, ProcessVector );
-    DECLARE_VECTOR( System*, SystemVector );
+    typedef std::vector<Real> RealVector;
+    typedef std::vector<Variable*> VariableVector;
+    typedef std::vector<Process*> ProcessVector;
+    typedef std::vector<System*> SystemVector;
 
     typedef VariableVector::size_type VariableIndex;
 
@@ -92,24 +96,23 @@ public:
     class PriorityCompare
     {
     public:
-        bool operator()( StepperPtr aLhs, StepperPtr aRhs ) const
+        bool operator()( Stepper const* aLhs, Stepper const* aRhs ) const
         {
             return compare( aLhs->getPriority(), aRhs->getPriority() );
         }
 
-        bool operator()( StepperPtr aLhs, IntegerParam aRhs ) const
+        bool operator()( Stepper const* aLhs, Integer aRhs ) const
         {
             return compare( aLhs->getPriority(), aRhs );
         }
 
-        bool operator()( IntegerParam aLhs, StepperPtr aRhs ) const
+        bool operator()( Integer aLhs, Stepper const* aRhs ) const
         {
             return compare( aLhs, aRhs->getPriority() );
         }
 
     private:
-        // if statement can be faster than returning an expression directly
-        static bool compare( IntegerParam aLhs, IntegerParam aRhs )
+        static bool compare( Integer aLhs, Integer aRhs )
         {
             return aLhs > aRhs;
         }
@@ -145,8 +148,8 @@ public:
     */
     GET_METHOD( Real, StepInterval )
     {
-        Real const aNextTime( getNextTime() );
-        Real const aCurrentTime( getCurrentTime() );
+        const Real aNextTime( getNextTime() );
+        const Real aCurrentTime( getCurrentTime() );
         if ( aCurrentTime == libecs::INF )
         {
             return libecs::INF;
@@ -224,7 +227,7 @@ public:
     */
     virtual void step() = 0;
 
-    virtual void integrate( RealParam aTime );
+    virtual void integrate( Real aTime );
 
     /**
        Let the Loggers log data.
@@ -239,14 +242,14 @@ public:
 
        @param aSystemPtr a pointer to a System object to register
     */
-    void registerSystem( SystemPtr aSystemPtr );
+    void registerSystem( System* aSystemPtr );
 
     /**
        Remove a System from this Stepper.
 
        @param aSystemPtr a pointer to a System object
     */
-    void unregisterSystem( SystemPtr aSystemPtr );
+    void unregisterSystem( System* aSystemPtr );
 
     /**
        Remove all the associated System from this Stepper.
@@ -258,7 +261,7 @@ public:
 
          @param aProcessPtr a pointer to a Process object to register
     */
-    void registerProcess( ProcessPtr aProcessPtr );
+    void registerProcess( Process* aProcessPtr );
 
     /**
        Remove a Process from this Stepper.
@@ -267,21 +270,21 @@ public:
 
        @param aProcessPtr a pointer to a Process object
     */
-    void unregisterProcess( ProcessPtr aProcessPtr );
+    void unregisterProcess( Process* aProcessPtr );
 
     /**
        Remove all the associated Process from this Stepper.
     */
     void unregisterAllProcesses();
 
-    void registerLogger( LoggerPtr );
+    void registerLogger( Logger* );
 
-    void setSchedulerIndex( const int anIndex )
+    void setSchedulerIndex( int anIndex )
     {
         theSchedulerIndex = anIndex;
     }
 
-    const int getSchedulerIndex() const
+    int getSchedulerIndex() const
     {
         return theSchedulerIndex;
     }
@@ -340,7 +343,7 @@ public:
     /**
        @see getProcessVector()
     */
-    const ProcessVector::size_type getDiscreteProcessOffset() const
+    ProcessVector::size_type getDiscreteProcessOffset() const
     {
         return theDiscreteProcessOffset;
     }
@@ -367,7 +370,7 @@ public:
     /**
        @see getVariableVector()
     */
-    const VariableVector::size_type getReadWriteVariableOffset() const
+    VariableVector::size_type getReadWriteVariableOffset() const
     {
         return theReadWriteVariableOffset;
     }
@@ -375,7 +378,7 @@ public:
     /**
        @see getVariableVector()
     */
-    const VariableVector::size_type getReadOnlyVariableOffset() const
+    VariableVector::size_type getReadOnlyVariableOffset() const
     {
         return theReadOnlyVariableOffset;
     }
@@ -387,9 +390,9 @@ public:
     }
 
 
-    const VariableIndex getVariableIndex( Variable const* aVariable ) const;
+    VariableIndex getVariableIndex( Variable const* aVariable ) const;
 
-    virtual void interrupt( TimeParam aTime ) = 0;
+    virtual void interrupt( Time aTime ) = 0;
 
     /**
        Definition of the Stepper dependency:
@@ -404,7 +407,7 @@ public:
 
        @see Process, VariableReference
     */
-    const bool isDependentOn( Stepper const* aStepper );
+    bool isDependentOn( Stepper const* aStepper );
 
     /** 
        This method updates theIntegratedVariableVector.
@@ -421,7 +424,7 @@ public:
 
     virtual Interpolant* createInterpolant( Variable const* aVariable ) const;
 
-    const gsl_rng* getRng() const
+    gsl_rng* getRng() const
     {
         return theRng;
     }

@@ -70,7 +70,7 @@ public:
         ; // do nothing
     }
 
-    DataPoint( RealParam aTime, RealParam aValue )
+    DataPoint( Real aTime, Real aValue )
         : theTime ( aTime ),
           theValue( aValue )     
     {
@@ -113,13 +113,13 @@ public:
     }
 
 
-    void setTime( RealParam aReal )
+    void setTime( Real aReal )
     {
         theTime = aReal;
     }
 
 
-    void setValue( RealParam aReal )
+    void setValue( Real aReal )
     {
         theValue = aReal;
     }
@@ -137,7 +137,7 @@ public:
     }
 
 
-    DataPointRef operator= ( LongDataPointCref aLongDataPoint );
+    DataPoint& operator=( LongDataPoint const& aLongDataPoint );
 
 
     bool operator==( const DataPoint& that ) const
@@ -167,7 +167,7 @@ public:
     }
 
 
-    LongDataPoint( RealParam aTime, RealParam aValue )//constructor with 2 args
+    LongDataPoint( Real aTime, Real aValue )//constructor with 2 args
         : DataPoint( aTime, aValue ),
           theAvg( aValue ),
           theMin( aValue ),
@@ -176,9 +176,9 @@ public:
         ; // do nothing
     }
 
-    LongDataPoint( RealParam aTime, RealParam aValue, 
-                   RealParam anAvg, RealParam aMax, 
-                   RealParam aMin ) //constructor with 5 args
+    LongDataPoint( Real aTime, Real aValue, 
+                   Real anAvg, Real aMax, 
+                   Real aMin ) //constructor with 5 args
         : DataPoint( aTime, aValue ),
           theAvg( anAvg ),
           theMin( aMin ),
@@ -188,7 +188,7 @@ public:
     }
 
 
-    LongDataPoint( DataPointCref aDataPoint ) // constructor from DP2
+    LongDataPoint( DataPoint const& aDataPoint ) // constructor from DP2
         : DataPoint( aDataPoint ),
           theAvg( aDataPoint.getAvg() ),
           theMin( aDataPoint.getMin() ),
@@ -234,31 +234,31 @@ public:
     }
 
 
-    void setTime( RealParam aReal )
+    void setTime( Real aReal )
     {
         theTime = aReal;
     }
 
 
-    void setValue( RealParam aReal )
+    void setValue( Real aReal )
     {
         theValue = aReal;
     }
 
 
-    void setAvg( RealParam aReal )
+    void setAvg( Real aReal )
     {
         theAvg = aReal;
     }
 
 
-    void setMin( RealParam aReal )
+    void setMin( Real aReal )
     {
         theMin = aReal;
     }
 
 
-    void setMax( RealParam aReal )
+    void setMax( Real aReal )
     {
         theMax = aReal;
     }
@@ -296,25 +296,25 @@ public:
     
     DataPointAggregator();
     
-    DataPointAggregator( LongDataPointCref );
+    DataPointAggregator( LongDataPoint const& );
     
     
     ~DataPointAggregator();
     
-    void aggregate( LongDataPointCref );
+    void aggregate( LongDataPoint const& );
     
-    LongDataPointCref getData();
+    LongDataPoint const& getData();
     
     void beginNextPoint();
     
     LongDataPoint getLastPoint();
     
 private:
-    void store( LongDataPointCref );
+    void store( LongDataPoint const& );
     
-    bool stockpile( LongDataPointRef, LongDataPointCref );
-    void calculate( LongDataPointCref );
-    void calculateMinMax( LongDataPointRef, LongDataPointCref );
+    bool stockpile( LongDataPoint&, LongDataPoint const& );
+    void calculate( LongDataPoint const& );
+    void calculateMinMax( LongDataPoint&, LongDataPoint const& );
     
     LongDataPoint theAccumulator;
     LongDataPoint theCollector;

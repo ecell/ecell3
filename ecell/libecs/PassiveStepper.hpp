@@ -66,7 +66,7 @@ public:
 
     virtual void step();
 
-    virtual void interrupt( TimeParam aTime );
+    virtual void interrupt( Time aTime );
 
     virtual SET_METHOD( Real, NextTime );
 };

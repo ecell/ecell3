@@ -50,7 +50,6 @@ namespace libecs
    @param BASE      the base class
  */
 #define LIBECS_DM_CLASS( CLASSNAME, BASE )\
-    DECLARE_CLASS( CLASSNAME );\
     class DM_IF CLASSNAME: public BASE
 
 /**
@@ -59,7 +58,6 @@ namespace libecs
    @param BASE      the base class
  */
 #define LIBECS_DM_CLASS_EXTRA_1( CLASSNAME, BASE, IF1 )\
-    DECLARE_CLASS( CLASSNAME );\
     class DM_IF CLASSNAME: public BASE, public IF1
 
 /**
@@ -69,7 +67,6 @@ namespace libecs
    @param MIXIN     the class mixed-in to CLASSNAME
  */
 #define LIBECS_DM_CLASS_MIXIN( CLASSNAME, BASE, MIXIN )\
-    DECLARE_CLASS( CLASSNAME );\
     class DM_IF CLASSNAME: public BASE, public MIXIN< CLASSNAME >
 
 
@@ -171,36 +168,36 @@ namespace libecs
     { \
         reinterpret_cast< libecs::PropertyInterface<CLASSNAME>* >( thePropertyInterface )->~PropertyInterface<CLASSNAME>(); \
     } \
-    libecs::PropertySlotBase const* CLASSNAME::getPropertySlot( libecs::StringCref aPropertyName ) const \
+    libecs::PropertySlotBase const* CLASSNAME::getPropertySlot( libecs::String const& aPropertyName ) const \
     { \
         return _getPropertyInterface().getPropertySlot( aPropertyName ); \
     } \
-    void CLASSNAME::setProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ) \
+    void CLASSNAME::setProperty( libecs::String const& aPropertyName, libecs::Polymorph const& aValue ) \
     { \
         return _getPropertyInterface().setProperty( *this, aPropertyName, aValue ); \
     } \
-    const libecs::Polymorph CLASSNAME::getProperty( libecs::StringCref aPropertyName ) const \
+    libecs::Polymorph CLASSNAME::getProperty( libecs::String const& aPropertyName ) const \
     { \
         return _getPropertyInterface().getProperty( *this, aPropertyName ); \
     } \
-    void CLASSNAME::loadProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ) \
+    void CLASSNAME::loadProperty( libecs::String const& aPropertyName, libecs::Polymorph const& aValue ) \
     { \
         return _getPropertyInterface().loadProperty( *this, aPropertyName, aValue ); \
     } \
-    const libecs::Polymorph CLASSNAME::saveProperty( libecs::StringCref aPropertyName ) const \
+    libecs::Polymorph CLASSNAME::saveProperty( libecs::String const& aPropertyName ) const \
     { \
         return _getPropertyInterface().saveProperty( *this, aPropertyName ); \
     } \
-    const libecs::StringVector CLASSNAME::getPropertyList() const \
+    std::vector< libecs::String > CLASSNAME::getPropertyList() const \
     { \
         return _getPropertyInterface().getPropertyList( *this ); \
     } \
-    libecs::PropertySlotProxyPtr CLASSNAME::createPropertySlotProxy( libecs::StringCref aPropertyName ) \
+    libecs::PropertySlotProxy* CLASSNAME::createPropertySlotProxy( libecs::String const& aPropertyName ) \
     { \
         return _getPropertyInterface().createPropertySlotProxy( *this, aPropertyName ); \
     } \
-    const libecs::PropertyAttributes \
-    CLASSNAME::getPropertyAttributes( libecs::StringCref aPropertyName ) const \
+    libecs::PropertyAttributes \
+    CLASSNAME::getPropertyAttributes( libecs::String const& aPropertyName ) const \
     { \
         return _getPropertyInterface().getPropertyAttributes( *this, aPropertyName ); \
     } \
@@ -244,14 +241,14 @@ public:\
     static void initializeModule(); \
     static void finalizeModule(); \
     static DynamicModuleInfo const* getClassInfoPtr(); \
-    virtual libecs::PropertySlotBase const* getPropertySlot( libecs::StringCref aPropertyName ) const; \
-    virtual void setProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ); \
-    virtual const libecs::Polymorph getProperty( libecs::StringCref aPropertyName ) const; \
-    virtual void loadProperty( libecs::StringCref aPropertyName, libecs::PolymorphCref aValue ); \
-    virtual const libecs::Polymorph saveProperty( libecs::StringCref aPropertyName ) const; \
-    virtual const libecs::StringVector getPropertyList() const; \
-    virtual libecs::PropertySlotProxyPtr createPropertySlotProxy( libecs::StringCref aPropertyName ); \
-    virtual const libecs::PropertyAttributes getPropertyAttributes( libecs::StringCref aPropertyName ) const; \
+    virtual libecs::PropertySlotBase const* getPropertySlot( libecs::String const& aPropertyName ) const; \
+    virtual void setProperty( libecs::String const& aPropertyName, libecs::Polymorph const& aValue ); \
+    virtual libecs::Polymorph getProperty( libecs::String const& aPropertyName ) const; \
+    virtual void loadProperty( libecs::String const& aPropertyName, libecs::Polymorph const& aValue ); \
+    virtual libecs::Polymorph saveProperty( libecs::String const& aPropertyName ) const; \
+    virtual std::vector< libecs::String > getPropertyList() const; \
+    virtual libecs::PropertySlotProxy* createPropertySlotProxy( libecs::String const& aPropertyName ); \
+    virtual libecs::PropertyAttributes getPropertyAttributes( libecs::String const& aPropertyName ) const; \
     virtual libecs::PropertyInterfaceBase const& getPropertyInterface() const;
 
 /**
@@ -273,7 +270,7 @@ public:\
 #define CLASS_DESCRIPTION( DESCRIPTION )\
         CLASS_INFO( "Description", DESCRIPTION )
 
-#define NOMETHOD NULLPTR
+#define NOMETHOD 0
 
 #define CLASSINFO_TRUE 1
 #define CLASSINFO_FALSE 0
@@ -375,7 +372,7 @@ public:\
  */
 #define PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD )\
     PROPERTYSLOT_LOAD_SAVE( TYPE, NAME, SETMETHOD, GETMETHOD, \
-                            NULLPTR, NULLPTR )
+                            0, 0 )
 
 /**
    Define a property slot such that its getter and setter functions are
@@ -396,7 +393,7 @@ public:\
    @param NAME the name of the property.
  */
 #define PROPERTYSLOT_SET( TYPE, NAME )\
-    PROPERTYSLOT( TYPE, NAME, & _LIBECS_CLASS_::set ## NAME, NULLPTR )
+    PROPERTYSLOT( TYPE, NAME, & _LIBECS_CLASS_::set ## NAME, 0 )
 
 
 /**
@@ -407,7 +404,7 @@ public:\
    @param NAME the name of the property.
  */
 #define PROPERTYSLOT_GET( TYPE, NAME )\
-    PROPERTYSLOT( TYPE, NAME, NULLPTR, & _LIBECS_CLASS_::get ## NAME )
+    PROPERTYSLOT( TYPE, NAME, 0, & _LIBECS_CLASS_::get ## NAME )
 
 
 /**
@@ -429,8 +426,7 @@ public:\
    @param NAME the name of the property.
  */
 #define PROPERTYSLOT_SET_NO_LOAD_SAVE( TYPE, NAME )\
-    PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME, & _LIBECS_CLASS_::set ## NAME,\
-                                           NULLPTR )
+    PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME, & _LIBECS_CLASS_::set ## NAME, 0 )
 
 
 /**
@@ -441,8 +437,7 @@ public:\
    @param NAME the name of the property.
  */
 #define PROPERTYSLOT_GET_NO_LOAD_SAVE( TYPE, NAME )\
-    PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME, NULLPTR, \
-                                           & _LIBECS_CLASS_::get ## NAME )
+    PROPERTYSLOT_NO_LOAD_SAVE( TYPE, NAME, 0, &_LIBECS_CLASS_::get ## NAME )
 
 
 
@@ -467,7 +462,7 @@ public:\
    @param METHODNAME the name of the method.
  */
 #define GET_SLOT( TYPE, METHODNAME )\
-    const TYPE METHODNAME() const
+    TYPE METHODNAME() const
 
 /**
    Expand to the method definition starter of a setter.
@@ -593,6 +588,7 @@ public:\
     SIMPLE_GET_METHOD( TYPE, NAME )
 
 template< typename T > class PropertyInterface;
+class PropertyInterfaceBase;
 
 /**
    Common base class for classes with PropertySlots.
@@ -663,7 +659,7 @@ public:
        @return the pointer to the PropertySlot.
      */
     virtual PropertySlotBase const* 
-    getPropertySlot( StringCref aPropertyName ) const = 0;
+    getPropertySlot( String const& aPropertyName ) const = 0;
 
 
     /**
@@ -675,7 +671,7 @@ public:
        @return the value of the property.
      */
     virtual void 
-    setProperty( StringCref aPropertyName, PolymorphCref aValue ) = 0;
+    setProperty( String const& aPropertyName, Polymorph const& aValue ) = 0;
 
 
     /**
@@ -684,33 +680,31 @@ public:
        @param aPropertyName the name of the property.
        @return the value of the property.
      */
-    virtual const Polymorph 
-    getProperty( StringCref aPropertyName ) const = 0;
+    virtual Polymorph 
+    getProperty( String const& aPropertyName ) const = 0;
 
     virtual void 
-    loadProperty( StringCref aPropertyName, PolymorphCref aValue ) = 0;
+    loadProperty( String const& aPropertyName, Polymorph const& aValue ) = 0;
 
-    virtual const Polymorph 
-    saveProperty( StringCref aPropertyName ) const = 0;
+    virtual Polymorph saveProperty( String const& aPropertyName ) const = 0;
 
-    virtual const StringVector getPropertyList() const = 0;
+    virtual std::vector< String > getPropertyList() const = 0;
 
-    virtual const PropertyAttributes
-    getPropertyAttributes( StringCref aPropertyName ) const = 0;
+    virtual PropertyAttributes
+    getPropertyAttributes( String const& aPropertyName ) const = 0;
 
-    virtual const PropertyInterfaceBase& getPropertyInterface() const = 0; 
-    virtual void defaultSetProperty( StringCref aPropertyName, 
-                                     PolymorphCref aValue );
+    virtual PropertyInterfaceBase const& getPropertyInterface() const = 0; 
+    virtual void defaultSetProperty( String const& aPropertyName, 
+                                     Polymorph const& aValue );
     
-    virtual const Polymorph 
-    defaultGetProperty( StringCref aPorpertyName ) const;
+    virtual Polymorph defaultGetProperty( String const& aPorpertyName ) const;
 
-    virtual const StringVector defaultGetPropertyList() const;
+    virtual std::vector< String > defaultGetPropertyList() const;
 
-    virtual const PropertyAttributes
-    defaultGetPropertyAttributes( StringCref aPropertyName ) const;
+    virtual PropertyAttributes
+    defaultGetPropertyAttributes( String const& aPropertyName ) const;
 
-    LIBECS_DEPRECATED StringCref getClassName() const;
+    LIBECS_DEPRECATED String const& getClassName() const;
 
     virtual String asString() const;
 
@@ -727,11 +721,11 @@ public:
 
     /// @internal
     template <typename Type>
-    void nullSet( typename Param<Type>::type );
+    void nullSet( typename Param< Type >::type );
 
     /// @internal
     template <typename Type>
-    const Type nullGet() const;
+    Type nullGet() const;
 
 private:
 
@@ -745,13 +739,13 @@ protected:
 };
 
 template <typename Type>
-inline void EcsObject::nullSet( typename Param<Type>::type )
+inline void EcsObject::nullSet( typename Param< Type >::type )
 {
     throwNotSetable();
 }
 
 template <typename Type>
-inline const Type EcsObject::nullGet() const
+inline Type EcsObject::nullGet() const
 {
     throwNotGetable();
 }
@@ -761,8 +755,8 @@ inline const Type EcsObject::nullGet() const
 // inline copies of them around.    This reduces sizes of DM .so files a bit.
 
 #define NULLGETSET_SPECIALIZATION( TYPE )\
-    template <> LIBECS_API void EcsObject::nullSet<TYPE>( Param<TYPE>::type ); \
-    template <> LIBECS_API const TYPE EcsObject::nullGet<TYPE>() const
+    template <> LIBECS_API void EcsObject::nullSet<TYPE>( Param< TYPE >::type ); \
+    template <> LIBECS_API TYPE EcsObject::nullGet<TYPE>() const
 
 NULLGETSET_SPECIALIZATION( Real );
 NULLGETSET_SPECIALIZATION( Integer );

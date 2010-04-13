@@ -65,7 +65,7 @@ public:
         ; // do nothing
     }
 
-    virtual const bool isContinuous() const
+    virtual bool isContinuous() const
     {
         return theIsContinuous;
     }
@@ -109,22 +109,22 @@ public:
     }
 
     virtual void defaultSetProperty( libecs::String const& aPropertyName,
-                             libecs::PolymorphCref aValue )
+                                     libecs::Polymorph const& aValue )
     {
         return _LIBECS_MIXIN_CLASS_::defaultSetProperty( aPropertyName, aValue );
     }
 
-    virtual const libecs::Polymorph defaultGetProperty( libecs::String const& aPropertyName ) const
+    virtual libecs::Polymorph defaultGetProperty( libecs::String const& aPropertyName ) const
     {
         return _LIBECS_MIXIN_CLASS_::defaultGetProperty( aPropertyName );
     }
 
-    virtual const libecs::StringVector defaultGetPropertyList() const
+    virtual std::vector< libecs::String > defaultGetPropertyList() const
     {
         return _LIBECS_MIXIN_CLASS_::defaultGetPropertyList();
     }
 
-    virtual const libecs::PropertyAttributes
+    virtual libecs::PropertyAttributes
     defaultGetPropertyAttributes( libecs::String const& aPropertyName ) const
     {
         return _LIBECS_MIXIN_CLASS_::defaultGetPropertyAttributes( aPropertyName );

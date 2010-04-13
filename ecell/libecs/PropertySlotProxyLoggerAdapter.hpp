@@ -38,7 +38,7 @@ namespace libecs
 class LIBECS_API PropertySlotProxyLoggerAdapter: public LoggerAdapter
 {
 public:
-    PropertySlotProxyLoggerAdapter( PropertySlotProxyPtr aPropertySlotProxy )
+    PropertySlotProxyLoggerAdapter( PropertySlotProxy* aPropertySlotProxy )
         : thePropertySlotProxy( aPropertySlotProxy )
     {
         ; // do nothing
@@ -55,7 +55,7 @@ public:
     }
 
 private:
-    PropertySlotProxyPtr thePropertySlotProxy;
+    PropertySlotProxy* thePropertySlotProxy;
 };
 
 } // namespace libecs

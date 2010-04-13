@@ -99,6 +99,7 @@ void DifferentialStepper::initialize()
 
 void DifferentialStepper::initializeVariableReferenceList()
 {
+    typedef Process::VariableReferenceVector VariableReferenceVector;
     const ProcessVector::size_type aDiscreteProcessOffset(
             getDiscreteProcessOffset() );
 
@@ -107,9 +108,9 @@ void DifferentialStepper::initializeVariableReferenceList()
     
     for ( ProcessVector::size_type i( 0 ); i < aDiscreteProcessOffset; ++i )
     {
-        ProcessPtr const aProcess( theProcessVector[ i ] );
+        Process* const aProcess( theProcessVector[ i ] );
 
-        VariableReferenceVectorCref aVariableReferenceVector(
+        VariableReferenceVector const& aVariableReferenceVector(
                 aProcess->getVariableReferenceVector() );
 
         VariableReferenceVector::size_type const aZeroVariableReferenceOffset(
@@ -122,7 +123,7 @@ void DifferentialStepper::initializeVariableReferenceList()
                         aPositiveVariableReferenceOffset + 
                         aZeroVariableReferenceOffset ) );
 
-        for ( VariableReferenceVectorConstIterator 
+        for ( VariableReferenceVector::const_iterator
                 anIterator( aVariableReferenceVector.begin() ),
                 anEnd ( aVariableReferenceVector.begin()
                         + aZeroVariableReferenceOffset );
@@ -136,7 +137,7 @@ void DifferentialStepper::initializeVariableReferenceList()
                          aVariableReference.getCoefficient() ) );
         }
 
-        for ( VariableReferenceVectorConstIterator
+        for ( VariableReferenceVector::const_iterator
                 anIterator( aVariableReferenceVector.begin()
                             + aPositiveVariableReferenceOffset ); 
               anIterator < aVariableReferenceVector.end(); ++anIterator )
@@ -204,7 +205,7 @@ void DifferentialStepper::resetAll()
     const VariableVector::size_type aSize( theVariableVector.size() );
     for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
+        Variable* const aVariable( theVariableVector[ c ] );
         aVariable->setValue( theValueBuffer[ c ] );
     }
 }
@@ -217,7 +218,7 @@ void DifferentialStepper::interIntegrate()
     VariableVector::size_type c( theReadWriteVariableOffset );
     for( ; c != theReadOnlyVariableOffset; ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
+        Variable* const aVariable( theVariableVector[ c ] );
 
         aVariable->interIntegrate( aCurrentTime );
     }
@@ -226,7 +227,7 @@ void DifferentialStepper::interIntegrate()
     // before interIntegrate().
     for( ; c != theVariableVector.size(); ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
+        Variable* const aVariable( theVariableVector[ c ] );
 
         aVariable->setValue( theValueBuffer[ c ] );
         aVariable->interIntegrate( aCurrentTime );
@@ -234,7 +235,7 @@ void DifferentialStepper::interIntegrate()
 }
 
 
-void DifferentialStepper::interrupt( TimeParam aTime )
+void DifferentialStepper::interrupt( Time aTime )
 {
     const Real aCallerCurrentTime( aTime );
 
@@ -287,7 +288,7 @@ void DifferentialStepper::updateInternalState( Real aStepInterval )
 }
 
 const Real DifferentialStepper::Interpolant::getDifference(
-        RealParam aTime, RealParam anInterval ) const
+        Real aTime, Real anInterval ) const
 {
     DifferentialStepper const* const theStepper( reinterpret_cast< DifferentialStepper const    * >( this->theStepper ) );
     if ( !theStepper->theStateFlag )
@@ -298,8 +299,8 @@ const Real DifferentialStepper::Interpolant::getDifference(
     const Real aTimeInterval1( aTime - theStepper->getCurrentTime() );
     const Real aTimeInterval2( aTimeInterval1 - anInterval );
 
-    RealMatrixCref aTaylorSeries( theStepper->getTaylorSeries() );
-    RealCptr aTaylorCoefficientPtr( aTaylorSeries.origin() + theIndex );
+    RealMatrix const& aTaylorSeries( theStepper->getTaylorSeries() );
+    Real const* aTaylorCoefficientPtr( aTaylorSeries.origin() + theIndex );
 
     // calculate first order.
     // here it assumes that always aTaylorSeries.size() >= 1
@@ -348,7 +349,7 @@ const Real DifferentialStepper::Interpolant::getDifference(
 }
 
 
-const Real DifferentialStepper::Interpolant::getVelocity( RealParam aTime ) const
+const Real DifferentialStepper::Interpolant::getVelocity( Real aTime ) const
 {
     DifferentialStepper const* const theStepper( reinterpret_cast< DifferentialStepper const* >( this->theStepper ) );
 
@@ -359,8 +360,8 @@ const Real DifferentialStepper::Interpolant::getVelocity( RealParam aTime ) cons
 
     const Real aTimeInterval( aTime - theStepper->getCurrentTime() );
 
-    RealMatrixCref aTaylorSeries( theStepper->getTaylorSeries() );
-    RealCptr aTaylorCoefficientPtr( aTaylorSeries.origin() + theIndex );
+    RealMatrix const& aTaylorSeries( theStepper->getTaylorSeries() );
+    Real const* aTaylorCoefficientPtr( aTaylorSeries.origin() + theIndex );
 
     // calculate first order.
     // here it assumes that always aTaylorSeries.size() >= 1
@@ -401,7 +402,7 @@ const Real DifferentialStepper::Interpolant::getVelocity( RealParam aTime ) cons
 }
 
 
-libecs::Interpolant* DifferentialStepper::createInterpolant( Variable const* aVariable ) const
+Interpolant* DifferentialStepper::createInterpolant( Variable const* aVariable ) const
 {
     return new DifferentialStepper::Interpolant( aVariable, this );
 }

@@ -50,30 +50,30 @@ namespace libecs
 {
 
 ///////////////////////////// EcsObject
-const PropertyAttributes EcsObject::
-defaultGetPropertyAttributes( StringCref aPropertyName ) const
+PropertyAttributes
+EcsObject::defaultGetPropertyAttributes( String const& aPropertyName ) const
 {
     THROW_EXCEPTION_INSIDE( NoSlot, 
                     asString() + ": failed to retrieve property attributes "
                     "for [" + aPropertyName + "] (no such slot)" );
 }
 
-const StringVector
+std::vector< String >
 EcsObject::defaultGetPropertyList() const
 {
-    return StringVector();
+    return std::vector< String >();
 }
 
-void EcsObject::defaultSetProperty( StringCref aPropertyName, 
-                                                                                    PolymorphCref aValue )
+void EcsObject::defaultSetProperty( String const& aPropertyName, 
+                                                                                    Polymorph const& aValue )
 {
     THROW_EXCEPTION_INSIDE( NoSlot,
                      asString() + ": failed to set property ["
                      + aPropertyName + "] (no such slot)." );
 }
 
-const Polymorph 
-EcsObject::defaultGetProperty( StringCref aPropertyName ) const
+Polymorph 
+EcsObject::defaultGetProperty( String const& aPropertyName ) const
 {
     THROW_EXCEPTION_INSIDE( NoSlot, 
                      asString() + ": failed to get property ["
@@ -93,7 +93,7 @@ void EcsObject::throwNotGetable() const
 }
 
 
-StringCref EcsObject::getClassName() const
+String const& EcsObject::getClassName() const
 {
     return getPropertyInterface().getClassName();
 }
@@ -126,7 +126,7 @@ template <> void EcsObject::nullSet<TYPE>( Param<TYPE>::type )\
 {\
     throwNotSetable();\
 }\
-template <> const TYPE EcsObject::nullGet<TYPE>() const\
+template <> TYPE EcsObject::nullGet<TYPE>() const\
 {\
     throwNotGetable();\
     return TYPE(); \

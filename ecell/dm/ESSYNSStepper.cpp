@@ -61,7 +61,7 @@ public:
     }
 
     ESSYNSStepper()
-        : theESSYNSProcessPtr( NULLPTR, NULLPTR ), theTaylorOrder( 1 )
+        : theTaylorOrder( 1 ), theESSYNSProcessPtr( 0, 0 )
     {
         ; 
     }
@@ -95,15 +95,15 @@ public:
         theESSYNSMatrix.resize( boost::extents[ theSystemSize + 1 ][ theTaylorOrder + 1 ] );
 
         theIndexVector.resize( theSystemSize );
-        VariableReferenceVectorCref aVariableReferenceVectorCref(
+        Process::VariableReferenceVector const& aVariableReferenceVectorCref(
             theESSYNSProcessPtr.second->getVariableReferenceVector() );
 
-        for ( VariableReferenceVector::size_type c(
+        for ( Integer c(
                 theESSYNSProcessPtr.second->getPositiveVariableReferenceOffset() );
               c < theSystemSize; ++c )
         {
-            VariableReferenceCref aVariableReferenceCref( aVariableReferenceVectorCref[ c ] );
-            const VariablePtr aVariablePtr( aVariableReferenceCref.getVariable() );
+            VariableReference const& aVariableReferenceCref( aVariableReferenceVectorCref[ c ] );
+            Variable* const aVariablePtr( aVariableReferenceCref.getVariable() );
 
             theIndexVector[ c ] = getVariableIndex( aVariablePtr );
         }
@@ -112,8 +112,6 @@ public:
     virtual bool calculate( Real aStepInterval )
     {
         const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
-
-        Real aCurrentTime( getCurrentTime() );
 
         // write step() function
         theESSYNSMatrix = theESSYNSProcessPtr.first->getESSYNSMatrix();
@@ -132,10 +130,10 @@ public:
         }
         
         //set value
-        for( int c( 0 ); c < aSize; ++c )
+        for( VariableVector::size_type c( 0 ); c < aSize; ++c )
         {
             const VariableVector::size_type anIndex( theIndexVector[ c ] );
-            VariablePtr const aVariable( theVariableVector[ anIndex ] );
+            Variable* const aVariable( theVariableVector[ anIndex ] );
         
             const Real aVelocity( ( exp( (theESSYNSMatrix[c])[0] ) - ( aVariable->getValue() ) ) / aStepInterval );
                  

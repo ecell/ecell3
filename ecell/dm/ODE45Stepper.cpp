@@ -121,7 +121,7 @@ bool ODE45Stepper::calculate( Real aStepInterval )
 
         for( VariableVector::size_type c( 0 ); c < aSize; ++c )
         {
-            VariablePtr const aVariable( theVariableVector[ c ] );
+            Variable* const aVariable( theVariableVector[ c ] );
         
             aVariable->setValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
                                   * aStepInterval + theValueBuffer[ c ] );
@@ -131,7 +131,7 @@ bool ODE45Stepper::calculate( Real aStepInterval )
     {
         for( VariableVector::size_type c( 0 ); c < aSize; ++c )
         {
-            VariablePtr const aVariable( theVariableVector[ c ] );
+            Variable* const aVariable( theVariableVector[ c ] );
         
             // get k1
             theTaylorSeries[ 0 ][ c ] = theRungeKuttaBuffer[ 5 ][ c ];
@@ -149,7 +149,7 @@ bool ODE45Stepper::calculate( Real aStepInterval )
 
     for ( VariableVector::size_type c( 0 ); c < aSize; ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
+        Variable* const aVariable( theVariableVector[ c ] );
             
         aVariable ->setValue( ( theTaylorSeries[ 0 ][ c ] * ( 3.0 / 40.0 ) 
                                  + theRungeKuttaBuffer[ 0 ][ c ] * ( 9.0 / 40.0 ) )
@@ -164,7 +164,7 @@ bool ODE45Stepper::calculate( Real aStepInterval )
 
     for( VariableVector::size_type c( 0 ); c < aSize; ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
+        Variable* const aVariable( theVariableVector[ c ] );
             
         aVariable->setValue(
             ( theTaylorSeries[ 0 ][ c ] * ( 44.0 / 45.0 ) 
@@ -181,7 +181,7 @@ bool ODE45Stepper::calculate( Real aStepInterval )
 
     for( VariableVector::size_type c( 0 ); c < aSize; ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
+        Variable* const aVariable( theVariableVector[ c ] );
             
         aVariable->setValue(
             ( theTaylorSeries[ 0 ][ c ] * ( 19372.0 / 6561.0 ) 
@@ -199,7 +199,7 @@ bool ODE45Stepper::calculate( Real aStepInterval )
 
     for( VariableVector::size_type c( 0 ); c < aSize; ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
+        Variable* const aVariable( theVariableVector[ c ] );
             
         // temporarily set Y^6
         theTaylorSeries[ 1 ][ c ] =
@@ -226,7 +226,7 @@ bool ODE45Stepper::calculate( Real aStepInterval )
 
     for( VariableVector::size_type c( 0 ); c < aSize; ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
+        Variable* const aVariable( theVariableVector[ c ] );
             
         theTaylorSeries[ 2 ][ c ] =
             theTaylorSeries[ 0 ][ c ] * ( 35.0 / 384.0 )
@@ -256,8 +256,6 @@ bool ODE45Stepper::calculate( Real aStepInterval )
 
     for( VariableVector::size_type c( 0 ); c < aSize; ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
-
         // calculate error
         const Real anEstimatedError(
             ( theTaylorSeries[ 0 ][ c ] * ( 71.0 / 57600.0 )

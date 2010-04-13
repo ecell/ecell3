@@ -62,15 +62,6 @@
 namespace libemc
 {
 
-DECLARE_CLASS( EventChecker );
-DECLARE_CLASS( EventHandler );
-
-DECLARE_CLASS( Simulator );
-DECLARE_CLASS( SimulatorImplementation );
-
-DECLARE_SHAREDPTR( EventChecker );
-DECLARE_SHAREDPTR( EventHandler );
-
 class LIBEMC_API EventHandler
     : public std::unary_function< void, void >
 {

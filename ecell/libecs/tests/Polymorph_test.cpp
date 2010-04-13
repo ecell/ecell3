@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(testStream)
     BOOST_CHECK_EQUAL( "\"test\"", stream_tester( Polymorph( "test" ) ) );
     BOOST_CHECK_EQUAL( "123", stream_tester( Polymorph( 123l ) ) );
     BOOST_CHECK_EQUAL( "123.01", stream_tester( Polymorph( 123.01 ) ) );
-    BOOST_CHECK_EQUAL( "[1, 1, 1]", stream_tester( Polymorph( PolymorphVector( 3, 1l ) ) ) );
+    BOOST_CHECK_EQUAL( "[1, 1, 1]", stream_tester( Polymorph( PolymorphVector( 3, Polymorph( 1l ) ) ) ) );
 }
 
 BOOST_AUTO_TEST_CASE(testBasic)

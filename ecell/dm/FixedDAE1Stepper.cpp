@@ -37,10 +37,10 @@
 
 USE_LIBECS;
 
-DECLARE_VECTOR( int, IntVector );
-
 LIBECS_DM_CLASS( FixedDAE1Stepper, DifferentialStepper )
 {
+private:
+    typedef std::vector< Integer > IntegerVector;
 
 public:
 
@@ -53,16 +53,16 @@ public:
     }
 
     FixedDAE1Stepper()
-        : theJacobianMatrix( NULLPTR ),
-          theVelocityVector( NULLPTR ),
-          theSolutionVector( NULLPTR ),
-          thePermutation( NULLPTR ),
-          theSystemSize( 0 ),
-          theTolerance( 1e-10 ),
+        : theSystemSize( 0 ),
           thePerturbationRate( 1e-9 ),
-          theDependentProcessVector( NULLPTR ),
-          theContinuousVariableVector( NULLPTR ),
-          theActivityBuffer( NULLPTR )
+          theTolerance( 1e-10 ),
+          theDependentProcessVector( 0 ),
+          theJacobianMatrix( 0 ),
+          theVelocityVector( 0 ),
+          theSolutionVector( 0 ),
+          thePermutation( 0 ),
+          theContinuousVariableVector( 0 ),
+          theActivityBuffer( 0 )
     {
         ; // do nothing
     }
@@ -197,7 +197,7 @@ public:
             theActivityBuffer[ c ] = theProcessVector[ c ]->getActivity();
         }
 
-        for( IntVector::size_type i( 0 ); 
+        for( IntegerVector::size_type i( 0 ); 
                  i < theContinuousVariableVector.size(); ++i )
         {
             const int anIndex( theContinuousVariableVector[ i ] );
@@ -213,8 +213,6 @@ public:
         for( ProcessVector::size_type c( aDiscreteProcessOffset );
                  c < theProcessVector.size(); ++c )
         {
-            const Real anActivity( theProcessVector[ c ]->getActivity() );
-
             gsl_vector_set( theVelocityVector,
                             theContinuousVariableVector.size() + c
                                 - aDiscreteProcessOffset,
@@ -240,14 +238,14 @@ public:
         for( VariableVector::size_type c( 0 ); c < aReadOnlyVariableOffset;
              ++c )
         {
-            VariablePtr const aVariable( theVariableVector[ c ] );
+            Variable* const aVariable( theVariableVector[ c ] );
             const Real aValue( aVariable->getValue() );
 
             aVariable->setValue( aValue + aPerturbation );
 
-            FOR_ALL( IntVector, theDependentProcessVector[ c ] )
+            FOR_ALL( IntegerVector, theDependentProcessVector[ c ] )
             {
-                const Integer anIndex( *i );
+                const VariableVector::size_type anIndex( *i );
 
                 theProcessVector[ anIndex ]->fire();
                 const Real aDifference( theProcessVector[ anIndex ]->getActivity() - theActivityBuffer[ anIndex ] );
@@ -275,7 +273,7 @@ public:
                 }
             }
 
-            for ( IntVector::size_type i( 0 ); 
+            for ( IntegerVector::size_type i( 0 ); 
                   i < theContinuousVariableVector.size(); ++i )
             {
                 // this calculation already includes negative factor
@@ -292,7 +290,7 @@ public:
             aVariable->setValue( aValue );
         }
 
-        for ( IntVector::size_type c( 0 ); 
+        for ( IntegerVector::size_type c( 0 ); 
               c < theContinuousVariableVector.size(); c++ )
         {
             const int anIndex( theContinuousVariableVector[ c ] );
@@ -316,27 +314,27 @@ public:
 
         theContinuousVariableVector.clear();
 
-        IntVector anIndexVector;
-        IntVectorConstIterator aWriteVariableIterator;
+        IntegerVector anIndexVector;
+        IntegerVector::const_iterator aWriteVariableIterator;
 
-        ProcessVectorConstIterator anIterator( theProcessVector.begin() );
+        ProcessVector::const_iterator anIterator( theProcessVector.begin() );
         for( ProcessVector::size_type c( 0 ); c < theProcessVector.size(); ++c )
         {
-            VariableReferenceVectorCref aVariableReferenceVector(
+            Process::VariableReferenceVector const& aVariableReferenceVector(
                     (*anIterator)->getVariableReferenceVector() );
 
-            const VariableReferenceVector::size_type aZeroVariableReferenceOffset(
+            const Process::VariableReferenceVector::size_type aZeroVariableReferenceOffset(
                     (*anIterator)->getZeroVariableReferenceOffset() );
-            const VariableReferenceVector::size_type
+            const Process::VariableReferenceVector::size_type
                 aPositiveVariableReferenceOffset(
                     (*anIterator)->getPositiveVariableReferenceOffset() );
 
             anIndexVector.clear();
-            for ( VariableReferenceVector::size_type i(
+            for ( Process::VariableReferenceVector::size_type i(
                     aZeroVariableReferenceOffset );
                   i != aPositiveVariableReferenceOffset; ++i )
             {
-                VariablePtr const aVariable(
+                Variable* const aVariable(
                     aVariableReferenceVector[ i ].getVariable() );
 
                 const VariableVector::size_type anIndex(
@@ -352,10 +350,10 @@ public:
                 }
             }
 
-            const IntVector::size_type aNonZeroOffset( anIndexVector.size() );
+            const IntegerVector::size_type aNonZeroOffset( anIndexVector.size() );
             const bool aContinuity( (*anIterator)->isContinuous() );
 
-            for( VariableReferenceVector::size_type i( 0 ); 
+            for( Process::VariableReferenceVector::size_type i( 0 ); 
                      i < aVariableReferenceVector.size(); ++i )
             {
                 if ( i == aZeroVariableReferenceOffset )
@@ -367,7 +365,7 @@ public:
                     i = aPositiveVariableReferenceOffset;
                 }
 
-                VariablePtr const aVariable(
+                Variable* const aVariable(
                         aVariableReferenceVector[ i ].getVariable() );
 
                 const VariableVector::size_type anIndex(
@@ -393,9 +391,9 @@ public:
                 }
             }
 
-            FOR_ALL( IntVector, anIndexVector )
+            FOR_ALL( IntegerVector, anIndexVector )
             {
-                for( IntVector::size_type j( aNonZeroOffset );
+                for( IntegerVector::size_type j( aNonZeroOffset );
                      j != anIndexVector.size(); ++j )
                 {
                     const int anIndex( anIndexVector[ j ] );
@@ -438,7 +436,7 @@ public:
         for( VariableVector::size_type c( 0 ); c < aReadOnlyVariableOffset;
              ++c )
         {
-            VariablePtr const aVariable( theVariableVector[ c ] );
+            Variable* const aVariable( theVariableVector[ c ] );
 
             const Real aDifference( gsl_vector_get( theSolutionVector, c ) );
             aVariable->addValue( aDifference );
@@ -459,16 +457,16 @@ protected:
     Real                    thePerturbationRate;
     Real                    theTolerance;
 
-    std::vector<IntVector>  theDependentProcessVector;
-    std::vector<IntVector>  theDependentVariableVector;
+    std::vector<IntegerVector>  theDependentProcessVector;
+    std::vector<IntegerVector>  theDependentVariableVector;
 
     gsl_matrix*             theJacobianMatrix;
     gsl_vector*             theVelocityVector;
     gsl_vector*             theSolutionVector;
     gsl_permutation*        thePermutation;
 
-    IntVector             theContinuousVariableVector;
-    RealVector            theActivityBuffer;
+    IntegerVector           theContinuousVariableVector;
+    RealVector              theActivityBuffer;
 };
 
 LIBECS_DM_INIT( FixedDAE1Stepper, Stepper );

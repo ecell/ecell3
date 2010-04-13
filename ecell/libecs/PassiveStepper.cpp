@@ -61,7 +61,7 @@ void PassiveStepper::step()
     theNextTime = INF;
 }
 
-void PassiveStepper::interrupt( TimeParam aTime )
+void PassiveStepper::interrupt( Time aTime )
 {
     setCurrentTime( aTime );
     theNextTime = aTime;

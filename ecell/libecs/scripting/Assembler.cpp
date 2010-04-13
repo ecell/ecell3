@@ -32,7 +32,8 @@
 // E-Cell Project.
 //
 
-#include "scripting/Assembler.hpp"
+#include "libecs/MethodProxy.hpp"
+#include "libecs/scripting/Assembler.hpp"
 
 namespace libecs { namespace scripting {
 

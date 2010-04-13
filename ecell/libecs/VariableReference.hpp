@@ -53,26 +53,26 @@ public:
             ; // do nothing
         }
 
-        bool operator()( VariableReferenceCref aLhs, 
-                         VariableReferenceCref aRhs ) const
+        bool operator()( VariableReference const& aLhs, 
+                         VariableReference const& aRhs ) const
         {
             return compare( aLhs.getCoefficient(), aRhs.getCoefficient() );
         }
 
-        bool operator()( IntegerParam aLhs, 
-                         VariableReferenceCref aRhs ) const
+        bool operator()( Integer aLhs, 
+                         VariableReference const& aRhs ) const
         {
             return compare( aLhs, aRhs.getCoefficient() );
         }
 
-        bool operator()( VariableReferenceCref aLhs, 
-                         IntegerParam aRhs ) const
+        bool operator()( VariableReference const& aLhs, 
+                         Integer aRhs ) const
         {
             return compare( aLhs.getCoefficient(), aRhs );
         }
 
     private:
-        static const bool compare( IntegerParam aLhs, IntegerParam aRhs )
+        static bool compare( Integer aLhs, Integer aRhs )
         {
             return std::less<Integer>()( aLhs, aRhs );
         }
@@ -86,15 +86,15 @@ public:
             ; // do nothing
         }
 
-        bool operator()( VariableReferenceCref aLhs, 
-                         VariableReferenceCref aRhs ) const
+        bool operator()( VariableReference const& aLhs, 
+                         VariableReference const& aRhs ) const
         {
             return compare( aLhs.getFullID(), aRhs.getFullID() );
         }
 
     private:
 
-        static const bool compare( FullID const& aLhs, FullID const& aRhs )
+        static bool compare( FullID const& aLhs, FullID const& aRhs )
         {
             return std::less<String>()( aLhs, aRhs );
         }
@@ -110,8 +110,8 @@ public:
             ; // do nothing
         }
 
-        bool operator()( VariableReferenceCref aLhs, 
-                         VariableReferenceCref aRhs ) const
+        bool operator()( VariableReference const& aLhs, 
+                         VariableReference const& aRhs ) const
         {
             CoefficientLess aCoefficientLess;
             if( aCoefficientLess( aLhs, aRhs ) )
@@ -132,29 +132,29 @@ public:
 public:
     VariableReference()
         : theFullID(),
-          theVariable( NULLPTR ),
+          theVariable( 0 ),
           theCoefficient( 0 ),
           theIsAccessor( true )
     {
         ; // do nothing
     }
 
-    VariableReference( IntegerParam aSerial,
+    VariableReference( Integer aSerial,
                        FullID const& anFullID,
-                       IntegerParam aCoefficient,
+                       Integer aCoefficient,
                        const bool anIsAccessor = true )    
         : theSerial( aSerial ),
           theFullID( anFullID ),
-          theVariable( NULLPTR ),
+          theVariable( 0 ),
           theCoefficient( aCoefficient ),
           theIsAccessor( anIsAccessor )
     {
         ; // do nothing
     }
 
-    VariableReference( IntegerParam aSerial,
+    VariableReference( Integer aSerial,
                        Variable* aVariable,
-                       IntegerParam aCoefficient,
+                       Integer aCoefficient,
                        const bool anIsAccessor = true )    
         : theSerial( aSerial ),
           theFullID(),
@@ -167,7 +167,7 @@ public:
 
     ~VariableReference() {}
 
-    void setName( StringCref aName )
+    void setName( String const& aName )
     {
         theName = aName;
     }
@@ -192,17 +192,17 @@ public:
         return theVariable; 
     }
 
-    void setCoefficient( IntegerParam aCoefficient )
+    void setCoefficient( Integer aCoefficient )
     {
         theCoefficient = aCoefficient;
     }
 
-    const Integer getCoefficient() const 
+    Integer getCoefficient() const 
     { 
         return theCoefficient; 
     }
 
-    const bool isMutator() const
+    bool isMutator() const
     {
         return theCoefficient != 0;
     }
@@ -212,24 +212,24 @@ public:
         theIsAccessor = anIsAccessor;
     }
 
-    const bool isAccessor() const
+    bool isAccessor() const
     {
         return theIsAccessor;
     }
 
-    const bool isEllipsisName() const
+    bool isEllipsisName() const
     {
         return isEllipsisNameString( theName );
     }
 
-    const Integer getEllipsisNumber() const;
+    Integer getEllipsisNumber() const;
 
-    const bool isDefaultName() const
+    bool isDefaultName() const
     {
         return isDefaultNameString( theName );
     }
 
-    bool operator==( VariableReferenceCref rhs ) const
+    bool operator==( VariableReference const& rhs ) const
     {
         if( theName        == rhs.theName && 
             theVariable == rhs.theVariable &&
@@ -244,26 +244,26 @@ public:
         }
     }
 
-    static const bool isEllipsisNameString( StringCref aName )
+    static bool isEllipsisNameString( String const& aName )
     {
         return aName.size() > 3 && aName.compare( 0, 3, ELLIPSIS_PREFIX ) == 0
                && std::isdigit( *reinterpret_cast< const unsigned char* >(
                     &aName[ 4 ] ) );
     }
 
-    static const bool isDefaultNameString( StringCref aName )
+    static bool isDefaultNameString( String const& aName )
     {
         return aName == DEFAULT_NAME;
     }
 
     LIBECS_DEPRECATED
-    void setValue( RealParam aValue ) const
+    void setValue( Real aValue ) const
     {
         theVariable->setValue( aValue );
     }
 
     LIBECS_DEPRECATED
-    const Real getValue() const
+    Real getValue() const
     {
         return theVariable->getValue();
     }
@@ -278,31 +278,31 @@ public:
        @deprecated
     */
     LIBECS_DEPRECATED
-    void addValue( RealParam aValue ) const
+    void addValue( Real aValue ) const
     {
         theVariable->addValue( aValue * theCoefficient );
     }
 
     LIBECS_DEPRECATED
-    const Real getMolarConc() const
+    Real getMolarConc() const
     {
         return theVariable->getMolarConc();
     }
 
     LIBECS_DEPRECATED
-    const Real getNumberConc() const
+    Real getNumberConc() const
     {
         return theVariable->getNumberConc();
     }
 
     LIBECS_DEPRECATED
-    const Real getVelocity() const
+    Real getVelocity() const
     {
         return theVariable->getVelocity();
     }
 
     LIBECS_DEPRECATED
-    const bool isFixed() const
+    bool isFixed() const
     {
         return theVariable->isFixed();
     }
@@ -314,14 +314,14 @@ public:
     }
 
     LIBECS_DEPRECATED
-    SystemPtr getSuperSystem() const
+    System* getSuperSystem() const
     {
         return theVariable->getSuperSystem();
     }
 
 protected:
 
-    void setSerial( IntegerParam anID )
+    void setSerial( Integer anID )
     {
         theSerial = anID;
     }

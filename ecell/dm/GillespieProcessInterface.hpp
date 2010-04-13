@@ -34,7 +34,7 @@ struct GillespieProcessInterface
 {
     virtual GET_METHOD( libecs::Real, Propensity ) = 0;
 
-    virtual const libecs::Real getPD( libecs::Variable* aVariable ) const = 0;
+    virtual libecs::Real getPD( libecs::Variable const* aVariable ) const = 0;
 };
 
 #endif /* __GILLESPIEPROCESSINTERFACE_HPP */

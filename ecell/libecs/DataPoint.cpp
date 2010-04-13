@@ -45,7 +45,7 @@ DataPointAggregator::DataPointAggregator()
 }
 
 
-DataPointAggregator::DataPointAggregator( LongDataPointCref aDataPoint )
+DataPointAggregator::DataPointAggregator( LongDataPoint const& aDataPoint )
 {
     store( aDataPoint );
 }
@@ -57,7 +57,7 @@ DataPointAggregator::~DataPointAggregator()
 }
 
 
-void DataPointAggregator::store( LongDataPointCref aDataPoint )
+void DataPointAggregator::store( LongDataPoint const& aDataPoint )
 {
     theAccumulator = aDataPoint;
     thePreviousPoint = aDataPoint;
@@ -65,8 +65,8 @@ void DataPointAggregator::store( LongDataPointCref aDataPoint )
 }
 
 
-bool DataPointAggregator::stockpile( LongDataPointRef aTarget, 
-                                     LongDataPointCref aNewPoint )
+bool DataPointAggregator::stockpile( LongDataPoint& aTarget, 
+                                     LongDataPoint const& aNewPoint )
 {
     //if target empty, simply store
     //return true
@@ -93,7 +93,7 @@ bool DataPointAggregator::stockpile( LongDataPointRef aTarget,
 }
 
 
-void DataPointAggregator::aggregate( LongDataPointCref aNewPoint )
+void DataPointAggregator::aggregate( LongDataPoint const& aNewPoint )
 {
     // first try to put it into accumulator
     if ( ! stockpile( theAccumulator, aNewPoint ) )
@@ -114,15 +114,15 @@ void DataPointAggregator::aggregate( LongDataPointCref aNewPoint )
 }
 
 
-LongDataPointCref DataPointAggregator::getData()
+LongDataPoint const& DataPointAggregator::getData()
 {
     return theAccumulator;
 }
 
 
 inline void
-DataPointAggregator::calculateMinMax( LongDataPointRef aTarget,
-                                      LongDataPointCref aNewPoint )
+DataPointAggregator::calculateMinMax( LongDataPoint& aTarget,
+                                      LongDataPoint const& aNewPoint )
 {
     // accu min
     if( aTarget.getMin() > aNewPoint.getMin() )
@@ -138,7 +138,7 @@ DataPointAggregator::calculateMinMax( LongDataPointRef aTarget,
 }
 
 
-void DataPointAggregator::calculate( LongDataPointCref aNewPoint )
+void DataPointAggregator::calculate( LongDataPoint const& aNewPoint )
 {
     // accu avg
     theAccumulator.setAvg

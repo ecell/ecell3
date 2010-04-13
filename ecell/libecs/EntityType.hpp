@@ -65,7 +65,7 @@ public:
     }
 
 
-    EntityType( EntityTypeCref primitivetype )
+    EntityType( EntityType const& primitivetype )
         : theType( primitivetype.getType() )
     {
         ; // do nothing
@@ -102,7 +102,7 @@ public:
         return getType();
     }
 
-    bool operator<( EntityTypeCref rhs ) const
+    bool operator<( EntityType const& rhs ) const
     {
         return theType < rhs.getType();
     }
@@ -112,7 +112,7 @@ public:
         return theType < rhs;
     }
 
-    bool operator==( EntityTypeCref rhs ) const
+    bool operator==( EntityType const& rhs ) const
     {
         return theType == rhs.getType();
     }

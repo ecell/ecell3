@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(testCreateEntity)
     Variable* var( dynamic_cast< Variable* >(
             model.createEntity( "Variable", FullID( "Variable:/:test" ) ) ) );
 
-    BOOST_CHECK( var != NULLPTR );
+    BOOST_CHECK( var );
     BOOST_CHECK_EQUAL( var->getEntityType(), EntityType( "Variable" ) );
     BOOST_CHECK_EQUAL( var->getSystemPath().asString(), "/" );
     BOOST_CHECK_EQUAL( var->getID(), "test" );
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(testCreateEntity)
     Process* proc( dynamic_cast< Process* >(
             model.createEntity( "MockProcess", FullID( "Process:/:test" ) ) ) );
 
-    BOOST_CHECK( proc != NULLPTR );
+    BOOST_CHECK( proc );
     BOOST_CHECK_EQUAL( proc->getEntityType(), EntityType( "Process" ) );
     BOOST_CHECK_EQUAL( proc->getSystemPath().asString(), "/" );
     BOOST_CHECK_EQUAL( proc->getID(), "test" );
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(testCreateEntity)
     System* sys( dynamic_cast< System* >(
             model.createEntity( "System", FullID( "System:/:test" ) ) ) );
 
-    BOOST_CHECK( sys != NULLPTR );
+    BOOST_CHECK( sys );
     BOOST_CHECK_EQUAL( sys->getEntityType(), EntityType( "System" ) );
     BOOST_CHECK_EQUAL( sys->getSystemPath().asString(), "/" );
     BOOST_CHECK_EQUAL( sys->getID(), "test" );
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(testCreateStepper)
 
     Stepper* stepper( model.createStepper( "PassiveStepper", "test" ) );
 
-    BOOST_CHECK( stepper != NULLPTR );
+    BOOST_CHECK( stepper );
     BOOST_CHECK_EQUAL( stepper->getID(), "test" );
     model.getStepper( "test" ); // assert no throw 
 }

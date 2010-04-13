@@ -37,12 +37,13 @@
 #include "Polymorph.hpp"
 
 #include "Logger.hpp"
+#include "libecs/DataPointVector.hpp"
 
 namespace libecs
 {
 
 // Constructor
-Logger::Logger( LoggerAdapterPtr aLoggerAdapter, Policy const& aPolicy )
+Logger::Logger( LoggerAdapter* aLoggerAdapter, Policy const& aPolicy )
     : theLoggerAdapter( aLoggerAdapter ),
       theLastTime( 0.0 ),
       theStepCounter( 0 ),
@@ -83,8 +84,8 @@ boost::shared_ptr< DataPointVector > Logger::getData( void ) const
 
 
 
-boost::shared_ptr< DataPointVector > Logger::getData( RealParam aStartTime,
-                                                      RealParam anEndTime ) const
+boost::shared_ptr< DataPointVector > Logger::getData( Real aStartTime,
+                                                      Real anEndTime ) const
 {
     if( thePhysicalLogger.empty() )
     {
@@ -114,7 +115,7 @@ boost::shared_ptr< DataPointVector > Logger::createEmptyVector()
     return aDataPointVector;
 }
 
-void Logger::log( RealParam aTime )
+void Logger::log( Real aTime )
 {
     ++theStepCounter;
     if ( ( theStepCounter >= thePolicy.getMinimumStep()
@@ -142,9 +143,9 @@ const Real Logger::getEndTime( void ) const
     return thePhysicalLogger.back().getTime();
 }
 
-boost::shared_ptr< DataPointVector > Logger::getData( RealParam aStartTime,
-                                                      RealParam anEndTime,
-                                          RealParam anInterval ) const
+boost::shared_ptr< DataPointVector > Logger::getData( Real aStartTime,
+                                                      Real anEndTime,
+                                                      Real anInterval ) const
 {
     if ( thePhysicalLogger.empty() )
     {
@@ -162,14 +163,14 @@ boost::shared_ptr< DataPointVector > Logger::getData( RealParam aStartTime,
                                          anEndTime ) );
         LongDataPoint 
             aLongDataPoint( thePhysicalLogger.at( anIterator ) );
-        DataPointVectorPtr 
+        DataPointVector*
             aDataPointVector( new DataPointVector( 1, 5 ) );
         aDataPointVector->asLong( 0 ) = aLongDataPoint;
         return boost::shared_ptr< DataPointVector >( aDataPointVector ); 
     }
 
     // set up output vector
-    DataPointVectorIterator aPhysicalRange(
+    std::size_t aPhysicalRange(
         static_cast<size_type>( ( anEndTime - aStartTime ) / anInterval ) );
 
     //this is a technical adjustment, because I realized that sometimes
@@ -185,7 +186,7 @@ boost::shared_ptr< DataPointVector > Logger::getData( RealParam aStartTime,
                      - thePhysicalLogger.front().getTime() ) /
                                  thePhysicalLogger.size() );
 
-    DataPointVectorPtr aDataPointVector(
+    DataPointVector* const aDataPointVector(
         new DataPointVector( aPhysicalRange, 5 ) );
 
     // set up iterators
@@ -214,7 +215,7 @@ boost::shared_ptr< DataPointVector > Logger::getData( RealParam aStartTime,
     
     DataPointAggregator anAggregator;
     anAggregator.aggregate( aLongDataPoint );
-    for ( DataPointVectorIterator anElementCount( 0 ); 
+    for ( std::size_t anElementCount( 0 ); 
           anElementCount < aPhysicalRange; ++anElementCount )
     {
         do 

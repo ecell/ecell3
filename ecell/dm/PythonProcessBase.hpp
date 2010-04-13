@@ -51,12 +51,8 @@
 template< typename Tmixin_ >
 class PythonProcessBase
 {
-    DECLARE_ASSOCVECTOR(
-        libecs::String,
-        libecs::Polymorph,
-        std::less< const libecs::String >,
-        PropertyMap
-    );
+    typedef Loki::AssocVector< libecs::String, libecs::Polymorph,
+                               std::less< libecs::String > > PropertyMap;
 
 public:
     LIBECS_DM_OBJECT_MIXIN( PythonProcessBase, Tmixin_ )
@@ -89,7 +85,7 @@ public:
     void defaultSetProperty( libecs::String const& aPropertyName,
                              libecs::Polymorph const& aValue )
     {
-        PropertyMapIterator i( thePropertyMap.find( aPropertyName ) );
+        PropertyMap::iterator i( thePropertyMap.find( aPropertyName ) );
         if ( i == thePropertyMap.end() )
         {
             thePropertyMap.insert( std::make_pair( aPropertyName, aValue ) );
@@ -106,7 +102,7 @@ public:
 
     const libecs::Polymorph defaultGetProperty( libecs::String const& aPropertyName ) const
     {
-        PropertyMapConstIterator aPropertyMapIterator(
+        PropertyMap::const_iterator aPropertyMapIterator(
                 thePropertyMap.find( aPropertyName ) );
 
         if( aPropertyMapIterator != thePropertyMap.end() )
@@ -123,9 +119,9 @@ public:
         }
     }
 
-    const libecs::StringVector defaultGetPropertyList() const
+    std::vector< libecs::String > defaultGetPropertyList() const
     {
-        libecs::StringVector aVector;
+        std::vector< libecs::String > aVector;
 
         std::transform( thePropertyMap.begin(), thePropertyMap.end(),
                 std::back_inserter( aVector ),
@@ -134,7 +130,7 @@ public:
         return aVector;
     }
 
-    const libecs::PropertyAttributes
+    libecs::PropertyAttributes
     defaultGetPropertyAttributes( libecs::String const& aPropertyName ) const
     {
         return libecs::PropertyAttributes(
@@ -145,13 +141,13 @@ public:
     void initialize()
     {
         theGlobalNamespace.clear();
-        libecs::VariableReferenceVector const& varRefVector(
+        libecs::Process::VariableReferenceVector const& varRefVector(
             static_cast< Tmixin_* >( this )->getVariableReferenceVector() );
-        for( libecs::VariableReferenceVectorConstIterator i(
+        for( libecs::Process::VariableReferenceVector::const_iterator i(
                     varRefVector.begin() );
              i != varRefVector.end(); ++i )
         {
-            libecs::VariableReferenceCref aVariableReference( *i );
+            libecs::VariableReference const& aVariableReference( *i );
 
             theGlobalNamespace[ aVariableReference.getName() ] = 
                     boost::python::object( boost::ref( aVariableReference ) );

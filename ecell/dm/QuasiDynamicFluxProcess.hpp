@@ -77,11 +77,11 @@ public:
 
     virtual void fire();
 
-    virtual libecs::VariableReferenceVector getFluxDistributionVector();
+    virtual VariableReferenceVector getFluxDistributionVector();
 
 protected:
 
-    libecs::VariableReferenceVector theFluxDistributionVector;
+    VariableReferenceVector theFluxDistributionVector;
     libecs::Integer irreversible_;
     libecs::Real vmax_;
 };

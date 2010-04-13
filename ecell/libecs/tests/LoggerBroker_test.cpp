@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(testIteration)
     valueLogger->log( 1.0 );
     valueLogger->log( 2.0 );
     valueLogger->log( 3.0 );
-    DataPointVectorSharedPtr vec( valueLogger->getData() );
+    boost::shared_ptr< DataPointVector > vec( valueLogger->getData() );
     BOOST_CHECK( DataPoint( 0.0, 0.0 ) == vec->asShort( 0 ) );
     BOOST_CHECK( DataPoint( 1.0, 0.0 ) == vec->asShort( 1 ) );
     BOOST_CHECK( DataPoint( 2.0, 0.0 ) == vec->asShort( 2 ) );

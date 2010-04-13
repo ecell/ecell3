@@ -39,38 +39,34 @@
 namespace libecs
 {
 
-DECLARE_TYPE( size_t, DataPointVectorIterator )
-
-DECLARE_SHAREDPTR( DataPointVector );
-
 class LIBECS_API DataPointVector
 {
 public:
-    DataPointVector( DataPointVectorIterator, int aPointSize );
+    DataPointVector( std::size_t, int aPointSize );
 
     ~DataPointVector();
 
-    DataPointRef asShort( DataPointVectorIterator aPosition );
+    DataPoint& asShort( std::size_t aPosition );
 
-    DataPointCref asShort( DataPointVectorIterator aPosition ) const;
+    DataPoint const& asShort( std::size_t aPosition ) const;
 
-    LongDataPointRef asLong( DataPointVectorIterator aPosition );
+    LongDataPoint& asLong( std::size_t aPosition );
 
-    LongDataPointCref asLong( DataPointVectorIterator aPosition ) const;
+    LongDataPoint const& asLong( std::size_t aPosition ) const;
 
-    DataPointVectorIterator getSize() const
+    std::size_t getSize() const
     {
         return theSize;
     }
 
-    size_t getElementSize() const;
+    std::size_t getElementSize() const;
             
-    DataPointVectorIterator begin() const
+    std::size_t begin() const
     {
         return 0;
     }
             
-    DataPointVectorIterator end() const
+    std::size_t end() const
     {
         return getSize();
     }
@@ -80,7 +76,7 @@ public:
     Integer getPointSize();
 
 private:
-    DataPointVectorIterator theSize;
+    std::size_t theSize;
 
     Integer thePointSize;
     

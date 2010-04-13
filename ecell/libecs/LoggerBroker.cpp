@@ -73,7 +73,7 @@ void LoggerBroker::flush()
                 SelectSecond< iterator::value_type >() ) );
 }
 
-LoggerPtr LoggerBroker::getLogger( FullPNCref aFullPN ) const
+Logger* LoggerBroker::getLogger( FullPN const& aFullPN ) const
 {
     LoggerMap::const_iterator anOuterIter(
         theLoggerMap.find( aFullPN.getFullID() ) );
@@ -96,8 +96,8 @@ LoggerPtr LoggerBroker::getLogger( FullPNCref aFullPN ) const
     return anInnerIter->second;
 }
 
-LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,
-                                      Logger::Policy const& aPolicy )
+Logger* LoggerBroker::createLogger( FullPN const& aFullPN,
+                                    Logger::Policy const& aPolicy )
 {
     LoggerMap::const_iterator anOuterIter(
         theLoggerMap.find( aFullPN.getFullID() ) );
@@ -114,17 +114,17 @@ LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,
         }
     }
 
-    EntityPtr anEntityPtr( theModel.getEntity( aFullPN.getFullID() ) );
+    Entity* const anEntity( theModel.getEntity( aFullPN.getFullID() ) );
 
     const String aPropertyName( aFullPN.getPropertyName() );
 
-    PropertySlotProxyPtr aPropertySlotProxy(
-        anEntityPtr->createPropertySlotProxy( aPropertyName ) );
+    PropertySlotProxy* const aPropertySlotProxy(
+        anEntity->createPropertySlotProxy( aPropertyName ) );
 
-    LoggerAdapterPtr aLoggerAdapter(
+    LoggerAdapter* const aLoggerAdapter(
         new PropertySlotProxyLoggerAdapter( aPropertySlotProxy ) );
 
-    LoggerPtr aNewLogger( new Logger( aLoggerAdapter, aPolicy ) );
+    Logger* const aNewLogger( new Logger( aLoggerAdapter, aPolicy ) );
 
     std::pair< LoggerMap::iterator, bool > anInnerMap(
         theLoggerMap.insert(
@@ -134,7 +134,7 @@ LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,
     {
         ( (*anInnerMap.first).second )[ aFullPN.getPropertyName() ] = aNewLogger;
         if ( anInnerMap.second )
-            anEntityPtr->setLoggerMap( &( *anInnerMap.first ).second );
+            anEntity->setLoggerMap( &( *anInnerMap.first ).second );
 
         // it should have at least one datapoint to work correctly.
         aNewLogger->log( theModel.getCurrentTime() );
@@ -144,7 +144,7 @@ LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,
     {
         if ( anInnerMap.second )
         {
-            anEntityPtr->setLoggerMap( 0 );
+            anEntity->setLoggerMap( 0 );
             theLoggerMap.erase( anInnerMap.first );
         }
         delete aNewLogger;
@@ -154,7 +154,7 @@ LoggerPtr LoggerBroker::createLogger( FullPNCref aFullPN,
     return aNewLogger;
 }
 
-void LoggerBroker::removeLogger( FullPNCref aFullPN )
+void LoggerBroker::removeLogger( FullPN const& aFullPN )
 {
     LoggerMap::iterator anOuterIter(
         theLoggerMap.find( aFullPN.getFullID() ) );
@@ -177,8 +177,8 @@ void LoggerBroker::removeLogger( FullPNCref aFullPN )
     anOuterIter->second.erase( anInnerIter );
     if ( anOuterIter->second.empty() )
     {
-        EntityPtr anEntityPtr( theModel.getEntity( aFullPN.getFullID() ) );
-        anEntityPtr->setLoggerMap( 0 );
+        Entity* const anEntity( theModel.getEntity( aFullPN.getFullID() ) );
+        anEntity->setLoggerMap( 0 );
         theLoggerMap.erase( anOuterIter );
     }
 

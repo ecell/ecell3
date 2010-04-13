@@ -51,7 +51,7 @@ const String EntityType::entityTypeStringOfVariable( "Variable" );
 
 const String EntityType::entityTypeStringOfSystem( "System" );
 
-EntityType::EntityType( StringCref aTypeString )
+EntityType::EntityType( String const& aTypeString )
 {
     // linear search may well work here;    n < 8.
 
@@ -83,7 +83,7 @@ EntityType::EntityType( StringCref aTypeString )
     }
 }
 
-StringCref EntityType::asString() const
+String const& EntityType::asString() const
 {
     switch( theType )
     {

@@ -104,7 +104,7 @@ __STRINGCAST_SPECIALIZATION_DECL( UnsignedInteger, String );
 /**
    Erase white space characters ( ' ', '\t', and '\n' ) from a string
 */
-void eraseWhiteSpaces( StringRef str );
+void eraseWhiteSpaces( String& str );
 
 template < class T >
 struct PtrGreater
@@ -314,21 +314,21 @@ for( SEQCLASS ::const_iterator i( (SEQ) .begin() ) ;\
         i != (SEQ) .end() ; ++i )
 
 template< typename T >
-inline const T nullValue()
+inline T nullValue()
 {
     return 0;
 }
 
 
 template<>
-inline const Real nullValue()
+inline Real nullValue()
 {
     return 0.0;
 }
 
 
 template<>
-inline const String nullValue()
+inline String nullValue()
 {
     return String();
 }
@@ -351,7 +351,7 @@ public:
     NEW operator()( const GIVEN& aPtr )
     {
         NEW aNew( dynamic_cast<NEW>( aPtr ) );
-        if( aNew != NULLPTR )
+        if( aNew )
         {
             return aNew;
         }
@@ -424,6 +424,46 @@ SecondBinder< OP > BindSecond( OP const& anOp,
                                typename boost::call_traits< typename OP::second_argument_type >::param_type aBoundValue )
 {
 	return SecondBinder< OP >( anOp, aBoundValue );
+}
+
+/**
+   Converts each type into a unique, insipid type.
+   Invocation Type2Type<T> where T is a type.
+   Defines the type OriginalType which maps back to T.
+   
+   taken from loki library.
+
+   @ingroup util
+*/
+
+template <typename T>
+struct Type2Type
+{
+    typedef T OriginalType;
+};
+
+template<typename T>
+inline T safe_add(const T& o1, const T& o2)
+{
+    T r = o1 + o2;
+    BOOST_ASSERT(r >= o1 || r >= o2);
+    return r;
+}
+
+template<typename T1, typename T2>
+inline T1 safe_mul(const T1& o1, const T2& o2)
+{
+    T1 r = o1 * o2;
+    BOOST_ASSERT(sizeof(o1) >= sizeof(double) || static_cast<T1>(static_cast<double>(o1) * o2) == r);
+    return r;
+}
+
+template<typename Td, typename Ts>
+inline Td safe_int_cast(const Ts& v)
+{
+    const Td retval = static_cast<Td>( v );
+    BOOST_ASSERT(v == static_cast<Ts>( retval ));
+    return retval;
 }
 
 } // namespace libecs

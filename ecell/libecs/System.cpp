@@ -60,13 +60,13 @@ GET_METHOD_DEF( Polymorph, SystemList, System )
     PolymorphVector aVector;
     aVector.reserve( theSystemMap.size() );
 
-    for( SystemMapConstIterator i = theSystemMap.begin() ;
+    for( SystemMap::const_iterator i = theSystemMap.begin() ;
          i != theSystemMap.end() ; ++i )
     {
         aVector.push_back( Polymorph( i->second->getID() ) );
     }
 
-    return aVector;
+    return Polymorph( aVector );
 }
 
 
@@ -75,13 +75,13 @@ GET_METHOD_DEF( Polymorph, VariableList, System )
     PolymorphVector aVector;
     aVector.reserve( theVariableMap.size() );
 
-    for( VariableMapConstIterator i( theVariableMap.begin() );
+    for( VariableMap::const_iterator i( theVariableMap.begin() );
          i != theVariableMap.end() ; ++i )
     {
         aVector.push_back( Polymorph( i->second->getID() ) );
     }
 
-    return aVector;
+    return Polymorph( aVector );
 }
 
 
@@ -90,20 +90,20 @@ GET_METHOD_DEF( Polymorph, ProcessList, System )
     PolymorphVector aVector;
     aVector.reserve( theProcessMap.size() );
 
-    for( ProcessMapConstIterator i( theProcessMap.begin() );
+    for( ProcessMap::const_iterator i( theProcessMap.begin() );
          i != theProcessMap.end() ; ++i )
     {
         aVector.push_back( Polymorph( i->second->getID() ) );
     }
 
-    return aVector;
+    return Polymorph( aVector );
 }
 
 
 SET_METHOD_DEF( String, StepperID, System )
 {
     theStepperID = value;
-    theStepper = NULLPTR;
+    theStepper = 0;
 }
 
 
@@ -114,8 +114,8 @@ GET_METHOD_DEF( String, StepperID, System )
 
 
 System::System()
-    : theStepper( NULLPTR ),
-      theSizeVariable( NULLPTR )
+    : theStepper( 0 ),
+      theSizeVariable( 0 )
 {
     ; // do nothing
 }
@@ -133,7 +133,7 @@ Variable const* System::findSizeVariable() const
     }
     catch( NotFound const& )
     {
-        SystemCptr const aSuperSystem( getSuperSystem() );
+        System const* const aSuperSystem( getSuperSystem() );
 
         // Prevent infinite looping.    But this shouldn't happen.
         if( aSuperSystem == this )
@@ -170,12 +170,12 @@ void System::preinitialize()
     //
     // Set Process::theStepper.
     // 
-    for ( ProcessMapConstIterator i( theProcessMap.begin() );
+    for ( ProcessMap::const_iterator i( theProcessMap.begin() );
           i != theProcessMap.end() ; ++i )
     {
         Process* aProcess( i->second );
 
-        if( aProcess->getStepper() == NULLPTR )
+        if( !aProcess->getStepper() )
         {
             aProcess->setStepper( getStepper() );
         }
@@ -193,7 +193,7 @@ void System::initialize()
 Process*
 System::getProcess( String const& anID ) const
 {
-    ProcessMapConstIterator i( theProcessMap.find( anID ) );
+    ProcessMap::const_iterator i( theProcessMap.find( anID ) );
 
     if ( i == theProcessMap.end() )
     {
@@ -209,7 +209,7 @@ System::getProcess( String const& anID ) const
 Variable*
 System::getVariable( String const& anID ) const
 {
-    VariableMapConstIterator i( theVariableMap.find( anID ) );
+    VariableMap::const_iterator i( theVariableMap.find( anID ) );
 
     if ( i == theVariableMap.end() )
     {
@@ -242,7 +242,7 @@ void System::registerEntity( System* aSystem )
 
 void System::unregisterEntity( SystemMap::iterator const& i )
 {
-    (*i).second->setSuperSystem( NULLPTR );
+    (*i).second->setSuperSystem( 0 );
     theSystemMap.erase( i ); 
     notifyChangeOfEntityList();    
 }
@@ -286,7 +286,7 @@ System::getSystem( String const& anID ) const
 
         if ( anIDSize == 1 ) // == "."
         {
-            return const_cast<SystemPtr>( this );
+            return const_cast<System*>( this );
         }
         else if ( anID[1] == '.' && anIDSize == 2 ) // == ".."
         {
@@ -300,7 +300,7 @@ System::getSystem( String const& anID ) const
         }
     }
 
-    SystemMapConstIterator i( theSystemMap.find( anID ) );
+    SystemMap::const_iterator i( theSystemMap.find( anID ) );
     if ( i == theSystemMap.end() )
     {
         THROW_EXCEPTION_INSIDE( NotFound,
@@ -330,7 +330,7 @@ Variable const* System::getSizeVariable() const
 }
 
 
-const SystemPath System::getSystemPath() const
+SystemPath System::getSystemPath() const
 {
     return isRootSystem() ? SystemPath(): Entity::getSystemPath();
 }
@@ -356,7 +356,7 @@ void System::registerEntity( Process* aProcess )
 
 void System::unregisterEntity( ProcessMap::iterator const& i )
 {
-    (*i).second->setSuperSystem( NULLPTR );
+    (*i).second->setSuperSystem( 0 );
     theProcessMap.erase( i ); 
     notifyChangeOfEntityList();    
 }
@@ -382,7 +382,7 @@ void System::registerEntity( Variable* aVariable )
 
 void System::unregisterEntity( VariableMap::iterator const& i )
 {
-    (*i).second->setSuperSystem( NULLPTR );
+    (*i).second->setSuperSystem( 0 );
     theVariableMap.erase( i ); 
     notifyChangeOfEntityList();    
 }

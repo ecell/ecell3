@@ -40,9 +40,8 @@
 
 namespace libecs
 {
-    DECLARE_VECTOR( EntityPtr, EntityVector );
+    class System;
 
-    
     /**
        Entity class is a base class for all components in the cell model.
     */
@@ -75,7 +74,7 @@ namespace libecs
 
            @return a FullID of this Entity.
         */
-        const FullID getFullID() const;
+        FullID getFullID() const;
 
         /**
            Get EntityType of this Entity.
@@ -85,7 +84,7 @@ namespace libecs
            @return EntityType of this Entity object.
            @see EntityType
         */
-        virtual const EntityType getEntityType() const
+        virtual EntityType getEntityType() const
         {
             return EntityType( EntityType::ENTITY );
         }
@@ -98,7 +97,7 @@ namespace libecs
 
            @return a SystemPath of this Entity.
         */
-        virtual const SystemPath getSystemPath() const;
+        virtual SystemPath getSystemPath() const;
 
 
         /**
@@ -174,7 +173,7 @@ namespace libecs
 
            @param supersystem a pointer to a System to which this object belongs.
         */
-        void setSuperSystem( SystemPtr const supersystem ) 
+        void setSuperSystem( System* supersystem ) 
         { 
             theSuperSystem = supersystem; 
         }
@@ -194,8 +193,8 @@ namespace libecs
     private:
 
         // hide them
-        Entity( EntityRef );
-        EntityRef operator=( EntityRef );
+        Entity( Entity& );
+        Entity& operator=( Entity& );
 
     private:
         System*                        theSuperSystem;

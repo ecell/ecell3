@@ -35,8 +35,6 @@
 
 USE_LIBECS;
 
-DECLARE_VECTOR( Real, RealVector );
-
 LIBECS_DM_CLASS_EXTRA_1( SSystemProcess, ContinuousProcess,
                          ESSYNSProcessInterface )
 {
@@ -164,7 +162,7 @@ public:
     {
         //get theY
         int anIndex = 0;
-        for( VariableReferenceVectorConstIterator i(
+        for( VariableReferenceVector::const_iterator i(
                 thePositiveVariableReferenceIterator );
              i != theVariableReferenceVector.end() ; ++i )
         {
@@ -259,8 +257,8 @@ public:
     }
 
 protected:
-    int Order;
     int theSystemSize;
+    int Order;
 
     Polymorph SSystemMatrix;
 

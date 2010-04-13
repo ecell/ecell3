@@ -41,6 +41,11 @@
 namespace libecs
 {
 
+class Stepper;
+class Variable;
+class Process;
+class System;
+
 template< typename T_ >  
 class EcsObjectMaker 
 {
@@ -75,7 +80,7 @@ public:
         return anInstance;
     }
 
-    const Backend::Module& getModule(StringCref aClassName )
+    const Backend::Module& getModule(String const& aClassName )
     {
         const Backend::Module& mod( theBackend.getModule( aClassName ) );
         const PropertyInterface< DMType >* info(

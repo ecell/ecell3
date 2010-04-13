@@ -33,7 +33,7 @@
 
 struct QuasiDynamicFluxProcessInterface
 {
-    virtual libecs::VariableReferenceVector getFluxDistributionVector() = 0;
+    virtual libecs::Process::VariableReferenceVector getFluxDistributionVector() = 0;
 
     virtual GET_METHOD( libecs::Integer, Irreversible ) = 0;
 

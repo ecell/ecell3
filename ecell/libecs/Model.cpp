@@ -158,7 +158,7 @@ System* Model::createSystem( String const& aClassname )
     return retval;
 }
 
-Entity* Model::createEntity( String const& aClassname, FullIDCref aFullID )
+Entity* Model::createEntity( String const& aClassname, FullID const& aFullID )
 {
     if( aFullID.getSystemPath().isModel() )
     {
@@ -212,17 +212,17 @@ Entity* Model::createEntity( String const& aClassname, FullIDCref aFullID )
 }
 
 
-SystemPtr Model::getSystem( SystemPathCref aSystemPath ) const
+System* Model::getSystem( SystemPath const& aSystemPath ) const
 {
     return getRootSystem()->getSystem(
         aSystemPath.toRelative( SystemPath( "/" ) ) );
 }
 
 
-Entity* Model::getEntity( FullIDCref aFullID ) const
+Entity* Model::getEntity( FullID const& aFullID ) const
 {
-    Entity* anEntity( NULL );
-    SystemPathCref aSystemPath( aFullID.getSystemPath() );
+    Entity* anEntity( 0 );
+    SystemPath const& aSystemPath( aFullID.getSystemPath() );
     String const&         anID( aFullID.getID() );
 
     if( aSystemPath.isModel() )
@@ -239,7 +239,7 @@ Entity* Model::getEntity( FullIDCref aFullID ) const
         }
     }
 
-    SystemPtr aSystem ( getSystem( aSystemPath ) );
+    System* const aSystem ( getSystem( aSystemPath ) );
 
     switch( aFullID.getEntityType() )
     {
@@ -308,7 +308,7 @@ EcsObject* Model::getObject( Handle const& handle ) const
 
 Stepper* Model::getStepper( String const& anID ) const
 {
-    StepperMapConstIterator i( theStepperMap.find( anID ) );
+    StepperMap::const_iterator i( theStepperMap.find( anID ) );
 
     if( i == theStepperMap.end() )
     {
@@ -375,7 +375,7 @@ void Model::initializeEntities( System* const aSystem )
 {
     aSystem->initialize();
 
-    if( aSystem->getStepper() == NULLPTR )
+    if( !aSystem->getStepper() )
     {
         THROW_EXCEPTION( InitializationFailed,
                          "No stepper is connected with [" +
@@ -415,7 +415,7 @@ void Model::checkSizeVariable( System const* const aSystem )
 
 void Model::initialize()
 {
-    SystemPtr aRootSystem( getRootSystem() );
+    System* const aRootSystem( getRootSystem() );
 
     checkSizeVariable( aRootSystem );
 
@@ -468,7 +468,7 @@ void Model::setDMSearchPath( const std::string& path )
     smmbase->setSearchPath( path );
 }
 
-const std::string Model::getDMSearchPath() const
+String Model::getDMSearchPath() const
 {
     SharedModuleMakerInterface const* smmbase(
         dynamic_cast< SharedModuleMakerInterface const* >( &theEcsObjectMaker ) );
@@ -499,7 +499,7 @@ void Model::step()
         initialize();
     }
 
-    StepperEventCref aNextEvent( theScheduler.getTopEvent() );
+    StepperEvent const& aNextEvent( theScheduler.getTopEvent() );
     theCurrentTime = aNextEvent.getTime();
     theLastStepper = aNextEvent.getStepper();
 

@@ -73,7 +73,7 @@ template< typename ToType >
 class ConvertTo< ToType, String >
 {
 public:
-    const ToType operator()( StringCref aValue )
+    const ToType operator()( String const& aValue )
     {
         // strategy:
         // (1) if ToType is arithmetic, use LexicalCaster.

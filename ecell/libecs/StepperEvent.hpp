@@ -39,20 +39,18 @@
 namespace libecs
 {
 
-DECLARE_CLASS( StepperEvent );
-
 class LIBECS_API StepperEvent: public EventBase
 {
 public:
-    StepperEvent( TimeParam aTime, Stepper* aStepperPtr );
+    StepperEvent( Time aTime, Stepper* aStepperPtr );
 
     void fire();
 
-    void update( TimeParam aTime );
+    void update( Time aTime );
 
     void reschedule();
 
-    const bool isDependentOn( StepperEventCref anEvent ) const;
+    bool isDependentOn( StepperEvent const& anEvent ) const;
 
     Stepper* getStepper() const
     {
@@ -64,7 +62,7 @@ public:
        in the Scheduler to determine if goUp()/goDown (position change) is
        needed 
      */
-    const bool operator< ( StepperEventCref rhs ) const
+    bool operator< ( StepperEvent const& rhs ) const
     {
         if( getTime() > rhs.getTime() )
         {
@@ -82,7 +80,7 @@ public:
     }
 
 
-    const bool operator> ( StepperEventCref rhs ) const
+    bool operator> ( StepperEvent const& rhs ) const
     {
         if( getTime() < rhs.getTime() )
         {
@@ -100,17 +98,17 @@ public:
     }
 
 
-    const bool operator<= ( StepperEventCref rhs ) const
+    bool operator<= ( StepperEvent const& rhs ) const
     {
         return !( *this > rhs );
     }
 
-    const bool operator>= ( StepperEventCref rhs ) const
+    bool operator>= ( StepperEvent const& rhs ) const
     {
         return !( *this < rhs );
     }
 
-    const bool operator!= ( StepperEventCref rhs ) const
+    bool operator!= ( StepperEvent const& rhs ) const
     {
         if( getStepper() == rhs.getStepper() &&
                 getTime() == rhs.getTime() )

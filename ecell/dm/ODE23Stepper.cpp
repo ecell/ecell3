@@ -85,7 +85,7 @@ void ODE23Stepper::interIntegrate2()
     for( VariableVector::size_type c( 0 );
          c != theVariableVector.size(); ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
+        Variable* const aVariable( theVariableVector[ c ] );
 
         aVariable->setValue( theValueBuffer[ c ] );
         aVariable->interIntegrate( aCurrentTime );

@@ -57,11 +57,11 @@ public:
 
     virtual void initialize();
 
-    virtual void integrate( RealParam aTime );
+    virtual void integrate( Real aTime );
 
     virtual void step();
 
-    virtual void interrupt( TimeParam aTime )
+    virtual void interrupt( Time aTime )
     {
         ; // do nothing
     }
@@ -69,8 +69,7 @@ public:
 
 protected:
 
-    void integrateVariablesRecursively( SystemPtr const aSystem,
-                                        RealParam aTime );
+    void integrateVariablesRecursively( System* aSystem, Real aTime );
 
 };
 

@@ -74,7 +74,7 @@ SET_METHOD_DEF( libecs::Polymorph, FluxDistributionList, QuasiDynamicFluxProcess
 GET_METHOD_DEF( libecs::Polymorph, FluxDistributionList, QuasiDynamicFluxProcess )
 {
     libecs::PolymorphVector aVector;
-    for ( libecs::VariableReferenceVector::const_iterator i(
+    for ( VariableReferenceVector::const_iterator i(
             theFluxDistributionVector.begin() );
           i != theFluxDistributionVector.end() ; ++i )
     {
@@ -82,10 +82,10 @@ GET_METHOD_DEF( libecs::Polymorph, FluxDistributionList, QuasiDynamicFluxProcess
         aVector.push_back( libecs::Polymorph( aFullID.asString() ) );
     }
 
-    return aVector;
+    return libecs::Polymorph( aVector );
 }
 
-VariableReferenceVector QuasiDynamicFluxProcess::getFluxDistributionVector()
+Process::VariableReferenceVector QuasiDynamicFluxProcess::getFluxDistributionVector()
 {
     return theFluxDistributionVector;
 }

@@ -61,7 +61,7 @@ public:
     }
     
     GMAProcess()
-        : theSystemSize(0), Order(3)
+        : Order(3), theSystemSize(0)
     {
         ; // do nothing.
     }
@@ -158,7 +158,7 @@ public:
         // get theY
         Integer anIndex( 0 );
         
-        for ( VariableReferenceVectorConstIterator
+        for ( VariableReferenceVector::const_iterator
                i ( thePositiveVariableReferenceIterator );
              i != theVariableReferenceVector.end(); ++i )
         {

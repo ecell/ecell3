@@ -44,10 +44,10 @@ namespace libecs
 LIBECS_DM_INIT_STATIC( Entity, Entity );
 
 Entity::Entity()
-    : theSuperSystem( NULLPTR ),
+    : theSuperSystem( 0 ),
       theID( "" ),
       theName( "" ),
-      theLoggerMap( NULLPTR )
+      theLoggerMap( 0 )
 {
 
 }
@@ -58,12 +58,12 @@ Entity::~Entity()
     ; // do nothing
 }
 
-const FullID Entity::getFullID() const
+FullID Entity::getFullID() const
 {
     return FullID( getEntityType(), getSystemPath(), getID() );
 }
 
-const SystemPath Entity::getSystemPath() const
+SystemPath Entity::getSystemPath() const
 {
     System* aSystem( getSuperSystem() );
 
@@ -121,7 +121,7 @@ void Entity::detach()
         try { theSuperSystem->unregisterEntity( this ); }
         catch ( NotFound const& ) {}
     }
-    theSuperSystem = NULLPTR;
+    theSuperSystem = 0;
     EcsObject::detach();
 }
 

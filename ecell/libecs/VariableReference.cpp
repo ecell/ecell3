@@ -43,7 +43,7 @@ namespace libecs
 const String VariableReference::ELLIPSIS_PREFIX( "___" );
 const String VariableReference::DEFAULT_NAME( "_" );
 
-const Integer VariableReference::getEllipsisNumber() const
+Integer VariableReference::getEllipsisNumber() const
 {
     if( isEllipsisName() )
     {

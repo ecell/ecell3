@@ -97,7 +97,7 @@ public:
         initializeStepper();
     }
 
-    const Integer getIntegrationType() const { return isStiff; }
+    Integer getIntegrationType() const { return isStiff; }
     
     SET_METHOD( Real, JacobianRecalculateTheta )
     {
@@ -142,14 +142,14 @@ public:
     std::pair< bool, Real > calculateRadauIIA( Real const aStepInterval, Real const aPreviousStepInterval );
     void updateInternalStateRadauIIA( Real const aStepInterval );
 
-    void initializeTolerance( RealParam value )
+    void initializeTolerance( Real value )
     {
         setTolerance( value ); // AdaptiveDifferentialStepper::
         rtoler = 0.1 * pow( getTolerance(), 2.0 / 3.0 );
         atoler = rtoler * getAbsoluteToleranceFactor();
     }
 
-    void initializeAbsoluteToleranceFactor( RealParam value )
+    void initializeAbsoluteToleranceFactor( Real value )
     {
         setAbsoluteToleranceFactor( value ); // AdaptiveDifferentialStepper::
         atoler = rtoler * getAbsoluteToleranceFactor();
@@ -196,7 +196,7 @@ protected:
     Real theJacobianRecalculateTheta;
     Real theSpectralRadius;
 
-    UnsignedInteger theStiffnessCounter, theRejectedStepCounter;
+    Integer theStiffnessCounter, theRejectedStepCounter;
     Integer CheckIntervalCount, SwitchingCount;
 
     bool theFirstStepFlag, theJacobianCalculateFlag;
@@ -210,30 +210,30 @@ LIBECS_DM_INIT( ODEStepper, Stepper );
 
 ODEStepper::ODEStepper()
     : theSystemSize( -1 ),
-      theJacobianMatrix1( NULLPTR ),
-      thePermutation1( NULLPTR ),
-      theVelocityVector1( NULLPTR ),
-      theSolutionVector1( NULLPTR ),
-      theJacobianMatrix2( NULLPTR ),
-      thePermutation2( NULLPTR ),
-      theVelocityVector2( NULLPTR ),
-      theSolutionVector2( NULLPTR ),
+      theJacobianMatrix1( 0 ),
+      thePermutation1( 0 ),
+      theVelocityVector1( 0 ),
+      theSolutionVector1( 0 ),
+      theJacobianMatrix2( 0 ),
+      thePermutation2( 0 ),
+      theVelocityVector2( 0 ),
+      theSolutionVector2( 0 ),
       theMaxIterationNumber( 7 ),
+      theStoppingCriterion( 0.0 ),
       eta( 1.0 ),
       Uround( 1e-10 ),
-      theStoppingCriterion( 0.0 ),
-      theFirstStepFlag( true ),
-      theRejectedStepCounter( 0 ),
-      theJacobianCalculateFlag( true ),
+      rtoler( 1e-6 ),
+      atoler( 1e-6 ),
       theAcceptedError( 0.0 ),
       theAcceptedStepInterval( 0.0 ),
       theJacobianRecalculateTheta( 0.001 ),
-      rtoler( 1e-6 ),
-      atoler( 1e-6 ),
       theSpectralRadius( 0.0 ),
       theStiffnessCounter( 0 ),
+      theRejectedStepCounter( 0 ),
       CheckIntervalCount( 100 ),
       SwitchingCount( 20 ),
+      theFirstStepFlag( true ),
+      theJacobianCalculateFlag( true ),
       isStiff( true )
 {
     const Real pow913( pow( 9.0, 1.0 / 3.0 ) );
@@ -405,7 +405,7 @@ void ODEStepper::calculateJacobian()
 
     for ( VariableVector::size_type i( 0 ); i < theSystemSize; ++i )
     {
-        const VariablePtr aVariable1( theVariableVector[ i ] );
+        Variable* const aVariable1( theVariableVector[ i ] );
         const Real aValue( aVariable1->getValue() );
 
         aPerturbation = sqrt( Uround * std::max( 1e-5, fabs( aValue ) ) );
@@ -416,8 +416,6 @@ void ODEStepper::calculateJacobian()
 
         for ( VariableVector::size_type j( 0 ); j < theSystemSize; ++j )
         {
-            const VariablePtr aVariable2( theVariableVector[ j ] );
-
             theJacobian[ j ][ i ] =
                     - ( theW[ 4 ][ j ] - theW[ 3 ][ j ] ) / aPerturbation;
         }
@@ -627,7 +625,7 @@ std::pair< bool, Real > ODEStepper::calculateRadauIIA( Real const aStepInterval,
     Real aNorm( 0. );
     Real theta( fabs( theJacobianRecalculateTheta ) );
 
-    UnsignedInteger anIterator( 0 );
+    Integer anIterator( 0 );
 
     if ( !isInterrupted )
     {
@@ -982,7 +980,7 @@ bool ODEStepper::calculate( Real aStepInterval )
 
         for( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
         {
-            VariablePtr const aVariable( theVariableVector[ c ] );
+            Variable* const aVariable( theVariableVector[ c ] );
 
             aVariable->setValue( theTaylorSeries[ 0 ][ c ] * ( 1.0 / 5.0 )
                                   * aStepInterval
@@ -993,7 +991,7 @@ bool ODEStepper::calculate( Real aStepInterval )
     {
         for( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
         {
-            VariablePtr const aVariable( theVariableVector[ c ] );
+            Variable* const aVariable( theVariableVector[ c ] );
 
             // get k1
             theTaylorSeries[ 0 ][ c ] = theW[ 5 ][ c ];
@@ -1011,7 +1009,7 @@ bool ODEStepper::calculate( Real aStepInterval )
 
     for( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
+        Variable* const aVariable( theVariableVector[ c ] );
 
         aVariable->setValue( ( theTaylorSeries[ 0 ][ c ] * ( 3.0 / 40.0 )
                                          + theW[ 0 ][ c ] * ( 9.0 / 40.0 ) )
@@ -1026,7 +1024,7 @@ bool ODEStepper::calculate( Real aStepInterval )
 
     for( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
+        Variable* const aVariable( theVariableVector[ c ] );
 
         aVariable->setValue( ( theTaylorSeries[ 0 ][ c ] * ( 44.0 / 45.0 )
                                  - theW[ 0 ][ c ] * ( 56.0 / 15.0 )
@@ -1042,7 +1040,7 @@ bool ODEStepper::calculate( Real aStepInterval )
 
     for( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
+        Variable* const aVariable( theVariableVector[ c ] );
 
         aVariable->setValue( ( theTaylorSeries[ 0 ][ c ] * ( 19372.0 / 6561.0 )
                                 - theW[ 0 ][ c ] * ( 25360.0 / 2187.0 )
@@ -1059,7 +1057,7 @@ bool ODEStepper::calculate( Real aStepInterval )
 
     for( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
+        Variable* const aVariable( theVariableVector[ c ] );
 
         // temporarily set Y^6
         theTaylorSeries[ 1 ][ c ] = theTaylorSeries[ 0 ][ c ] * ( 9017.0 / 3168.0 )
@@ -1085,7 +1083,7 @@ bool ODEStepper::calculate( Real aStepInterval )
 
     for ( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
+        Variable* const aVariable( theVariableVector[ c ] );
 
         theTaylorSeries[ 2 ][ c ] =
                 theTaylorSeries[ 0 ][ c ] * ( 35.0 / 384.0 )
@@ -1114,8 +1112,6 @@ bool ODEStepper::calculate( Real aStepInterval )
 
     for( VariableVector::size_type c( 0 ); c < theSystemSize; ++c )
     {
-        VariablePtr const aVariable( theVariableVector[ c ] );
-
         // calculate error
         const Real anEstimatedError(
                 ( theTaylorSeries[ 0 ][ c ] * ( 71.0 / 57600.0 )

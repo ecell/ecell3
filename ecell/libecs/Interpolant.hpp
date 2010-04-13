@@ -36,6 +36,9 @@
 
 namespace libecs
 {
+class Stepper;
+class Variable;
+
 class LIBECS_API Interpolant
 {
     friend class libecs::Stepper;
@@ -81,12 +84,12 @@ public:
 
     virtual ~Interpolant();
     
-    virtual const Real getVelocity( RealParam aTime ) const
+    virtual const Real getVelocity( Real aTime ) const
     {
         return 0.0;
     }
     
-    virtual const Real getDifference( RealParam aTime, RealParam anInterval ) const
+    virtual const Real getDifference( Real aTime, Real anInterval ) const
     {
         return 0.0;
     }
@@ -105,9 +108,6 @@ protected:
     Variable const* theVariable;
     Stepper const* theStepper;
 };
-
-
-DECLARE_VECTOR( InterpolantPtr, InterpolantVector );
 
 } // namespace libecs
 

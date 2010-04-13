@@ -31,6 +31,8 @@
 #if !defined(__PHYSICALLOGGER_HPP)
 #define __PHYSICALLOGGER_HPP
 
+#include <boost/shared_ptr.hpp>
+
 #include "libecs/Defs.hpp"
 #include "libecs/Exceptions.hpp"
 #include "libecs/DataPoint.hpp"
@@ -46,13 +48,12 @@ class LIBECS_API PhysicalLogger
     typedef vvector< DataPoint > Vector;
 
 public:
-    DECLARE_TYPE( size_t, VectorIterator )
-    DECLARE_TYPE( size_t, size_type )
+    typedef std::size_t size_type;
 
     PhysicalLogger();
     virtual ~PhysicalLogger();
             
-    void push( DataPointCref aDataPoint );
+    void push( DataPoint const& aDataPoint );
 
     void setEndPolicy( Integer anEndPolicy );
 

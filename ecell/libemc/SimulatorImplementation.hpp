@@ -45,6 +45,7 @@
 #undef _DLL_EXPORT
 #endif /* _DLL_EXPORT */
 
+#include <map>
 #include "libemc.hpp"
 
 namespace libemc
@@ -56,118 +57,121 @@ namespace libemc
 class LIBEMC_API SimulatorImplementation
 {
 public:
+    typedef std::map< libecs::String, libecs::Polymorph > PolymorphMap;
+
+public:
 
     SimulatorImplementation() {}
     virtual ~SimulatorImplementation() {}
 
-    virtual void createStepper( libecs::StringCref  aClassname,
-                                 libecs::StringCref anId ) = 0;
+    virtual void createStepper( libecs::String const&  aClassname,
+                                 libecs::String const& anId ) = 0;
 
-    virtual void deleteStepper( libecs::StringCref anID ) = 0;
+    virtual void deleteStepper( libecs::String const& anID ) = 0;
 
-    virtual const libecs::Polymorph getStepperList() const = 0;
+    virtual libecs::Polymorph getStepperList() const = 0;
 
-    virtual const libecs::Polymorph 
-    getStepperPropertyList( libecs::StringCref aStepperID ) const = 0;
+    virtual libecs::Polymorph 
+    getStepperPropertyList( libecs::String const& aStepperID ) const = 0;
 
-    virtual const libecs::Polymorph 
-    getStepperPropertyAttributes( libecs::StringCref aStepperID, 
-                                  libecs::StringCref aPropertyName ) const = 0;
+    virtual libecs::Polymorph 
+    getStepperPropertyAttributes( libecs::String const& aStepperID, 
+                                  libecs::String const& aPropertyName ) const = 0;
 
-    virtual void setStepperProperty( libecs::StringCref aStepperID,
-                                     libecs::StringCref aPropertyName,
-                                     libecs::PolymorphCref aValue ) = 0;
+    virtual void setStepperProperty( libecs::String const& aStepperID,
+                                     libecs::String const& aPropertyName,
+                                     libecs::Polymorph const& aValue ) = 0;
 
-    virtual const libecs::Polymorph
-    getStepperProperty( libecs::StringCref aStepperID,
-                        libecs::StringCref aPropertyName ) const = 0;
+    virtual libecs::Polymorph
+    getStepperProperty( libecs::String const& aStepperID,
+                        libecs::String const& aPropertyName ) const = 0;
 
-    virtual void loadStepperProperty( libecs::StringCref    aStepperID,
-                                      libecs::StringCref    aPropertyName,
-                                      libecs::PolymorphCref aValue ) = 0;
+    virtual void loadStepperProperty( libecs::String const&    aStepperID,
+                                      libecs::String const&    aPropertyName,
+                                      libecs::Polymorph const& aValue ) = 0;
 
-    virtual const libecs::Polymorph
-    saveStepperProperty( libecs::StringCref aStepperID,
-                         libecs::StringCref aPropertyName ) const = 0;
+    virtual libecs::Polymorph
+    saveStepperProperty( libecs::String const& aStepperID,
+                         libecs::String const& aPropertyName ) const = 0;
 
-    virtual const libecs::String
-    getStepperClassName( libecs::StringCref aStepperID ) const = 0;
+    virtual libecs::String
+    getStepperClassName( libecs::String const& aStepperID ) const = 0;
 
     
-    virtual void createEntity( libecs::StringCref aClassname, 
-                               libecs::StringCref aFullIDString ) = 0;
+    virtual void createEntity( libecs::String const& aClassname, 
+                               libecs::String const& aFullIDString ) = 0;
 
-    virtual void deleteEntity( libecs::StringCref aFullIDString ) = 0;
+    virtual void deleteEntity( libecs::String const& aFullIDString ) = 0;
 
-    virtual const libecs::Polymorph 
-    getEntityList( libecs::StringCref anEntityTypeString,
-                   libecs::StringCref aSystemPathString ) const = 0;
+    virtual libecs::Polymorph 
+    getEntityList( libecs::String const& anEntityTypeString,
+                   libecs::String const& aSystemPathString ) const = 0;
 
-    virtual const libecs::Polymorph 
-    getEntityPropertyList( libecs::StringCref aFullIDString ) const = 0;
+    virtual libecs::Polymorph 
+    getEntityPropertyList( libecs::String const& aFullIDString ) const = 0;
 
-    virtual const bool 
-    entityExists( libecs::StringCref aFullIDString ) const = 0;
+    virtual bool 
+    entityExists( libecs::String const& aFullIDString ) const = 0;
 
-    virtual void setEntityProperty( libecs::StringCref aFullPNString,
-                                    libecs::PolymorphCref aValue ) = 0;
+    virtual void setEntityProperty( libecs::String const& aFullPNString,
+                                    libecs::Polymorph const& aValue ) = 0;
 
-    virtual const libecs::Polymorph
-    getEntityProperty( libecs::StringCref aFullPNString ) const = 0;
+    virtual libecs::Polymorph
+    getEntityProperty( libecs::String const& aFullPNString ) const = 0;
 
-    virtual void loadEntityProperty( libecs::StringCref aFullPNString,
-                                     libecs::PolymorphCref aValue ) = 0;
+    virtual void loadEntityProperty( libecs::String const& aFullPNString,
+                                     libecs::Polymorph const& aValue ) = 0;
 
-    virtual const libecs::Polymorph
-    saveEntityProperty( libecs::StringCref aFullPNString ) const = 0;
+    virtual libecs::Polymorph
+    saveEntityProperty( libecs::String const& aFullPNString ) const = 0;
 
-    virtual const libecs::Polymorph
-    getEntityPropertyAttributes( libecs::StringCref aFullPNString ) const = 0;
+    virtual libecs::Polymorph
+    getEntityPropertyAttributes( libecs::String const& aFullPNString ) const = 0;
 
-    virtual const libecs::String
-    getEntityClassName( libecs::StringCref aFullIDString ) const = 0;
+    virtual libecs::String
+    getEntityClassName( libecs::String const& aFullIDString ) const = 0;
 
-    virtual void createLogger( libecs::StringCref aFullPNString ) = 0;
+    virtual void createLogger( libecs::String const& aFullPNString ) = 0;
 
-    virtual void createLogger( libecs::StringCref aFullPNString,
+    virtual void createLogger( libecs::String const& aFullPNString,
                                libecs::Polymorph aParamList    ) = 0;
 
-    virtual const libecs::Polymorph getLoggerList() const = 0;
+    virtual libecs::Polymorph getLoggerList() const = 0;
 
-    virtual const boost::shared_ptr< libecs::DataPointVector > 
-    getLoggerData( libecs::StringCref aFullPNString ) const = 0;
+    virtual boost::shared_ptr< libecs::DataPointVector > 
+    getLoggerData( libecs::String const& aFullPNString ) const = 0;
 
-    virtual const boost::shared_ptr< libecs::DataPointVector >
-    getLoggerData( libecs::StringCref aFullPNString, 
-                   libecs::RealCref aStartTime, 
-                   libecs::RealCref anEndTime ) const = 0;
+    virtual boost::shared_ptr< libecs::DataPointVector >
+    getLoggerData( libecs::String const& aFullPNString, 
+                   libecs::Real aStartTime, 
+                   libecs::Real anEndTime ) const = 0;
 
-    virtual const boost::shared_ptr< libecs::DataPointVector >
-    getLoggerData( libecs::StringCref aFullPNString,
-                   libecs::RealCref aStartTime, libecs::RealCref anEndTime, 
-                   libecs::RealCref interval ) const = 0;
+    virtual boost::shared_ptr< libecs::DataPointVector >
+    getLoggerData( libecs::String const& aFullPNString,
+                   libecs::Real aStartTime, libecs::Real anEndTime, 
+                   libecs::Real interval ) const = 0;
 
-    virtual const libecs::Real 
-    getLoggerStartTime( libecs::StringCref aFullPNString ) const = 0;
+    virtual libecs::Real 
+    getLoggerStartTime( libecs::String const& aFullPNString ) const = 0;
 
-    virtual const libecs::Real 
-    getLoggerEndTime( libecs::StringCref aFullPNString ) const = 0;
+    virtual libecs::Real 
+    getLoggerEndTime( libecs::String const& aFullPNString ) const = 0;
 
     virtual void 
-    setLoggerPolicy( libecs::StringCref aFullPNString, 
+    setLoggerPolicy( libecs::String const& aFullPNString, 
                      libecs::Polymorph aParamList ) = 0;
 
-    virtual const libecs::Polymorph
-    getLoggerPolicy( libecs::StringCref aFullPNString ) const = 0;
+    virtual libecs::Polymorph
+    getLoggerPolicy( libecs::String const& aFullPNString ) const = 0;
 
-    virtual const libecs::Logger::size_type
-    getLoggerSize( libecs::StringCref aFullPNString ) const = 0;
+    virtual libecs::Logger::size_type
+    getLoggerSize( libecs::String const& aFullPNString ) const = 0;
 
-    virtual const libecs::Polymorph getNextEvent() const = 0;
+    virtual libecs::Polymorph getNextEvent() const = 0;
 
     virtual void step( const libecs::Integer aNumSteps ) = 0;
 
-    virtual const libecs::Real getCurrentTime() const = 0;
+    virtual libecs::Real getCurrentTime() const = 0;
 
     virtual void run() = 0;
 
@@ -175,23 +179,23 @@ public:
 
     virtual void stop() = 0;
 
-    virtual void setEventChecker( EventCheckerSharedPtrCref aEventChecker ) = 0;
+    virtual void setEventChecker( boost::shared_ptr< EventChecker > const& aEventChecker ) = 0;
 
-    virtual void setEventHandler( EventHandlerSharedPtrCref anEventHandler ) = 0;
+    virtual void setEventHandler( boost::shared_ptr< EventHandler > const& anEventHandler ) = 0;
 
-    virtual const libecs::PolymorphMap
-    getClassInfo( libecs::StringCref aClassname ) const = 0;
+    virtual PolymorphMap
+    getClassInfo( libecs::String const& aClassname ) const = 0;
 
-    virtual const libecs::PolymorphMap
-    getPropertyInfo( libecs::StringCref aClassname ) const = 0; 
+    virtual PolymorphMap
+    getPropertyInfo( libecs::String const& aClassname ) const = 0; 
 
-    virtual const libecs::PolymorphVector getDMInfo() const = 0;
+    virtual libecs::PolymorphVector getDMInfo() const = 0;
 
-    virtual const char getDMSearchPathSeparator() const = 0;
+    virtual char getDMSearchPathSeparator() const = 0;
 
-    virtual const std::string getDMSearchPath() const = 0;
+    virtual libecs::String getDMSearchPath() const = 0;
 
-    virtual void setDMSearchPath( const std::string& aDMSearchPath ) = 0;
+    virtual void setDMSearchPath( libecs::String const& aDMSearchPath ) = 0;
 
 }; //end of class Simulator
 

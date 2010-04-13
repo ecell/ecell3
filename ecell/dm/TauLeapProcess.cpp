@@ -43,8 +43,8 @@ USE_LIBECS;
 LIBECS_DM_CLASS_EXTRA_1( TauLeapProcess, ContinuousProcess,
                          GillespieProcessInterface )
 {
-    typedef const Real (TauLeapProcess::* getPropensityMethodPtr)( ) const;
-    typedef const Real (TauLeapProcess::* getPDMethodPtr)( VariablePtr ) const;
+    typedef Real (TauLeapProcess::* getPropensityMethodPtr)() const;
+    typedef Real (TauLeapProcess::* getPDMethodPtr)( Variable const* ) const;
 
 public:
 
@@ -82,7 +82,7 @@ public:
         return ( this->*theGetPropensityMethodPtr )();
     }
 
-    virtual const Real getPD( VariablePtr value )const
+    virtual Real getPD( Variable const* value )const
     {
         return ( this->*theGetPDMethodPtr )( value );
     }
@@ -113,11 +113,11 @@ protected:
     {
         theOrder = 0;
 
-        for( VariableReferenceVectorConstIterator i(
+        for( VariableReferenceVector::const_iterator i(
                 theVariableReferenceVector.begin() );
              i != theVariableReferenceVector.end() ; ++i )
         {
-            VariableReferenceCref aVariableReference( *i );
+            VariableReference const& aVariableReference( *i );
             const Integer aCoefficient( aVariableReference.getCoefficient() );
 
             // here assume aCoefficient != 0
@@ -172,17 +172,17 @@ protected:
         }
     }
     
-    const Real getZero( VariablePtr value ) const
+    Real getZero( Variable const * value ) const
     {
         return 0.0;
     }
 
-    const Real getZero( ) const
+    Real getZero( ) const
     {
         return 0.0;
     }
         
-    const Real getPropensity_FirstOrder() const
+    Real getPropensity_FirstOrder() const
     {
         const Real 
             aMultiplicity( theVariableReferenceVector[0].getVariable()->getValue() );
@@ -197,7 +197,7 @@ protected:
         }
     }
 
-    const Real getPD_FirstOrder( VariablePtr value ) const
+    Real getPD_FirstOrder( Variable const* value ) const
     {
         if( theVariableReferenceVector[0].getVariable() == value )
         {
@@ -209,7 +209,7 @@ protected:
         }
     }
 
-    const Real getPropensity_SecondOrder_TwoSubstrates() const
+    Real getPropensity_SecondOrder_TwoSubstrates() const
     {
         const Real aMultiplicity( theVariableReferenceVector[0].getVariable()->getValue() *
                                    theVariableReferenceVector[1].getVariable()->getValue() );
@@ -225,7 +225,7 @@ protected:
         }
     }
 
-    const Real getPD_SecondOrder_TwoSubstrates( VariablePtr value ) const
+    Real getPD_SecondOrder_TwoSubstrates( Variable const* value ) const
     {
         if( theVariableReferenceVector[0].getVariable() == value )
         {
@@ -241,7 +241,7 @@ protected:
         }
     }
     
-    const Real getPropensity_SecondOrder_OneSubstrate() const
+    Real getPropensity_SecondOrder_OneSubstrate() const
     {
         Variable const* aVariable( theVariableReferenceVector[ 0 ].getVariable() );
         const Real aValue( aVariable->getValue() );
@@ -261,7 +261,7 @@ protected:
         return 0.0;
     }
 
-    const Real getPD_SecondOrder_OneSubstrate( VariablePtr value ) const
+    Real getPD_SecondOrder_OneSubstrate( Variable const* value ) const
     {
         if( theVariableReferenceVector[0].getVariable() == value )
         {
@@ -284,8 +284,8 @@ protected:
     
 protected:
     
-    Real k;
     Integer theOrder;
+    Real k;
     
     getPropensityMethodPtr theGetPropensityMethodPtr;
     getPDMethodPtr theGetPDMethodPtr;

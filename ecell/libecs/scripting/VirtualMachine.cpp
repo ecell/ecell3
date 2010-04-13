@@ -135,7 +135,7 @@ private:
 };
 
 
-const Real VirtualMachine::execute( CodeCref aCode )
+const Real VirtualMachine::execute( Code const& aCode )
 {
 
 #define FETCH_OPCODE()\

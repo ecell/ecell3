@@ -37,6 +37,7 @@
 #include <vector>
 
 #include <boost/utility.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "libecs/Defs.hpp"
 #include "libecs/LoggerAdapter.hpp"
@@ -53,15 +54,15 @@ namespace libecs
 class LIBECS_API Logger
 {
 public:
-    DECLARE_TYPE( PhysicalLogger::size_type, size_type )
+    typedef PhysicalLogger::size_type size_type;
     
     class Policy
     {
     public:
-        Policy( IntegerParam aMinimumStep = 1,
-                RealParam    aMinimumTimeInterval = 0.0,
-                bool         _continueOnError = false,
-                IntegerParam aMaxSpace = 0 )
+        Policy( Integer aMinimumStep = 1,
+                Real    aMinimumTimeInterval = 0.0,
+                bool    _continueOnError = false,
+                Integer aMaxSpace = 0 )
             : theMinimumStep( aMinimumStep ),
               theMinimumTimeInterval( aMinimumTimeInterval ),
               continueOnError( _continueOnError ),
@@ -90,7 +91,7 @@ public:
             return theMinimumStep;
         }
 
-        void setMinimumStep( IntegerParam aMinimumStep )
+        void setMinimumStep( Integer aMinimumStep )
         {
             if ( aMinimumStep < 0 )
             {
@@ -105,7 +106,7 @@ public:
             return theMinimumTimeInterval;
         }
 
-        void setMinimumTimeInterval( RealParam aMinimumTimeInterval )
+        void setMinimumTimeInterval( Real aMinimumTimeInterval )
         {
             if( aMinimumTimeInterval < 0 )
             {
@@ -131,7 +132,7 @@ public:
             return theMaxSpace;
         }
 
-        void setMaxSpace( IntegerParam aMaxSpace )
+        void setMaxSpace( Integer aMaxSpace )
         {
             if ( aMaxSpace < 0 )
             {
@@ -166,7 +167,7 @@ public:
 
     */
 
-    Logger( LoggerAdapterPtr aLoggerAdapter, Policy const& aPolicy = Policy() );
+    Logger( LoggerAdapter* aLoggerAdapter, Policy const& aPolicy = Policy() );
 
     /// Destructor
 
@@ -198,7 +199,7 @@ public:
 
     */
 
-    void log( RealParam aTime );
+    void log( Real aTime );
 
 
     /**
@@ -213,17 +214,17 @@ public:
 
     */
 
-    boost::shared_ptr< DataPointVector > getData( RealParam aStartTime,
-                                      RealParam anEndTime ) const;
+    boost::shared_ptr< DataPointVector > getData( Real aStartTime,
+                                                  Real anEndTime ) const;
 
     /**
          Returns a summary of the data from aStartTime to anEndTime with
          intervals anInterval between data elements.
     */
 
-    boost::shared_ptr< DataPointVector > getData( RealParam aStartTime,
-                                      RealParam anEndTime, 
-                                      RealParam anInterval ) const;
+    boost::shared_ptr< DataPointVector > getData( Real aStartTime,
+                                                  Real anEndTime, 
+                                                  Real anInterval ) const;
     
 
 
@@ -262,26 +263,10 @@ public:
 protected:
 
     /**
-
-    @internal
-
-    */
-
-    DataPointVectorIterator binary_search( DataPointVectorIterator begin,
-                                           DataPointVectorIterator end,
-                                           RealParam t ) 
-    {
-        return thePhysicalLogger.lower_bound( thePhysicalLogger.begin(), 
-                                              thePhysicalLogger.end(), t );
-    }
-    
-protected:
-
-    /**
          Writes data (aTime, aValue ) onto the logger
     */
 
-    void pushData( RealParam aTime, RealParam aValue )
+    void pushData( Real aTime, Real aValue )
     {
         thePhysicalLogger.push( DataPoint( aTime, aValue ) );
     }
@@ -303,7 +288,7 @@ private:
 
     PhysicalLogger                thePhysicalLogger;
 
-    LoggerAdapterPtr              theLoggerAdapter;
+    LoggerAdapter*                theLoggerAdapter;
 
     Integer                       theStepCounter;
     Real                          theLastTime;

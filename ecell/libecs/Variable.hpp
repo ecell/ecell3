@@ -48,6 +48,8 @@ namespace libecs
 */
 LIBECS_DM_CLASS( Variable, Entity )
 {
+protected:
+    typedef std::vector< Interpolant* > InterpolantVector;
 
 public:
 
@@ -88,7 +90,7 @@ public:
 
     virtual void dispose();
 
-    virtual const EntityType getEntityType() const
+    virtual EntityType getEntityType() const
     {
         return EntityType( EntityType::VARIABLE );
     }
@@ -114,7 +116,7 @@ public:
     /** 
        Integrate.
     */
-    void integrate( RealParam aTime )
+    void integrate( Real aTime )
     {
         if( isFixed() == false ) 
         {
@@ -131,7 +133,7 @@ public:
        @internal
     */
 
-    void interIntegrate( RealParam aCurrentTime )
+    void interIntegrate( Real aCurrentTime )
     {
         const Real anInterval( aCurrentTime - theLastTime );
         
@@ -168,19 +170,19 @@ public:
     }
 
 
-    void addValue( RealParam aValue )
+    void addValue( Real aValue )
     {
         setValue( getValue() + aValue );
     }
 
 
-    void loadValue( RealParam aValue )
+    void loadValue( Real aValue )
     {
         theValue = aValue;
     }
 
 
-    const Real saveValue() const
+    Real saveValue() const
     {
         return theValue;
     }
@@ -193,7 +195,7 @@ public:
         Real aVelocitySum( 0.0 );
         FOR_ALL( InterpolantVector, theInterpolantVector )
         {
-            InterpolantPtr const anInterpolantPtr( *i );
+            Interpolant const* anInterpolantPtr( *i );
             aVelocitySum += anInterpolantPtr->getVelocity( theLastTime );
         }
 
@@ -314,25 +316,25 @@ public:
 
     LOAD_METHOD( Real, NumberConc );
 
-    void registerInterpolant( InterpolantPtr const anInterpolant );
+    void registerInterpolant( Interpolant* anInterpolant );
 
     virtual void detach();
 
 protected:
-    const Real calculateDifferenceSum( RealParam aCurrentTime, 
-                                       RealParam anInterval ) const
+    const Real calculateDifferenceSum( Real aCurrentTime, 
+                                       Real anInterval ) const
     {
         Real aVelocitySum( 0.0 );
         FOR_ALL( InterpolantVector, theInterpolantVector )
         {
-            InterpolantPtr const anInterpolantPtr( *i );
+            Interpolant const* anInterpolantPtr( *i );
             aVelocitySum += anInterpolantPtr->getDifference(
                 aCurrentTime, anInterval );
         }
         return aVelocitySum;
     }
 
-    void updateValue( RealParam aCurrentTime )
+    void updateValue( Real aCurrentTime )
     {
         const Real anInterval( aCurrentTime - theLastTime );
 

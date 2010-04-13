@@ -47,6 +47,8 @@
 namespace libecs
 {
 
+class Entity;
+
 /**
    Model class represents a simulation model.
 
@@ -55,8 +57,8 @@ namespace libecs
 class LIBECS_API Model
 {
 public:
-    DECLARE_ASSOCVECTOR( String, Stepper*, std::less< const String >,
-                         StepperMap ); 
+    typedef Loki::AssocVector<String, Stepper*, std::less<String> > StepperMap;
+
 protected:
     typedef EventScheduler< StepperEvent > StepperEventScheduler;
     typedef StepperEventScheduler::EventIndex EventIndex;
@@ -104,7 +106,7 @@ public:
     /**
        Get the next event to occur on the scheduler.
      */
-    const StepperEvent& getTopEvent() const
+    StepperEvent const& getTopEvent() const
     {
         return theScheduler.getTopEvent();
     }
@@ -115,13 +117,13 @@ public:
 
        @return time elasped since start of the simulation.
     */
-    const Real getCurrentTime() const
+    Real getCurrentTime() const
     {
         return theCurrentTime;
     }
 
 
-    const Stepper* getLastStepper() const
+    Stepper* getLastStepper() const
     {
         return theLastStepper;
     }
@@ -132,7 +134,7 @@ public:
 
        @param aClassname
     */
-    const PropertyInterfaceBase& getPropertyInterface(
+    PropertyInterfaceBase const& getPropertyInterface(
             String const& aClassname ) const;
 
     /**
@@ -182,7 +184,7 @@ public:
        @param aFullID
        @param aName
     */
-    Entity* createEntity( String const& aClassname, FullIDCref aFullID );
+    Entity* createEntity( String const& aClassname, FullID const& aFullID );
 
 
     /**
@@ -259,7 +261,7 @@ public:
 
        @return the const reference of the StepperMap.
     */
-    StepperMapCref getStepperMap() const
+    StepperMap const& getStepperMap() const
     {
         return theStepperMap;
     }
@@ -296,13 +298,13 @@ public:
 
        @return a borrowed pointer to the LoggerBroker.
     */
-    LoggerBrokerRef getLoggerBroker()
+    LoggerBroker& getLoggerBroker()
     { 
         return theLoggerBroker; 
     }
 
 
-    LoggerBrokerCref getLoggerBroker() const
+    LoggerBroker const& getLoggerBroker() const
     { 
         return theLoggerBroker; 
     }
@@ -319,9 +321,9 @@ public:
         return theScheduler;
     }
 
-    void setDMSearchPath( const String& path );
+    void setDMSearchPath( String const& path );
 
-    const String getDMSearchPath() const;
+    String getDMSearchPath() const;
 
     void markDirty();
 
@@ -334,7 +336,7 @@ private:
     /** @internal */
     void registerBuiltinModules();
 
-    void checkSizeVariable( SystemCptr const aSystem );
+    void checkSizeVariable( System const* aSystem );
 
     Handle generateNextHandle();
 

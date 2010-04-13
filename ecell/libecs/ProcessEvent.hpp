@@ -40,20 +40,18 @@
 namespace libecs
 {
 
-DECLARE_CLASS( ProcessEvent );
-
 class LIBECS_API ProcessEvent: public EventBase
 {
 public:
-    ProcessEvent( TimeParam aTime = 0, ProcessPtr aProcessPtr = 0)
+    ProcessEvent( Time aTime = 0, Process* aProcess = 0)
         : EventBase( aTime ),
-          theProcess( aProcessPtr )
+          theProcess( aProcess )
     {
         ; // do nothing
     }
 
 
-    const ProcessPtr getProcess() const
+    const Process* getProcess() const
     {
         return theProcess;
     }
@@ -67,26 +65,26 @@ public:
         reschedule( getTime() );
     }
 
-    void update( TimeParam aTime )
+    void update( Time aTime )
     {
         reschedule( aTime );
     }
 
 
-    void reschedule( TimeParam aTime )
+    void reschedule( Time aTime )
     {
         const Time aNewStepInterval( theProcess->getStepInterval() );
         setTime( aNewStepInterval + aTime );
     }
 
 
-    const bool isDependentOn( ProcessEventCref anEvent ) const
+    const bool isDependentOn( ProcessEvent const& anEvent ) const
     {
         return theProcess->isDependentOn( anEvent.getProcess() );
     }
 
 
-    const bool operator< ( ProcessEventCref rhs ) const
+    const bool operator< ( ProcessEvent const& rhs ) const
     {
         if( getTime() > rhs.getTime() )
         {
@@ -104,7 +102,7 @@ public:
     }
 
 
-    const bool operator> ( ProcessEventCref rhs ) const
+    const bool operator> ( ProcessEvent const& rhs ) const
     {
         if( getTime() < rhs.getTime() )
         {
@@ -122,19 +120,19 @@ public:
     }
 
 
-    const bool operator<= ( ProcessEventCref rhs ) const
+    const bool operator<= ( ProcessEvent const& rhs ) const
     {
         return !( *this > rhs );
     }
 
 
-    const bool operator>= ( ProcessEventCref rhs ) const
+    const bool operator>= ( ProcessEvent const& rhs ) const
     {
         return !( *this < rhs );
     }
 
 
-    const bool operator!= ( ProcessEventCref rhs ) const
+    const bool operator!= ( ProcessEvent const& rhs ) const
     {
         return getTime() != rhs.getTime() ||
                 getProcess() != rhs.getProcess();
@@ -143,7 +141,7 @@ public:
 
 private:
 
-    ProcessPtr theProcess;
+    Process* theProcess;
 
 };
 

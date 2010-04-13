@@ -32,6 +32,7 @@
 #ifndef __FULLID_HPP
 #define __FULLID_HPP
 
+#include <vector>
 #include "libecs/Defs.hpp"
 #include "libecs/EntityType.hpp"
 
@@ -44,11 +45,12 @@ namespace libecs
 class SystemPath
 {
 public:
-    typedef StringList::const_iterator const_iterator;
-    typedef StringList::size_type size_type;
+    typedef std::vector< String > StringVector;
+    typedef StringVector::const_iterator const_iterator;
+    typedef StringVector::size_type size_type;
 
 public:
-    explicit SystemPath( StringCref systempathstring )
+    explicit SystemPath( String const& systempathstring )
         : isCanonicalized_( true )
     {
         parse( systempathstring );
@@ -56,7 +58,7 @@ public:
 
     SystemPath(): isCanonicalized_( true ) {}
 
-    SystemPath( SystemPathCref that )
+    SystemPath( SystemPath const& that )
         : isCanonicalized_( that.isCanonicalized_  ),
           theComponents( that.theComponents )
     {
@@ -177,12 +179,12 @@ public:
 
 private:
 
-    LIBECS_API void parse( StringCref systempathstring );
+    LIBECS_API void parse( String const& systempathstring );
 
 private:
 
     bool isCanonicalized_;
-    StringList theComponents;
+    StringVector theComponents;
 
 public:
 
@@ -204,9 +206,9 @@ public:
           theSystemPath(),
           theID() {}
 
-    FullID( const EntityType type,
-            SystemPathCref systempath,
-            StringCref id )
+    FullID( EntityType const& type,
+            SystemPath const& systempath,
+            String const& id )
         : theEntityType( type ),
           theSystemPath( systempath ),
           theID( id )
@@ -214,9 +216,9 @@ public:
         ; // do nothing
     }
 
-    explicit FullID( const EntityType type,
-                     StringCref systempathstring,
-                     StringCref id )
+    explicit FullID( EntityType const& type,
+                     String const& systempathstring,
+                     String const& id )
         : theEntityType( type ),
           theSystemPath( systempathstring ),
           theID( id )
@@ -224,13 +226,13 @@ public:
         ; // do nothing
     }
 
-    FullID( StringCref fullidstring )
+    FullID( String const& fullidstring )
     {
         parse( fullidstring );
     }
 
 
-    FullID( FullIDCref fullid )
+    FullID( FullID const& fullid )
         : theEntityType( fullid.getEntityType() ),
           theSystemPath( fullid.getSystemPath() ),
           theID( fullid.getID() )
@@ -242,37 +244,37 @@ public:
     ~FullID() {}
 
 
-    const EntityType getEntityType() const 
+    EntityType const& getEntityType() const 
     { 
         return theEntityType; 
     }
 
 
-    SystemPathCref getSystemPath() const
+    SystemPath const& getSystemPath() const
     { 
         return theSystemPath; 
     }
 
 
-    StringCref getID() const
+    String const& getID() const
     { 
         return theID;
     }
 
 
-    void setEntityType( const EntityType type )
+    void setEntityType( EntityType const& type )
     {
         theEntityType = type;
     }
 
 
-    void setSystemPath( SystemPathCref systempath ) 
+    void setSystemPath( SystemPath const& systempath ) 
     {
         theSystemPath = systempath;
     }
 
 
-    void setID( StringCref id ) 
+    void setID( String const& id ) 
     {
         theID = id;
     }
@@ -288,7 +290,7 @@ public:
         return asString();
     }
 
-    bool operator<( FullIDCref rhs ) const
+    bool operator<( FullID const& rhs ) const
     {
         // first look at the EntityType
         if( getEntityType() != rhs.getEntityType() )
@@ -307,7 +309,7 @@ public:
         return getID() < rhs.getID();
     }
 
-    bool operator==( FullIDCref rhs ) const
+    bool operator==( FullID const& rhs ) const
     {
         // first look at the EntityType
         if( getEntityType() != rhs.getEntityType() )
@@ -325,7 +327,7 @@ public:
         return getID() == rhs.getID();
     }
 
-    bool operator!=( FullIDCref rhs ) const
+    bool operator!=( FullID const& rhs ) const
     {
         return ! operator==( rhs );
     }
@@ -336,7 +338,7 @@ public:
     }
 
 protected:
-    LIBECS_API void parse( StringCref fullidstring );
+    LIBECS_API void parse( String const& fullidstring );
 
 public:
     static const char DELIMITER = ':';
@@ -352,37 +354,37 @@ class FullPN
 {
 public:
     FullPN( const EntityType type, 
-            SystemPathCref systempath,
-            StringCref id,
-            StringCref propertyname )
+            SystemPath const& systempath,
+            String const& id,
+            String const& propertyname )
         : theFullID( type, systempath, id ),
           thePropertyName( propertyname )
     {
         ; // do nothing
     }
 
-    FullPN( FullIDCref fullid, StringCref propertyname )
+    FullPN( FullID const& fullid, String const& propertyname )
         : theFullID( fullid ),
           thePropertyName( propertyname )
     {
         ; // do nothing
     }
 
-    FullPN( FullPNCref fullpn )
+    FullPN( FullPN const& fullpn )
         : theFullID( fullpn.getFullID() ),
           thePropertyName( fullpn.getPropertyName() )
     {
         ; // do nothing
     }
 
-    LIBECS_API FullPN( StringCref fullpropertynamestring );
+    LIBECS_API FullPN( String const& fullpropertynamestring );
 
     ~FullPN() 
     {
         ; // do nothing
     }
 
-    FullIDCref getFullID() const
+    FullID const& getFullID() const
     {
         return theFullID;
     }
@@ -392,17 +394,17 @@ public:
         return getFullID().getEntityType(); 
     }
 
-    SystemPathCref getSystemPath() const
+    SystemPath const& getSystemPath() const
     { 
         return getFullID().getSystemPath();
     }
 
-    StringCref getID() const
+    String const& getID() const
     { 
         return getFullID().getID();
     }
 
-    StringCref getPropertyName() const
+    String const& getPropertyName() const
     {
         return thePropertyName;
     }
@@ -412,17 +414,17 @@ public:
         theFullID.setEntityType( type );
     }
 
-    void setSystemPath( SystemPathCref systempath ) 
+    void setSystemPath( SystemPath const& systempath ) 
     {
         theFullID.setSystemPath( systempath );
     }
 
-    void setID( StringCref id ) 
+    void setID( String const& id ) 
     {
         theFullID.setID( id );
     }
 
-    void setPropertyName( StringCref propertyname )
+    void setPropertyName( String const& propertyname )
     {
         thePropertyName = propertyname;
     }
@@ -437,7 +439,7 @@ public:
 
     LIBECS_API bool isValid() const;
 
-    bool operator<( FullPNCref rhs ) const
+    bool operator<( FullPN const& rhs ) const
     {
         if( getFullID() != rhs.getFullID() )
         {
@@ -447,7 +449,7 @@ public:
         return getPropertyName() < rhs.getPropertyName();
     }
 
-    bool operator==( FullPNCref rhs ) const
+    bool operator==( FullPN const& rhs ) const
     {
         if( getFullID() != rhs.getFullID() )
         {
@@ -458,7 +460,7 @@ public:
         return getPropertyName() == rhs.getPropertyName();
     }
 
-    bool operator!=( FullPNCref rhs ) const
+    bool operator!=( FullPN const& rhs ) const
     {
         return ! operator==( rhs );
     }

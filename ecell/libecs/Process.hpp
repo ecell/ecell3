@@ -32,9 +32,11 @@
 #ifndef __PROCESS_HPP
 #define __PROCESS_HPP
 
+#include <vector>
 #include <boost/mem_fn.hpp>
 #include <boost/functional.hpp>
 
+#include "libecs/AssocVector.h"
 #include "libecs/Defs.hpp"
 #include "libecs/AssocVector.h"
 #include "libecs/Entity.hpp"
@@ -43,10 +45,6 @@
 namespace libecs
 {
 
-DECLARE_ASSOCVECTOR( String, VariableReference, std::less< const String >, 
-                     VariableReferenceMap );
-DECLARE_VECTOR( VariableReference, VariableReferenceVector );
-
 /**
    Process class is used to represent chemical and other phenonema which 
    may or may not result in change in value of one or more Variables.
@@ -54,6 +52,10 @@ DECLARE_VECTOR( VariableReference, VariableReferenceVector );
 
 LIBECS_DM_CLASS( Process, Entity )
 {
+public:
+    typedef Loki::AssocVector< String, VariableReference,
+                               std::less< String > > VariableReferenceMap;
+    typedef std::vector< VariableReference > VariableReferenceVector;
 
 public:
 
@@ -85,17 +87,17 @@ public:
     class PriorityCompare
     {
     public:
-        bool operator()( ProcessPtr aLhs, ProcessPtr aRhs ) const
+        bool operator()( Process const* aLhs, Process const* aRhs ) const
         {
             return compare( aLhs->getPriority(), aRhs->getPriority() );
         }
 
-        bool operator()( ProcessPtr aLhs, IntegerParam aRhs ) const
+        bool operator()( Process const* aLhs, Integer aRhs ) const
         {
             return compare( aLhs->getPriority(), aRhs );
         }
 
-        bool operator()( IntegerParam aLhs, ProcessPtr aRhs ) const
+        bool operator()( Integer aLhs, Process const* aRhs ) const
         {
             return compare( aLhs, aRhs->getPriority() );
         }
@@ -103,7 +105,7 @@ public:
     private:
 
         // if statement can be faster than returning an expression directly
-        inline static bool compare( IntegerParam aLhs, IntegerParam aRhs )
+        inline static bool compare( Integer aLhs, Integer aRhs )
         {
             if( aLhs > aRhs )
             {
@@ -121,7 +123,7 @@ public:
 
     virtual ~Process();
 
-    virtual const EntityType getEntityType() const
+    virtual EntityType getEntityType() const
     {
         return EntityType( EntityType::PROCESS );
     }
@@ -142,7 +144,7 @@ public:
        This method returns true if this Process is compatible with 
        continuous Steppers.
     */
-    virtual const bool isContinuous() const
+    virtual bool isContinuous() const
     {
         return false;
     }
@@ -248,10 +250,10 @@ public:
               behavior.
        @return a serial number that refers to the registered variable reference.
     */
-    const Integer registerVariableReference( StringCref aName, 
-                                             FullID const& aFullID, 
-                                             IntegerParam aCoefficient, 
-                                             const bool isAccessor = true );
+    Integer registerVariableReference( String const& aName, 
+                                       FullID const& aFullID, 
+                                       Integer aCoefficient, 
+                                       bool isAccessor = true );
 
     /**
        Register a new anonymous VariableReference to theVariableReferenceVector.
@@ -265,9 +267,9 @@ public:
               behavior.
        @return a serial number that refers to the registered variable reference.
     */
-    const Integer registerVariableReference( FullID const& aFullID, 
-                                             IntegerParam aCoefficient, 
-                                             const bool isAccessor = true );
+    Integer registerVariableReference( FullID const& aFullID, 
+                                       Integer aCoefficient, 
+                                       bool isAccessor = true );
 
     /**
        Register a new VariableReference to theVariableReferenceVector.
@@ -282,10 +284,10 @@ public:
               behavior.
        @return a serial number that refers to the registered variable reference.
     */
-    const Integer registerVariableReference( StringCref aName, 
-                                             Variable* aVariable, 
-                                             IntegerParam aCoefficient, 
-                                             const bool isAccessor = true );
+    Integer registerVariableReference( String const& aName, 
+                                       Variable* aVariable, 
+                                       Integer aCoefficient, 
+                                       bool isAccessor = true );
 
     /**
        Register a new anonymous VariableReference to theVariableReferenceVector.
@@ -299,9 +301,9 @@ public:
               behavior.
        @return a serial number that refers to the registered variable reference.
     */
-    const Integer registerVariableReference( Variable* aVariable, 
-                                             IntegerParam aCoefficient, 
-                                             const bool isAccessor = true );
+    Integer registerVariableReference( Variable* aVariable, 
+                                       Integer aCoefficient, 
+                                       bool isAccessor = true );
 
 
     bool removeVariableReference( String const& aName, bool raiseException = true );
@@ -318,7 +320,7 @@ public:
        @return a VariableReference
        @see VariableReference
     */
-    VariableReference const& getVariableReference( StringCref aVariableReferenceName ) const;
+    VariableReference const& getVariableReference( String const& aVariableReferenceName ) const;
 
     /**
        Get VariableReference by the serial number.
@@ -327,7 +329,7 @@ public:
        @return a VariableReference
        @see VariableReference
     */
-    VariableReference const& getVariableReference( IntegerParam anID ) const;
+    VariableReference const& getVariableReference( Integer anID ) const;
 
     /**
        Get VariableReference by the variable
@@ -341,7 +343,7 @@ public:
     /**
        @return a const reference to the VariableReferenceVector
     */
-    VariableReferenceVectorCref getVariableReferenceVector() const
+    VariableReferenceVector const& getVariableReferenceVector() const
     {
         return theVariableReferenceVector;
     }
@@ -357,7 +359,7 @@ public:
         return thePositiveVariableReferenceIterator - getVariableReferenceVector().begin();
     }
 
-    void setStepper( StepperPtr const aStepper );
+    void setStepper( Stepper* aStepper );
 
     /**
        Returns a pointer to a Stepper object that this Process belongs.
@@ -365,7 +367,7 @@ public:
        @return A pointer to a Stepper object that this Process, or
        NULLPTR if it is not set yet.
     */
-    StepperPtr getStepper() const
+    Stepper* getStepper() const
     {
         return theStepper;
     }
@@ -382,7 +384,7 @@ public:
 
        @param aValue aReal value to be added.
     */
-    void addValue( RealParam aValue );
+    void addValue( Real aValue );
 
 
     /**
@@ -394,7 +396,7 @@ public:
 
        @param aVelocity a base velocity to be added.
     */
-    void setFlux( RealParam aVelocity )
+    void setFlux( Real aVelocity )
     {
         setActivity( aVelocity );
     }
@@ -419,20 +421,20 @@ public:
     /**
        Check if this Process can affect on a given Process.
     */
-    const bool isDependentOn( const ProcessCptr aProcessPtr ) const;
+    bool isDependentOn( Process const* aProcessPtr ) const;
 
     virtual void detach();
 
 protected:
-    VariableReferenceVectorIterator findVariableReference( StringCref aName );
+    VariableReferenceVector::iterator findVariableReference( String const& aName );
 
-    VariableReferenceVectorConstIterator findVariableReference( StringCref aName ) const;
+    VariableReferenceVector::const_iterator findVariableReference( String const& aName ) const;
 
-    VariableReferenceVectorIterator findVariableReference( IntegerParam anID );
+    VariableReferenceVector::iterator findVariableReference( Integer anID );
 
-    VariableReferenceVectorConstIterator findVariableReference( IntegerParam anID ) const; 
+    VariableReferenceVector::const_iterator findVariableReference( Integer anID ) const; 
 
-    static void addValue( VariableReference const& aVarRef, RealParam value );
+    static void addValue( VariableReference const& aVarRef, Real value );
 
     void updateVariableReferenceVector();
 
@@ -440,11 +442,11 @@ protected:
 
 protected:
     VariableReferenceVector theVariableReferenceVector;
-    VariableReferenceVectorIterator theZeroVariableReferenceIterator;
-    VariableReferenceVectorIterator thePositiveVariableReferenceIterator;
+    VariableReferenceVector::iterator theZeroVariableReferenceIterator;
+    VariableReferenceVector::iterator thePositiveVariableReferenceIterator;
 
 private:
-    StepperPtr    theStepper;
+    Stepper*      theStepper;
     Real          theActivity;
     Integer       thePriority;
     Integer       theNextSerial;

@@ -40,13 +40,11 @@
 namespace libecs
 {
 
-typedef boost::multi_array<Real, 2> RealMatrix_;
-DECLARE_TYPE( RealMatrix_, RealMatrix )
-
-DECLARE_CLASS( DifferentialStepper );
-
 LIBECS_DM_CLASS( DifferentialStepper, Stepper )
 {
+public:
+    typedef boost::multi_array<Real, 2> RealMatrix;
+
 public:
     typedef VariableVector::size_type VariableIndex;
     typedef std::pair< VariableIndex, Integer > ExprComponent;
@@ -84,10 +82,10 @@ public:
         }
 
 
-        virtual const Real getDifference( RealParam aTime,
-                                          RealParam anInterval ) const;
+        virtual const Real getDifference( Real aTime,
+                                          Real anInterval ) const;
 
-        virtual const Real getVelocity( RealParam aTime ) const;
+        virtual const Real getVelocity( Real aTime ) const;
 
     protected:
 
@@ -120,7 +118,7 @@ public:
         return theTolerableStepInterval;
     }
 
-    void initializeStepInterval( RealParam aStepInterval )
+    void initializeStepInterval( Real aStepInterval )
     {
         setStepInterval( aStepInterval );
         setTolerableStepInterval( aStepInterval );
@@ -143,7 +141,7 @@ public:
 
     virtual void updateInternalState( Real aStepInterval );
 
-    virtual void interrupt( TimeParam aTime );
+    virtual void interrupt( Time aTime );
 
     virtual libecs::Interpolant* createInterpolant( Variable const* aVariable ) const;
 
@@ -157,7 +155,7 @@ public:
         return getStage(); 
     }
 
-    RealMatrixCref getTaylorSeries() const
+    RealMatrix const& getTaylorSeries() const
     {
         return theTaylorSeries;
     }

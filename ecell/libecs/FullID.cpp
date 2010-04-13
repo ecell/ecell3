@@ -45,7 +45,7 @@ namespace libecs
 
 ///////////////////////    SystemPath
 
-void SystemPath::parse( StringCref systempathstring )
+void SystemPath::parse( String const& systempathstring )
 {
     if( systempathstring.empty() )
     {
@@ -105,7 +105,7 @@ void SystemPath::parse( StringCref systempathstring )
 
 String SystemPath::asString() const
 {
-    StringList::const_iterator i = theComponents.begin();
+    StringVector::const_iterator i = theComponents.begin();
     String aString;
 
     if( isAbsolute() )
@@ -151,9 +151,9 @@ String SystemPath::asString() const
 
 void SystemPath::canonicalize()
 {
-    StringList aNewPathComponents;
+    StringVector aNewPathComponents;
 
-    for ( StringList::const_iterator i( theComponents.begin() );
+    for ( StringVector::const_iterator i( theComponents.begin() );
            i != theComponents.end(); ++i )
     {
         if ( *i == "." )
@@ -221,9 +221,9 @@ SystemPath SystemPath::toRelative( SystemPath const& aBaseSystemPath ) const
     }
 
     SystemPath aRetval;
-    StringList::const_iterator j( thisPath->theComponents.begin() ),
+    StringVector::const_iterator j( thisPath->theComponents.begin() ),
                                je( thisPath->theComponents.end() );
-    StringList::const_iterator
+    StringVector::const_iterator
         i( aCanonicalizedBaseSystemPath->theComponents.begin() ),
         ie( aCanonicalizedBaseSystemPath->theComponents.end() );
 
@@ -257,7 +257,7 @@ SystemPath SystemPath::toRelative( SystemPath const& aBaseSystemPath ) const
 
 ///////////////// FullID
 
-void FullID::parse( StringCref fullidstring )
+void FullID::parse( String const& fullidstring )
 {
     // empty FullID string is invalid
     if( fullidstring == "" )
@@ -324,7 +324,7 @@ bool FullID::isValid() const
 ///////////////// FullPN
 
 
-FullPN::FullPN( StringCref fullpropertynamestring )
+FullPN::FullPN( String const& fullpropertynamestring )
     : theFullID( fullpropertynamestring )
 {
 

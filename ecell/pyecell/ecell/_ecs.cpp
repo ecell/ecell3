@@ -272,13 +272,25 @@ struct PolymorphRetriever
         }
         else if( PyString_Check( aPyObjectPtr ) )
         {
-            return Polymorph( PyString_AsString( aPyObjectPtr ) );
+            return Polymorph( PyString_AS_STRING( aPyObjectPtr ),
+                              PyString_GET_SIZE( aPyObjectPtr ) );
         }
         else if( PyUnicode_Check( aPyObjectPtr ) )
         {
             aPyObjectPtr = PyUnicode_AsEncodedString( aPyObjectPtr, NULL, NULL );
             if ( aPyObjectPtr )
-                return Polymorph( PyString_AsString( aPyObjectPtr ) );
+            {
+                char *str;
+                Py_ssize_t str_len;
+                if ( !PyString_AsStringAndSize( aPyObjectPtr, &str, &str_len ) )
+                {
+                    return Polymorph( str, str_len );
+                }
+                else
+                {
+                    PyErr_Clear();
+                }
+            }
         }
         else if ( PySequence_Check( aPyObjectPtr ) )
         {
@@ -286,7 +298,7 @@ struct PolymorphRetriever
         }            
         // conversion is failed. ( convert with repr() ? )
         PyErr_SetString( PyExc_TypeError, 
-                                         "Unacceptable type of an object in the tuple." );
+                         "Unacceptable type of an object in the tuple." );
         py::throw_error_already_set();
         // never get here: the following is for suppressing warnings
         return Polymorph();
@@ -352,6 +364,8 @@ struct PropertySlotMapToPythonConverter
 
 struct StringVectorToPythonConverter
 {
+    typedef std::vector< libecs::String > StringVector;
+
     static void addToRegistry()
     {
         py::to_python_converter< StringVector, StringVectorToPythonConverter >();
@@ -402,7 +416,7 @@ struct TupleToPythonConverter
 };
 
 template< typename Tfirst_, typename Tsecond_ >
-struct TupleToPythonConverter<std::pair<Tfirst_, Tsecond_> >
+struct TupleToPythonConverter< std::pair<Tfirst_, Tsecond_> >
 {
     typedef std::pair<Tfirst_, Tsecond_> argument_value_type;
     typedef const argument_value_type& argument_type;
@@ -435,29 +449,6 @@ void registerTupleConverters()
         boost::shared_ptr<Ttuple_>,
         TupleToPythonConverter<boost::shared_ptr<Ttuple_> > >();
 }
-
-template< typename T_ >
-struct StringKeyedMapToPythonConverter
-{
-    static void addToRegistry()
-    {
-        py::to_python_converter< T_, StringKeyedMapToPythonConverter>();
-    }
-
-    static PyObject* convert( T_ const& aStringKeyedMap )
-    {
-        PyObject* aPyDict( PyDict_New() );
-        for ( typename T_::const_iterator i( aStringKeyedMap.begin() );
-              i != aStringKeyedMap.end(); ++i )
-        {
-            PyDict_SetItem( aPyDict, PyString_FromStringAndSize(
-                i->first.data(), i->first.size() ),
-                py::incref( py::object( i->second ).ptr() ) );
-                                            
-        }
-        return aPyDict;
-    }
-};
 
 struct FullIDToPythonConverter
 {
@@ -1238,7 +1229,7 @@ public:
 
     py::list getPositivesReferences()
     {
-        VariableReferenceVector const& refs(
+        Process::VariableReferenceVector const& refs(
                 theProc->getVariableReferenceVector() );
 
         py::list retval;
@@ -1252,7 +1243,7 @@ public:
 
     py::list getNegativeReferences()
     {
-        VariableReferenceVector const& refs(
+        Process::VariableReferenceVector const& refs(
                 theProc->getVariableReferenceVector() );
 
         py::list retval;
@@ -1266,7 +1257,7 @@ public:
 
     py::list getZeroReferences()
     {
-        VariableReferenceVector const& refs(
+        Process::VariableReferenceVector const& refs(
                 theProc->getVariableReferenceVector() );
 
         py::list retval;
@@ -1280,20 +1271,19 @@ public:
 
     py::object __iter__()
     {
-        return py::object( STLIteratorWrapper< VariableReferenceVector::const_iterator >( theProc->getVariableReferenceVector() ) );
+        return py::object( STLIteratorWrapper< Process::VariableReferenceVector::const_iterator >( theProc->getVariableReferenceVector() ) );
     }
 
     std::string __str__()
     {
-        VariableReferenceVector const& refs(
+        Process::VariableReferenceVector const& refs(
                 theProc->getVariableReferenceVector() );
 
         std::string retval;
 
         retval += '[';
-        for ( VariableReferenceVector::const_iterator b( refs.begin() ),
-                                                      i( b ),
-                                                      e( refs.end() );
+        for ( Process::VariableReferenceVector::const_iterator
+                b( refs.begin() ), i( b ), e( refs.end() );
                 i != e; ++i )
         {
             if ( i != b )
@@ -1494,7 +1484,7 @@ public:
         return theModule;
     }
 
-    const Polymorph defaultGetProperty( String const& aPropertyName ) const
+    Polymorph defaultGetProperty( String const& aPropertyName ) const
     {
         PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
         py::handle<> aValue( py::allow_null( PyObject_GenericGetAttr( aSelf, py::handle<>( PyString_InternFromString( const_cast< char* >( aPropertyName.c_str() ) ) ).get() ) ) );
@@ -1509,7 +1499,7 @@ public:
         return py::extract< Polymorph >( aValue.get() );
     }
 
-    const PropertyAttributes defaultGetPropertyAttributes( String const& aPropertyName ) const
+    PropertyAttributes defaultGetPropertyAttributes( String const& aPropertyName ) const
     {
         return PropertyAttributes( PropertySlotBase::POLYMORPH, true, true, true, true, true );
     }
@@ -1527,7 +1517,7 @@ public:
         }
     }
 
-    const StringVector defaultGetPropertyList() const
+    std::vector< String > defaultGetPropertyList() const
     {
         PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
         std::set< String > aPropertySet;
@@ -1549,7 +1539,7 @@ public:
                 reinterpret_cast< PyObject* >( aSelf->ob_type ) );
         removeAttributesFromBases( aPropertySet, anUpperBound );
 
-        StringVector retval;
+        std::vector< String > retval;
         for ( std::set< String >::iterator i( aPropertySet.begin() ), e( aPropertySet.end() ); i != e; ++i )
         {
             retval.push_back( *i );
@@ -1569,7 +1559,7 @@ public:
     {
     }
 
-    const Polymorph getProperty( String const& aPropertyName ) const
+    Polymorph getProperty( String const& aPropertyName ) const
     {
         return _getPropertyInterface().getProperty( *this, aPropertyName );
     }
@@ -1579,12 +1569,12 @@ public:
         return _getPropertyInterface().loadProperty( *this, aPropertyName, aValue );
     }
 
-    const Polymorph saveProperty( String const& aPropertyName ) const
+    Polymorph saveProperty( String const& aPropertyName ) const
     {
         return _getPropertyInterface().saveProperty( *this, aPropertyName );
     }
 
-    const StringVector getPropertyList() const
+    std::vector< String > getPropertyList() const
     {
         return _getPropertyInterface().getPropertyList( *this );
     }
@@ -1594,7 +1584,7 @@ public:
         return _getPropertyInterface().createPropertySlotProxy( *this, aPropertyName );
     }
 
-    const PropertyAttributes
+    PropertyAttributes
     getPropertyAttributes( String const& aPropertyName ) const
     {
         return _getPropertyInterface().getPropertyAttributes( *this, aPropertyName );
@@ -1649,7 +1639,7 @@ public:
         } 
     }
 
-    virtual const bool isContinuous() const
+    virtual bool isContinuous() const
     {
         PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
         py::handle<> anIsContinuousDescr( py::allow_null( PyObject_GenericGetAttr( reinterpret_cast< PyObject* >( aSelf->ob_type ), py::handle<>( PyString_InternFromString( "IsContinuous" ) ).get() ) ) );
@@ -1885,7 +1875,7 @@ inline PyObject* to_python_indirect_fun( T_* arg )
 class AbstractSimulator: public Model
 {
 public:
-    const py::list getStepperList() const
+    py::list getStepperList() const
     {
         Model::StepperMap const& aStepperMap( getStepperMap() );
         py::list retval;
@@ -1899,7 +1889,7 @@ public:
         return retval;
     }
 
-    const StringVector
+    std::vector< String >
     getStepperPropertyList( String const& aStepperID ) const
     {
         return getStepper( aStepperID )->getPropertyList();
@@ -1919,7 +1909,7 @@ public:
         getStepper( aStepperID )->setProperty( aPropertyName, aValue );
     }
 
-    const Polymorph
+    Polymorph
     getStepperProperty( String const& aStepperID,
                         String const& aPropertyName ) const
     {
@@ -1933,34 +1923,34 @@ public:
         getStepper( aStepperID )->loadProperty( aPropertyName, aValue );
     }
 
-    const Polymorph
+    Polymorph
     saveStepperProperty( String const& aStepperID,
                          String const& aPropertyName ) const
     {
         return getStepper( aStepperID )->saveProperty( aPropertyName );
     }
 
-    const String
+    String
     getStepperClassName( String const& aStepperID ) const
     {
         return getStepper( aStepperID )->getPropertyInterface().getClassName();
     }
 
-    const PolymorphMap getClassInfo( String const& aClassname ) const
+    py::dict getClassInfo( String const& aClassname ) const
     {
-        libecs::PolymorphMap aBuiltInfoMap;
+        py::dict retval;
         for ( DynamicModuleInfo::EntryIterator* anInfo(
               getPropertyInterface( aClassname ).getInfoFields() );
               anInfo->next(); )
         {
-            aBuiltInfoMap.insert( std::make_pair( anInfo->current().first,
-                                  *reinterpret_cast< const libecs::Polymorph* >(
-                                    anInfo->current().second ) ) );
+            retval[ anInfo->current().first ] =
+                *reinterpret_cast< const libecs::Polymorph* >(
+                    anInfo->current().second );
         }
-        return aBuiltInfoMap;
+        return retval;
     }
 
-    const Polymorph 
+    Polymorph 
     getEntityList( String const& anEntityTypeString,
                    String const& aSystemPathString ) const
     {
@@ -1974,7 +1964,7 @@ public:
             {
                 aVector.push_back( Polymorph( "/" ) );
             }
-            return aVector;
+            return Polymorph( aVector );
         }
 
         System const* aSystemPtr( getSystem( aSystemPath ) );
@@ -1994,17 +1984,17 @@ public:
         NEVER_GET_HERE;
     }
 
-    const StringVector
+    std::vector< String >
     getEntityPropertyList( String const& aFullIDString ) const
     {
         return getEntity( FullID( aFullIDString ) )->getPropertyList();
     }
 
-    const bool entityExists( String const& aFullIDString ) const
+    bool entityExists( String const& aFullIDString ) const
     {
         try
         {
-            IGNORE_RETURN getEntity( FullID( aFullIDString ) );
+            (void)getEntity( FullID( aFullIDString ) );
         }
         catch( const NotFound& )
         {
@@ -2018,16 +2008,16 @@ public:
                             Polymorph const& aValue )
     {
         FullPN aFullPN( aFullPNString );
-        EntityPtr anEntityPtr( getEntity( aFullPN.getFullID() ) );
+        Entity* const anEntityPtr( getEntity( aFullPN.getFullID() ) );
 
         anEntityPtr->setProperty( aFullPN.getPropertyName(), aValue );
     }
 
-    const Polymorph
+    Polymorph
     getEntityProperty( String const& aFullPNString ) const
     {
         FullPN aFullPN( aFullPNString );
-        Entity const * anEntityPtr( getEntity( aFullPN.getFullID() ) );
+        Entity const * const anEntityPtr( getEntity( aFullPN.getFullID() ) );
                 
         return anEntityPtr->getProperty( aFullPN.getPropertyName() );
     }
@@ -2036,16 +2026,16 @@ public:
                              Polymorph const& aValue )
     {
         FullPN aFullPN( aFullPNString );
-        EntityPtr anEntityPtr( getEntity( aFullPN.getFullID() ) );
+        Entity* const anEntityPtr( getEntity( aFullPN.getFullID() ) );
 
         anEntityPtr->loadProperty( aFullPN.getPropertyName(), aValue );
     }
 
-    const Polymorph
+    Polymorph
     saveEntityProperty( String const& aFullPNString ) const
     {
         FullPN aFullPN( aFullPNString );
-        Entity const * anEntityPtr( getEntity( aFullPN.getFullID() ) );
+        Entity const* const anEntityPtr( getEntity( aFullPN.getFullID() ) );
 
         return anEntityPtr->saveProperty( aFullPN.getPropertyName() );
     }
@@ -2054,16 +2044,16 @@ public:
     getEntityPropertyAttributes( String const& aFullPNString ) const
     {
         FullPN aFullPN( aFullPNString );
-        Entity const * anEntityPtr( getEntity( aFullPN.getFullID() ) );
+        Entity const* const anEntityPtr( getEntity( aFullPN.getFullID() ) );
 
         return anEntityPtr->getPropertyAttributes( aFullPN.getPropertyName() );
     }
 
-    const String
+    String
     getEntityClassName( String const& aFullIDString ) const
     {
         FullID aFullID( aFullIDString );
-        Entity const * anEntityPtr( getEntity( aFullID ) );
+        Entity const* const anEntityPtr( getEntity( aFullID ) );
 
         return anEntityPtr->getPropertyInterface().getClassName();
     }
@@ -2100,7 +2090,7 @@ public:
                     PyInt_AsLong( static_cast< py::object >( aParamList[ 3 ] ).ptr() ) ) );
     }
 
-    const py::list getLoggerList() const
+    py::list getLoggerList() const
     {
         py::list retval;
 
@@ -2137,13 +2127,13 @@ public:
         return getLogger( aFullPNString )->getData( start, end, interval );
     }
 
-    const Real 
+    Real 
     getLoggerStartTime( String const& aFullPNString ) const
     {
         return getLogger( aFullPNString )->getStartTime();
     }
 
-    const Real 
+    Real 
     getLoggerEndTime( String const& aFullPNString ) const
     {
         return getLogger( aFullPNString )->getEndTime();
@@ -2181,13 +2171,13 @@ public:
         return getLogger( aFullPNString )->getLoggerPolicy();
     }
 
-    const Logger::size_type 
+    Logger::size_type 
     getLoggerSize( String const& aFullPNString ) const
     {
         return getLogger( aFullPNString )->getSize();
     }
 
-    const std::pair< Real, String > getNextEvent() const
+    std::pair< Real, String > getNextEvent() const
     {
         StepperEvent const& aNextEvent( getTopEvent() );
 
@@ -2196,7 +2186,7 @@ public:
             aNextEvent.getStepper()->getID() );
     }
 
-    const py::object getDMInfo() const
+    py::object getDMInfo() const
     {
         typedef ModuleMaker< EcsObject >::ModuleMap ModuleMap;
         const ModuleMap& modules( theEcsObjectMaker.getModuleMap() );
@@ -2230,7 +2220,7 @@ public:
         return getLoggerBroker().getLogger( aFullPNString );
     }
 
-    static const char getDMSearchPathSeparator()
+    static char getDMSearchPathSeparator()
     {
         return Model::PATH_SEPARATOR;
     }
@@ -2260,7 +2250,7 @@ private:
             }
         }
 
-        virtual const std::string getSearchPath() const
+        virtual std::string getSearchPath() const
         {
             SharedModuleMakerInterface* anInterface(
                 dynamic_cast< SharedModuleMakerInterface* >( &theDefaultModuleMaker ) );
@@ -2343,7 +2333,7 @@ private:
             {
                 py::object aBase( py::borrowed( PyTuple_GET_ITEM( aBasesList.get(), i ) ) );
                 EntityType aResult( ( *this )( aBase ) );
-                if ( aResult.getType() != EntityType::NONE )
+                if ( aResult != EntityType::NONE )
                 {
                     return aResult;
                 }
@@ -2439,7 +2429,7 @@ public:
         while( theRunningFlag );
     }
 
-    void run( const Real aDuration )
+    void run( Real aDuration )
     {
         if( aDuration <= 0.0 )
         {
@@ -2801,14 +2791,13 @@ BOOST_PYTHON_MODULE( _ecs )
 {
     DataPointVectorWrapper< DataPoint >::__class_init__();
     DataPointVectorWrapper< LongDataPoint >::__class_init__();
-    STLIteratorWrapper< VariableReferenceVector::const_iterator >::__class_init__();
+    STLIteratorWrapper< Process::VariableReferenceVector::const_iterator >::__class_init__();
 
     // without this it crashes when Logger::getData() is called. why?
     import_array();
 
     registerTupleConverters< std::pair< Real, String > >();
     PolymorphToPythonConverter::addToRegistry();
-    StringKeyedMapToPythonConverter< PolymorphMap >::addToRegistry();
     StringVectorToPythonConverter::addToRegistry();
     PropertySlotMapToPythonConverter::addToRegistry();
     DataPointVectorSharedPtrConverter::addToRegistry();
@@ -2997,11 +2986,11 @@ BOOST_PYTHON_MODULE( _ecs )
               &Logger::getData )
         .def( "getData", 
               ( boost::shared_ptr< DataPointVector >( Logger::* )(
-                RealParam, RealParam ) const )
+                Real, Real ) const )
               &Logger::getData )
         .def( "getData",
               ( boost::shared_ptr< DataPointVector >( Logger::* )(
-                     RealParam, RealParam, RealParam ) const )
+                     Real, Real, Real ) const )
               &Logger::getData )
         ;
 
@@ -3151,13 +3140,13 @@ BOOST_PYTHON_MODULE( _ecs )
         .def( "stop",
               &Simulator::stop )
         .def( "step",
-              ( void ( Simulator::* )( const Integer ) )
+              ( void ( Simulator::* )( Integer ) )
               &Simulator::step )
         .def( "run",
               ( void ( Simulator::* )() )
               &Simulator::run )
         .def( "run",
-              ( void ( Simulator::* )( const Real ) ) 
+              ( void ( Simulator::* )( Real ) ) 
               &Simulator::run )
         .def( "setEventHandler",
               &Simulator::setEventHandler )

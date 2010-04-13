@@ -38,6 +38,8 @@
 #include <cstddef>
 #include <cstring>
 #include <cassert>
+#include <vector>
+
 #include <boost/static_assert.hpp>
 #include <boost/intrusive_ptr.hpp>
 #include <boost/range/begin.hpp>
@@ -55,7 +57,9 @@
 namespace libecs
 {
 
-DECLARE_CLASS( PolymorphValue );
+class Polymorph;
+
+typedef std::vector< Polymorph > PolymorphVector;
 
 class LIBECS_API PolymorphValue
 {
@@ -254,7 +258,7 @@ public:
         return theType;
     }
 
-    const PolymorphVector asPolymorphVector() const;
+    PolymorphVector asPolymorphVector() const;
 
     template< typename T >
     T as() const
@@ -268,12 +272,12 @@ public:
         return new PolymorphValue();
     }
 
-    static Handle create( IntegerParam aValue )
+    static Handle create( Integer aValue )
     {
         return new PolymorphValue( aValue );
     }
 
-    static Handle create( RealParam aValue )
+    static Handle create( Real aValue )
     {
         return new PolymorphValue( aValue );
     }
@@ -504,16 +508,14 @@ public:
                std::size_t sz = static_cast< std::size_t >( -1 ) ) 
         : theValue( PolymorphValue::create( ptr, sz ) ) { }
 
-    explicit Polymorph( RealParam aValue )            
+    explicit Polymorph( Real aValue )            
         : theValue( PolymorphValue::create( aValue ) ) { }
 
-    explicit Polymorph( IntegerParam aValue )            
+    explicit Polymorph( Integer aValue )            
         : theValue( PolymorphValue::create( aValue ) ) { }
 
-    Polymorph( PolymorphVector const& aValue )
-        : theValue( PolymorphValue::create( aValue ) ) { }
-
-    Polymorph( StringVector const& aValue )
+    template< typename Trange_ >
+    explicit Polymorph( Trange_ const& aValue )
         : theValue( PolymorphValue::create( aValue ) ) { }
 
     template< typename T0_, typename T1_, typename T2_, typename T3_,
@@ -529,22 +531,22 @@ public:
         return theValue->as<T>();
     }
 
-    const Type getType() const
+    Type getType() const
     {
         return theValue->getType();
     }
 
     /** @deprecated */
-    LIBECS_DEPRECATED const String asString() const;
+    LIBECS_DEPRECATED String asString() const;
 
     /** @deprecated */
-    LIBECS_DEPRECATED const Real   asReal() const;
+    LIBECS_DEPRECATED Real   asReal() const;
   
     /** @deprecated */
-    LIBECS_DEPRECATED const Integer asInteger() const;
+    LIBECS_DEPRECATED Integer asInteger() const;
 
     /** @deprecated */
-    LIBECS_DEPRECATED const PolymorphVector asPolymorphVector() const;
+    LIBECS_DEPRECATED PolymorphVector asPolymorphVector() const;
 
     Polymorph const& operator=( Polymorph const& rhs )
     {
@@ -1273,7 +1275,7 @@ inline PolymorphVector PolymorphValue::as() const
     case TUPLE:
         return PolymorphVector( boost::begin( theTupleValue ), boost::end( theTupleValue ) );
     default:
-        return PolymorphVector( 1, Polymorph( const_cast< PolymorphValue * >( this ) ) );
+        return PolymorphVector( 1, Polymorph( PolymorphValue::Handle( const_cast< PolymorphValue * >( this ) ) ) );
     }
 }
 
@@ -1793,7 +1795,7 @@ inline PolymorphValue::operator PolymorphValue::Tuple const& () const
 
 
 template< typename Tnew_ >
-inline const Tnew_ convertTo( const Polymorph& aValue )
+inline Tnew_ convertTo( const Polymorph& aValue )
 {
     return aValue.as< Tnew_ >();
 }
@@ -1804,28 +1806,28 @@ inline const Tnew_ convertTo( const Polymorph& aValue )
 //
 
 template<>
-inline const Polymorph nullValue()
+inline Polymorph nullValue()
 {
     return Polymorph();
 }
 
 
-inline const String Polymorph::asString() const
+inline String Polymorph::asString() const
 { 
     return as<String>(); 
 }
 
-inline const Real   Polymorph::asReal() const
+inline Real   Polymorph::asReal() const
 { 
     return as<Real>(); 
 }
   
-inline const Integer Polymorph::asInteger() const
+inline Integer Polymorph::asInteger() const
 { 
     return as<Integer>();
 }
 
-inline const PolymorphVector Polymorph::asPolymorphVector() const
+inline PolymorphVector Polymorph::asPolymorphVector() const
 { 
     return as<PolymorphVector>();
 }

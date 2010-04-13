@@ -56,7 +56,7 @@ private:
 
 typedef Caster< GillespieProcessInterface*, Process* > GPCaster;
 
-DECLARE_VECTOR( GPCaster::result_type, GillespieProcessVector );
+typedef std::vector< GPCaster::result_type > GillespieProcessVector;
 
 LIBECS_DM_CLASS( TauLeapStepper, DifferentialStepper )
 {    
@@ -164,12 +164,12 @@ protected:
             {
                 const Real aPropensity(
                     theGillespieProcessVector[ j ].first->getPropensity() );
-                VariableReferenceVectorCref aVariableReferenceVector(
+                Process::VariableReferenceVector const& aVariableReferenceVector(
                     theGillespieProcessVector[ j ].second->getVariableReferenceVector() );
                 
                 // future works : theDependentProcessVector
                 Real expectedChange( 0.0 );
-                for( VariableReferenceVectorConstIterator 
+                for( Process::VariableReferenceVector::const_iterator
                              k( aVariableReferenceVector.begin() ); 
                      k != aVariableReferenceVector.end(); ++k )
                 {

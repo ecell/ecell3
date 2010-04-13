@@ -40,13 +40,17 @@
 namespace libecs
 {
 
+class Variable;
+class Process;
+class Stepper;
+
 LIBECS_DM_CLASS( System, Entity )
 {
 public:
     // Maps used for entry lists
-    DECLARE_MAP( const String, Variable*, std::less<const String>, VariableMap );
-    DECLARE_MAP( const String, Process*, std::less<const String>, ProcessMap );
-    DECLARE_MAP( const String, System*, std::less<const String>, SystemMap );
+    typedef std::map<String, Variable*, std::less<String> > VariableMap;
+    typedef std::map<String, Process*, std::less<String> > ProcessMap;
+    typedef std::map<String, System*, std::less<String> > SystemMap;
 
     typedef boost::iterator_range< VariableMap::iterator > Variables;
     typedef boost::iterator_range< ProcessMap::iterator > Processes;
@@ -65,7 +69,7 @@ public:
     System();
     virtual ~System();
 
-    virtual const EntityType getEntityType() const
+    virtual EntityType getEntityType() const
     {
         return EntityType( EntityType::SYSTEM );
     }
@@ -173,7 +177,7 @@ public:
        @param aSystemPath A SystemPath object.
        @return a borrowed pointer to a System object pointed by aSystemPath.
     */
-    System* getSystem( SystemPathCref anID ) const;
+    System* getSystem( SystemPath const& anID ) const;
 
 
     /**
@@ -253,7 +257,7 @@ public:
     /**
        @see Entity::getSystePath()
     */
-    virtual const SystemPath getSystemPath() const;
+    virtual SystemPath getSystemPath() const;
 
     Variable const* getSizeVariable() const;
 

@@ -50,8 +50,7 @@ DataPointVector::~DataPointVector()
     }
 }
 
-DataPointVector::DataPointVector( DataPointVectorIterator aLength, 
-                                  int aPointSize ) 
+DataPointVector::DataPointVector( std::size_t aLength, int aPointSize ) 
     : theSize( aLength ),
       thePointSize( aPointSize )
 {
@@ -78,28 +77,28 @@ size_t DataPointVector::getElementSize() const
 }
 
 
-DataPointRef DataPointVector::asShort( DataPointVectorIterator aPosition )
+DataPoint& DataPointVector::asShort( std::size_t aPosition )
 {
     assert (thePointSize == 2);
     return theRawArray[ aPosition ];
 }
 
-DataPointCref 
-DataPointVector::asShort( DataPointVectorIterator aPosition ) const
+DataPoint const& 
+DataPointVector::asShort( std::size_t aPosition ) const
 {
     assert (thePointSize == 2);
     return theRawArray[ aPosition ];
 }
 
-LongDataPointRef DataPointVector::asLong( DataPointVectorIterator aPosition )
+LongDataPoint& DataPointVector::asLong( std::size_t aPosition )
 {
     assert (thePointSize == 5);
     return theRawArrayLong[ aPosition ];
 }
 
 
-LongDataPointCref 
-DataPointVector::asLong( DataPointVectorIterator aPosition ) const
+LongDataPoint const& 
+DataPointVector::asLong( std::size_t aPosition ) const
 {
     assert (thePointSize == 5);
     return theRawArrayLong[ aPosition ];

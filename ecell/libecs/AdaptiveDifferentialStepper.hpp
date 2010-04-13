@@ -39,7 +39,6 @@
 */
 namespace libecs
 {
-DECLARE_CLASS( AdaptiveDifferentialStepper );
 
 LIBECS_DM_CLASS( AdaptiveDifferentialStepper, DifferentialStepper )
 {
@@ -136,7 +135,7 @@ public:
         }
     }
 
-    const Integer isEpsilonChecked() const
+    Integer isEpsilonChecked() const
     {
         return theEpsilonChecked;
     }

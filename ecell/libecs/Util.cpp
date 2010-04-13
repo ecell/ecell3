@@ -67,7 +67,7 @@ __STRINGCAST_SPECIALIZATION_DEF( UnsignedInteger, String );
 // Specialization here for <Real,String> does this job.
 
 template< typename T >
-const Real stringToFloat( StringCref aValue )
+const Real stringToFloat( String const& aValue )
 {
     String aCaseless( boost::algorithm::to_lower_copy( aValue ) );
     
@@ -86,14 +86,14 @@ const Real stringToFloat( StringCref aValue )
 }
 
 template<>
-const Real stringCast<Real,String>( StringCref aValue )
+const Real stringCast<Real,String>( String const& aValue )
 {
     return stringToFloat<Real>( aValue );
 }
 
 #if !HIGHREAL_IS_REAL
 template<>
-const HighReal stringCast<HighReal,String>( StringCref aValue )
+const HighReal stringCast<HighReal,String>( String const& aValue )
 {
     return stringToFloat<HighReal>( aValue );
 }
@@ -103,7 +103,7 @@ const HighReal stringCast<HighReal,String>( StringCref aValue )
 #undef __STRINGCAST_SPECIALIZATION_DEF
 
 
-void eraseWhiteSpaces( StringRef str )
+void eraseWhiteSpaces( String& str )
 {
     static const String aSpaceCharacters( " \t\n" );
 

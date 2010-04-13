@@ -51,7 +51,7 @@ PhysicalLogger::~PhysicalLogger()
     delete theVector;
 }
             
-void PhysicalLogger::push( DataPointCref aDataPoint )
+void PhysicalLogger::push( DataPoint const& aDataPoint )
 {
     theVector->push_back( aDataPoint );
 }
@@ -80,9 +80,9 @@ LongDataPoint PhysicalLogger::at( size_type index) const
 }
 
 PhysicalLogger::size_type 
-PhysicalLogger::lower_bound( const size_type start,
-                             const size_type end,
-                             const Real time ) const
+PhysicalLogger::lower_bound( size_type start,
+                             size_type end,
+                             Real time ) const
 {
     size_type iterator( ( start + end ) / 2 );
     size_type i_start( start );
@@ -117,9 +117,9 @@ PhysicalLogger::lower_bound( const size_type start,
 }
 
 PhysicalLogger::size_type 
-PhysicalLogger::upper_bound( const size_type start,
-                             const size_type end,
-                             const Real time ) const
+PhysicalLogger::upper_bound( size_type start,
+                             size_type end,
+                             Real time ) const
 {
     size_type result( lower_bound( start, end, time ) );
     
@@ -133,9 +133,9 @@ PhysicalLogger::upper_bound( const size_type start,
 
 
 PhysicalLogger::size_type 
-PhysicalLogger::lower_bound_linear_backwards( const size_type start,
-                                              const size_type end,
-                                              const Real time ) const
+PhysicalLogger::lower_bound_linear_backwards( size_type start,
+                                              size_type end,
+                                              Real time ) const
 {
     size_type i_start( start );
     size_type i_end( end );
@@ -155,10 +155,10 @@ PhysicalLogger::lower_bound_linear_backwards( const size_type start,
 }
 
 PhysicalLogger::size_type 
-PhysicalLogger::lower_bound_linear_estimate( const size_type start,
-                                             const size_type end,
-                                             const Real time,
-                                             const Real time_per_step ) const
+PhysicalLogger::lower_bound_linear_estimate( size_type start,
+                                             size_type end,
+                                             Real time,
+                                             Real time_per_step ) const
 {
     //if time_per_step is zero fall back to stepwise linear search
     if ( time_per_step == 0 )
@@ -185,10 +185,10 @@ PhysicalLogger::lower_bound_linear_estimate( const size_type start,
 }
 
 PhysicalLogger::size_type 
-PhysicalLogger::upper_bound_linear_estimate( const size_type start,
-                                             const size_type end,
-                                             const Real time,
-                                             const Real time_per_step ) const
+PhysicalLogger::upper_bound_linear_estimate( size_type start,
+                                             size_type end,
+                                             Real time,
+                                             Real time_per_step ) const
 {
     size_type result( lower_bound_linear_estimate( start, end, time, time_per_step ) );
     
@@ -202,9 +202,9 @@ PhysicalLogger::upper_bound_linear_estimate( const size_type start,
 }
 
 PhysicalLogger::size_type 
-PhysicalLogger::lower_bound_linear( const size_type start,
-                                    const size_type end,
-                                    const Real time ) const
+PhysicalLogger::lower_bound_linear( size_type start,
+                                    size_type end,
+                                    Real time ) const
 {
     size_type i_start( start );
     size_type i_end( end );
@@ -237,9 +237,9 @@ PhysicalLogger::lower_bound_linear( const size_type start,
 
 
 PhysicalLogger::size_type 
-PhysicalLogger::upper_bound_linear( const size_type start,
-                                    const size_type end,
-                                    const Real time ) const
+PhysicalLogger::upper_bound_linear( size_type start,
+                                    size_type end,
+                                    Real time ) const
 {
     size_type result( lower_bound_linear( start, end, time ) );
     
@@ -252,8 +252,7 @@ PhysicalLogger::upper_bound_linear( const size_type start,
 }
 
 boost::shared_ptr< DataPointVector > 
-PhysicalLogger::getVector( const size_type start,
-                           const size_type end ) const
+PhysicalLogger::getVector( size_type start, size_type end ) const
 {
     size_type i_start ( start );
     size_type i_end ( end );
@@ -266,15 +265,15 @@ PhysicalLogger::getVector( const size_type start,
     
     size_type counter ( start );
     
-    DataPointVectorPtr aVector;
+    DataPointVector* aVector;
     
     if ( empty() )
     {
-        aVector = new DataPointVector ( 0, 2 );
+        aVector = new DataPointVector( 0, 2 );
     }
     else
     {
-        aVector = new DataPointVector ( end - start + 1, 2 );
+        aVector = new DataPointVector( end - start + 1, 2 );
         
         do 
         {

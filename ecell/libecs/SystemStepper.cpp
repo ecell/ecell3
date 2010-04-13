@@ -68,14 +68,14 @@ void SystemStepper::step()
     setStepInterval( INF );
 }
 
-void SystemStepper::integrate( RealParam aTime )
+void SystemStepper::integrate( Real aTime )
 {
     integrateVariablesRecursively( getModel()->getRootSystem(), aTime );
     setCurrentTime( aTime );
 }
 
 void SystemStepper::integrateVariablesRecursively( System* aSystem,
-                                                   RealParam aTime )
+                                                   Real aTime )
 {
     FOR_ALL( System::Variables, aSystem->getVariables() )
     {
