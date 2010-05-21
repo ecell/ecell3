@@ -144,10 +144,11 @@ public:
     registerPropertySlot( PropertySlotBase* aPropertySlotPtr )
     {
         String const& aName( aPropertySlotPtr->getName() );
-        if( findPropertySlot( aName ) != thePropertySlotMap.end() )
+        PropertySlotMapConstIterator i( findPropertySlot( aName ) );
+        if ( i != thePropertySlotMap.end() )
         {
             // it already exists. take the latter one.
-            delete thePropertySlotMap[ aName ];
+            delete ( *i ).second;
             thePropertySlotMap.erase( aName );
         }
 
