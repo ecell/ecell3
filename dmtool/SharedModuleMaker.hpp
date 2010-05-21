@@ -182,17 +182,14 @@ protected:
                 {
                     break;
                 }
+                const char* err( lt_dlerror() );
                 if ( error.empty() )
                 {
-                    error = lt_dlerror();
-                    if ( error.empty() )
-                    {
-                        error = "unknown reasons";
-                    }
+                    error = err ? err: "unknown reasons";
                 }
                 else
                 {
-                    if ( error != lt_dlerror() )
+                    if ( !err || error != err )
                     {
                         error = "various reasons";
                     }
