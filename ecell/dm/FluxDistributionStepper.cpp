@@ -91,7 +91,7 @@ public:
           Epsilon( 1e-6 ),
           theIrreversibleFlag( false )
     {
-        initializeStepInterval( INF );
+        DifferentialStepper::setStepInterval( INF );
     }
 
     ~FluxDistributionStepper()

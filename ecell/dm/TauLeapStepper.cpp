@@ -108,7 +108,7 @@ public:
 
         calculateTau();
 
-        initializeStepInterval( getTau() );
+        DifferentialStepper::setStepInterval( getTau() );
 
         FOR_ALL( GillespieProcessVector, theGillespieProcessVector )
         {

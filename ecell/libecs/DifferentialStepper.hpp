@@ -58,10 +58,6 @@ public:
         INHERIT_PROPERTIES( Stepper );
 
         // FIXME: load/save ??
-        PROPERTYSLOT( Real, StepInterval,
-                      &DifferentialStepper::initializeStepInterval,
-                      &DifferentialStepper::getStepInterval );
-        
         PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, NextStepInterval );
         PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real,    TolerableStepInterval );
         PROPERTYSLOT_GET_NO_LOAD_SAVE( Integer,    Stage );
@@ -118,9 +114,9 @@ public:
         return theTolerableStepInterval;
     }
 
-    void initializeStepInterval( Real aStepInterval )
+    virtual void setStepInterval( Real aStepInterval )
     {
-        setStepInterval( aStepInterval );
+        Stepper::setStepInterval( aStepInterval );
         setTolerableStepInterval( aStepInterval );
         setNextStepInterval( aStepInterval );
     }

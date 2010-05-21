@@ -146,7 +146,7 @@ public:
 
        @return the step interval of this Stepper
     */
-    GET_METHOD( Real, StepInterval )
+    virtual GET_METHOD( Real, StepInterval )
     {
         const Real aNextTime( getNextTime() );
         const Real aCurrentTime( getCurrentTime() );
