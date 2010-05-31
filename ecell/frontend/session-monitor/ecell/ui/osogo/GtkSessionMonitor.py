@@ -532,7 +532,6 @@ class GtkSessionMonitor(Session):
         """
         saves logging policy into config database
         """
-
         self.setParameter( 'logger_min_step', logPolicy[0] )
         self.setParameter( 'logger_min_interval', logPolicy[1] ) 
         self.setParameter( 'end_policy' , logPolicy[2] )

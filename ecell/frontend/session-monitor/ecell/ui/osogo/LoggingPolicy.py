@@ -69,7 +69,7 @@ class LoggingPolicy( Window ):
 			)
 		self.theSession = aSession
 		# Sets the return number
-		self.___num = CANCEL_PRESSED
+		self.___num = None
 
 		# Create the Dialog
 		self.win = gtk.Dialog("Logging Policy", None, gtk.DIALOG_MODAL)
@@ -113,14 +113,10 @@ class LoggingPolicy( Window ):
 
 		# add handlers
 		self.addHandlers( {
-			"on_space_max_toggled" : self.__buttonChosen,
-			"on_space_no_limit_toggled" : self.__buttonChosen,
-			"on_end_overwrite_toggled" : self.__buttonChosen,
-			"on_end_throw_ex_toggled" : self.__buttonChosen,
-			"on_log_by_secs_toggled" : self.__buttonChosen,
-			"on_log_by_step_toggled" : self.__buttonChosen } )
-
-		gtk.main()
+			"on_space_max_toggled" : self.__spaceLimitButtonChosen,
+			"on_space_no_limit_toggled" : self.__spaceNoLimitButtonChosen,
+			"on_log_by_secs_toggled" : self.__logBySecsButtonChosen,
+			"on_log_by_step_toggled" : self.__logByStepButtonChosen } )
 
 
 	def openConfirmWindow(self,  aMessage, aTitle, isCancel = 1 ):
@@ -202,18 +198,19 @@ class LoggingPolicy( Window ):
 
 
 	# ==========================================================================
-	def __buttonChosen( self, *args ):
-		aName = args[0].get_name()
-		if aName == "log_by_secs":
-			self['second_entry'].set_sensitive( True )
-			self['step_entry'].set_sensitive( False )
-		elif aName == "log_by_step":
-			self['second_entry'].set_sensitive( False )
-			self['step_entry'].set_sensitive( True )
-		elif aName == "space_no_limit":
-			self['space_entry'].set_sensitive( False )
-		elif aName == "spac_max":
-			self['space_entry'].set_sensitive( True )
+	def __logBySecsButtonChosen( self, *args ):
+		self['second_entry'].set_sensitive( True )
+		self['step_entry'].set_sensitive( False )
+
+	def __logByStepButtonChosen( self, *args ):
+		self['second_entry'].set_sensitive( False )
+		self['step_entry'].set_sensitive( True )
+
+	def __spaceNoLimitButtonChosen( self, *args ):
+		self['space_entry'].set_sensitive( False )
+
+	def __spaceLimitButtonChosen( self, *args ):
+		self['space_entry'].set_sensitive( True )
 
 
 	# ==========================================================================
@@ -237,7 +234,6 @@ class LoggingPolicy( Window ):
 		"""
 
 		# set the return number
-		self.___num = None
 		self.destroy()
 	
 
@@ -254,5 +250,4 @@ class LoggingPolicy( Window ):
 		"""destroy dialog
 		"""
 		self.win.hide()
-		gtk.mainquit()
 

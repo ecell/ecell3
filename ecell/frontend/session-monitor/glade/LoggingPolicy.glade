@@ -227,7 +227,6 @@
 		      <property name="active">False</property>
 		      <property name="inconsistent">False</property>
 		      <property name="draw_indicator">True</property>
-		      <signal name="toggled" handler="on_end_throw_ex_toggled" last_modification_time="Sat, 29 May 2004 12:31:19 GMT"/>
 		    </widget>
 		    <packing>
 		      <property name="padding">0</property>
@@ -247,7 +246,6 @@
 		      <property name="inconsistent">False</property>
 		      <property name="draw_indicator">True</property>
 		      <property name="group">end_throw_ex</property>
-		      <signal name="toggled" handler="on_end_overwrite_toggled" last_modification_time="Sat, 29 May 2004 12:31:26 GMT"/>
 		    </widget>
 		    <packing>
 		      <property name="padding">0</property>
