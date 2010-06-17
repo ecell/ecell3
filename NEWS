@@ -1,4 +1,19 @@
+ecell-3.2.1: 17-Jun-2010
+
+ * Removed DifferentialStepper::initializeStepInterval() in favor of
+   virtualized Stepper::setStepInterval().
+
+ * Better compatibility with Fujitsu C++ compiler.
+
+ * Fixed possible segmentation fault that occurs during loading a DM.
+
+ * Removed funky macros derived from UtilLinux.
+
+ * Optimized code in VariableReference.
+
+
 ecell-3.2.0p2: 2-Apr-2010
+
  * Fixed DataPointVector's python wrapper to have "shape" property that returns
    the shape of the array.  That is required by TableIO module.
    (notified by Erin Rachael Shellman. Thanks.)
