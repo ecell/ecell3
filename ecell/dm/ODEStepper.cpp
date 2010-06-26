@@ -139,17 +139,17 @@ public:
     Real estimateLocalError( Real const aStepInterval );
 
     void initializeRadauIIA( VariableVector::size_type );
-    std::pair< bool, Real > calculateRadauIIA( Real const aStepInterval, Real const aPreviousStepInterval );
-    void updateInternalStateRadauIIA( Real const aStepInterval );
+    std::pair< bool, Real > calculateRadauIIA( Real aStepInterval, Real aPreviousStepInterval );
+    void updateInternalStateRadauIIA( Real aStepInterval );
 
-    void initializeTolerance( Real value )
+    void initializeTolerance( libecs::Param<Real>::type value )
     {
         setTolerance( value ); // AdaptiveDifferentialStepper::
         rtoler = 0.1 * pow( getTolerance(), 2.0 / 3.0 );
         atoler = rtoler * getAbsoluteToleranceFactor();
     }
 
-    void initializeAbsoluteToleranceFactor( Real value )
+    void initializeAbsoluteToleranceFactor( libecs::Param<Real>::type value )
     {
         setAbsoluteToleranceFactor( value ); // AdaptiveDifferentialStepper::
         atoler = rtoler * getAbsoluteToleranceFactor();
@@ -619,7 +619,7 @@ Real ODEStepper::solve()
     return sqrt( aNorm / ( 3 * theSystemSize ) );
 }
 
-std::pair< bool, Real > ODEStepper::calculateRadauIIA( Real const aStepInterval, Real const aPreviousStepInterval )
+std::pair< bool, Real > ODEStepper::calculateRadauIIA( Real aStepInterval, Real aPreviousStepInterval )
 {
     Real aNewStepInterval;
     Real aNorm( 0. );

@@ -179,8 +179,8 @@ public:
     typedef SlotType ( T::* GetMethodPtr )() const;
 
     ConcretePropertySlot( String const& aName,
-                          const SetMethodPtr aSetMethodPtr,
-                          const GetMethodPtr aGetMethodPtr )
+                          SetMethodPtr aSetMethodPtr,
+                          GetMethodPtr aGetMethodPtr )
         : theName( aName ),
           theType( PropertySlotBase::TypeToTypeCode< SlotType_ >::value ),
           theSetMethodPtr( SetMethod( aSetMethodPtr ) ),

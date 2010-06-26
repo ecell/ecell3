@@ -176,7 +176,7 @@ public:
     }
 
 
-    void loadValue( Real aValue )
+    void loadValue( Param<Real>::type aValue )
     {
         theValue = aValue;
     }
