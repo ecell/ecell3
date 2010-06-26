@@ -57,10 +57,10 @@ class PersistentIDPolicy
 
 public:
 
-    typedef uint64_t               ID;
-    typedef std::vector< ID >      IDVector;
-    typedef IDVector::size_type    Index;
-    typedef IDVector::const_iterator IDIterator;
+  typedef uint64_t               ID;
+  typedef std::vector< ID >      IDVector;
+  typedef IDVector::size_type    Index;
+  typedef IDVector::const_iterator IDIterator;
 
 #if defined( HAVE_UNORDERED_MAP ) || defined( HAVE_TR1_UNORDERED_MAP )
 
@@ -108,17 +108,17 @@ public:
         this->indexMap.clear();
     }
 
-    const Index getIndex( const ID id ) const
-    {
-        IndexMap::const_iterator i = this->indexMap.find( id );
-
-        if( i == this->indexMap.end() )
-        {
-            throw std::out_of_range( "PersistentIDPolicy::getIndex()" );
-        }
-
-        return (*i).second;
-    }
+  const Index getIndex( const ID id ) const
+  {
+    IndexMap::const_iterator i = this->indexMap.find( id );
+    
+    if( i == this->indexMap.end() )
+      {
+	throw std::out_of_range( "PersistentIDPolicy::getIndex()" );
+      }
+    
+    return (*i).second;
+  }
 
     const ID getIDByIndex( const Index index ) const
     {
