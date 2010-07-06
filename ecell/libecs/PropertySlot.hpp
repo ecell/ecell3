@@ -338,7 +338,7 @@ public:
     }
 
 protected:
-    inline void callLoadMethod( T& anObject, typename Param<SlotType>::type const& aValue ) const
+    inline void callLoadMethod( T& anObject, typename Param<SlotType>::type aValue ) const
     {
         ( anObject.*theLoadMethodPtr )( aValue );
     }
