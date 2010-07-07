@@ -17,7 +17,8 @@ class FileSelection(gtk.FileChooserDialog):
         self.cancel_button = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
         self.ok_button = self.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
         self.ok_button.grab_default()
-        self.set_alternative_button_order([gtk.RESPONSE_OK, gtk.RESPONSE_CANCEL])
+        if hasattr(self, "set_alternative_button_order"):
+            self.set_alternative_button_order([gtk.RESPONSE_OK, gtk.RESPONSE_CANCEL])
 
     def __set_action(self, action):
         gtk.FileChooserDialog.set_action(self, self.actions[action])
