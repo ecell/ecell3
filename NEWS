@@ -1,4 +1,6 @@
-ecell-3.2.1: 7-Jul-2010
+ecell-3.2.1: ?-Jul-2010
+
+ * Fix segmentation fault in PythonProcess and PythonFluxProcess.
 
  * Removed DifferentialStepper::initializeStepInterval() in favor of
    virtualized Stepper::setStepInterval().
