@@ -67,7 +67,7 @@ public:
         }
     }
 
-    ~PythonProcessBase()
+    virtual ~PythonProcessBase()
     {
         // ; do nothing
     }
@@ -155,7 +155,7 @@ public:
 
         // extract 'this' Process's methods and attributes
         boost::python::object aPySelfProcess(
-            boost::python::ptr( reinterpret_cast< libecs::Process* >( this ) ) );
+            boost::python::ptr( dynamic_cast< libecs::Process* const >( this ) ) );
 
         theGlobalNamespace[ "self" ] = aPySelfProcess;
 
