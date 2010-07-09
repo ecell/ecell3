@@ -94,7 +94,7 @@ public:
         DifferentialStepper::setStepInterval( INF );
     }
 
-    ~FluxDistributionStepper()
+    virtual ~FluxDistributionStepper()
     {
         if ( theUnknownMatrix )
         {
