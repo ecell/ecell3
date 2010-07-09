@@ -39,6 +39,7 @@ struct QuasiDynamicFluxProcessInterface
 
     virtual GET_METHOD( libecs::Real, Vmax ) = 0;
 
+    virtual ~QuasiDynamicFluxProcessInterface() {}
 };
 
 #endif /* __QUASIDYNAMICFLUXPROCESSINTERFACE_HPP */

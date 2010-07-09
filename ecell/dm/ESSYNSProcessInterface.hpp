@@ -36,6 +36,8 @@ struct ESSYNSProcessInterface
     virtual const boost::multi_array< libecs::Real, 2 >& getESSYNSMatrix() = 0;
 
     virtual libecs::Integer getSystemSize() const = 0;
+
+    virtual ~ESSYNSProcessInterface() {}
 };
 
 #endif /* __ESSYNSPROCESS_HPP */

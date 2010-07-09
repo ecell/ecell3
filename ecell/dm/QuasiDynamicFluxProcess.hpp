@@ -56,7 +56,7 @@ public:
         theFluxDistributionVector.reserve( 0 );
     }
 
-    ~QuasiDynamicFluxProcess()
+    virtual ~QuasiDynamicFluxProcess()
     {
         ; // do nothing
     }

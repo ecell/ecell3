@@ -161,7 +161,7 @@ public:
         // ; do nothing
     }
 
-    ~ExpressionProcessBase()
+    virtual ~ExpressionProcessBase()
     {
         delete theCompiledCode;
     }
