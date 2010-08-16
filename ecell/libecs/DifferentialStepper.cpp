@@ -277,7 +277,7 @@ void DifferentialStepper::step()
 
 void DifferentialStepper::updateInternalState( Real aStepInterval )
 {
-    setStepInterval( aStepInterval );
+    Stepper::setStepInterval( aStepInterval );
 
     // check if the step interval was changed, by epsilon
     if ( std::fabs( getTolerableStepInterval() - aStepInterval )
