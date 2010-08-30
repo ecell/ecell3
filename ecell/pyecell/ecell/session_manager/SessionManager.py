@@ -796,7 +796,7 @@ class SessionManager( object ):
         return int : job id
         '''
         # creates AbstractSessionProxy
-        jva.suob = self.__theSystemProxy.createSessionProxy()
+        job = self.__theSystemProxy.createSessionProxy()
         job.setScriptFileName( scriptfile )
         job.setInterpreter( interpreter )
         if arguments != None:
@@ -853,7 +853,7 @@ class SessionManager( object ):
         self.__theSystemProxy.getSessionProxy( jobid ).clear()
 
     def clearAllSessionProxies( self ):
-        for job in self.getSessionProxies():
+        for job in list(self.getSessionProxies()):
             job.clear()
 
     def clearRunningSessionProxies( self ):
