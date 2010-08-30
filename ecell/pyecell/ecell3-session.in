@@ -49,11 +49,8 @@ class Console:
 
     # Session methods
     def loadScript( self, ecs, parameters={} ):
-        ( ecsDir, ecsFile ) = os.path.split( ecs )
-        if ecsDir != '':
-            os.chdir( ecsDir )
         aContext = self.__createScriptContext( parameters )
-        execfile( ecsFile, aContext )
+        execfile( ecs, aContext )
 
     def interact( self, parameters = {} ):
         aContext = self.__createScriptContext( parameters )
@@ -83,6 +80,8 @@ Usage:
 
 Options:
 
+    -C                                 :  change to the directory where
+                                          the script (.ess) file is placed.
     -e or --exec=[.ess file]           :  load script (.ess) file
     -f or --file=[.eml file]           :  load model (.eml) file
     
@@ -115,6 +114,7 @@ def main():
     # -------------------------------------
     anEmlFile = None
     anEssFile = None
+    chdirToEssFile = False
     anEmlFlag = 0
 
     aParameters = {}
@@ -139,7 +139,7 @@ def main():
     # -------------------------------------
     try:
         opts, args = getopt.gnu_getopt(
-            sys.argv[ 1: ] , 'he:f:D:',
+            sys.argv[ 1: ] , 'he:f:D:C',
             [ "parameters=", "help", "exec=", "file=" ] )
     except:
         usage()
@@ -170,6 +170,10 @@ def main():
                 usage()
                 sys.exit( -1 )
             anEmlFile = anArg            
+
+        # change directory where ESS file is placed.
+        if anOption == "-C":
+            chdirToEssFile = True
 
         # set session parameters            
         if anOption == "-D":
@@ -226,6 +230,9 @@ More info: http://www.e-cell.org/software''' % (
         aSession.loadModel( anEmlFile )
 
     if anEssFile:
+        if chdirToEssFile:
+            anEssDirectory, anEssFile = os.path.split( anEssFile )
+            os.chdir( anEssDirectory )
         aConsole.loadScript( anEssFile, aParameters )
     else:
         aConsole.interact( aParameters )
