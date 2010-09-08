@@ -48,9 +48,9 @@ LIBECS_DM_CLASS( System, Entity )
 {
 public:
     // Maps used for entry lists
-    typedef std::map<String, Variable*, std::less<String> > VariableMap;
-    typedef std::map<String, Process*, std::less<String> > ProcessMap;
-    typedef std::map<String, System*, std::less<String> > SystemMap;
+    typedef std::map< String, Variable*, std::less< String > > VariableMap;
+    typedef std::map< String, Process*, std::less< String > > ProcessMap;
+    typedef std::map< String, System*, std::less< String > > SystemMap;
 
     typedef boost::iterator_range< VariableMap::iterator > Variables;
     typedef boost::iterator_range< ProcessMap::iterator > Processes;
@@ -121,7 +121,7 @@ public:
     }
 
     template <class T_>
-    boost::iterator_range< typename std::map< const String, T_*, std::less<const String> >::iterator > getEntities() const;
+    boost::iterator_range< typename std::map< String, T_*, std::less< String > >::iterator > getEntities() const;
 
     Variables getVariables() const
     {
@@ -295,19 +295,19 @@ private:
 
 
 template <>
-inline System::Variables System::getEntities< Variable >() const
+inline typename System::Variables System::getEntities< Variable >() const
 {
     return getVariables();
 }
 
 template <>
-inline System::Processes System::getEntities< Process >() const
+inline typename System::Processes System::getEntities< Process >() const
 {
     return getProcesses();
 }
 
 template <>
-inline System::Systems   System::getEntities< System >() const
+inline typename System::Systems   System::getEntities< System >() const
 {
     return getSystems();
 }
