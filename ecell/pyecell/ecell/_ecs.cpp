@@ -2688,7 +2688,9 @@ static py::object Process_get_variableReferences( Process* self )
     return py::object( VariableReferences( self ) );
 }
 
-static Polymorph Entity___getattr__( Entity* self, std::string key )
+template< typename TecsObject_ >
+static Polymorph EcsObject___getattr__( TecsObject_* self, std::string key )
+try
 {
     if ( key == "__members__" || key == "__methods__" )
     {
@@ -2698,25 +2700,38 @@ static Polymorph Entity___getattr__( Entity* self, std::string key )
 
     return self->getProperty( key );
 }
-
-static void Entity___setattr__( py::object aSelf, py::object key, py::object value )
+catch ( NoSlot const& anException )
 {
-    py::handle<> aDescr( py::allow_null( PyObject_GetAttr( reinterpret_cast< PyObject* >( aSelf.ptr()->ob_type ), key.ptr() ) ) );
+    PyErr_SetString( PyExc_AttributeError, anException.what() );
+    py::throw_error_already_set();
+    return Polymorph();
+}
+
+template< typename TecsObject_ >
+static void EcsObject___setattr__( py::back_reference< TecsObject_* > aSelf, py::object key, py::object value )
+try
+{
+    py::handle<> aDescr( py::allow_null( PyObject_GetAttr( reinterpret_cast< PyObject* >( aSelf.source().ptr()->ob_type ), key.ptr() ) ) );
     if ( !aDescr || !( aDescr->ob_type->tp_flags & Py_TPFLAGS_HAVE_CLASS ) || !aDescr.get()->ob_type->tp_descr_set )
     {
         PyErr_Clear();
-        Entity* self = py::extract< Entity* >( aSelf );
+        EcsObject* self = aSelf.get();
         std::string keyStr = py::extract< std::string >( key );
         self->setProperty( keyStr, py::extract< Polymorph >( value ) );
     }
     else
     {
-        aDescr.get()->ob_type->tp_descr_set( aDescr.get(), aSelf.ptr(), value.ptr() );
+        aDescr.get()->ob_type->tp_descr_set( aDescr.get(), aSelf.source().ptr(), value.ptr() );
         if (PyErr_Occurred())
         {
             py::throw_error_already_set();
         }
     }
+}
+catch ( NoSlot const& anException )
+{
+    PyErr_SetString( PyExc_AttributeError, anException.what() );
+    py::throw_error_already_set();
 }
 
 template< typename T_ >
@@ -2926,6 +2941,8 @@ BOOST_PYTHON_MODULE( _ecs )
                        &Stepper::getMinStepInterval,
                        &Stepper::setMinStepInterval )
         .add_property( "RngSeed", &writeOnly<Stepper>, &Stepper::setRngSeed )
+        .def( "__setattr__", &EcsObject___setattr__< Stepper > )
+        .def( "__getattr__", &EcsObject___getattr__< Stepper > )
         ;
 
     py::class_< Entity, py::bases<>, Entity, boost::noncopyable >
@@ -2937,8 +2954,8 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "ID", &Entity::getID, &Entity::setID )
         .add_property( "FullID", &Entity::getFullID )
         .add_property( "Name", &Entity::getName )
-        .def( "__setattr__", &Entity___setattr__ )
-        .def( "__getattr__", &Entity___getattr__ )
+        .def( "__setattr__", &EcsObject___setattr__< Entity > )
+        .def( "__getattr__", &EcsObject___getattr__< Entity > )
         ;
 
     py::class_< System, py::bases< Entity >, System, boost::noncopyable>
