@@ -41,14 +41,14 @@ namespace libecs { namespace scripting {
  appendInstruction\
    ( Instruction<OBJECT_METHOD_REAL>\
      ( RealObjectMethodProxy::\
-       create< CLASSNAME, & CLASSNAME::METHODNAME >\
+       createConst< CLASSNAME, & CLASSNAME::METHODNAME >\
        ( OBJECT ) ) ) // \
  
 #define APPEND_OBJECT_METHOD_INTEGER( OBJECT, CLASSNAME, METHODNAME )\
  appendInstruction\
    ( Instruction<OBJECT_METHOD_INTEGER>\
      ( IntegerObjectMethodProxy::\
-       create< CLASSNAME, & CLASSNAME::METHODNAME >\
+       createConst< CLASSNAME, & CLASSNAME::METHODNAME >\
        ( OBJECT ) ) ) // \
  
 void
