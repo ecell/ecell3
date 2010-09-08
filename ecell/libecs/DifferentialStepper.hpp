@@ -36,6 +36,7 @@
 #include "libecs/Stepper.hpp"
 
 #include <boost/multi_array.hpp>
+#include <iostream>
 
 namespace libecs
 {
@@ -114,12 +115,7 @@ public:
         return theTolerableStepInterval;
     }
 
-    virtual void setStepInterval( Real aStepInterval )
-    {
-        Stepper::setStepInterval( aStepInterval );
-        setTolerableStepInterval( aStepInterval );
-        setNextStepInterval( aStepInterval );
-    }
+    virtual SET_METHOD( Real, StepInterval );
 
     void resetAll();
 

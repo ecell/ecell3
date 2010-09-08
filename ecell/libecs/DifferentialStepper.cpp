@@ -407,5 +407,11 @@ Interpolant* DifferentialStepper::createInterpolant( Variable const* aVariable )
     return new DifferentialStepper::Interpolant( aVariable, this );
 }
 
+SET_METHOD_DEF( Real, StepInterval, DifferentialStepper )
+{
+    Stepper::setStepInterval( value );
+    setTolerableStepInterval( value );
+    setNextStepInterval( value );
+}
 
 } // namespace libecs

@@ -146,7 +146,7 @@ public:
 
        @return the step interval of this Stepper
     */
-    virtual GET_METHOD( Real, StepInterval )
+    GET_METHOD( Real, StepInterval )
     {
         const Real aNextTime( getNextTime() );
         const Real aCurrentTime( getCurrentTime() );
@@ -157,10 +157,7 @@ public:
         return aNextTime - aCurrentTime;
     }
 
-    SET_METHOD( Real, StepInterval )
-    {
-        setNextTime( getCurrentTime() + value );
-    }
+    virtual SET_METHOD( Real, StepInterval );
 
     /**
        This may be overridden in dynamically scheduled steppers.

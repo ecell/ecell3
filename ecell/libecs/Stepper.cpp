@@ -572,6 +572,10 @@ void Stepper::reset()
     }
 }
 
+SET_METHOD_DEF( Real, StepInterval, Stepper )
+{
+    setNextTime( getCurrentTime() + value );
+}
 
 SET_METHOD_DEF( String, RngSeed, Stepper )
 {
