@@ -31,7 +31,7 @@
 
 #include <libecs/libecs.hpp>
 
-struct ESSYNSProcessInterface
+struct DM_IF ESSYNSProcessInterface
 {
     virtual const boost::multi_array< libecs::Real, 2 >& getESSYNSMatrix() = 0;
 

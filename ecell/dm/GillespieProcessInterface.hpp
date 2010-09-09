@@ -30,7 +30,7 @@
 
 #include <libecs/libecs.hpp>
 
-struct GillespieProcessInterface
+struct DM_IF GillespieProcessInterface
 {
     virtual GET_METHOD( libecs::Real, Propensity ) = 0;
 
