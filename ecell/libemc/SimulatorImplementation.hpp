@@ -169,13 +169,13 @@ public:
 
     virtual libecs::Polymorph getNextEvent() const = 0;
 
-    virtual void step( const libecs::Integer aNumSteps ) = 0;
+    virtual void step( libecs::Integer aNumSteps ) = 0;
 
     virtual libecs::Real getCurrentTime() const = 0;
 
     virtual void run() = 0;
 
-    virtual void run( const libecs::Real aDuration ) = 0;
+    virtual void run( libecs::Real aDuration ) = 0;
 
     virtual void stop() = 0;
 
