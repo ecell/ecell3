@@ -33,10 +33,10 @@ GillespieProcess::GillespieProcess()
     : theOrder( 0 ),
       c( 0.0 ),
       theGetPropensityMethodPtr(
-              RealMethodProxy::create<
+              RealMethodProxy::createConst<
                       &GillespieProcess::getZero>() ),
       theGetMinValueMethodPtr(
-              RealMethodProxy::create<
+              RealMethodProxy::createConst<
                       &GillespieProcess::getZero>() ),
       theGetPDMethodPtr( &GillespieProcess::getPD_Zero )
 {
@@ -310,35 +310,35 @@ void GillespieProcess::calculateOrder()
     if( theOrder == 0 )     // no substrate
     {
         theGetPropensityMethodPtr =
-                    RealMethodProxy::create<&GillespieProcess::getZero>();
+                    RealMethodProxy::createConst<&GillespieProcess::getZero>();
         theGetMinValueMethodPtr   =
-                    RealMethodProxy::create<&GillespieProcess::getZero>();
+                    RealMethodProxy::createConst<&GillespieProcess::getZero>();
         theGetPDMethodPtr         = &GillespieProcess::getPD_Zero;
     }
     else if( theOrder == 1 )     // one substrate, first order.
     {
         theGetPropensityMethodPtr =
-                    RealMethodProxy::create<&GillespieProcess::getPropensity_FirstOrder>();
+                    RealMethodProxy::createConst<&GillespieProcess::getPropensity_FirstOrder>();
         theGetMinValueMethodPtr   =
-                    RealMethodProxy::create<&GillespieProcess::getMinValue_FirstOrder>();
+                    RealMethodProxy::createConst<&GillespieProcess::getMinValue_FirstOrder>();
         theGetPDMethodPtr         = &GillespieProcess::getPD_FirstOrder;
     }
     else if( theOrder == 2 )
     {
         if( getZeroVariableReferenceOffset() == 2 ) // 2 substrates, 2nd order
         {    
-            theGetPropensityMethodPtr   = RealMethodProxy::create<
+            theGetPropensityMethodPtr   = RealMethodProxy::createConst<
                     &GillespieProcess::getPropensity_SecondOrder_TwoSubstrates > ();
-            theGetMinValueMethodPtr     = RealMethodProxy::create<
+            theGetMinValueMethodPtr     = RealMethodProxy::createConst<
                     &GillespieProcess::getMinValue_SecondOrder_TwoSubstrates >();
             theGetPDMethodPtr           =
                     &GillespieProcess::getPD_SecondOrder_TwoSubstrates;
         }
         else // one substrate, second order (coeff == -2)
         {
-            theGetPropensityMethodPtr = RealMethodProxy::create<
+            theGetPropensityMethodPtr = RealMethodProxy::createConst<
                     &GillespieProcess::getPropensity_SecondOrder_OneSubstrate>();
-            theGetMinValueMethodPtr   = RealMethodProxy::create<
+            theGetMinValueMethodPtr   = RealMethodProxy::createConst<
                     &GillespieProcess::getMinValue_SecondOrder_OneSubstrate>();
             theGetPDMethodPtr         =
                     &GillespieProcess::getPD_SecondOrder_OneSubstrate;
@@ -347,9 +347,9 @@ void GillespieProcess::calculateOrder()
     else
     {
         //FIXME: generic functions should come here.
-        theGetPropensityMethodPtr = RealMethodProxy::create<
+        theGetPropensityMethodPtr = RealMethodProxy::createConst<
                 &GillespieProcess::getZero>();
-        theGetPropensityMethodPtr = RealMethodProxy::create<
+        theGetPropensityMethodPtr = RealMethodProxy::createConst<
                 &GillespieProcess::getZero>();
         theGetPDMethodPtr         = &GillespieProcess::getPD_Zero;
     }
