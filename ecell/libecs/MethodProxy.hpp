@@ -43,7 +43,7 @@ template < class CLASS, typename RET >
 class MethodProxy<CLASS, RET>
 {
 private:
-    typedef RET (* Invoker )( CLASS* );
+    typedef RET ( *Invoker )( CLASS* );
 
 public:
     RET operator()( CLASS* anObject ) const 
@@ -110,7 +110,7 @@ template < typename RET >
 class ObjectMethodProxy<RET>
 {
 private:
-    typedef RET (* Invoker )( void* );
+    typedef RET ( *Invoker )( void* );
 
 public:
     RET operator()() const 
@@ -121,13 +121,13 @@ public:
 	template < typename T, RET (T::*TMethod)() >
     static ObjectMethodProxy create( T* anObject )
     {
-        return ObjectMethodProxy( reinterpret_cast< Invoker >( &invoke< T, TMethod > ), anObject );
+        return ObjectMethodProxy( &invoke< T, TMethod >, anObject );
     }
 
 	template < typename T, RET (T::*TMethod)() const >
     static ObjectMethodProxy createConst( T const* anObject )
     {
-        return ObjectMethodProxy( reinterpret_cast< Invoker >( &invokeConst< T, TMethod > ), const_cast< T* >( anObject ) );
+        return ObjectMethodProxy( &invokeConst< T, TMethod >, const_cast< T* >( anObject ) );
     }
 
 	inline bool operator==( ObjectMethodProxy const& that ) const
@@ -151,15 +151,15 @@ private:
     }
 
     template < class T, RET (T::*TMethod)() >
-    static RET invoke( T* anObject )
+    static RET invoke( void* anObject )
     {
-        return ( anObject->*TMethod )();
+        return ( reinterpret_cast< T* >( anObject )->*TMethod )();
     }
 
     template < class T, RET (T::*TMethod)() const >
-    static RET invokeConst( T const* anObject )
+    static RET invokeConst( void* anObject )
     {
-        return ( anObject->*TMethod )();
+        return ( reinterpret_cast< T const* >( anObject )->*TMethod )();
     }
 
 private:
