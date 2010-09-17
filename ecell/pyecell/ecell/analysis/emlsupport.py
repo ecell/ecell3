@@ -131,7 +131,6 @@ class EmlSupport( ecell.eml.Eml ):
 
         if type( fileName ) == str:
             self.__theEmlFileName = os.path.abspath( fileName )
-            os.chdir( os.path.dirname( self.getEmlFileName() ) )
         else:
             raise TypeError, ' The type of fileName must be string (file name) '
 
