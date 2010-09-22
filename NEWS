@@ -1,4 +1,4 @@
-ecell-3.2.1: ?-Jul-2010
+ecell-3.2.1: 23-Sep-2010
 
  * Fix segmentation fault in PythonProcess and PythonFluxProcess.
 
