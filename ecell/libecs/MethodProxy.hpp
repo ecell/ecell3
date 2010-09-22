@@ -65,7 +65,7 @@ public:
     template< RET (CLASS::*METHOD)() const >
     static MethodProxy createConst()
     {
-        return MethodProxy( reinterpret_cast< Invoker >( &invokeConst<METHOD> ) );
+        return MethodProxy( &invokeConst<METHOD> );
     }
 
     inline bool operator==( MethodProxy const& that ) const
@@ -93,7 +93,7 @@ private:
     }
 
     template< RET (CLASS::*METHOD)() const >
-    inline static RET invokeConst( CLASS const* anObject )
+    inline static RET invokeConst( CLASS* anObject )
     {
         return ( anObject->*METHOD )();
     }
