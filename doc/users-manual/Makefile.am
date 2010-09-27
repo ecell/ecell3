@@ -3,9 +3,6 @@ DOC_ps = users-manual.ps
 DOC_pdf = users-manual.pdf
 DOC_dvi = users-manual.dvi
 
-_htmldir = $(htmldir)/$(DOC_html)
-_html_DATA = $(DOC_html)/*
-
 if BUILD_USERS_MANUAL_html
 $(DOC_html)/*: users-manual.xml
 	$(DB2HTML) -o $(DOC_html) $<
@@ -54,6 +51,20 @@ EXTRA_DIST = \
 
 if BUILD_USERS_MANUAL_html
 EXTRA_DIST += $(DOC_html)
+endif
+
+if BUILD_USERS_MANUAL_html
+install-data-local:
+	(cd "$(DOC_html)" && \
+	find . -type d | while read path; do $(INSTALL) -d "$(DESTDIR)$(htmldir)/$(DOC_html)/$$path"; done && \
+	find . -type f | while read path; do $(INSTALL) -m 644 $$path "$(DESTDIR)$(htmldir)/$(DOC_html)/$$path"; done)
+
+uninstall-local:
+	( cd "$(DESTDIR)$(htmldir)" && rm -rf "$(DOC_html)" )
+else
+install-data-local:
+
+uninstall-local:
 endif
 
 clean-local:
