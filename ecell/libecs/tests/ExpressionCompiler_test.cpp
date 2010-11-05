@@ -87,7 +87,7 @@ inline Real toReal( const T& val )
     BOOST_REQUIRE_EQUAL( op, reinterpret_cast< const scripting::InstructionHead* >(pc)->getOpcode() ); \
     if ( isReal( oper ) ) \
     { \
-        BOOST_CHECK_CLOSE_FRACTION( toReal( oper ), toReal( reinterpret_cast< const scripting::Instruction< op >* >( pc )->getOperand() ), 50 ); \
+        BOOST_CHECK_CLOSE_FRACTION( toReal( oper ), toReal( reinterpret_cast< const scripting::Instruction< op >* >( pc )->getOperand() ), .1 ); \
     } \
     else \
     { \

@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(testBasic)
             scripting::Instruction< scripting::PUSH_REAL >( i ) );
         a.appendInstruction( scripting::Instruction< scripting::ADD >() );
         a.appendInstruction( scripting::Instruction< scripting::RET >() );
-        BOOST_CHECK_CLOSE_FRACTION( i * 2, vm.execute( *code ), 50 );
+        BOOST_CHECK_CLOSE( i * 2, vm.execute( *code ), .1 );
     }
 
     for ( Real i = 0; i < 100; i += 0.8 ) {
@@ -83,7 +83,84 @@ BOOST_AUTO_TEST_CASE(testBasic)
             scripting::Instruction< scripting::PUSH_REAL >( i ) );
         a.appendInstruction( scripting::Instruction< scripting::ADD >() );
         a.appendInstruction( scripting::Instruction< scripting::RET >() );
-        BOOST_CHECK_CLOSE_FRACTION( i * 3, vm.execute( *code ), 50 );
+        BOOST_CHECK_CLOSE( i * 3, vm.execute( *code ), .1 );
+    }
+}
+
+struct Test
+{
+    Real getValue() const
+    {
+        return 4;
+    }
+};
+
+BOOST_AUTO_TEST_CASE(testFunctionCall)
+{
+    {
+        std::auto_ptr<scripting::Code> code(new scripting::Code());
+        scripting::VirtualMachine vm;
+        scripting::Assembler a( code.get() );
+        Test t;
+        a.appendInstruction(
+            scripting::Instruction< scripting::OBJECT_METHOD_REAL >(
+                scripting::RealObjectMethodProxy::createConst<
+                    Test, &Test::getValue >( &t ) ) );
+        a.appendInstruction(
+            scripting::Instruction< scripting::CALL_FUNC1 >( &std::sqrt ) );
+        a.appendInstruction(
+            scripting::Instruction< scripting::PUSH_REAL >( 1 ) );
+        a.appendInstruction( scripting::Instruction< scripting::ADD >() );
+        a.appendInstruction( scripting::Instruction< scripting::RET >() );
+        BOOST_CHECK_CLOSE( 3, vm.execute( *code ), .1 );
+    }
+   
+    {
+        std::auto_ptr<scripting::Code> code(new scripting::Code());
+        scripting::VirtualMachine vm;
+        scripting::Assembler a( code.get() );
+        a.appendInstruction(
+            scripting::Instruction< scripting::PUSH_REAL >( 4 ) );
+        a.appendInstruction(
+            scripting::Instruction< scripting::CALL_FUNC1 >( &std::sqrt ) );
+        a.appendInstruction(
+            scripting::Instruction< scripting::PUSH_REAL >( 1 ) );
+        a.appendInstruction( scripting::Instruction< scripting::ADD >() );
+        a.appendInstruction( scripting::Instruction< scripting::RET >() );
+        BOOST_CHECK_CLOSE( 3, vm.execute( *code ), .1 );
+    }
+
+    {
+        std::auto_ptr<scripting::Code> code(new scripting::Code());
+        scripting::VirtualMachine vm;
+        scripting::Assembler a( code.get() );
+        Test t;
+        a.appendInstruction(
+            scripting::Instruction< scripting::PUSH_REAL >( 1 ) );
+        a.appendInstruction(
+            scripting::Instruction< scripting::OBJECT_METHOD_REAL >(
+                scripting::RealObjectMethodProxy::createConst<
+                    Test, &Test::getValue >( &t ) ) );
+        a.appendInstruction(
+            scripting::Instruction< scripting::CALL_FUNC1 >( &std::sqrt ) );
+        a.appendInstruction( scripting::Instruction< scripting::ADD >() );
+        a.appendInstruction( scripting::Instruction< scripting::RET >() );
+        BOOST_CHECK_CLOSE( 3, vm.execute( *code ), .1 );
+    }
+   
+    {
+        std::auto_ptr<scripting::Code> code(new scripting::Code());
+        scripting::VirtualMachine vm;
+        scripting::Assembler a( code.get() );
+        a.appendInstruction(
+            scripting::Instruction< scripting::PUSH_REAL >( 1 ) );
+        a.appendInstruction(
+            scripting::Instruction< scripting::PUSH_REAL >( 4 ) );
+        a.appendInstruction(
+            scripting::Instruction< scripting::CALL_FUNC1 >( &std::sqrt ) );
+        a.appendInstruction( scripting::Instruction< scripting::ADD >() );
+        a.appendInstruction( scripting::Instruction< scripting::RET >() );
+        BOOST_CHECK_CLOSE( 3, vm.execute( *code ), .1 );
     }
 }
 
