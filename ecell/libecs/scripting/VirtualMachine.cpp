@@ -96,13 +96,12 @@ public:
     void push_back(const Telem_& elem)
     {
         *(++ptr_) = elem;
-        last = elem;
     }
 
     Telem_& pop()
     {
-        last = *(ptr_ - 1);
-        return *(ptr_--);
+        Telem_& retval(*(ptr_--));
+        return retval;
     }
 
     size_type size()
@@ -118,20 +117,23 @@ public:
     template<size_type bkidx>
     Telem_& peek()
     {
-        if ( bkidx == 0 )
-            return last;
+        return *( ptr_ - bkidx );
+    }
+
+    template<size_type bkidx>
+    Telem_ const& peek() const
+    {
         return *( ptr_ - bkidx );
     }
 
     void pop_back()
     {
-        last = *(--ptr_);
+        --ptr_;
     }
 
 private:
     Telem_ elems_[ maxdepth_ + 1 ];
     Telem_* ptr_;
-    Telem_ last;
 };
 
 
