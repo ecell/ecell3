@@ -394,7 +394,7 @@ BOOST_AUTO_TEST_CASE(testVariableReferenceResolver)
         CHECK_INSTRUCTION( pc, scripting::LOAD_REAL, &aPropertyAccess.a );
         CHECK_INSTRUCTION( pc, scripting::ADD, scripting::NoOperand() );
         CHECK_INSTRUCTION( pc, scripting::OBJECT_METHOD_REAL, (
-                scripting::RealObjectMethodProxy::create<
+                scripting::RealObjectMethodProxy::createConst<
                     Variable, &Variable::getValue >( 0 ) ) );
         CHECK_INSTRUCTION( pc, scripting::ADD, scripting::NoOperand() );
         CHECK_INSTRUCTION( pc, scripting::RET, scripting::NoOperand() );
@@ -410,4 +410,83 @@ BOOST_AUTO_TEST_CASE(testVariableReferenceResolver)
     }
 }
 
+BOOST_AUTO_TEST_CASE(testFunctionCall)
+{
+    class ErrorReporter: public scripting::ErrorReporter {
+    public:
+        ErrorReporter() {}
 
+        virtual void error( const String& type, const String& msg ) const {
+            throw type;
+        }
+    } anErrorReporter;
+
+    class PropertyAccess: public scripting::PropertyAccess {
+    public:
+        PropertyAccess()
+            : a(0), b(0), c(0)
+        {
+        }
+
+        virtual Real* get( const String& name ) {
+            if (name == "a") {
+                return &a;
+            } else if (name == "b") {
+                return &b;
+            } else if (name == "c") {
+                return &c;
+            }
+            return 0;
+        }
+    public:
+        Real a, b, c;
+    } aPropertyAccess;
+
+    class VariableReferenceResolver: public scripting::VariableReferenceResolver {
+    public:
+        virtual const VariableReference* get(
+                const String& name ) const
+        {
+            if (name == "A") {
+                return &a;
+            } else if (name == "B") {
+                return &b;
+            } else if (name == "C") {
+                return &c;
+            }
+            return 0;
+        }
+    public:
+        VariableReference a, b, c;
+    } aVarRefResolver;
+
+
+    class EntityResolver: public scripting::EntityResolver {
+    public:
+        virtual Entity* get( const String& name )
+        {
+            return 0;
+        }
+    } anEntityResolver;
+
+    scripting::ExpressionCompiler ec(
+        anErrorReporter, aPropertyAccess,
+        anEntityResolver, aVarRefResolver );
+
+    {
+        std::auto_ptr<const scripting::Code> code(
+             ec.compileExpression("sqrt( A.Value ) + 1.0") );
+
+        const unsigned char* pc = code->data();
+        const unsigned char* eoc = &*code->end();
+        CHECK_INSTRUCTION( pc, scripting::OBJECT_METHOD_REAL, (
+                scripting::RealObjectMethodProxy::createConst<
+                    Variable, &Variable::getValue >( 0 ) ) );
+        CHECK_INSTRUCTION( pc, scripting::CALL_FUNC1,
+                static_cast< double(*)( double ) >( &std::sqrt ) );
+        CHECK_INSTRUCTION( pc, scripting::PUSH_REAL, 1 );
+        CHECK_INSTRUCTION( pc, scripting::ADD, scripting::NoOperand() );
+        CHECK_INSTRUCTION( pc, scripting::RET, scripting::NoOperand() );
+        BOOST_CHECK_EQUAL(eoc, pc);
+    }
+}
