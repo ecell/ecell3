@@ -101,9 +101,11 @@ public:
         {
             if( i->getCoefficient() != 0 )
             {
-                theVariableReference = *i; 
+                theVariableReference = *i;
+                return;
             }
         }
+        THROW_EXCEPTION_INSIDE(InitializationFailed, "No variable references with non-zero coefficients exist");
     }
 
     virtual void fire()
