@@ -116,26 +116,29 @@ public:
             return theNumberOfItems;
         }
 
-        bool operator==( Tuple const& rhs ) const;
+        template<typename Trange>
+        bool operator==( Trange const& rhs ) const;
 
-        template< typename T_ >
-        bool operator!=( Tuple const& rhs ) const
+        template< typename Trange >
+        bool operator!=( Trange const& rhs ) const
         {
             return !operator==( rhs );
         }
 
-        bool operator<( Tuple const& rhs ) const;
+        template< typename Trange >
+        bool operator<( Trange const& rhs ) const;
 
-        template< typename T_ >
-        bool operator>=( Tuple const& rhs ) const
+        template< typename Trange >
+        bool operator>=( Trange const& rhs ) const
         {
             return !operator<( rhs );
         }
 
-        bool operator>( Tuple const& rhs ) const;
+        template< typename Trange >
+        bool operator>( Trange const& rhs ) const;
 
-        template< typename T_ >
-        bool operator<=( Tuple const& rhs ) const
+        template< typename Trange >
+        bool operator<=( Trange const& rhs ) const
         {
             return !operator<( rhs );
         }
@@ -186,16 +189,25 @@ public:
 
         bool operator<( RawString const& rhs ) const
         {
-            size_type l( std::min( theLength, rhs.theLength ) );
-            int c( memcmp( ptr, rhs.ptr, sizeof( value_type ) * l ) );
-            return c < 0 || ( c == 0 && l == theLength );
+            size_type const l( std::min( theLength, rhs.theLength ) );
+            std::pair< value_type const*, value_type const* > c(
+                    std::mismatch( ptr, ptr + l, rhs.ptr ) );
+            return ( c.first == ptr + theLength &&
+                     c.second != rhs.ptr + rhs.theLength)
+                    || ( c.first != ptr + theLength &&
+                         c.second != rhs.ptr + rhs.theLength &&
+                         *c.first < *c.second );
         }
 
         bool operator<( const char* rhs ) const
         {
-            size_type l( std::min( theLength, std::strlen( rhs ) ) );
-            int c( memcmp( ptr, rhs, sizeof( value_type ) * l ) );
-            return c < 0 || ( c == 0 && l == theLength );
+            size_type const rl( std::strlen( rhs ) );
+            size_type const l( std::min( theLength, rl ) );
+            std::pair< value_type const*, value_type const* > c(
+                    std::mismatch( ptr, ptr + l, rhs ) );
+            return ( c.first == ptr + theLength && c.second != rhs + rl )
+                    || ( c.first != ptr + theLength &&
+                         c.second != rhs + rl && *c.first < *c.second );
         }
 
         bool operator<( String const& rhs ) const
@@ -211,16 +223,25 @@ public:
 
         bool operator>( RawString const& rhs ) const
         {
-            size_type l( std::min( theLength, rhs.theLength ) );
-            int c( memcmp( ptr, rhs.ptr, sizeof( value_type ) * l ) );
-            return c < 0 || (c == 0 && l == theLength );
+            size_type const l( std::min( theLength, rhs.theLength ) );
+            std::pair< value_type const*, value_type const* > c(
+                    std::mismatch( ptr, ptr + l, rhs.ptr ) );
+            return ( c.first != ptr + theLength &&
+                     c.second == rhs.ptr + rhs.theLength )
+                    || ( c.first != ptr + theLength &&
+                         c.second != rhs.ptr + rhs.theLength &&
+                         *c.first > *c.second );
         }
 
         bool operator>( const char* rhs ) const
         {
-            size_type l( std::min( theLength, std::strlen( rhs ) ) );
-            int c( memcmp( ptr, rhs, sizeof( value_type ) * l ) );
-            return c < 0 || (c == 0 && l == theLength );
+            size_type const rl( std::strlen( rhs ) );
+            size_type const l( std::min( theLength, rl ) );
+            std::pair< value_type const*, value_type const* > c(
+                    std::mismatch( ptr, ptr + l, rhs ) );
+            return ( c.first != ptr + theLength && c.second == rhs + rl )
+                    || ( c.first != ptr + theLength &&
+                         c.second != rhs + rl && *c.first > *c.second );
         }
 
         bool operator>( String const& rhs ) const
@@ -246,7 +267,7 @@ public:
 
     private:
         size_type theLength;
-        char ptr[1];
+        value_type ptr[1];
     };
 
 public:
@@ -1150,39 +1171,44 @@ end< libecs::PolymorphValue::Tuple >(
 namespace libecs
 {
 
-inline bool PolymorphValue::Tuple::operator==( PolymorphValue::Tuple const& rhs ) const
+template< typename Trange >
+inline bool PolymorphValue::Tuple::operator==( Trange const& rhs ) const
 {
-    if ( theNumberOfItems != rhs.theNumberOfItems )
+    if ( theNumberOfItems != rhs.size() )
         return false;
-    return std::equal( reinterpret_cast< Polymorph const* >( ptr ),
-                       reinterpret_cast< Polymorph const* >( ptr ) + theNumberOfItems,
-                       reinterpret_cast< Polymorph const* >( rhs.ptr ) );
+    return std::equal( boost::begin( *this ), boost::end( *this ),
+                       boost::begin( rhs ) );
+}
+
+template< typename Trange >
+inline bool PolymorphValue::Tuple::operator<( Trange const& rhs ) const
+{
+    std::pair< Polymorph const*,
+               typename boost::range_const_iterator< Trange >::type > c(
+        std::mismatch( boost::begin( *this ),
+                       boost::begin( *this )
+                           + std::min( theNumberOfItems, rhs.size() ),
+                       boost::begin( rhs ) ) );
+    return ( c.first == boost::end( *this ) && c.second != boost::end( rhs ) )
+            || ( c.first != boost::end( *this ) &&
+                 c.second != boost::end( rhs ) &&
+                 *c.first < *c.second );
 }
 
 
-inline bool PolymorphValue::Tuple::operator<( PolymorphValue::Tuple const& rhs ) const
+template< typename Trange >
+inline bool PolymorphValue::Tuple::operator>( Trange const& rhs ) const
 {
-    size_type l( std::min( theNumberOfItems, rhs.theNumberOfItems ) );
-    std::pair< Polymorph const*, Polymorph const* > c(
-        std::mismatch( reinterpret_cast< Polymorph const* >( ptr ),
-                       reinterpret_cast< Polymorph const* >( ptr ) + l,
-                       reinterpret_cast< Polymorph const* >( rhs.ptr ) ) );
-    return *c.first < *c.second
-            || ( theNumberOfItems < l &&
-                 c.first == reinterpret_cast< Polymorph const * >( ptr ) + l );
-}
-
-
-inline bool PolymorphValue::Tuple::operator>( PolymorphValue::Tuple const& rhs ) const
-{
-    size_type l( std::min( theNumberOfItems, rhs.theNumberOfItems ) );
-    std::pair< Polymorph const*, Polymorph const* > c(
-        std::mismatch( reinterpret_cast< Polymorph const* >( ptr ),
-                       reinterpret_cast< Polymorph const* >( ptr ) + l,
-                       reinterpret_cast< Polymorph const* >( rhs.ptr ) ) );
-    return *c.first > *c.second
-            || ( theNumberOfItems > l &&
-                 c.second == reinterpret_cast< Polymorph const * >( rhs.ptr ) + l );
+    std::pair< Polymorph const*,
+               typename boost::range_const_iterator< Trange >::type > c(
+        std::mismatch( boost::begin( *this ),
+                       boost::begin( *this )
+                           + std::min( theNumberOfItems, rhs.size() ),
+                       boost::begin( rhs ) ) );
+    return ( c.first != boost::end( *this ) && c.second == boost::end( rhs ) )
+            || ( c.first != boost::end( *this ) &&
+                 c.second != boost::end( rhs ) &&
+                 *c.first > *c.second );
 }
 
 inline PolymorphValue::Tuple::operator Polymorph*()
@@ -1451,8 +1477,10 @@ inline bool PolymorphValue::operator==( Tuple const& rhs ) const
         return false;
     case TUPLE:
         return theTupleValue == rhs;
-    default:
+    case REAL:
         return rhs.size() == 1 && theRealValue == rhs[ 0 ];
+    default:
+         return false;
     }
     NEVER_GET_HERE;
 }
@@ -1514,6 +1542,26 @@ inline bool PolymorphValue::operator==( PolymorphValue const& rhs ) const
     NEVER_GET_HERE;
 }
 
+inline bool PolymorphValue::operator==( PolymorphVector const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return false;
+    case TUPLE:
+        return theTupleValue == rhs;
+    case REAL:
+        return rhs.size() == 1 && theRealValue == rhs[ 0 ];
+    case INTEGER:
+        return rhs.size() == 1 && theIntegerValue == rhs[ 0 ];
+    case STRING:
+        return rhs.size() == 1 && theStringValue == rhs[ 0 ];
+    default:
+         return false;
+    }
+    NEVER_GET_HERE;
+}
+
 inline bool PolymorphValue::operator<( Real const& rhs ) const
 {
     switch ( theType )
@@ -1527,7 +1575,9 @@ inline bool PolymorphValue::operator<( Real const& rhs ) const
     case STRING:
         return false;
     case TUPLE: 
-        return theTupleValue.size() < 1 || static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) < rhs;
+        return theTupleValue.size() == 0
+                || ( theTupleValue.size() == 1 &&
+                 static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) < rhs);
     }
     NEVER_GET_HERE;
 }
@@ -1545,8 +1595,9 @@ inline bool PolymorphValue::operator<( Integer const& rhs ) const
     case STRING:
         return false;
     case TUPLE: 
-        return theTupleValue.size() < 1 ||
-            static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) < rhs;
+        return theTupleValue.size() == 0
+                || ( theTupleValue.size() == 1 &&
+                 static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) < rhs);
     }
     NEVER_GET_HERE;
 }
@@ -1564,7 +1615,9 @@ inline bool PolymorphValue::operator<( RawString const& rhs ) const
     case STRING:
         return theStringValue < rhs;
     case TUPLE:
-        return theTupleValue.size() < 1 || static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) < rhs;
+        return theTupleValue.size() == 0
+                || ( theTupleValue.size() == 1 &&
+                 static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) < rhs);
     }
     NEVER_GET_HERE;
 }
@@ -1576,11 +1629,14 @@ inline bool PolymorphValue::operator<( Tuple const& rhs ) const
     case NONE:
         return true;
     case REAL:
-        return rhs.size() < 1 && theRealValue < static_cast< PolymorphValue const& >( rhs[ 0 ] );
+        return ( rhs.size() == 1 && theRealValue < static_cast< PolymorphValue const& >( rhs[ 0 ] ) )
+                 || ( rhs.size() > 1 && theRealValue <= static_cast< PolymorphValue const& >( rhs[ 0 ] ) );
     case INTEGER:
-        return rhs.size() < 1 && theIntegerValue < static_cast< PolymorphValue const& >( rhs[ 0 ] );
+        return ( rhs.size() == 1 && theIntegerValue < static_cast< PolymorphValue const& >( rhs[ 0 ] ) )
+                 || ( rhs.size() > 1 && theIntegerValue <= static_cast< PolymorphValue const& >( rhs[ 0 ] ) );
     case STRING:
-        return rhs.size() < 1 && theStringValue < static_cast< PolymorphValue const& >( rhs[ 0 ] );
+        return ( rhs.size() == 1 && theStringValue < static_cast< PolymorphValue const& >( rhs[ 0 ] ) )
+                 || ( rhs.size() > 1 && theStringValue <= static_cast< PolymorphValue const& >( rhs[ 0 ] ) );
     case TUPLE:
         return theTupleValue < rhs;
     }
@@ -1600,7 +1656,9 @@ inline bool PolymorphValue::operator<( const char* rhs ) const
     case STRING:
         return theStringValue < rhs;
     case TUPLE:
-        return theTupleValue.size() < 1 || static_cast< PolymorphValue const& >( theTupleValue[ 0 ] )< rhs;
+        return theTupleValue.size() == 0
+                || ( theTupleValue.size() == 1 &&
+                 static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) < rhs);
     }
     NEVER_GET_HERE;
 }
@@ -1618,7 +1676,30 @@ inline bool PolymorphValue::operator<( String const& rhs ) const
     case STRING:
         return theStringValue < rhs;
     case TUPLE:
-        return theTupleValue.size() < 1 || static_cast< PolymorphValue const& >( theTupleValue[ 0 ] )< rhs;
+        return theTupleValue.size() == 0
+                || ( theTupleValue.size() == 1 &&
+                 static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) < rhs);
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator<( PolymorphVector const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return true;
+    case REAL:
+        return ( rhs.size() == 1 && theRealValue < static_cast< PolymorphValue const& >( rhs[ 0 ] ) )
+                 || ( rhs.size() > 1 && theRealValue <= static_cast< PolymorphValue const& >( rhs[ 0 ] ) );
+    case INTEGER:
+        return ( rhs.size() == 1 && theIntegerValue < static_cast< PolymorphValue const& >( rhs[ 0 ] ) )
+                 || ( rhs.size() > 1 && theIntegerValue <= static_cast< PolymorphValue const& >( rhs[ 0 ] ) );
+    case STRING:
+        return ( rhs.size() == 1 && theStringValue < static_cast< PolymorphValue const& >( rhs[ 0 ] ) )
+                 || ( rhs.size() > 1 && theStringValue <= static_cast< PolymorphValue const& >( rhs[ 0 ] ) );
+    case TUPLE:
+        return theTupleValue < rhs;
     }
     NEVER_GET_HERE;
 }
@@ -1654,8 +1735,10 @@ inline bool PolymorphValue::operator>( Real const& rhs ) const
     case STRING:
         return true;
     case TUPLE: 
-        return theTupleValue.size() >= 1 &&
-            static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs;
+        return ( theTupleValue.size() == 1 &&
+                 static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs )
+                || ( theTupleValue.size() > 1 &&
+                 static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) >= rhs);
     }
     NEVER_GET_HERE;
 }
@@ -1673,8 +1756,10 @@ inline bool PolymorphValue::operator>( Integer const& rhs ) const
     case STRING:
         return true;
     case TUPLE: 
-        return theTupleValue.size() >= 1 &&
-            static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs;
+        return ( theTupleValue.size() == 1 &&
+                 static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs )
+                || ( theTupleValue.size() > 1 &&
+                 static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) >= rhs);
     }
     NEVER_GET_HERE;
 }
@@ -1692,7 +1777,10 @@ inline bool PolymorphValue::operator>( RawString const& rhs ) const
     case STRING:
         return theStringValue > rhs;
     case TUPLE:
-        return theTupleValue.size() >= 1 && static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs;
+        return ( theTupleValue.size() == 1 &&
+                 static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs )
+                || ( theTupleValue.size() > 1 &&
+                 static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) >= rhs);
     }
     NEVER_GET_HERE;
 }
@@ -1705,13 +1793,13 @@ inline bool PolymorphValue::operator>( Tuple const& rhs ) const
         return false;
     case REAL:
         return rhs.size() == 0
-                || ( rhs.size() == 1 && static_cast< PolymorphValue const& >( rhs[ 0 ] ) < theRealValue );
+                || ( rhs.size() == 1 && static_cast< PolymorphValue const& >( rhs[ 0 ] ) <= theRealValue );
     case INTEGER:
         return rhs.size() == 0
-                || ( rhs.size() == 1 && static_cast< PolymorphValue const& >( rhs[ 0 ] ) < theIntegerValue );
+                || ( rhs.size() >= 1 && static_cast< PolymorphValue const& >( rhs[ 0 ] ) <= theIntegerValue );
     case STRING:
         return rhs.size() == 0
-                || ( rhs.size() == 1 && static_cast< PolymorphValue const& >( rhs[ 0 ] )< theStringValue );
+                || ( rhs.size() >= 1 && static_cast< PolymorphValue const& >( rhs[ 0 ] ) <= theStringValue );
     case TUPLE:
         return theTupleValue > rhs;
     }
@@ -1731,7 +1819,10 @@ inline bool PolymorphValue::operator>( const char* rhs ) const
     case STRING:
         return theStringValue > rhs;
     case TUPLE:
-        return theTupleValue.size() >= 1 && static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs;
+        return ( theTupleValue.size() == 1 &&
+                 static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs )
+                || ( theTupleValue.size() > 1 &&
+                 static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) >= rhs);
     }
     NEVER_GET_HERE;
 }
@@ -1749,7 +1840,31 @@ inline bool PolymorphValue::operator>( String const& rhs ) const
     case STRING:
         return theStringValue > rhs;
     case TUPLE:
-        return theTupleValue.size() >= 1 && static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs;
+        return ( theTupleValue.size() == 1 &&
+                 static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) > rhs )
+                || ( theTupleValue.size() > 1 &&
+                 static_cast< PolymorphValue const& >( theTupleValue[ 0 ] ) >= rhs);
+    }
+    NEVER_GET_HERE;
+}
+
+inline bool PolymorphValue::operator>( PolymorphVector const& rhs ) const
+{
+    switch ( theType )
+    {
+    case NONE:
+        return false;
+    case REAL:
+        return rhs.size() == 0
+                || ( rhs.size() == 1 && static_cast< PolymorphValue const& >( rhs[ 0 ] ) <= theRealValue );
+    case INTEGER:
+        return rhs.size() == 0
+                || ( rhs.size() >= 1 && static_cast< PolymorphValue const& >( rhs[ 0 ] ) <= theIntegerValue );
+    case STRING:
+        return rhs.size() == 0
+                || ( rhs.size() >= 1 && static_cast< PolymorphValue const& >( rhs[ 0 ] ) <= theStringValue );
+    case TUPLE:
+        return theTupleValue > rhs;
     }
     NEVER_GET_HERE;
 }

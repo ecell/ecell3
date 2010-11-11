@@ -80,3 +80,66 @@ BOOST_AUTO_TEST_CASE(testBasic)
     BOOST_CHECK_EQUAL( "1.0", Polymorph( "1.0" ) );
     BOOST_CHECK_EQUAL( Polymorph( "1.0" ), "1.0" );
 }
+
+BOOST_AUTO_TEST_CASE(testStringComparison)
+{
+    BOOST_CHECK( Polymorph( "1" ) == Polymorph( "1" ) );
+    BOOST_CHECK( Polymorph( "1" ) >= Polymorph( "1" ) );
+    BOOST_CHECK( Polymorph( "1" ) != Polymorph( "" ) );
+    BOOST_CHECK( !( Polymorph( "1" ) == Polymorph( "" ) ) );
+    BOOST_CHECK( Polymorph( "" ) != Polymorph( "1" ) );
+    BOOST_CHECK( !( Polymorph( "" ) == Polymorph( "1" ) ) );
+    BOOST_CHECK( Polymorph( "" ) < Polymorph( "1" ) );
+    BOOST_CHECK( !( Polymorph( "" ) >= Polymorph( "1" ) ) );
+    BOOST_CHECK( !( Polymorph( "" ) > Polymorph( "1" ) ) );
+    BOOST_CHECK( Polymorph( "2" ) > Polymorph( "1" ) );
+    BOOST_CHECK( !( Polymorph( "2" ) < Polymorph( "1" ) ) );
+    BOOST_CHECK( !( Polymorph( "2" ) <= Polymorph( "1" ) ) );
+    BOOST_CHECK( Polymorph( "1" ) < Polymorph( "2" ) );
+    BOOST_CHECK( !( Polymorph( "1" ) > Polymorph( "2" ) ) );
+    BOOST_CHECK( !( Polymorph( "1" ) >= Polymorph( "2" ) ) );
+    BOOST_CHECK( Polymorph( "1" ) > Polymorph( "" ) );
+    BOOST_CHECK( !( Polymorph( "1" ) < Polymorph( "" ) ) );
+    BOOST_CHECK( !( Polymorph( "1" ) <= Polymorph( "" ) ) );
+    BOOST_CHECK( Polymorph( "12" ) > Polymorph( "1" ) );
+    BOOST_CHECK( !( Polymorph( "12" ) < Polymorph( "1" ) ) );
+    BOOST_CHECK( !( Polymorph( "12" ) <= Polymorph( "1" ) ) );
+    BOOST_CHECK( Polymorph( "1" ) < Polymorph( "12" ) );
+    BOOST_CHECK( !( Polymorph( "1" ) > Polymorph( "12" ) ) );
+    BOOST_CHECK( !( Polymorph( "1" ) >= Polymorph( "12" ) ) );
+}
+
+BOOST_AUTO_TEST_CASE(testTupleComparison)
+{
+    BOOST_CHECK( Polymorph( "1" ) == Polymorph( boost::make_tuple( "1" ) ) );
+    BOOST_CHECK( Polymorph( 1l ) == Polymorph( boost::make_tuple( 1l ) ) );
+    BOOST_CHECK( Polymorph( 1.0 ) == Polymorph( boost::make_tuple( 1.0 ) ) );
+    BOOST_CHECK( Polymorph( boost::make_tuple() ) == Polymorph( boost::make_tuple() ) );
+    BOOST_CHECK( Polymorph( boost::make_tuple( 1.0 ) ) == Polymorph( boost::make_tuple( 1.0 ) ) );
+
+    BOOST_CHECK( Polymorph( "1" ) != Polymorph( boost::make_tuple() ) );
+    BOOST_CHECK( Polymorph( "1" ) != Polymorph( boost::make_tuple( "2" ) ) );
+    BOOST_CHECK( Polymorph( 1l ) != Polymorph( boost::make_tuple() ) );
+    BOOST_CHECK( Polymorph( 1l ) != Polymorph( boost::make_tuple( 2l ) ) );
+    BOOST_CHECK( Polymorph( 1.0 ) != Polymorph( boost::make_tuple() ) );
+    BOOST_CHECK( Polymorph( 1.0 ) != Polymorph( boost::make_tuple( 2.0 ) ) );
+    BOOST_CHECK( Polymorph( boost::make_tuple() ) != Polymorph( boost::make_tuple( 1.0 ) ) );
+    BOOST_CHECK( Polymorph( boost::make_tuple( 2.0 ) ) != Polymorph( boost::make_tuple( 1.0 ) ) );
+    BOOST_CHECK( Polymorph( boost::make_tuple( 1.0 ) ) != Polymorph( boost::make_tuple( 1.0, 2.0 ) ) );
+
+    BOOST_CHECK( Polymorph( "1" ) < Polymorph( boost::make_tuple( "2" ) ) );
+    BOOST_CHECK( Polymorph( "1" ) < Polymorph( boost::make_tuple( "1", "2" ) ) );
+    BOOST_CHECK( Polymorph( 1l ) < Polymorph( boost::make_tuple( 2l ) ) );
+    BOOST_CHECK( Polymorph( 1l ) < Polymorph( boost::make_tuple( 1l, 2l ) ) );
+    BOOST_CHECK( Polymorph( 1.0 ) < Polymorph( boost::make_tuple( 2.0 ) ) );
+    BOOST_CHECK( Polymorph( 1.0 ) < Polymorph( boost::make_tuple( 1.0, 2.0 ) ) );
+    BOOST_CHECK( Polymorph( boost::make_tuple() ) < Polymorph( boost::make_tuple( 0.0 ) ) );
+    BOOST_CHECK( Polymorph( boost::make_tuple( 1.0 ) ) < Polymorph( boost::make_tuple( 1.0, 2.0 ) ) );
+
+    BOOST_CHECK( Polymorph( "2" ) > Polymorph( boost::make_tuple( "1" ) ) );
+    BOOST_CHECK( Polymorph( boost::make_tuple( "1", "2" ) ) > Polymorph( "1" ) );
+    BOOST_CHECK( Polymorph( 2.0 ) > Polymorph( boost::make_tuple( 1.0 ) ) );
+    BOOST_CHECK( Polymorph( boost::make_tuple( 1.0, 2.0 ) ) > Polymorph( boost::make_tuple( 1.0 ) ) );
+    BOOST_CHECK( Polymorph( 2l ) > Polymorph( boost::make_tuple( 1l ) ) );
+    BOOST_CHECK( Polymorph( boost::make_tuple( 1l, 2l ) ) > Polymorph( boost::make_tuple( 1l ) ) );
+}
