@@ -188,10 +188,13 @@ class SystemProxy( AbstractSystemProxy ):
         aStatusDict = {}
 
         # reads the result of qstat
+        aCommandLine = [ QSTAT ]
+        if self.getOwner() is not None:
+            aCommandLine.extend( [ '-u', self.getOwner() ] )
         out = raiseExceptionOnError(
             RuntimeError,
             pollForOutputs(
-                popen2.Popen3( ( QSTAT, '-u', self.getOwner() ), True )
+                popen2.Popen3( aCommandLine, True )
                 )
             ).split( "\n" )
 
