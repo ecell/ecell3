@@ -400,8 +400,10 @@ def p_empty(t):
     t[0] = None
 
 def p_error(t):
-    print "Syntax error at line %d in %s. " % ( t.lineno, t.value )
-    yacc.errok()
+    if t is None:
+        print "Syntax error"
+    else:
+        print "Syntax error at line %d in %s. " % ( t.lineno, t.value )
     
 # Constract List
     
