@@ -45,6 +45,7 @@ public:
         INHERIT_PROPERTIES( Process );
 
         PROPERTYSLOT_SET_GET( Integer, IsContinuous );
+        PROPERTYSLOT_SET_GET( Real, StepInterval );
         PROPERTYSLOT_SET_GET( String, FireMethod );
         PROPERTYSLOT_SET_GET( String, InitializeMethod );
     }
@@ -75,6 +76,16 @@ public:
         theIsContinuous = value;
     }
 
+    virtual Real getStepInterval() const
+    {
+        return theStepInterval;
+    }
+
+    SET_METHOD( Real, StepInterval)
+    {
+        theStepInterval = value;
+    }
+
     SET_METHOD( String, FireMethod )
     {
         theFireMethod = value;
@@ -91,7 +102,6 @@ public:
     {
         return theFireMethod;
     }
-
 
     SET_METHOD( String, InitializeMethod )
     {
@@ -161,6 +171,7 @@ protected:
     boost::python::handle<> theCompiledInitializeMethod;
 
     bool theIsContinuous;
+    Real theStepInterval;
 };
 
 LIBECS_DM_INIT( PythonProcess, Process );
