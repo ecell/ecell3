@@ -959,9 +959,9 @@ public:
     }
 
     template< typename Trange_ >
-    static STLIteratorWrapper* create( Trange_ const& range )
+    static PyObject* create( Trange_ const& range )
     {
-        return new STLIteratorWrapper( range );
+        return reinterpret_cast< PyObject* >( new STLIteratorWrapper( range ) );
     }
 
     static void __dealloc__( STLIteratorWrapper* self )
@@ -974,7 +974,7 @@ public:
         if ( self->theIdx == self->theEnd )
             return NULL;
 
-        return py::incref( py::object( *self->theIdx ).ptr() );
+        return py::incref( py::object( *( self->theIdx++ ) ).ptr() );
     }
 };
 
@@ -1269,9 +1269,9 @@ public:
         return retval;
     }
 
-    py::object __iter__()
+    PyObject* __iter__()
     {
-        return py::object( STLIteratorWrapper< Process::VariableReferenceVector::const_iterator >( theProc->getVariableReferenceVector() ) );
+        return STLIteratorWrapper< Process::VariableReferenceVector::const_iterator >::create( theProc->getVariableReferenceVector() );
     }
 
     std::string __str__()
