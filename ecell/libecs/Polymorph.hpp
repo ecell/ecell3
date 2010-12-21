@@ -47,8 +47,13 @@
 #include <boost/range/size.hpp>
 #include <boost/range/const_iterator.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/mpl/or.hpp>
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/less.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits/is_same.hpp>
+#include <boost/type_traits/is_integral.hpp>
+#include <boost/type_traits/is_arithmetic.hpp>
 
 #include "libecs/Defs.hpp"
 #include "libecs/convertTo.hpp"
@@ -529,14 +534,18 @@ public:
                std::size_t sz = static_cast< std::size_t >( -1 ) ) 
         : theValue( PolymorphValue::create( ptr, sz ) ) { }
 
-    explicit Polymorph( Real aValue )            
+    explicit Polymorph( Real aValue )
         : theValue( PolymorphValue::create( aValue ) ) { }
 
-    explicit Polymorph( Integer aValue )            
+    explicit Polymorph( Integer aValue )
         : theValue( PolymorphValue::create( aValue ) ) { }
 
     template< typename Trange_ >
-    explicit Polymorph( Trange_ const& aValue )
+    explicit Polymorph( Trange_ const& aValue,
+        typename boost::disable_if<
+            boost::mpl::or_<
+                boost::is_arithmetic< Trange_ >,
+                boost::is_same< Trange_, String > > >::type* = 0)
         : theValue( PolymorphValue::create( aValue ) ) { }
 
     template< typename T0_, typename T1_, typename T2_, typename T3_,
