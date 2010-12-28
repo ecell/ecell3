@@ -1072,7 +1072,7 @@ System System( /CELL/CYTOPLASM )
 		Name	PKC_PKC_active;
 		StepperID PASSIVE_1;
 
-		FireMethod "P0.Value = R0.Value + R1.Value + R2.Value + R3.Value";	
+		FireMethod "P0.variable.Value = R0.variable.Value + R1.variable.Value + R2.variable.Value + R3.variable.Value";	
 		VariableReferenceList	[ R0 :.:Ca_DAG_PKC 0 ] 
 					[ R1 :.:DAG_AA_PKC 0 ] 
 					[ R2 :.:AA_PKC 0 ] 
@@ -1085,7 +1085,7 @@ System System( /CELL/CYTOPLASM )
 		Name	MAPact;
 		StepperID PASSIVE_1;	
 
-		FireMethod "P0.Value = R0.Value + R1.Value";
+		FireMethod "P0.variable.Value = R0.variable.Value + R1.variable.Value";
 
 		VariableReferenceList	[ R0 :.:MAPK_P 0 ] 
 					[ R1 :.:MAPK_PP 0 ]

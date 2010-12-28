@@ -61,7 +61,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		IsContinuous	1;
 		InitializeMethod "vs = 0.76; KI = 1;";
-		FireMethod "self.setFlux( (vs*KI) / (KI + (C0.MolarConc * C0.MolarConc * C0.MolarConc) ) * self.getSuperSystem().SizeN_A )";
+		FireMethod "self.Flux = ( (vs*KI) / (KI + (C0.variable.MolarConc * C0.variable.MolarConc * C0.variable.MolarConc) ) * self.superSystem.SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:M 1 ] [ C0 Variable:.:Pn ];
 	}
@@ -70,7 +70,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		IsContinuous	1;
 		InitializeMethod "vm = 0.65; Km = 0.5;";
-		FireMethod "self.setFlux( (vm * S0.MolarConc) / ( Km + S0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		FireMethod "self.Flux = ( (vm * S0.variable.MolarConc) / ( Km + S0.variable.MolarConc) * self.superSystem.SizeN_A )";
 
 		VariableReferenceList	[ S0 Variable:.:M -1 ];
 	}
@@ -79,7 +79,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		IsContinuous	1;
 		InitializeMethod "Ks = 0.38;";
-		FireMethod "self.setFlux( (Ks * C0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		FireMethod "self.Flux = ( (Ks * C0.variable.MolarConc) * self.superSystem.SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ C0 Variable:.:M 0 ];
 	}
@@ -88,7 +88,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		IsContinuous	1;
 		InitializeMethod "V1 = 3.2; K1 = 2;";
-		FireMethod "self.setFlux( ( V1 * S0.MolarConc) / (K1 + S0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		FireMethod "self.Flux = ( ( V1 * S0.variable.MolarConc) / (K1 + S0.variable.MolarConc) * self.superSystem.SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ S0 Variable:.:P0 -1 ];
 	}
@@ -97,7 +97,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		IsContinuous	1;
 		InitializeMethod "V2 = 1.58; K2 = 2;";
-		FireMethod "self.setFlux( (V2 * S0.MolarConc) / (K2 + S0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		FireMethod "self.Flux = ( (V2 * S0.variable.MolarConc) / (K2 + S0.variable.MolarConc) * self.superSystem.SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P0 1 ] [ S0 Variable:.:P1 -1 ];
 	}
@@ -106,7 +106,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		IsContinuous	1;
 		InitializeMethod "V3 = 5; K3 = 2;";
-		FireMethod "self.setFlux( ( V3 * S0.MolarConc) / (K3 + S0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		FireMethod "self.Flux = ( ( V3 * S0.variable.MolarConc) / (K3 + S0.variable.MolarConc) * self.superSystem.SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ S0 Variable:.:P1 -1];
 	}
@@ -115,7 +115,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		IsContinuous	1;
 		InitializeMethod "V4 = 2.5; K4 = 2;";
-		FireMethod "self.setFlux( (V4 * S0.MolarConc) / (K4 + S0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		FireMethod "self.Flux = ( (V4 * S0.variable.MolarConc) / (K4 + S0.variable.MolarConc) * self.superSystem.SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P1 1 ] [ S0 Variable:.:P2 -1 ];
 	}
@@ -124,7 +124,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		IsContinuous	1;
 		InitializeMethod "k1 = 1.9;";
-		FireMethod "self.setFlux( ( k1 * S0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		FireMethod "self.Flux = ( ( k1 * S0.variable.MolarConc) * self.superSystem.SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:Pn 1 ] [ S0 Variable:.:P2 -1 ];
 	}
@@ -133,7 +133,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		IsContinuous	1;
 		InitializeMethod "k2 = 1.3;";
-		FireMethod "self.setFlux( (k2 * S0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		FireMethod "self.Flux = ( (k2 * S0.variable.MolarConc) * self.superSystem.SizeN_A )";
 
 		VariableReferenceList	[ P0 Variable:.:P2 1 ] [ S0 Variable:.:Pn -1 ];
 	}
@@ -142,7 +142,7 @@ System System( /CELL/CYTOPLASM )
 	{
 		IsContinuous	1;
 		InitializeMethod "vd = 0.95; Kd = 0.2;";
-		FireMethod "self.setFlux( ( vd * S0.MolarConc) / (Kd + S0.MolarConc) * self.getSuperSystem().SizeN_A )";
+		FireMethod "self.Flux = ( ( vd * S0.variable.MolarConc) / (Kd + S0.variable.MolarConc) * self.superSystem.SizeN_A )";
 
 		VariableReferenceList	[ S0 Variable:.:P2 -1 ];
 	}	
