@@ -1,6 +1,24 @@
+ecell-3.2.2: 29-Dec-2010
+
+ * Fixed the bug that some expressions given to ExpressionFluxProcess or
+   ExpressionAssignmentProcess would not be evaluated correctly.
+
+ * Fixed segmentation fault bug in ExpressionAssignmentProcess.
+
+ * Overhauled libecs::Polymorph.
+
+ * Fixed a bug in ecell.session_manager that SGE backend doesn't work
+   unless setOwner() is called prior to job dispatch.
+
+ * Fixed compilation error in ecell/libecs/MethodProxy.hpp.
+
+ * Fixed ecell._ecs module so that iter(process.variableReferences) works
+   correctly.
+
+
 ecell-3.2.1: 23-Sep-2010
 
- * Fix segmentation fault in PythonProcess and PythonFluxProcess.
+ * Fixed segmentation fault in PythonProcess and PythonFluxProcess.
 
  * Removed DifferentialStepper::initializeStepInterval() in favor of
    virtualized Stepper::setStepInterval().
