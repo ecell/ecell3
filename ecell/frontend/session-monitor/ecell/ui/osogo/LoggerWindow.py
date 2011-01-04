@@ -273,7 +273,7 @@ class LoggerWindow(OsogoWindow):
 
 		# [1-3] Now binary type is not supported by Logger.
 		# If binary type is selected, exit this method.
-		aType = self["datatype_combo"].get_text()
+		aType = self["datatype_combo"].get_active_text()
 
 		if aType == 'ecd':
 			pass
@@ -545,7 +545,7 @@ class LoggerWindow(OsogoWindow):
 	def getDataFileType (self ):
 		""" returns Data Type of file choosen by the user
 		"""
-		return self["datatype_combo"].get_text()
+		return self["datatype_combo"].get_active_text()
 
 	# ==============================================================================
 	def setDataFileType (self, aDataType ):
