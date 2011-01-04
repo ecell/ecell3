@@ -1,4 +1,4 @@
-ecell-3.2.2: 29-Dec-2010
+ecell-3.2.2: 5-Jan-2011
 
  * Fixed the bug that some expressions given to ExpressionFluxProcess or
    ExpressionAssignmentProcess would not be evaluated correctly.
@@ -14,6 +14,8 @@ ecell-3.2.2: 29-Dec-2010
 
  * Fixed ecell._ecs module so that iter(process.variableReferences) works
    correctly.
+
+ * Fixed the bug that logger data could not be saved through LoggerWindow.
 
 
 ecell-3.2.1: 23-Sep-2010
