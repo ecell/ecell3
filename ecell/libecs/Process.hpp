@@ -384,7 +384,7 @@ public:
 
        @param aValue aReal value to be added.
     */
-    void addValue( Real aValue );
+    void addValue( libecs::Param<Real>::type aValue );
 
 
     /**
@@ -396,7 +396,7 @@ public:
 
        @param aVelocity a base velocity to be added.
     */
-    void setFlux( Real aVelocity )
+    void setFlux( libecs::Param<Real>::type aVelocity )
     {
         setActivity( aVelocity );
     }

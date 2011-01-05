@@ -604,7 +604,7 @@ void Process::addValue( VariableReference const& aVarRef, Real value )
     aVarRef.getVariable()->addValue( aVarRef.getCoefficient() * value );
 }
 
-void Process::addValue( Real aValue )
+void Process::addValue( libecs::Param<Real>::type aValue )
 {
     setActivity( aValue );
 
