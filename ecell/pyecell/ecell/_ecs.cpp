@@ -77,6 +77,17 @@ typedef int Py_ssize_t;
 
 #endif
 
+#if PY_VERSION_HEX < 0x02040000
+#define Py_VISIT(op)                                    \
+    do {                                                \
+        if (op) {                                       \
+            int vret = visit((PyObject *)(op), arg);    \
+            if (vret)                                   \
+                return vret;                            \
+        }                                               \
+    } while (0)
+#endif
+
 using namespace libecs;
 namespace py = boost::python;
 
