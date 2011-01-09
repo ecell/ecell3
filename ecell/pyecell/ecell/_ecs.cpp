@@ -40,7 +40,11 @@
 #include <boost/range/size.hpp>
 #include <boost/range/size_type.hpp>
 #include <boost/range/const_iterator.hpp>
-#include <boost/cast.hpp>
+#if BOOST_VERSION >= 103200 // for boost-1.32.0 or later.
+#   include <boost/numeric/conversion/cast.hpp>
+#else // use this instead for boost-1.31 or earlier.
+#   include <boost/cast.hpp>
+#endif
 #include <boost/format.hpp>
 #include <boost/format/group.hpp>
 #include <boost/python.hpp>
