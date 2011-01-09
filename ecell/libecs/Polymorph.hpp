@@ -1917,12 +1917,25 @@ inline PolymorphValue::operator PolymorphValue::Tuple const& () const
     return as<PolymorphValue::Tuple const& >();
 }
 
+template<>
+class ConvertTo< String, Polymorph >
+{
+public:
+    const String operator()( const Polymorph& aValue )
+    {
+        return aValue.as< String >();
+    }
+};
 
 template< typename Tnew_ >
-inline Tnew_ convertTo( const Polymorph& aValue )
+class ConvertTo< Tnew_, Polymorph >
 {
-    return aValue.as< Tnew_ >();
-}
+public:
+    const Tnew_ operator()( const Polymorph& aValue )
+    {
+        return aValue.as< Tnew_ >();
+    }
+};
 
 
 //
