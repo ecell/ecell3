@@ -102,10 +102,11 @@ class Namespaces( object ):
     rft = u'http://www.globus.org/namespaces/2004/10/rft'
 
     def __metaclass__( name, base, dic ):
-        dic[ '__rev__' ] = dict( (
-            ( uri, prefix )
-                for prefix, uri in dic.iteritems()
-                if not prefix.startswith( '__' ) ) )
+        rev = {}
+        for prefix, uri in dic.iteritems():
+            if not prefix.startswith( '__' ):
+                rev[uri] = prefix
+        dic[ '__rev__' ] = rev
         return type( name, base, dic )
 
 class EPRParser( object ):
@@ -562,8 +563,10 @@ class SessionProxy( AbstractSessionProxy ):
         for file in self.getExtraFileList():
             files.append( os.path.normpath(
                 os.path.join( absJobDirectory, file ) ) )
-        job.filesCleanedUp = job.filesStagedIn = (
-            'file://' + file for file in files )
+        urlifiedFiles = []
+        for file in files:
+            urlifiedFiles.append( "file://" + file )
+        job.filesCleanedUp = job.filesStagedIn = urlifiedFiles
         job.stdout =  os.path.normpath(
             os.path.join( absJobDirectory, self.getStdoutFileName() ) )
         job.stderr =  os.path.normpath(

@@ -559,8 +559,11 @@ class AbstractSystemProxy:
         Return list : the list of AbstractSessionProxy
         '''
         # initializes a job list
-        return ( job for job in self.getSessionProxies() \
-                 if job.getStatus() == stat )
+        def generator():
+            for job in self.getSessionProxies():
+                if job.getStatus() == stat:
+                    yield job
+        return generator()
 
     def removeSessionProxy( self, job ):
         del self.jobs[ job.getJobID() ]
