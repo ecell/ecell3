@@ -3030,7 +3030,13 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_static_property( "DM_SEARCH_PATH_SEPARATOR",
               &AbstractSimulator::getDMSearchPathSeparator )
         .add_property( "rootSystem",
-              py::make_function( &AbstractSimulator::getRootSystem,
+              py::make_function(
+                    &AbstractSimulator::getRootSystem,
+                    py::return_internal_reference<>() ) )
+        .add_property( "rootSystem",
+              py::make_function(
+                    static_cast< System*( AbstractSimulator::* )() const >(
+                        &AbstractSimulator::getRootSystem ),
                     py::return_internal_reference<>() ) )
         .def( "getClassInfo",
               &AbstractSimulator::getClassInfo )
