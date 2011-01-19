@@ -495,7 +495,7 @@ class GtkSessionMonitor(Session):
             fp = open( self.theIniFileName, 'w' )
             self.theConfigDB.write( fp )
         except:
-            self.message("Couldnot save preferences into file %s.\n Please check permissions for home directory.\n"%self.theIniFileName)
+            self.message("Could not save preferences into file %s.\n Please check permissions for home directory.\n"%self.theIniFileName)
             
     #-------------------------------------------------------------------
     def createLoggerWithPolicy( self, fullpn, logpolicy = None ):
