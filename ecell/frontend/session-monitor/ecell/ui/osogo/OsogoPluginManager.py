@@ -45,7 +45,6 @@ from ecell.ecs_constants import *
 
 from ecell.Plugin import *
 from ecell.ui.osogo.config import *
-from ecell.ui.osogo.DataGenerator import *
 
 class OsogoPluginManager(PluginManager):
     """PluginManager specified for Osogo
@@ -60,19 +59,14 @@ class OsogoPluginManager(PluginManager):
         PluginManager.__init__( self, PLUGIN_PATH )
 
         self.theSession = aSession
-        self.theDataGenerator = DataGenerator( self.theSession )
 
         self.thePluginTitleDict = {}     # key is instance , value is title
         self.thePluginWindowNumber = {}
         self.thePropertyWindowOnEntityListWindows = {}  # key is instance, value is None
+        self.theAssociatedSession = self.theSession.theSession
 
     # end of __init__
         
-    # ========================================================================
-    def getDataGenerator( self ):
-        return self.theDataGenerator 
-
-
     # ========================================================================
     def createInstance( self, classname, data, rootWidget=None, parent=None ):
         '''
@@ -105,34 +99,28 @@ class OsogoPluginManager(PluginManager):
                 self.thePluginWindowNumber[ classname ] = 1
             title = "%s%d" %(title,self.thePluginWindowNumber[ classname ])
 
-        # Nothing is selected.
-        if len(data) == 0:
-            self.printMessage("Nothing is selected.")
+        try:
+            instance = plugin.createInstance( data, self, rootWidget, parent )
+        except TypeError:
+            errorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value, sys.exc_traceback ) )
+            self.theSession.message( errorMessage )
+            return None
 
+        instance.openWindow()
+
+        #try:
+        if parent.__class__.__name__ == 'EntityListWindow':
+            self.thePropertyWindowOnEntityListWindows[ instance ] = None
         else:
-            try:
-                instance = plugin.createInstance( data, self, rootWidget, parent )
-            except TypeError:
-                errorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value, sys.exc_traceback ) )
-                self.theSession.message( errorMessage )
-                return None
+            instance.editTitle( title )
+            self.thePluginTitleDict[ instance ] = title
+            self.theInstanceList.append( instance )
+        # initializes session
+        self.updateFundamentalWindows()
+        #except:
+        #    pass
 
-            instance.openWindow()
-
-            #try:
-            if parent.__class__.__name__ == 'EntityListWindow':
-                self.thePropertyWindowOnEntityListWindows[ instance ] = None
-            else:
-                instance.editTitle( title )
-                self.thePluginTitleDict[ instance ] = title
-                self.theInstanceList.append( instance )
-            # initializes session
-            #self.theSession.theSimulator.initialize()
-            self.updateFundamentalWindows()
-            #except:
-            #    pass
-
-            return instance
+        return instance
 
     # end of createInstance
 
@@ -164,7 +152,14 @@ class OsogoPluginManager(PluginManager):
         """updates all plugin windows
         Returns None
         """
-        self.theDataGenerator.update()
+        if self.theSession.theSession is not self.theAssociatedSession:
+            self.theAssociatedSession = self.theSession.theSession
+            for i in self.theInstanceList:
+                i.close()
+            return
+
+        if self.theSession.theSession is None:
+            return
 
         # updates all plugin windows
         PluginManager.updateAllPluginWindow(self)

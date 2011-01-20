@@ -50,7 +50,8 @@ class VariableWindow( OsogoPluginWindow ):
 
         # creates EntityStub
         self.theSession = aPluginManager.theSession
-        self.theFullIDString = createFullIDString( self.theFullID() )
+        aFullID, _ = convertFullPNToFullID( self.getFullPN() )
+        self.theFullIDString = createFullIDString( aFullID )
         self.theStub = self.theSession.createEntityStub( self.theFullIDString )
 
         # initializes flags for validation of Property

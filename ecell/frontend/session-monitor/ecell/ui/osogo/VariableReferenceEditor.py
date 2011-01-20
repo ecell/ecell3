@@ -89,13 +89,13 @@ class VariableReferenceEditor:
         self.theTreeView.append_column( columnCoef )
         self.theTreeView.connect( "button-press-event", self.__buttonPressed )
         attachmentPoint.add( self.theTreeView )
-        self.setDisplayedFullID ( self.theParent.theFullID() )
+        aFullID, aPropertyName = convertFullPNToFullID( self.theParent.getFullPN() )
+        self.setDisplayedFullID ( aFullID )
         
         
     def setDisplayedFullID ( self, aFullID ):
         self.theFullID = aFullID
         self.theFullIDString = createFullIDString( self.theFullID )
-        self.theFullPNString = createFullIDString( self.theFullID ) + ":VariableReferenceList"
         self.update()
         
     def getProcessFullID( self ):
@@ -103,8 +103,7 @@ class VariableReferenceEditor:
         
     def update( self ):
         # gets varreflist
-        theValue = self.theSession.theSimulator.getEntityProperty( self.theFullPNString )
-        
+        theValue = self.theSession.createEntityStub( self.theFullIDString ).getProperty( "VariableReferenceList" )
         #redraw whole list
         self.theListStore.clear()
         anIter = None
@@ -132,7 +131,7 @@ class VariableReferenceEditor:
         aVarrefListTuple = tuple( aVarrefList )
 
         try:
-            self.theSession.theSimulator.setEntityProperty( self.theFullPNString, aVarrefListTuple )
+            self.theSession.createEntityStub( self.theFullIDString ).setProperty( "VariableReferenceList", aVarrefListTuple )
         except:
             # print out traceback
             import sys
@@ -262,7 +261,7 @@ class VariableReferenceEditor:
         
     def __doesExistEntity( self, anEntity ):
         try:
-            self.theSession.theSimulator.getEntityClassName( anEntity )
+            self.theSession.createEntityStub( anEntity ).getClassname()
         except:
             return False
         else:

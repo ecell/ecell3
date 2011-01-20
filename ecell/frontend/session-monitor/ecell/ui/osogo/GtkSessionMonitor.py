@@ -57,28 +57,23 @@ import ecell.ui.osogo.StepperWindow as StepperWindow
 import ecell.ui.osogo.BoardWindow as BoardWindow
 import ecell.ui.osogo.LoggingPolicy as LoggingPolicy
 import ecell.ui.osogo.OsogoPluginManager as OsogoPluginManager
+from ecell.ui.osogo.DataGenerator import *
 
-class GtkSessionMonitor(Session):
-#
-# GtkSessionMonitor class functions
-#
-    # ==========================================================================
-    def __init__(self, aSimulator = None ):
+class GtkSessionMonitor(object):
+    def __init__(self):
         """sets up the osogo session, creates Mainwindow and other fundamental
         windows but doesn't show them"""
 
-        #calls superclass
-        Session.__init__(self, aSimulator )
+        self.theSession = None
+        self.theModelWalker = None
+        self.theMessageMethod = None
+        self.theDataGenerator = None
 
-        if aSimulator == None:
-            self.theModelWalker = None
-        else:
-            self.theModelWalker = ModelWalker( aSimulator )
         self.updateCallbackList = []
         # -------------------------------------
         # reads defaults from osogo.ini 
         # -------------------------------------
-        self.theConfigDB=ConfigParser.ConfigParser()
+        self.theConfigDB = ConfigParser.ConfigParser()
 
         self.theIniFileName = os.path.join( home_dir, '.ecell', 'osogo.ini' )
         theDefaultIniFileName = os.path.join( conf_dir, 'osogo.ini' )
@@ -133,31 +128,22 @@ class GtkSessionMonitor(Session):
         self.theEntityListInstanceMap = {}  
 
         # -------------------------------------
-        # initializes for run method 
-        # -------------------------------------
-        self.theSimulator.setEventHandler( lambda:
-            gtk.events_pending() and gtk.main_iteration()  )
-
-        # -------------------------------------
         # creates MainWindow
         # -------------------------------------
     
         self.theMainWindow = aMainWindow
 
 
-    # ==========================================================================
     def GUI_interact(self):
         "hands over controlto the user (gtk.main_loop())"
 
         gtk.main()
 
-    # ==========================================================================
     def QuitGUI( self ):
         """ quits gtk.main_loop() after saving changes """
         gtk.main_quit()
 
-    # ==========================================================================
-    def doesExist( self, aWindowName):
+    def doesExist( self, aWindowName ):
         """ aWindowName: (str) name of Window
              returns True if window is opened
                  False if window is not opened
@@ -181,15 +167,11 @@ class GtkSessionMonitor(Session):
         return False
 
 
-    # ==========================================================================
     def openWindow( self, aWindowName, rootWidget = None, rootWindow = None ): 
         """opens up window and returns aWindowname instance
         aWindowName   ---  Window name (str)
         Returns FundamentalWindow or EntityListWindow list
         """
-        if len(self.theModelName) == 0 and aWindowName != 'MainWindow':
-            message ( "Model has not yet been loaded. Can't open windows." )
-            return None
         # When the WindowName does not match, create nothing.
         if self.theFundamentalWindows.has_key( aWindowName ):
             if rootWidget == None:
@@ -204,7 +186,6 @@ class GtkSessionMonitor(Session):
             message( "No such WindowType (%s) " %aWindowName )
             return None
 
-    # ==========================================================================
     def getWindow( self, aWindowName ):
         """
         aWindowName   ---  Window name (str)
@@ -228,7 +209,6 @@ class GtkSessionMonitor(Session):
         return None
 
 
-    # ==========================================================================
     def displayWindow( self, aWindowName ):
         """When the Window is not created, calls its openWidow() method.
         When already created, move it to the top of desktop.
@@ -250,7 +230,6 @@ class GtkSessionMonitor(Session):
             self.theFundamentalWindows[aWindowName].openWindow()
             self.theFundamentalWindows[aWindowName].update()
     
-    # ==========================================================================
     def toggleWindow( self, aWindowName, aNewState=None ):
         aState = self.theFundamentalWindows[aWindowName].exists()
         if aNewState is None:
@@ -264,7 +243,6 @@ class GtkSessionMonitor(Session):
         if self.theFundamentalWindows['MainWindow'].exists():
             self.theFundamentalWindows['MainWindow'].update()
 
-    # ==========================================================================
     def createPluginWindow(self, aType, aFullPNList):
         """ opens and returns _PluginWindow instance of aType showing aFullPNList 
             returns None if pluginwindow could not have been created """
@@ -274,7 +252,6 @@ class GtkSessionMonitor(Session):
         return anInstance
 
 
-    # ==========================================================================
     def createPluginOnBoard(self, aType, aFullPNList):
         """ creates and adds plugin to pluginwindow and returns plugininstance """
         aBoardWindow = self.getWindow('BoardWindow')
@@ -284,7 +261,6 @@ class GtkSessionMonitor(Session):
         return aBoardWindow.addPluginWindows( aType, aFullPNList)
 
 
-    # ==========================================================================
     def openLogPolicyWindow(self,  aLogPolicy, aTitle ="Set log policy" ):
         """ pops up a modal dialog window
             with aTitle (str) as its title
@@ -298,14 +274,13 @@ class GtkSessionMonitor(Session):
         aLogPolicyWindow = LoggingPolicy.LoggingPolicy( self, aLogPolicy, aTitle )
         return aLogPolicyWindow.return_result()
         
-    # ==========================================================================
     def createEntityListWindow( self, rootWidget = 'EntityListWindow', aStatusBar=None ):
         """creates and returns an EntityListWindow
         """
         anEntityListWindow = None
 
         # when Model is already loaded.
-        if len(self.theModelName) > 0:
+        if self.theSession is not None:
             # creates new EntityListWindow instance
             anEntityListWindow = EntityListWindow.EntityListWindow( self, rootWidget, aStatusBar )
             anEntityListWindow.openWindow()
@@ -327,12 +302,10 @@ class GtkSessionMonitor(Session):
             
         return anEntityListWindow
 
-    # ==========================================================================
     def registerUpdateCallback( self, aFunction ):
         self.updateCallbackList.append( aFunction )        
 
 
-    # ==========================================================================
     def deleteEntityListWindow( self, anEntityListWindow ):
         """deletes the reference to the instance of EntityListWindow
         anEntityListWindow   ---  an instance of EntityListWindow(EntityListWindow)
@@ -354,7 +327,6 @@ class GtkSessionMonitor(Session):
             anEntityListWindow.close()
             del self.theEntityListInstanceMap[ anEntityListWindow ]
     
-    # ==========================================================================
     def __updateByTimeOut( self, arg ):
         """when time out, calls updates method()
         Returns None
@@ -373,7 +345,6 @@ class GtkSessionMonitor(Session):
         self.theTimer = gobject.timeout_add( int(self.theUpdateInterval), self.__updateByTimeOut, 0 )
 
 
-    # ==========================================================================
     def __removeTimeOut( self ):
         """removes time out
         Returns None
@@ -381,7 +352,6 @@ class GtkSessionMonitor(Session):
 
         gobject.source_remove( self.theTimer )
 
-    # ==========================================================================
     def updateWindows( self ):
         self.theMainWindow.update()
         self.updateFundamentalWindows()
@@ -391,18 +361,15 @@ class GtkSessionMonitor(Session):
             apply( aFunction )
      
 
-    # ==========================================================================
     def setUpdateInterval(self, Secs):
         "plugins are refreshed every secs seconds"
         self.theMainWindow.theUpdateInterval = Secs
     
-    # ==========================================================================
     def getUpdateInterval(self ):        #
         "returns the rate by plugins are refreshed "
         return self.theMainWindow.theUpdateInterval 
 
 
-    # ==========================================================================
     def updateFundamentalWindows( self ):
         """updates fundamental windows
         Return None
@@ -419,8 +386,6 @@ class GtkSessionMonitor(Session):
         #update MainWindow
         self.theMainWindow.update()
 
-
-    # ==========================================================================
     def __readIni(self,aPath):
         """read osogo.ini file
         an osogo.ini file may be in the given path
@@ -454,7 +419,6 @@ class GtkSessionMonitor(Session):
             anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback ) )
             self.message(anErrorMessage)
 
-    # ==========================================================================
     def getParameter(self, aParameter):
         """tries to get a parameter from ConfigDB
         if the param is not present in either osogo or default section
@@ -469,7 +433,6 @@ class GtkSessionMonitor(Session):
         # gets it from default
         return self.theConfigDB.get('DEFAULT',aParameter)
 
-    # ==========================================================================
     def setParameter(self, aParameter, aValue):
         """tries to set a parameter in ConfigDB
         if the param is not present in either osogo or default section
@@ -484,7 +447,6 @@ class GtkSessionMonitor(Session):
             # sets it in default
             self.theConfigDB.set('DEFAULT',aParameter, str(aValue))
 
-    # ==========================================================================
     def saveParameters( self ):
         """tries to save all parameters into a config file in home directory
         """
@@ -497,23 +459,6 @@ class GtkSessionMonitor(Session):
         except:
             self.message("Could not save preferences into file %s.\n Please check permissions for home directory.\n"%self.theIniFileName)
             
-    #-------------------------------------------------------------------
-    def createLoggerWithPolicy( self, fullpn, logpolicy = None ):
-        """creates logger for fullpn with logpolicy. if logpolicy parameter is not given, gets parameters from 
-        config database        
-        """
-        # if logpolicy is None get it from parameters
-        if logpolicy == None:
-            logpolicy = self.getLogPolicyParameters()
-        self.theSimulator.createLogger( fullpn, logpolicy )
-
-    #-------------------------------------------------------------------
-    def changeLoggerPolicy( self, fullpn, logpolicy ):
-        """changes logging policy for a given logger
-        """
-        self.theSimulator.setLoggerPolicy( fullpn, logpolicy )
-        
-    #-------------------------------------------------------------------
     def getLogPolicyParameters( self ):
         """
         gets logging policy from config database
@@ -527,7 +472,6 @@ class GtkSessionMonitor(Session):
             logPolicy[0]=1
         return logPolicy
 
-    #-------------------------------------------------------------------
     def setLogPolicyParameters( self, logPolicy ):
         """
         saves logging policy into config database
@@ -538,43 +482,51 @@ class GtkSessionMonitor(Session):
         self.setParameter( 'available_space' ,logPolicy[3] )
         self.saveParameters()
 
-
-#------------------------------------------------------------------------
-#IMPORTANT!
-#
-#Session methods to be used in interactive scripting shoould be overloaded here
-#-------------------------------------------------------------------------
-
-    #-------------------------------------------------------------------
-    def loadScript( self, ecs, parameters={} ):
-        #self.__readIni( ecs )
-        Session.loadScript (self, ecs, parameters )
-
-    #-------------------------------------------------------------------
     def interact( self, parameters={} ):
-        Session.interact (self, parameters )
+        self.theSession.interact( parameters )
 
-    #-------------------------------------------------------------------
+    def unload( self ):
+        if self.theSession is None:
+            return
+        self.stop()
+        self.theSession = None
+        self.theModelWalker = None
+        self.theDataGenerator = None
+        self.updateWindows()
+
+    def newSession( self ):
+        self.theSession = Session()
+        self.theModelWalker = ModelWalker( self.theSession.theSimulator )
+        self.theDataGenerator = DataGenerator( self )
+        self.theSession.theSimulator.setEventHandler( lambda:
+            gtk.events_pending() and gtk.main_iteration()  )
+        self.theSession.setMessageMethod( self.theMessageMethod )
+
     def loadModel( self, aModel ):
         #self.__readIni( aModel )
+        self.unload()
+        self.newSession()
+        self.theSession.loadModel( aModel )
 
-        Session.loadModel( self, aModel )
-        self.theModelWalker = ModelWalker( self.theSimulator )
-
-    #-------------------------------------------------------------------
     def saveModel( self , aModel ):
-        Session.saveModel( self , aModel )
+        if self.theSession is None:
+            raise Exception( "Model is not loaded" )
+        self.theSession.saveModel( self , aModel )
 
-    #-------------------------------------------------------------------
     def setMessageMethod( self, aMethod ):
-        Session.setMessageMethod( self, aMethod )
+        self.theMessageMethod = aMethod
+        if self.theSession is not None:
+            self.theSession.setMessageMethod( aMethod )
 
-    #-------------------------------------------------------------------
+    def restoreMessageMethod( self ):
+        if self.theSession is None:
+            return
+        self.theSession.restoreMessageMethod()
+
     def message( self, message ):
-        Session.message( self, message )
+        self.theMessageMethod( message )
         #self._synchronize()
 
-    #-------------------------------------------------------------------
     def run( self , time = '' ):
         """ 
         if already running: do nothing
@@ -583,6 +535,8 @@ class GtkSessionMonitor(Session):
             if Mainwindow is not opened create a stop button
             set up a timeout rutin and Running Flag 
         """
+        if self.theSession is None:
+            raise Exception("Model is not loaded")
 
         if self.theRunningFlag == True:
             return
@@ -597,7 +551,7 @@ class GtkSessionMonitor(Session):
             aCurrentTime = self.getCurrentTime()
             self.message("%15s"%aCurrentTime + ":Start\n" )
 
-            Session.run( self, time )
+            self.theSession.run( time )
             self.theRunningFlag = False
             self.__removeTimeOut()
 
@@ -609,15 +563,15 @@ class GtkSessionMonitor(Session):
 
         self.updateWindows()
 
-    #-------------------------------------------------------------------
     def stop( self ):
         """ stop Simulation, remove timeout, set Running flag to false
         """
-
+        if self.theSession is None:
+            raise Exception("Model is not loaded")
 
         try:
             if self.theRunningFlag == True:
-                Session.stop( self )
+                self.theSession.stop()
 
                 aCurrentTime = self.getCurrentTime()
                 self.message( ("%15s"%aCurrentTime + ":Stop\n" ))
@@ -630,11 +584,13 @@ class GtkSessionMonitor(Session):
         self.updateWindows()
         #self._synchronize()
 
-    #-------------------------------------------------------------------
     def step( self, num = None ):
         """ step according to num, if num is not given,
             according to set step parameters
         """
+        if self.theSession is None:
+            raise Exception("Model is not loaded")
+
         if self.theRunningFlag == True:
             return
 
@@ -649,7 +605,7 @@ class GtkSessionMonitor(Session):
             self.message( "Step\n" )
             self.theTimer = gobject.timeout_add( self.theUpdateInterval, self.__updateByTimeOut, 0 )
 
-            Session.step( self, int( num ) )
+            self.theSession.step( int( num ) )
 
             self.theRunningFlag = False
             self.__removeTimeOut()
@@ -660,60 +616,84 @@ class GtkSessionMonitor(Session):
             self.theRunningFlag = False
 
         self.updateWindows()
-        #self._synchronize()
 
     def isRunning(self):
         return self.theRunningFlag
 
-    #-------------------------------------------------------------------
     def getNextEvent( self ):
-        return Session.getNextEvent( self )
+        if self.theSession is None:
+            raise Exception("Model is not loaded")
 
-    #-------------------------------------------------------------------
+        return self.theSession.getNextEvent()
+
     def getCurrentTime( self ):
-        return Session.getCurrentTime( self )
+        if self.theSession is None:
+            return float("nan")
 
-    #-------------------------------------------------------------------
-    def setEventChecker( self, event ):
-        Session.setEventChecker( self, event )
-
-    #-------------------------------------------------------------------
-    def setEventHandler( self, event ):
-        Session.setEventHandler( self, event )
+        return self.theSession.getCurrentTime()
 
     def getStepperList( self ):
-        return Session.getStepperList( self )
+        if self.theSession is None:
+            raise Exception("Model is not loaded")
 
-    #-------------------------------------------------------------------
+        return self.theSession.getStepperList()
+
     def createStepperStub( self, id ):
-        return Session.createStepperStub( self, id )
+        if self.theSession is None:
+            raise Exception("Model is not loaded")
 
-    #-------------------------------------------------------------------
+        return self.theSession.createStepperStub( id )
+
     def getEntityList( self, entityType, systemPath ):
-        return Session.getEntityList( self, entityType, systemPath )
+        if self.theSession is None:
+            raise Exception("Model is not loaded")
 
-    #-------------------------------------------------------------------
+        return self.theSession.getEntityList( entityType, systemPath )
+
     def createEntityStub( self, fullid ):
-        return Session.createEntityStub( self, fullid )
+        if self.theSession is None:
+            raise Exception("Model is not loaded")
 
-    #-------------------------------------------------------------------
+        return self.theSession.createEntityStub( fullid )
+
+    def getEntityProperty( self, fullPN ):
+        if self.theSession is None:
+            raise Exception("Model is not loaded")
+
+        return self.theSession.getEntityProperty( fullPN )
+
+    def getEntityPropertyAttributes( self, fullPN ):
+        if self.theSession is None:
+            raise Exception("Model is not loaded")
+
+        return self.theSession.getEntityPropertyAttributes( fullPN )
+
+    def setEntityProperty( self, fullPN, aValue ):
+        if self.theSession is None:
+            raise Exception("Model is not loaded")
+
+        self.theSession.setEntityProperty( fullPN, aValue )
+
     def getLoggerList( self ):
-        return Session.getLoggerList( self )
+        if self.theSession is None:
+            raise Exception("Model is not loaded")
 
-    #-------------------------------------------------------------------
-    def createLogger( self, fullpn ):
-        Session.createLogger( self, fullpn )
-#FIXME        #remember refresh Tracer and Loggerwindows!!!
+        return self.theSession.getLoggerList()
 
-
-
-    #-------------------------------------------------------------------
     def createLoggerStub( self, fullpn ):
-        return Session.createLoggerStub( self, fullpn )
+        if self.theSession is None:
+            raise Exception("Model is not loaded")
 
-    #-------------------------------------------------------------------
+        return self.theSession.createLoggerStub( fullpn )
+
     def saveLoggerData( self, fullpn=0, aSaveDirectory='./Data', aStartTime=-1, anEndTime=-1, anInterval=-1 ):
-        Session.saveLoggerData( self, fullpn, aSaveDirectory, aStartTime, anEndTime, anInterval )
+        if self.theSession is None:
+            raise Exception("Model is not loaded")
 
+        self.theSession.saveLoggerData( fullpn, aSaveDirectory, aStartTime, anEndTime, anInterval )
 
+    def getDataGenerator( self ):
+        if self.theSession is None:
+            raise Exception("Model is not loaded")
 
+        return self.theDataGenerator

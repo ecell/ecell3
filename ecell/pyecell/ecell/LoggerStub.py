@@ -62,15 +62,15 @@ class LoggerStub( ObjectStub ):
         if self.exists():
             return
         if self.theLoggingPolicy != None:
-            self.theSimulator.createLogger( self.theFullPNString, self.theLoggingPolicy )
+            self.theSimulator().createLogger( self.theFullPNString, self.theLoggingPolicy )
         else:
-            self.theSimulator.createLogger( self.theFullPNString )
+            self.theSimulator().createLogger( self.theFullPNString )
 
     def delete( self ):
         """
         Deletes the logger created by create()
         """
-        self.theSimulator.deleteLogger( self.theFullPNString )
+        self.theSimulator().deleteLogger( self.theFullPNString )
 
     def exists( self ):
         """
@@ -79,7 +79,7 @@ class LoggerStub( ObjectStub ):
         """
         # When the FullPN of this instance exists in 
         # the FullPN list, returns TRUE
-        return self.theFullPNString in self.theSimulator.getLoggerList()
+        return self.theFullPNString in self.theSimulator().getLoggerList()
 
     def getData( self, aStartTime=None, anEndTime=None, anInterval=None ):
         """
@@ -91,11 +91,11 @@ class LoggerStub( ObjectStub ):
         if anEndTime == None:
             anEndTime = self.getEndTime()
         if anInterval == None:
-            return self.theSimulator.getLoggerData( self.theFullPNString,
+            return self.theSimulator().getLoggerData( self.theFullPNString,
                                                     aStartTime,
                                                     anEndTime )
         else:
-            return self.theSimulator.getLoggerData( self.theFullPNString,
+            return self.theSimulator().getLoggerData( self.theFullPNString,
                                                     aStartTime,
                                                     anEndTime,
                                                     anInterval )
@@ -109,20 +109,20 @@ class LoggerStub( ObjectStub ):
         return self.getData( aStartTime, anEndTime, anInterval )
 
     def getStartTime( self ):
-        return self.theSimulator.getLoggerStartTime( self.theFullPNString )
+        return self.theSimulator().getLoggerStartTime( self.theFullPNString )
 
     def getEndTime( self ):
-        return self.theSimulator.getLoggerEndTime( self.theFullPNString )
+        return self.theSimulator().getLoggerEndTime( self.theFullPNString )
 
     def getSize( self ):
-        return self.theSimulator.getLoggerSize( self.theFullPNString )
+        return self.theSimulator().getLoggerSize( self.theFullPNString )
 
     def getLoggerPolicy( self ):
         """
         Returns the logger policy
         This method can throw exceptions.
         """
-        return self.theSimulator.getLoggerPolicy( self.theFullPNString )
+        return self.theSimulator().getLoggerPolicy( self.theFullPNString )
 
     def setLoggerPolicy( self, aLoggingPolicy ):
         """
@@ -135,7 +135,7 @@ class LoggerStub( ObjectStub ):
         This method can throw exceptions.
         """
         if self.exists():
-            self.theSimulator.setLoggerPolicy( self.theFullPNString, aLoggingPolicy)
+            self.theSimulator().setLoggerPolicy( self.theFullPNString, aLoggingPolicy)
         else:
             self.theLoggingPolicy = aLoggingPolicy
 

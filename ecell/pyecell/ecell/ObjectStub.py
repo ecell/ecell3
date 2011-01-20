@@ -33,6 +33,7 @@
 
 
 from ecs_constants import *
+from weakref import ref
 
 # ---------------------------------------------------------------
 # ObjectStub
@@ -51,8 +52,7 @@ class ObjectStub:
     # This method can throw exceptions.
     # ---------------------------------------------------------------
     def __init__( self, aSimulator ):
-    
-        self.theSimulator = aSimulator
+        self.theSimulator = ref( aSimulator )
 
     # end of __init__
 
@@ -80,29 +80,13 @@ class ObjectStub:
 
 
     # ---------------------------------------------------------------
-    # setSimulator
-    #
-    # aSimulator    : the reference to Simulator to set
-    #
-    # return -> None
-    # This method can throw exceptions.
-    # ---------------------------------------------------------------
-    def setSimulator( self, aSimulator ):
-    
-        self.theSimulator = aSimulator
-
-    # end of setSimulator
-
-
-    # ---------------------------------------------------------------
     # getSimulator
     #
     # return -> the reference to Simulator
     # This method can throw exceptions.
     # ---------------------------------------------------------------
     def getSimulator( self ):
-    
-        return self.theSimulator
+        return self.theSimulator()
 
     # end of getSimulator
 

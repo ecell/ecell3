@@ -126,13 +126,43 @@ Selected systems</property>
 	  </child>
 
 	  <child>
-	    <widget class="GtkVBox" id="navigator_area">
+	    <widget class="GtkHBox" id="hbox1">
 	      <property name="visible">True</property>
 	      <property name="homogeneous">False</property>
 	      <property name="spacing">0</property>
 
 	      <child>
-		<placeholder/>
+		<widget class="GtkToolButton" id="backbutton">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes"></property>
+		  <property name="use_underline">True</property>
+		  <property name="stock_id">gtk-go-back</property>
+		  <property name="visible_horizontal">True</property>
+		  <property name="visible_vertical">True</property>
+		  <property name="is_important">False</property>
+		</widget>
+		<packing>
+		  <property name="padding">0</property>
+		  <property name="expand">False</property>
+		  <property name="fill">False</property>
+		</packing>
+	      </child>
+
+	      <child>
+		<widget class="GtkToolButton" id="forwardbutton">
+		  <property name="visible">True</property>
+		  <property name="label" translatable="yes"></property>
+		  <property name="use_underline">True</property>
+		  <property name="stock_id">gtk-go-forward</property>
+		  <property name="visible_horizontal">True</property>
+		  <property name="visible_vertical">True</property>
+		  <property name="is_important">False</property>
+		</widget>
+		<packing>
+		  <property name="padding">0</property>
+		  <property name="expand">False</property>
+		  <property name="fill">False</property>
+		</packing>
 	      </child>
 	    </widget>
 	    <packing>

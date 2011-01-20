@@ -299,10 +299,6 @@ class MainWindow(OsogoWindow):
             os.path.join( config.GLADEFILE_PATH, "ecell32.png" ) )
                 
 
-        self.__setMenuAndButtonsStatus( False )
-        #self.theSession.updateFundamentalWindows()
-
-
         # display MainWindow
         self[self.__class__.__name__].show_all()
         self.present()
@@ -372,8 +368,8 @@ class MainWindow(OsogoWindow):
         self['simulation_button'].set_sensitive(aDataLoadedStatus)
         self['step_button'].set_sensitive(aDataLoadedStatus)
         self['timer_clear_button'].set_sensitive(aDataLoadedStatus)
-        self['load_model_button'].set_sensitive(not aDataLoadedStatus)
-        self['load_script_button'].set_sensitive(not aDataLoadedStatus)
+        # self['load_model_button'].set_sensitive(not aDataLoadedStatus)
+        # self['load_script_button'].set_sensitive(not aDataLoadedStatus)
         self['save_model_button'].set_sensitive(aDataLoadedStatus)
         self['entitylist_button'].set_sensitive(aDataLoadedStatus)
         self['logger_button'].set_sensitive(aDataLoadedStatus)
@@ -384,8 +380,8 @@ class MainWindow(OsogoWindow):
         self['timer_button'].set_sensitive(aDataLoadedStatus)
 
         # file menu
-        self['load_model_menu'].set_sensitive(not aDataLoadedStatus)
-        self['load_script_menu'].set_sensitive(not aDataLoadedStatus)
+        # self['load_model_menu'].set_sensitive(not aDataLoadedStatus)
+        # self['load_script_menu'].set_sensitive(not aDataLoadedStatus)
         self['save_model_menu'].set_sensitive(aDataLoadedStatus)
         self['import_sbml'].set_sensitive(not aDataLoadedStatus)
         self['export_sbml'].set_sensitive(aDataLoadedStatus)
@@ -532,17 +528,11 @@ class MainWindow(OsogoWindow):
 
             if aFileType == 'Model':
                 self.theSession.loadModel( aFileName )
-                # self.theSession.theSimulator.initialize()
             elif aFileType == 'Script':
                 self.theSession.loadScript( aFileName )
             elif aFileType == 'SBML':
                     self.theSession.importSBML( aFileName )
-                                
-            self.theEntityListWindow.updateButtons()
-
-            self.update()
-            self.theSession.updateFundamentalWindows()
-            self.theEntityListWindow.theQueue.applyFullPNList()
+            self.theSession.updateWindows()
         except:
                         # expants message window, when it is folded.
             if self.exists():
@@ -605,7 +595,6 @@ class MainWindow(OsogoWindow):
 
         # updates
         self.update()
-        self.updateButtons()
         self.theSession.updateFundamentalWindows()
 
     def __exportSBML( self, *arg ) :
@@ -653,7 +642,6 @@ class MainWindow(OsogoWindow):
 
         # updates
         self.update()
-        self.updateButtons()
         self.theSession.updateFundamentalWindows()
 
     def __deleted( self, *arg ):
@@ -693,7 +681,7 @@ class MainWindow(OsogoWindow):
         """ restores message method and closes window """
         self.theSession.restoreMessageMethod()
 
-        if len( self.theSession.theModelName ) > 0:
+        if self.theSession.theSession is not None:
             self.theEntityListWindow.update()                    
 
         self.theEntityListWindow.close()
@@ -861,7 +849,7 @@ class MainWindow(OsogoWindow):
             return None
                     
         # updates time
-        aTime = self.theSession.theSimulator.getCurrentTime()
+        aTime = self.theSession.getCurrentTime()
         self.theCurrentTime = aTime
         self['time_entry'].set_text( str( self.theCurrentTime ) )
         self['sec_step_entry'].set_text( str( self.theStepSizeOrSec ) )
@@ -884,13 +872,10 @@ class MainWindow(OsogoWindow):
                 self.updateCount = 0
                 
         # when Model is already loaded.
-        if len(self.theSession.theModelName) > 0:
-            # updates status of menu and button 
-            self.__setMenuAndButtonsStatus( True )
-            self.updateButtons()
+        self.__setMenuAndButtonsStatus( self.theSession.theSession is not None )
+        self.updateButtons()
 
     def getCurrentTime( self, aTime ):
-
         theTime = self.datetime.fromtimestamp( aTime )
 
         return str( theTime.hour-9 )+" : "+str( theTime.minute ) + " : " + str( theTime.second )
@@ -971,7 +956,7 @@ class MainWindow(OsogoWindow):
             self['indicator_box'].show()
             self.setIndicatorActive(True)
             self.indicatorVisible = True
-            self.theLastTime = self.theSession.theSimulator.getCurrentTime()
+            self.theLastTime = self.theSession.getCurrentTime()
 
     def __displayTimer( self, *arg ):
         # show Indicator

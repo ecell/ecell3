@@ -187,7 +187,7 @@ class StepperWindow(OsogoWindow):
 		self.theSelectedStepperID = aStepperID
 		self.thePropertyMap = {}
 		# aStepperStub is selected StepperStub of selected stepper
-		aStepperStub = StepperStub( self.theSession.theSimulator, aStepperID )
+		aStepperStub = self.theSession.StepperStub( aStepperID )
 
 
 		
@@ -294,7 +294,7 @@ class StepperWindow(OsogoWindow):
 		# --------------------------------------------------
 		iter_stepper = self['stepper_id_list'].get_selection().get_selected()[1]
 		aStepperID = self['stepper_id_list'].get_model().get_value(iter_stepper,0)
-		aStepperStub = StepperStub( self.theSession.theSimulator, aStepperID )
+		aStepperStub = self.theSession.createStepperStub( aStepperID )
 
 		# --------------------------------------------------
 		# gets selected property name
@@ -355,7 +355,7 @@ class StepperWindow(OsogoWindow):
 		# --------------------------------------------------
 		iter = self['stepper_id_list'].get_selection().get_selected()[1]
 		aStepperID = self['stepper_id_list'].get_model().get_value(iter,0)
-		aStepperStub = StepperStub( self.theSession.theSimulator, aStepperID )
+		aStepperStub = self.theSession.createStepperStub( aStepperID )
 
 		# gets selected property row
 		iter = self['property_list'].get_selection().get_selected()[1]
@@ -493,7 +493,7 @@ class StepperWindow(OsogoWindow):
 		# gets stepperID
 		iter_stepper = self['stepper_id_list'].get_selection().get_selected()[1]
 		aStepperID = self['stepper_id_list'].get_model().get_value(iter_stepper,0)
-		aStepperStub = StepperStub( self.theSession.theSimulator, aStepperID )
+		aStepperStub = self.theSession.createStepperStub( aStepperID )
 
 		iter = self.theFirstPropertyIter[aStepperID]
 

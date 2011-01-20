@@ -120,7 +120,7 @@ class InterfaceWindow( OsogoWindow ):
 		for anInstance in anInstanceList:
 			aTitle = anInstance.getTitle()
 			aClass =  anInstance.__class__.__name__
-			aFullPN = createFullPNString( anInstance.theFullPN() )
+			aFullPN = createFullPNString( anInstance.getFullPN() )
 
 			if self.exists():
 

@@ -83,7 +83,7 @@ def convertFullPNToFullID( fullpn ):
 
     validateFullPN( fullpn )
     fullid = tuple( fullpn[:3] )
-    return fullid
+    return fullid, fullpn[3]
 
 
 def validateFullID( fullid ):
@@ -91,7 +91,7 @@ def validateFullID( fullid ):
     aLength = len( fullid )
     if aLength != 3:
         raise ValueError(
-            "FullID has 3 fields. ( %d given )" % aLength )
+            "FullID must have exactly 3 fields. ( %d given )" % aLength )
 
 
 def validateFullPN( fullpn ):
@@ -99,7 +99,7 @@ def validateFullPN( fullpn ):
     aLength = len( fullpn )
     if aLength != 4:
         raise ValueError(
-            "FullPN has 4 fields. ( %d given )" % aLength )
+            "FullPN must have exactly 4 fields. ( %d given )" % aLength )
 
 
 def createSystemPathFromFullID( aSystemFullID ):

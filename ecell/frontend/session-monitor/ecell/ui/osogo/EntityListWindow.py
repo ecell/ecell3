@@ -88,6 +88,8 @@ class EntityListWindow(OsogoWindow):
         self.thePropertyWindow = None
         self.thePluginInstanceSelection = None
 
+        self.theAssociatedSession = None
+
         
 
     def openWindow( self ):
@@ -100,21 +102,13 @@ class EntityListWindow(OsogoWindow):
         
         # add handers
         self.addHandlers( { 
-            # system tree
-            #			'on_system_tree_cursor_changed' :\
-            #			self.updateSystemSelection,\
-            'on_system_tree_button_press_event' : self.popupMenu,\
-            # entity list
-            #			'on_process_tree_cursor_changed': self.selectProcess,\
-            #			'on_variable_tree_cursor_changed':self.selectVariable,\
-            
-            'on_view_button_clicked': self.createPluginWindow,\
-            'on_variable_tree_button_press_event': self.popupMenu,\
-            'on_process_tree_button_press_event': self.popupMenu,\
+            'on_system_tree_button_press_event' : self.popupMenu,
+            'on_view_button_clicked': self.createPluginWindow,
+            'on_variable_tree_button_press_event': self.popupMenu,
+            'on_process_tree_button_press_event': self.popupMenu,
             # search 
-            'on_search_button_clicked': self.pushSearchButton,\
-            'on_search_entry_key_press_event':\
-            self.keypressOnSearchEntry,\
+            'on_search_button_clicked': self.pushSearchButton,
+            'on_search_entry_key_press_event': self.keypressOnSearchEntry,
             'on_clear_button_clicked': self.pushClearButton, 
             'on_search_scope_changed': self.searchScopeChanged
             } )
@@ -131,51 +125,36 @@ class EntityListWindow(OsogoWindow):
         # initialize components
         # --------------------------------------------
         self.__initializeSystemTree()
-        self.systemTreeConstructed = False
-        if self.theSession.theModelWalker != None:
-            self.reconstructSystemTree()
- 
         self.__initializeProcessTree()
         self.__initializeVariableTree()
         self.__initializeSelection()
         self.__initializePluginWindowOptionMenu()
 
-        aFullPN = convertFullIDToFullPN( createFullID ( 'System::/' ) )
-        self.theQueue = FullPNQueue( self["navigator_area"] , [ aFullPN ] )
-
-        self.theQueue.registerCallback( self.doSelection )        
+        self.theQueue = None
         self.__initializePropertyWindow()
         self.__initializePopupMenu()
 
-        # --------------------------------------------
-        # initialize buffer
-        # --------------------------------------------
         self.theSelectedEntityList = []
         self.theSelectedPluginInstanceList = []
 
-        # --------------------------------------------
-        # initialize Add to Board button
-        # --------------------------------------------
         self.CloseOrder = False
         self.updateButtons()
 
-
-
-
-
-
     def updateButtons( self ):
-        if ( self.theSession.theModelWalker != None ):
+        if self.theSession.theSession is not None:
             self['search_button'].set_sensitive(True)
             self['view_button'].set_sensitive(True)
             self['search_entry'].set_sensitive(True)
             self['plugin_optionmenu'].set_sensitive(True)
-
+            self['backbutton'].set_sensitive(False)
+            self['forwardbutton'].set_sensitive(False)
         else:
-            self['search_button'].set_sensitive(0)
-            self['view_button'].set_sensitive(0)
-            self['search_entry'].set_sensitive(0)
-            self['plugin_optionmenu'].set_sensitive(0)
+            self['search_button'].set_sensitive(False)
+            self['view_button'].set_sensitive(False)
+            self['search_entry'].set_sensitive(False)
+            self['plugin_optionmenu'].set_sensitive(False)
+            self['backbutton'].set_sensitive(False)
+            self['forwardbutton'].set_sensitive(False)
     
 
     def getQueue( self ):
@@ -330,13 +309,9 @@ class EntityListWindow(OsogoWindow):
     def __initializePropertyWindow( self ):
         if self.thePropertyWindow != None:
             return
-        self.thePropertyWindow= self.thePluginManager.createInstance(
-            'PropertyWindow',\
-            [(SYSTEM, '', '/', '')],\
-            rootWidget= 'top_frame',\
-            parent= self ) 
-
-        if ( self.theStatusbar != None ):
+        self.thePropertyWindow = self.thePluginManager.createInstance(
+            'PropertyWindow', [], rootWidget='top_frame', parent=self ) 
+        if self.theStatusbar is not None:
             self.thePropertyWindow.setStatusBar( self.theStatusbar )
 
         aPropertyWindowTopVBox = self.thePropertyWindow['top_frame']
@@ -470,23 +445,21 @@ class EntityListWindow(OsogoWindow):
         Returns None
         [Note]:creates and adds submenu that includes menus of PluginWindow instances
         """
-        # When right button is pressed
+        # When left button is pressed
         if anEvent.type == gtk.gdk._2BUTTON_PRESS:
-
             aSelectedRawFullPNList = self.__getSelectedRawFullPNList()
             aPluginWindowType = self['plugin_optionmenu'].get_children()[0].get()
 
             # When no FullPN is selected, displays error message.
             if aSelectedRawFullPNList  != None:
                 if len( aSelectedRawFullPNList ) == 0:
-
                     aMessage = 'No entity is selected.'
                     aDialog = ConfirmWindow(OK_MODE,aMessage,'Error!')
                     self.thePropertyWindow.showMessageOnStatusBar(aMessage)
                     return False
 
             #self.theQueue.pushFullPNList( aSelectedRawFullPNList )
-            self.thePluginManager.createInstance( aPluginWindowType, self.thePropertyWindow.theFullPNList() )
+            self.thePluginManager.createInstance( aPluginWindowType, self.thePropertyWindow.getFullPNList() )
 
 
 
@@ -541,23 +514,18 @@ class EntityListWindow(OsogoWindow):
             self.thePopupMenu.popup(None,None,None,anEvent.button,anEvent.time)
 
 
-#    def reset( self ):
-#
-#        self.reconstructSystemTree()
-#        self.reconstructLists()
-#        self.update()
-
-
     def update( self ):
         """overwrite superclass's method
         updates this window and property window
         Returns None
         """
-        if self.theSession.theModelWalker == None:
-            return
-        elif not self.systemTreeConstructed:
+        if self.theSession.theSession is not self.theAssociatedSession:
             self.reconstructSystemTree()
-            
+            self.theQueue = FullPNQueue( ( self[ "backbutton" ], self[ "forwardbutton" ] ) )
+            self.theQueue.registerCallback( self.doSelection )
+            self.theQueue.pushFullPNList( [ convertFullIDToFullPN( createFullID ( 'System::/' ) ) ] )
+            self.updateButtons()
+
         # updates this window
         if not self.exists():
             return
@@ -571,13 +539,11 @@ class EntityListWindow(OsogoWindow):
             self.thePluginInstanceSelection.update()
 
         self.updateLists()
-
+        self.theAssociatedSession = self.theSession.theSession
 
 
     def constructSystemTree( self, parent, fullID ):
-
         # System tree
-
         newlabel = fullID[ID] 
 
         systemStore = self.systemTree.get_model()
@@ -603,18 +569,17 @@ class EntityListWindow(OsogoWindow):
 
 
     def reconstructSystemTree( self ):
-
         rootSystemFullID = createFullID( 'System::/' )
-        self.constructSystemTree( None, rootSystemFullID )
-        self.systemTreeConstructed = True
-
+        self.donotHandle = True
+        self.theSysTreeStore.clear()
+        self.donotHandle = False
+        if self.theSession.theSession:
+            self.constructSystemTree( None, rootSystemFullID )
+        self.reconstructLists()
 
 
     def reconstructLists( self ):
         selectedSystemList = self.getSelectedSystemList()
-
-        if len( selectedSystemList ) == 0:
-            return
         if self.entitySelected:
             return 
         # Variable list
@@ -638,13 +603,12 @@ class EntityListWindow(OsogoWindow):
         typeID = ENTITYTYPE_DICT[ type ]
 
         fullIDList = []
-        for systemFullID in systemList:
+        if self.theSession.theSession is not None:
+            for systemFullID in systemList:
+                systemPath = createSystemPathFromFullID( systemFullID )
 
-            systemPath = createSystemPathFromFullID( systemFullID )
-
-            idList = self.theSession.getEntityList( type, systemPath )
-            fullIDList += [ ( typeID, systemPath, id ) for id in idList ]
-
+                idList = self.theSession.getEntityList( type, systemPath )
+                fullIDList += [ ( typeID, systemPath, id ) for id in idList ]
 
         entityStore = view.get_model()
 
@@ -654,7 +618,7 @@ class EntityListWindow(OsogoWindow):
         entityStore.clear()
         self.donotHandle = donotHandle
 
-        #		columnList = view.get_columns()
+        #        columnList = view.get_columns()
         # re-create the list
         for fullID in fullIDList:
 
@@ -693,21 +657,19 @@ class EntityListWindow(OsogoWindow):
 
 
     def doSelection( self, aFullPNList ):
-        if self.theSession.theModelWalker == None:
-            return
         self.doSelectSystem( aFullPNList ) 
         self.doSelectProcess( aFullPNList )
         self.doSelectVariable( aFullPNList )
 
 
     def doSelectSystem( self, aFullPNList ):
-
         targetFullIDList = []
         if aFullPNList[0][TYPE] != SYSTEM:
             targetFullIDList += [ createFullIDFromSystemPath( aFullPN[SYSTEMPATH] )  for aFullPN in aFullPNList ]
         else:
             for aFullPN in aFullPNList:
-                targetFullIDList.append( convertFullPNToFullID( aFullPN ) )
+                aFullID, _ = convertFullPNToFullID( aFullPN ) 
+                targetFullIDList.append( aFullID )
 
         # if to slow there should be a check whether this is needed in all cases
         donotHandle = self.donotHandle
@@ -719,10 +681,10 @@ class EntityListWindow(OsogoWindow):
             #doselection
             targetPath = createSystemPathFromFullID( targetFullID )
             anIter = self.getSysTreeIter( targetPath )
-
-            aPath = self.theSysTreeStore.get_path( anIter )
-            self.__expandRow( aPath )
-            self.theSysSelection.select_iter( anIter )
+            if anIter is not None:
+                aPath = self.theSysTreeStore.get_path( anIter )
+                self.__expandRow( aPath )
+                self.theSysSelection.select_iter( anIter )
 
         self.donotHandle = donotHandle
 
@@ -851,7 +813,7 @@ class EntityListWindow(OsogoWindow):
         for systemFullID in systemFullIDList:
             fullPNList.append( convertFullIDToFullPN( systemFullID ) )
         self.donotHandle = True
-        self.theQueue.pushFullPNList(  fullPNList  )
+        self.theQueue.pushFullPNList( fullPNList )
         self.donotHandle = False
 
 
@@ -889,6 +851,8 @@ class EntityListWindow(OsogoWindow):
         This method updates property values shown in the list of
         Variables and Processes.
         '''
+        if self.theSession.theSession is None:
+            return
 
         self.updateEntityList( 'Process', self.processTree.get_model(),\
                                self.PROCESS_COLUMN_LIST,\
@@ -939,7 +903,6 @@ class EntityListWindow(OsogoWindow):
 
 
     def selectProcess( self, selection ):
-
         if self.donotHandle:
             return
         self.entitySelected = True
@@ -951,7 +914,7 @@ class EntityListWindow(OsogoWindow):
         # get selected items
         selection.selected_foreach(self.process_select_func)
 
-        if len(self.theSelectedFullPNList)>0:
+        if len( self.theSelectedFullPNList ) > 0:
             self.donotHandle = True
             self.theQueue.pushFullPNList( self.theSelectedFullPNList )
             self.donotHandle = False
@@ -973,7 +936,7 @@ class EntityListWindow(OsogoWindow):
         # get selected items
         selection.selected_foreach(self.variable_select_func)
 
-        if len(self.theSelectedFullPNList)>0:
+        if len( self.theSelectedFullPNList ) > 0:
             self.donotHandle = True
             self.theQueue.pushFullPNList( self.theSelectedFullPNList )
             self.donotHandle = False
@@ -1047,7 +1010,7 @@ class EntityListWindow(OsogoWindow):
             return False
 
         #self.theQueue.pushFullPNList( aSelectedRawFullPNList )
-        self.thePluginManager.createInstance( aPluginWindowType, self.thePropertyWindow.theFullPNList() )
+        self.thePluginManager.createInstance( aPluginWindowType, self.thePropertyWindow.getFullPNList() )
 
 
 
@@ -1155,40 +1118,6 @@ class EntityListWindow(OsogoWindow):
         Return a list of selected FullPNs
         """
         return self.theQueue.getActualFullPNList()
-        
-        # this is redundant
-        self.theSelectedFullPNList = []
-
-        if ( self.theLastSelectedWindow == "None" ):
-            return None
-
-        if ( self.theLastSelectedWindow == "Variable" ):
-
-            selection=self.variableTree.get_selection()
-            selection.selected_foreach(self.variable_select_func)
-
-        if ( self.theLastSelectedWindow == "Process" ):
-
-            selection=self.processTree.get_selection()
-            selection.selected_foreach(self.process_select_func)
-
-        if len(self.theSelectedFullPNList) == 0:
-            selectedSystemList = self.getSelectedSystemList()
-            for aSystemFullID in selectedSystemList:
-                self.theSelectedFullPNList.append( convertFullIDToFullPN( aSystemFullID ) )
-
-
-        # If no property is selected on PropertyWindow, 
-        # create plugin Window with default property (aValue) 
-        if len( str(self.thePropertyWindow.getSelectedFullPN()) ) == 0:
-            return self.theSelectedFullPNList
-
-        # If a property is selected on PropertyWindow, 
-        # create plugin Window with selected property
-        else:
-            return [self.thePropertyWindow.getSelectedFullPN()]
-
-
 
 
     def addToBoard( self, *arg ):
@@ -1252,7 +1181,22 @@ class EntityListWindow(OsogoWindow):
 
         # creates Logger using PropertyWindow
         #self.theQueue.pushFullPNList( aSelectedRawFullPNList )
-        self.thePropertyWindow.createLogger()
+        aLogPolicy = self.theSession.getLogPolicyParameters()
+        try:
+            for aFullPN in self.getFullPNList():
+                # creates loggerstub and call its create method.
+                aLoggerStub = self.theSession.createLoggerStub( createFullPNString( aFullPN ) )
+                if not aLoggerStub.exists():
+                    aLoggerStub.setLoggerPolicy( aLogPolicy )
+                    aLoggerStub.create()
+        except:
+            # When to create log is failed, display error message on MessageWindow.
+            anErrorMessage = traceback.format_exception(sys.exc_type,sys.exc_value,sys.exc_traceback)
+            self.thePluginManager.printMessage( anErrorMessage )
+            return
+
+        # updates fandamental windows.
+        self.thePluginManager.updateFundamentalWindows()
 
         # display message on status bar
         if len(aSelectedRawFullPNList) == 1:

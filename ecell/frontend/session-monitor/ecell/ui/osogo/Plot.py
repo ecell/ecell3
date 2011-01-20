@@ -96,7 +96,7 @@ def sign( num ):
         return 0
     return int( num / abs( num ) )
 
-class Axis:
+class Axis( object ):
     def __init__( self, aParent, aType, anOrientation ):
         """ aParent = Plot instance
         aType = PLOT_TIME_AXIS or PLOT_VALUE_AXIS
@@ -465,8 +465,7 @@ class Axis:
                 
 
 
-class DataSeries:
-
+class DataSeries( object ):
     def __init__( self, aFullPNString, aDataSource, aPlot, aColor ):
         self.theFullPNString = aFullPNString
         self.isOnFlag = True
@@ -529,10 +528,7 @@ class DataSeries:
 
     def addPoints( self, newPoints):
         """ newPoints: Numeric array of new points ( x, y, avg, max, min )"""
-
         self.theNewData = nu.concatenate( (self.theNewData, newPoints) )
-
-
 
     def replacePoints( self, newPoints):
         """ replace all datapoints """
@@ -778,9 +774,7 @@ class DataSeries:
         self.thePlot.drawWholePlot()
 
 
-class Plot:
-
-
+class Plot( object ):
     def __init__( self, owner, root, aDrawingArea ):
     # ------------------------------------------------------
 
@@ -943,7 +937,7 @@ class Plot:
 
     def resetData( self ):
         for aSeries in self.getDataSeriesList():
-            aSeries.replacePoints( zeros ( ( 0, 5) ) )
+            aSeries.replacePoints( zeros ( ( 0, 5 ) ) )
 
     def setStripMode(self, aMode):
 

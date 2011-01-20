@@ -40,158 +40,135 @@ from ecell.ui.osogo.OsogoPluginWindow import *
 #   - show one numerical property 
 # ------------------------------------------------------
 class DigitalWindow( OsogoPluginWindow ):
-
-	# ------------------------------------------------------
-	# Constructor
-	# 
-	# aDirName(str)   : directory name that includes glade file
-	# data            : RawFullPN
-	# aPluginManager  : the reference to pluginmanager 
-	# return -> None
-	# ------------------------------------------------------
-	def __init__( self, aDirName, aData, aPluginManager, aRoot=None ):
-
-		# call constructor of superclass
-		OsogoPluginWindow.__init__( self, aDirName, aData, \
-		                            aPluginManager, aRoot )
+    # ------------------------------------------------------
+    # Constructor
+    # 
+    # aDirName(str)   : directory name that includes glade file
+    # data            : RawFullPN
+    # aPluginManager  : the reference to pluginmanager 
+    # return -> None
+    # ------------------------------------------------------
+    def __init__( self, aDirName, aData, aPluginManager, aRoot=None ):
+        # call constructor of superclass
+        OsogoPluginWindow.__init__( self, aDirName, aData, \
+                                    aPluginManager, aRoot )
         
-		aFullPNString = createFullPNString( self.theFullPN() )
-		aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
-		if not operator.isNumberType( aValue ):
-			aMessage = "Error: (%s) is not numerical data" %aFullPNString
-			self.thePluginManager.printMessage( aMessage )
-			aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,'Error!')
-			raise TypeError( aMessage )
+        aFullPNString = createFullPNString( self.getFullPN() )
+        aValue = self.theSession.getEntityProperty( aFullPNString )
+        if not operator.isNumberType( aValue ):
+            aMessage = "Error: (%s) is not numerical data" %aFullPNString
+            self.thePluginManager.printMessage( aMessage )
+            aDialog = ConfirmWindow.ConfirmWindow(0,aMessage,'Error!')
+            raise TypeError( aMessage )
 
-	# end of __init__
+    # end of __init__
 
-	def openWindow(self):
+    def openWindow(self):
+        OsogoPluginWindow.openWindow(self)
 
-		OsogoPluginWindow.openWindow(self)
+        aFullPNString = createFullPNString( self.getFullPN() )
+        aValue = self.theSession.getEntityProperty( aFullPNString )
+        anAttribute = self.theSession.getEntityPropertyAttributes( aFullPNString )
 
-		aFullPNString = createFullPNString( self.theFullPN() )
-		aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
-		anAttribute = self.theSession.theSimulator.getEntityPropertyAttributes( \
-		              aFullPNString )
+        self.thePluginManager.appendInstance( self )
 
-		self.thePluginManager.appendInstance( self )
+        self.addHandlers( { 
+                    'on_value_frame_activate'        :self.inputValue,
+                      'on_increase_button_clicked'     :self.increaseValue,
+                      'on_decrease_button_clicked'     :self.decreaseValue,
+                    } )
 
-		self.addHandlers( { 
-		            'on_value_frame_activate'        :self.inputValue,
-	  	            'on_increase_button_clicked'     :self.increaseValue,
-	  	            'on_decrease_button_clicked'     :self.decreaseValue,
-		            } )
+        aString = str( self.getFullPN()[ID] )
+        aString += ':\n' + str( self.getFullPN()[PROPERTY] )
+        self[ "id_label" ].set_text( aString )
 
-		aString = str( self.theFullPN()[ID] )
-		aString += ':\n' + str( self.theFullPN()[PROPERTY] )
-		self[ "id_label" ].set_text( aString )
+        # If this property is not settable, sets unsensitive TextEntry and Buttons.
+        if not anAttribute[ SETTABLE ]:
+            self[ "value_frame"     ].set_editable( False )
+            self[ "increase_button" ].set_sensitive( False )
+            self[ "decrease_button" ].set_sensitive( False )
+            self.setIconList(
+                os.path.join( config.GLADEFILE_PATH, "ecell.png" ),
+                os.path.join( config.GLADEFILE_PATH, "ecell32.png" ) )
+        self.update()
 
-		# If this property is not settable, sets unsensitive TextEntry and Buttons.
-		if not anAttribute[ SETTABLE ]:
-			self[ "value_frame"     ].set_editable( False )
-			self[ "increase_button" ].set_sensitive( False )
-			self[ "decrease_button" ].set_sensitive( False )
-                self.setIconList(
-			os.path.join( config.GLADEFILE_PATH, "ecell.png" ),
-			os.path.join( config.GLADEFILE_PATH, "ecell32.png" ) )
-		self.update()
+    # ------------------------------------------------------
+    # update
+    # 
+    # return -> None
+    # ------------------------------------------------------
+    def update( self ):
+        aFullPNString = createFullPNString( self.getFullPN() )
+        aValue = self.theSession.getEntityProperty( aFullPNString )
+        self["value_frame"].set_text( str( aValue ) )
 
-	# ------------------------------------------------------
-	# changeFullPN
-	# 
-	# anObject(any)   : a dammy object
-	# return -> None
-	# ------------------------------------------------------
-	def changeFullPN( self, anObject ):
-
-		OsogoPluginWindow.changeFullPN( self, anObject )
-
-		aString = str( self.theFullPN()[ID] )
-		aString += ':\n' + str( self.theFullPN()[PROPERTY] )
-		self["id_label"].set_text( aString )
-
-	# end of changeFullPN
+    # end of update
 
 
-	# ------------------------------------------------------
-	# update
-	# 
-	# return -> None
-	# ------------------------------------------------------
-	def update( self ):
+    # ------------------------------------------------------
+    # inputValue
+    # 
+    # anObject(any)   : a dammy object
+    # return -> None
+    # ------------------------------------------------------
+    def inputValue( self, *arg ):
+        # gets text from text field.
+        aText = self['value_frame'].get_text().split()
+        if type(aText) == type([]):
+            if len(aText) > 0:
+                aText = aText[0]
+            else:
+                return None
+        else:
+            return None
 
-		aFullPNString = createFullPNString( self.theFullPN() )
-		aValue = self.theSession.theSimulator.getEntityProperty( aFullPNString )
-		self["value_frame"].set_text( str( aValue ) )
+        # Only when the length of text > 0,
+        # checks type of text and set it.
+        if len(aText)>0:
+            # Only when the value is numeric, 
+            # the value will be set to value_frame.
+            try:
+                aValue = float( aText )
+                self.theSession.setEntityProperty( self.getFullPN(), aValue )
+            except:
+                ConfirmWindow.ConfirmWindow(0,'Input numerical value.')
+                aValue = self.theSession.getEntityProperty( self.getFullPN() )
+                self["value_frame"].set_text( str( aValue ) )
+            return None
+        else:
+            return None
 
-	# end of update
-
-
-	# ------------------------------------------------------
-	# inputValue
-	# 
-	# anObject(any)   : a dammy object
-	# return -> None
-	# ------------------------------------------------------
-	def inputValue( self, *arg ):
-
-		# gets text from text field.
-		aText = self['value_frame'].get_text().split()
-		if type(aText) == type([]):
-			if len(aText) > 0:
-				aText = aText[0]
-			else:
-				return None
-		else:
-			return None
-
-		# Only when the length of text > 0,
-		# checks type of text and set it.
-		if len(aText)>0:
-			# Only when the value is numeric, 
-			# the value will be set to value_frame.
-			try:
-				aValue = float( aText )
-				self.setValue( self.theFullPN(), aValue )
-			except:
-				ConfirmWindow.ConfirmWindow(0,'Input numerical value.')
-				aValue = self.getValue( self.theFullPN() )
-				self["value_frame"].set_text( str( aValue ) )
-			return None
-		else:
-			return None
-
-	# end of inputValue
+    # end of inputValue
 
 
-	# ------------------------------------------------------
-	# increaseValue
-	# 
-	# anObject(any)   : a dammy object
-	# return -> None
-	# ------------------------------------------------------
-	def increaseValue( self, obj ):
+    # ------------------------------------------------------
+    # increaseValue
+    # 
+    # anObject(any)   : a dammy object
+    # return -> None
+    # ------------------------------------------------------
+    def increaseValue( self, obj ):
+        aValue = self.theSession.getEntityProperty( self.getFullPN() )
+        if aValue:
+            self.theSession.setEntityProperty( self.getFullPN(), aValue * 2.0 )
+        else:
+            self.theSession.setEntityProperty( self.getFullPN(), 1.0 )
 
-		if self.getValue( self.theFullPN() ):
-			self.setValue( self.theFullPN(), self.getValue( self.theFullPN() ) * 2.0 )
-		else:
-			self.setValue( self.theFullPN(), 1.0 )
-
-	# end of increaseValue
-		
+    # end of increaseValue
         
-	# ------------------------------------------------------
-	# decreaseValue
-	# 
-	# anObject(any)   : a dammy object
-	# return -> None
-	# ------------------------------------------------------
-	def decreaseValue( self, obj ):
+        
+    # ------------------------------------------------------
+    # decreaseValue
+    # 
+    # anObject(any)   : a dammy object
+    # return -> None
+    # ------------------------------------------------------
+    def decreaseValue( self, obj ):
+        aValue = self.theSession.getEntityProperty( self.getFullPN() )
+        self.theSession.setEntityProperty( self.getFullPN(), aValue * 0.5 )
 
-		self.setValue( self.theFullPN(), self.getValue( self.theFullPN() ) * 0.5 )
-
-	# end of decreaseValue
-			
+    # end of decreaseValue
+            
 # end of DigitalWindow
 
 

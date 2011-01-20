@@ -39,6 +39,7 @@ import os
 import sys
 import getopt
 import traceback
+import thread
 
 try:
     import pygtk
@@ -47,9 +48,11 @@ try:
     import gobject 
     import ecell.ui.osogo.config as config
     import ecell.ecs
+    from ecell.Session import createScriptContext
     from ecell.ui.osogo.GtkSessionMonitor import GtkSessionMonitor
 except KeyboardInterrupt:
     sys.exit(1)
+
 
 def loadScript( aTupple ):
     aSession = aTupple[0]
@@ -57,18 +60,15 @@ def loadScript( aTupple ):
 
     #loads script after main has been called
     try:
-            # load ane execute script file
-            aSession.loadScript( anEssFile )
+        # load ane execute script file
+        thread.start_new_thread( execfile, ( anEssFile, createScriptContext( aSession, {} ) ) )
     except:
-            aSession.message(' can\'t load [%s]' %anEssFile)
-            anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback ) )
-            aSession.message("-----------")
-            aSession.message(anErrorMessage)
-            aSession.message("-----------")
-    #else:
-            # initialize & update windows
-            #aSession.openWindow('MainWindow
-            #aSession.updateWindow()
+        aSession.message(' can\'t load [%s]' %anEssFile)
+        anErrorMessage = '\n'.join( traceback.format_exception( sys.exc_type,sys.exc_value,sys.exc_traceback ) )
+        aSession.message("-----------")
+        aSession.message(anErrorMessage)
+        aSession.message("-----------")
+
 
 # -----------------------------------------------------------------
 # main
@@ -126,7 +126,6 @@ def main():
     # -------------------------------------
     aSession = GtkSessionMonitor()
 
-
     # -------------------------------------
     # executes options
     # -------------------------------------
@@ -154,11 +153,6 @@ def main():
             aSession.message("-----------")
             aSession.message(anErrorMessage)
             aSession.message("-----------")
-        else:
-
-            # initialize & update windows
-            aMainWindow = aSession.openWindow('MainWindow')
-            aSession.updateWindows()
 
     # executes script file (.ess)
     elif anEssFile != None:
@@ -173,10 +167,11 @@ def main():
 
         # print message on MainWindow
         aSession.message("%s is being loaded and executed.\n" %anEssFile )
-        gobject.timeout_add( 1, loadScript, [aSession, anEssFile] )
+        gobject.timeout_add( 1, loadScript, [ aSession, anEssFile ] )
 
-    else:
-        aMainWindow = aSession.openWindow('MainWindow')
+    aMainWindow = aSession.openWindow('MainWindow')
+    aSession.updateWindows()
+
 
     # -------------------------------------
     # calls gtk.main()

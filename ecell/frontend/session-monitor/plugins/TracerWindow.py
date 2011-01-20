@@ -55,7 +55,7 @@ class TracerWindow( OsogoPluginWindow ):
         #initiates OsogoPluginWindow
         OsogoPluginWindow.__init__( self, dirname, data, pluginmanager, root )
         self.thePluginManager = pluginmanager
-        self.theDataGenerator = self.thePluginManager.getDataGenerator()
+        self.theDataGenerator = self.thePluginManager.theSession.getDataGenerator()
         self.displayedFullPNStringList = []
         
         #get session
@@ -67,7 +67,6 @@ class TracerWindow( OsogoPluginWindow ):
         self.theSaveDirectorySelection.cancel_button.connect('clicked', self.closeParentWindow)
 
     def openWindow(self):
-
         OsogoPluginWindow.openWindow(self)
 
         #self.openWindow()
@@ -132,7 +131,7 @@ class TracerWindow( OsogoPluginWindow ):
             os.path.join( config.GLADEFILE_PATH, "ecell.png" ),
             os.path.join( config.GLADEFILE_PATH, "ecell32.png" ) )
         #addtrace to plot
-        self.addTraceToPlot( self.theFullPNList() )
+        self.addTraceToPlot( self.getFullPNList() )
         #sets stripinterval, disable history buttons
         self.theEntry.set_text( str(self.thePlotInstance.getStripInterval()) )
         self.theEntry.connect( 'activate', self.stripIntervalChangedEnter )
@@ -158,7 +157,9 @@ class TracerWindow( OsogoPluginWindow ):
             if not self.hasLogger(fpn):
 
                 try:
-                    self.theSession.theSimulator.createLogger(fpn, logPolicy )
+                    aLoggerStub = self.theSession.createLoggerStub( fpn )
+                    aLoggerStub.setLoggerPolicy( logPolicy )
+                    aLoggerStub.create()
                 except:
                     self.theSession.message( 'Error while creating logger\n logger for ' + fpn + ' not created\n' )
                 else:
@@ -181,7 +182,7 @@ class TracerWindow( OsogoPluginWindow ):
 
 
     def allHasLogger( self ):
-        loggerList = self.theSession.theSimulator.getLoggerList()
+        loggerList = self.theSession.getLoggerList()
         for aSeries in self.thePlotInstance.getDataSeriesList():
             if aSeries.getFullPNString() not in loggerList:
                 return False
@@ -189,20 +190,8 @@ class TracerWindow( OsogoPluginWindow ):
     
     # ========================================================================
     def hasLogger(self, aFullPNString):
-        loggerlist=self.theSession.theSimulator.getLoggerList()
+        loggerlist=self.theSession.getLoggerList()
         return aFullPNString in loggerlist
-
-    # ========================================================================
-#    def checkHistoryButton(self):
-#        history_button = self['togglebutton3']
-#        if len( self.displayedFullPNStringList ) == 0:
-#            history_button.set_sensitive( False )
-#            return None 
-#        for fpn in self.displayedFullPNStringList:
-#            if not self.hasLogger(fpn):
-#                history_button.set_sensitive(False)
-#                return None 
-#        history_button.set_sensitive(True)
 
 
     # ========================================================================
@@ -275,10 +264,10 @@ class TracerWindow( OsogoPluginWindow ):
         
     # ========================================================================
     def getLatestData( self, fpn ):
-        value = self.theSession.theSimulator.getEntityProperty( fpn )
+        value = self.theSession.getEntityProperty( fpn )
         if not operator.isNumberType( value):
             return None
-        time = self.theSession.theSimulator.getCurrentTime()
+        time = self.theSession.getCurrentTime()
         return nu.array( [time,value, value, value, value] )
         
     # ========================================================================

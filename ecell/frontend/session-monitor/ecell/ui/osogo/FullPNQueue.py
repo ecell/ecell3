@@ -30,54 +30,43 @@ import gtk
 import ecell.ui.osogo.Window as Window
 from ecell.ui.osogo.config import *
 
-class FullPNQueue:
-
-    def __init__( self, anAttachmentPoint, aFullPNList ):
+class FullPNQueue( object ):
+    def __init__( self, anAttachmentPoint, aRawFullPNList=None ):
         self.backwardQueue = []
         self.forwardQueue = []
-        self.theRawFullPNList = aFullPNList
-        aWindow = Window.Window(
-            os.path.join( GLADEFILE_PATH, self.__class__.__name__ + '.glade'),
-            "hbox1"
-            )
-        aWindow.openWindow()
-        aFrame = aWindow['hbox1']
-        self.backButton = aWindow['backbutton']
-        self.forwardButton = aWindow['forwardbutton']
-        anAttachmentPoint.add( aFrame )
-        self.backButton.connect( "clicked", self.__goBack )
-        self.forwardButton.connect( "clicked", self.__goForward )
+        if aRawFullPNList is not None:
+            self.theRawFullPNList = self.__copyList( aRawFullPNList )
+        else:
+            self.theRawFullPNList = None
+        self.backButton = anAttachmentPoint[0]
+        self.forwardButton = anAttachmentPoint[1]
+        self.thebackbuttonHandle = self.backButton.connect( "clicked", self.__goBack )
+        self.theForwardButtonHandle = self.forwardButton.connect( "clicked", self.__goForward )
         self.callbackList = []
         self.__updateNavigatorButtons()
 
+    def __del__( self ):
+        self.backButton.disconnect( self.theBackButtonHandle )
+        self.forwardButton.disconnect( self.theForwardButtonHandle )
+
     def registerCallback( self, aFunction ):
         self.callbackList.append( aFunction )
-        apply( aFunction, [self.theRawFullPNList] )
-
 
     def pushFullPNList( self, aRawFullPNList ):
-        self.backwardQueue.append( self.__copyList ( self.theRawFullPNList  ) )
+        aRawFullPNList = self.__copyList( aRawFullPNList )
+        if self.theRawFullPNList is not None:
+            self.backwardQueue.append( self.theRawFullPNList )
+        self.theRawFullPNList = aRawFullPNList
         self.forwardQueue = []
-
-        self.__applyFullPNList( aRawFullPNList )
+        self.applyFullPNList()
         self.__updateNavigatorButtons()
         
     def getActualFullPNList( self ):
-        return self.__copyList( self.theRawFullPNList )
+        return self.theRawFullPNList
 
-    def __applyFullPNList( self, aRawFullPNList ):
-        self.theRawFullPNList = self.__copyList( aRawFullPNList )
+    def applyFullPNList( self ):
         for aFunction in self.callbackList:
-
-            apply( aFunction, [aRawFullPNList] )
-
-
-    def applyFullPNList( self  ):
-        for aFunction in self.callbackList:
-
-            apply( aFunction, [self.theRawFullPNList] )
-
-
+            apply( aFunction, [ self.theRawFullPNList ] )
 
     def __copyList( self, aList ):
         newList = []
@@ -87,39 +76,28 @@ class FullPNQueue:
             else:
                 newList.append( self.__copyList( anItem ) )
         return newList
-
-
         
     def __goBack(self, *args):
         if len( self.backwardQueue ) == 0:
             return
         rawFullPNList = self.backwardQueue.pop()
         self.forwardQueue.append( self.__copyList( self.theRawFullPNList ) )
-        self.__applyFullPNList( rawFullPNList )
+        self.theRawFullPNList = rawFullPNList
+        self.applyFullPNList()
         self.__updateNavigatorButtons()
-
         
     def __goForward( self, *args ):
         if len( self.forwardQueue ) == 0:
             return
         rawFullPNList = self.forwardQueue.pop()
         self.backwardQueue.append( self.__copyList( self.theRawFullPNList ) )
-        self.__applyFullPNList( rawFullPNList )
+        self.theRawFullPNList = rawFullPNList
+        self.applyFullPNList()
         self.__updateNavigatorButtons()
-        
 
     def __updateNavigatorButtons( self ):
-        if len( self.backwardQueue ) == 0:
-            backFlag = False
-        else:
-            backFlag = True
-        if len( self.forwardQueue ) == 0:
-            forFlag = False
-        else:
-            forFlag = True
-        self.forwardButton.set_sensitive( forFlag )
-        self.backButton.set_sensitive( backFlag )
-        
+        self.forwardButton.set_sensitive( len( self.forwardQueue ) > 0 )
+        self.backButton.set_sensitive( len( self.backwardQueue ) > 0 )
 
 # read buttons fromfile
 # create from EntityList

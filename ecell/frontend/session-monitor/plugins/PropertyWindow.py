@@ -34,6 +34,7 @@ import ecell.ui.osogo.config as config
 from ecell.ui.osogo.OsogoPluginWindow import *
 from ecell.ui.osogo.VariableReferenceEditor import *
 from ecell.ui.osogo.FullPNQueue import *
+from ecell.ecssupport import *
 
 # column index of clist
 GETABLE_COL   = 0
@@ -66,6 +67,8 @@ class PropertyWindow(OsogoPluginWindow):
         OsogoPluginWindow.__init__( self, aDirName, aData,
                                    aPluginManager, rootWidget=rootWidget )
         self.theStatusBarWidget = None
+        self.theQueue = None
+        self.theAssociatedSession = None
 
     # end of __init__
 
@@ -83,15 +86,6 @@ class PropertyWindow(OsogoPluginWindow):
         # initializes buffer
         self.thePreFullID = None
         self.thePrePropertyMap = {}
-        if self.theParent != None:
-            if   self.theParent.__class__.__name__ == "EntityListWindow":
-                self.theQueue = self.theParent.getQueue()
-            else:
-                self.theQueue = FullPNQueue( self['navigator_area'], self.theRawFullPNList )
-        else:
-            self.theQueue = FullPNQueue( self['navigator_area'], self.theRawFullPNList )
-
-        self.theQueue.registerCallback( self.setRawFullPNList )
        
         # initializes ListStore
         self.theListStore=gtk.ListStore(
@@ -162,7 +156,7 @@ class PropertyWindow(OsogoPluginWindow):
         self['entryVariableMolar'].set_property( 'xalign', 1 )
         self['entryVariableNumber'].set_property( 'xalign', 1 )
 
-        if self.theRawFullPNList == ():
+        if len( self.theRawFullPNList ) == 0:
             return
         # set default as not to view all properties
         self['checkViewAll'].set_active( False )
@@ -171,12 +165,11 @@ class PropertyWindow(OsogoPluginWindow):
             os.path.join( config.GLADEFILE_PATH, "ecell.png" ),
             os.path.join( config.GLADEFILE_PATH, "ecell32.png" ) )
         #self.__setFullPNList()
-        self.update(True)
+        self.update()
 
-        #if ( len( self.theFullPNList() ) > 1 ) and ( aRoot != 'top_vbox' ):
-        if ( len( self.theFullPNList() ) > 1 ) and ( rootWidget !=
+        if ( len( self.getFullPNList() ) > 1 ) and ( rootWidget !=
                                                     'EntityWindow' ):
-            self.thePreFullID = self.theFullID()
+            self.thePreFullID, _ = convertFullPNToFullID( self.getFullPN() )
             aClassName = self.__class__.__name__
 
         # registers myself to PluginManager
@@ -254,7 +247,6 @@ class PropertyWindow(OsogoPluginWindow):
     # return -> None
     # ---------------------------------------------------------------
     def setRawFullPNList( self, aRawFullPNList ):
-
         # When aRawFullPNList is not changed, does nothing.
         if self.theRawFullPNList == aRawFullPNList:
             # do nothing
@@ -278,90 +270,110 @@ class PropertyWindow(OsogoPluginWindow):
     # return -> None
     # This method is throwable exception.
     # ---------------------------------------------------------------
-    def update( self, fullUpdate = False ):
+    def update( self ):
+        aFullID = None
+        aFullPN = None
+        fullUpdate = False
 
-        if self.theSession.theModelWalker == None:
-            return
-        # ----------------------------------------------------
-        # checks a value is changed or not
-        # ----------------------------------------------------
-        # check the fullID
-        if self.thePreFullID != self.theFullID():
+        if self.theSession.theSession is not self.theAssociatedSession:
+            self.theRawFullPNList = []
+            if self.theSession.theSession is not None:
+                if self.theParent != None:
+                    if self.theParent.__class__.__name__ == "EntityListWindow":
+                        self.theQueue = self.theParent.getQueue()
+                    else:
+                        self['navigation'].visible = True
+                        self.theQueue = FullPNQueue( ( self['backbutton'], self['forwardbutton'] ), self.theRawFullPNList )
+                else:
+                    self['navigation'].visible = True
+                    self.theQueue = FullPNQueue( ( self['backbutton'], self['forwardbutton'] ), self.theRawFullPNList )
+                self.theAssociatedSession = self.theSession.theSession
+                self.theQueue.registerCallback( self.setRawFullPNList )
+            else:
+                self.theQueue = None
+        else:
+            aFullPN = self.getFullPN()
+            if aFullPN is not None:
+                aFullID, _ = convertFullPNToFullID( self.getFullPN() )
+        if self.thePreFullID != aFullID:
             fullUpdate = True
 
         # ----------------------------------------------------
         # updates widgets
         # ----------------------------------------------------
         # creates EntityStub
-        anEntityStub = EntityStub( self.theSession.theSimulator, createFullIDString(self.theFullID()) )
+        if aFullID is not None:
+            anEntityStub = self.theSession.createEntityStub( createFullIDString( aFullID ) )
+        else:
+            anEntityStub = None
+            fullUpdate = True
 
-        if fullUpdate == False:
+        if not fullUpdate:
             # gets propery values for thePreProperyMap in case value is not tuple
             for aPropertyName in self.thePrePropertyMap.keys():
                 aProperty = self.thePrePropertyMap[aPropertyName]
-                if type( aProperty[0] ) not in ( type( () ), type( [] ) ):
-                    aProperty[0] = anEntityStub.getProperty(aPropertyName)
+                if type( aProperty[0] ) not in ( tuple, list ):
+                    aProperty[0] = anEntityStub.getProperty( aPropertyName )
             if self.theVarrefEditor != None:
                 self.theVarrefEditor.update()
-                
         else:
-
             self.theSelectedFullPN = ''
 
             # -----------------------------------------------
             # updates each widget
             # Type, ID, Path, Classname
             # -----------------------------------------------
-            anEntityType = ENTITYTYPE_STRING_LIST[self.theFullID()[TYPE]]
-            anID = self.theFullID()[ID]
-            aSystemPath = str( self.theFullID()[SYSTEMPATH] )
-            
-            self['labelEntityType'].set_text( anEntityType + ' Property' )
-            self['entryClassName'].set_text( anEntityStub.getClassname() )
-            self['entryFullID'].set_text( ':'.join( [ anEntityType,
-                                                      aSystemPath,
-                                                      anID ] ) )
-            
-            # saves properties to buffer
-            self.thePrePropertyMap = {}
-            for aProperty in anEntityStub.getPropertyList():
-                self.thePrePropertyMap[str(aProperty)] = [None, None]
-                self.thePrePropertyMap[str(aProperty)][0] =\
-                        anEntityStub.getProperty(aProperty)
-                self.thePrePropertyMap[str(aProperty)][1] =\
-                        anEntityStub.getPropertyAttributes(aProperty)
-                
-            # updates PropertyListStore
-#            self.__updatePropertyList()
+            if anEntityStub is not None:
+                anEntityType = ENTITYTYPE_STRING_LIST[aFullPN[TYPE]]
+                anID = aFullPN[ID]
+                aSystemPath = str( aFullPN[SYSTEMPATH] )
+
+                self['labelEntityType'].set_text( anEntityType + ' Property' )
+                self['entryClassName'].set_text( anEntityStub.getClassname() )
+                self['entryFullID'].set_text( ':'.join( [ anEntityType,
+                                                          aSystemPath,
+                                                          anID ] ) )
+                # saves properties to buffer
+                self.thePrePropertyMap = {}
+                for aProperty in anEntityStub.getPropertyList():
+                    self.thePrePropertyMap[str(aProperty)] = [None, None]
+                    self.thePrePropertyMap[str(aProperty)][0] =\
+                            anEntityStub.getProperty(aProperty)
+                    self.thePrePropertyMap[str(aProperty)][1] =\
+                            anEntityStub.getPropertyAttributes(aProperty)
+
+                self['entryName'].set_text( str(
+                                     self.thePrePropertyMap[ 'Name' ][0] )  )
+
+                # save current full id to previous full id.
+                self.thePreFullID = aFullID
+                self.setSelectedFullPN( aFullPN )
+            else:
+                self['labelEntityType'].set_text( "" )
+                self['entryClassName'].set_text( "" )
+                self['entryFullID'].set_text( "" )
+                self['entryName'].set_text( "" )
 
             # update Summary tab for unique fields of each entity type
             # update the respective Entity's PropertyList
-            self.__setDiscardList()
-            if self.theFullID()[TYPE] == PROCESS:
-                self.__createVariableReferenceListTab()
-                self.__updateProcess()
-            elif self.theFullID()[TYPE] == VARIABLE:
-                self.__deleteVariableReferenceListTab()
-                self.__updateVariable()
-            elif self.theFullID()[TYPE] == SYSTEM:
-                self.__deleteVariableReferenceListTab()
-                self.__updateSystem()
+            if aFullPN is not None:
+                self.__setDiscardList()
+                if aFullPN[TYPE] == PROCESS:
+                    self.__createVariableReferenceListTab()
+                    self.__updateProcess()
+                elif aFullPN[TYPE] == VARIABLE:
+                    self.__deleteVariableReferenceListTab()
+                    self.__updateVariable()
+                elif aFullPN[TYPE] == SYSTEM:
+                    self.__deleteVariableReferenceListTab()
+                    self.__updateSystem()
 
-
-            self['entryName'].set_text( str(
-                                 self.thePrePropertyMap[ 'Name' ][0] )  )
-
-        # save current full id to previous full id.
-        self.preFullID = self.theFullID()
-        self.setSelectedFullPN(self.theRawFullPNList[0])
         # updates status bar
         if self['statusbar'] != None:
             self['statusbar'].push(1,'')
 
-
                 
     def __updatePropertyList( self ):
-
         self.theList = []
         aPropertyList = self.thePrePropertyMap.keys()
 
@@ -410,7 +422,8 @@ class PropertyWindow(OsogoPluginWindow):
             self.theListStore.remove( anIter )
             anIter = nextIter
 
-        self.setSelectedFullPN( self.theRawFullPNList[0] )
+        if len( self.theRawFullPNList ) > 0:
+            self.setSelectedFullPN( self.theRawFullPNList[0] )
 
         self.lockCursor = lockCursor
 
@@ -476,7 +489,8 @@ class PropertyWindow(OsogoPluginWindow):
 
     def __updateSystem( self ):
         self.__updatePropertyList()
-        aSystemPath = createSystemPathFromFullID( self.theFullID() )
+        aFullID, _ = convertFullPNToFullID( self.getFullPN() )
+        aSystemPath = createSystemPathFromFullID( aFullID )
         aProcessList = self.theSession.getEntityList( 'Process', aSystemPath )
         aVariableList = self.theSession.getEntityList( 'Variable', aSystemPath )
         aSystemList = self.theSession.getEntityList( 'System', aSystemPath ) 
@@ -499,15 +513,18 @@ class PropertyWindow(OsogoPluginWindow):
 
 
     def __setDiscardList( self ):
+        aFullPN = self.getFullPN()
+        if aFullPN is None:
+            return
         isViewAll = self['checkViewAll'].get_active()
         if isViewAll:
             self.theDiscardList = []
         else:
-            if self.theFullID()[TYPE] == PROCESS:
+            if aFullPN[TYPE] == PROCESS:
                 self.theDiscardList = PROCESS_DISCARD_LIST 
-            elif self.theFullID()[TYPE] == VARIABLE:
+            elif aFullPN[TYPE] == VARIABLE:
                 self.theDiscardList = VARIABLE_DISCARD_LIST 
-            elif self.theFullID()[TYPE] == SYSTEM:
+            elif aFullPN[TYPE] == SYSTEM:
                 self.theDiscardList = SYSTEM_DISCARD_LIST 
         
 
@@ -522,8 +539,8 @@ class PropertyWindow(OsogoPluginWindow):
         aPath = args[1]
         anIter = self.theListStore.get_iter_from_string( aPath )
         aSelectedProperty = self.theListStore.get_value( anIter, PROPERTY_COL )
-        self.theSelectedFullPN = convertFullIDToFullPN( self.theFullID(),
-                                                       aSelectedProperty )
+        aFullID, _ = convertFullPNToFullID( self.getFullPN() )
+        self.theSelectedFullPN = convertFullIDToFullPN( aFullID, aSelectedProperty )
         
         # disable VariableReferenceList editing because of a bug when
         # saving changes
@@ -626,7 +643,7 @@ class PropertyWindow(OsogoPluginWindow):
         aFullPNString = createFullPNString(self.theSelectedFullPN)
 
         try:
-            self.setValue( self.theSelectedFullPN, aValue ) 
+            self.theSession.setEntityProperty( self.theSelectedFullPN, aValue ) 
             lockCursor = self.lockCursor
             self.lockCursor = True
             self['theTreeView'].get_selection().select_iter( anIter )
@@ -663,8 +680,8 @@ class PropertyWindow(OsogoPluginWindow):
         else:
             aSelectedProperty = self.theListStore.get_value( anIter,
                                                             PROPERTY_COL )
-            self.theSelectedFullPN = convertFullIDToFullPN(
-                                       self.theFullID(), aSelectedProperty )
+            aFullID, _ = convertFullPNToFullID( self.getFullPN() )
+            self.theSelectedFullPN = convertFullIDToFullPN( aFullID, aSelectedProperty )
         return self.theSelectedFullPN
 
     def setSelectedFullPN( self, aFullPN ):
@@ -715,27 +732,18 @@ class PropertyWindow(OsogoPluginWindow):
         # gets PluginWindowName from selected MenuItem
         aPluginWindowName = anObject.get_name()
 
-        # gets selected property
-#        aRow = self['theTreeView'].get_selection().get_selected()[1]
-#        aSelectedProperty = self.theListStore.get_value(aRow,PROPERTY_COL)
-
-        # creates RawFullPN
-#        aType = ENTITYTYPE_STRING_LIST[self.theFullID()[TYPE]] 
-#        anID = self.theFullID()[ID]
-#        aPath = self.theFullID()[SYSTEMPATH] 
-#        aRawFullPN = [(ENTITYTYPE_DICT[aType],aPath,anID,aSelectedProperty)]
-        
         # creates PluginWindow
         self.thePluginManager.createInstance( aPluginWindowName, self.theRawFullPNList )
 
     # end of createNewPluginWindow
 
     def __createVariableReferenceListTab( self ):
+        aFullID, _ = convertFullPNToFullID( self.getFullPN() )
         if self.theVarrefTabNumber  != -1:
-            if self.theVarrefEditor.getProcessFullID() == self.theFullID():
+            if self.theVarrefEditor.getProcessFullID() == aFullID:
                 return
             else:
-                self.theVarrefEditor.setDisplayedFullID( self.theFullID() )
+                self.theVarrefEditor.setDisplayedFullID( aFullID )
         else:
             aFrame = gtk.Frame()
             aFrame.show()

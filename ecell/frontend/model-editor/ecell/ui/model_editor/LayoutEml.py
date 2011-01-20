@@ -578,9 +578,8 @@ class Eml:
 
 
         aFullPN = createFullPN( aFullPNString )
-        aPropertyName = aFullPN[3]
-        aFullID = createFullIDString( convertFullPNToFullID( aFullPN ) )
-        anEntityPropertyNode = self.__getEntityPropertyNode( aFullID, aPropertyName )
+        aFullID, aPropertyName = convertFullPNToFullID( aFullPN )
+        anEntityPropertyNode = self.__getEntityPropertyNode( createFullIDString( aFullID ), aPropertyName )
 
         return self.__createValueList( anEntityPropertyNode )
 

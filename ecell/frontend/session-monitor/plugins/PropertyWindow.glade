@@ -29,23 +29,6 @@
       <property name="spacing">0</property>
 
       <child>
-	<widget class="GtkVBox" id="navigator_area_old">
-	  <property name="visible">True</property>
-	  <property name="homogeneous">False</property>
-	  <property name="spacing">0</property>
-
-	  <child>
-	    <placeholder/>
-	  </child>
-	</widget>
-	<packing>
-	  <property name="padding">0</property>
-	  <property name="expand">False</property>
-	  <property name="fill">False</property>
-	</packing>
-      </child>
-
-      <child>
 	<widget class="GtkFrame" id="top_frame">
 	  <property name="width_request">296</property>
 	  <property name="visible">True</property>
@@ -61,36 +44,49 @@
 	      <property name="spacing">0</property>
 
 	      <child>
-		<widget class="GtkHBox" id="hbox1">
-		  <property name="visible">True</property>
+		<widget class="GtkHBox" id="navigation">
+		  <property name="visible">False</property>
 		  <property name="homogeneous">False</property>
 		  <property name="spacing">0</property>
 
 		  <child>
-		    <placeholder/>
-		  </child>
-
-		  <child>
-		    <widget class="GtkVBox" id="navigator_area">
+		    <widget class="GtkToolButton" id="backbutton">
 		      <property name="visible">True</property>
-		      <property name="homogeneous">False</property>
-		      <property name="spacing">0</property>
-
-		      <child>
-			<placeholder/>
-		      </child>
+		      <property name="label" translatable="yes"></property>
+		      <property name="use_underline">True</property>
+		      <property name="stock_id">gtk-go-back</property>
+		      <property name="visible_horizontal">True</property>
+		      <property name="visible_vertical">True</property>
+		      <property name="is_important">False</property>
 		    </widget>
 		    <packing>
 		      <property name="padding">0</property>
 		      <property name="expand">False</property>
-		      <property name="fill">True</property>
+		      <property name="fill">False</property>
+		    </packing>
+		  </child>
+
+		  <child>
+		    <widget class="GtkToolButton" id="forwardbutton">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes"></property>
+		      <property name="use_underline">True</property>
+		      <property name="stock_id">gtk-go-forward</property>
+		      <property name="visible_horizontal">True</property>
+		      <property name="visible_vertical">True</property>
+		      <property name="is_important">False</property>
+		    </widget>
+		    <packing>
+		      <property name="padding">0</property>
+		      <property name="expand">False</property>
+		      <property name="fill">False</property>
 		    </packing>
 		  </child>
 		</widget>
 		<packing>
 		  <property name="padding">0</property>
 		  <property name="expand">False</property>
-		  <property name="fill">True</property>
+		  <property name="fill">False</property>
 		</packing>
 	      </child>
 

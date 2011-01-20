@@ -228,12 +228,11 @@ def p_ecs(t):
     ecs : fullid valuelist SEMI
     '''
     aFullPN = createFullPN( t[1] )
-    aPropertyName = aFullPN[3]
-    aFullID = createFullIDString( convertFullPNToFullID( aFullPN ) )
+    aFullID, aPropertyName = convertFullPNToFullID( aFullPN )
 
     # for update property
     if anEml.getEntityProperty( t[1] ):
-        anEml.deleteEntityProperty( aFullID, aPropertyName )
+        anEml.deleteEntityProperty( createFullIDString( aFullID ), aPropertyName )
         
     anEml.setEntityProperty(aFullID, aPropertyName, t[2])
 

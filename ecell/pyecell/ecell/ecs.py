@@ -36,6 +36,7 @@ __all__ = (
     'Process',
     'Variable',
     'PropertyAttributes',
+    'PropertyType',
     'LoggerPolicy',
     'VariableReference',
     'VariableReferences',

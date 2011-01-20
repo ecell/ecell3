@@ -200,6 +200,15 @@ class Session:
     def createEntityStub( self, fullid ):
         return EntityStub( self.theSimulator, fullid )
 
+    def getEntityProperty( self, fullPN ):
+        return self.theSimulator.getEntityProperty( fullPN )
+
+    def getEntityPropertyAttributes( self, fullPN ):
+        return self.theSimulator.getEntityPropertyAttributes( fullPN )
+
+    def setEntityProperty( self, fullPN, aValue ):
+        self.theSimulator.setEntityProperty( fullPN, aValue )
+
     #
     # Logger methods
     #
@@ -624,6 +633,28 @@ class Session:
 
 
         return aList
+
+
+def createScriptContext( session, parameters ):
+    # theSession == self in the script
+    aContext = { 'theSession': session, 'self': session }
+
+    # flatten class methods and object properties so that
+    # 'self.' isn't needed for each method calls in the script
+    aKeyList = list( session.__dict__.keys() +\
+                     session.__class__.__dict__.keys() )
+    aDict = {}
+    for aKey in aKeyList:
+        if not aKey.startswith('__'):
+            aDict[ aKey ] = getattr( session, aKey )
+
+    aContext.update( aDict )
+        
+    # add parameters to the context
+    aContext.update( parameters )
+
+    return aContext
+
 
 if __name__ == "__main__":
     pass

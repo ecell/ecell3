@@ -58,7 +58,7 @@ class EntityStub( ObjectStub ):
         return -> None
         This method can throw exceptions.
         """
-        self.theSimulator.createEntity( aClassname,
+        self.theSimulator().createEntity( aClassname,
                                         self.theFullIDString ) 
 
     def delete( self ):
@@ -66,30 +66,28 @@ class EntityStub( ObjectStub ):
         return -> None
         This method can throw exceptions.
         """
-        self.theSimulator.deleteEntity( self.theFullIDString ) 
+        self.theSimulator().deleteEntity( self.theFullIDString ) 
 
     def getClassname( self ):
         """
         return -> None
         This method can throw exceptions.
         """
-        return self.theSimulator.\
-               getEntityClassName( self.theFullIDString )
+        return self.theSimulator().getEntityClassName( self.theFullIDString )
 
     def getPropertyList( self ):
         """
         return -> a list of property names
         This method can throw exceptions.
         """
-        return self.theSimulator.\
-               getEntityPropertyList( self.theFullIDString )
+        return self.theSimulator().getEntityPropertyList( self.theFullIDString )
 
     def exists( self ):
         """
         return -> exist:TRUE / not exist:FALSE
         This method can throw exceptions.
         """
-        return self.theSimulator.isEntityExist( self.theFullIDString )
+        return self.theSimulator().isEntityExist( self.theFullIDString )
 
     def setProperty( self, aPropertyName, aValue ):
         """
@@ -100,7 +98,7 @@ class EntityStub( ObjectStub ):
         This method can throw exceptions.
         """
         aFullPN = self.theFullIDString + ':' + aPropertyName	
-        self.theSimulator.setEntityProperty( aFullPN, aValue )
+        self.theSimulator().setEntityProperty( aFullPN, aValue )
         self.theSimulator.markDirty()
 
     def __setitem__( self, aPropertyName, aValue ):
@@ -119,7 +117,7 @@ class EntityStub( ObjectStub ):
         This method can throw exceptions.
         """
         aFullPN = self.theFullIDString + ':' + aPropertyName
-        return self.theSimulator.getEntityProperty( aFullPN )
+        return self.theSimulator().getEntityProperty( aFullPN )
 
     def __getitem__( self, aPropertyName ):
         """
@@ -137,7 +135,7 @@ class EntityStub( ObjectStub ):
         This method can throw exceptions.
         """
         aFullPN = self.theFullIDString + ':' + aPropertyName
-        return self.theSimulator.getEntityPropertyAttributes( aFullPN )
+        return self.theSimulator().getEntityPropertyAttributes( aFullPN )
 
 # end of EntityStub
 

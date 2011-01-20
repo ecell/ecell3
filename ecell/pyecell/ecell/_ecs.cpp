@@ -2866,6 +2866,13 @@ BOOST_PYTHON_MODULE( _ecs )
         .def( "__iter__", &PropertyAttributes___iter__ )
         ;
 
+    py::enum_< PropertySlotBase::Type >( "PropertyType" )
+        .value( "POLYMORPH", PropertySlotBase::POLYMORPH )
+        .value( "REAL", PropertySlotBase::REAL )
+        .value( "INTEGER", PropertySlotBase::INTEGER )
+        .value( "STRING", PropertySlotBase::STRING )
+        ;
+
     py::class_< Logger::Policy >( "LoggerPolicy", py::init<>() )
         .add_property( "minimumStep", &Logger::Policy::getMinimumStep,
                                       &Logger::Policy::setMinimumStep )

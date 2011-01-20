@@ -8,7 +8,7 @@ import os
 import ecell.config
 import ecell.ecs
 import ecell.emc
-from ecell.Session import Session
+from ecell.Session import Session, createScriptContext
 
 class Prompt:
     def __init__( self, aSession ):
@@ -27,33 +27,13 @@ class Console:
         self.session = session
         self.banner = banner
 
-    def __createScriptContext( self, parameters ):
-        # theSession == self in the script
-        aContext = { 'theSession': self.session, 'self': self.session }
-
-        # flatten class methods and object properties so that
-        # 'self.' isn't needed for each method calls in the script
-        aKeyList = list( self.session.__dict__.keys() +\
-                         self.session.__class__.__dict__.keys() )
-        aDict = {}
-        for aKey in aKeyList:
-            if not aKey.startswith('__'):
-                aDict[ aKey ] = getattr( self.session, aKey )
-
-        aContext.update( aDict )
-            
-        # add parameters to the context
-        aContext.update( parameters )
-
-        return aContext
-
     # Session methods
     def loadScript( self, ecs, parameters={} ):
-        aContext = self.__createScriptContext( parameters )
+        aContext = createScriptContext( self.session, parameters )
         execfile( ecs, aContext )
 
     def interact( self, parameters = {} ):
-        aContext = self.__createScriptContext( parameters )
+        aContext = createScriptContext( self.session, parameters )
         try:
             import readline # to provide convenient commandline editing :)
         except:
