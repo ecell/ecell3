@@ -57,13 +57,17 @@ from ecell.ui.osogo.FileSelection import FileSelection
 import ecell.ui.osogo.MessageWindow as MessageWindow
 
 class SimulationButton:
-    def __init__( self ):
+    def __init__( self, container ):
         self.startImage = os.path.join(
             config.GLADEFILE_PATH, "icon_start.png" )
         self.stopImage = os.path.join(
             config.GLADEFILE_PATH, "icon_stop.png" )
-        self.image = gtk.Image()
-        self.image.set_from_file( self.startImage )
+        for widget in container.get_children():
+            if isinstance( widget, gtk.Image ):
+                self.image = widget
+            elif isinstance( widget, gtk.Label ):
+                self.label = widget
+
         self.__currentState = 'stop'
         self.image.show()
 
@@ -75,11 +79,12 @@ class SimulationButton:
 
     def setCurrentState( self, aCurrentState ):
         self.__currentState = aCurrentState
-    
         if ( self.__currentState == 'run' ):
             self.image.set_from_file( self.stopImage )
+            self.label.set_text( 'Stop' )
         elif ( self.__currentState == 'stop' ):
             self.image.set_from_file( self.startImage )
+            self.label.set_text( 'Start' )
 
 class LogoAnimation:
     iconList = (
@@ -194,10 +199,7 @@ class MainWindow(OsogoWindow):
         # create SimulationButton
         # -------------------------------------
                 
-        self.SimulationButton = SimulationButton()
-        self['SimulationButton'].add( self.SimulationButton.getCurrentImage() )
-        self['SimulationButtonLabel'].set_text('Start')
-
+        self.SimulationButton = SimulationButton( self['SimulationButton'] )
 
         # ---------------------------
         # create logo button
@@ -340,22 +342,6 @@ class MainWindow(OsogoWindow):
         Return None
         """
         pass
-
-    def __resizeVertically( self, height ): #gets entitylistarea or messagebox height
-        """__resizeVertically
-        Return None
-        """
-
-        # gets fix components height
-        menu_height=self['handlebox22'].get_child_requisition()[1]
-        toolbar_height=self['handlebox19'].get_child_requisition()[1]
-
-        # gets window_width
-        window_width=self['MainWindow'].get_size()[0]
-
-        # resizes
-        window_height=menu_height+toolbar_height+height
-        self['MainWindow'].resize(window_width,window_height)
 
     def __setMenuAndButtonsStatus( self, aDataLoadedStatus ):
         """sets initial widgets status
@@ -652,27 +638,25 @@ class MainWindow(OsogoWindow):
         if self.theSession.theRunningFlag:
         # stop simulation temporarily
             self.theSession.stop()
-
             running_flag = True
 
-        # If there is no logger data, exit this program.
-        if len(self.theSession.getLoggerList()) != 0:
-            aMessage = 'Are you sure you want to quit?'
-            aTitle = 'Question'
-            # Popup confirm window, and check user request
-            aDialog = ConfirmWindow(1,aMessage,aTitle)
+        if self.theSession.theSession is not None:
+            # If there is no logger data, exit this program.
+            if len(self.theSession.getLoggerList()) != 0:
+                aMessage = 'Are you sure you want to quit?'
+                aTitle = 'Question'
+                # Popup confirm window, and check user request
+                aDialog = ConfirmWindow(1,aMessage,aTitle)
 
-            # ok is pressed
-        
-            if aDialog.return_result() != OK_PRESSED:
-                if running_flag:
-                    self.theSession.run()
-                return True        
+                # ok is pressed
+            
+                if aDialog.return_result() != OK_PRESSED:
+                    if running_flag:
+                        self.theSession.run()
+                    return True        
 
         self.setStopState()
-
         self.close()
-
         self.theSession.QuitGUI()
 
         return True
@@ -688,9 +672,7 @@ class MainWindow(OsogoWindow):
         OsogoWindow.close( self )
 
     def setStartState( self ):
-
         self.SimulationButton.setCurrentState( 'run' )
-        self['SimulationButtonLabel'].set_text('Stop')
 
         if self.logoMovable:
             self.logoAnimation.start()
@@ -700,7 +682,6 @@ class MainWindow(OsogoWindow):
 
     def setStopState( self ):
         self.SimulationButton.setCurrentState( 'stop' )
-        self['SimulationButtonLabel'].set_text('Start')
         self.logoAnimation.stop()
         
         self.setTempTime()
@@ -923,10 +904,6 @@ class MainWindow(OsogoWindow):
         if self.theToolbarVisible:
             self['toolbar_handlebox'].hide()
             self.theToolbarVisible = False
-
-            if self.theMessageWindowVisible == False and \
-               self.theEntityListWindowVisible == False:
-                   self.__resizeVertically( 0 )
         else:
             self['toolbar_handlebox'].show()
             self.theToolbarVisible = True
@@ -937,10 +914,6 @@ class MainWindow(OsogoWindow):
         if self.theStatusbarVisible:
             self['statusbar'].hide()
             self.theStatusbarVisible = False
-
-            if self.theMessageWindowVisible == False and \
-               self.theEntityListWindowVisible == False:
-                   self.__resizeVertically( 0 )
         else:
             self['statusbar'].show()
             self.theStatusbarVisible = True
@@ -1036,16 +1009,9 @@ class MainWindow(OsogoWindow):
         if anObject.get_active():
             self.theMessageWindowVisible = True
             self.showMessageWindow() 
-            self.__resizeVertically( self.theMessageWindow.getActualSize()[1] )
-            # hide
         else:
             self.theMessageWindowVisible = False
             self.hideMessageWindow()
-            
-            if self.theEntityListWindowVisible:
-                self.__resizeVertically( self['entitylistarea'].get_allocation()[3] )
-            else:
-                self.__resizeVertically( 0 )
 
         self.updateButtons()
 
@@ -1053,16 +1019,9 @@ class MainWindow(OsogoWindow):
         if arg[0].get_active():
             self.theEntityListWindowVisible = True
             self['entitylistarea'].show()
-            self.__resizeVertically( self['entitylistarea'].get_allocation()[3] )
-                
         else:
             self.theEntityListWindowVisible = False
             self['entitylistarea'].hide()
-
-            if self.theMessageWindowVisible:
-                self.__resizeVertically( self.theMessageWindow.getActualSize()[1] )
-            else:
-                self.__resizeVertically( 0 )
 
     def __displayAbout ( self, *args ):
         # show about information
@@ -1124,7 +1083,8 @@ class MainWindow(OsogoWindow):
         delete this window.
         Returns True
         """
-        return self.__deleted( *arg )
+        pass
+        #return self.__deleted( *arg )
 
 
 

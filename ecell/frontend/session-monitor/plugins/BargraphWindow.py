@@ -188,7 +188,7 @@ class BargraphWindow( OsogoPluginWindow ):
 	    self.button.set_active(self.buttonstate)
 
 	def getlatestdata(self):
-	    return self.theSession.getEntityProperty( self.ccFullPN )
+	    return self.theSession.getEntityProperty( createFullPNString( self.ccFullPN ) )
 	    
 	def get_scale(self,value): 
 	    no_scales = len(self.colored_ranges)

@@ -884,7 +884,6 @@ class EntityListWindow(OsogoWindow):
 
 
     def updateListLabels( self ):
-
         self.__updateViewLabel( 'Variable', self['variable_label'],\
                                 self.variableTree )
         self.__updateViewLabel( 'Process', self['process_label'],\
@@ -893,14 +892,10 @@ class EntityListWindow(OsogoWindow):
                                 self.systemTree )
 
     def __updateViewLabel( self, type, label, view ):
-
         shownCount    = len( view.get_model() )
         selectedCount = view.get_selection().count_selected_rows()
-        labelText = type + ' (' + str( selectedCount ) + '/' + \
-                    str( shownCount ) + ')' 
-        label.set_text( labelText )
-
-
+        labelText = '<b>%s</b> (%d / %d)' % (type, selectedCount, shownCount )
+        label.set_markup( labelText )
 
     def selectProcess( self, selection ):
         if self.donotHandle:

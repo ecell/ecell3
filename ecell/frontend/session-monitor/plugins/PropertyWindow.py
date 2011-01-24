@@ -328,7 +328,6 @@ class PropertyWindow(OsogoPluginWindow):
                 anID = aFullPN[ID]
                 aSystemPath = str( aFullPN[SYSTEMPATH] )
 
-                self['labelEntityType'].set_text( anEntityType + ' Property' )
                 self['entryClassName'].set_text( anEntityStub.getClassname() )
                 self['entryFullID'].set_text( ':'.join( [ anEntityType,
                                                           aSystemPath,
@@ -349,7 +348,6 @@ class PropertyWindow(OsogoPluginWindow):
                 self.thePreFullID = aFullID
                 self.setSelectedFullPN( aFullPN )
             else:
-                self['labelEntityType'].set_text( "" )
                 self['entryClassName'].set_text( "" )
                 self['entryFullID'].set_text( "" )
                 self['entryName'].set_text( "" )
@@ -472,15 +470,14 @@ class PropertyWindow(OsogoPluginWindow):
         aNumberConc = str( self.thePrePropertyMap[ 'NumberConc' ][0] )
         aVelocity = str( self.thePrePropertyMap[ 'Velocity' ][0] )
         if self.thePrePropertyMap[ 'Fixed'][0]  == 1:
-            aFixed = '(Fixed)'
+            aFixed = '<b>Fixed</b>'
         else:
-            aFixed = '(Not Fixed)'
+            aFixed = ''
         
         self['entryVariableValue'].set_text( aValue )
         self['entryVariableMolar'].set_text( aMolarConc )
         self['entryVariableNumber'].set_text( aNumberConc )
-        self['labelVariableQuantities'].set_markup( '<b>Quantities '
-                                                   + aFixed + '</b>' )
+        self['labelVariableQuantities'].set_markup( 'Quantities / Concentration %s' % aFixed )
         self['entryVariableVelocity'].set_text( aVelocity )
 
         self['systemFrame'].hide()

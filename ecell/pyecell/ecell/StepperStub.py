@@ -52,9 +52,7 @@ class StepperStub( ObjectStub ):
     # This method can throw exceptions.
     # ---------------------------------------------------------------
     def __init__( self, aSimulator, anID ):
-
         ObjectStub.__init__( self, aSimulator )
-
         self.theID = anID
 
     # end of __init__
@@ -70,8 +68,7 @@ class StepperStub( ObjectStub ):
     # ---------------------------------------------------------------
 
     def create( self, aClassname ):
-
-        self.theSimulator.createStepper( aClassname, self.theID )
+        self.theSimulator().createStepper( aClassname, self.theID )
 
     # end of create
 
@@ -83,8 +80,7 @@ class StepperStub( ObjectStub ):
     # ---------------------------------------------------------------
 
     def delete( self ):
-
-        self.theSimulator.deleteStepper( self.theID )
+        self.theSimulator().deleteStepper( self.theID )
 
     # end of delete
 
@@ -97,7 +93,7 @@ class StepperStub( ObjectStub ):
     # ---------------------------------------------------------------
 
     def exists( self ):
-        return self.theID in self.theSimulator.getStepperList()
+        return self.theID in self.theSimulator().getStepperList()
 
     # end of exists
 
@@ -109,8 +105,7 @@ class StepperStub( ObjectStub ):
     # This method can throw exceptions.
     # ---------------------------------------------------------------
     def getClassname( self ):
-
-        return self.theSimulator.getStepperClassName( self.theID )
+        return self.theSimulator().getStepperClassName( self.theID )
 
     # end of setClassname
 
@@ -123,7 +118,7 @@ class StepperStub( ObjectStub ):
 
     def getPropertyList( self ):
 
-        return self.theSimulator.getStepperPropertyList( self.theID )
+        return self.theSimulator().getStepperPropertyList( self.theID )
 
     # end of getPropertyList
 
@@ -139,10 +134,10 @@ class StepperStub( ObjectStub ):
     # ---------------------------------------------------------------
 
     def setProperty( self, aPropertyName, aValue ):
-        self.theSimulator.setStepperProperty( self.theID, 
+        self.theSimulator().setStepperProperty( self.theID, 
                                               aPropertyName, 
                                               aValue )
-        self.theSimulator.markDirty()
+        self.theSimulator().markDirty()
 
     # end of setProperty
 
@@ -174,8 +169,7 @@ class StepperStub( ObjectStub ):
     # ---------------------------------------------------------------
 
     def getProperty( self, aPropertyName ):
-
-        return self.theSimulator.getStepperProperty( self.theID, 
+        return self.theSimulator().getStepperProperty( self.theID, 
                                                      aPropertyName )
 
     # end of getProperty
@@ -206,8 +200,7 @@ class StepperStub( ObjectStub ):
     # This method can throw exceptions.
     # ---------------------------------------------------------------
     def getPropertyAttributes( self, aPropertyName ):
-    
-        return self.theSimulator.\
+        return self.theSimulator().\
                getStepperPropertyAttributes( self.theID,\
                              aPropertyName )
 

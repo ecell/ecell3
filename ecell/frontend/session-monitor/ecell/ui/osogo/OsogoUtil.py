@@ -47,20 +47,6 @@ GETABLE  = 1
 SINGLE   = 0
 MULTIPLE = 1
 
-# ----------------------------------------------------------------------
-# decodeAttribute
-#
-# anAttribute : an attribute ( TRUE or FALSE )
-#
-# return -> '+' or '-'
-# ----------------------------------------------------------------------
-def decodeAttribute(anAttribute):
-
-	if anAttribute:
-		return '+'
-	else:
-		return '-'
-
 # end of decodeAttribute
 
 
