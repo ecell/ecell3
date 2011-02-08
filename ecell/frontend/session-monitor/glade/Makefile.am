@@ -2,7 +2,6 @@ EXTRA_DIST =\
 	AboutSessionMonitor.glade \
 	BoardWindow.glade \
 	EntityListWindow.glade \
-	FullPNQueue.glade \
 	InterfaceWindow.glade \
 	LoggerWindow.glade \
 	LoggingPolicy.glade \
