@@ -59,7 +59,7 @@ namespace libecs
        (2) setTime( new scheduled time ).
    }
 
-   const bool isDependentOn( const Event& anEvent )
+   bool isDependentOn( const Event& anEvent )
    {
        Return true if this Event must be updated when the
        given Event (anEvent) fired.    Otherwise return false;
@@ -83,33 +83,33 @@ public:
     }
 
 
-    const Time getTime() const
+    Time getTime() const
     {
         return theTime;
     }
 
 
-    const bool operator< ( EventBase const& rhs ) const
+    bool operator< ( EventBase const& rhs ) const
     {
         return getTime() < rhs.getTime();
     }
 
-    const bool operator> ( EventBase const& rhs ) const
+    bool operator> ( EventBase const& rhs ) const
     {
         return getTime() > rhs.getTime();
     }
 
-    const bool operator>= ( EventBase const& rhs ) const
+    bool operator>= ( EventBase const& rhs ) const
     {
         return !(*this < rhs);
     }
 
-    const bool operator<= ( EventBase const& rhs ) const
+    bool operator<= ( EventBase const& rhs ) const
     {
         return !(*this > rhs);
     }
 
-    const bool operator!= ( EventBase const& rhs ) const
+    bool operator!= ( EventBase const& rhs ) const
     {
         return getTime() != rhs.getTime();
     }
@@ -162,7 +162,7 @@ public:
     }
 
 
-    const EventIndex getSize() const
+    EventIndex getSize() const
     {
         return theEventPriorityQueue.getSize();
     }
@@ -259,7 +259,7 @@ public:
         theEventDependencyMap.clear();
     }
 
-    const EventID addEvent( Event const& anEvent )
+    EventID addEvent( Event const& anEvent )
     {
         return theEventPriorityQueue.push( anEvent );
     }

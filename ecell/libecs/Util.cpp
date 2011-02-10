@@ -46,7 +46,7 @@ namespace libecs
 {
 
 #define __STRINGCAST_SPECIALIZATION_DEF( NEW, GIVEN )\
-    template<> const NEW stringCast<NEW,GIVEN>( const GIVEN& aValue )\
+    template<> NEW stringCast<NEW,GIVEN>( const GIVEN& aValue )\
     {\
         return boost::lexical_cast<NEW>( aValue );\
     } //
@@ -67,7 +67,7 @@ __STRINGCAST_SPECIALIZATION_DEF( UnsignedInteger, String );
 // Specialization here for <Real,String> does this job.
 
 template< typename T >
-const Real stringToFloat( String const& aValue )
+Real stringToFloat( String const& aValue )
 {
     String aCaseless( boost::algorithm::to_lower_copy( aValue ) );
     
@@ -86,14 +86,14 @@ const Real stringToFloat( String const& aValue )
 }
 
 template<>
-const Real stringCast<Real,String>( String const& aValue )
+Real stringCast<Real,String>( String const& aValue )
 {
     return stringToFloat<Real>( aValue );
 }
 
 #if !HIGHREAL_IS_REAL
 template<>
-const HighReal stringCast<HighReal,String>( String const& aValue )
+HighReal stringCast<HighReal,String>( String const& aValue )
 {
     return stringToFloat<HighReal>( aValue );
 }

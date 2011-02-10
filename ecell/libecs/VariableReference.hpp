@@ -172,12 +172,12 @@ public:
         theName = aName;
     }
 
-    const String getName() const 
+    String getName() const 
     { 
         return theName; 
     }
 
-    const Integer getSerial() const
+    Integer getSerial() const
     {
         return theSerial;
     }

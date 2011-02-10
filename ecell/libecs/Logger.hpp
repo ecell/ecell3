@@ -232,19 +232,19 @@ public:
          Returns time of the first element    in Logger.
     */
 
-    const Real getStartTime( void ) const;
+    Real getStartTime( void ) const;
 
     /**
          Returns time of the last element in Logger
     */
 
-    const Real getEndTime( void ) const;
+    Real getEndTime( void ) const;
 
     /**
         Returns size of logger
     */
 
-    const size_type getSize() const
+    size_type getSize() const
     {
         return thePhysicalLogger.size();
     }

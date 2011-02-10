@@ -108,7 +108,7 @@ public:
     /**
        Clear theVelocity by zero.
     */
-    virtual const bool isIntegrationNeeded() const
+    virtual bool isIntegrationNeeded() const
     {
         return ! theInterpolantVector.empty();
     }
@@ -205,7 +205,7 @@ public:
     /**
        A wrapper to set Fixed property by a bool value.
     */
-    void setFixed( const bool aValue )
+    void setFixed( bool aValue )
     {
         theFixed = aValue;
     }
@@ -213,7 +213,7 @@ public:
     /**
        @return true if the Variable is fixed or false if not.
     */
-    const bool isFixed() const
+    bool isFixed() const
     {
         return theFixed;
     }
@@ -321,8 +321,8 @@ public:
     virtual void detach();
 
 protected:
-    const Real calculateDifferenceSum( Real aCurrentTime, 
-                                       Real anInterval ) const
+    Real calculateDifferenceSum( Real aCurrentTime, 
+                                 Real anInterval ) const
     {
         Real aVelocitySum( 0.0 );
         FOR_ALL( InterpolantVector, theInterpolantVector )
@@ -354,7 +354,7 @@ protected:
     void clearInterpolantVector();
 
 private:
-    const Real getSizeOfSuperSystem() const
+    Real getSizeOfSuperSystem() const
     {
         return getSuperSystem()->getSizeVariable()->getValue();
     }

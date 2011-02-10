@@ -83,31 +83,31 @@ public:
     }
 
 
-    const Real getTime() const
+    Real getTime() const
     {
         return theTime;
     }
 
 
-    const Real getValue() const
+    Real getValue() const
     {
         return theValue;
     }
 
 
-    const Real getAvg() const
+    Real getAvg() const
     {
         return theValue;
     }
 
 
-    const Real getMin() const
+    Real getMin() const
     {
         return theValue;
     }
 
 
-    const Real getMax() const
+    Real getMax() const
     {
         return theValue;
     }
@@ -125,13 +125,13 @@ public:
     }
 
 
-    static const size_t getElementSize()
+    static size_t getElementSize()
     {
         return sizeof( Real );
     }
 
 
-    static const int getElementNumber()
+    static int getElementNumber()
     {
         return 2;
     }
@@ -204,31 +204,31 @@ public:
     }
 
     
-    const Real getTime() const
+    Real getTime() const
     {
         return theTime;
     }
 
     
-    const Real getValue() const
+    Real getValue() const
     {
         return theValue;
     }
 
     
-    const Real getAvg() const
+    Real getAvg() const
     {
         return theAvg;
     }
 
     
-    const Real getMin() const
+    Real getMin() const
     {
         return theMin;
     }
 
 
-    const Real getMax() const
+    Real getMax() const
     {
         return theMax;
     }
@@ -264,13 +264,13 @@ public:
     }
 
 
-    static const size_t getElementSize()
+    static size_t getElementSize()
     {
         return sizeof( Real );
     }
 
 
-    static const int getElementNumber()
+    static int getElementNumber()
     {
         return 5;
     }

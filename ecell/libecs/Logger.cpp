@@ -132,13 +132,13 @@ void Logger::log( Real aTime )
 }
 
 
-const Real Logger::getStartTime( void ) const
+Real Logger::getStartTime( void ) const
 {
     return  thePhysicalLogger.front().getTime();
 }
 
 
-const Real Logger::getEndTime( void ) const
+Real Logger::getEndTime( void ) const
 {
     return thePhysicalLogger.back().getTime();
 }

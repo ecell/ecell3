@@ -48,7 +48,7 @@ template< typename ToType, typename FromType >
 class ConvertTo
 {
 public:
-    const ToType operator()( const FromType& aValue )
+    ToType operator()( const FromType& aValue )
     {
         // strategy:
         // (1) if both of ToType and FromType are arithmetic, and
@@ -73,7 +73,7 @@ template< typename ToType >
 class ConvertTo< ToType, String >
 {
 public:
-    const ToType operator()( String const& aValue )
+    ToType operator()( String const& aValue )
     {
         // strategy:
         // (1) if ToType is arithmetic, use LexicalCaster.
@@ -89,7 +89,7 @@ template< typename ToType, std::size_t _N >
 class ConvertTo< ToType, char[_N] >
 {
 public:
-    const ToType operator()( char const* aValue )
+    ToType operator()( char const* aValue )
     {
         // strategy:
         // (1) if ToType is arithmetic, use LexicalCaster.
@@ -106,7 +106,7 @@ template< typename ToType, std::size_t _N >
 class ConvertTo< ToType, const char[_N] >
 {
 public:
-    const ToType operator()( char const* aValue )
+    ToType operator()( char const* aValue )
     {
         // strategy:
         // (1) if ToType is arithmetic, use LexicalCaster.
@@ -124,7 +124,7 @@ template< typename ToType >
 class ConvertTo< ToType, char* >
 {
 public:
-    const ToType operator()( char const* const& aValue )
+    ToType operator()( char const* const& aValue )
     {
         // strategy:
         // (1) if ToType is arithmetic, use LexicalCaster.
@@ -142,7 +142,7 @@ template< typename ToType >
 class ConvertTo< ToType, char const* >
 {
 public:
-    const ToType operator()( char const* const& aValue )
+    ToType operator()( char const* const& aValue )
     {
         // strategy:
         // (1) if ToType is arithmetic, use LexicalCaster.
@@ -161,7 +161,7 @@ template< typename FromType >
 class ConvertTo< String, FromType >
 {
 public:
-    const String operator()( const FromType& aValue )
+    String operator()( const FromType& aValue )
     {
         // strategy:
         // (1) if FromType is arithmetic, use LexicalCaster.
@@ -179,7 +179,7 @@ template<>
 class ConvertTo< String, String >
 {
 public:
-    const String operator()( const String& aValue )
+    String operator()( const String& aValue )
     {
         return aValue;
     }
@@ -191,7 +191,7 @@ public:
 // convertTo template function
 //
 template< typename ToType, typename FromType >
-inline const ToType convertTo( const FromType& aValue )
+inline ToType convertTo( const FromType& aValue )
 {
     return ConvertTo<ToType,FromType>()( aValue );
 }

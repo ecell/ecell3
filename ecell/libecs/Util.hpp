@@ -72,7 +72,7 @@ namespace libecs
    can reduce resulting binary size.
 */
 template< typename NEW, typename GIVEN >
-const NEW stringCast( const GIVEN& aValue )
+NEW stringCast( const GIVEN& aValue )
 {
     return boost::lexical_cast<NEW>( aValue );
 }
@@ -80,13 +80,13 @@ const NEW stringCast( const GIVEN& aValue )
 
 /** @internal */
 template< typename GIVEN >
-const String stringCast( const GIVEN& aValue )
+String stringCast( const GIVEN& aValue )
 {
     return stringCast<String,GIVEN>( aValue );
 }
 
 #define __STRINGCAST_SPECIALIZATION_DECL( NEW, GIVEN )\
-template<> LIBECS_API const NEW stringCast<NEW,GIVEN>( const GIVEN& )
+template<> LIBECS_API NEW stringCast<NEW,GIVEN>( const GIVEN& )
 
 __STRINGCAST_SPECIALIZATION_DECL( String, Real );
 __STRINGCAST_SPECIALIZATION_DECL( String, HighReal );
@@ -372,7 +372,7 @@ template< class NEW, class GIVEN >
 class LexicalCaster: public std::unary_function< GIVEN, NEW >
 {
 public:
-    const NEW operator()( const GIVEN& aValue )
+    NEW operator()( const GIVEN& aValue )
     {
         return stringCast<NEW>( aValue );
     }

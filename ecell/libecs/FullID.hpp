@@ -353,7 +353,7 @@ private:
 class FullPN
 {
 public:
-    FullPN( const EntityType type, 
+    FullPN( EntityType type, 
             SystemPath const& systempath,
             String const& id,
             String const& propertyname )
@@ -389,7 +389,7 @@ public:
         return theFullID;
     }
 
-    const EntityType    getEntityType() const 
+    EntityType getEntityType() const 
     { 
         return getFullID().getEntityType(); 
     }
