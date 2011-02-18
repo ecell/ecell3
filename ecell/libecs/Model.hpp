@@ -73,7 +73,7 @@ public:
 
     void setup();
 
-    ~Model();
+    virtual ~Model();
     /**
        Initialize the whole model.
 

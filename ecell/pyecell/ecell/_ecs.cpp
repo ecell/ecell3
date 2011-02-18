@@ -2817,6 +2817,11 @@ struct return_entity
     };
 };
 
+AbstractSimulator* Entity_getModel(Entity const& entity)
+{
+    return dynamic_cast<AbstractSimulator*>(entity.getModel());
+}
+
 BOOST_PYTHON_MODULE( _ecs )
 {
     DataPointVectorWrapper< DataPoint >::__class_init__();
@@ -2970,6 +2975,12 @@ BOOST_PYTHON_MODULE( _ecs )
     py::class_< Entity, py::bases<>, Entity, boost::noncopyable >
         ( "Entity", py::no_init )
         // properties
+        .add_property( "model",
+            py::make_function( &Entity_getModel,
+            return_existing_object() ) )
+        .add_property( "simulator",
+            py::make_function( &Entity_getModel,
+            return_existing_object() ) )
         .add_property( "superSystem",
             py::make_function( &Entity::getSuperSystem,
             return_existing_object() ) )
