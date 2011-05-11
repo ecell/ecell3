@@ -2986,7 +2986,7 @@ BOOST_PYTHON_MODULE( _ecs )
             return_existing_object() ) )
         .add_property( "ID", &Entity::getID, &Entity::setID )
         .add_property( "FullID", &Entity::getFullID )
-        .add_property( "Name", &Entity::getName )
+        .add_property( "Name", &Entity::getName, &Entity::setName )
         .def( "__setattr__", &EcsObject___setattr__< Entity > )
         .def( "__getattr__", &EcsObject___getattr__< Entity > )
         ;
