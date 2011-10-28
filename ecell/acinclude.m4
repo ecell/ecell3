@@ -308,3 +308,36 @@ boost::python::detail::init_module("dummy", 0);
   CPPFLAGS="$ac_save_CPPFLAGS"
 ])
 
+AC_DEFUN([ECELL_CHECK_BOOST_RANGE_ADL_BARRIER], [
+  ac_save_CPPFLAGS="$CPPFLAGS"
+  CPPFLAGS="$CPPFLAGS $PYTHON_INCLUDES"
+  AC_MSG_CHECKING([if boost::begin is ADL-barriered])
+  AC_CACHE_VAL([ac_cv_boost_range_adl_barrier], [
+    AC_TRY_COMPILE(
+    [
+#include <boost/range/begin.hpp>
+
+namespace boost { namespace range_adl_barrier {
+template<>
+char* begin<char[10]>(char(&a)[10])
+{
+    return a;
+}
+} }
+    ], [], [
+      ac_cv_boost_range_adl_barrier=yes
+    ], [
+      ac_cv_boost_range_adl_barrier=no
+    ])
+  ])
+  if test "$ac_cv_boost_range_adl_barrier" = "yes"; then
+    AC_MSG_RESULT(yes)
+    BOOST_RANGE_ADL_BARRIER=1
+  else
+    AC_MSG_RESULT(no)
+    BOOST_RANGE_ADL_BARRIER=
+  fi
+  CPPFLAGS="$ac_save_CPPFLAGS"
+])
+
+

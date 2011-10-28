@@ -1133,6 +1133,7 @@ inline bool operator<=( Polymorph const& lhs, T_ rhs )
 
 namespace boost
 {
+
 template<>
 struct range_iterator< libecs::PolymorphValue::Tuple >
 {
@@ -1145,22 +1146,26 @@ struct range_const_iterator< libecs::PolymorphValue::Tuple >
     typedef libecs::PolymorphValue::Tuple::value_type const* type;
 };
 
+#ifdef HAVE_BOOST_RANGE_ADL_BARRIER
+namespace range_adl_barrier {
+#endif
+
 template<>
-inline range_iterator< libecs::PolymorphValue::Tuple >::type
+inline typename boost::range_iterator< libecs::PolymorphValue::Tuple >::type
 begin< libecs::PolymorphValue::Tuple >( libecs::PolymorphValue::Tuple& r )
 {
     return static_cast< libecs::Polymorph* >( r );
 }
 
 template<>
-inline range_const_iterator< libecs::PolymorphValue::Tuple >::type
+inline typename boost::range_const_iterator< libecs::PolymorphValue::Tuple >::type
 begin< libecs::PolymorphValue::Tuple >( libecs::PolymorphValue::Tuple const& r )
 {
     return static_cast< libecs::Polymorph const* >( r );
 }
 
 template<>
-inline range_iterator< libecs::PolymorphValue::Tuple >::type
+inline typename boost::range_iterator< libecs::PolymorphValue::Tuple >::type
 end< libecs::PolymorphValue::Tuple >(
         libecs::PolymorphValue::Tuple& r )
 {
@@ -1168,12 +1173,16 @@ end< libecs::PolymorphValue::Tuple >(
 }
 
 template<>
-inline range_const_iterator< libecs::PolymorphValue::Tuple >::type
+inline typename boost::range_const_iterator< libecs::PolymorphValue::Tuple >::type
 end< libecs::PolymorphValue::Tuple >(
         libecs::PolymorphValue::Tuple const& r )
 {
     return static_cast< libecs::Polymorph const* >( r ) + r.size();
 }
+
+#ifdef HAVE_BOOST_RANGE_ADL_BARRIER
+} // namespace range_adl_barrier
+#endif
 
 } // namespace boost
 
