@@ -232,7 +232,7 @@ class RCGA:
             self.__executeEliteStrategy()
 
             # clear all jobs
-            clearJob(jobid=-1)
+            clearAllSessionProxies()
 
 
             print "[%s]\t%s" %(self.theCurrentGeneration, \
@@ -317,7 +317,7 @@ class RCGA:
                 anIndividual.setJobIDList( aJobIDList )
 
 
-        aJobNumber = len(getQueuedJobList())
+        aJobNumber = len( list( getQueuedSessionProxyList()))
 
         # -----------------------------------------------------
         # [2] Run ess files using SessionManager
@@ -335,7 +335,7 @@ class RCGA:
             time.sleep(1)
 
             sys.stdout.write("\r")
-            sys.stdout.write("(%s/%s)" %(len(getFinishedJobList()),aJobNumber))
+            sys.stdout.write("(%s/%s)" %(len(list(getFinishedSessionProxyList())),aJobNumber))
 
             if aLoopCounter % 6 == 1:
                 sys.stdout.write(" .    ")
@@ -355,7 +355,7 @@ class RCGA:
 
             if isFinished() == True:
                 sys.stdout.write("\r")
-                sys.stdout.write("(%s/%s)" %(len(getFinishedJobList()),aJobNumber))
+                sys.stdout.write("(%s/%s)" %(len(list(getFinishedSessionProxyList())),aJobNumber))
                 sys.stdout.write(" .....")
                 break
 
