@@ -1151,21 +1151,21 @@ namespace range_adl_barrier {
 #endif
 
 template<>
-inline typename boost::range_iterator< libecs::PolymorphValue::Tuple >::type
+inline boost::range_iterator< libecs::PolymorphValue::Tuple >::type
 begin< libecs::PolymorphValue::Tuple >( libecs::PolymorphValue::Tuple& r )
 {
     return static_cast< libecs::Polymorph* >( r );
 }
 
 template<>
-inline typename boost::range_const_iterator< libecs::PolymorphValue::Tuple >::type
+inline boost::range_const_iterator< libecs::PolymorphValue::Tuple >::type
 begin< libecs::PolymorphValue::Tuple >( libecs::PolymorphValue::Tuple const& r )
 {
     return static_cast< libecs::Polymorph const* >( r );
 }
 
 template<>
-inline typename boost::range_iterator< libecs::PolymorphValue::Tuple >::type
+inline boost::range_iterator< libecs::PolymorphValue::Tuple >::type
 end< libecs::PolymorphValue::Tuple >(
         libecs::PolymorphValue::Tuple& r )
 {
@@ -1173,7 +1173,7 @@ end< libecs::PolymorphValue::Tuple >(
 }
 
 template<>
-inline typename boost::range_const_iterator< libecs::PolymorphValue::Tuple >::type
+inline boost::range_const_iterator< libecs::PolymorphValue::Tuple >::type
 end< libecs::PolymorphValue::Tuple >(
         libecs::PolymorphValue::Tuple const& r )
 {
