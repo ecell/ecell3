@@ -137,7 +137,7 @@ executing the &ESS;.
 
         <screen><prompt>$</prompt> <userinput>&ecell3-session; <optional>-f model.eml</optional></userinput>
 ecell3-session [ for E-Cell SE Version 3, on Python Version 2.2.1 ]
-Copyright (C) 1996-2010 Keio University.
+Copyright (C) 1996-2012 Keio University.
 Send feedback to Koichi Takahashi <email>shafi@e-cell.org</email>
 <prompt>ecell3-session>>> </prompt>
         </screen>

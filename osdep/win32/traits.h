@@ -2,7 +2,7 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2010 Keio University
+//       Copyright (C) 1996-2012 Keio University
 //       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
