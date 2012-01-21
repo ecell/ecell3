@@ -1,3 +1,25 @@
+ecell-3.2.3pre2: 21-Jan-2012
+
+ * Fixed a bug that EntityStub.setProperty() doesn't work since 3.2.3pre1.
+
+ * Added workaround for Apple's GCC extensions.
+
+ * Made ga.py work with the new SessionManager.
+
+
+ecell-3.2.3pre1: 28-Oct-2011
+
+ * Made the simulator object available to the expressions in PythonProcess.
+
+ * Made session_monitor reloadable.
+
+ * Added missing accessors in Python binding.
+
+ * Supported Boost >= 1.43.0
+
+ * Made compatible Better compatibility with newer
+
+
 ecell-3.2.2: 5-Jan-2011
 
  * Fixed the bug that some expressions given to ExpressionFluxProcess or
