@@ -99,7 +99,7 @@ class EntityStub( ObjectStub ):
         """
         aFullPN = self.theFullIDString + ':' + aPropertyName	
         self.theSimulator().setEntityProperty( aFullPN, aValue )
-        self.theSimulator.markDirty()
+        self.theSimulator().markDirty()
 
     def __setitem__( self, aPropertyName, aValue ):
         """
