@@ -29,6 +29,7 @@ OPTIONS = [
     make_option('-D', action='append', type='string', dest='macro'),
     make_option('-L', action='append', type='string', dest='library_dir'),
     make_option('-l', action='append', type='string', dest='library'),
+    make_option('-^', '--option-with-argument', action='append', type='string', dest='option_with_argument'),
     make_option('-o', '--output', type='string', dest='out')
 ]
 
@@ -111,14 +112,22 @@ class CustomizedOptionParser( OptionParser ):
 
     def _process_short_opts(self, rargs, values):
         arg = rargs[ 0 ]
-        try:
-            OptionParser._process_short_opts( self, rargs, values )
-        except BadOptionError:
+        if values.option_with_argument is not None and \
+           arg in values.option_with_argument:
             sys.stderr.write( 
-                "%s: unknown option '%s'; passing it through to the compiler\n" % ( self.get_prog_name(), arg ) )
+                "%s: does not handle option '%s' that takes an argument; passing it through to the compiler\n" % ( self.get_prog_name(), arg ) )
             if values.unknown is None:
                 values.unknown = []
-            values.unknown.append( arg )
+            values.unknown += [ rargs.pop( 0 ), rargs.pop( 0 ) ]
+        else:
+            try:
+                OptionParser._process_short_opts( self, rargs, values )
+            except BadOptionError:
+                sys.stderr.write( 
+                    "%s: unknown option '%s'; passing it through to the compiler\n" % ( self.get_prog_name(), arg ) )
+                if values.unknown is None:
+                    values.unknown = []
+                values.unknown.append( arg )
 
 progname = os.path.basename( sys.argv[0] )
 
@@ -196,7 +205,7 @@ def main():
     for i in args:
         _, ext = os.path.splitext(i)
         ext = ext.lower()
-        if ext in OBJECT_EXTS:
+        if ext in OBJECT_EXTS or ext == '':
             extra_objects.append(i)
         else:
             sources.append(i)
