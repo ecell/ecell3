@@ -524,8 +524,9 @@ class GtkSessionMonitor(object):
         self.theSession.restoreMessageMethod()
 
     def message( self, message ):
-        self.theMessageMethod( message )
-        #self._synchronize()
+        if self.theMessageMethod is not None:
+            self.theMessageMethod( message )
+            #self._synchronize()
 
     def run( self , time = '' ):
         """ 
