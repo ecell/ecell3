@@ -233,6 +233,10 @@ def main():
 
     cmdList.append( dmcompile )
 
+    if sys.platform == 'darwin':
+        cmdList.append("--option-with-argument=-framework")
+        cmdList.append("--option-with-argument=-u")
+
     if VERBOSE:
         cmdList.append( '-v' )
 
