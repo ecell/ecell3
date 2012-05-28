@@ -217,7 +217,7 @@ def main():
         return 1 
 
     if sys.platform == 'darwin':
-        compiler.linker_so = [ arg for arg in compiler.linker_so if arg != '-shard' ]
+        compiler.linker_so = [ arg for arg in compiler.linker_so if arg != '-shared' ]
 
     dlflags = []
     dlflags.extend( split_quoted(
