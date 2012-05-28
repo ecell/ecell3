@@ -100,7 +100,7 @@ class CustomizedOptionParser( OptionParser ):
 
     def _process_long_opt(self, rargs, values):
         arg = rargs[ 0 ]
-        argname, _ = arg.split( '=', 1 )
+        argname, _, _ = arg.partition( '=' )
         try:
             OptionParser._process_long_opt( self, rargs, values )
         except BadOptionError:
