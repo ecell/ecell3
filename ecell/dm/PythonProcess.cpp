@@ -46,7 +46,7 @@ public:
 
         PROPERTYSLOT_SET_GET( Integer, IsContinuous );
         PROPERTYSLOT_SET_GET( Real, StepInterval );
-        PROPERTYSLOT_SET( Real, Flux );
+        PROPERTYSLOT_SET_GET_NO_LOAD_SAVE( Real, Flux );
         PROPERTYSLOT_SET_GET( String, FireMethod );
         PROPERTYSLOT_SET_GET( String, InitializeMethod );
     }
@@ -85,6 +85,11 @@ public:
     SET_METHOD( Real, StepInterval)
     {
         theStepInterval = value;
+    }
+
+    GET_METHOD( Real, Flux )
+    {
+        return getActivity();
     }
 
     SET_METHOD( String, FireMethod )
