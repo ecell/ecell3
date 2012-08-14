@@ -48,3 +48,4 @@ Makefile.in
 missing
 mkinstalldirs
 stamp-h1
+.DS_Store
