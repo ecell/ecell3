@@ -1,4 +1,5 @@
 import gtk
+import os
 
 __all__ = [
     'FileSelection',
@@ -14,6 +15,7 @@ class FileSelection(gtk.FileChooserDialog):
 
     def __init__(self, *arg, **kwarg):
         gtk.FileChooserDialog.__init__(self, *arg, **kwarg)
+        self.set_current_folder(os.getcwd())
         self.cancel_button = self.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
         self.ok_button = self.add_button(gtk.STOCK_OK, gtk.RESPONSE_OK)
         self.ok_button.grab_default()
