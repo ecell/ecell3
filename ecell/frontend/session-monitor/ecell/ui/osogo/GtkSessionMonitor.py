@@ -667,13 +667,13 @@ class GtkSessionMonitor(object):
         if self.theSession is None:
             raise Exception("Model is not loaded")
 
-        return self.theSession.getEntityPropertyAttributes( fullPN )
+        return self.theSession.getEntityPropertyAttributes( createFullPNString( fullPN ) )
 
     def setEntityProperty( self, fullPN, aValue ):
         if self.theSession is None:
             raise Exception("Model is not loaded")
 
-        self.theSession.setEntityProperty( fullPN, aValue )
+        self.theSession.setEntityProperty( createFullPNString( fullPN ), aValue )
 
     def getLoggerList( self ):
         if self.theSession is None:
