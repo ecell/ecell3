@@ -187,13 +187,11 @@ protected:
                 {
                     error = err ? err: "unknown reasons";
                 }
-                else
+                if ( !err )
                 {
-                    if ( !err || error != err )
-                    {
-                        error = "various reasons";
-                    }
+                    error = "various reasons";
                 }
+                  
             }
 
             if ( !handle )
