@@ -248,6 +248,23 @@ public:
         }
     }
 
+    void rescheduleEvent( EventID const& anID )
+    {
+        Event& anEvent( theEventPriorityQueue.get( anID ) );
+        const Time anOldTime( anEvent.getTime() );
+        anEvent.reschedule();
+        const Time aNewTime( anEvent.getTime() );
+
+        // theEventPriorityQueue.move( anIndex );
+        if( aNewTime >= anOldTime )
+        {
+            theEventPriorityQueue.moveDown( anID );
+        }
+        else
+        {
+            theEventPriorityQueue.moveUp( anID );
+        }
+    }
 
     void updateEventDependency();    // update all
 

@@ -449,7 +449,8 @@ void Model::initialize()
         {
             aStepper->updateInternalState( aStepper->getStepInterval() );
         }
-        anEvent.reschedule();
+        // anEvent.reschedule();
+        theScheduler.rescheduleEvent(c);
     }
 
     isDirty_ = false;
