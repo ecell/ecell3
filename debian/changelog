@@ -1,0 +1,62 @@
+ecell (3.2.3p2-1) precise; urgency=low
+
+  * Upstream update.
+  * Update dependencies
+  * Add upstream build fix patch; Use 3.0 (quilt)
+
+ -- Naohiro Aota <naota@riken.jp>  Mon, 04 Jun 2012 18:43:46 +0900
+
+ecell (3.2.0p2-1) lucid; urgency=low
+
+  * Upstream update.
+
+ -- Moriyoshi Koizumi <mozo@sfc.keio.ac.jp>  Fri, 2 Apr 2010 15:53:42 +0900
+
+ecell (3.2.0p1-1) lucid; urgency=low
+
+  * Upstream update.
+
+ -- Moriyoshi Koizumi <mozo@sfc.keio.ac.jp>  Fri, 5 Feb 2010 17:15:42 +0900
+
+ecell (3.1.107-1) jaunty; urgency=low
+
+  * Upstream update.
+
+ -- Moriyoshi Koizumi <mozo@sfc.keio.ac.jp>  Wed, 24 Jun 2008 13:24:12 +0900
+
+ecell (3.1.106-3) jaunty; urgency=low
+
+  * Reflect versioning scheme changes of libsbml packages.
+
+ -- Moriyoshi Koizumi <mozo@sfc.keio.ac.jp>  Wed, 18 Jun 2008 18:24:12 +0900
+
+ecell (3.1.106-2) jaunty; urgency=low
+
+  * Fix dependencies between packages.
+
+ -- Moriyoshi Koizumi <mozo@sfc.keio.ac.jp>  Tue, 05 Feb 2008 17:12:24 +0900
+
+ecell (3.1.106-1) jaunty; urgency=low
+
+  * Upstream update.
+
+ -- Moriyoshi Koizumi <mozo@sfc.keio.ac.jp>  Mon, 04 Feb 2008 17:33:57 +0900
+
+ecell (3.1.106-0rc2-2) jaunty; urgency=low
+
+  * Fix ecell3.doc-base to specify users-manual instead of README.
+
+ -- Moriyoshi Koizumi <mozo@sfc.keio.ac.jp>  Tue, 25 Dec 2007 19:59:02 +0900
+
+ecell (3.1.106-0rc2-1) jaunty; urgency=low
+
+  * Upstream update. 
+
+ -- Moriyoshi Koizumi <mozo@sfc.keio.ac.jp>  Fri, 21 Dec 2007 02:57:00 +0900
+
+ecell (3.1.106-0rc1-1) unstable; urgency=low
+
+  * Initial release
+
+ -- Moriyoshi Koizumi <mozo@sfc.keio.ac.jp>  Sat, 15 Dec 2007 07:44:09 +0900
+

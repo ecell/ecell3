@@ -1,0 +1,11 @@
+Document: ecell3-model-editor-manual
+Title: Users manual for E-Cell System version 3 Model Editor
+Author: Koichi Takahashi <ktakahashi@molsci.org>
+Abstract: Users manual for E-Cell System version 3 Model Editor
+Section: unknown
+
+Format: HTML
+Index: /usr/share/doc/ecell/model-editor/index.html
+Files: /usr/share/doc/ecell/model-editor/*.html
+
+  
