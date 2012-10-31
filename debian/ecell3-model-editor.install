@@ -1,0 +1,6 @@
+debian/tmp/etc/ecell-3.2/model-editor.ini
+debian/tmp/usr/bin/ecell3-model-editor
+debian/tmp/usr/lib/ecell-3.2/model-editor
+debian/tmp/usr/lib/python2.7/dist-packages/ecell.model_editor-*.egg-info
+debian/tmp/usr/lib/python2.7/dist-packages/ecell/ui/model_editor
+debian/tmp/usr/share/ecell-3.2/model-editor
