@@ -1,0 +1,12 @@
+diff --git a/ecell/dm/Makefile.am b/ecell/dm/Makefile.am
+index 414ff47..8c9747f 100644
+--- a/ecell/dm/Makefile.am
++++ b/ecell/dm/Makefile.am
+@@ -5,6 +5,7 @@ SUFFIXES = .cpp $(LTDL_SHLIB_EXT)
+ SHELL = @SHELL@
+ 
+ AM_CXXFLAGS = @CXXFLAGS@
++CXXFLAGS = --option-with-argument=--param @CXXFLAGS@
+ 
+ ECELL3_DMC = $(top_builddir)/pyecell/ecell3-python ../bin/ecell3-dmc
+ 

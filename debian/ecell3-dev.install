@@ -1,0 +1,9 @@
+debian/tmp/usr/bin/dmcompile
+debian/tmp/usr/bin/ecell3-dmc
+debian/tmp/usr/include/dmtool
+debian/tmp/usr/include/ecell-3.2
+debian/tmp/usr/share/ecell-3.2/dms
+debian/tmp/usr/lib/libecs.so
+debian/tmp/usr/lib/libecs.la
+debian/tmp/usr/lib/libemc.so
+debian/tmp/usr/lib/libemc.la
