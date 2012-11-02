@@ -178,6 +178,14 @@ public:
     typedef void ( T::* SetMethodPtr )( typename Param<SlotType>::type );
     typedef SlotType ( T::* GetMethodPtr )() const;
 
+protected:
+
+    static const bool isSetableMethod( const SetMethodPtr aSetMethodPtr );
+
+    static const bool isGetableMethod( const GetMethodPtr aGetMethodPtr );
+
+public:
+
     ConcretePropertySlot( String const& aName,
                           SetMethodPtr aSetMethodPtr,
                           GetMethodPtr aGetMethodPtr )
@@ -264,10 +272,6 @@ protected:
         return convertTo<Type>( callGetMethod( anObject ) );
     }
 
-    static const bool isSetableMethod( const SetMethodPtr aSetMethodPtr );
-
-    static const bool isGetableMethod( const GetMethodPtr aGetMethodPtr );
-
     static SetMethodPtr SetMethod( SetMethodPtr aSetMethodPtr );
 
     static GetMethodPtr GetMethod( GetMethodPtr aGetMethodPtr );
@@ -305,8 +309,8 @@ public:
                                         SetMethodPtr aLoadMethodPtr,
                                         GetMethodPtr aSaveMethodPtr )
         : BaseType( aName, aSetMethodPtr, aGetMethodPtr ),
-          theLoadMethodPtr( SetMethod( aLoadMethodPtr ) ),
-          theSaveMethodPtr( GetMethod( aSaveMethodPtr ) )
+          theLoadMethodPtr( this->SetMethod( aLoadMethodPtr ) ),
+          theSaveMethodPtr( this->GetMethod( aSaveMethodPtr ) )
     {
         ; // do nothing
     }
@@ -319,12 +323,12 @@ public:
 
     DM_IF virtual const bool isLoadable() const
     {
-        return isSetableMethod( theLoadMethodPtr );
+        return this->isSetableMethod( theLoadMethodPtr );
     }
 
     DM_IF virtual const bool isSavable()    const
     {
-        return isGetableMethod( theSaveMethodPtr );
+        return this->isGetableMethod( theSaveMethodPtr );
     }
 
     DM_IF virtual void loadPolymorph( T& anObject, libecs::Polymorph const& aValue ) const

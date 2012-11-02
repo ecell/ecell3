@@ -251,6 +251,13 @@ struct DeletePtr
     }
 };
 
+/** @internal */
+LIBECS_API void throwSequenceSizeError( const size_t aSize, 
+                                        const size_t aMin, const size_t aMax );
+
+/** @internal */
+LIBECS_API void throwSequenceSizeError( const size_t aSize, const size_t aMin );
+
 /**
    Check if aSequence's size() is within [ aMin, aMax ].    
 
@@ -285,15 +292,6 @@ void checkSequenceSize( const Sequence& aSequence,
         throwSequenceSizeError( aSize, aMin );
     }
 }
-
-
-/** @internal */
-LIBECS_API void throwSequenceSizeError( const size_t aSize, 
-                                        const size_t aMin, const size_t aMax );
-
-/** @internal */
-LIBECS_API void throwSequenceSizeError( const size_t aSize, const size_t aMin );
-
 
 /**
    Form a 'for' loop over a STL sequence.
