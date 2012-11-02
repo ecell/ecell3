@@ -1,0 +1,96 @@
+--- ecell-3.2.3pre2.orig/doc/Makefile.am	2011-12-16 14:09:52.000000000 +0900
++++ ecell-3.2.3pre2/doc/Makefile.am	2012-07-13 19:03:19.000000000 +0900
+@@ -5,12 +5,22 @@
+ 	index.tmpl
+ 
+ if BUILD_API_REF_html
+-_htmldir = $(htmldir)/api
+-_html_DATA = $(wildcard api/*)
++all-local: api/
+ 
+-api/index.html: ecell3.doxy
++apidoc_dir=$(htmldir)/api
++
++api/: ecell3.doxy
+ 	doxygen ecell3.doxy
+ 
++install-data-local:
++	@$(NORMAL_INSTALL)
++	$(MKDIR_P) $(DESTDIR)$(apidoc_dir)
++	$(INSTALL_DATA) api/* $(DESTDIR)$(apidoc_dir)
++
++uninstall-local:
++	@$(NORMAL_UNINSTALL)
++	rm -f $(DESTDIR)$(apidoc_dir)/*
++
+ clean-local:
+ 	$(RM) -r api
+ 
+--- ecell-3.2.3pre2.orig/doc/users-manual/Makefile.am	2011-12-16 14:09:52.000000000 +0900
++++ ecell-3.2.3pre2/doc/users-manual/Makefile.am	2012-07-13 19:15:47.000000000 +0900
+@@ -4,12 +4,19 @@
+ DOC_dvi = users-manual.dvi
+ 
+ if BUILD_USERS_MANUAL_html
+-$(DOC_html)/*: users-manual.xml
++all-local: $(DOC_html)/index.html
++
++$(DOC_html)/index.html: users-manual.xml
+ 	$(DB2HTML) -o $(DOC_html) $<
+-else
+-$(DOC_html)/*:
+-	$(RM) -rf $(DOC_html)
+-	mkdir $(DOC_html)
++
++install-data-local:
++	@$(NORMAL_INSTALL)
++	$(MKDIR_P) $(DESTDIR)$(htmldir)/$(DOC_html)
++	$(INSTALL_DATA) $(DOC_html)/* $(DESTDIR)$(htmldir)/$(DOC_html)
++
++uninstall-local:
++	@$(NORMAL_UNINSTALL)
++	rm -f $(DESTDIR)$(htmldir)/$(DOC_html)/*
+ endif
+ 
+ if BUILD_USERS_MANUAL_ps
+@@ -26,9 +33,14 @@
+ 
+ if BUILD_USERS_MANUAL_dvi
+ dvi_DATA  = $(DOC_dvi)
++if BUILD_USERS_MANUAL_pdf
++$(DOC_dvi): users-manual.xml $(DOC_pdf)
++	$(DB2DVI) $<
++else
+ $(DOC_dvi): users-manual.xml
+ 	$(DB2DVI) $<
+ endif
++endif
+ 
+ EXTRA_DIST = \
+ 	users-manual \
+@@ -49,24 +61,6 @@
+ 	session-class-api.xml \
+ 	stddmlib.xml
+ 
+-if BUILD_USERS_MANUAL_html
+-EXTRA_DIST += $(DOC_html)
+-endif
+-
+-if BUILD_USERS_MANUAL_html
+-install-data-local:
+-	(cd "$(DOC_html)" && \
+-	find . -type d | while read path; do $(INSTALL) -d "$(DESTDIR)$(htmldir)/$(DOC_html)/$$path"; done && \
+-	find . -type f | while read path; do $(INSTALL) -m 644 $$path "$(DESTDIR)$(htmldir)/$(DOC_html)/$$path"; done)
+-
+-uninstall-local:
+-	( cd "$(DESTDIR)$(htmldir)" && rm -rf "$(DOC_html)" )
+-else
+-install-data-local:
+-
+-uninstall-local:
+-endif
+-
+ clean-local:
+ 	$(RM) -f $(DOC_ps) $(DOC_pdf) $(DOC_dvi)
+-	$(RM) -rf *.junk *.tex
++	$(RM) -rf *.junk *.tex $(DOC_html)
