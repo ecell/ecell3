@@ -1,0 +1,97 @@
+--- a/ecell/libecs/Util.hpp
++++ b/ecell/libecs/Util.hpp
+@@ -251,6 +251,13 @@
+     }
+ };
+ 
++/** @internal */
++LIBECS_API void throwSequenceSizeError( const size_t aSize, 
++                                        const size_t aMin, const size_t aMax );
++
++/** @internal */
++LIBECS_API void throwSequenceSizeError( const size_t aSize, const size_t aMin );
++
+ /**
+    Check if aSequence's size() is within [ aMin, aMax ].    
+ 
+@@ -286,15 +293,6 @@
+     }
+ }
+ 
+-
+-/** @internal */
+-LIBECS_API void throwSequenceSizeError( const size_t aSize, 
+-                                        const size_t aMin, const size_t aMax );
+-
+-/** @internal */
+-LIBECS_API void throwSequenceSizeError( const size_t aSize, const size_t aMin );
+-
+-
+ /**
+    Form a 'for' loop over a STL sequence.
+ 
+--- a/ecell/libecs/PropertySlot.hpp
++++ b/ecell/libecs/PropertySlot.hpp
+@@ -178,6 +178,14 @@
+     typedef void ( T::* SetMethodPtr )( typename Param<SlotType>::type );
+     typedef SlotType ( T::* GetMethodPtr )() const;
+ 
++protected:
++
++    static const bool isSetableMethod( const SetMethodPtr aSetMethodPtr );
++
++    static const bool isGetableMethod( const GetMethodPtr aGetMethodPtr );
++
++public:
++
+     ConcretePropertySlot( String const& aName,
+                           SetMethodPtr aSetMethodPtr,
+                           GetMethodPtr aGetMethodPtr )
+@@ -264,10 +272,6 @@
+         return convertTo<Type>( callGetMethod( anObject ) );
+     }
+ 
+-    static const bool isSetableMethod( const SetMethodPtr aSetMethodPtr );
+-
+-    static const bool isGetableMethod( const GetMethodPtr aGetMethodPtr );
+-
+     static SetMethodPtr SetMethod( SetMethodPtr aSetMethodPtr );
+ 
+     static GetMethodPtr GetMethod( GetMethodPtr aGetMethodPtr );
+@@ -305,8 +309,8 @@
+                                         SetMethodPtr aLoadMethodPtr,
+                                         GetMethodPtr aSaveMethodPtr )
+         : BaseType( aName, aSetMethodPtr, aGetMethodPtr ),
+-          theLoadMethodPtr( SetMethod( aLoadMethodPtr ) ),
+-          theSaveMethodPtr( GetMethod( aSaveMethodPtr ) )
++          theLoadMethodPtr( this->SetMethod( aLoadMethodPtr ) ),
++          theSaveMethodPtr( this->GetMethod( aSaveMethodPtr ) )
+     {
+         ; // do nothing
+     }
+@@ -319,12 +323,12 @@
+ 
+     DM_IF virtual const bool isLoadable() const
+     {
+-        return isSetableMethod( theLoadMethodPtr );
++        return this->isSetableMethod( theLoadMethodPtr );
+     }
+ 
+     DM_IF virtual const bool isSavable()    const
+     {
+-        return isGetableMethod( theSaveMethodPtr );
++        return this->isGetableMethod( theSaveMethodPtr );
+     }
+ 
+     DM_IF virtual void loadPolymorph( T& anObject, libecs::Polymorph const& aValue ) const
+--- a/dmtool/SharedModuleMaker.hpp
++++ b/dmtool/SharedModuleMaker.hpp
+@@ -223,7 +223,7 @@
+             throw DMException( "[" + filename + "] is compiled as the module [" + desc->moduleName + "]." );
+         }
+ 
+-        addClass( new SharedModule( *desc, filename, handle ) );
++        this->addClass( new SharedModule( *desc, filename, handle ) );
+     }
+ };
+ 
