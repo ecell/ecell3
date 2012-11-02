@@ -1,25 +1,22 @@
-diff -ur ecell-3.1.107~/ecell/frontend/model-editor/Makefile.am ecell-3.1.107/ecell/frontend/model-editor/Makefile.am
---- ecell-3.1.107~/ecell/frontend/model-editor/Makefile.am	2009-04-30 05:56:48.000000000 +0900
-+++ ecell-3.1.107/ecell/frontend/model-editor/Makefile.am	2009-06-26 13:54:48.037499775 +0900
-@@ -97,4 +97,4 @@
+--- a/ecell/frontend/model-editor/Makefile.am
++++ b/ecell/frontend/model-editor/Makefile.am
+@@ -99,4 +99,4 @@
  	rm -rf build
  
  install-exec-local:
 -	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) --install-scripts=$(bindir) $(if $(DESTDIR),--root $(DESTDIR), )
 +	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) --install-scripts=$(bindir) --install-layout=deb --no-compile -O0 $(if $(DESTDIR),--root $(DESTDIR), )
-diff -ur ecell-3.1.107~/ecell/frontend/session-monitor/Makefile.am ecell-3.1.107/ecell/frontend/session-monitor/Makefile.am
---- ecell-3.1.107~/ecell/frontend/session-monitor/Makefile.am	2009-04-30 05:56:50.000000000 +0900
-+++ ecell-3.1.107/ecell/frontend/session-monitor/Makefile.am	2009-06-26 13:54:52.829853254 +0900
-@@ -52,4 +52,4 @@
+--- a/ecell/frontend/session-monitor/Makefile.am
++++ b/ecell/frontend/session-monitor/Makefile.am
+@@ -54,4 +54,4 @@
  	rm -rf build
  
  install-exec-local:
 -	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) --install-scripts=$(bindir) $(if $(DESTDIR),--root $(DESTDIR), )
 +	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) --install-scripts=$(bindir) --install-layout=deb --no-compile -O0 $(if $(DESTDIR),--root $(DESTDIR), )
-diff -ur ecell-3.1.107~/ecell/pyecell/Makefile.am ecell-3.1.107/ecell/pyecell/Makefile.am
---- ecell-3.1.107~/ecell/pyecell/Makefile.am	2009-04-30 05:56:55.000000000 +0900
-+++ ecell-3.1.107/ecell/pyecell/Makefile.am	2009-06-26 13:54:28.079317075 +0900
-@@ -97,4 +97,4 @@
+--- a/ecell/pyecell/Makefile.am
++++ b/ecell/pyecell/Makefile.am
+@@ -90,4 +90,4 @@
  	$(RM) -rf build
  
  install-exec-local:
