@@ -1,5 +1,2 @@
 01_distutils_install_layout.patch
-02_fix_dmcompile.patch
-03_fix_dmcompile.patch
 04_add_dmcompile_flag.patch
-05_fix_dmcompile.patch
