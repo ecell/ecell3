@@ -252,7 +252,7 @@ struct DeletePtr
 };
 
 /** @internal */
-LIBECS_API void throwSequenceSizeError( const size_t aSize, 
+LIBECS_API void throwSequenceSizeError( const size_t aSize,
                                         const size_t aMin, const size_t aMax );
 
 /** @internal */
