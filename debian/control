@@ -3,7 +3,7 @@ Section: contrib/science
 Priority: extra
 Maintainer: Moriyoshi Koizumi <mozo@sfc.keio.ac.jp>
 Build-Depends: cdbs, debhelper (>= 5), automake, libtool,
-    python2.7-dev, libboost-dev (>= 1.34.0), libboost-python-dev (>= 1.34.0),
+    python2.6-dev, libboost-dev (>= 1.34.0), libboost-python-dev (>= 1.34.0),
     libgsl0-dev (>=1.8), python-numpy (>=1.0.1), python-ply (>=2.5),
     python-gtk2 (>=2.6), python-gnome2 (>=2.6), python-support,
     docbook-xml, docbook-utils, doxygen
