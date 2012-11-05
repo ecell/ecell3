@@ -2,5 +2,5 @@ debian/tmp/etc/ecell-3.2/osogo.ini
 debian/tmp/usr/bin/ecell3-session-monitor
 debian/tmp/usr/lib/ecell-3.2/session-monitor
 debian/tmp/usr/share/ecell-3.2/session-monitor
-debian/tmp/usr/lib/python2.7/dist-packages/ecell.session_monitor-*.egg-info
-debian/tmp/usr/lib/python2.7/dist-packages/ecell/ui/osogo
+debian/tmp/usr/lib/python2.6/dist-packages/ecell.session_monitor-*.egg-info
+debian/tmp/usr/lib/python2.6/dist-packages/ecell/ui/osogo

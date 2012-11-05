@@ -9,9 +9,9 @@ debian/tmp/usr/lib/libecs.so.*
 debian/tmp/usr/lib/libemc.so.*
 debian/tmp/usr/lib/ecell-3.2/dms
 debian/tmp/usr/share/doc/ecell3/samples
-debian/tmp/usr/lib/python2.7/dist-packages/E_Cell-*.egg-info
-debian/tmp/usr/lib/python2.7/dist-packages/ecell/*.py*
-debian/tmp/usr/lib/python2.7/dist-packages/ecell/*.so
-debian/tmp/usr/lib/python2.7/dist-packages/ecell/ui/__init__.py*
-debian/tmp/usr/lib/python2.7/dist-packages/ecell/analysis
-debian/tmp/usr/lib/python2.7/dist-packages/ecell/session_manager
+debian/tmp/usr/lib/python2.6/dist-packages/E_Cell-*.egg-info
+debian/tmp/usr/lib/python2.6/dist-packages/ecell/*.py*
+debian/tmp/usr/lib/python2.6/dist-packages/ecell/*.so
+debian/tmp/usr/lib/python2.6/dist-packages/ecell/ui/__init__.py*
+debian/tmp/usr/lib/python2.6/dist-packages/ecell/analysis
+debian/tmp/usr/lib/python2.6/dist-packages/ecell/session_manager
