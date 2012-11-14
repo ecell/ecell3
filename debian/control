@@ -30,7 +30,7 @@ Package: ecell3-model-editor
 Architecture: any
 Section: contrib/science
 Depends: ecell3, ecell3-session-monitor, ${shlibs:Depends}, ${misc:Depends},
-    python-numpy (>=1.0.1), python-gtk2 (>=2.6), python-gnomecanvas (>=2.6)
+    python-numpy (>=1.0.1), python-gtk2 (>=2.6), python-gnome2 (>=2.28.1)
 Description: E-Cell System is an object-oriented software suite for modeling,
  simulation, and analysis of large scale complex systems, particularly focused
  on biological details of cellular behavior.
