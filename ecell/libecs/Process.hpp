@@ -128,6 +128,14 @@ public:
         return EntityType( EntityType::PROCESS );
     }
 
+    /**
+       Pre-initializes this process prior to preinitialize().
+    */
+    virtual void prepreinitialize();
+
+    /**
+       Pre-initializes this process.
+    */
     virtual void preinitialize();
 
     virtual void initialize();

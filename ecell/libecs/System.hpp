@@ -74,6 +74,14 @@ public:
         return EntityType( EntityType::SYSTEM );
     }
 
+    /**
+       Pre-initializes this system prior to preinitialize().
+    */
+    virtual void prepreinitialize();
+
+    /**
+       Pre-initializes this system. 
+    */
     virtual void preinitialize();
 
     virtual void initialize();

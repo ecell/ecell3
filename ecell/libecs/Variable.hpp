@@ -96,6 +96,11 @@ public:
     }
 
     /**
+       Pre-initializes this variable prior to preinitialize().
+    */
+    virtual void prepreinitialize();
+
+    /**
        Pre-initializes this variable. 
     */
     virtual void preinitialize();

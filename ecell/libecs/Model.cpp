@@ -399,25 +399,31 @@ void Model::initializeEntities( System* const aSystem )
 }
 
 
-void Model::checkSizeVariable( System const* const aSystem )
+void Model::prepreinitializeEntities( System* aSystem )
 {
-    try
-    {
-        getRootSystem()->getVariable( "SIZE" );
-    }
-    catch( NotFound const& )
-    {
-        Variable& v( *reinterpret_cast< Variable* >(
-                createEntity( "Variable", FullID( "Variable:/:SIZE" ) ) ) );
-        v.setValue( 1.0 );
-    }
+    aSystem->prepreinitialize();
+
+    System::Variables variables( aSystem->getVariables() );
+    std::for_each( boost::begin( variables ), boost::end( variables ),
+            ComposeUnary( boost::bind( &Variable::prepreinitialize, _1 ),
+                          SelectSecond< boost::range_value< System::Variables >::type >() ) );
+
+    System::Processes processes( aSystem->getProcesses() );
+    std::for_each( boost::begin( processes ), boost::end( processes ),
+            ComposeUnary( boost::bind( &Process::prepreinitialize, _1 ),
+                          SelectSecond< boost::range_value< System::Processes >::type >() ) );
+
+    System::Systems systems( aSystem->getSystems() );
+    std::for_each( boost::begin( systems ), boost::end( systems ),
+            ComposeUnary( boost::bind( &Model::prepreinitializeEntities, _1 ),
+                          SelectSecond< boost::range_value< System::Systems >::type >() ) );
 }
 
 void Model::initialize()
 {
     System* const aRootSystem( getRootSystem() );
 
-    checkSizeVariable( aRootSystem );
+    prepreinitializeEntities( aRootSystem );
 
     preinitializeEntities( aRootSystem );
 
