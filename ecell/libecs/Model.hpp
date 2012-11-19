@@ -336,9 +336,17 @@ private:
     /** @internal */
     void registerBuiltinModules();
 
-    void checkSizeVariable( System const* aSystem );
-
     Handle generateNextHandle();
+
+    /**
+       This method handles to establish prerequisites for succeeding
+       initialization process.
+
+       @param aSystem a root node to start recursive search.
+       
+       @throw InitializationFailed if the check is failed.
+    */
+    static void prepreinitializeEntities( System* aSystem );
 
     /**
        This method checks recursively if all systems have Steppers

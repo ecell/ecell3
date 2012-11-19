@@ -583,6 +583,10 @@ bool Process::isDependentOn( Process const* aProcessPtr ) const
     return false;
 }
 
+void Process::prepreinitialize()
+{
+} 
+
 void Process::preinitialize()
 {
     resolveVariableReferences();
