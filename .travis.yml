@@ -1,5 +1,5 @@
 language: cpp
-script: ./configure --with-boost-python-libname=boost_python-mt-py27 && make
+script: ./autogen.sh && ./configure --with-boost-python-libname=boost_python-mt-py27 && make
 compiler:
  - gcc
  - clang
