@@ -37,8 +37,17 @@
 
 #include <new>
 
+#ifdef HAVE_BOOST_SPIRIT_CLASSIC
+#include <boost/spirit/include/classic_core.hpp>
+#include <boost/spirit/include/classic_ast.hpp>
+#else
 #include <boost/spirit/core.hpp>
 #include <boost/spirit/tree/ast.hpp>
+#endif
+
+#ifndef BOOST_SPIRIT_CLASSIC_NS
+#define BOOST_SPIRIT_CLASSIC_NS boost::spirit
+#endif
 
 #if SPIRIT_VERSION >= 0x1800
 #define PARSER_CONTEXT parser_context<>
