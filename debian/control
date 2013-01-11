@@ -12,7 +12,8 @@ Standards-Version: 3.9.3
 Package: ecell3
 Architecture: any
 Section: contrib/science
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy (>=1.0.1)
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-numpy (>=1.0.1),
+    python-ply (>=2.5)
 Recommends: python-sbml2 (>=2.3.5)
 Description: E-Cell System is an object-oriented software suite for modeling,
  simulation, and analysis of large scale complex systems, particularly focused
