@@ -35,7 +35,7 @@ Installing on Mac OS X
        sh autogen.sh
        LDFLAGS=-L/usr/local/opt/boost149/lib CPPFLAGS=-I/usr/local/opt/boost149/include ./configure --with-boost-python-libname=boost_python-mt
        make
-       sudo make install
+       make install # do NOT use sudo, sudo command changes owner of /usr/loca/bin[, etc, lib].
 
 5. configure PYTHONPATH
 
