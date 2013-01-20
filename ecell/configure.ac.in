@@ -9,7 +9,7 @@ AC_CONFIG_SRCDIR([libecs/Entity.hpp])
 sinclude([../ecell_version.sh])
 
 
-AM_CONFIG_HEADER(ecell_config.h)
+AC_CONFIG_HEADERS([ecell_config.h])
 
 AM_INIT_AUTOMAKE
 
