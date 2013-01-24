@@ -2382,7 +2382,7 @@ public:
         setup();
     }
 
-    ~Simulator()
+    virtual ~Simulator()
     {
     }
 
@@ -3045,7 +3045,7 @@ BOOST_PYTHON_MODULE( _ecs )
               &Logger::getData )
         ;
 
-    py::class_< AbstractSimulator, py::bases<>, AbstractSimulator*, boost::noncopyable >( "AbstractSimulator", py::no_init )
+    py::class_< AbstractSimulator, py::bases<>, boost::shared_ptr< AbstractSimulator >, boost::noncopyable  >( "AbstractSimulator", py::no_init )
         .add_static_property( "DM_SEARCH_PATH_SEPARATOR",
               &AbstractSimulator::getDMSearchPathSeparator )
         .add_property( "rootSystem",
@@ -3192,7 +3192,7 @@ BOOST_PYTHON_MODULE( _ecs )
         ;
 
     // Simulator class
-    py::class_< Simulator, py::bases<AbstractSimulator>, Simulator*, boost::noncopyable >( "Simulator" )
+    py::class_< Simulator, py::bases< AbstractSimulator >, boost::shared_ptr< Simulator >, boost::noncopyable >( "Simulator" )
         .def( py::init<>() )
         .def( "stop",
               &Simulator::stop )
