@@ -223,7 +223,7 @@ protected:
             throw DMException( "[" + filename + "] is compiled as the module [" + desc->moduleName + "]." );
         }
 
-        addClass( new SharedModule( *desc, filename, handle ) );
+        this->addClass( new SharedModule( *desc, filename, handle ) );
     }
 };
 
