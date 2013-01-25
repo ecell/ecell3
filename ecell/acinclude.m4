@@ -340,4 +340,10 @@ char* begin<char[10]>(char(&a)[10])
   CPPFLAGS="$ac_save_CPPFLAGS"
 ])
 
+AC_DEFUN([ECELL_CHECK_BOOST_SPIRIT], [
+  AC_CHECK_HEADER([boost/spirit/include/classic_core.hpp],
+    [ BOOST_SPIRIT_CLASSIC=1 ],
+    [ BOOST_SPIRIT_CLASSIC=  ]
+  )
+])
 

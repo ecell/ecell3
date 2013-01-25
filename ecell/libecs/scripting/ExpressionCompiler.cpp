@@ -41,11 +41,11 @@
 
 namespace libecs { namespace scripting {
 
-using namespace boost::spirit;
+using namespace BOOST_SPIRIT_CLASSIC_NS;
 using namespace libecs;
 using namespace libecs::math;
 
-typedef boost::spirit::tree_match<const char*> TreeMatch;
+typedef BOOST_SPIRIT_CLASSIC_NS::tree_match<const char*> TreeMatch;
 typedef TreeMatch::tree_iterator TreeIterator;
 
 //  VariableReferenceMethodProxy;

@@ -33,7 +33,7 @@ AC_ARG_ENABLE([compiler-extensions],
   AC_HELP_STRING([--disable-compiler-extensions],
                  [Don't exploit the compiler's special language syntax and optimizations that are not part of the standard (such as ISO C++).]))
 
-AM_CONFIG_HEADER(ecell3_config.h)
+AC_CONFIG_HEADERS(ecell3_config.h)
 
 AC_CHECK_TOOL([DB2HTML], [db2html])
 AC_CHECK_TOOL([DB2PDF], [db2pdf])
