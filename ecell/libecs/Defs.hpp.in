@@ -147,7 +147,7 @@ namespace libecs
 
   typedef @HIGHREAL_TYPE@ HighReal;
 # define HIGHREAL_IS_REAL @HIGHREAL_IS_REAL@
-  typedef double Time;
+  typedef long double Time;
  
   //! Infinity.
   const Real INF( @INFINITY_VAL@ );
