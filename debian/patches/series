@@ -1,4 +1,3 @@
 06_doc_install.patch
 01_distutils_install_layout.patch
 04_add_dmcompile_flag.patch
-05_gcc47.patch
