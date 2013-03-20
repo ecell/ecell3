@@ -158,6 +158,23 @@ void System::configureSizeVariable()
     theSizeVariable = findSizeVariable();
 }
 
+void System::prepreinitialize()
+{
+    if ( isRootSystem() )
+    {
+        try
+        {
+            getVariable( "SIZE" );
+        }
+        catch( NotFound const& )
+        {
+            Variable& v( *reinterpret_cast< Variable* >(
+                    theModel->createEntity( "Variable", FullID( "Variable:/:SIZE" ) ) ) );
+            v.setValue( 1.0 );
+        }
+    }
+}
+
 void System::preinitialize()
 {
     // no need to call subsystems' initialize() -- the Model does this
