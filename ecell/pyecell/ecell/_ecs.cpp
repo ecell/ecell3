@@ -55,6 +55,7 @@
 #include <boost/python/object/find_instance.hpp>
 #include <boost/python/reference_existing_object.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+#include <boost/optional/optional.hpp>
 
 #include <numpy/arrayobject.h>
 #include <stringobject.h>
@@ -95,6 +96,25 @@ typedef int Py_ssize_t;
 using namespace libecs;
 namespace py = boost::python;
 
+inline boost::optional< py::object > generic_getattr( py::object anObj, const char* aName, bool return_null_if_not_exists )
+{
+    py::handle<> aRetval( py::allow_null( PyObject_GenericGetAttr(
+        anObj.ptr(),
+        py::handle<>(
+            PyString_InternFromString(
+                const_cast< char* >( aName ) ) ).get() ) ) );
+    if ( !aRetval )
+    {
+        if ( return_null_if_not_exists )
+            PyErr_Clear();
+        else
+            py::throw_error_already_set();
+        return boost::optional< py::object >();
+    }
+
+    return py::object( aRetval );
+}
+
 inline py::object generic_getattr( py::object anObj, const char* aName )
 {
     py::handle<> aRetval( py::allow_null( PyObject_GenericGetAttr(
@@ -109,7 +129,6 @@ inline py::object generic_getattr( py::object anObj, const char* aName )
 
     return py::object( aRetval );
 }
-
 
 struct PolymorphToPythonConverter
 {
@@ -1646,12 +1665,20 @@ public:
         INHERIT_PROPERTIES( Process );
     }
 
+    virtual void preinitialize()
+    {
+        Process::preinitialize();
+        boost::optional< py::object > meth( generic_getattr( py::object( py::borrowed( py::detail::wrapper_base_::owner( this ) ) ), "preinitialize", true ) );
+        if ( meth )
+            meth.get()();
+    }
+
     virtual void initialize()
     {
         Process::initialize();
-        PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
-        generic_getattr( py::object( py::borrowed( aSelf ) ), "initialize" )();
-        theFireMethod = generic_getattr( py::object( py::borrowed( aSelf ) ), "fire" );
+        boost::optional< py::object > meth( generic_getattr( py::object( py::borrowed( py::detail::wrapper_base_::owner( this ) ) ), "initialize", true ) );
+        if ( meth )
+            meth.get()();
     }
 
     virtual void fire()
@@ -1697,11 +1724,21 @@ public:
         INHERIT_PROPERTIES( Variable );
     }
 
+    virtual void preinitialize()
+    {
+        Variable::preinitialize();
+        boost::optional< py::object > meth( generic_getattr( py::object( py::borrowed( py::detail::wrapper_base_::owner( this ) ) ), "preinitialize", true ) );
+        if ( meth )
+            meth.get()();
+    }
+
     virtual void initialize()
     {
         Variable::initialize();
         PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
-        py::getattr( py::object( py::borrowed( aSelf ) ), "initialize" )();
+        boost::optional< py::object > meth( generic_getattr( py::object( py::borrowed( aSelf ) ), "initialize", true ) );
+        if ( meth )
+            meth.get()();
         theOnValueChangingMethod = py::handle<>( py::allow_null( PyObject_GenericGetAttr( aSelf, py::handle<>( PyString_InternFromString( const_cast< char* >( "onValueChanging" ) ) ).get() ) ) );
         if ( !theOnValueChangingMethod )
         {
@@ -1754,11 +1791,20 @@ public:
         INHERIT_PROPERTIES( System );
     }
 
+    virtual void preinitialize()
+    {
+        System::preinitialize();
+        boost::optional< py::object > meth( generic_getattr( py::object( py::borrowed( py::detail::wrapper_base_::owner( this ) ) ), "preinitialize", true ) );
+        if ( meth )
+            meth.get()();
+    }
+
     virtual void initialize()
     {
         System::initialize();
-        PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
-        py::getattr( py::object( py::borrowed( aSelf ) ), "initialize" )();
+        boost::optional< py::object > meth( generic_getattr( py::object( py::borrowed( py::detail::wrapper_base_::owner( this ) ) ), "initialize", true ) );
+        if ( meth )
+            meth.get()();
     }
 
     PythonSystem( PythonDynamicModule< PythonSystem > const& aModule )
