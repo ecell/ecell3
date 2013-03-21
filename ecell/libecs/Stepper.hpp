@@ -404,7 +404,7 @@ public:
 
        @see Process, VariableReference
     */
-    virtual bool isDependentOn( Stepper const* aStepper );
+    bool isDependentOn( Stepper const* aStepper );
 
     /** 
        This method updates theIntegratedVariableVector.
