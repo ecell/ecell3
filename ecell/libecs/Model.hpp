@@ -32,6 +32,8 @@
 #ifndef __MODEL_HPP
 #define __MODEL_HPP
 
+#include <boost/shared_ptr.hpp>
+
 #include "dmtool/ModuleMaker.hpp"
 
 #include "libecs/Defs.hpp"
@@ -69,7 +71,7 @@ protected:
     typedef std::map< Handle, EcsObject* > HandleToObjectMap;
 
 public:
-    Model( ModuleMaker< EcsObject >& maker );
+    Model( boost::shared_ptr< ModuleMaker< EcsObject > > maker );
 
     void setup();
 
@@ -332,6 +334,10 @@ public:
         return this->isDirty_;
     }
 
+    boost::shared_ptr< ModuleMaker< EcsObject > > getEcsObjectMaker() const {
+        return theEcsObjectMaker;
+    }
+
 private:
     /** @internal */
     void registerBuiltinModules();
@@ -383,7 +389,7 @@ protected:
 
     StepperMap                      theStepperMap;
 
-    ModuleMaker< EcsObject >&       theEcsObjectMaker;
+    boost::shared_ptr< ModuleMaker< EcsObject > > theEcsObjectMaker;
     StepperMaker                    theStepperMaker;
     SystemMaker                     theSystemMaker;
     VariableMaker                   theVariableMaker;

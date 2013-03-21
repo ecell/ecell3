@@ -2277,7 +2277,7 @@ public:
     py::object getDMInfo() const
     {
         typedef ModuleMaker< EcsObject >::ModuleMap ModuleMap;
-        const ModuleMap& modules( theEcsObjectMaker.getModuleMap() );
+        const ModuleMap& modules( theEcsObjectMaker->getModuleMap() );
         py::list retval;
 
         for( ModuleMap::const_iterator i( modules.begin() );
@@ -2313,7 +2313,7 @@ public:
         return Model::PATH_SEPARATOR;
     }
 
-    AbstractSimulator( ModuleMaker< EcsObject >& maker )
+    AbstractSimulator( boost::shared_ptr< ModuleMaker< EcsObject > > maker )
         : Model( maker ) {}
 
 private:
@@ -2331,7 +2331,7 @@ private:
         virtual void setSearchPath( const std::string& path )
         {
             SharedModuleMakerInterface* anInterface(
-                dynamic_cast< SharedModuleMakerInterface* >( &theDefaultModuleMaker ) );
+                dynamic_cast< SharedModuleMakerInterface* >( theDefaultModuleMaker.get() ) );
             if ( anInterface )
             {
                 anInterface->setSearchPath( path );
@@ -2341,7 +2341,7 @@ private:
         virtual std::string getSearchPath() const
         {
             SharedModuleMakerInterface* anInterface(
-                dynamic_cast< SharedModuleMakerInterface* >( &theDefaultModuleMaker ) );
+                dynamic_cast< SharedModuleMakerInterface* >( theDefaultModuleMaker.get() ) );
             if ( anInterface )
             {
                 return anInterface->getSearchPath();
@@ -2355,7 +2355,7 @@ private:
             ModuleMap::iterator i( theRealModuleMap.find( aClassName ) );
             if ( i == theRealModuleMap.end() )
             {
-                const Module& retval( theDefaultModuleMaker.getModule( aClassName, forceReload ) );
+                const Module& retval( theDefaultModuleMaker->getModule( aClassName, forceReload ) );
                 theRealModuleMap[ retval.getModuleName() ] = const_cast< Module* >( &retval );
                 return retval;
             }
@@ -2374,11 +2374,11 @@ private:
             return theRealModuleMap;
         }
 
-        CompositeModuleMaker( ModuleMaker< EcsObject >& aDefaultModuleMaker )
+        CompositeModuleMaker( boost::shared_ptr< ModuleMaker< EcsObject > > aDefaultModuleMaker )
             : theDefaultModuleMaker( aDefaultModuleMaker ) {}
 
     private:
-        ModuleMaker< EcsObject >& theDefaultModuleMaker;
+        boost::shared_ptr< ModuleMaker< EcsObject > > theDefaultModuleMaker;
         ModuleMap theRealModuleMap;
     };
 
@@ -2444,13 +2444,11 @@ private:
 
 public:
     Simulator()
-        : AbstractSimulator( thePropertiedObjectMaker ),
+        : AbstractSimulator( boost::shared_ptr< ModuleMaker< EcsObject > >( new CompositeModuleMaker( boost::shared_ptr< ModuleMaker< EcsObject > >( createDefaultModuleMaker() ) ) ) ),
           theRunningFlag( false ),
           theDirtyFlag( true ),
           theEventCheckInterval( 20 ),
-          theEventHandler(),
-          theDefaultPropertiedObjectMaker( createDefaultModuleMaker() ),
-          thePropertiedObjectMaker( *theDefaultPropertiedObjectMaker )
+          theEventHandler()
     {
         setup();
     }
@@ -2621,7 +2619,7 @@ public:
             THROW_EXCEPTION( NotImplemented, "not implemented" );
         }
     
-        thePropertiedObjectMaker.addClass( aModule );
+        theEcsObjectMaker->addClass( aModule );
     }
 
 protected:
@@ -2669,9 +2667,6 @@ private:
     Integer         theEventCheckInterval;
 
     py::handle<>    theEventHandler;
-
-    std::auto_ptr< ModuleMaker< EcsObject > > theDefaultPropertiedObjectMaker;
-    CompositeModuleMaker thePropertiedObjectMaker;
 };
 
 inline const char* typeCodeToString( enum PropertySlotBase::Type aTypeCode )

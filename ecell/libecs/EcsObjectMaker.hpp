@@ -32,6 +32,8 @@
 #ifndef ___ECSOBJECTMAKER_H
 #define ___ECSOBJECTMAKER_H
 
+#include <boost/shared_ptr.hpp>
+
 #include "dmtool/ModuleMaker.hpp"
 #include "dmtool/DynamicModuleInfo.hpp"
 
@@ -54,7 +56,7 @@ public:
     typedef T_ DMType;
 
 public:
-    EcsObjectMaker( Backend& aBackend )
+    EcsObjectMaker( boost::shared_ptr< Backend > aBackend )
       : theBackend( aBackend )
     {
         // do nothing;
@@ -82,7 +84,7 @@ public:
 
     const Backend::Module& getModule(String const& aClassName )
     {
-        const Backend::Module& mod( theBackend.getModule( aClassName ) );
+        const Backend::Module& mod( theBackend->getModule( aClassName ) );
         const PropertyInterface< DMType >* info(
                 reinterpret_cast< const PropertyInterface< DMType >* >( mod.getInfo() ) );
         if ( !info || info->getTypeName() != getTypeName() )
@@ -95,7 +97,7 @@ public:
     }
 
 protected:
-    Backend& theBackend;
+    boost::shared_ptr< Backend > theBackend;
 };
 
 template<>  

@@ -57,8 +57,7 @@ LocalSimulatorImplementation::LocalSimulatorImplementation()
       theEventCheckInterval( 20 ),
       theEventChecker(),
       theEventHandler(),
-      thePropertiedObjectMaker( libecs::createDefaultModuleMaker() ),
-      theModel( *thePropertiedObjectMaker )
+      theModel( boost::shared_ptr< ModuleMaker< libecs::EcsObject > >( libecs::createDefaultModuleMaker() ) )
 {
     clearEventChecker();
 }
@@ -66,7 +65,6 @@ LocalSimulatorImplementation::LocalSimulatorImplementation()
 
 LocalSimulatorImplementation::~LocalSimulatorImplementation()
 {
-    delete thePropertiedObjectMaker;
 }
 
 
@@ -706,7 +704,7 @@ libecs::PolymorphVector LocalSimulatorImplementation::getDMInfo() const
 {
     typedef ModuleMaker< libecs::EcsObject >::ModuleMap ModuleMap;
     libecs::PolymorphVector aVector;
-    const ModuleMap& modules( thePropertiedObjectMaker->getModuleMap() );
+    const ModuleMap& modules( theModel.getEcsObjectMaker()->getModuleMap() );
 
     for( ModuleMap::const_iterator i( modules.begin() );
                 i != modules.end(); ++i )

@@ -61,7 +61,7 @@ namespace libecs
 
 const char Model::PATH_SEPARATOR = SharedModuleMakerInterface::PATH_SEPARATOR;
 
-Model::Model( ModuleMaker< EcsObject >& maker )
+Model::Model( boost::shared_ptr< ModuleMaker< EcsObject > > maker )
     : theCurrentTime( 0.0 ),
       theNextHandleVal( 0 ),
       theLoggerBroker( *this ),
@@ -124,7 +124,7 @@ const PropertyInterfaceBase&
 Model::getPropertyInterface( String const& aClassname ) const
 {
     return *(reinterpret_cast<const PropertyInterfaceBase*>(
-        theEcsObjectMaker.getModule( aClassname ).getInfo() ) );
+        theEcsObjectMaker->getModule( aClassname ).getInfo() ) );
 }
 
 
@@ -465,7 +465,7 @@ void Model::initialize()
 void Model::setDMSearchPath( const std::string& path )
 {
     SharedModuleMakerInterface* smmbase(
-        dynamic_cast< SharedModuleMakerInterface* >( &theEcsObjectMaker ) );
+        dynamic_cast< SharedModuleMakerInterface* >( theEcsObjectMaker.get() ) );
     if ( !smmbase )
     {
         THROW_EXCEPTION( IllegalOperation,
@@ -478,7 +478,7 @@ void Model::setDMSearchPath( const std::string& path )
 String Model::getDMSearchPath() const
 {
     SharedModuleMakerInterface const* smmbase(
-        dynamic_cast< SharedModuleMakerInterface const* >( &theEcsObjectMaker ) );
+        dynamic_cast< SharedModuleMakerInterface const* >( theEcsObjectMaker.get() ) );
     if ( !smmbase )
     {
         THROW_EXCEPTION( IllegalOperation,
@@ -490,12 +490,12 @@ String Model::getDMSearchPath() const
 
 void Model::registerBuiltinModules()
 {
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, DiscreteEventStepper );
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, DiscreteTimeStepper );
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, PassiveStepper );
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, SystemStepper );
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, System );
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, Variable );
+    DM_NEW_STATIC( theEcsObjectMaker, EcsObject, DiscreteEventStepper );
+    DM_NEW_STATIC( theEcsObjectMaker, EcsObject, DiscreteTimeStepper );
+    DM_NEW_STATIC( theEcsObjectMaker, EcsObject, PassiveStepper );
+    DM_NEW_STATIC( theEcsObjectMaker, EcsObject, SystemStepper );
+    DM_NEW_STATIC( theEcsObjectMaker, EcsObject, System );
+    DM_NEW_STATIC( theEcsObjectMaker, EcsObject, Variable );
 }
 
 void Model::step()
