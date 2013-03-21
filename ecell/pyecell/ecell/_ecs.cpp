@@ -1665,6 +1665,16 @@ public:
         INHERIT_PROPERTIES( Process );
     }
 
+    virtual void prepreinitialize()
+    {
+        Process::prepreinitialize();
+        PyObject* aSelf( py::detail::wrapper_base_::owner( this ) );
+        boost::optional< py::object > meth( generic_getattr( py::object( py::borrowed( aSelf ) ), "prepreinitialize", true ) );
+        if ( meth )
+            meth.get()();
+        theFireMethod = generic_getattr( py::object( py::borrowed( aSelf ) ), "fire" );
+    }
+
     virtual void preinitialize()
     {
         Process::preinitialize();
@@ -1722,6 +1732,14 @@ public:
     LIBECS_DM_INIT_PROP_INTERFACE()
     {
         INHERIT_PROPERTIES( Variable );
+    }
+
+    virtual void prepreinitialize()
+    {
+        Variable::prepreinitialize();
+        boost::optional< py::object > meth( generic_getattr( py::object( py::borrowed( py::detail::wrapper_base_::owner( this ) ) ), "prepreinitialize", true ) );
+        if ( meth )
+            meth.get()();
     }
 
     virtual void preinitialize()
@@ -1789,6 +1807,15 @@ public:
     LIBECS_DM_INIT_PROP_INTERFACE()
     {
         INHERIT_PROPERTIES( System );
+    }
+
+    virtual void prepreinitialize()
+    {
+        System::prepreinitialize();
+
+        boost::optional< py::object > meth( generic_getattr( py::object( py::borrowed( py::detail::wrapper_base_::owner( this ) ) ), "prepreinitialize", true ) );
+        if ( meth )
+            meth.get()();
     }
 
     virtual void preinitialize()
