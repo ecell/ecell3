@@ -1784,7 +1784,7 @@ public:
         template <class Arg>
         static inline holder_t* construct(void* storage, PyObject* arg, Arg& x)
         {
-            py::detail::initialize_wrapper( py::incref( arg ), boost::get_pointer(x) );
+            py::detail::initialize_wrapper( arg, boost::get_pointer(x) );
             return new (storage) holder_t(x);
         }
 
@@ -1855,9 +1855,8 @@ template< typename T_ >
 EcsObject* PythonDynamicModule< T_ >::createInstance() const
 {
     T_* retval( new T_( *this ) );
-    py::handle<> aNewObject( make_ptr_instance::execute( retval ) );
 
-    if ( !aNewObject )
+    if ( !make_ptr_instance::execute( retval ) )
     {
         delete retval;
         std::string anErrorStr( "Instantiation failure" );
