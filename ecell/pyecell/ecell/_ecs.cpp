@@ -2772,9 +2772,7 @@ static void setWarningHandler( py::handle<> const& handler )
     libecs::setWarningHandler( &thehandler );
 }
 
-struct return_entity
-    : public py::with_custodian_and_ward_postcall<
-            0, 1, py::default_call_policies >
+struct return_entity : public py::default_call_policies
 {
     struct result_converter
     {
@@ -2818,6 +2816,10 @@ struct return_entity
                         {
                             aRetval = py::detail::make_reference_holder::execute( ptr );
                         }
+                    }
+                    else
+                    {
+                        py::incref( aRetval );
                     }
                     return aRetval;
                 }
@@ -3060,22 +3062,22 @@ BOOST_PYTHON_MODULE( _ecs )
         .add_property( "rootSystem",
               py::make_function(
                     &AbstractSimulator::getRootSystem,
-                    py::return_internal_reference<>() ) )
+                  py::return_value_policy< py::reference_existing_object >() ) )
         .add_property( "rootSystem",
               py::make_function(
                     static_cast< System*( AbstractSimulator::* )() const >(
                         &AbstractSimulator::getRootSystem ),
-                    py::return_internal_reference<>() ) )
+                  py::return_value_policy< py::reference_existing_object >() ) )
         .def( "getClassInfo",
               &AbstractSimulator::getClassInfo )
         // Stepper-related methods
         .def( "createStepper",
               (Stepper*(AbstractSimulator::*)(String const&, String const&))
               &AbstractSimulator::createStepper,
-              py::return_internal_reference<>() )
+              py::return_value_policy< py::reference_existing_object >() )
         .def( "getStepper",
               &AbstractSimulator::getStepper,
-              py::return_internal_reference<>() )
+              py::return_value_policy< py::reference_existing_object >() )
         .def( "deleteStepper",
               &AbstractSimulator::deleteStepper )
         .def( "deleteEntity",
@@ -3103,13 +3105,13 @@ BOOST_PYTHON_MODULE( _ecs )
               return_entity() )
         .def( "createVariable",
               &AbstractSimulator::createVariable,
-              py::return_internal_reference<>() )
+              py::return_value_policy< py::reference_existing_object >() )
         .def( "createProcess",
               &AbstractSimulator::createProcess,
-              py::return_internal_reference<>() )
+              py::return_value_policy< py::reference_existing_object >() )
         .def( "createSystem",
               &AbstractSimulator::createSystem,
-              py::return_internal_reference<>() )
+              py::return_value_policy< py::reference_existing_object >() )
         .def( "getEntity",
               &AbstractSimulator::getEntity,
               return_entity() )
