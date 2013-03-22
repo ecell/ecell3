@@ -1610,6 +1610,15 @@ public:
         return _getPropertyInterface();
     }
 
+    void __init__()
+    {
+        boost::optional< py::object > meth( generic_getattr( py::object( py::borrowed( py::detail::wrapper_base_::owner( this ) ) ), "__init__", true ) );
+        if ( meth )
+        {
+            meth.get()();
+        }
+    }
+
     PythonEntityBase( PythonDynamicModule< Tderived_ > const& aModule )
         : theModule( aModule ) {}
 
@@ -1877,6 +1886,7 @@ EcsObject* PythonDynamicModule< T_ >::createInstance() const
         throw std::runtime_error( anErrorStr );
     }
 
+    retval->__init__();
     return retval;
 }
 
