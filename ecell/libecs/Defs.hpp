@@ -1,0 +1,199 @@
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//        This file is part of E-Cell Simulation Environment package
+//
+//                Copyright (C) 1996-2012 Keio University
+//
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+//
+// E-Cell is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public
+// License as published by the Free Software Foundation; either
+// version 2 of the License, or (at your option) any later version.
+// 
+// E-Cell is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public
+// License along with E-Cell -- see the file COPYING.
+// If not, write to the Free Software Foundation, Inc.,
+// 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+// 
+//END_HEADER
+//
+// written by Koichi Takahashi <shafi@e-cell.org>,
+// E-Cell Project.
+//
+
+
+#ifndef __DEFS_HPP
+#define __DEFS_HPP
+ 
+#if defined( __CYGWIN__ )
+#define WIN32 __CYGWIN__
+#endif /* __CYGWIN __ */
+
+#if defined(  WIN32  )
+#if defined( _MSC_VER )
+#define _USE_MATH_DEFINES
+#if _MANAGED
+/* suppress __fastcall warnings */
+#pragma warning(disable:4561)
+#endif /* _MANAGED */
+/* suppress deprecation warnings */
+#pragma warning(disable:4996)
+/* suppress DLL import warnings */
+#pragma warning(disable:4251)
+#endif /* _MSC_VER */
+#endif /* WIN32 */
+
+#include <float.h>
+#include <string>
+#include <time.h>
+#include <limits>
+#include <cmath>
+
+#include <boost/call_traits.hpp>
+
+#include <stdint.h>
+
+#define HAVE_BOOST_RANGE_ADL_BARRIER 1
+#define HAVE_BOOST_SPIRIT_CLASSIC 1
+
+#define ECELL_MAJOR_VERSION 3
+#define ECELL_MINOR_VERSION 2
+#define ECELL_MICRO_VERSION 3
+#define ECELL_VERSION_STRING "3.2.3pre2"
+
+// stringifiers.  see preprocessor manual
+#define XSTR( S ) STR( S )
+#define STR( S ) #S
+
+
+#define USE_LIBECS using namespace libecs
+
+// 
+// If USE_COMPILER_EXTENSIONS is defined, the compiler's special
+// language syntax and optimizations that are not part of the standard
+// (such as ISO C++) are exploited.
+//
+// Defined macros:
+//
+// LIBECS_USE_PMF_CONVERSIONS 
+// If this macro is defined, conversions from pointer-to-member-functions 
+// to usual function pointers can be used.
+//
+//
+// LIBECS_LIKELY( EXP ), LIBECS_UNLIKELY( EXP )
+// These macros indicate the expression EXP is very (un)likely to be true,
+// and the branch based on this will be frequently (not) taken.
+// These are typically used in if() statements.   Unless you are very sure,
+// it is a good idea to not to try to do this job by yourself and just 
+// rely on the compiler and CPU's branch prediction mechanisms and 
+// profile-based branch counters. These macros do nothing when 
+// libecs does not support branch prediction on the platform.
+//
+//
+// LIBECS_PREFETCH( ADDR, RW, LOCALITY )
+// This macro prefetches the content of memory at the address ADDR,
+// and refreshes the cache.   If RW is zero, the cache is prepared for
+// a read access, and one for a write access.  LOCALITY (0..3) indicates
+// the temporal locality of the access.   Larger values let the
+// accessed addresses more sticky on the cache.
+// These macros do nothing when libecs does not support prefetching
+// on the platform.
+//
+
+#if defined( USE_COMPILER_EXTENSIONS ) && defined( __GNUC__ )
+#    define LIBECS_USE_PMF_CONVERSIONS 1
+#    define LIBECS_LIKELY( EXP )       __builtin_expect( ( EXP ), 1 )
+#    define LIBECS_UNLIKELY( EXP )     __builtin_expect( ( EXP ), 0 )
+#    define LIBECS_PREFETCH( ADDR, RW, LOCALITY )\
+            __builtin_prefetch( ( ADDR ), ( RW ), ( LOCALITY ) )
+#else
+// do not define LIBECS_USE_PMF_CONVERSIONS
+#    define LIBECS_LIKELY( EXP )       ( EXP )
+#    define LIBECS_UNLIKELY( EXP )     ( EXP )
+#    define LIBECS_PREFETCH            
+#endif /* defined( USE_COMPILER_EXTENSIONS ) && defined( __GNUC__ ) */
+
+
+#if defined( __GNUC__ )
+#define LIBECS_DEPRECATED __attribute__((deprecated))
+#elif defined( _MSC_VER ) && _MSC_VER >= 1300
+#define LIBECS_DEPRECATED __declspec(deprecated)
+#else
+#define LIBECS_DEPRECATED
+#endif
+
+namespace libecs
+{
+  // Types
+
+  template <typename T>
+  class Param
+  {
+  public:
+      typedef typename boost::call_traits<T>::param_type type;
+  };
+
+  typedef std::string String;
+  typedef long int Integer;
+  typedef unsigned long int UnsignedInteger;
+  typedef double Real;
+
+  typedef double HighReal;
+# define HIGHREAL_IS_REAL 1
+  typedef double Time;
+ 
+  //! Infinity.
+  const Real INF( std::numeric_limits<double>::infinity() );
+
+  //! Avogadro number. 
+  const Real N_A( 6.0221367e+23 );
+
+  //! 1 / Avogadro number (reciprocal of N_A)
+  const Real N_A_R( 1.0 / N_A );
+
+  // MACROS
+
+} // namespace libecs
+
+#if !defined( HAVE_PRETTY_FUNCTION )
+#define __PRETTY_FUNCTION__ ""
+#endif
+
+// WIN32 stuff
+#if defined( WIN32 )
+
+#if defined( LIBECS_EXPORTS ) || defined( DLL_EXPORT )
+#define LIBECS_API __declspec(dllexport)
+#else
+#define LIBECS_API __declspec(dllimport)
+#endif /* LIBECS_EXPORTS */
+
+#if !defined( __CYGWIN__ )
+#define fmin(x, y) __min(x, y)
+#endif /* __CYGWIN__ */
+
+#else
+
+#define LIBECS_API
+
+#endif /* WIN32 */
+
+#endif /* __DEFS_HPP */
+
+/*
+  Do not modify
+  $Author$
+  $Revision$
+  $Date$
+  $Locker$
+*/
+
+
+
