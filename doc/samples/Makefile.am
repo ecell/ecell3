@@ -19,16 +19,16 @@ SAMPLES = \
 EXTRA_DIST = $(SAMPLES)
 
 install-data-hook:
-	[ ! -e "$(DESTDIR)$(samplesdir)" ] && mkdir "$(DESTDIR)$(samplesdir)"; \
+	[ ! -e "$(DESTDIR)$(samplesdir)" ] && $(top_srcdir)/install-sh -d "$(DESTDIR)$(samplesdir)"; \
 	for dir in $(SAMPLES); do \
 		[ ! -e "$(DESTDIR)$(samplesdir)/$$dir" ] && \
-			mkdir "$(DESTDIR)$(samplesdir)/$$dir"; \
+			$(top_srcdir)/install-sh -d "$(DESTDIR)$(samplesdir)/$$dir"; \
 		for file in "$$dir"/*; do \
 			if [ -f "$$file" ]; then \
 				$(INSTALL_DATA) "$$file" "$(DESTDIR)$(samplesdir)/$$dir"; \
 			elif [ -d "$$file" ]; then \
 				[ ! -e "$(DESTDIR)$(samplesdir)/$$file" ] && \
-					mkdir "$(DESTDIR)$(samplesdir)/$$file"; \
+					$(top_srcdir)/install-sh -d "$(DESTDIR)$(samplesdir)/$$file"; \
 				for file in "$$file"/*; do \
 					$(INSTALL_DATA) "$$file" "$(DESTDIR)$(samplesdir)/$$file"; \
 				done; \
