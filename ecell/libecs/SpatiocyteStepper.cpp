@@ -44,7 +44,19 @@
 #include "SpatiocyteProcessInterface.hpp"
 #include "ReactionProcessInterface.hpp"
 
-LIBECS_DM_INIT(SpatiocyteStepper, Stepper);
+
+#ifdef HAVE_CONFIG_H
+#include "ecell_config.h"
+#endif /* HAVE_CONFIG_H */
+
+#include "Model.hpp"
+
+#include "SpatiocyteStepper.hpp"
+
+namespace libecs
+{
+
+LIBECS_DM_INIT_STATIC(SpatiocyteStepper, Stepper);
 
 void SpatiocyteStepper::initialize()
 {
