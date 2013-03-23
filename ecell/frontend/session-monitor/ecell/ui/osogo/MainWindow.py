@@ -832,7 +832,7 @@ class MainWindow(OsogoWindow):
         # updates time
         aTime = self.theSession.getCurrentTime()
         self.theCurrentTime = aTime
-        self['time_entry'].set_text( str( self.theCurrentTime ) if ( aTime == aTime ) else '' )  #Check NaN
+        self['time_entry'].set_text( not math.isnan( aTime ) and str( self.theCurrentTime ) or '' )
         self['sec_step_entry'].set_text( str( self.theStepSizeOrSec ) )
 
         if ( self.SimulationButton.getCurrentState() == 'run' and
