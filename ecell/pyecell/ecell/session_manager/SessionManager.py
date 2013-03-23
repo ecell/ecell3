@@ -856,7 +856,7 @@ class SessionManager( object ):
         self.__theSystemProxy.getSessionProxy( jobid ).clear()
 
     def clearAllSessionProxies( self ):
-        for job in list(self.getSessionProxies()):
+        for job in list( self.getSessionProxies() ):
             job.clear()
 
     def clearRunningSessionProxies( self ):
@@ -873,13 +873,13 @@ class SessionManager( object ):
         for job in self.getErrorSessionProxyList():
             job.clear()
 
-    def clearFinishedSessionProxys( self ):
+    def clearFinishedSessionProxies( self ):
         '''remove finished jobs
 
         Return None
         '''
         # delete AbstractSessionProxy instance whose status is FINISHED
-        for job in self.getFinishedSessionProxyList():
+        for job in list( self.getFinishedSessionProxyList() ):
             job.clear()
 
     def update( self ):
