@@ -349,6 +349,7 @@ class PropertyWindow(OsogoPluginWindow):
                 self.setSelectedFullPN( aFullPN )
             else:
                 self['entryClassName'].set_text( "" )
+                self['entryClassName'].set_max_length(0)
                 self['entryFullID'].set_text( "" )
                 self['entryName'].set_text( "" )
 
@@ -637,11 +638,9 @@ class PropertyWindow(OsogoPluginWindow):
                     return None
 
 
-        aFullPNString = createFullPNString(self.theSelectedFullPN)
-
         try:
             self.theSession.setEntityProperty( self.theSelectedFullPN, aValue ) 
-            lockCursor = self.lockCursor
+            self.theSession.updateWindows()
             self.lockCursor = True
             self['theTreeView'].get_selection().select_iter( anIter )
             self.lockCursor = False

@@ -174,7 +174,7 @@ class MainWindow(OsogoWindow):
         self.isStarted = False
         self.timerVisible = False
         self.theLastTime = 0
-        self.theLastRealTime = 0                
+        self.theLastRealTime = 0
         self.updateCount = 0
 
         # initialize Indicator
@@ -832,7 +832,7 @@ class MainWindow(OsogoWindow):
         # updates time
         aTime = self.theSession.getCurrentTime()
         self.theCurrentTime = aTime
-        self['time_entry'].set_text( str( self.theCurrentTime ) )
+        self['time_entry'].set_text( str( self.theCurrentTime ) if ( aTime == aTime ) else '' )  #Check NaN
         self['sec_step_entry'].set_text( str( self.theStepSizeOrSec ) )
 
         if ( self.SimulationButton.getCurrentState() == 'run' and
