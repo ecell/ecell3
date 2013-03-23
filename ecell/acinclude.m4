@@ -347,3 +347,11 @@ AC_DEFUN([ECELL_CHECK_BOOST_SPIRIT], [
   )
 ])
 
+AC_DEFUN([ECELL_CHECK_HDF5_CPP], [
+  AC_CHECK_HEADER([H5Cpp.h], [
+    AC_DEFINE(HAVE_HDF5_CPP, 1, [Define to 1 if HDF5 C++ library is installed])
+    ifelse([$1], [],, [$1])
+  ], [
+    ifelse([$2], [],, [$2])
+  ])
+])
