@@ -56,43 +56,27 @@
 #include "System.hpp"
 #include "Variable.hpp"
 
-#include "CompartmentGrowthProcess.hpp"
-#include "CompartmentProcess.hpp"
+// spatiocyte hpps
 #include "CoordinateLogProcess.hpp"
 #include "DiffusionInfluencedReactionProcess.hpp"
-#include "DiffusionInfluencedReactionProcessInterface.hpp"
 #include "DiffusionProcess.hpp"
 #include "ErythrocyteProcess.hpp"
-#include "H5Support.hpp"
 #include "HistogramLogProcess.hpp"
 #include "IteratingLogProcess.hpp"
 #include "MassActionProcess.hpp"
 #include "MicroscopyTrackingProcess.hpp"
 #include "MicrotubuleProcess.hpp"
-#include "MoleculeLogProcess.hpp"
 #include "MoleculePopulateProcess.hpp"
-#include "MoleculePopulateProcessInterface.hpp"
 #include "OscillationAnalysisProcess.hpp"
-#include "Packer.hpp"
 #include "PeriodicBoundaryDiffusionProcess.hpp"
 #include "PolymerFragmentationProcess.hpp"
 #include "PolymerizationParameterProcess.hpp"
 #include "PolymerizationProcess.hpp"
-#include "PriorityQueue.hpp"
 #include "ReactionProcess.hpp"
-#include "ReactionProcessInterface.hpp"
-#include "SpatiocyteCommon.hpp"
 #include "SpatiocyteNextReactionProcess.hpp"
-#include "SpatiocytePolymer.hpp"
 #include "SpatiocyteProcess.hpp"
-#include "SpatiocyteProcessInterface.hpp"
-#include "SpatiocyteSpecies.hpp"
 #include "SpatiocyteStepper.hpp"
-//#include "SpatiocyteVisualizer.hpp"
-#include "Species.hpp"
 #include "TagProcess.hpp"
-#include "Thread.hpp"
-#include "Vector.hpp"
 #include "VisualizationLogProcess.hpp"
 
 namespace libecs
@@ -531,43 +515,27 @@ void Model::registerBuiltinModules()
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, System );
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, Variable );
 
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, CompartmentGrowthProcess );
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, CompartmentProcess );
+    // spatiocyte dms in shimo-branch
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, CoordinateLogProcess );
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, DiffusionInfluencedReactionProcess);
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, DiffusionInfluencedReactionProcessInterface);
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, DiffusionProcess);
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, ErythrocyteProcess);
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, H5Support);
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, HistogramLogProcess);
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, IteratingLogProcess);
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, MassActionProcess);
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, MicroscopyTrackingProcess);
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, MicrotubuleProcess);
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, MoleculeLogProcess);
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, MoleculePopulateProcess);
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, MoleculePopulateProcessInterface);
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, OscillationAnalysisProcess);
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, Packer);
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, PeriodicBoundaryDiffusionProcess);
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, PolymerFragmentationProcess);
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, PolymerizationParameterProcess);
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, PolymerizationProcess);
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, PriorityQueue );
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, ReactionProcess );
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, ReactionProcessInterface );
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, SpatiocyteCommon );
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, SpatiocyteNextReactionProcess );
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, SpatiocytePolymer );
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, SpatiocyteProcess );
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, SpatiocyteProcessInterface );
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, SpatiocyteSpecies );
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, SpatiocyteStepper );
-//    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, SpatiocyteVisualizer );
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, Species );
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, TagProcess );
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, Thread );
-    DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, Vector );
     DM_NEW_STATIC( &theEcsObjectMaker, EcsObject, VisualizationLogProcess );
 }
 
