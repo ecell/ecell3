@@ -873,7 +873,7 @@ class SessionManager( object ):
         for job in self.getErrorSessionProxyList():
             job.clear()
 
-    def clearFinishedSessionProxys( self ):
+    def clearFinishedSessionProxies( self ):
         '''remove finished jobs
 
         Return None
