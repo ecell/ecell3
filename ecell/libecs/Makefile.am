@@ -52,7 +52,8 @@ PhysicalLogger.cpp\
 VariableReference.cpp\
 LoggerBroker.cpp\
 Exceptions.cpp\
-StepperEvent.cpp
+StepperEvent.cpp \
+SpatiocyteStepper.cpp
 
 
 libecsdir=$(ECELL_INCLUDE_DIR)/libecs
@@ -100,7 +101,8 @@ EcsObjectMaker.hpp\
 PropertySlotProxyLoggerAdapter.hpp\
 PropertyAttributes.hpp\
 Handle.hpp\
-RealMath.hpp
+RealMath.hpp\
+SpatiocyteStepper.cpp
 
 noinst_HEADERS=\
 osif.h\
