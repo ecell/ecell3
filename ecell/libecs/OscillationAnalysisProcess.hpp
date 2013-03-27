@@ -37,6 +37,9 @@
 #include "SpatiocyteProcess.hpp"
 #include "SpatiocyteSpecies.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(OscillationAnalysisProcess, SpatiocyteProcess)
 { 
 public:
@@ -173,5 +176,7 @@ protected:
   Species* minE;
   Point theCenterPoint;
 };
+
+}
 
 #endif /* __OscillationAnalysisProcess_hpp */

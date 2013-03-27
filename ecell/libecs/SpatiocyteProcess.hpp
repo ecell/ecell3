@@ -38,6 +38,9 @@
 #include "SpatiocyteStepper.hpp"
 #include "SpatiocyteProcessInterface.hpp"
 
+namespace libecs
+{
+
 class ReactionProcess;
 
 LIBECS_DM_CLASS_EXTRA_1(SpatiocyteProcess, Process, virtual SpatiocyteProcessInterface)
@@ -235,5 +238,7 @@ protected:
   VariableReferenceVector theZeroVariableReferences;
   VariableReferenceVector theSortedVariableReferences;
 };
+
+}
 
 #endif /* __SpatiocyteProcess_hpp */

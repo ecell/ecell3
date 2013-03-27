@@ -30,6 +30,9 @@
 
 #include "ErythrocyteProcess.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_INIT(ErythrocyteProcess, Process); 
 
 void ErythrocyteProcess::initializeThird()
@@ -266,3 +269,4 @@ void ErythrocyteProcess::rotatePointAlongVector(Point& D, Point& P, Point& T,
   T.z = zz;
 }
 
+}

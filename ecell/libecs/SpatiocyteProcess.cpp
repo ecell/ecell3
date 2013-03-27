@@ -31,6 +31,9 @@
 #include "SpatiocyteProcess.hpp"
 #include "SpatiocyteSpecies.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_INIT(SpatiocyteProcess, Process);
 
 String SpatiocyteProcess::getIDString(Voxel* aVoxel) const
@@ -62,4 +65,6 @@ String SpatiocyteProcess::getIDString(unsigned int id) const
   Variable* aVariable(theSpecies[id]->getVariable());
   return "["+aVariable->getSystemPath().asString()+":"+
     aVariable->getID()+"]["+int2str(id)+"]";
+}
+
 }

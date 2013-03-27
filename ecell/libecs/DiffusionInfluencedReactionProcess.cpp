@@ -31,6 +31,9 @@
 #include "DiffusionInfluencedReactionProcess.hpp"
 #include "SpatiocyteSpecies.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_INIT(DiffusionInfluencedReactionProcess, Process);
 
 void DiffusionInfluencedReactionProcess::checkSubstrates()
@@ -437,7 +440,7 @@ void DiffusionInfluencedReactionProcess::printParameters()
     ", p_B=" << B->getReactionProbability(A->getID()) << std::endl; 
 }
 
-
+}
     
       
 

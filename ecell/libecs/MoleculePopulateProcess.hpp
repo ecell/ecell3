@@ -35,6 +35,9 @@
 #include "SpatiocyteProcess.hpp"
 #include "MoleculePopulateProcessInterface.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS_EXTRA_1(MoleculePopulateProcess, SpatiocyteProcess, MoleculePopulateProcessInterface)
 { 
 public:
@@ -105,5 +108,7 @@ protected:
   double UniformRadiusY;
   double UniformRadiusZ;
 };
+
+}
 
 #endif /* __MoleculePopulateProcess_hpp */

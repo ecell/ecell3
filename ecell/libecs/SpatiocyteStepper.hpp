@@ -35,6 +35,9 @@
 #include <libecs/Stepper.hpp>
 #include "SpatiocyteCommon.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(SpatiocyteStepper, Stepper)
 { 
 public: 
@@ -209,6 +212,8 @@ private:
   std::vector<Voxel> theLattice;
   std::vector<Process*> theExternInterruptedProcesses;
 };
+
+}
 
 #endif /* __SpatiocyteStepper_hpp */
 

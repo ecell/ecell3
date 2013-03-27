@@ -37,6 +37,9 @@
 #include "SpatiocyteProcess.hpp"
 #include "SpatiocyteSpecies.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(MicrotubuleProcess, SpatiocyteProcess)
 { 
 public:
@@ -254,6 +257,8 @@ protected:
   std::vector<Species*> theKinesinSpecies;
   std::vector<unsigned int> occCoords;
 };
+
+}
 
 #endif /* __MicrotubuleProcess_hpp */
 

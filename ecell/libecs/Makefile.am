@@ -52,9 +52,26 @@ PhysicalLogger.cpp\
 VariableReference.cpp\
 LoggerBroker.cpp\
 Exceptions.cpp\
-StepperEvent.cpp \
-SpatiocyteStepper.cpp
-
+StepperEvent.cpp\
+SpatiocyteStepper.cpp\
+SpatiocyteProcess.cpp\
+MassActionProcess.cpp\
+ReactionProcess.cpp\
+VisualizationLogProcess.cpp\
+CompartmentProcess.cpp\
+ErythrocyteProcess.cpp\
+H5VisualizationLogProcess.cpp\
+IteratingLogProcess.cpp\
+DiffusionInfluencedReactionProcess.cpp\
+OscillationAnalysisProcess.cpp\
+SpatiocyteNextReactionProcess.cpp\
+MicroscopyTrackingProcess.cpp\
+CoordinateLogProcess.cpp\
+HistogramLogProcess.cpp\
+MoleculePopulateProcess.cpp\
+DiffusionProcess.cpp\
+TagProcess.cpp\
+PeriodicBoundaryDiffusionProcess.cpp
 
 libecsdir=$(ECELL_INCLUDE_DIR)/libecs
 libecs_HEADERS=\
@@ -102,7 +119,24 @@ PropertySlotProxyLoggerAdapter.hpp\
 PropertyAttributes.hpp\
 Handle.hpp\
 RealMath.hpp\
-SpatiocyteStepper.cpp
+CoordinateLogProcess.hpp\
+DiffusionInfluencedReactionProcess.hpp\
+DiffusionProcess.hpp\
+ErythrocyteProcess.hpp\
+HistogramLogProcess.hpp\
+IteratingLogProcess.hpp\
+MassActionProcess.hpp\
+MicroscopyTrackingProcess.hpp\
+MoleculePopulateProcess.hpp\
+OscillationAnalysisProcess.hpp\
+PeriodicBoundaryDiffusionProcess.hpp\
+ReactionProcess.hpp\
+SpatiocyteNextReactionProcess.hpp\
+SpatiocyteProcess.hpp\
+SpatiocyteStepper.hpp\
+TagProcess.hpp\
+VisualizationLogProcess.hpp\
+SpatiocyteSpecies.hpp
 
 noinst_HEADERS=\
 osif.h\

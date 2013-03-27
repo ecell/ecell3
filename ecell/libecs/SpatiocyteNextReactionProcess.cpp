@@ -32,6 +32,9 @@
 #include "SpatiocyteSpecies.hpp"
 #include "ReactionProcess.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_INIT(SpatiocyteNextReactionProcess, Process);
 
 void SpatiocyteNextReactionProcess::fire()
@@ -1217,4 +1220,4 @@ void SpatiocyteNextReactionProcess::calculateOrder()
     }
 }
 
-
+}

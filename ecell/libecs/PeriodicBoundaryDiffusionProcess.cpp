@@ -30,4 +30,9 @@
 
 #include "PeriodicBoundaryDiffusionProcess.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_INIT(PeriodicBoundaryDiffusionProcess, Process); 
+
+}

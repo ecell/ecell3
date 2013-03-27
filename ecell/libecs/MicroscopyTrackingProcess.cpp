@@ -30,6 +30,9 @@
 
 #include "MicroscopyTrackingProcess.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_INIT(MicroscopyTrackingProcess, Process); 
 
 void MicroscopyTrackingProcess::incSpeciesLatticeCount()
@@ -99,3 +102,4 @@ void MicroscopyTrackingProcess::logFluorescentSpecies()
     }
 }
 
+}

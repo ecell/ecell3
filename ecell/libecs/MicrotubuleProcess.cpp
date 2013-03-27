@@ -30,6 +30,9 @@
 
 #include "MicrotubuleProcess.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_INIT(MicrotubuleProcess, Process); 
 
 unsigned int MicrotubuleProcess::getLatticeResizeCoord(unsigned int aStartCoord)
@@ -523,6 +526,4 @@ void MicrotubuleProcess::rotatePointAlongVector(Point& S, double angle)
   S.z = zz;
 }
 
-
-
-
+}

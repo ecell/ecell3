@@ -30,6 +30,9 @@
 
 #include "MassActionProcess.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_INIT(MassActionProcess, Process); 
 
 void MassActionProcess::fire()
@@ -81,3 +84,4 @@ void MassActionProcess::fire()
     } 
 }
 
+}

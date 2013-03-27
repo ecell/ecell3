@@ -37,6 +37,9 @@
 #include "IteratingLogProcess.hpp"
 #include "SpatiocyteSpecies.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(CoordinateLogProcess, IteratingLogProcess)
 { 
 public:
@@ -116,5 +119,7 @@ private:
   double theMoleculeSize;
   unsigned int theStartCoord;
 };
+
+}
 
 #endif /* __CoordinateLogProcess_hpp */

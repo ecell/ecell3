@@ -37,6 +37,9 @@
 #include "SpatiocyteProcess.hpp"
 #include "SpatiocyteSpecies.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(DiffusionProcess, SpatiocyteProcess)
 { 
   typedef void (DiffusionProcess::*WalkMethod)(void) const;
@@ -213,6 +216,8 @@ protected:
   Species* theVacantSpecies;
   WalkMethod theWalkMethod;
 };
+
+}
 
 #endif /* __DiffusionProcess_hpp */
 

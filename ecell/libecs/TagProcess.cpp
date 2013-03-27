@@ -40,6 +40,9 @@
 #include "SpatiocyteSpecies.hpp"
 #include "SpatiocyteProcess.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_INIT(TagProcess, Process); 
 
 
@@ -171,4 +174,4 @@ void TagProcess::initializeFourth()
     }
 }
 
-
+}

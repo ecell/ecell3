@@ -30,6 +30,9 @@
 
 #include "OscillationAnalysisProcess.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_INIT(OscillationAnalysisProcess, Process); 
 
 void OscillationAnalysisProcess::testMembraneBinding()
@@ -180,3 +183,5 @@ void OscillationAnalysisProcess::testOscillation()
   prevRightSize = rightPositions.size();
   std::cout << "theTime:" << theTime << " left:" << leftPositions.size() << " right:" << rightPositions.size() << " current period:" << Period << " avg period:" << theTotalPeriod/theCycleCount << std::endl;
 }  
+
+}

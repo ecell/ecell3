@@ -37,6 +37,9 @@
 #include "SpatiocyteProcess.hpp"
 #include "SpatiocyteSpecies.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(VisualizationLogProcess, SpatiocyteProcess)
 { 
 public:
@@ -176,5 +179,7 @@ protected:
   std::vector<Species*> theLatticeSpecies;
   std::vector<Species*> theOffLatticeSpecies;
 };
+
+}
 
 #endif /* __VisualizationLogProcess_hpp */

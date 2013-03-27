@@ -35,6 +35,9 @@
 #include "VisualizationLogProcess.hpp"
 #include "SpatiocyteSpecies.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(MicroscopyTrackingProcess, VisualizationLogProcess)
 { 
 public:
@@ -193,5 +196,7 @@ protected:
   std::vector<std::vector<int> > theFreqLattice;
   std::vector<std::vector<int> > theLatticeSpeciesIndices;
 };
+
+}
 
 #endif /* __MicroscopyTrackingProcess_hpp */

@@ -35,6 +35,9 @@
 #include "ReactionProcess.hpp"
 #include "DiffusionInfluencedReactionProcessInterface.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS_EXTRA_1(DiffusionInfluencedReactionProcess, ReactionProcess, virtual DiffusionInfluencedReactionProcessInterface)
 { 
 public:
@@ -83,5 +86,7 @@ protected:
   double r_v;
   double V;
 };
+
+}
 
 #endif /* __DiffusionInfluencedReactionProcess_hpp */

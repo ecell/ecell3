@@ -34,6 +34,9 @@
 
 #include "DiffusionProcess.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(PeriodicBoundaryDiffusionProcess, DiffusionProcess)
 { 
 public:
@@ -71,5 +74,7 @@ public:
         }
     }
 };
+
+}
 
 #endif /* __PeriodicBoundaryDiffusionProcess_hpp */

@@ -34,6 +34,9 @@
 
 #include "SpatiocyteProcess.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(TagProcess, SpatiocyteProcess)
 { 
 public:
@@ -51,5 +54,7 @@ protected:
   std::vector<unsigned> theTaggedSizes;
   std::vector<Species*> theTaggedSpeciesList;
 };
+
+}
 
 #endif /* __TagProcess_hpp */

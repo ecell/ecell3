@@ -33,6 +33,9 @@
 #include "DiffusionInfluencedReactionProcess.hpp"
 #include "MoleculePopulateProcessInterface.hpp"
 
+namespace libecs
+{
+
 // The size of Coord must be 128 bytes to avoid cacheline splits
 // The Core 2 has 64-byte cacheline
 static double getDistance(Point* aSourcePoint, Point* aDestPoint)
@@ -1438,6 +1441,7 @@ private:
   std::vector<Voxel>& theLattice;
 };
 
+}
 
 #endif /* __SpatiocyteSpecies_hpp */
 

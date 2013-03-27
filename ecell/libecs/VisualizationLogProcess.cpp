@@ -30,6 +30,9 @@
 
 #include "VisualizationLogProcess.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_INIT(VisualizationLogProcess, Process); 
 
 void VisualizationLogProcess::initializeLog()
@@ -278,4 +281,6 @@ void VisualizationLogProcess::logCompVacant()
         }
     }
   theLogFile.write((char*)(&theLogMarker), sizeof(theLogMarker));
+}
+
 }

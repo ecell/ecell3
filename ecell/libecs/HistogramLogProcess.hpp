@@ -37,6 +37,8 @@
 #include "IteratingLogProcess.hpp"
 #include "SpatiocyteSpecies.hpp"
 
+namespace libecs{
+
 LIBECS_DM_CLASS(HistogramLogProcess, IteratingLogProcess)
 { 
 public:
@@ -111,5 +113,7 @@ protected:
   Comp* theComp;
   std::vector<std::vector<std::vector<double> > > theLogValues;
 };
+
+}
 
 #endif /* __HistogramLogProcess_hpp */

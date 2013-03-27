@@ -35,6 +35,9 @@
 #include "SpatiocyteProcess.hpp"
 #include "ReactionProcessInterface.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS_EXTRA_1(ReactionProcess, SpatiocyteProcess, ReactionProcessInterface)
 { 
 public:
@@ -238,5 +241,7 @@ protected:
   Voxel* moleculeS;
   std::vector<SpatiocyteProcess*> theInterruptedProcesses;
 };
+
+}
 
 #endif /* __ReactionProcess_hpp */

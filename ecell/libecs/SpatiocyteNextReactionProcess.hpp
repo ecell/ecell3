@@ -37,6 +37,9 @@
 #include <libecs/MethodProxy.hpp>
 #include "ReactionProcess.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(SpatiocyteNextReactionProcess, ReactionProcess)
 { 
   typedef MethodProxy<SpatiocyteNextReactionProcess, Real> RealMethodProxy; 
@@ -169,5 +172,7 @@ protected:
   RealMethodProxy theGetPropensityMethodPtr;  
   std::vector<Voxel*> moleculesA;
 };
+
+}
 
 #endif /* __SpatiocyteNextReactionProcess_hpp */

@@ -3075,3 +3075,4 @@ std::vector<Comp*> const& SpatiocyteStepper::getComps() const
   return theComps;
 }
 
+}

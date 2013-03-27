@@ -36,6 +36,9 @@
 #include "SpatiocyteStepper.hpp"
 #include "SpatiocyteCommon.hpp"
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(MassActionProcess, ContinuousProcess)
 { 
 public:
@@ -59,6 +62,8 @@ protected:
   double k;
   double theSpace;
 };
+
+}
 
 #endif /* __MassActionProcess_hpp */
 
