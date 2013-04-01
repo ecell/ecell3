@@ -2999,10 +2999,10 @@ void SpatiocyteStepper::populateComp(Comp* aComp)
     {
       THROW_EXCEPTION(ValueError, String(
                           getPropertyInterface().getClassName()) +
-                          "There are " + int2str(populationSize) + 
+                          "There are " + Species::int2str(populationSize) +
                           " total molecules that must be uniformly " +
                           "populated,\nbut there are only "
-                          + int2str(aComp->vacantSpecies->size()) + 
+                          + Species::int2str(aComp->vacantSpecies->size()) +
                           " vacant voxels of [" + 
                   aComp->vacantSpecies->getVariable()->getFullID().asString() +
                           "] that can be populated on.");

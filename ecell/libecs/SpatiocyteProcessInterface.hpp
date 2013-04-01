@@ -34,6 +34,9 @@
 
 #include "SpatiocyteCommon.hpp"
 
+namespace libecs
+{
+
 class SpatiocyteProcessInterface
 { 
 public:
@@ -59,5 +62,7 @@ public:
   virtual bool getIsPriorityQueued() = 0;
   virtual bool getIsExternInterrupted() = 0;
 };
+
+}
 
 #endif /* __SPATIOCYTEPROCESSINTERFACE_HPP */

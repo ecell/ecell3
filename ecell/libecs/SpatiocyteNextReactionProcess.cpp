@@ -35,7 +35,7 @@
 namespace libecs
 {
 
-LIBECS_DM_INIT(SpatiocyteNextReactionProcess, Process);
+LIBECS_DM_INIT_STATIC(SpatiocyteNextReactionProcess, Process);
 
 void SpatiocyteNextReactionProcess::fire()
 {

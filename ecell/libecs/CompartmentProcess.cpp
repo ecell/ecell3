@@ -31,10 +31,7 @@
 #include "CompartmentProcess.hpp"
 #include "Vector.hpp"
 
-namespace libecs
-{
-
-LIBECS_DM_INIT(CompartmentProcess, Process); 
+LIBECS_DM_INIT_STATIC(CompartmentProcess, Process);
 
 unsigned CompartmentProcess::getLatticeResizeCoord(unsigned aStartCoord)
 {
@@ -449,6 +446,4 @@ void CompartmentProcess::addNonIntersectInterfaceVoxel(Voxel& aVoxel,
             }
         }
     }
-}
-
 }

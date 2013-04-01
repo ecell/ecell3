@@ -43,7 +43,7 @@
 namespace libecs
 {
 
-LIBECS_DM_INIT(MoleculePopulateProcess, Process); 
+LIBECS_DM_INIT_STATIC(MoleculePopulateProcess, Process);
 
 
 void MoleculePopulateProcess::initialize()
@@ -154,10 +154,10 @@ void MoleculePopulateProcess::populateUniformOnDiffusiveVacant(Species*
               THROW_EXCEPTION(ValueError, String(
                               getPropertyInterface().getClassName()) +
                               "[" + getFullID().asString() + "]: There are " +
-                              int2str(aSize) + " " + getIDString(aSpecies) +
+                              Species::int2str(aSize) + " " + getIDString(aSpecies) +
                               " molecules that must be uniformly populated," +
                               "\nbut there are only " +
-                              int2str(aVacantSpecies->size()) + 
+                              Species::int2str(aVacantSpecies->size()) +
                               " diffuse vacant voxels of " +
                               getIDString(aSpecies->getVacantSpecies()) +
                               " that can be populated on.");
@@ -309,10 +309,10 @@ void MoleculePopulateProcess::populateUniformRanged(Species* aSpecies)
       THROW_EXCEPTION(ValueError, String(
                       getPropertyInterface().getClassName()) +
                       "[" + getFullID().asString() + "]: There are " +
-                      int2str(aSize) + " " + getIDString(aSpecies) +
+                      Species::int2str(aSize) + " " + getIDString(aSpecies) +
                       " molecules that must be uniformly populated in a " +
                       "given range,\n but there are only " +
-                      int2str(aCoords.size()) + " vacant voxels of " +
+                      Species::int2str(aCoords.size()) + " vacant voxels of " +
                       getIDString(aSpecies->getVacantSpecies()) +
                       " that can be populated.");
     }

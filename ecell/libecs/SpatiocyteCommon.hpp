@@ -39,6 +39,9 @@
 #include <libecs/FullID.hpp>
 #include "PriorityQueue.hpp"
 
+namespace libecs
+{
+
 class SpatiocyteProcessInterface;
 class Species;
 struct Subunit;
@@ -170,6 +173,8 @@ struct Comp
   std::vector<unsigned int> adjoinCount;
 };
 
+
+
 //id by default is 0, it is only has non-zero value when a GFP is explicitly
 //tagged:
 struct Tag
@@ -223,5 +228,7 @@ struct Subunit
   //so there can be duplicates of contPoints
   std::vector<int> contPointSize;
 };
+
+}
 
 #endif /* __SpatiocyteCommon_hpp */

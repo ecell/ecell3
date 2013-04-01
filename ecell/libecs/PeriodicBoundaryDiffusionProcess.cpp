@@ -33,6 +33,6 @@
 namespace libecs
 {
 
-LIBECS_DM_INIT(PeriodicBoundaryDiffusionProcess, Process); 
+LIBECS_DM_INIT_STATIC(PeriodicBoundaryDiffusionProcess, Process);
 
 }

@@ -33,7 +33,7 @@
 namespace libecs
 {
 
-LIBECS_DM_INIT(OscillationAnalysisProcess, Process); 
+LIBECS_DM_INIT_STATIC(OscillationAnalysisProcess, Process);
 
 void OscillationAnalysisProcess::testMembraneBinding()
 {

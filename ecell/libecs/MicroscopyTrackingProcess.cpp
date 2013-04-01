@@ -33,7 +33,7 @@
 namespace libecs
 {
 
-LIBECS_DM_INIT(MicroscopyTrackingProcess, Process); 
+LIBECS_DM_INIT_STATIC(MicroscopyTrackingProcess, Process);
 
 void MicroscopyTrackingProcess::incSpeciesLatticeCount()
 {

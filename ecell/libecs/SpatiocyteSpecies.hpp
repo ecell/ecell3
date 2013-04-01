@@ -33,8 +33,11 @@
 #include "DiffusionInfluencedReactionProcess.hpp"
 #include "MoleculePopulateProcessInterface.hpp"
 
+
 namespace libecs
 {
+
+using namespace libecs;
 
 // The size of Coord must be 128 bytes to avoid cacheline splits
 // The Core 2 has 64-byte cacheline
@@ -45,12 +48,6 @@ static double getDistance(Point* aSourcePoint, Point* aDestPoint)
               pow(aDestPoint->z-aSourcePoint->z, 2));
 }
 
-String int2str(int anInt)
-{
-  std::stringstream aStream;
-  aStream << anInt;
-  return aStream.str();
-}
 
 /*
  * isVacant: vacant species definition: a species on which other species can
@@ -141,6 +138,14 @@ public:
       theNullTag.origin = theNullCoord;
       theNullTag.id = theNullID;
     }
+
+static String int2str(int anInt)
+{
+  std::stringstream aStream;
+  aStream << anInt;
+  return aStream.str();
+}
+
   void setDiffusionInfluencedReaction(
                                     DiffusionInfluencedReactionProcess*
                                       aReaction, int anID, double aProbability)
@@ -1444,4 +1449,3 @@ private:
 }
 
 #endif /* __SpatiocyteSpecies_hpp */
-
