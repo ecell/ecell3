@@ -121,6 +121,7 @@ Handle.hpp\
 RealMath.hpp\
 CoordinateLogProcess.hpp\
 DiffusionInfluencedReactionProcess.hpp\
+DiffusionInfluencedReactionProcessInterface.hpp\
 DiffusionProcess.hpp\
 ErythrocyteProcess.hpp\
 HistogramLogProcess.hpp\
@@ -128,11 +129,16 @@ IteratingLogProcess.hpp\
 MassActionProcess.hpp\
 MicroscopyTrackingProcess.hpp\
 MoleculePopulateProcess.hpp\
+MoleculePopulateProcessInterface.hpp\
 OscillationAnalysisProcess.hpp\
 PeriodicBoundaryDiffusionProcess.hpp\
+PriorityQueue.hpp\
 ReactionProcess.hpp\
+ReactionProcessInterface.hpp\
+SpatiocyteCommon.hpp\
 SpatiocyteNextReactionProcess.hpp\
 SpatiocyteProcess.hpp\
+SpatiocyteProcessInterface.hpp\
 SpatiocyteStepper.hpp\
 TagProcess.hpp\
 VisualizationLogProcess.hpp\
