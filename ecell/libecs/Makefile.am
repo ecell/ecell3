@@ -17,7 +17,9 @@ lib_LTLIBRARIES = libecs.la
 
 AM_CXXFLAGS = $(CXXFLAGS)
 
-libecs_la_LDFLAGS= -version-info 2:0:0 -no-undefined
+HDF5_LDFLAGS = @HDF5_LDFLAGS@
+
+libecs_la_LDFLAGS= -version-info 2:0:0 -no-undefined $(HDF5_LDFLAGS)
 libecs_la_LIBADD=  $(LIBLTDL) $(GSL_LIBADD) scripting/libecs-scripting.la
 libecs_la_SOURCES=\
 libecs.cpp\
