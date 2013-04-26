@@ -4,7 +4,7 @@ Release notes for E-Cell Simulation Environment Version 3 (E-Cell SE 3)
 
 Koichi Takahashi <shafi@e-cell.org>
 
-"!https://travis-ci.org/ecell/ecell3.png!":https://travis-ci.org/ecell/ecell3
+|build-status|
 
 What is E-Cell System?
 ======================
@@ -336,6 +336,12 @@ every condition of the respective licenses.
   The website for this software is located at:
 
      http://php.iupui.edu/~mmiller3/python/
+
+.. Build status badge
+.. |build-status|
+   image:: https://secure.travis-ci.org/ecell/ecell3.png
+   :target: http://travis-ci.org/ecell/ecell3
+   :alt: Build Status
 
 $Id$
 
