@@ -4,6 +4,8 @@ Release notes for E-Cell Simulation Environment Version 3 (E-Cell SE 3)
 
 Koichi Takahashi <shafi@e-cell.org>
 
+"!https://travis-ci.org/ecell/ecell3.png!":https://travis-ci.org/ecell/ecell3
+
 What is E-Cell System?
 ======================
 E-Cell is a generic software package for cellular modeling and simulation.  
