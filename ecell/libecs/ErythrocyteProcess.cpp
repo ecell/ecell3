@@ -30,7 +30,7 @@
 
 #include <ErythrocyteProcess.hpp>
 
-LIBECS_DM_INIT(ErythrocyteProcess, Process); 
+LIBECS_DM_INIT_STATIC(ErythrocyteProcess, Process); 
 
 void ErythrocyteProcess::initializeThird()
 {

@@ -35,6 +35,9 @@
 #include <RandomLib/Random.hpp>
 #include <SpatiocyteCommon.hpp>
 
+namespace libecs
+{
+
 class ReactionProcess;
 
 class SpatiocyteProcessInterface
@@ -73,5 +76,7 @@ public:
   virtual bool isDependentOnPre(const ReactionProcess*) = 0;
   virtual bool isDependentOnPost(const ReactionProcess*) = 0;
 };
+
+}
 
 #endif /* __SPATIOCYTEPROCESSINTERFACE_HPP */

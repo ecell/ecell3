@@ -31,7 +31,7 @@
 #include <DiffusionInfluencedReactionProcess.hpp>
 #include <SpatiocyteSpecies.hpp>
 
-LIBECS_DM_INIT(DiffusionInfluencedReactionProcess, Process);
+LIBECS_DM_INIT_STATIC(DiffusionInfluencedReactionProcess, Process);
 
 void DiffusionInfluencedReactionProcess::checkSubstrates()
 {

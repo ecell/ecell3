@@ -40,7 +40,7 @@
 #include <SpatiocyteSpecies.hpp>
 #include <SpatiocyteProcess.hpp>
 
-LIBECS_DM_INIT(TagProcess, Process); 
+LIBECS_DM_INIT_STATIC(TagProcess, Process); 
 
 
 void TagProcess::initialize()
@@ -153,8 +153,8 @@ void TagProcess::initializeFourth()
                           "[" + getFullID().asString() + "]: The number of " +
                           "available molecules of the tagged species " +
                           getIDString(aSpecies) + " is " + 
-                          int2str(anAvailableSize) + ", but there are " + 
-                          int2str(theTaggedSizes[i]) + " molecules that must " +
+                          Species::int2str(anAvailableSize) + ", but there are " + 
+                          Species::int2str(theTaggedSizes[i]) + " molecules that must " +
                           "be tagged by the tag species " +
                           getIDString(theTagSpecies) + ". Please increase " +
                           "the molecule number of tagged species or reduce " +

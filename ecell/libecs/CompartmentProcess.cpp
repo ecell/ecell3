@@ -31,7 +31,7 @@
 #include <CompartmentProcess.hpp>
 #include <SpatiocyteVector.hpp>
 
-LIBECS_DM_INIT(CompartmentProcess, Process); 
+LIBECS_DM_INIT_STATIC(CompartmentProcess, Process); 
 
 unsigned CompartmentProcess::getLatticeResizeCoord(unsigned aStartCoord)
 {

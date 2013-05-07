@@ -30,7 +30,7 @@
 
 #include <VisualizationLogProcess.hpp>
 
-LIBECS_DM_INIT(VisualizationLogProcess, Process); 
+LIBECS_DM_INIT_STATIC(VisualizationLogProcess, Process); 
 
 void VisualizationLogProcess::initializeLog()
 {

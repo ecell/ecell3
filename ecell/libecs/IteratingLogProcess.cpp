@@ -280,4 +280,4 @@ void IteratingLogProcess::logValues()
 }
 
 
-LIBECS_DM_INIT(IteratingLogProcess, Process); 
+LIBECS_DM_INIT_STATIC(IteratingLogProcess, Process); 

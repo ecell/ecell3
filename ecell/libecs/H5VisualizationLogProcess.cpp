@@ -424,4 +424,4 @@ void H5VisualizationLogProcess::logSpecies()
     }
 }
 
-LIBECS_DM_INIT(H5VisualizationLogProcess, Process); 
+LIBECS_DM_INIT_STATIC(H5VisualizationLogProcess, Process); 

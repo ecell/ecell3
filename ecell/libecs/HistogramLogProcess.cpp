@@ -289,4 +289,4 @@ bool HistogramLogProcess::isInside(unsigned int& bin, Point N)
   return true;
 }
 
-LIBECS_DM_INIT(HistogramLogProcess, Process); 
+LIBECS_DM_INIT_STATIC(HistogramLogProcess, Process); 

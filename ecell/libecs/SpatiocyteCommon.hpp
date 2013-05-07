@@ -39,6 +39,9 @@
 #include <libecs/FullID.hpp>
 #include <PriorityQueue.hpp>
 
+namespace libecs
+{
+
 class SpatiocyteProcessInterface;
 class Species;
 //struct Subunit;
@@ -232,5 +235,7 @@ struct Subunit
   std::vector<int> contPointSize;
 };
 */
+
+}
 
 #endif /* __SpatiocyteCommon_hpp */

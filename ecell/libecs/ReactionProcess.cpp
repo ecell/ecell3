@@ -30,7 +30,7 @@
 
 #include <ReactionProcess.hpp>
 
-LIBECS_DM_INIT(ReactionProcess, Process);
+LIBECS_DM_INIT_STATIC(ReactionProcess, Process);
 
 void ReactionProcess::calculateOrder()
 { 

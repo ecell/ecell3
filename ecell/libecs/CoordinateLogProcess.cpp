@@ -30,4 +30,4 @@
 
 #include <CoordinateLogProcess.hpp>
 
-LIBECS_DM_INIT(CoordinateLogProcess, Process); 
+LIBECS_DM_INIT_STATIC(CoordinateLogProcess, Process); 

@@ -31,7 +31,7 @@
 #include <MassActionProcess.hpp>
 #include <SpatiocyteSpecies.hpp>
 
-LIBECS_DM_INIT(MassActionProcess, Process); 
+LIBECS_DM_INIT_STATIC(MassActionProcess, Process); 
 
 void MassActionProcess::fire()
 { 
