@@ -30,6 +30,9 @@
 
 #include <MicrotubuleProcess.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_INIT(MicrotubuleProcess, Process); 
 
 unsigned MicrotubuleProcess::getLatticeResizeCoord(unsigned aStartCoord)
@@ -269,3 +272,4 @@ void MicrotubuleProcess::addPlaneIntersectInterfaceVoxel(Voxel& aVoxel,
     }
 }
 
+}

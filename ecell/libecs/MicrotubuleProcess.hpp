@@ -36,6 +36,9 @@
 #include <CompartmentProcess.hpp>
 #include <SpatiocyteSpecies.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(MicrotubuleProcess, CompartmentProcess)
 { 
 public:
@@ -232,6 +235,8 @@ protected:
   Species* thePlusSpecies;
   std::vector<Species*> theKinesinSpecies;
 };
+
+}
 
 #endif /* __MicrotubuleProcess_hpp */
 

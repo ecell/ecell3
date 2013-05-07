@@ -30,4 +30,9 @@
 
 #include <CoordinateLogProcess.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_INIT_STATIC(CoordinateLogProcess, Process); 
+
+}

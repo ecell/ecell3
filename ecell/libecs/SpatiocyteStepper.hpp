@@ -37,6 +37,9 @@
 #include <SpatiocyteCommon.hpp>
 #include <SpatiocyteDebug.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(SpatiocyteStepper, Stepper)
 { 
 public: 
@@ -230,6 +233,8 @@ private:
   RandomLib::Random theRan;
   std::vector<SpatiocyteProcessInterface*> theInterruptedProcesses;
 };
+
+}
 
 #endif /* __SpatiocyteStepper_hpp */
 

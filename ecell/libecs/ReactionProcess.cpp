@@ -30,6 +30,9 @@
 
 #include <ReactionProcess.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_INIT_STATIC(ReactionProcess, Process);
 
 void ReactionProcess::calculateOrder()
@@ -129,3 +132,4 @@ void ReactionProcess::calculateOrder()
     }
 } 
 
+}

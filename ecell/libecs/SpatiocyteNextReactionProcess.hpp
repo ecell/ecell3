@@ -36,6 +36,9 @@
 #include <sstream>
 #include <ReactionProcess.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(SpatiocyteNextReactionProcess, ReactionProcess)
 { 
   typedef double (SpatiocyteNextReactionProcess::*PropensityMethod)(void); 
@@ -190,5 +193,7 @@ protected:
   PropensityMethod thePropensityMethod;  
   std::vector<Voxel*> moleculesA;
 };
+
+}
 
 #endif /* __SpatiocyteNextReactionProcess_hpp */

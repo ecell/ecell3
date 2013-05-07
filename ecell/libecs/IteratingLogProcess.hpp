@@ -38,6 +38,9 @@
 #include <ReactionProcess.hpp>
 #include <SpatiocyteSpecies.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(IteratingLogProcess, SpatiocyteProcess)
 { 
 public:
@@ -165,5 +168,7 @@ protected:
   Comp* theComp;
   std::vector<std::vector<double> > theLogValues;
 };
+
+}
 
 #endif /* __IteratingLogProcess_hpp */

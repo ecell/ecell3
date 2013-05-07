@@ -35,6 +35,9 @@
 #include <SpatiocyteProcess.hpp>
 #include <SpatiocyteSpecies.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(ErythrocyteProcess, SpatiocyteProcess)
 {
 public:
@@ -133,6 +136,8 @@ protected:
   Comp* theComp;
   std::vector<unsigned int> filamentCoords;
 };
+
+}
 
 #endif /* __ErythrocyteProcess_hpp */
 

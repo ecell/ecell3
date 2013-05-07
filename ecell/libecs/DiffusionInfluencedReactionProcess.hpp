@@ -35,6 +35,9 @@
 #include <ReactionProcess.hpp>
 #include <DiffusionInfluencedReactionProcessInterface.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS_EXTRA_1(DiffusionInfluencedReactionProcess, ReactionProcess, virtual DiffusionInfluencedReactionProcessInterface)
 { 
   typedef void (DiffusionInfluencedReactionProcess::*Method)(Voxel*, Voxel*,
@@ -146,5 +149,7 @@ protected:
   double V;
   Method reactM;
 };
+
+}
 
 #endif /* __DiffusionInfluencedReactionProcess_hpp */

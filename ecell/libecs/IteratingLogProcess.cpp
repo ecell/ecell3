@@ -30,6 +30,9 @@
 
 #include <IteratingLogProcess.hpp>
 
+namespace libecs
+{
+
 void IteratingLogProcess::initializeFifth()
 {
   for(std::vector<Species*>::const_iterator i(theProcessSpecies.begin());
@@ -281,3 +284,5 @@ void IteratingLogProcess::logValues()
 
 
 LIBECS_DM_INIT_STATIC(IteratingLogProcess, Process); 
+
+}

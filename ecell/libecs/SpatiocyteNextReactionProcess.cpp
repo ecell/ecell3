@@ -32,6 +32,9 @@
 #include <SpatiocyteSpecies.hpp>
 #include <ReactionProcess.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_INIT_STATIC(SpatiocyteNextReactionProcess, Process);
 
 void SpatiocyteNextReactionProcess::fire()
@@ -1495,4 +1498,6 @@ void SpatiocyteNextReactionProcess::checkExternStepperInterrupted()
             }
         }
     }
+}
+
 }

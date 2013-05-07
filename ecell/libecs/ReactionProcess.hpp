@@ -35,6 +35,9 @@
 #include <SpatiocyteProcess.hpp>
 #include <ReactionProcessInterface.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS_EXTRA_1(ReactionProcess, SpatiocyteProcess, ReactionProcessInterface)
 { 
 public:
@@ -260,5 +263,7 @@ protected:
   std::vector<SpatiocyteProcessInterface*> theInterruptedProcessesPre;
   std::vector<SpatiocyteProcessInterface*> theInterruptedProcessesPost;
 };
+
+}
 
 #endif /* __ReactionProcess_hpp */

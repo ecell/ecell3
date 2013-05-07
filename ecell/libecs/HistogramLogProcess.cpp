@@ -30,6 +30,9 @@
 
 #include <HistogramLogProcess.hpp>
 
+namespace libecs
+{
+
 void HistogramLogProcess::initializeFifth()
 {
   for(std::vector<Species*>::const_iterator i(theProcessSpecies.begin());
@@ -290,3 +293,5 @@ bool HistogramLogProcess::isInside(unsigned int& bin, Point N)
 }
 
 LIBECS_DM_INIT_STATIC(HistogramLogProcess, Process); 
+
+}

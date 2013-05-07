@@ -40,6 +40,9 @@
 #include <SpatiocyteSpecies.hpp>
 #include <SpatiocyteProcess.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_INIT_STATIC(TagProcess, Process); 
 
 
@@ -174,4 +177,4 @@ void TagProcess::initializeFourth()
   theTagSpecies->setIsPopulated();
 }
 
-
+}

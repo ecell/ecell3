@@ -40,6 +40,9 @@
 #include <SpatiocyteSpecies.hpp>
 #include <SpatiocyteProcess.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_INIT_STATIC(MoleculePopulateProcess, Process); 
 
 
@@ -359,3 +362,4 @@ void MoleculePopulateProcess::populateUniformRanged(Species* aSpecies)
     }
 }
 
+}

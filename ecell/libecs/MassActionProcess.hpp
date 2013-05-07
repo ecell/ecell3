@@ -34,6 +34,9 @@
 
 #include <SpatiocyteNextReactionProcess.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(MassActionProcess, SpatiocyteNextReactionProcess)
 { 
 public:
@@ -57,6 +60,8 @@ public:
     }
   virtual void substrateValueChanged(double) {}
 };
+
+}
 
 #endif /* __MassActionProcess_hpp */
 

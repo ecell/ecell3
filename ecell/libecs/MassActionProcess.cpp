@@ -31,6 +31,9 @@
 #include <MassActionProcess.hpp>
 #include <SpatiocyteSpecies.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_INIT_STATIC(MassActionProcess, Process); 
 
 void MassActionProcess::fire()
@@ -92,4 +95,4 @@ void MassActionProcess::finalizeFire()
     */
 }
 
-
+}
