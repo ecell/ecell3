@@ -125,6 +125,15 @@ public:
     theLattice(aLattice),
     theSpecies(aSpeciesList) {}
   ~Species() {}
+
+      static String int2str(int anInt)
+      {
+	std::stringstream aStream;
+	aStream << anInt;
+	return aStream.str();
+      }
+
+
   void initialize(const int anAdjoiningCoordSize, const unsigned aNullCoord,
                   const unsigned aNullID)
     {
@@ -140,12 +149,6 @@ public:
       isMultiscaleBinderID.resize(speciesSize);
       isMultiscaleBoundID.resize(speciesSize);
 
-      String int2str(int anInt)
-      {
-	std::stringstream aStream;
-	aStream << anInt;
-	return aStream.str();
-      }
 
       for(unsigned i(0); i != speciesSize; ++i)
         {
@@ -3277,6 +3280,7 @@ private:
   std::vector<unsigned> theUnbindList;
 };
 
+}
 
 #endif /* __SpatiocyteSpecies_hpp */
 
