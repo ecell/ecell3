@@ -881,7 +881,7 @@ void SpatiocyteNextReactionProcess::preinitialize()
           const unsigned aDeoligomerIndex(i+1);
           Process* aProcess(SpatiocyteStepper::createProcess(
              getPropertyInterface().getClassName(),
-             String(getFullID().getID()+int2str(aDeoligomerIndex)),
+             String(getFullID().getID()+Species::int2str(aDeoligomerIndex)),
              getStepper()->getModel()->getSystem(getFullID().getSystemPath()),
              getStepper()->getModel()));
           aProcess->setStepper(getStepper());

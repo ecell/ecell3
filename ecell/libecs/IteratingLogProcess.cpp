@@ -162,7 +162,7 @@ void IteratingLogProcess::saveFile()
   unsigned aCompletedIterations(1);
   if(SeparateFiles)
     {
-      String aFileName(FileName+int2str(theFileCnt-1));
+      String aFileName(FileName+Species::int2str(theFileCnt-1));
       cout << "Saving data in: " << aFileName.c_str() << std::endl;
       theLogFile.open(aFileName.c_str(), std::ios::trunc);
     }

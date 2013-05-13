@@ -55,12 +55,12 @@ Exceptions.cpp\
 StepperEvent.cpp\
 SpatiocyteStepper.cpp\
 SpatiocyteProcess.cpp\
+SpatiocyteVector.cpp\
 MassActionProcess.cpp\
 ReactionProcess.cpp\
 VisualizationLogProcess.cpp\
 CompartmentProcess.cpp\
 ErythrocyteProcess.cpp\
-H5VisualizationLogProcess.cpp\
 IteratingLogProcess.cpp\
 DiffusionInfluencedReactionProcess.cpp\
 SpatiocyteNextReactionProcess.cpp\
