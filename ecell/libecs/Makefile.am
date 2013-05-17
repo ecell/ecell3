@@ -56,6 +56,7 @@ StepperEvent.cpp\
 SpatiocyteStepper.cpp\
 SpatiocyteProcess.cpp\
 SpatiocyteVector.cpp\
+SpatiocyteVisualizer.cpp\
 MassActionProcess.cpp\
 ReactionProcess.cpp\
 VisualizationLogProcess.cpp\
@@ -138,6 +139,7 @@ SpatiocyteNextReactionProcess.hpp\
 SpatiocyteProcess.hpp\
 SpatiocyteProcessInterface.hpp\
 SpatiocyteStepper.hpp\
+SpatiocyteVisualizer.hpp\
 TagProcess.hpp\
 VisualizationLogProcess.hpp\
 SpatiocyteSpecies.hpp
