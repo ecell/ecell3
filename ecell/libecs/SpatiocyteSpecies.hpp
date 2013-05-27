@@ -137,6 +137,11 @@ public:
   void initialize(const int anAdjoiningCoordSize, const unsigned aNullCoord,
                   const unsigned aNullID)
     {
+	  theZeroTag.origin = 0;
+	  theZeroTag.id = 0;
+	  theZeroTag.rotIndex = 0;
+	  theZeroTag.vacantIdx = 0;
+	  theZeroTag.boundCnt = 0;
       const unsigned speciesSize(theSpecies.size());
       theAdjoiningCoordSize = anAdjoiningCoordSize;
       theNullCoord = aNullCoord;
@@ -1453,12 +1458,11 @@ public:
       if(theMoleculeSize > theMolecules.size())
         {
           theMolecules.resize(theMoleculeSize);
-          Tag aTag{0, 0, 0, 0, 0};
-          theTags.push_back(aTag);
+          theTags.push_back(theZeroTag);
         }
       else
         {
-          theTags[theMoleculeSize-1] = {0, 0, 0, 0, 0};
+          theTags[theMoleculeSize-1] = theZeroTag;
         }
       theMolecules[theMoleculeSize-1] = aVoxel;
       theVariable->setValue(theMoleculeSize);
@@ -1470,12 +1474,11 @@ public:
       if(theMoleculeSize > theMolecules.size())
         {
           theMolecules.resize(theMoleculeSize);
-          Tag aTag{0, 0, 0, 0, 0};
-          theTags.push_back(aTag);
+          theTags.push_back(theZeroTag);
         }
       else
         {
-          theTags[theMoleculeSize-1] = {0, 0, 0, 0, 0};
+          theTags[theMoleculeSize-1] = theZeroTag;
         }
       theMolecules[theMoleculeSize-1] = aVoxel;
       theVariable->setValue(theMoleculeSize);
@@ -3235,6 +3238,7 @@ private:
   double theVoxelRadius;
   double theWalkProbability;
   double theWalkPropensity;
+  Tag theZeroTag;
   RandomLib::Random& theRng;
   Species* theVacantSpecies;
   Species* theMultiscaleVacantSpecies;
