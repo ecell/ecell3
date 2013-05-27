@@ -18,7 +18,7 @@ lib_LTLIBRARIES = libecs.la
 AM_CXXFLAGS = $(CXXFLAGS)
 
 libecs_la_LDFLAGS= -version-info 2:0:0 -no-undefined
-libecs_la_LIBADD=  $(LIBLTDL) $(GSL_LIBADD) scripting/libecs-scripting.la
+libecs_la_LIBADD=  $(LIBLTDL) $(GSL_LIBADD) scripting/libecs-scripting.la -lRandom
 libecs_la_SOURCES=\
 libecs.cpp\
 Util.cpp\
@@ -56,7 +56,6 @@ StepperEvent.cpp\
 SpatiocyteStepper.cpp\
 SpatiocyteProcess.cpp\
 SpatiocyteVector.cpp\
-SpatiocyteVisualizer.cpp\
 MassActionProcess.cpp\
 ReactionProcess.cpp\
 VisualizationLogProcess.cpp\
@@ -139,7 +138,6 @@ SpatiocyteNextReactionProcess.hpp\
 SpatiocyteProcess.hpp\
 SpatiocyteProcessInterface.hpp\
 SpatiocyteStepper.hpp\
-SpatiocyteVisualizer.hpp\
 TagProcess.hpp\
 VisualizationLogProcess.hpp\
 SpatiocyteSpecies.hpp
