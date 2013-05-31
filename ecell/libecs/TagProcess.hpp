@@ -32,7 +32,7 @@
 #ifndef __TagProcess_hpp
 #define __TagProcess_hpp
 
-#include <SpatiocyteProcess.hpp>
+#include <libecs/SpatiocyteProcess.hpp>
 
 namespace libecs
 {

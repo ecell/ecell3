@@ -33,8 +33,8 @@
 #define __MultiscaleReactionProcess_hpp
 
 #include <sstream>
-#include <DiffusionInfluencedReactionProcess.hpp>
-#include <SpatiocyteSpecies.hpp>
+#include <libecs/DiffusionInfluencedReactionProcess.hpp>
+#include <libecs/SpatiocyteSpecies.hpp>
 
 LIBECS_DM_CLASS(MultiscaleReactionProcess, DiffusionInfluencedReactionProcess)
 { 

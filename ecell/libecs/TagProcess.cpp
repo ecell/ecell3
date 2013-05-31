@@ -36,9 +36,9 @@
 #include <libecs/Stepper.hpp>
 #include <libecs/Process.hpp>
 #include <libecs/VariableReference.hpp>
-#include <TagProcess.hpp>
-#include <SpatiocyteSpecies.hpp>
-#include <SpatiocyteProcess.hpp>
+#include <libecs/TagProcess.hpp>
+#include <libecs/SpatiocyteSpecies.hpp>
+#include <libecs/SpatiocyteProcess.hpp>
 
 namespace libecs
 {

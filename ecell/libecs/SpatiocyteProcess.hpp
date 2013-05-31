@@ -34,9 +34,9 @@
 
 #include <libecs/Process.hpp>
 #include <libecs/Model.hpp>
-#include <SpatiocyteCommon.hpp>
-#include <SpatiocyteStepper.hpp>
-#include <SpatiocyteProcessInterface.hpp>
+#include <libecs/SpatiocyteCommon.hpp>
+#include <libecs/SpatiocyteStepper.hpp>
+#include <libecs/SpatiocyteProcessInterface.hpp>
 
 namespace libecs
 {

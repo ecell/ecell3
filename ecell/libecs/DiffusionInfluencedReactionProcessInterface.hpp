@@ -32,7 +32,7 @@
 #ifndef __DIFFUSIONINFLUENCEDREACTIONPROCESSINTERFACE_HPP
 #define __DIFFUSIONINFLUENCEDREACTIONPROCESSINTERFACE_HPP
 
-#include <ReactionProcessInterface.hpp>
+#include <libecs/ReactionProcessInterface.hpp>
 
 class DiffusionInfluencedReactionProcessInterface
 { 

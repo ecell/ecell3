@@ -70,7 +70,9 @@ HistogramLogProcess.cpp\
 MoleculePopulateProcess.cpp\
 DiffusionProcess.cpp\
 TagProcess.cpp\
-PeriodicBoundaryDiffusionProcess.cpp
+PeriodicBoundaryDiffusionProcess.cpp\
+SpatiocyteTauLeapProcess.hpp\
+SpatiocyteVisualizer.hpp
 
 libecsdir=$(ECELL_INCLUDE_DIR)/libecs
 libecs_HEADERS=\
@@ -140,7 +142,13 @@ SpatiocyteProcessInterface.hpp\
 SpatiocyteStepper.hpp\
 TagProcess.hpp\
 VisualizationLogProcess.hpp\
-SpatiocyteSpecies.hpp
+SpatiocyteSpecies.hpp\
+SpatiocyteVector.hpp\
+SpatiocyteTauLeapProcess.hpp\
+SpatiocyteVisualizer.hpp\
+SpatiocyteDebug.hpp
+
+
 
 noinst_HEADERS=\
 osif.h\

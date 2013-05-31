@@ -32,7 +32,7 @@
 #ifndef __SpatiocyteTauLeapProcess_hpp
 #define __SpatiocyteTauLeapProcess_hpp
 
-#include <SpatiocyteNextReactionProcess.hpp> 
+#include <libecs/SpatiocyteNextReactionProcess.hpp> 
 
 
 LIBECS_DM_CLASS(SpatiocyteTauLeapProcess, SpatiocyteNextReactionProcess)

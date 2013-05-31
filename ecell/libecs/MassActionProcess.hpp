@@ -32,7 +32,7 @@
 #ifndef __MassActionProcess_hpp
 #define __MassActionProcess_hpp
 
-#include <SpatiocyteNextReactionProcess.hpp>
+#include <libecs/SpatiocyteNextReactionProcess.hpp>
 
 namespace libecs
 {

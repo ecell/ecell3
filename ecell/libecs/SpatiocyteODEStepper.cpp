@@ -35,7 +35,7 @@
 #define GSL_RANGE_CHECK_OFF
 
 #include <libecs/Stepper.hpp>
-#include <SpatiocyteProcessInterface.hpp>
+#include <libecs/SpatiocyteProcessInterface.hpp>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_complex.h>
 #include <gsl/gsl_complex_math.h>

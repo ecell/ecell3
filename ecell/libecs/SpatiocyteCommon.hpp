@@ -37,7 +37,7 @@
 #include <math.h>
 #include <libecs/libecs.hpp>
 #include <libecs/FullID.hpp>
-#include <PriorityQueue.hpp>
+#include <libecs/PriorityQueue.hpp>
 #include <libecs/System.hpp>
 
 namespace libecs

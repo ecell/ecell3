@@ -28,7 +28,7 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#include <SpatiocyteVector.hpp>
+#include <libecs/SpatiocyteVector.hpp>
 
 namespace libecs
 {

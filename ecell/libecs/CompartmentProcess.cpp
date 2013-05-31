@@ -28,8 +28,8 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#include <CompartmentProcess.hpp>
-#include <SpatiocyteVector.hpp>
+#include <libecs/CompartmentProcess.hpp>
+#include <libecs/SpatiocyteVector.hpp>
 
 LIBECS_DM_INIT_STATIC(CompartmentProcess, Process); 
 

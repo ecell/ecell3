@@ -32,8 +32,8 @@
 #ifndef __ErythrocyteProcess_hpp
 #define __ErythrocyteProcess_hpp
 
-#include <SpatiocyteProcess.hpp>
-#include <SpatiocyteSpecies.hpp>
+#include <libecs/SpatiocyteProcess.hpp>
+#include <libecs/SpatiocyteSpecies.hpp>
 
 namespace libecs
 {

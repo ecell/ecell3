@@ -28,6 +28,6 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#include <RotationProcess.hpp>
+#include <libecs/RotationProcess.hpp>
 
 LIBECS_DM_INIT(RotationProcess, Process); 

@@ -26,13 +26,13 @@
 
 #include <sstream>
 #include <libecs/Variable.hpp>
-#include <SpatiocyteCommon.hpp>
-#include <SpatiocyteStepper.hpp>
-#include <SpatiocyteProcessInterface.hpp>
-#include <SpatiocyteNextReactionProcess.hpp>
-#include <DiffusionInfluencedReactionProcess.hpp>
-#include <MoleculePopulateProcessInterface.hpp>
-#include <SpatiocyteVector.hpp>
+#include <libecs/SpatiocyteCommon.hpp>
+#include <libecs/SpatiocyteStepper.hpp>
+#include <libecs/SpatiocyteProcessInterface.hpp>
+#include <libecs/SpatiocyteNextReactionProcess.hpp>
+#include <libecs/DiffusionInfluencedReactionProcess.hpp>
+#include <libecs/MoleculePopulateProcessInterface.hpp>
+#include <libecs/SpatiocyteVector.hpp>
 
 namespace libecs
 {

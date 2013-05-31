@@ -34,9 +34,9 @@
 
 #include <fstream>
 #include <math.h>
-#include <SpatiocyteProcess.hpp>
-#include <ReactionProcess.hpp>
-#include <SpatiocyteSpecies.hpp>
+#include <libecs/SpatiocyteProcess.hpp>
+#include <libecs/ReactionProcess.hpp>
+#include <libecs/SpatiocyteSpecies.hpp>
 
 namespace libecs
 {

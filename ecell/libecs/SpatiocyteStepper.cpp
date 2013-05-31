@@ -36,10 +36,10 @@
 #include <libecs/Process.hpp>
 #include <libecs/Stepper.hpp>
 #include <libecs/VariableReference.hpp>
-#include <SpatiocyteStepper.hpp>
-#include <SpatiocyteSpecies.hpp>
-#include <SpatiocyteProcessInterface.hpp>
-#include <ReactionProcessInterface.hpp>
+#include <libecs/SpatiocyteStepper.hpp>
+#include <libecs/SpatiocyteSpecies.hpp>
+#include <libecs/SpatiocyteProcessInterface.hpp>
+#include <libecs/ReactionProcessInterface.hpp>
 
 #ifdef HAVE_CONFIG_H
 #include "ecell_config.h"

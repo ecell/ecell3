@@ -53,7 +53,7 @@
 #include <gtkmm/ruler.h>
 #include <gtkmm/drawingarea.h>
 #include <netinet/in.h>
-#include <SpatiocyteVisualizer.hpp>
+#include <libecs/SpatiocyteVisualizer.hpp>
 
 namespace libecs
 {

@@ -34,8 +34,8 @@
 
 #include <libecs/Stepper.hpp>
 #include <RandomLib/Random.hpp>
-#include <SpatiocyteCommon.hpp>
-#include <SpatiocyteDebug.hpp>
+#include <libecs/SpatiocyteCommon.hpp>
+#include <libecs/SpatiocyteDebug.hpp>
 
 namespace libecs
 {

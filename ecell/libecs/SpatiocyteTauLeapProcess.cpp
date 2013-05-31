@@ -28,8 +28,8 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#include <SpatiocyteTauLeapProcess.hpp>
-#include <SpatiocyteSpecies.hpp>
+#include <libecs/SpatiocyteTauLeapProcess.hpp>
+#include <libecs/SpatiocyteSpecies.hpp>
 
 LIBECS_DM_INIT(SpatiocyteTauLeapProcess, Process); 
 

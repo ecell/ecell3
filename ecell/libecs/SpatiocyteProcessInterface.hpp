@@ -33,7 +33,7 @@
 #define __SPATIOCYTEPROCESSINTERFACE_HPP
 
 #include <RandomLib/Random.hpp>
-#include <SpatiocyteCommon.hpp>
+#include <libecs/SpatiocyteCommon.hpp>
 
 namespace libecs
 {

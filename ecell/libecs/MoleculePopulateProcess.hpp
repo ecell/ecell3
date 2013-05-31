@@ -32,8 +32,8 @@
 #ifndef __MoleculePopulateProcess_hpp
 #define __MoleculePopulateProcess_hpp
 
-#include <SpatiocyteProcess.hpp>
-#include <MoleculePopulateProcessInterface.hpp>
+#include <libecs/SpatiocyteProcess.hpp>
+#include <libecs/MoleculePopulateProcessInterface.hpp>
 
 namespace libecs
 {

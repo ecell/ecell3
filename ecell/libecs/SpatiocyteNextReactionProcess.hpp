@@ -34,7 +34,7 @@
 #define __SpatiocyteNextReactionProcess_hpp
 
 #include <sstream>
-#include <ReactionProcess.hpp>
+#include <libecs/ReactionProcess.hpp>
 
 namespace libecs
 {

@@ -33,8 +33,8 @@
 #define __MicrotubuleProcess_hpp
 
 #include <sstream>
-#include <CompartmentProcess.hpp>
-#include <SpatiocyteSpecies.hpp>
+#include <libecs/CompartmentProcess.hpp>
+#include <libecs/SpatiocyteSpecies.hpp>
 
 namespace libecs
 {

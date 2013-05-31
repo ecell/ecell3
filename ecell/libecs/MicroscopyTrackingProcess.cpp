@@ -28,7 +28,7 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#include <MicroscopyTrackingProcess.hpp>
+#include <libecs/MicroscopyTrackingProcess.hpp>
 
 namespace libecs
 {

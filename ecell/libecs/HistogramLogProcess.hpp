@@ -34,8 +34,8 @@
 
 #include <fstream>
 #include <math.h>
-#include <IteratingLogProcess.hpp>
-#include <SpatiocyteSpecies.hpp>
+#include <libecs/IteratingLogProcess.hpp>
+#include <libecs/SpatiocyteSpecies.hpp>
 
 namespace libecs
 {

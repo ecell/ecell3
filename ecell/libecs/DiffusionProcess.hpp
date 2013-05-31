@@ -33,8 +33,8 @@
 #define __DiffusionProcess_hpp
 
 #include <sstream>
-#include <SpatiocyteProcess.hpp>
-#include <SpatiocyteSpecies.hpp>
+#include <libecs/SpatiocyteProcess.hpp>
+#include <libecs/SpatiocyteSpecies.hpp>
 
 namespace libecs
 {

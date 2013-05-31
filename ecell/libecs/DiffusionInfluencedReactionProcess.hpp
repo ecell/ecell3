@@ -32,8 +32,8 @@
 #ifndef __DiffusionInfluencedReactionProcess_hpp
 #define __DiffusionInfluencedReactionProcess_hpp
 
-#include <ReactionProcess.hpp>
-#include <DiffusionInfluencedReactionProcessInterface.hpp>
+#include <libecs/ReactionProcess.hpp>
+#include <libecs/DiffusionInfluencedReactionProcessInterface.hpp>
 
 namespace libecs
 {

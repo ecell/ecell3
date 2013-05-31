@@ -32,8 +32,8 @@
 #ifndef __ReactionProcess_hpp
 #define __ReactionProcess_hpp
 
-#include <SpatiocyteProcess.hpp>
-#include <ReactionProcessInterface.hpp>
+#include <libecs/SpatiocyteProcess.hpp>
+#include <libecs/ReactionProcessInterface.hpp>
 
 namespace libecs
 {

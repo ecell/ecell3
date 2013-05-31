@@ -32,7 +32,7 @@
 #ifndef __SpatiocyteVector_hpp
 #define __SpatiocyteVector_hpp
 
-#include <SpatiocyteCommon.hpp>
+#include <libecs/SpatiocyteCommon.hpp>
 
 namespace libecs
 {

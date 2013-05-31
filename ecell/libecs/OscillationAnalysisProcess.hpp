@@ -33,8 +33,8 @@
 #define __OscillationAnalysisProcess_hpp
 
 #include <fstream>
-#include <SpatiocyteProcess.hpp>
-#include <SpatiocyteSpecies.hpp>
+#include <libecs/SpatiocyteProcess.hpp>
+#include <libecs/SpatiocyteSpecies.hpp>
 
 LIBECS_DM_CLASS(OscillationAnalysisProcess, SpatiocyteProcess)
 { 

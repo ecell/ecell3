@@ -28,7 +28,7 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#include <MultiscaleReactionProcess.hpp>
+#include <libecs/MultiscaleReactionProcess.hpp>
 
 LIBECS_DM_INIT(MultiscaleReactionProcess, Process); 
 

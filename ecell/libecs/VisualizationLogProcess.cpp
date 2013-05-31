@@ -28,7 +28,7 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#include <VisualizationLogProcess.hpp>
+#include <libecs/VisualizationLogProcess.hpp>
 
 namespace libecs
 {

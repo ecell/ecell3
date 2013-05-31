@@ -28,9 +28,9 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#include <SpatiocyteNextReactionProcess.hpp>
-#include <SpatiocyteSpecies.hpp>
-#include <ReactionProcess.hpp>
+#include <libecs/SpatiocyteNextReactionProcess.hpp>
+#include <libecs/SpatiocyteSpecies.hpp>
+#include <libecs/ReactionProcess.hpp>
 
 namespace libecs
 {

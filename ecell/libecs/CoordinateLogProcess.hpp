@@ -33,8 +33,8 @@
 #define __CoordinateLogProcess_hpp
 
 #include <fstream>
-#include <IteratingLogProcess.hpp>
-#include <SpatiocyteSpecies.hpp>
+#include <libecs/IteratingLogProcess.hpp>
+#include <libecs/SpatiocyteSpecies.hpp>
 
 namespace libecs
 {
