@@ -76,6 +76,7 @@ public:
   // need to check interrupt when we suddenly stop the simulation, do we
   // need to update the priority queue?
   virtual void interrupt(double);
+  virtual void interruptAllProcesses(const double);
   virtual void step();
   void createSpecies();
   Species* addSpecies(Variable*);
@@ -232,6 +233,7 @@ private:
   std::vector<Process*> theExternInterruptedProcesses;
   RandomLib::Random theRan;
   std::vector<SpatiocyteProcessInterface*> theInterruptedProcesses;
+  std::vector<SpatiocyteProcessInterface*> theSpatiocyteProcesses;
 };
 
 }

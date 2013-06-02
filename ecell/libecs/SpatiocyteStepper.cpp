@@ -500,6 +500,7 @@ void SpatiocyteStepper::broadcastLatticeProperties()
     {      
       SpatiocyteProcessInterface*
         aProcess(dynamic_cast<SpatiocyteProcessInterface*>(*i));
+      theSpatiocyteProcesses.push_back(aProcess);
       aProcess->setLatticeProperties(&theLattice, theAdjoiningCoordSize,
                                      theNullCoord, theNullID, &theRan);
     }
@@ -507,34 +508,25 @@ void SpatiocyteStepper::broadcastLatticeProperties()
 
 void SpatiocyteStepper::initializeFirst()
 {
-  for(std::vector<Process*>::const_iterator i(theProcessVector.begin());
-      i != theProcessVector.end(); ++i)
-    {      
-      SpatiocyteProcessInterface*
-        aProcess(dynamic_cast<SpatiocyteProcessInterface*>(*i));
-      aProcess->initializeFirst();
+  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
+    {
+      theSpatiocyteProcesses[i]->initializeFirst();
     }
 }
 
 void SpatiocyteStepper::initializeSecond()
 {
-  for(std::vector<Process*>::const_iterator i(theProcessVector.begin());
-      i != theProcessVector.end(); ++i)
-    {      
-      SpatiocyteProcessInterface*
-        aProcess(dynamic_cast<SpatiocyteProcessInterface*>(*i));
-      aProcess->initializeSecond();
+  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
+    {
+      theSpatiocyteProcesses[i]->initializeSecond();
     }
 }
 
 void SpatiocyteStepper::printProcessParameters()
 {
-  for(std::vector<Process*>::const_iterator i(theProcessVector.begin());
-      i != theProcessVector.end(); ++i)
-    {      
-      SpatiocyteProcessInterface*
-        aProcess(dynamic_cast<SpatiocyteProcessInterface*>(*i));
-      aProcess->printParameters();
+  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
+    {
+      theSpatiocyteProcesses[i]->printParameters();
     }
   cout << std::endl;
 }
@@ -543,12 +535,9 @@ void SpatiocyteStepper::resizeProcessLattice()
 {
   unsigned startCoord(theLattice.size());
   unsigned endCoord(startCoord);
-  for(std::vector<Process*>::const_iterator i(theProcessVector.begin());
-      i != theProcessVector.end(); ++i)
-    {      
-      SpatiocyteProcessInterface*
-        aProcess(dynamic_cast<SpatiocyteProcessInterface*>(*i));
-      endCoord += aProcess->getLatticeResizeCoord(endCoord);
+  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
+    {
+      endCoord += theSpatiocyteProcesses[i]->getLatticeResizeCoord(endCoord);
     }
   //Save the coords of molecules before resizing theLattice
   //because the voxel address pointed by molecule list will become
@@ -567,57 +556,42 @@ void SpatiocyteStepper::resizeProcessLattice()
     {
       theSpecies[i]->updateMoleculePointers();
     }
-  for(std::vector<Process*>::const_iterator i(theProcessVector.begin());
-      i != theProcessVector.end(); ++i)
-    {    
-      SpatiocyteProcessInterface*
-        aProcess(dynamic_cast<SpatiocyteProcessInterface*>(*i));
-      aProcess->updateResizedLattice();
+  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
+    {
+      theSpatiocyteProcesses[i]->updateResizedLattice();
     }
 }
 
 void SpatiocyteStepper::initializeThird()
 {
-  for(std::vector<Process*>::const_iterator i(theProcessVector.begin());
-      i != theProcessVector.end(); ++i)
-    {      
-      SpatiocyteProcessInterface*
-        aProcess(dynamic_cast<SpatiocyteProcessInterface*>(*i));
-      aProcess->initializeThird();
+  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
+    {
+      theSpatiocyteProcesses[i]->initializeThird();
     }
 }
 
 void SpatiocyteStepper::initializeFourth()
 {
-  for(std::vector<Process*>::const_iterator i(theProcessVector.begin());
-      i != theProcessVector.end(); ++i)
-    {      
-      SpatiocyteProcessInterface*
-        aProcess(dynamic_cast<SpatiocyteProcessInterface*>(*i));
-      aProcess->initializeFourth();
+  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
+    {
+      theSpatiocyteProcesses[i]->initializeFourth();
     }
 }
 
 void SpatiocyteStepper::initializeFifth()
 {
-  for(std::vector<Process*>::const_iterator i(theProcessVector.begin());
-      i != theProcessVector.end(); ++i)
-    {      
-      SpatiocyteProcessInterface*
-        aProcess(dynamic_cast<SpatiocyteProcessInterface*>(*i));
-      aProcess->initializeFifth();
+  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
+    {
+      theSpatiocyteProcesses[i]->initializeFifth();
     }
   setStepInterval(thePriorityQueue.getTop()->getTime()-getCurrentTime());
 }
 
 void SpatiocyteStepper::initializeLastOnce()
 {
-  for(std::vector<Process*>::const_iterator i(theProcessVector.begin());
-      i != theProcessVector.end(); ++i)
-    {      
-      SpatiocyteProcessInterface*
-        aProcess(dynamic_cast<SpatiocyteProcessInterface*>(*i));
-      aProcess->initializeLastOnce();
+  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
+    {
+      theSpatiocyteProcesses[i]->initializeLastOnce();
     }
 }
 
@@ -719,6 +693,14 @@ void SpatiocyteStepper::interruptProcesses(const double aCurrentTime)
       theInterruptedProcesses[i]->substrateValueChanged(aCurrentTime);
     }
   theInterruptedProcesses.resize(0);
+}
+
+void SpatiocyteStepper::interruptAllProcesses(const double aCurrentTime)
+{
+  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
+    {
+      theSpatiocyteProcesses[i]->substrateValueChanged(aCurrentTime);
+    }
 }
 
 void SpatiocyteStepper::checkSpecies()
