@@ -73,6 +73,7 @@ public:
   SIMPLE_SET_GET_METHOD(Real, P);
   SIMPLE_SET_GET_METHOD(Real, Propensity);
   SIMPLE_SET_GET_METHOD(Real, WalkProbability);
+  virtual void substrateValueChanged(double) {}
   virtual void initialize()
     {
       if(isInitialized)
