@@ -629,7 +629,7 @@ void SpatiocyteNextReactionProcess::removeMoleculeE()
   E->removeMolecule(moleculeE);
 }
 
-//nonHD (+Vacant[BindingSite]) -> nonHD[BindingSite]
+//A (+Vacant[BindingSite]) -> nonHD[BindingSite]
 bool SpatiocyteNextReactionProcess::reactACbind(Species* a, Species* c)
 {
   unsigned indexA(a->getRandomIndex());
@@ -647,32 +647,39 @@ bool SpatiocyteNextReactionProcess::reactACbind(Species* a, Species* c)
   return true;
 }
 
-//nonHD(a) -> nonHD(c[BindingSite]) if vacant[BindingSite]
-//else if BindingSite is not vacant:
-//nonHD(a) -> nonHD(d)
+//A (+Vacant[BindingSite] || +D[BindingSite]) -> 
+//[molA <- D] + (Vacant[BindingSite] || D[BindingSite] <- C)
 bool SpatiocyteNextReactionProcess::reactACDbind(Species* a, Species* c,
                                                  Species* d)
 {
   unsigned indexA(a->getRandomIndex());
   moleculeA = a->getMolecule(indexA);
+  //Look for Vacant[BindingSite]:
   moleculeC = c->getBindingSiteAdjoiningVoxel(moleculeA, BindingSite);
   if(moleculeC == NULL)
     {
-      moleculeD = NULL;
-      moleculeD = d->getRandomAdjoiningVoxel(moleculeA, SearchVacant);
-      if(moleculeD == NULL)
+      //Look for D[BindingSite]:
+      moleculeC = c->getBindingSiteAdjoiningVoxel(moleculeA, BindingSite, d);
+      if(moleculeC == NULL)
         {
           return false;
         }
       interruptProcessesPre();
       Tag tagA(a->getTag(indexA));
-      a->removeMolecule(indexA);
-      d->addMolecule(moleculeD, tagA);
+      //molA <- D
+      a->softRemoveMolecule(indexA);
+      d->addMolecule(moleculeA);
+      //D[BindingSite] <- C
+      d->softRemoveMolecule(moleculeC);
+      c->addMolecule(moleculeC, tagA);
       return true;
     }
   interruptProcessesPre();
   Tag tagA(a->getTag(indexA));
+  //molA <- D
   a->removeMolecule(indexA);
+  d->addMolecule(moleculeA);
+  //Vacant[BindingSite] <- C
   c->addMolecule(moleculeC, tagA);
   return true;
 }
@@ -881,7 +888,7 @@ void SpatiocyteNextReactionProcess::preinitialize()
           const unsigned aDeoligomerIndex(i+1);
           Process* aProcess(SpatiocyteStepper::createProcess(
              getPropertyInterface().getClassName(),
-             String(getFullID().getID()+Species::int2str(aDeoligomerIndex)),
+             String(getFullID().getID()+int2str(aDeoligomerIndex)),
              getStepper()->getModel()->getSystem(getFullID().getSystemPath()),
              getStepper()->getModel()));
           aProcess->setStepper(getStepper());

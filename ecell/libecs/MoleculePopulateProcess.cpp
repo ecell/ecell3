@@ -79,9 +79,9 @@ void MoleculePopulateProcess::initializeSecond()
     }
 }
 
-void MoleculePopulateProcess::initializeThird()
+void MoleculePopulateProcess::initializeFourth()
 {
-  SpatiocyteProcess::initializeThird();
+  SpatiocyteProcess::initializeFourth();
   std::vector<Variable*> aVariables;
   std::vector<Process*> aProcesses(theSpatiocyteStepper->getProcessVector());
   for(std::vector<Process*>::const_iterator j(aProcesses.begin());
@@ -105,7 +105,8 @@ void MoleculePopulateProcess::initializeThird()
       i !=theSpecies.end(); ++i)
     {
       if(!(*i)->getIsVacant() && !(*i)->getIsInterface() &&
-         (*i)->getVariable() && (*i)->getVariable()->getValue() != 0 &&
+         !(*i)->getIsPopulated() && (*i)->getVariable() &&
+         (*i)->getVariable()->getValue() != 0 &&
          std::find(aVariables.begin(), aVariables.end(),
                    (*i)->getVariable()) == aVariables.end())
         {
@@ -152,10 +153,10 @@ void MoleculePopulateProcess::populateUniformOnMultiscale(Species* aSpecies)
               THROW_EXCEPTION(ValueError, String(
                               getPropertyInterface().getClassName()) +
                               "[" + getFullID().asString() + "]: There are " +
-                              Species::int2str(aSize) + " " + getIDString(aSpecies) +
+                              int2str(aSize) + " " + getIDString(aSpecies) +
                               " molecules that must be uniformly populated," +
                               "\nbut there are only " +
-                              Species::int2str(aVacantSize) + 
+                              int2str(aVacantSize) + 
                               " multiscale vacant voxels of " +
                               getIDString(aSpecies->getVacantSpecies()) +
                               " that can be populated on.");
@@ -198,10 +199,10 @@ void MoleculePopulateProcess::populateUniformOnDiffusiveVacant(Species*
               THROW_EXCEPTION(ValueError, String(
                               getPropertyInterface().getClassName()) +
                               "[" + getFullID().asString() + "]: There are " +
-                              Species::int2str(aSize) + " " + getIDString(aSpecies) +
+                              int2str(aSize) + " " + getIDString(aSpecies) +
                               " molecules that must be uniformly populated," +
                               "\nbut there are only " +
-                              Species::int2str(aVacantSize) + 
+                              int2str(aVacantSize) + 
                               " diffuse vacant voxels of " +
                               getIDString(aSpecies->getVacantSpecies()) +
                               " that can be populated on.");
@@ -344,10 +345,10 @@ void MoleculePopulateProcess::populateUniformRanged(Species* aSpecies)
       THROW_EXCEPTION(ValueError, String(
                       getPropertyInterface().getClassName()) +
                       "[" + getFullID().asString() + "]: There are " +
-                      Species::int2str(aSize) + " " + getIDString(aSpecies) +
+                      int2str(aSize) + " " + getIDString(aSpecies) +
                       " molecules that must be uniformly populated in a " +
                       "given range,\n but there are only " +
-                      Species::int2str(aCoords.size()) + " vacant voxels of " +
+                      int2str(aCoords.size()) + " vacant voxels of " +
                       getIDString(aSpecies->getVacantSpecies()) +
                       " that can be populated.");
     }
@@ -363,3 +364,4 @@ void MoleculePopulateProcess::populateUniformRanged(Species* aSpecies)
 }
 
 }
+

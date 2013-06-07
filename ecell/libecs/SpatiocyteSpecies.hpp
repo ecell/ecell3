@@ -37,10 +37,18 @@
 namespace libecs
 {
 
-  using namespace libecs;
+using namespace libecs;
 
 // The size of Coord must be 128 bytes to avoid cacheline splits
 // The Core 2 has 64-byte cacheline
+
+
+static String int2str(int anInt)
+{
+  std::stringstream aStream;
+  aStream << anInt;
+  return aStream.str();
+}
 
 /*
  * isVacant: vacant species definition: a species on which other species can
@@ -116,6 +124,7 @@ public:
     theVoxelRadius(voxelRadius),
     theWalkProbability(1),
     theRng(aRng),
+    theTrailSpecies(NULL),
     theDeoligomerizedProduct(NULL),
     thePopulateProcess(NULL),
     theStepper(aStepper),
@@ -125,23 +134,9 @@ public:
     theLattice(aLattice),
     theSpecies(aSpeciesList) {}
   ~Species() {}
-
-      static String int2str(int anInt)
-      {
-	std::stringstream aStream;
-	aStream << anInt;
-	return aStream.str();
-      }
-
-
   void initialize(const int anAdjoiningCoordSize, const unsigned aNullCoord,
                   const unsigned aNullID)
     {
-	  theZeroTag.origin = 0;
-	  theZeroTag.id = 0;
-	  theZeroTag.rotIndex = 0;
-	  theZeroTag.vacantIdx = 0;
-	  theZeroTag.boundCnt = 0;
       const unsigned speciesSize(theSpecies.size());
       theAdjoiningCoordSize = anAdjoiningCoordSize;
       theNullCoord = aNullCoord;
@@ -153,8 +148,6 @@ public:
       theMultiscaleUnbindIDs.resize(speciesSize);
       isMultiscaleBinderID.resize(speciesSize);
       isMultiscaleBoundID.resize(speciesSize);
-
-
       for(unsigned i(0); i != speciesSize; ++i)
         {
           isMultiscaleBinderID[i] = false;
@@ -759,6 +752,90 @@ public:
               if(theWalkProbability == 1 || theRng.Fixed() < theWalkProbability)
                 {
                   source->idx = target->idx;
+                  target->idx = i+theStride*theID;
+                  theMolecules[i] = target;
+                }
+            }
+          else
+            {
+              if(getID(target) == theComp->interfaceID)
+                {
+                  //Some interface voxels do not have pointers to the
+                  //off lattice subunits, so their adjoiningSize == diffuseSize:
+                  if(target->adjoiningSize == target->diffuseSize)
+                    {
+                      continue;
+                    }
+                  unsigned coord(theRng.Integer(target->adjoiningSize-
+                                                target->diffuseSize));
+                  coord = target->adjoiningCoords[coord+target->diffuseSize];
+                  target = &theLattice[coord];
+                }
+              const unsigned tarID(getID(target));
+              if(theDiffusionInfluencedReactions[tarID])
+                {
+                  //If it meets the reaction probability:
+                  if(theReactionProbabilities[tarID] == 1 ||
+                     theRng.Fixed() < theReactionProbabilities[tarID])
+                    { 
+                      if(theCollision)
+                        { 
+                          ++collisionCnts[i];
+                          Species* targetSpecies(theSpecies[tarID]);
+                          targetSpecies->addCollision(target);
+                          if(theCollision != 2)
+                            {
+                              return;
+                            }
+                        }
+                      unsigned aMoleculeSize(theMoleculeSize);
+                      react(source, target, i);
+                      //If the reaction is successful, the last molecule of this
+                      //species will replace the pointer of i, so we need to 
+                      //decrement i to perform the diffusion on it. However, if
+                      //theMoleculeSize didn't decrease, that means the
+                      //currently walked molecule was a product of this
+                      //reaction and so we don't need to walk it again by
+                      //decrementing i.
+                      if(theMoleculeSize < aMoleculeSize)
+                        {
+                          --i;
+                        }
+                    }
+                }
+            }
+        }
+    }
+  void walkTrail()
+    {
+      const unsigned beginMoleculeSize(theMoleculeSize);
+      unsigned size(theAdjoiningCoordSize);
+      for(unsigned i(0); i < beginMoleculeSize && i < theMoleculeSize; ++i)
+        {
+          Voxel* source(theMolecules[i]);
+          if(!isFixedAdjoins)
+            {
+              size = source->diffuseSize;
+            }
+          Voxel* target(&theLattice[source->adjoiningCoords[
+                        theRng.Integer(size)]]);
+          if(getID(target) == theVacantID)
+            {
+              if(theWalkProbability == 1 || theRng.Fixed() < theWalkProbability)
+                {
+                  theTrailSpecies->addMolecule(source);
+                  target->idx = i+theStride*theID;
+                  theMolecules[i] = target;
+                }
+            }
+          else if(getID(target) == theTrailSpecies->getID())
+            {
+              if(theWalkProbability == 1 || theRng.Fixed() < theWalkProbability)
+                {
+                  //Can be optimized by directly replacing source with target
+                  //voxel of theTrailSpecies:
+                  theTrailSpecies->addMolecule(source);
+                  theTrailSpecies->softRemoveMolecule(target);
                   target->idx = i+theStride*theID;
                   theMolecules[i] = target;
                 }
@@ -1458,11 +1535,12 @@ public:
       if(theMoleculeSize > theMolecules.size())
         {
           theMolecules.resize(theMoleculeSize);
-          theTags.push_back(theZeroTag);
+          Tag aTag{0, 0, 0, 0, 0};
+          theTags.push_back(aTag);
         }
       else
         {
-          theTags[theMoleculeSize-1] = theZeroTag;
+          theTags[theMoleculeSize-1] = {0, 0, 0, 0, 0};
         }
       theMolecules[theMoleculeSize-1] = aVoxel;
       theVariable->setValue(theMoleculeSize);
@@ -1474,11 +1552,12 @@ public:
       if(theMoleculeSize > theMolecules.size())
         {
           theMolecules.resize(theMoleculeSize);
-          theTags.push_back(theZeroTag);
+          Tag aTag{0, 0, 0, 0, 0};
+          theTags.push_back(aTag);
         }
       else
         {
-          theTags[theMoleculeSize-1] = theZeroTag;
+          theTags[theMoleculeSize-1] = {0, 0, 0, 0, 0};
         }
       theMolecules[theMoleculeSize-1] = aVoxel;
       theVariable->setValue(theMoleculeSize);
@@ -2345,6 +2424,10 @@ public:
           isMultiscaleComp = true;
         }
     }
+  void setTrailSpecies(Species* aTrailSpecies)
+    {
+      theTrailSpecies = aTrailSpecies;
+    }
    const std::vector<double>& getBendAngles() const
     {
       return theBendAngles;
@@ -2456,6 +2539,46 @@ public:
       cout << "shouldn't get here deoligomerize:" << getIDString() <<
         std::endl;
       return 0;
+      /*
+      const unsigned start(theRng.Integer(theMoleculeSize));
+      const unsigned dir(theRng.Integer(2));
+      if(dir)
+        {
+          for(unsigned i(start); i < theMoleculeSize; ++i)
+            {
+              if(theTags[i].boundCnt == boundCnt)
+                {
+                  return i;
+                }
+            }
+          for(unsigned i(start); i >= 1; --i)
+            {
+              if(theTags[i-1].boundCnt == boundCnt)
+                {
+                  return i-1;
+                }
+            }
+        }
+      else
+        {
+          for(unsigned i(start); i >= 1; --i)
+            {
+              if(theTags[i-1].boundCnt == boundCnt)
+                {
+                  return i-1;
+                }
+            }
+          for(unsigned i(start); i < theMoleculeSize; ++i)
+            {
+              if(theTags[i].boundCnt == boundCnt)
+                {
+                  return i;
+                }
+            }
+        }
+      cout << "shouldn't get here deoligomerize:" << getIDString() << std::endl;
+      return 0;
+      */
     }
   Voxel* getRandomMolecule()
     {
@@ -2505,6 +2628,19 @@ public:
         { 
           unsigned aCoord(source->adjoiningCoords[bindingSite]);
           if(isPopulatable(&theLattice[aCoord]))
+            {
+              return &theLattice[aCoord];
+            }
+        }
+      return NULL;
+    } 
+  Voxel* getBindingSiteAdjoiningVoxel(Voxel* source, int bindingSite,
+                                      Species* aSpecies)
+    {
+      if(bindingSite < source->adjoiningSize)
+        { 
+          unsigned aCoord(source->adjoiningCoords[bindingSite]);
+          if(getID(&theLattice[aCoord]) == aSpecies->getID())
             {
               return &theLattice[aCoord];
             }
@@ -3238,8 +3374,8 @@ private:
   double theVoxelRadius;
   double theWalkProbability;
   double theWalkPropensity;
-  Tag theZeroTag;
   RandomLib::Random& theRng;
+  Species* theTrailSpecies;
   Species* theVacantSpecies;
   Species* theMultiscaleVacantSpecies;
   Species* theDeoligomerizedProduct;

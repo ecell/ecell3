@@ -104,6 +104,10 @@ void IteratingLogProcess::initializeLastOnce()
     }
 }
 
+void IteratingLogProcess::saveFileHeader(std::ofstream& aFile)
+{
+}
+
 void IteratingLogProcess::fire()
 {
   if(theTime < LogStart)
@@ -123,7 +127,15 @@ void IteratingLogProcess::fire()
         }
       ++timePointCnt;
     }
-  if(theTime >= LogEnd && Iterations > 0)
+  if(theTotalIterations == 1)
+    {
+      saveATimePoint(theLogFile, theTime, 1, timePointCnt-1);
+      if(theTime >= LogEnd)
+        {
+          theLogFile.close();
+        }
+    }
+  else if(theTime >= LogEnd && Iterations > 0)
     {
       --Iterations;
       saveFile();
@@ -155,6 +167,13 @@ void IteratingLogProcess::doPreLog()
           aSpecies->resetMoleculeOrigins();
         }
     }
+  if(theTotalIterations == 1)
+    {
+      cout << "Saving single iteration data in: " << FileName.c_str()
+        << std::endl;
+      theLogFile.open(FileName.c_str(), std::ios::trunc);
+      saveFileHeader(theLogFile);
+    }
 }
 
 void IteratingLogProcess::saveFile()
@@ -162,7 +181,7 @@ void IteratingLogProcess::saveFile()
   unsigned aCompletedIterations(1);
   if(SeparateFiles)
     {
-      String aFileName(FileName+Species::int2str(theFileCnt-1));
+      String aFileName(FileName+int2str(theFileCnt-1));
       cout << "Saving data in: " << aFileName.c_str() << std::endl;
       theLogFile.open(aFileName.c_str(), std::ios::trunc);
     }
@@ -176,19 +195,34 @@ void IteratingLogProcess::saveFile()
     {
       return;
     }
+  saveFileHeader(theLogFile);
+  saveFileData(theLogFile, aCompletedIterations);
+}
+
+void IteratingLogProcess::saveFileData(std::ofstream& aFile,
+                                       const unsigned iterations)
+{
   double aTime(LogStart);
-  for(unsigned i(0); i < timePoints-1; ++i)
+  for(unsigned i(0); i != theLogValues.size(); ++i)
     {
-      theLogFile << std::setprecision(15) << aTime;
-      for(unsigned j(0); j != theLogValues[i].size(); ++j)
-        {
-          theLogFile << "," << std::setprecision(15) <<
-            theLogValues[i][j]/aCompletedIterations;
-        }
-      theLogFile << std::endl;
+      saveATimePoint(theLogFile, aTime, iterations, i);
       aTime += LogInterval;
     }
   theLogFile.close();
+}
+
+void IteratingLogProcess::saveATimePoint(std::ofstream& aFile,
+                                         const double aTime,
+                                         const unsigned anIteration,
+                                         const unsigned aCnt)
+{
+  aFile << std::setprecision(15) << aTime;
+  for(unsigned i(0); i != theLogValues[aCnt].size(); ++i)
+    {
+      aFile << "," << std::setprecision(15) << 
+        theLogValues[aCnt][i]/anIteration;
+    }
+  aFile << std::endl;
 }
 
 void IteratingLogProcess::saveBackup()
@@ -205,14 +239,7 @@ void IteratingLogProcess::saveBackup()
       unsigned completedIterations(theTotalIterations-Iterations);
       for(unsigned i(0); i < timePoints-2; ++i)
         {
-          aFile << std::setprecision(15) << aTime;
-          for(unsigned j(0);
-              j != theProcessSpecies.size()+theProcessVariables.size(); ++j)
-            {
-              aFile << "," << std::setprecision(15) <<
-                theLogValues[i][j]/completedIterations;
-            }
-          aFile << std::endl;
+          saveATimePoint(aFile, aTime, completedIterations, i);
           aTime += LogInterval;
         }
       aFile.close();
@@ -221,7 +248,8 @@ void IteratingLogProcess::saveBackup()
 
 void IteratingLogProcess::logValues()
 {
- //cout << "timePoint:" << timePointCnt <<  " curr:" << theSpatiocyteStepper->getCurrentTime() << std::endl;
+ //cout << "timePoint:" << timePointCnt <<  " curr:" <<
+ //theSpatiocyteStepper->getCurrentTime() << std::endl;
   isSurviving = false;
   for(unsigned i(0); i != theProcessSpecies.size(); ++i)
     {
@@ -284,5 +312,4 @@ void IteratingLogProcess::logValues()
 
 
 LIBECS_DM_INIT_STATIC(IteratingLogProcess, Process); 
-
 }

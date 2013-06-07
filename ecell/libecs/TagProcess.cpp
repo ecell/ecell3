@@ -156,8 +156,8 @@ void TagProcess::initializeFourth()
                           "[" + getFullID().asString() + "]: The number of " +
                           "available molecules of the tagged species " +
                           getIDString(aSpecies) + " is " + 
-                          Species::int2str(anAvailableSize) + ", but there are " + 
-                          Species::int2str(theTaggedSizes[i]) + " molecules that must " +
+                          int2str(anAvailableSize) + ", but there are " + 
+                          int2str(theTaggedSizes[i]) + " molecules that must " +
                           "be tagged by the tag species " +
                           getIDString(theTagSpecies) + ". Please increase " +
                           "the molecule number of tagged species or reduce " +

@@ -36,23 +36,12 @@
 #include <libecs/Process.hpp>
 #include <libecs/Stepper.hpp>
 #include <libecs/VariableReference.hpp>
-#include <libecs/SpatiocyteStepper.hpp>
-#include <libecs/SpatiocyteSpecies.hpp>
-#include <libecs/SpatiocyteProcessInterface.hpp>
-#include <libecs/ReactionProcessInterface.hpp>
+#include <SpatiocyteStepper.hpp>
+#include <SpatiocyteSpecies.hpp>
+#include <SpatiocyteProcessInterface.hpp>
+#include <ReactionProcessInterface.hpp>
 
-#ifdef HAVE_CONFIG_H
-#include "ecell_config.h"
-#endif /* HAVE_CONFIG_H */
-
-#include "Model.hpp"
-
-#include "SpatiocyteStepper.hpp"
-
-namespace libecs
-{
-
-  LIBECS_DM_INIT_STATIC(SpatiocyteStepper, Stepper);
+LIBECS_DM_INIT(SpatiocyteStepper, Stepper);
 
 void SpatiocyteStepper::initialize()
 {
@@ -509,7 +498,7 @@ void SpatiocyteStepper::broadcastLatticeProperties()
 void SpatiocyteStepper::initializeFirst()
 {
   for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
-    {
+    {      
       theSpatiocyteProcesses[i]->initializeFirst();
     }
 }
@@ -517,15 +506,49 @@ void SpatiocyteStepper::initializeFirst()
 void SpatiocyteStepper::initializeSecond()
 {
   for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
-    {
+    {      
       theSpatiocyteProcesses[i]->initializeSecond();
     }
 }
 
+void SpatiocyteStepper::initializeThird()
+{
+  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
+    {      
+      theSpatiocyteProcesses[i]->initializeThird();
+    }
+}
+
+void SpatiocyteStepper::initializeFourth()
+{
+  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
+    {      
+      theSpatiocyteProcesses[i]->initializeFourth();
+    }
+}
+
+void SpatiocyteStepper::initializeFifth()
+{
+  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
+    {      
+      theSpatiocyteProcesses[i]->initializeFifth();
+    }
+  setStepInterval(thePriorityQueue.getTop()->getTime()-getCurrentTime());
+}
+
+void SpatiocyteStepper::initializeLastOnce()
+{
+  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
+    {      
+      theSpatiocyteProcesses[i]->initializeLastOnce();
+    }
+}
+
+
 void SpatiocyteStepper::printProcessParameters()
 {
   for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
-    {
+    {      
       theSpatiocyteProcesses[i]->printParameters();
     }
   cout << std::endl;
@@ -536,7 +559,7 @@ void SpatiocyteStepper::resizeProcessLattice()
   unsigned startCoord(theLattice.size());
   unsigned endCoord(startCoord);
   for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
-    {
+    {      
       endCoord += theSpatiocyteProcesses[i]->getLatticeResizeCoord(endCoord);
     }
   //Save the coords of molecules before resizing theLattice
@@ -557,41 +580,8 @@ void SpatiocyteStepper::resizeProcessLattice()
       theSpecies[i]->updateMoleculePointers();
     }
   for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
-    {
+    {      
       theSpatiocyteProcesses[i]->updateResizedLattice();
-    }
-}
-
-void SpatiocyteStepper::initializeThird()
-{
-  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
-    {
-      theSpatiocyteProcesses[i]->initializeThird();
-    }
-}
-
-void SpatiocyteStepper::initializeFourth()
-{
-  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
-    {
-      theSpatiocyteProcesses[i]->initializeFourth();
-    }
-}
-
-void SpatiocyteStepper::initializeFifth()
-{
-  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
-    {
-      theSpatiocyteProcesses[i]->initializeFifth();
-    }
-  setStepInterval(thePriorityQueue.getTop()->getTime()-getCurrentTime());
-}
-
-void SpatiocyteStepper::initializeLastOnce()
-{
-  for(unsigned i(0); i != theSpatiocyteProcesses.size(); ++i)
-    {
-      theSpatiocyteProcesses[i]->initializeLastOnce();
     }
 }
 
@@ -663,7 +653,8 @@ inline void SpatiocyteStepper::step()
 {
   do
     {
-      //cout << "before:" << thePriorityQueue.getTop()->getIDString() << " " << getCurrentTime() << std::endl;
+      //cout << "before:" << thePriorityQueue.getTop()->getIDString() << " "
+      //<< getCurrentTime() << std::endl;
       thePriorityQueue.getTop()->fire();
       //checkSpecies();
       //checkLattice();
@@ -1128,14 +1119,8 @@ void SpatiocyteStepper::setLatticeProperties()
 
 void SpatiocyteStepper::rotateCompartment(Comp* aComp)
 {
-  Point min;
-  min.x = -aComp->lengthX/2;
-  min.y = -aComp->lengthY/2;
-  min.z = -aComp->lengthZ/2;
-  Point max;
-  max.x = aComp->lengthX/2;
-  max.y = aComp->lengthY/2;
-  max.z = aComp->lengthZ/2;
+  Point min({-aComp->lengthX/2, -aComp->lengthY/2, -aComp->lengthZ/2});
+  Point max({aComp->lengthX/2, aComp->lengthY/2, aComp->lengthZ/2});
   rotateX(aComp->rotateX, &min);
   rotateY(aComp->rotateY, &min);
   rotateZ(aComp->rotateZ, &min);
@@ -2349,6 +2334,14 @@ void SpatiocyteStepper::setSurfaceVoxelProperties(Comp* aComp)
           optimizeSurfaceVoxel(aCoord, aComp);
           setSurfaceSubunit(aCoord, aComp);
         }
+      if(RemoveSurfaceBias)
+        {
+          for(unsigned i(0); i != aVacantSpecies->size(); ++i)
+            {
+              unsigned aCoord(aVacantSpecies->getCoord(i));
+              addSurfaceAdjoins(aCoord, aComp);
+            }
+        }
     }
 }
 
@@ -2478,6 +2471,85 @@ void SpatiocyteStepper::optimizeSurfaceVoxel(unsigned aCoord, Comp* aComp)
     }
     */
   aVoxel.diffuseSize = forward-aVoxel.adjoiningCoords;
+}
+
+void SpatiocyteStepper::addSurfaceAdjoins(const unsigned aCoord,
+                                          const Comp* aComp)
+{
+  Voxel& aVoxel(theLattice[aCoord]);
+  if(aVoxel.diffuseSize > 5)
+    {
+      return;
+    }
+  std::vector<unsigned> extCoords;
+  std::vector<double> extDists;
+  const Point aPoint(coord2point(aCoord));
+  for(unsigned i(0); i != theAdjoiningCoordSize; ++i)
+    {
+      Voxel& adjoin(theLattice[aVoxel.adjoiningCoords[i]]);
+      for(unsigned j(0); j != theAdjoiningCoordSize; ++j)
+        { 
+          const unsigned coord(adjoin.adjoiningCoords[j]);
+          Voxel& extAdjoin(theLattice[coord]);
+          if(extAdjoin.diffuseSize < 6 && coord != aCoord && 
+             extAdjoin.idx != theNullID*theStride &&
+             id2Comp(getID(extAdjoin))->dimension <= aComp->dimension)
+            {
+              if(std::find(extCoords.begin(), extCoords.end(),
+                           coord) == extCoords.end())
+                {
+                  bool isAdjoined(false);
+                  for(unsigned k(0); k != aVoxel.diffuseSize; ++k)
+                    { 
+                      if(aVoxel.adjoiningCoords[k] == coord)
+                        {
+                          isAdjoined = true;
+                          break;
+                        }
+                    }
+                  if(!isAdjoined)
+                    {
+                      extCoords.push_back(coord);
+                      const Point extPoint(coord2point(coord));
+                      extDists.push_back(distance(aPoint, extPoint));
+                    }
+                }
+            }
+        }
+    }
+  const unsigned addSize(6-aVoxel.diffuseSize);
+  std::vector<double> tmpDists(extDists);
+  std::sort(extDists.begin(), extDists.end());
+  /*
+  std::cout << "addSize:" << addSize << std::endl;
+  for(unsigned j(0); j != extCoords.size(); ++j)
+    {
+      std::cout << "dist:" << extDists[j] << std::endl;
+    }
+    */
+  for(unsigned i(0); i != addSize; ++i)
+    {
+      for(unsigned j(0); j != extCoords.size(); ++j)
+        {
+          if(tmpDists[j] == extDists[i])
+            {
+              Voxel& extAdjoin(theLattice[extCoords[j]]);
+              aVoxel.adjoiningCoords[aVoxel.diffuseSize++] = extCoords[j];
+              extAdjoin.adjoiningCoords[extAdjoin.diffuseSize++] = aCoord;
+              extCoords[j] = extCoords.back();
+              extCoords.pop_back();
+              tmpDists[j] = tmpDists.back();
+              tmpDists.pop_back();
+              break;
+            }
+        }
+    }
+  /*
+  if(aVoxel.diffuseSize != 6)
+    {
+      std::cout << "diffuse size is larger:" << aVoxel.diffuseSize << std::endl;
+    }
+    */
 }
 
 Species* SpatiocyteStepper::id2species(unsigned short id)
@@ -3203,10 +3275,10 @@ void SpatiocyteStepper::populateComp(Comp* aComp)
                 {
                   THROW_EXCEPTION(ValueError, String(
                           getPropertyInterface().getClassName()) +
-				  "There are " + Species::int2str(vacantPopulations[aVacantID]) +
+                          "There are " + int2str(vacantPopulations[aVacantID]) +
                           " total molecules that must be uniformly " +
                           "populated,\nbut there are only "
-				  + Species::int2str(available) + " vacant voxels of [" + 
+                          + int2str(available) + " vacant voxels of [" + 
                           theSpecies[aVacantID]->getIDString() +
                           "] that can be populated on.");
                 } 
@@ -3325,4 +3397,3 @@ std::vector<Comp*> const& SpatiocyteStepper::getComps() const
   return theComps;
 }
 
-}

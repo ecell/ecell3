@@ -138,6 +138,10 @@ public:
   virtual void saveFile();
   virtual void saveBackup();
   virtual void logValues();
+  virtual void saveFileHeader(std::ofstream&);
+  virtual void saveFileData(std::ofstream&, const unsigned);
+  virtual void saveATimePoint(std::ofstream&, const double, const unsigned,
+                              const unsigned);
   virtual bool isInterrupted(ReactionProcess*) 
     {
       return false;

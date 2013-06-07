@@ -40,14 +40,14 @@ String SpatiocyteProcess::getIDString(Voxel* aVoxel) const
 {
   Variable* aVariable(theSpecies[getID(aVoxel)]->getVariable());
   return "["+aVariable->getSystemPath().asString()+":"+
-    aVariable->getID()+"]["+Species::int2str(getID(aVoxel))+"]";
+    aVariable->getID()+"]["+int2str(getID(aVoxel))+"]";
 }
 
 String SpatiocyteProcess::getIDString(Species* aSpecies) const
 {
   Variable* aVariable(aSpecies->getVariable());
   return "["+aVariable->getSystemPath().asString()+":"+
-    aVariable->getID()+"]["+Species::int2str(aSpecies->getID())+"]";
+    aVariable->getID()+"]["+int2str(aSpecies->getID())+"]";
 }
 
 String SpatiocyteProcess::getIDString(Variable* aVariable) const
@@ -64,7 +64,7 @@ String SpatiocyteProcess::getIDString(unsigned int id) const
 {
   Variable* aVariable(theSpecies[id]->getVariable());
   return "["+aVariable->getSystemPath().asString()+":"+
-    aVariable->getID()+"]["+Species::int2str(id)+"]";
+    aVariable->getID()+"]["+int2str(id)+"]";
 }
 
 }

@@ -50,15 +50,18 @@ public:
       PROPERTYSLOT_SET_GET(Integer, LatticeType);
       PROPERTYSLOT_SET_GET(Integer, SearchVacant);
       PROPERTYSLOT_SET_GET(Integer, DebugLevel);
+      PROPERTYSLOT_SET_GET(Integer, RemoveSurfaceBias);
     }
   SIMPLE_SET_GET_METHOD(Real, VoxelRadius); 
   SIMPLE_SET_GET_METHOD(Integer, LatticeType); 
   SIMPLE_SET_GET_METHOD(Integer, SearchVacant); 
   SIMPLE_SET_GET_METHOD(Integer, DebugLevel); 
+  SIMPLE_SET_GET_METHOD(Integer, RemoveSurfaceBias); 
   SpatiocyteStepper():
     isInitialized(false),
     isPeriodicEdge(false),
     SearchVacant(false),
+    RemoveSurfaceBias(false),
     DebugLevel(1),
     LatticeType(HCP_LATTICE),
     theMoleculeID(0),
@@ -132,6 +135,7 @@ public:
   void addInterruptedProcess(SpatiocyteProcessInterface*);
   static Variable* getVariable(System*, String const&);
 private:
+  void addSurfaceAdjoins(const unsigned, const Comp*);
   void interruptProcesses(const double);
   void setCompsCenterPoint();
   void setIntersectingCompartmentList();
@@ -206,6 +210,7 @@ private:
   bool isInitialized;
   bool isPeriodicEdge;
   bool SearchVacant;
+  bool RemoveSurfaceBias;
   unsigned short theNullID;
   unsigned DebugLevel;
   unsigned LatticeType; 

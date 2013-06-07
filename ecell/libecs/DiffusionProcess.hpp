@@ -63,6 +63,7 @@ public:
     Propensity(0),
     WalkProbability(1),
     theDiffusionSpecies(NULL),
+    theTrailSpecies(NULL),
     theVacantSpecies(NULL),
     theWalkMethod(&DiffusionProcess::walk) {}
   virtual ~DiffusionProcess() {}
@@ -105,7 +106,7 @@ public:
               theDiffusionSpecies = aSpecies;
               theDiffusionSpecies->setDiffusionCoefficient(D);
             }
-          else
+          else if((*i).getCoefficient() < 0)
             {
               if(theVacantSpecies)
                 {
@@ -120,6 +121,22 @@ public:
                                   getIDString(aSpecies) + " are given."); 
                 }
               theVacantSpecies = aSpecies;
+            }
+          else
+            {
+              if(theTrailSpecies)
+                {
+                  THROW_EXCEPTION(ValueError, String(
+                                  getPropertyInterface().getClassName()) +
+                                  "[" + getFullID().asString() + 
+                                  "]: A DiffusionProcess requires only one " +
+                                  "nonHD variable reference with positive " +
+                                  "coefficient as the trailing species to be " +
+                                  "diffused off, but " +
+                                  getIDString(theTrailSpecies) + " and " +
+                                  getIDString(aSpecies) + " are given."); 
+                }
+              theTrailSpecies = aSpecies;
             }
         }
       if(!theDiffusionSpecies)
@@ -142,6 +159,10 @@ public:
               theVacantSpecies->setIsDiffusiveVacant();
             }
           theDiffusionSpecies->setVacantSpecies(theVacantSpecies);
+        }
+      if(theTrailSpecies)
+        {
+          theDiffusionSpecies->setTrailSpecies(theTrailSpecies);
         }
     }
   virtual void initializeFourth()
@@ -246,7 +267,14 @@ public:
             }
           else
             {
-              theWalkMethod = &DiffusionProcess::walk;
+              if(theTrailSpecies)
+                {
+                  theWalkMethod = &DiffusionProcess::walkTrail;
+                }
+              else
+                {
+                  theWalkMethod = &DiffusionProcess::walk;
+                }
             }
         }
       //After initializeFourth, this process will be enqueued in the priority
@@ -274,6 +302,10 @@ public:
   void walk() const
     {
       theDiffusionSpecies->walk();
+    }
+  void walkTrail() const
+    {
+      theDiffusionSpecies->walkTrail();
     }
   void walkRegular() const
     {
@@ -334,6 +366,7 @@ protected:
   double Propensity;
   double WalkProbability;
   Species* theDiffusionSpecies;
+  Species* theTrailSpecies;
   Species* theVacantSpecies;
   WalkMethod theWalkMethod;
 };
