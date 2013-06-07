@@ -47,9 +47,12 @@ public:
     {
       INHERIT_PROPERTIES(ReactionProcess);
       PROPERTYSLOT_SET_GET(Integer, Collision);
+      PROPERTYSLOT_SET_GET(Integer, ForcedSequence);
     }
   SIMPLE_SET_GET_METHOD(Integer, Collision);
+  SIMPLE_SET_GET_METHOD(Integer, ForcedSequence);
   DiffusionInfluencedReactionProcess():
+    ForcedSequence(false),
     Collision(0) {}
   virtual ~DiffusionInfluencedReactionProcess() {}
   virtual void addSubstrateInterrupt(Species* aSpecies, Voxel* aMolecule) {}
@@ -131,6 +134,7 @@ protected:
   void reactBtoC_AtoD(Voxel*, Voxel*, const unsigned, const unsigned);
   void reactBtoC_NtoD(Voxel*, Voxel*, const unsigned, const unsigned);
   void reactNtoC_NtoD(Voxel*, Voxel*, const unsigned, const unsigned);
+  void reactNtoC_BtoD(Voxel*, Voxel*, const unsigned, const unsigned);
   void reactVarC_VarD(Voxel*, Voxel*, const unsigned, const unsigned);
   void reactAtoC_compNtoE(Voxel*, Voxel*, const unsigned, const unsigned);
   void reactVarC(Voxel*, Voxel*, const unsigned, const unsigned);
@@ -141,7 +145,11 @@ protected:
   void reactNtoC(Voxel*, Voxel*, const unsigned, const unsigned);
   void reactBtoC_tagBtoC(Voxel*, Voxel*, const unsigned, const unsigned);
   void reactBtoC_tagAtoC(Voxel*, Voxel*, const unsigned, const unsigned);
+private:
+  void setFreeSequenceReactMethod();
+  void setForcedSequenceReactMethod();
 protected:
+  bool ForcedSequence;
   unsigned Collision;
   double D_A;
   double D_B;

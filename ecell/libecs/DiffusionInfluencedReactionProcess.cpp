@@ -491,6 +491,22 @@ void DiffusionInfluencedReactionProcess::reactNtoC_NtoD(Voxel* molA,
     }
 }
 
+//A + B -> [C <- molN] + [D <- molB]
+void DiffusionInfluencedReactionProcess::reactNtoC_BtoD(Voxel* molA,
+                                                        Voxel* molB,
+                                                        const unsigned indexA,
+                                                        const unsigned indexB)
+{
+  Voxel* mol(getPopulatableVoxel(C, molA, molB));
+  if(mol)
+    {
+      C->addMolecule(mol, A->getTag(indexA));
+      D->addMolecule(molB, B->getTag(indexB));
+      A->removeMolecule(indexA);
+      removeMolecule(B, molB, indexB);
+    }
+}
+
 //A + B -> [A == C]
 void DiffusionInfluencedReactionProcess::reactAeqC(Voxel* molA, Voxel* molB,
                                                    const unsigned indexA,
@@ -564,6 +580,51 @@ void DiffusionInfluencedReactionProcess::reactNtoC(Voxel* molA, Voxel* molB,
 }
 
 void DiffusionInfluencedReactionProcess::setReactMethod()
+{
+  if(ForcedSequence)
+    {
+      setForcedSequenceReactMethod();
+    }
+  else
+    {
+      setFreeSequenceReactMethod();
+    }
+}
+
+void DiffusionInfluencedReactionProcess::setForcedSequenceReactMethod()
+{
+  if(C && D)
+    {
+      if(A->isReplaceable(C))
+        {
+          if(B->isReplaceable(D))
+            {
+              //A + B -> [C <- molA] + [D <- molB]
+              reactM = &DiffusionInfluencedReactionProcess::reactAtoC_BtoD;
+            }
+          else
+            {
+              //A + B -> [C <- molA] + [D <- molN]
+              reactM = &DiffusionInfluencedReactionProcess::reactAtoC_NtoD;
+            }
+        }
+      else
+        {
+          if(B->isReplaceable(D))
+            {
+              //A + B -> [C <- molN] + [D <- molB]
+              reactM = &DiffusionInfluencedReactionProcess::reactNtoC_BtoD;
+            }
+          else
+            {
+              //A + B -> [C <- molN] + [D <- molN]
+              reactM = &DiffusionInfluencedReactionProcess::reactNtoC_NtoD;
+            }
+        }
+    }
+}
+
+void DiffusionInfluencedReactionProcess::setFreeSequenceReactMethod()
 {
   if(variableC && D)
     {
