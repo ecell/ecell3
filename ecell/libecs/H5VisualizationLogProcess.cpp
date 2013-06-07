@@ -178,13 +178,13 @@ H5::CompType getH5Type()
 template<typename T>
 unsigned char* pack(unsigned char* buffer, T const& container)
 {
-    return pack<h5_le_traits>(buffer, container);
+    return ::pack<h5_le_traits>(buffer, container);
 }
 
 template<template<typename> class TTserialize_, typename T>
 unsigned char* pack(unsigned char* buffer, T const& container)
 {
-    return pack<h5_le_traits, TTserialize_>(buffer, container);
+    return ::pack<h5_le_traits, TTserialize_>(buffer, container);
 }
 
 LIBECS_DM_CLASS(H5VisualizationLogProcess, SpatiocyteProcess)
