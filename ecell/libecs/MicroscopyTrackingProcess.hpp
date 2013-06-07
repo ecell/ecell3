@@ -67,17 +67,46 @@ public:
         {
           Variable* aVariable((*i).getVariable());
           Species* aSpecies(theSpatiocyteStepper->getSpecies(aVariable));
-          if(!aSpecies->getIsLipid() &&
+          if(aSpecies && 
              std::find(theLatticeSpecies.begin(), theLatticeSpecies.end(), 
                   aSpecies) == theLatticeSpecies.end())
             {
               theLatticeSpecies.push_back(aSpecies);
             }
         }
+      for(VariableReferenceVector::iterator 
+          i(theZeroVariableReferences.begin());
+          i != theZeroVariableReferences.end(); ++i)
+        {
+          Variable* aVariable((*i).getVariable());
+          Species* aSpecies(theSpatiocyteStepper->getSpecies(aVariable));
+          if(aSpecies)
+            {
+              if(aSpecies->getIsOffLattice())
+                {
+                  if(std::find(theOffLatticeSpecies.begin(),
+                     theOffLatticeSpecies.end(), aSpecies) == 
+                     theOffLatticeSpecies.end())
+                    {
+                      theOffLatticeSpecies.push_back(aSpecies);
+                    }
+                }
+              else
+                {
+                  if(std::find(theLatticeSpecies.begin(),
+                     theLatticeSpecies.end(), aSpecies) == 
+                     theLatticeSpecies.end())
+                    {
+                      theLatticeSpecies.push_back(aSpecies);
+                    }
+                }
+            }
+        }
       if(!getPriority())
         {
           setPriority(-1);
         }
+      setRadiusScales();
     }
   virtual void initializeFifth()
     {
@@ -90,9 +119,9 @@ public:
           int aPositiveCoefficient((*i).getCoefficient());
           Variable* aVariable((*i).getVariable());
           Species* aSpecies(theSpatiocyteStepper->getSpecies(aVariable));
-          if(!aSpecies->getIsLipid())
+          if(aSpecies)
             {
-              if(aPositiveCoefficient > 0)
+              if(aPositiveCoefficient > 0 && aPositiveCoefficient < 10000)
                 {
                   thePositiveSpecies.push_back(aSpecies);
                   std::vector<int> aProcessSpeciesIndices;
@@ -123,12 +152,17 @@ public:
             }
         }
       theFreqLattice.resize(theLatticeSpecies.size());
-      for(unsigned int i(0); i != theFreqLattice.size(); ++i)
+      for(unsigned i(0); i != theFreqLattice.size(); ++i)
         {
           theFreqLattice[i].resize(theFreqLatticeSize);
         }
       resetLattice();
-      if(MeanCount > 0)
+      if(LogInterval)
+        {
+          theInterval = LogInterval;
+          MeanCount = (int)rint(ExposureTime/theInterval);
+        }
+      else if(MeanCount > 0)
         {
           theInterval = ExposureTime/MeanCount;
         }
@@ -150,7 +184,7 @@ public:
             }
           MeanCount = (int)rint(ExposureTime/theInterval);
         }
-      theMeanCount = (unsigned int)MeanCount;
+      theMeanCount = (unsigned)MeanCount;
       theTime = theInterval;
       theLastExposedTime = theTime;
       thePriorityQueue->move(theQueueID);
@@ -182,16 +216,16 @@ protected:
   void logFluorescentSpecies();
   void resetLattice()
     {
-      for(unsigned int i(0); i != theFreqLattice.size(); ++i)
+      for(unsigned i(0); i != theFreqLattice.size(); ++i)
         {
-          for(unsigned int j(0); j != theFreqLatticeSize; ++j)
+          for(unsigned j(0); j != theFreqLatticeSize; ++j)
             {
               theFreqLattice[i][j] = 0;
             }
         }
     }
 protected:
-  unsigned int theFreqLatticeSize;
+  unsigned theFreqLatticeSize;
   int MeanCount;
   double ExposureTime;
   double theLastExposedTime;

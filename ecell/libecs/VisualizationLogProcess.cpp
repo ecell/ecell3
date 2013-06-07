@@ -75,7 +75,8 @@ void VisualizationLogProcess::initializeLog()
       theLogFile.write(
        theLatticeSpecies[i]->getVariable()->getFullID().asString().c_str(),
        aStringSize);
-      double aRadius(theLatticeSpecies[i]->getMoleculeRadius());
+      double aRadius(theLatticeSpecies[i]->getMoleculeRadius()*
+                     theRadiusScales[i]);
       theLogFile.write((char*)(&aRadius), sizeof(aRadius));
     }
   for(unsigned int i(0); i!=thePolymerSpecies.size(); ++i)
@@ -98,6 +99,7 @@ void VisualizationLogProcess::initializeLog()
         {
           aRadius = theOffLatticeSpecies[i]->getDiffuseRadius();
         }
+      aRadius *= theOffRadiusScales[i];
       theLogFile.write((char*)(&aRadius), sizeof(aRadius));
     }
 }
