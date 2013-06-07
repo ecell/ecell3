@@ -163,6 +163,7 @@ void LifetimeLogProcess::logTrackedMolecule(ReactionProcess* aProcess,
                                             Species* aSpecies,
                                             const Voxel* aMolecule)
 {
+  std::cout << "end:" << getStepper()->getCurrentTime() << std::endl;
   if(isBindingSite[aProcess->getID()])
     {
       if(aProcess->getMoleculeC() &&
@@ -189,6 +190,7 @@ void LifetimeLogProcess::logTrackedMolecule(ReactionProcess* aProcess,
 
 void LifetimeLogProcess::initTrackedMolecule(Species* aSpecies)
 {
+  std::cout << "start:" << getStepper()->getCurrentTime() << std::endl;
   const unsigned anIndex(aSpecies->size()-1);
   Tag& aTag(aSpecies->getTag(anIndex));
   aTag.origin = aSpecies->getCoord(anIndex);
