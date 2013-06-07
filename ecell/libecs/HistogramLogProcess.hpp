@@ -82,17 +82,16 @@ public:
     LogStart = 1e-8;
   }
   virtual ~HistogramLogProcess() {}
-  virtual void initializeFifth();
   virtual void initializeLastOnce();
-  virtual void fire();
-  virtual void saveFile();
   virtual void saveBackup();
   virtual void logValues();
   virtual void logCollision();
   virtual void logDensity();
   virtual void initLogValues();
-  virtual void logFile();
   virtual void saveFileHeader(std::ofstream&);
+  virtual void saveFileData(std::ofstream&, const unsigned);
+  virtual void saveATimePoint(std::ofstream&, const double, const unsigned,
+                              const unsigned);
   void initializeVectors();
   bool isInside(unsigned int&, Point);
 protected:

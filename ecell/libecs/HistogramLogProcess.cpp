@@ -28,36 +28,10 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#include <libecs/HistogramLogProcess.hpp>
-
-namespace libecs
-{
-
-void HistogramLogProcess::initializeFifth()
-{
-  for(std::vector<Species*>::const_iterator i(theProcessSpecies.begin());
-      i != theProcessSpecies.end(); ++i)
-    {
-      if((*i)->getDiffusionInterval() < theInterval)
-        {
-          theInterval = (*i)->getDiffusionInterval();
-        }
-    }
-  if(LogInterval > 0)
-    {
-      theInterval = LogInterval;
-    }
-  else
-    {
-      LogInterval = theInterval;
-    }
-  theTime = LogStart;
-  thePriorityQueue->move(theQueueID);
-}
+#include <HistogramLogProcess.hpp>
 
 void HistogramLogProcess::initializeLastOnce()
 {
-  theLogFile.open(FileName.c_str(), std::ios::trunc);
   theTotalIterations = Iterations;
   theComp = theSpatiocyteStepper->system2Comp(getSuperSystem());
   C = theComp->centerPoint;
@@ -69,82 +43,36 @@ void HistogramLogProcess::initializeLastOnce()
   Radius /= VoxelDiameter;
   binInterval = Length/(Bins+1);
   initializeVectors();
-  saveFileHeader(theLogFile);
 }
 
-void HistogramLogProcess::fire()
+void HistogramLogProcess::saveFileData(std::ofstream& aFile,
+                                       const unsigned iterations)
 {
-  if(theTime >= LogStart && theTime <= LogEnd)
+  double aTime(LogStart);
+  for(unsigned i(0); i != theLogValues.size(); ++i)
     {
-      logValues();
-      ++timePointCnt;
-    }
-  //Log file incrementally when there is only 1 iteration and we don't
-  //know the LogEnd time:
-  if(theTotalIterations == 1 && LogEnd == libecs::INF)
-    {
-      logFile();
-    }
-  else if(theTime >= LogEnd && Iterations > 0)
-    {
-      theInterval = LogInterval;
-      --Iterations;
-      cout << "Iterations left:" << Iterations << " of " <<
-        theTotalIterations << std::endl;
-      if(Iterations > 0)
-        {
-          theSpatiocyteStepper->reset(Iterations);
-          saveBackup();
-          return;
-        }
-    }
-  if(Iterations == 0)
-    {
-      saveFile();
-      cout << "Done saving." << std::endl;
-    }
-  theTime += theInterval;
-  thePriorityQueue->moveTop();
-}
-
-
-void HistogramLogProcess::saveFile()
-{
-  cout << "Saving data in: " << FileName.c_str() << std::endl;
-  double aTime(LogInterval);
-  for(unsigned int i(0); i != theLogValues.size(); ++i)
-    {
-      for(unsigned int j(0); j != Bins; ++j)
-        {
-          theLogFile << std::setprecision(15) << aTime << "," << j;
-          for(unsigned int k(0); k != theProcessSpecies.size(); ++k)
-            {
-              theLogFile << "," << std::setprecision(15) <<
-                theLogValues[i][j][k]/theTotalIterations;
-            }
-          theLogFile << std::endl;
-        }
+      saveATimePoint(aFile, aTime, iterations, i);
       aTime += LogInterval;
     }
-  theLogFile.close();
-  theInterval = libecs::INF;
+  aFile.close();
 }
 
-
-void HistogramLogProcess::logFile()
+void HistogramLogProcess::saveATimePoint(std::ofstream& aFile,
+                                          const double aTime,
+                                          const unsigned anIteration,
+                                          const unsigned aCnt)
 {
-  for(unsigned int j(0); j != Bins; ++j)
+  for(unsigned i(0); i != Bins; ++i)
     {
-      theLogFile << std::setprecision(15) << theTime << "," << j;
-      for(unsigned int k(0); k != theProcessSpecies.size(); ++k)
+      aFile << std::setprecision(15) << aTime << "," << i;
+      for(unsigned j(0); j != theLogValues[aCnt][i].size(); ++j)
         {
-          theLogFile << "," << std::setprecision(15) <<
-            theLogValues[timePointCnt-1][j][k];
+          aFile << "," << std::setprecision(15) << 
+            theLogValues[aCnt][i][j]/anIteration;
         }
-      theLogFile << std::endl;
+      aFile << std::endl;
     }
 }
-
 
 void HistogramLogProcess::saveBackup()
 {
@@ -157,20 +85,11 @@ void HistogramLogProcess::saveBackup()
       std::ofstream aFile;
       aFile.open(aFileName.c_str(), std::ios::trunc);
       saveFileHeader(aFile);
-      double aTime(LogInterval);
+      double aTime(LogStart);
       int completedIterations(theTotalIterations-Iterations);
-      for(unsigned int i(0); i != theLogValues.size(); ++i)
+      for(unsigned i(0); i != theLogValues.size(); ++i)
         {
-          for(unsigned int j(0); j != Bins; ++j)
-            {
-             aFile << std::setprecision(15) << aTime << "," << j;
-              for(unsigned int k(0); k != theProcessSpecies.size(); ++k)
-                {
-                  aFile << "," << std::setprecision(15) <<
-                    theLogValues[i][j][k]/completedIterations;
-                }
-              aFile << std::endl;
-            }
+          saveATimePoint(aFile, aTime, completedIterations, i);
           aTime += LogInterval;
         }
       aFile.close();
@@ -180,11 +99,11 @@ void HistogramLogProcess::saveBackup()
 void HistogramLogProcess::saveFileHeader(std::ofstream& aFile)
 {
   aFile << "Time," << std::scientific << binInterval*VoxelDiameter;
-  for(unsigned int i(0); i != theProcessSpecies.size(); ++i)
+  for(unsigned i(0); i != theProcessSpecies.size(); ++i)
     {
       aFile << "," << getIDString(theProcessSpecies[i]);
     }
-  aFile << std::endl;
+  aFile << std::endl << std::flush;
 }
 
 void HistogramLogProcess::logValues()
@@ -207,7 +126,7 @@ void HistogramLogProcess::initLogValues()
 {
   theLogValues.resize(timePointCnt+1);
   theLogValues[timePointCnt].resize(Bins);
-  for(unsigned int i(0); i != Bins; ++i)
+  for(unsigned i(0); i != Bins; ++i)
     {
       theLogValues[timePointCnt][i].resize(theProcessSpecies.size(), 0);
     }
@@ -215,12 +134,12 @@ void HistogramLogProcess::initLogValues()
 
 void HistogramLogProcess::logCollision()
 {
-  for(unsigned int i(0); i != theProcessSpecies.size(); ++i)
+  for(unsigned i(0); i != theProcessSpecies.size(); ++i)
     {
       Species* aSpecies(theProcessSpecies[i]);
-      for(unsigned int j(0); j != aSpecies->size(); ++j)
+      for(unsigned j(0); j != aSpecies->size(); ++j)
         {
-          unsigned int bin;
+          unsigned bin;
           if(isInside(bin, aSpecies->getPoint(j)))
             {
               theLogValues[timePointCnt][bin][i] += 
@@ -232,12 +151,12 @@ void HistogramLogProcess::logCollision()
 
 void HistogramLogProcess::logDensity()
 {
-  for(unsigned int i(0); i != theProcessSpecies.size(); ++i)
+  for(unsigned i(0); i != theProcessSpecies.size(); ++i)
     {
       Species* aSpecies(theProcessSpecies[i]);
-      for(unsigned int j(0); j != aSpecies->size(); ++j)
+      for(unsigned j(0); j != aSpecies->size(); ++j)
         {
-          unsigned int bin;
+          unsigned bin;
           if(isInside(bin, aSpecies->getPoint(j)))
             {
               theLogValues[timePointCnt][bin][i] += 1;
@@ -270,7 +189,7 @@ void HistogramLogProcess::initializeVectors()
 }
 
 
-bool HistogramLogProcess::isInside(unsigned int& bin, Point N)
+bool HistogramLogProcess::isInside(unsigned& bin, Point N)
 {
   double t((D.x*N.x+D.y*N.y+D.z*N.z-D.x*E.x-D.y*E.y-D.z*E.z)/
            (D.x*D.x +D.y*D.y+D.z*D.z));
@@ -278,7 +197,7 @@ bool HistogramLogProcess::isInside(unsigned int& bin, Point N)
     {
       return false;
     }
-  bin = (unsigned int)floor(t/binInterval);
+  bin = (unsigned)floor(t/binInterval);
   if(bin >= Bins)
     {
       return false;
@@ -293,5 +212,3 @@ bool HistogramLogProcess::isInside(unsigned int& bin, Point N)
 }
 
 LIBECS_DM_INIT_STATIC(HistogramLogProcess, Process); 
-
-}
