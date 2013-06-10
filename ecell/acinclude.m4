@@ -355,3 +355,33 @@ AC_DEFUN([ECELL_CHECK_HDF5_CPP], [
     ifelse([$2], [],, [$2])
   ])
 ])
+
+AC_DEFUN([ECELL_CHECK_BOOST], [
+  AC_CHECK_HEADER([boost/config.hpp], [
+    AC_DEFINE(HAVE_BOOST, 1, [Define to 1 if Boost C++ library is installed])
+    ifelse([$1], [],, [$1])
+  ], [
+    ifelse([$2], [],, [$2])
+  ])
+])
+
+AC_DEFUN([ECELL_CHECK_RANDOMLIB], [
+  AC_CHECK_HEADER([RandomLib/Random.hpp], [
+    AC_MSG_CHECKING([if RandomLib library is available])
+    ac_save_LDFLAGS="$LDFLAGS"
+    AC_TRY_LINK([
+#include <RandomLib/Random.hpp>
+    ], [
+RandomLib::RandomGenerator r;
+    ], [
+      AC_MSG_RESULT([yes])
+      AC_DEFINE(HAVE_RANDOMLIB, 1, [Define to 1 if RandomLib is installed])
+      ifelse([$1], [],, [$1])
+    ], [
+      AC_MSG_RESULT([no])
+      ifelse([$2], [],, [$2])
+    ])
+  ], [
+    ifelse([$2], [],, [$2])
+  ])
+])
