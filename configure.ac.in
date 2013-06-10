@@ -59,16 +59,11 @@ dnl Create the top-level Makefile.
 dnl
 AC_CONFIG_FILES([
 Makefile
-doc/Makefile
-doc/samples/Makefile
-doc/users-manual/Makefile
 osdep/Makefile
 osdep/win32/Makefile
 build/Makefile
 build/msvc/Makefile
 build/msvc/dm/Makefile
-doc/ecell3.doxy
-doc/users-manual/info.ent
 ])
 dnl
 AC_OUTPUT

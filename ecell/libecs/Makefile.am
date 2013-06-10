@@ -71,9 +71,7 @@ MoleculePopulateProcess.cpp\
 DiffusionProcess.cpp\
 TagProcess.cpp\
 PeriodicBoundaryDiffusionProcess.cpp\
-SpatiocyteTauLeapProcess.hpp\
-H5VisualizationLogProcess.cpp
-#SpatiocyteVisualizer.hpp
+SpatiocyteTauLeapProcess.hpp
 
 libecsdir=$(ECELL_INCLUDE_DIR)/libecs
 libecs_HEADERS=\
@@ -147,7 +145,6 @@ SpatiocyteSpecies.hpp\
 SpatiocyteVector.hpp\
 SpatiocyteTauLeapProcess.hpp\
 SpatiocyteVisualizer.hpp\
-H5Support.hpp\
 SpatiocyteDebug.hpp
 
 
