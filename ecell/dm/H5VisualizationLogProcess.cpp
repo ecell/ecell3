@@ -29,7 +29,7 @@
 //
 
 #include <H5Cpp.h>
-#include <H5Support.hpp>
+#include "H5Support.hpp"
 #include <boost/foreach.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/mpl/and.hpp>
@@ -40,9 +40,6 @@
 #include <boost/type_traits/make_unsigned.hpp>
 #include <libecs/SpatiocyteProcess.hpp>
 #include <libecs/SpatiocyteSpecies.hpp>
-
-namespace libecs
-{
 
 class ParticleData
 {
@@ -427,6 +424,4 @@ void H5VisualizationLogProcess::logSpecies()
     }
 }
 
-LIBECS_DM_INIT_STATIC(H5VisualizationLogProcess, Process); 
-
-}
+LIBECS_DM_INIT(H5VisualizationLogProcess, Process); 

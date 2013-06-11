@@ -2,7 +2,7 @@
 #define H5SUPPORT_HPP
 
 #include <H5Cpp.h>
-#include <Packer.hpp>
+#include "Packer.hpp"
 #include <utility>
 #include <string>
 #include <cstring>
