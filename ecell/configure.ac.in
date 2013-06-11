@@ -226,6 +226,8 @@ AC_SUBST(HAVE_BOOST_SPIRIT_CLASSIC)
 
 ECELL_CHECK_HDF5_CPP(, [AC_MSG_ERROR([could not find HDF5 C++ library])])
 
+ECELL_CHECK_RANDOMLIB(, [AC_MSG_ERROR([could not find RandomLib])])
+
 USE_COMPILER_EXTENSIONS=no
 AC_MSG_CHECKING( if use of compiler specific features are allowed )
 
