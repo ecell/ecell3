@@ -1,0 +1,280 @@
+#!/usr/bin/env /usr/bin/ecell3-python
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#
+#       This file is part of the E-Cell System
+#
+#       Copyright (C) 1996-2010 Keio University
+#       Copyright (C) 2005-2009 The Molecular Sciences Institute
+#
+#::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+#
+#
+# E-Cell System is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public
+# License as published by the Free Software Foundation; either
+# version 2 of the License, or (at your option) any later version.
+# 
+# E-Cell System is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public
+# License along with E-Cell System -- see the file COPYING.
+# If not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# 
+#END_HEADER
+#
+# Designed by Koichi Takahashi <shafi@e-cell.org>
+# Programmed by Masahiro Sugimoto <msugi@sfc.keio.ac.jp>
+
+import sys
+import getopt
+import os
+import re
+import weakref
+
+import ecell.config
+import ecell.ecs
+import ecell.emc
+import ecell.Session
+import session_manager
+
+DEFAULT_ENVIRONMENT = 'Local'
+
+class Prompt:
+    def __init__( self, sessionManager ):
+        self.sessionManager = sessionManager
+
+    def __str__( self ):
+        return 'ecell3-session-manager>>> '
+
+class Console:
+    def __init__( self, session, banner ):
+        self.session = session
+        self.banner = banner
+
+    def __createScriptContext( self, parameters ):
+        _session = weakref.proxy( self.session )
+        aContext = { 'theEsm': _session, 'self': _session }
+
+        # flatten class methods and object properties so that
+        # 'self.' isn't needed for each method calls in __the script
+        aKeyList = list( self.session.__dict__.keys() +\
+                         self.session.__class__.__dict__.keys() )
+        aDict = {}
+        for aKey in aKeyList:
+            if not aKey.startswith('__'):
+                aDict[ aKey ] = getattr( self.session, aKey )
+
+        aContext.update( aDict )
+
+        # add parameters to __the context
+        aContext.update( parameters )
+
+        return aContext
+
+    def loadScript( self, esmfile, parameters = {} ):
+        '''Load script file ( ESM file )
+
+        esm(str) -- an esm file name
+        parameters(dict) -- a parameter to be set to esm file
+        Return None
+        '''
+
+        # create a context
+        aContext = self.__createScriptContext( parameters )
+
+        # execute esm file
+        execfile( esmfile, aContext )
+
+    def interact( self, parameters = {} ):
+        ''' methods for intaractive mode '''
+        aContext = self.__createScriptContext( parameters )
+        
+        try:
+            import readline # to provide convenient commandline editing :)
+        except:
+            pass
+        import code
+        anInterpreter = code.InteractiveConsole( aContext )
+        aContext[ '__prompt__' ] = Prompt( self.session )
+        anInterpreter.runsource( 'import sys; sys.ps1 = __prompt__; del sys, __prompt__' )
+        anInterpreter.interact( self.banner )
+
+def usage():
+    global programName
+    print '''
+%(appname)s -- invoke ecell3-session-manager python intract mode or
+               run esm file
+
+Usage:
+    %(appname)s [-e] [-e esmfile]  : Load script (.esm) file 
+    %(appname)s                    : Run in interactive mode
+    %(appname)s [-h]               : Print this message
+       
+Options:
+    -e or --exec=[.esm file]           :  load script (.esm) file
+    -c or --concurrency=[int]          :  Set concurrency
+    -E or --environment=[environment]  :  Set environment
+    -O or --option=[option]            :  Set additional command-line options
+                                          for the backend
+
+    -DNAME=VALUE                       :  Set session parameter
+    --parameters="[python dictionary]" :  Set session parameters
+     
+    -h or --help              :  Print this message.
+
+    Example: 
+      %(appname)s -DNAME1=VALUE1 -DNAME2=VALUE2
+      %(appname)s --parameters="{NAME1:VALUE1,NAME2:VALUE2}"
+
+    Note that spaces are not allowed in names and values.
+
+Configurations:
+    If ECELL3_DM_PATH environment variable is set to a colon (%(pathsep)s) 
+    separated directory path, it tries to find dynamic modules within the
+    locations referred to by it.
+ 
+    Example: 
+      ECELL3_DM_PATH=/home/user/dm%(pathsep)s/home/user/dm_other %(appname)s
+
+'''% { 'appname': programName, 'pathsep': os.pathsep }
+
+def main( argv ):
+    global programName
+    # initialize 
+    anEsmFile = None
+    aParameters = {}
+    aConcurrency = None
+    anEnvironment = DEFAULT_ENVIRONMENT 
+
+    # gets options
+    try:
+        opts, args = getopt.gnu_getopt(
+            argv[ 1: ] , 'he:f:D:c:E:O:',
+            [
+                "parameters=",
+                "help",
+                "exec=",
+                "file=",
+                "concurrency=",
+                "environment=",
+                "option=",
+                ]
+            )
+    except:
+        usage()
+        return -1  
+
+    optionList = []
+
+    # checks argument
+    for anOption, anArg in opts:
+        # prints help message
+        if anOption in ( '-h', '--help' ):
+            usage()
+            return 0 
+        elif anOption in ( '-e', '--exec' ):
+            if not anArg:
+                sys.stderr.write( "%s: please specify esm file\n", programName )
+                usage()
+                return 255 
+            anEsmFile = anArg
+        elif anOption == '-D':
+            # set session-manager parameters            
+            aSplitArgList = anArg.split( '=' )
+            if not aSplitArgList[ 1 ]:
+                aSplitArgList[ 1 ] = 1
+            try:
+                anEvaluatedString = eval(aSplitArgList[1])
+                aParameters[ aSplitArgList[ 0 ] ] = anEvaluatedString
+            except:
+                aParameters[ aSplitArgList[ 0 ] ] = aSplitArgList[ 1 ]
+        elif anOption == '--parameters':
+            try:
+                anEvaluatedArg = eval(anArg)
+            except:
+                import traceback 
+                anErrorMessageList = traceback.format_exception(
+                    sys.exc_type, sys.exc_value, sys.exc_traceback )
+                for aLine in anErrorMessageList: 
+                    sys.stderr.write( aLine )
+                sys.stderr.write(
+                    "%s: %s is not a valid python expression.\n" % (
+                        programName, anArg ) )
+                return 255 
+
+            # check anEvaluatedArg type
+            if not type( anEvaluatedArg ) == dict:
+                sys.stderr.write(
+                    "%s: %s does not result in a python dictionary.\n" % (
+                        programName, aParameters ) )
+                return w55 
+
+            # add parameters to aParameters 
+            for aKeyString in anEvaluatedArg.keys():
+                aParameters[ aKeyString ] = anEvaluatedArg[ aKeyString ]
+        elif anOption in ( '-c', '--concurrency' ):
+            # check the existence of value
+            if anArg == '':
+                sys.stderr.write(
+                    "%s: concurrency value not specified.\n" % programName )
+                usage()
+                return 255 
+
+            # convert str to int
+            try:
+                aConcurrency = int( anArg )
+            except ValueError:
+                sys.stderr.write(
+                    "%s: invalid parameter --concurrency=int\n" % programName )
+                usage()
+                return 255 
+        elif anOption in ( '-E', '--environment', ):
+            # check the existence of value
+            if not anArg:
+                sys.stderr.write(
+                    "%s: environment value not specified.\n" % programName )
+                usage()
+                return 255 
+            anEnvironment = anArg
+        elif anOption in ( '-O', '--option' ):
+            optionList[:] = re.findall( r'(?:"(?:[^"]|\\")*"|\'(?:[^\']|\\\')*\'|(?:[^\s"\']|\\[\s"\'])+)+', anArg )
+
+    # check EMS file
+    if anEsmFile == None and ( len( argv ) >= ( len(opts) * 2 + 2 ) ):
+        if ( len( argv ) != 2 and not argv[ -1 ][ 0 ] == "-" ) or \
+                len( argv ) == 2:
+            if not os.path.isfile( argv[-1] ):
+                sys.stderr.write( "%s: %s does not exist.\n" %
+                    ( programName, argv[ -1 ] ) )
+                return 1  
+
+            if argv[ -1 ] != argv[ 0 ]:
+                anEsmFile = argv[ -1 ]
+
+    # aModulePath = [ os.path.join( ecell.__path__[ 0 ], "session_manager" ) ]
+    aModulePath = [ os.path.join( os.getcwd(), "session_manager" ) ]
+    
+    aSessionManager = session_manager.SessionManager(
+        aModulePath, aConcurrency, anEnvironment )
+    aSessionManager.setOptionList( optionList )
+    aConsole = Console( aSessionManager,
+        '''ecell3-session-manager [ E-Cell SE Version %s, on Python Version %d.%d.%d ]
+Copyright (C) 2001-2009 Keio University.
+Copyright (C) 2005-2009 The Molecular Sciences Institute.''' % (
+        ecell.ecs.getLibECSVersion(),
+        sys.version_info[0], sys.version_info[1], sys.version_info[2] )
+        )
+
+    if anEsmFile:
+        aConsole.loadScript( anEsmFile, aParameters  )
+    else:
+        aConsole.interact( aParameters )
+    return 0
+
+if __name__ == '__main__':
+    programName = os.path.basename( sys.argv[0] )
+    sys.exit( main( sys.argv ) )
