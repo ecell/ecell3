@@ -100,7 +100,7 @@ PythonProcess$(LTDL_SHLIB_EXT) : PythonProcess.cpp
 	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L$(abs_top_builddir)/tmp$(libdir) $(PYTHON_LIBS) $(EXTRA_LDFLAGS) -l$(BOOST_PYTHON_LIBNAME) $(LIBS) $(EXTRA_LDFLAGS)" --cxxflags='${CPPFLAGS} ${CXXFLAGS} $(EXTRA_CXXFLAGS) -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} -I${top_srcdir}/../libltdl  ${PYTHON_INCLUDES} ' -o $@ $< 
 
 H5VisualizationLogProcess.so:   H5VisualizationLogProcess.cpp
-	$(ECELL3_DMC) --verbose -o H5VisualizationLogProcess.so --ldflags=-lhdf5 --ldflags=-lhdf5_cpp H5VisualizationLogProcess.cpp
+	$(ECELL3_DMC) --verbose --dmcompile="../../dmtool" -o H5VisualizationLogProcess.so --ldflags=-lhdf5 --ldflags=-lhdf5_cpp H5VisualizationLogProcess.cpp
 
 .cpp$(LTDL_SHLIB_EXT):
 	${ECELL3_DMC} --verbose --dmcompile="../../dmtool" --no-stdinclude --no-stdlibdir --ldflags="-L$(abs_top_builddir)/tmp$(libdir) $(LIBS) $(EXTRA_LDFLAGS)" --cxxflags='${CPPFLAGS} ${CXXFLAGS} $(EXTRA_CXXFLAGS) -I${top_srcdir}/libecs -I${top_srcdir}/.. -I${top_srcdir} -I${top_srcdir}/../libltdl  ${PYTHON_INCLUDES} ' -o $@ $< 
