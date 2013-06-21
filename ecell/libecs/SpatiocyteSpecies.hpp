@@ -1531,33 +1531,33 @@ public:
     }
   void softAddMolecule(Voxel* aVoxel)
     {
+      Tag aTag = {0, 0, 0, 0, 0};
       ++theMoleculeSize; 
       if(theMoleculeSize > theMolecules.size())
         {
           theMolecules.resize(theMoleculeSize);
-          Tag aTag{0, 0, 0, 0, 0};
           theTags.push_back(aTag);
         }
       else
         {
-          theTags[theMoleculeSize-1] = {0, 0, 0, 0, 0};
+          theTags[theMoleculeSize-1] = aTag;
         }
       theMolecules[theMoleculeSize-1] = aVoxel;
       theVariable->setValue(theMoleculeSize);
     }
   void addMoleculeDirect(Voxel* aVoxel)
     {
+      Tag aTag = {0, 0, 0, 0, 0};
       aVoxel->idx = theMoleculeSize+theStride*theID;
       ++theMoleculeSize; 
       if(theMoleculeSize > theMolecules.size())
         {
           theMolecules.resize(theMoleculeSize);
-          Tag aTag{0, 0, 0, 0, 0};
           theTags.push_back(aTag);
         }
       else
         {
-          theTags[theMoleculeSize-1] = {0, 0, 0, 0, 0};
+          theTags[theMoleculeSize-1] = aTag;
         }
       theMolecules[theMoleculeSize-1] = aVoxel;
       theVariable->setValue(theMoleculeSize);

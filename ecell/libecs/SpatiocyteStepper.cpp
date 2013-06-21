@@ -1119,8 +1119,8 @@ void SpatiocyteStepper::setLatticeProperties()
 
 void SpatiocyteStepper::rotateCompartment(Comp* aComp)
 {
-  Point min({-aComp->lengthX/2, -aComp->lengthY/2, -aComp->lengthZ/2});
-  Point max({aComp->lengthX/2, aComp->lengthY/2, aComp->lengthZ/2});
+  Point min = {-aComp->lengthX/2, -aComp->lengthY/2, -aComp->lengthZ/2};
+  Point max = {aComp->lengthX/2, aComp->lengthY/2, aComp->lengthZ/2};
   rotateX(aComp->rotateX, &min);
   rotateY(aComp->rotateY, &min);
   rotateZ(aComp->rotateZ, &min);
