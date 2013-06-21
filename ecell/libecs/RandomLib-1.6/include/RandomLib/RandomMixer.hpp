@@ -107,6 +107,10 @@ namespace RandomLib {
     static const mixer_type
       d = mixer_t::width == 32 ? 1566083941ULL : 2862933555777941757ULL;
   };
+  template<class RandomType>
+    const typename MixerMT0<RandomType>::mixer_type MixerMT0<RandomType>::a0;
+  template<class RandomType>
+    const typename MixerMT0<RandomType>::mixer_type MixerMT0<RandomType>::a1;
 
   /**
    * \brief The modified %MT19937 mixing functionality
