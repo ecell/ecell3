@@ -11,8 +11,10 @@ aclocal.m4
 autom4te.cache
 config.guess
 config.h
+!ecell/libecs/RandomLib-1.6/include/RandomLib/Config.h
 config-h.in
 config.h.in
+!ecell/libecs/RandomLib-1.6/include/RandomLib/Config.h.in
 config.log
 config.status
 config.sub
