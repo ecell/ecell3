@@ -2,7 +2,7 @@ abs_top_builddir=@abs_top_builddir@
 
 libdir=@libdir@
 
-SUBDIRS = scripting . tests
+SUBDIRS = scripting RandomLib-1.6/src . tests
 
 ECELL_DIRNAME=@ECELL_DIRNAME@
 ECELL_INCLUDE_DIR=$(includedir)/$(ECELL_DIRNAME)
@@ -12,13 +12,13 @@ DMTOOL_INCLUDE = -I@DMTOOL_INCLUDE_DIR@
 INCLTDL = @INCLTDL@
 LIBLTDL = @LIBLTDL@
 
-INCLUDES = -I$(top_srcdir)  -I$(top_srcdir)/.. $(DMTOOL_INCLUDE) $(INCLTDL)
+INCLUDES = -I$(top_srcdir)  -I$(top_srcdir)/.. -I$(srcdir)/RandomLib-1.6/include $(DMTOOL_INCLUDE) $(INCLTDL)
 lib_LTLIBRARIES = libecs.la
 
 AM_CXXFLAGS = $(CXXFLAGS)
 
 libecs_la_LDFLAGS= -version-info 2:0:0 -no-undefined
-libecs_la_LIBADD=  $(LIBLTDL) $(GSL_LIBADD) scripting/libecs-scripting.la -lRandom
+libecs_la_LIBADD=  $(LIBLTDL) $(GSL_LIBADD) scripting/libecs-scripting.la RandomLib-1.6/src/libRandom.la
 libecs_la_SOURCES=\
 libecs.cpp\
 Util.cpp\
