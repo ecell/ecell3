@@ -209,6 +209,7 @@ public:
           theKinesinSpecies[i]->setDimension(1);
           theKinesinSpecies[i]->setVacantSpecies(theVacantSpecies);
           theKinesinSpecies[i]->setComp(theComp);
+          theKinesinSpecies[i]->resetFixedAdjoins();
         }
     }
   virtual unsigned getLatticeResizeCoord(unsigned);

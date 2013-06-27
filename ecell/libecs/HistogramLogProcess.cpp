@@ -33,15 +33,11 @@
 void HistogramLogProcess::initializeLastOnce()
 {
   theTotalIterations = Iterations;
-  theComp = theSpatiocyteStepper->system2Comp(getSuperSystem());
-  C = theComp->centerPoint;
-  C.x += OriginX*theComp->lengthX/2;
-  C.y += OriginY*theComp->lengthY/2;
-  C.z += OriginZ*theComp->lengthZ/2;
+  Origin = theSpatiocyteStepper->system2Comp(getSuperSystem())->centerPoint;
   VoxelDiameter = theSpatiocyteStepper->getVoxelRadius()*2;
-  Length /= VoxelDiameter;
-  Radius /= VoxelDiameter;
-  binInterval = Length/(Bins+1);
+  nLength = Length/VoxelDiameter;
+  nRadius = Radius/VoxelDiameter;
+  binInterval = nLength/(Bins+1);
   initializeVectors();
 }
 
@@ -64,13 +60,12 @@ void HistogramLogProcess::saveATimePoint(std::ofstream& aFile,
 {
   for(unsigned i(0); i != Bins; ++i)
     {
-      aFile << std::setprecision(15) << aTime << "," << i;
+      aFile << aTime << "," << i;
       for(unsigned j(0); j != theLogValues[aCnt][i].size(); ++j)
         {
-          aFile << "," << std::setprecision(15) << 
-            theLogValues[aCnt][i][j]/anIteration;
+          aFile << "," << theLogValues[aCnt][i][j]/anIteration;
         }
-      aFile << std::endl;
+      aFile << std::endl << std::flush;
     }
 }
 
@@ -98,6 +93,10 @@ void HistogramLogProcess::saveBackup()
 
 void HistogramLogProcess::saveFileHeader(std::ofstream& aFile)
 {
+  if(theTotalIterations != 1)
+    {
+      aFile << std::setprecision(15);
+    }
   aFile << "Time," << std::scientific << binInterval*VoxelDiameter;
   for(unsigned i(0); i != theProcessSpecies.size(); ++i)
     {
@@ -167,30 +166,39 @@ void HistogramLogProcess::logDensity()
 
 void HistogramLogProcess::initializeVectors()
 {
-  E.x = -Length/2;
-  E.y = 0;
-  E.z = 0;
+  //Minus end
+  Minus.x = -nLength/2;
+  Minus.y = 0;
+  Minus.z = 0;
+  Comp* aComp(theSpatiocyteStepper->system2Comp(getSuperSystem()));
+  Point tmpOrigin;
+  tmpOrigin.x = OriginX*aComp->lengthX/2;
+  tmpOrigin.y = OriginY*aComp->lengthY/2;
+  tmpOrigin.z = OriginZ*aComp->lengthZ/2;
   //Rotated Minus end
-  theSpatiocyteStepper->rotateX(RotateX, &E, -1);
-  theSpatiocyteStepper->rotateY(RotateY, &E, -1);
-  theSpatiocyteStepper->rotateZ(RotateZ, &E, -1);
-  E.x += C.x;
-  E.y += C.y;
-  E.z += C.z;
-  //Direction vector from the East to center
-  D.x = C.x-E.x;
-  D.y = C.y-E.y;
-  D.z = C.z-E.z;
-  //Make D a unit vector
-  double NormT(sqrt(D.x*D.x+D.y*D.y+D.z*D.z));
-  D.x /= NormT;
-  D.y /= NormT;
-  D.z /= NormT;
+  theSpatiocyteStepper->rotateX(aComp->rotateX, &Minus, -1);
+  theSpatiocyteStepper->rotateY(aComp->rotateY, &Minus, -1);
+  theSpatiocyteStepper->rotateZ(aComp->rotateZ, &Minus, -1);
+  theSpatiocyteStepper->rotateX(RotateX, &Minus, 1);
+  theSpatiocyteStepper->rotateY(RotateY, &Minus, 1);
+  theSpatiocyteStepper->rotateZ(RotateZ, &Minus, 1);
+  theSpatiocyteStepper->rotateX(aComp->rotateX, &tmpOrigin, -1);
+  theSpatiocyteStepper->rotateY(aComp->rotateY, &tmpOrigin, -1);
+  theSpatiocyteStepper->rotateZ(aComp->rotateZ, &tmpOrigin, -1);
+  add_(tmpOrigin, Origin);
+  add_(Minus, tmpOrigin);
+  //Direction vector from the Minus end to center
+  //Direction vector from the Minus end to center
+  lengthVector = sub(tmpOrigin, Minus);
+  //Make direction vector a unit vector
+  norm_(lengthVector);
 }
 
 
 bool HistogramLogProcess::isInside(unsigned& bin, Point N)
 {
+  Point D(lengthVector);
+  Point E(Minus);
   double t((D.x*N.x+D.y*N.y+D.z*N.z-D.x*E.x-D.y*E.y-D.z*E.z)/
            (D.x*D.x +D.y*D.y+D.z*D.z));
   if(t < 0)
@@ -204,7 +212,7 @@ bool HistogramLogProcess::isInside(unsigned& bin, Point N)
     }
   double dist(sqrt(pow(-N.x+E.x+D.x*t, 2)+pow(-N.y+E.y+D.y*t, 2)+
                    pow(-N.z+E.z+D.z*t, 2)));
-  if(dist > Radius)
+  if(dist > nRadius)
     {
       return false;
     }

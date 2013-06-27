@@ -2632,6 +2632,14 @@ void SpatiocyteStepper::setIntersectingPeers()
       //Only proceed if the volume is not enclosed:
       if(!(*i)->system->isRootSystem() && (*i)->dimension == 3)
         {
+          Point a((*i)->centerPoint);
+          Point u;
+          u.x = (*i)->lengthX/2;
+          u.y = (*i)->lengthY/2;
+          u.z = (*i)->lengthZ/2;
+          rotateX((*i)->rotateX, &u);
+          rotateY((*i)->rotateY, &u);
+          rotateZ((*i)->rotateZ, &u);
           for(std::vector<Comp*>::reverse_iterator j(theComps.rbegin());
               j != theComps.rend(); ++j)
             {
@@ -2643,14 +2651,26 @@ void SpatiocyteStepper::setIntersectingPeers()
                   if((*i)->system->getSuperSystem() == 
                      (*j)->system->getSuperSystem())
                     {
-                      Point a((*i)->centerPoint);
                       Point b((*j)->centerPoint);
-                      if(((a.x+(*i)->lengthX/2 > b.x-(*j)->lengthX/2) ||
-                          (a.x-(*i)->lengthX/2 < b.x+(*j)->lengthX/2)) && 
-                         ((a.y+(*i)->lengthY/2 > b.y-(*j)->lengthY/2) ||
-                          (a.y-(*i)->lengthY/2 < b.y+(*j)->lengthY/2)) &&
-                         ((a.z+(*i)->lengthZ/2 > b.z-(*j)->lengthZ/2) ||
-                          (a.z-(*i)->lengthZ/2 < b.z+(*j)->lengthZ/2)))
+                      Point v;
+                      v.x = (*j)->lengthX/2;
+                      v.y = (*j)->lengthY/2;
+                      v.z = (*j)->lengthZ/2;
+                      rotateX((*j)->rotateX, &v);
+                      rotateY((*j)->rotateY, &v);
+                      rotateZ((*j)->rotateZ, &v);
+                      if(std::min(a.x+u.x, a.x-u.x) <
+                         std::max(b.x+v.x, b.x-v.x) &&
+                         std::max(a.x+u.x, a.x-u.x) >
+                         std::min(b.x+v.x, b.x-v.x) &&
+                         std::min(a.y+u.y, a.y-u.y) <
+                         std::max(b.y+v.y, b.y-v.y) &&
+                         std::max(a.y+u.y, a.y-u.y) >
+                         std::min(b.y+v.y, b.y-v.y) &&
+                         std::min(a.z+u.z, a.z-u.z) <
+                         std::max(b.z+v.z, b.z-v.z) &&
+                         std::max(a.z+u.z, a.z-u.z) >
+                         std::min(b.z+v.z, b.z-v.z))
                         {
                           if((*i)->enclosed <= (*j)->enclosed) 
                             {

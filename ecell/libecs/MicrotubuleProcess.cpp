@@ -59,9 +59,11 @@ void MicrotubuleProcess::setCompartmentDimension()
   Width = Radius*2;
   Height = Radius*2;
   theDimension = 1;
+  /*
   Origin.x += OriginX*theComp->lengthX/2;
   Origin.y += OriginY*theComp->lengthY/2;
   Origin.z += OriginZ*theComp->lengthZ/2;
+  */
   allocateGrid();
 }
 
@@ -96,14 +98,26 @@ void MicrotubuleProcess::initializeVectors()
   Minus.x = -nLength/2;
   Minus.y = 0;
   Minus.z = 0;
+  Comp* aComp(theSpatiocyteStepper->system2Comp(getSuperSystem()));
+  Point tmpOrigin;
+  tmpOrigin.x = OriginX*aComp->lengthX/2;
+  tmpOrigin.y = OriginY*aComp->lengthY/2;
+  tmpOrigin.z = OriginZ*aComp->lengthZ/2;
   //Rotated Minus end
-  theSpatiocyteStepper->rotateX(RotateX, &Minus, -1);
-  theSpatiocyteStepper->rotateY(RotateY, &Minus, -1);
-  theSpatiocyteStepper->rotateZ(RotateZ, &Minus, -1);
-  add_(Minus, Origin);
+  theSpatiocyteStepper->rotateX(theComp->rotateX, &Minus, -1);
+  theSpatiocyteStepper->rotateY(theComp->rotateY, &Minus, -1);
+  theSpatiocyteStepper->rotateZ(theComp->rotateZ, &Minus, -1);
+  theSpatiocyteStepper->rotateX(RotateX, &Minus, 1);
+  theSpatiocyteStepper->rotateY(RotateY, &Minus, 1);
+  theSpatiocyteStepper->rotateZ(RotateZ, &Minus, 1);
+  theSpatiocyteStepper->rotateX(theComp->rotateX, &tmpOrigin, -1);
+  theSpatiocyteStepper->rotateY(theComp->rotateY, &tmpOrigin, -1);
+  theSpatiocyteStepper->rotateZ(theComp->rotateZ, &tmpOrigin, -1);
+  add_(tmpOrigin, Origin);
+  add_(Minus, tmpOrigin);
   //Direction vector from the Minus end to center
   //Direction vector from the Minus end to center
-  lengthVector = sub(Origin, Minus);
+  lengthVector = sub(tmpOrigin, Minus);
   //Make direction vector a unit vector
   norm_(lengthVector);
   //Rotated Plus end

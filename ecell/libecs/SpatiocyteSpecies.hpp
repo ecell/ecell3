@@ -184,6 +184,10 @@ public:
         }
       thePopulateProcess = aProcess;
     }
+  bool isTrailSpecies(Species* aSpecies)
+    {
+      return (theTrailSpecies == aSpecies);
+    }
   bool getIsInterface()
     {
       return isInterface;

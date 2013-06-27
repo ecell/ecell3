@@ -36,6 +36,18 @@ LIBECS_DM_INIT_STATIC(CompartmentProcess, Process);
 unsigned CompartmentProcess::getLatticeResizeCoord(unsigned aStartCoord)
 {
   Comp* aComp(theSpatiocyteStepper->system2Comp(getSuperSystem()));
+  if(aComp->diffusiveComp)
+    {
+      Comp* aDiffusiveComp(aComp->diffusiveComp);
+      if(aDiffusiveComp->interfaceID == theSpecies.size())
+        {
+          aDiffusiveComp->interfaceID = theInterfaceSpecies->getID();
+        }
+      else
+        {
+          theInterfaceSpecies = theSpecies[aDiffusiveComp->interfaceID];
+        }
+    }
   aComp->interfaceID = theInterfaceSpecies->getID();
   *theComp = *aComp;
   theVacantSpecies->resetFixedAdjoins();
@@ -450,9 +462,9 @@ void CompartmentProcess::rotate(Point& V)
 {
   if(!Autofit)
     {
-      theSpatiocyteStepper->rotateX(RotateX, &V, -1);
-      theSpatiocyteStepper->rotateY(RotateY, &V, -1);
-      theSpatiocyteStepper->rotateZ(RotateZ, &V, -1);
+      theSpatiocyteStepper->rotateX(RotateX, &V, 1);
+      theSpatiocyteStepper->rotateY(RotateY, &V, 1);
+      theSpatiocyteStepper->rotateZ(RotateZ, &V, 1);
     }
 }
 
@@ -798,7 +810,7 @@ void CompartmentProcess::addInterfaceVoxel(unsigned subunitCoord,
   //Should use SubunitRadius instead of DiffuseRadius since it is the
   //actual size of the subunit. Nope, the distance is too far when using
   //SubunitRadius:
-  if(dist < aDist)
+  if(dist < aDist && subunitInterfaces[subunitCoord-subStartCoord].size() < 3)
     {
       Voxel& voxel((*theLattice)[voxelCoord]);
       //theSpecies[6]->addMolecule(&voxel);
@@ -838,7 +850,8 @@ void CompartmentProcess::addInterfaceVoxel(Voxel& aVoxel, Point& aPoint)
                       const unsigned subCoord(coords[l]);
                       const Point& subPoint(*(*theLattice)[subCoord].point);
                       const double dist(distance(subPoint, aPoint));
-                      if(dist < nDiffuseRadius+nVoxelRadius)
+                      if(dist < nDiffuseRadius+nVoxelRadius &&
+                         subunitInterfaces[subCoord-subStartCoord].size() < 3)
                         {
                           subunitInterfaces[subCoord-subStartCoord].push_back(
                                                               aVoxel.coord);

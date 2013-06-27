@@ -58,6 +58,7 @@ public:
       PROPERTYSLOT_SET_GET(Integer, SeparateFiles);
       PROPERTYSLOT_SET_GET(Integer, SquaredDisplacement);
       PROPERTYSLOT_SET_GET(Integer, Survival);
+      PROPERTYSLOT_SET_GET(Real, ExposureTime);
       PROPERTYSLOT_SET_GET(Real, LogEnd);
       PROPERTYSLOT_SET_GET(Real, LogInterval);
       PROPERTYSLOT_SET_GET(Real, LogStart);
@@ -74,6 +75,7 @@ public:
   SIMPLE_SET_GET_METHOD(Integer, SeparateFiles);
   SIMPLE_SET_GET_METHOD(Integer, SquaredDisplacement);
   SIMPLE_SET_GET_METHOD(Integer, Survival);
+  SIMPLE_SET_GET_METHOD(Real, ExposureTime);
   SIMPLE_SET_GET_METHOD(Real, LogEnd);
   SIMPLE_SET_GET_METHOD(Real, LogStart);
   SIMPLE_SET_GET_METHOD(Real, LogInterval);
@@ -86,12 +88,14 @@ public:
     FrameDisplacement(0),
     InContact(0),
     Iterations(1),
+    logCnt(0),
     RebindTime(0),
     SaveCounts(0),
     SeparateFiles(0),
     SquaredDisplacement(0),
     Survival(0),
     theFileCnt(0),
+    ExposureTime(0),
     LogEnd(libecs::INF),
     LogStart(0),
     LogInterval(0),
@@ -127,6 +131,8 @@ public:
           LogStart = LogInterval;
         }
       timePointCnt = 0;
+      logCnt = 0;
+      exposureCnt = 0;
       if(!getPriority())
         {
           setPriority(-10);
@@ -151,10 +157,12 @@ protected:
   bool isSurviving;
   unsigned Centered;
   unsigned Diffusion;
+  unsigned exposureCnt;
   unsigned FileStartCount;
   unsigned FrameDisplacement;
   unsigned InContact;
   unsigned Iterations;
+  unsigned logCnt;
   unsigned RebindTime;
   unsigned SaveCounts;
   unsigned SeparateFiles;
@@ -164,12 +172,12 @@ protected:
   unsigned theTotalIterations;
   unsigned timePoints;
   unsigned timePointCnt;
+  double ExposureTime;
   double LogEnd;
   double LogStart;
   double LogInterval;
   String FileName;
   std::ofstream theLogFile;
-  Comp* theComp;
   std::vector<std::vector<double> > theLogValues;
 };
 

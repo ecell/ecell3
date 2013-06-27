@@ -648,7 +648,7 @@ bool SpatiocyteNextReactionProcess::reactACbind(Species* a, Species* c)
 }
 
 //A (+Vacant[BindingSite] || +D[BindingSite]) -> 
-//[molA <- D] + (Vacant[BindingSite] || D[BindingSite] <- C)
+//[molA <- D_trailA] + (Vacant[BindingSite] || D[BindingSite] <- C)
 bool SpatiocyteNextReactionProcess::reactACDbind(Species* a, Species* c,
                                                  Species* d)
 {
@@ -667,8 +667,15 @@ bool SpatiocyteNextReactionProcess::reactACDbind(Species* a, Species* c,
       interruptProcessesPre();
       Tag tagA(a->getTag(indexA));
       //molA <- D
-      a->softRemoveMolecule(indexA);
-      d->addMolecule(moleculeA);
+      if(a->isTrailSpecies(d))
+        {
+          a->softRemoveMolecule(indexA);
+          d->addMolecule(moleculeA);
+        }
+      else
+        {
+          a->removeMolecule(indexA);
+        }
       //D[BindingSite] <- C
       d->softRemoveMolecule(moleculeC);
       c->addMolecule(moleculeC, tagA);
@@ -676,9 +683,12 @@ bool SpatiocyteNextReactionProcess::reactACDbind(Species* a, Species* c,
     }
   interruptProcessesPre();
   Tag tagA(a->getTag(indexA));
-  //molA <- D
   a->removeMolecule(indexA);
-  d->addMolecule(moleculeA);
+  if(a->isTrailSpecies(d))
+    {
+      //molA <- D
+      d->addMolecule(moleculeA);
+    }
   //Vacant[BindingSite] <- C
   c->addMolecule(moleculeC, tagA);
   return true;
