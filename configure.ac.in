@@ -25,6 +25,11 @@ AC_ARG_ENABLE([pyecell],
                  [build ecell without Python binding.]), [],
   [enable_pyecell=yes])
 
+AC_ARG_ENABLE([visualizer],
+  AC_HELP_STRING([--disable-visualizer],
+                 [build ecell without Spatiocyte visualizer.]), [],
+  [enable_visualizer=yes])
+
 AC_ARG_WITH([boost-python-libname],
   AC_HELP_STRING([--with-boost-python-libname=LIBNAME],
                  [specify the library name of Boost.Python [[boost_python]]]))
