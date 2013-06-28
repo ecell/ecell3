@@ -4,6 +4,9 @@ SUBDIRS = libecs libemc bin dm
 if ENABLE_PYECELL
 SUBDIRS += pyecell frontend
 endif
+if ENABLE_VISUALIZER
+SUBDIRS += visualizer
+endif
 
 ECELL_DIRNAME = @ECELL_DIRNAME@
 
