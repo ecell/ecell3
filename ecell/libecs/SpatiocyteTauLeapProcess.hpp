@@ -34,11 +34,12 @@
 
 #include <libecs/SpatiocyteNextReactionProcess.hpp> 
 
+namespace libecs
+{
 
 LIBECS_DM_CLASS(SpatiocyteTauLeapProcess, SpatiocyteNextReactionProcess)
 { 
   typedef double (SpatiocyteTauLeapProcess::*RealMethod)(double);
-
 public:
   LIBECS_DM_OBJECT(SpatiocyteTauLeapProcess, Process)
     {
@@ -403,17 +404,16 @@ public:
     }
   void initPoisson()
     {
-      poisson_table = {
-        0.0,
-        0.0,
-        0.69314718055994529,
-        1.7917594692280550,
-        3.1780538303479458,
-        4.7874917427820458,
-        6.5792512120101012,
-        8.5251613610654147,
-        10.604602902745251,
-        12.801827480081469};
+      poisson_table.push_back(0.0);
+      poisson_table.push_back(0.0);
+      poisson_table.push_back(0.69314718055994529);
+      poisson_table.push_back(1.7917594692280550);
+      poisson_table.push_back(3.1780538303479458);
+      poisson_table.push_back(4.7874917427820458);
+      poisson_table.push_back(6.5792512120101012);
+      poisson_table.push_back(8.5251613610654147);
+      poisson_table.push_back(10.604602902745251);
+      poisson_table.push_back(12.801827480081469);
     }
   unsigned poisson(const double mean) const
     {
@@ -669,5 +669,6 @@ private:
   std::vector<double> poisson_table;
 };
 
-#endif /* __SpatiocyteTauLeapProcess_hpp */
+}
 
+#endif /* __SpatiocyteTauLeapProcess_hpp */

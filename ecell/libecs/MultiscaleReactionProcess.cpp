@@ -30,8 +30,10 @@
 
 #include <libecs/MultiscaleReactionProcess.hpp>
 
-LIBECS_DM_INIT(MultiscaleReactionProcess, Process); 
+namespace libecs
+{
 
+LIBECS_DM_INIT_STATIC(MultiscaleReactionProcess, Process); 
 
 void MultiscaleReactionProcess::initializeThird()
 {
@@ -700,5 +702,4 @@ void MultiscaleReactionProcess::setReactMethod()
     }
 }
 
-
-
+}

@@ -31,7 +31,10 @@
 #include <libecs/SpatiocyteTauLeapProcess.hpp>
 #include <libecs/SpatiocyteSpecies.hpp>
 
-LIBECS_DM_INIT(SpatiocyteTauLeapProcess, Process); 
+namespace libecs
+{
+
+LIBECS_DM_INIT_STATIC(SpatiocyteTauLeapProcess, Process); 
 
 void SpatiocyteTauLeapProcess::set_g(unsigned& currHOR, RealMethod& g_method,
                                      const int v)
@@ -79,4 +82,6 @@ void SpatiocyteTauLeapProcess::set_g(unsigned& currHOR, RealMethod& g_method,
       currHOR = aHOR;
       g_method = aG;
     }
+}
+
 }

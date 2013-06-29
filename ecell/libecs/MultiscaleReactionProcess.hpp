@@ -36,6 +36,9 @@
 #include <libecs/DiffusionInfluencedReactionProcess.hpp>
 #include <libecs/SpatiocyteSpecies.hpp>
 
+namespace libecs
+{
+
 LIBECS_DM_CLASS(MultiscaleReactionProcess, DiffusionInfluencedReactionProcess)
 { 
   typedef void (MultiscaleReactionProcess::*Method)(Voxel*, Voxel*,
@@ -101,9 +104,6 @@ protected:
   Method reactM;
 };
 
+}
+
 #endif /* __MultiscaleReactionProcess_hpp */
-
-
-
-
-
