@@ -33,12 +33,11 @@
 #define __DiffusionInfluencedReactionProcess_hpp
 
 #include <libecs/ReactionProcess.hpp>
-#include <libecs/DiffusionInfluencedReactionProcessInterface.hpp>
 
 namespace libecs
 {
 
-LIBECS_DM_CLASS_EXTRA_1(DiffusionInfluencedReactionProcess, ReactionProcess, virtual DiffusionInfluencedReactionProcessInterface)
+LIBECS_DM_CLASS(DiffusionInfluencedReactionProcess, ReactionProcess)
 { 
   typedef void (DiffusionInfluencedReactionProcess::*Method)(Voxel*, Voxel*,
                                        const unsigned, const unsigned);

@@ -28,10 +28,9 @@
 #include <libecs/Variable.hpp>
 #include <libecs/SpatiocyteCommon.hpp>
 #include <libecs/SpatiocyteStepper.hpp>
-#include <libecs/SpatiocyteProcessInterface.hpp>
 #include <libecs/SpatiocyteNextReactionProcess.hpp>
 #include <libecs/DiffusionInfluencedReactionProcess.hpp>
-#include <libecs/MoleculePopulateProcessInterface.hpp>
+#include <libecs/MoleculePopulateProcess.hpp>
 #include <libecs/SpatiocyteVector.hpp>
 
 namespace libecs
@@ -175,8 +174,7 @@ public:
     {
       theDiffusionInfluencedReactantPairs.push_back(aSpecies);
     }
-  void setPopulateProcess(MoleculePopulateProcessInterface* aProcess,
-                          double aDist)
+  void setPopulateProcess(MoleculePopulateProcess* aProcess, double aDist)
     {
       if(aDist)
         {
@@ -3384,7 +3382,7 @@ private:
   Species* theMultiscaleVacantSpecies;
   Species* theDeoligomerizedProduct;
   Comp* theComp;
-  MoleculePopulateProcessInterface* thePopulateProcess;
+  MoleculePopulateProcess* thePopulateProcess;
   SpatiocyteStepper* theStepper;
   Variable* theVariable;
   Tag theNullTag;

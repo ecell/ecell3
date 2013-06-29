@@ -33,12 +33,11 @@
 #define __ReactionProcess_hpp
 
 #include <libecs/SpatiocyteProcess.hpp>
-#include <libecs/ReactionProcessInterface.hpp>
 
 namespace libecs
 {
 
-LIBECS_DM_CLASS_EXTRA_1(ReactionProcess, SpatiocyteProcess, ReactionProcessInterface)
+LIBECS_DM_CLASS(ReactionProcess, SpatiocyteProcess)
 { 
 public:
   LIBECS_DM_OBJECT(ReactionProcess, Process)
@@ -155,8 +154,8 @@ public:
         {
           ReactionProcess*
             aReactionProcess(dynamic_cast<ReactionProcess*>(*i));
-          SpatiocyteProcessInterface*
-            aSpatiocyteProcess(dynamic_cast<SpatiocyteProcessInterface*>(*i));
+          SpatiocyteProcess*
+            aSpatiocyteProcess(dynamic_cast<SpatiocyteProcess*>(*i));
           Process* me(dynamic_cast<Process*>(this));
           if(this != aReactionProcess && aSpatiocyteProcess->isDependentOn(me))
             {
@@ -259,9 +258,9 @@ protected:
   Voxel* moleculeF;
   Voxel* moleculeP;
   Voxel* moleculeS;
-  std::vector<SpatiocyteProcessInterface*> theInterruptedProcesses;
-  std::vector<SpatiocyteProcessInterface*> theInterruptedProcessesPre;
-  std::vector<SpatiocyteProcessInterface*> theInterruptedProcessesPost;
+  std::vector<SpatiocyteProcess*> theInterruptedProcesses;
+  std::vector<SpatiocyteProcess*> theInterruptedProcessesPre;
+  std::vector<SpatiocyteProcess*> theInterruptedProcessesPost;
 };
 
 }

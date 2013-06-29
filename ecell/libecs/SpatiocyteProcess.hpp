@@ -36,14 +36,13 @@
 #include <libecs/Model.hpp>
 #include <libecs/SpatiocyteCommon.hpp>
 #include <libecs/SpatiocyteStepper.hpp>
-#include <libecs/SpatiocyteProcessInterface.hpp>
 
 namespace libecs
 {
 
 class ReactionProcess;
 
-LIBECS_DM_CLASS_EXTRA_1(SpatiocyteProcess, Process, virtual SpatiocyteProcessInterface)
+LIBECS_DM_CLASS(SpatiocyteProcess, Process)
 { 
 public:
   LIBECS_DM_OBJECT(SpatiocyteProcess, Process)

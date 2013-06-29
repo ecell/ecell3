@@ -33,12 +33,11 @@
 #define __MoleculePopulateProcess_hpp
 
 #include <libecs/SpatiocyteProcess.hpp>
-#include <libecs/MoleculePopulateProcessInterface.hpp>
 
 namespace libecs
 {
 
-LIBECS_DM_CLASS_EXTRA_1(MoleculePopulateProcess, SpatiocyteProcess, MoleculePopulateProcessInterface)
+LIBECS_DM_CLASS(MoleculePopulateProcess, SpatiocyteProcess)
 { 
 public:
   LIBECS_DM_OBJECT(MoleculePopulateProcess, Process)

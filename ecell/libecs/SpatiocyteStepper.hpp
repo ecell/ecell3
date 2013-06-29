@@ -132,7 +132,7 @@ public:
   unsigned getID(const Voxel*) const;
   virtual GET_METHOD(Real, TimeScale) { return 0; }
   Voxel* getVoxel(const unsigned int& aCoord) { return &theLattice[aCoord]; }
-  void addInterruptedProcess(SpatiocyteProcessInterface*);
+  void addInterruptedProcess(SpatiocyteProcess*);
   static Variable* getVariable(System*, String const&);
 private:
   void addSurfaceAdjoins(const unsigned, const Comp*);
@@ -237,8 +237,8 @@ private:
   std::vector<Voxel> theLattice;
   std::vector<Process*> theExternInterruptedProcesses;
   RandomLib::Random theRan;
-  std::vector<SpatiocyteProcessInterface*> theInterruptedProcesses;
-  std::vector<SpatiocyteProcessInterface*> theSpatiocyteProcesses;
+  std::vector<SpatiocyteProcess*> theInterruptedProcesses;
+  std::vector<SpatiocyteProcess*> theSpatiocyteProcesses;
 };
 
 }

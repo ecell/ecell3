@@ -38,8 +38,6 @@
 #include <libecs/VariableReference.hpp>
 #include <SpatiocyteStepper.hpp>
 #include <SpatiocyteSpecies.hpp>
-#include <SpatiocyteProcessInterface.hpp>
-#include <ReactionProcessInterface.hpp>
 
 LIBECS_DM_INIT(SpatiocyteStepper, Stepper);
 
@@ -128,8 +126,8 @@ void SpatiocyteStepper::interrupt(double aTime)
           i(theExternInterruptedProcesses.begin());
           i != theExternInterruptedProcesses.end(); ++i)
         {      
-          SpatiocyteProcessInterface*
-            aProcess(dynamic_cast<SpatiocyteProcessInterface*>(*i));
+          SpatiocyteProcess*
+            aProcess(dynamic_cast<SpatiocyteProcess*>(*i));
           aProcess->substrateValueChanged(getCurrentTime()); 
         }
       setNextTime(thePriorityQueue.getTop()->getTime());
@@ -403,7 +401,7 @@ void SpatiocyteStepper::checkModel()
           for(std::vector<Process*>::const_iterator j(aProcessVector.begin());
               j != aProcessVector.end(); ++j)
             {
-              if(dynamic_cast<SpatiocyteProcessInterface*>(*j))
+              if(dynamic_cast<SpatiocyteProcess*>(*j))
                 {
                   aProcessList.push_back(*j);
                 }
@@ -487,8 +485,8 @@ void SpatiocyteStepper::broadcastLatticeProperties()
   for(std::vector<Process*>::const_iterator i(theProcessVector.begin());
       i != theProcessVector.end(); ++i)
     {      
-      SpatiocyteProcessInterface*
-        aProcess(dynamic_cast<SpatiocyteProcessInterface*>(*i));
+      SpatiocyteProcess*
+        aProcess(dynamic_cast<SpatiocyteProcess*>(*i));
       theSpatiocyteProcesses.push_back(aProcess);
       aProcess->setLatticeProperties(&theLattice, theAdjoiningCoordSize,
                                      theNullCoord, theNullID, &theRan);
@@ -593,8 +591,8 @@ void SpatiocyteStepper::initPriorityQueue()
       i != theProcessVector.end(); ++i)
     {      
       Process* const aProcess(*i);
-      SpatiocyteProcessInterface*
-        aSpatiocyteProcess(dynamic_cast<SpatiocyteProcessInterface*>(*i));
+      SpatiocyteProcess*
+        aSpatiocyteProcess(dynamic_cast<SpatiocyteProcess*>(*i));
       if(aSpatiocyteProcess)
         {
           aSpatiocyteProcess->setTime(aCurrentTime+
@@ -621,8 +619,7 @@ void SpatiocyteStepper::initPriorityQueue()
       //they can change the number of molecules. 
       //This method is called to set the list of processes which will be
       //interrupted by the current ReactionProcess:
-      ReactionProcessInterface*
-        aReactionProcess(dynamic_cast<ReactionProcessInterface*>(*i));
+      ReactionProcess* aReactionProcess(dynamic_cast<ReactionProcess*>(*i));
       if(aReactionProcess)
         {
           aReactionProcess->setInterruption(theProcessVector);
@@ -667,8 +664,7 @@ inline void SpatiocyteStepper::step()
   setNextTime(thePriorityQueue.getTop()->getTime());
 }
 
-void SpatiocyteStepper::addInterruptedProcess(
-                                      SpatiocyteProcessInterface* aProcess)
+void SpatiocyteStepper::addInterruptedProcess(SpatiocyteProcess* aProcess)
 {
   if(std::find(theInterruptedProcesses.begin(), theInterruptedProcesses.end(),
                aProcess) == theInterruptedProcesses.end())

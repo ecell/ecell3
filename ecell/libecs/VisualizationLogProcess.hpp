@@ -195,7 +195,7 @@ public:
           theTime = libecs::INF;
           thePriorityQueue->moveTop();
           if(thePriorityQueue->getTop() != 
-             dynamic_cast<SpatiocyteProcessInterface*>(this))
+             dynamic_cast<SpatiocyteProcess*>(this))
             {
               theInterval = thePriorityQueue->getTop()->getTime() -
                 theSpatiocyteStepper->getCurrentTime();

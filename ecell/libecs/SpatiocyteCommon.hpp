@@ -43,10 +43,10 @@
 namespace libecs
 {
 
-class SpatiocyteProcessInterface;
+class SpatiocyteProcess;
 class Species;
 //struct Subunit;
-typedef PriorityQueue<SpatiocyteProcessInterface*> ProcessPriorityQueue;
+typedef PriorityQueue<SpatiocyteProcess*> ProcessPriorityQueue;
 typedef ProcessPriorityQueue::ID ProcessID;
 
 //Lattice type:
