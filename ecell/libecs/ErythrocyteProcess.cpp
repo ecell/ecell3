@@ -77,34 +77,34 @@ void ErythrocyteProcess::initializeDirectionVectors()
   Y.z = C.z-A.z;
   normalize(Y);
 
-  //Direction vector along rotated positive z-axis
-  A.x = 0; 
+  //Direction vector along rotated positive x-axis
+  A.x = -theComp->lengthX/2;; 
   A.y = 0;
-  A.z = -theComp->lengthZ/2;
+  A.z = 0;
   theSpatiocyteStepper->rotateX(theComp->rotateX, &A, -1);
   theSpatiocyteStepper->rotateY(theComp->rotateY, &A, -1);
   theSpatiocyteStepper->rotateZ(theComp->rotateZ, &A, -1);
   A.x += C.x;
   A.y += C.y;
   A.z += C.z;
-  Z.x = C.x-A.x;
-  Z.y = C.y-A.y;
-  Z.z = C.z-A.z;
-  normalize(Z);
+  X.x = C.x-A.x;
+  X.y = C.y-A.y;
+  X.z = C.z-A.z;
+  normalize(X);
 
   //Direction vector along rotated north-east
   A.x = C.x+5*Y.x;
   A.y = C.y+5*Y.y;
   A.z = C.z+5*Y.z;
   Point B(A);
-  rotatePointAlongVector(Z, C, A, M_PI/3); 
+  rotatePointAlongVector(X, C, A, M_PI/3); 
   R.x = A.x-C.x;
   R.y = A.y-C.y;
   R.z = A.z-C.z;
   normalize(R);
 
   //Direction vector along rotated north-west
-  rotatePointAlongVector(Z, C, B, -M_PI/3); 
+  rotatePointAlongVector(X, C, B, -M_PI/3); 
   L.x = B.x-C.x;
   L.y = B.y-C.y;
   L.z = B.z-C.z;

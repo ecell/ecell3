@@ -127,7 +127,7 @@ protected:
   double VoxelDiameter;
   double TriangleAltitude;
   Point Y; //Direction vector along the rotated positive y-axis
-  Point Z; //Direction vector along the rotated positive z-axis
+  Point X; //Direction vector along the rotated positive x-axis
   Point R; //Direction vector along rotated north east
   Point L; //Direction vector along rotated north west
   Point C; //Center point
