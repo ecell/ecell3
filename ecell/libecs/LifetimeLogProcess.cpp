@@ -28,7 +28,12 @@
 // E-Cell Project, Institute for Advanced Biosciences, Keio University.
 //
 
-#include <LifetimeLogProcess.hpp>
+#include <libecs/LifetimeLogProcess.hpp>
+
+namespace libecs
+{
+
+LIBECS_DM_INIT_STATIC(LifetimeLogProcess, Process); 
 
 void LifetimeLogProcess::initialize()
 {
@@ -280,5 +285,4 @@ bool LifetimeLogProcess::isDependentOnPost(const ReactionProcess* aProcess)
   return false;
 }
 
-
-LIBECS_DM_INIT(LifetimeLogProcess, Process); 
+}

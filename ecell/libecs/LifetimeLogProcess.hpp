@@ -32,8 +32,11 @@
 #ifndef __LifetimeLogProcess_hpp
 #define __LifetimeLogProcess_hpp
 
-#include <IteratingLogProcess.hpp>
-#include <ReactionProcess.hpp>
+#include <libecs/IteratingLogProcess.hpp>
+#include <libecs/ReactionProcess.hpp>
+
+namespace libecs
+{
 
 LIBECS_DM_CLASS(LifetimeLogProcess, IteratingLogProcess)
 { 
@@ -71,5 +74,7 @@ private:
   std::vector<unsigned> availableTagIDs;
   std::vector<double> theTagTimes;
 };
+
+}
 
 #endif /* __LifetimeLogProcess_hpp */
