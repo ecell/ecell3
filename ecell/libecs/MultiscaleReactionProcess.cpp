@@ -475,14 +475,14 @@ void MultiscaleReactionProcess::setReactC()
           //A + B -> [C <- molA]
           reactM = &MultiscaleReactionProcess::reactAtoC_Multi;
         }
-      else if(A->getIsMultiscaleComp() && B->getIsMultiscaleComp())
+      else if(A->getIsMultiscale() && B->getIsMultiscale())
         {
           //MuA + MuB -> [MuC <- allMuA]
           reactM = &MultiscaleReactionProcess::reactAllMuAtoMuC;
         }
       else
         {
-          throwException("Use DIRP since both substrates are not multiscale");
+          throwException("reactMuAtoMuC_withMuB");
         }
     }
   else if(B->isReplaceable(C))
