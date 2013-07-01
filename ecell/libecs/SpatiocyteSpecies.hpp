@@ -1643,7 +1643,8 @@ public:
             {
               const unsigned coord(coordB+lipStartCoord);
               const unsigned anID(getID(theLattice[coord]));
-              if(anID == theID || isMultiscaleBoundID[anID])
+              if(theSpecies[anID]->getIsMultiscale() ||
+                 isMultiscaleBoundID[anID])
                 {
                   return false;
                 }
@@ -1733,7 +1734,8 @@ public:
                 {
                   ++tarCnt;
                 }
-              else if(anID == theID || isMultiscaleBoundID[anID])
+              else if(theSpecies[anID]->getIsMultiscale() ||
+                      isMultiscaleBoundID[anID])
                 {
                   return false;
                 }
@@ -1981,7 +1983,8 @@ public:
               if(isInLattice(coordB, offsetRow+rowA))
                 {
                   const unsigned anID(getID(theLattice[coordB+lipStartCoord]));
-                  if(anID == theID || isMultiscaleBoundID[anID])
+                  if(theSpecies[anID]->getIsMultiscale() ||
+                     isMultiscaleBoundID[anID])
                     {
                       return true;
                     }
@@ -1994,7 +1997,8 @@ public:
             {
               unsigned coordB(theIntersectLipids[coordA][i]+lipStartCoord);
               unsigned anID(getID(theLattice[coordB]));
-              if(anID == theID || isMultiscaleBoundID[anID])
+              if(theSpecies[anID]->getIsMultiscale() ||
+                 isMultiscaleBoundID[anID])
                 {
                   return true;
                 }
