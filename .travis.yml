@@ -6,7 +6,7 @@ compiler:
 
 before_install:
  - sudo apt-get update -qq
- - sudo apt-get install -qq libtool python2.7-dev libboost-dev libboost-python-dev libgsl0-dev python-numpy python-ply python-gtk2 python-gnome2 python-support docbook-xml docbook-utils doxygen libhdf5-serial-dev
+ - sudo apt-get install -qq libtool python2.7-dev libboost-dev libboost-python-dev libgsl0-dev python-numpy python-ply python-gtk2 python-gnome2 python-support docbook-xml docbook-utils doxygen libhdf5-serial-dev libgtkmm-2.4-dev libgtkglextmm-x11-1.2-dev
 
 notifications:
   webhooks:
