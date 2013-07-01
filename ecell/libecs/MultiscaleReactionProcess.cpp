@@ -132,6 +132,11 @@ void MultiscaleReactionProcess::initializeMultiscaleCompReaction()
              "one multiscale substrate species or a substrate diffusing on " +
              "a multiscale species.");
     }
+  else if(A->getIsMultiscale() && B->getIsMultiscale())
+    {
+      A->setMultiMultiReactant(B->getID());
+      B->setMultiMultiReactant(A->getID());
+    }
 }
 
 unsigned MultiscaleReactionProcess::getIdx(Species* aSpecies,
@@ -145,6 +150,17 @@ unsigned MultiscaleReactionProcess::getIdx(Species* aSpecies,
   return mol->idx;
 }
 
+//MuA + MuB -> [MuC <- allMuA]
+void MultiscaleReactionProcess::reactAllMuAtoMuC(Voxel* molA,
+                                                 Voxel* molB,
+                                                 const unsigned indexA,
+                                                 const unsigned indexB)
+{
+  Tag aTag(A->getTag(indexA));
+  A->softRemoveMolecule(indexA);
+  removeMolecule(B, molB, indexB);
+  C->addMolecule(molA, aTag); 
+}
 
 //MuA + B -> [MuC <- MuA]
 void MultiscaleReactionProcess::reactMuAtoMuC(Voxel* molA,
@@ -459,10 +475,14 @@ void MultiscaleReactionProcess::setReactC()
           //A + B -> [C <- molA]
           reactM = &MultiscaleReactionProcess::reactAtoC_Multi;
         }
+      else if(A->getIsMultiscaleComp() && B->getIsMultiscaleComp())
+        {
+          //MuA + MuB -> [MuC <- allMuA]
+          reactM = &MultiscaleReactionProcess::reactAllMuAtoMuC;
+        }
       else
         {
-          //A + B -> [MuC <- MuA]
-          throwException("reactMuAtoMuC");
+          throwException("Use DIRP since both substrates are not multiscale");
         }
     }
   else if(B->isReplaceable(C))

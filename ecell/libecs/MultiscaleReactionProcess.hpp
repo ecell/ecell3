@@ -74,6 +74,7 @@ public:
 protected:
   unsigned getIdx(Species*, Voxel*, const unsigned);
   void reactMuAtoMuC(Voxel*, Voxel*, const unsigned, const unsigned);
+  void reactAllMuAtoMuC(Voxel*, Voxel*, const unsigned, const unsigned);
   void reactMuBtoMuC(Voxel*, Voxel*, const unsigned, const unsigned);
   void reactAtoC_MuBtoMuD(Voxel*, Voxel*, const unsigned, const unsigned);
   void reactMuAtoMuC_BtoD(Voxel*, Voxel*, const unsigned, const unsigned);

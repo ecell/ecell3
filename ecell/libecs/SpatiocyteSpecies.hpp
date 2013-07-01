@@ -97,6 +97,7 @@ public:
     isGaussianPopulation(false),
     isInContact(false),
     isInterface(false),
+    isMultiMultiReactive(false),
     isMultiscale(false),
     isMultiscaleComp(false),
     isOffLattice(false),
@@ -146,10 +147,12 @@ public:
       isFinalizeReactions.resize(speciesSize);
       theMultiscaleUnbindIDs.resize(speciesSize);
       isMultiscaleBinderID.resize(speciesSize);
+      isMultiMultiReactantID.resize(speciesSize);
       isMultiscaleBoundID.resize(speciesSize);
       for(unsigned i(0); i != speciesSize; ++i)
         {
           isMultiscaleBinderID[i] = false;
+          isMultiMultiReactantID[i] = false;
           isMultiscaleBoundID[i] = false;
           theDiffusionInfluencedReactions[i] = NULL;
           theReactionProbabilities[i] = 0;
@@ -1067,7 +1070,7 @@ public:
           const int tarIndex(theRng.Integer(2)); 
           const unsigned coordA(source->coord-vacStartCoord);
           const int rowA(coordA/lipCols);
-          if(!isIntersectMultiscaleRegular(coordA, rowA,
+          if(!isIntersectMultiscaleRegular(source, i, coordA, rowA,
                        theRotOffsets[rowA%2][theTags[i].rotIndex][tarIndex]))
             { 
               unsigned srcIndex(0);
@@ -1104,7 +1107,7 @@ public:
           const int tarIndex(theRng.Integer(2)); 
           const unsigned coordA(source->coord-vacStartCoord);
           const int rowA(coordA/lipCols); 
-          if(!isIntersectMultiscaleRegular(coordA, rowA,
+          if(!isIntersectMultiscaleRegular(source, i, coordA, rowA,
                  theRotOffsets[rowA%2][theTags[i].rotIndex][tarIndex]))
             {
               unsigned srcIndex(0);
@@ -1211,18 +1214,15 @@ public:
               continue;
             }
           Voxel* target(&theLattice[tarCoord+vacStartCoord]);
-          if(getID(target) == theVacantID)
+          if(!isIntersectMultiscaleRegular(source, i, srcCoord, row,
+                   theTarOffsets[row%2][theTags[i].rotIndex][tarIndex]))
             {
-              if(!isIntersectMultiscaleRegular(srcCoord, row,
-                       theTarOffsets[row%2][theTags[i].rotIndex][tarIndex]))
-                {
-                  moveMultiscaleMoleculeRegular(srcCoord, row, 
-                     theTarOffsets[row%2][theTags[i].rotIndex][tarIndex],
-                     theSrcOffsets[row%2][theTags[i].rotIndex][tarIndex], i);
-                  source->idx = target->idx;
-                  target->idx = i+theStride*theID;
-                  theMolecules[i] = target;
-                }
+              moveMultiscaleMoleculeRegular(srcCoord, row, 
+                 theTarOffsets[row%2][theTags[i].rotIndex][tarIndex],
+                 theSrcOffsets[row%2][theTags[i].rotIndex][tarIndex], i);
+              source->idx = target->idx;
+              target->idx = i+theStride*theID;
+              theMolecules[i] = target;
             }
         }
     }
@@ -1245,7 +1245,7 @@ public:
           Voxel* target(&theLattice[tarCoord+vacStartCoord]);
           if(getID(target) == theVacantID)
             {
-              if(!isIntersectMultiscaleRegular(srcCoord, row,
+              if(!isIntersectMultiscaleRegular(source, i, srcCoord, row,
                    theTarOffsets[row%2][theTags[i].rotIndex][tarIndex]))
                 {
                   moveMultiscaleMoleculeRegular(srcCoord, row, 
@@ -2076,10 +2076,12 @@ public:
         }
       return true;
     }
-  bool isIntersectMultiscaleRegular(const unsigned coordA, 
+  bool isIntersectMultiscaleRegular(Voxel* source, unsigned& srcIndex,
+                                    const unsigned coordA, 
                                     const unsigned rowA,
                                     const std::vector<int>& anOffsets)
     {
+      bool isIntersect(false);
       for(unsigned i(0); i != anOffsets.size(); ++i)
         {
           const int offsetRow((anOffsets[i]+theRegLatticeCoord)/lipCols-
@@ -2087,14 +2089,58 @@ public:
           int coordB(coordA+anOffsets[i]);
           if(isInLattice(coordB, offsetRow))
             {
-              const unsigned anID(getID(theLattice[coordB+lipStartCoord]));
-              if(anID == theID || isMultiscaleBoundID[anID])
+              const unsigned idx(theLattice[coordB+lipStartCoord].idx);
+              const unsigned tarID(idx/theStride);
+              if(!isMultiMultiReactive &&
+                 (theSpecies[tarID]->getIsMultiscale() ||
+                  isMultiscaleBoundID[tarID]))
                 {
                   return true;
                 }
+              else if(isMultiMultiReactantID[tarID])
+                {
+                  //If it meets the reaction probability:
+                  if(theReactionProbabilities[tarID] == 1 ||
+                     theRng.Fixed() < theReactionProbabilities[tarID])
+                    { 
+                      Voxel* target;
+                      if(theSpecies[tarID]->getIsMultiscale())
+                        {
+                          target = theSpecies[tarID
+                            ]->getMolecule(idx%theStride);
+                        }
+                      else
+                        {
+                          const unsigned multiIdx(theSpecies[tarID
+                                          ]->getTag(idx%theStride).vacantIdx);
+                          target = theSpecies[multiIdx/theStride
+                            ]->getMolecule(multiIdx%theStride);
+                        }
+                      unsigned aMoleculeSize(theMoleculeSize);
+                      react(source, target, srcIndex);
+                      //If the reaction is successful, the last molecule of this
+                      //species will replace the pointer of i, so we need to 
+                      //decrement i to perform the diffusion on it. However, if
+                      //theMoleculeSize didn't decrease, that means the
+                      //currently walked molecule was a product of this
+                      //reaction and so we don't need to walk it again by
+                      //decrementing i.
+                      if(theMoleculeSize < aMoleculeSize)
+                        {
+                          --srcIndex;
+                        }
+                      return true;
+                    }
+                  isIntersect = true;
+                }
+              else if(theSpecies[tarID]->getIsMultiscale() ||
+                      isMultiscaleBoundID[tarID])
+                {
+                  isIntersect = true;
+                }
             }
         }
-      return false;
+      return isIntersect;
     }
   bool isIntersectMultiscale(const unsigned srcCoord, const unsigned tarCoord)
     {
@@ -2171,12 +2217,17 @@ public:
     {
       return aVoxel->idx%theStride;
     }
-  //it is soft remove because the id of the molecule is not changed:
+  //It is soft remove because the id of the molecule is not changed:
   void softRemoveMolecule(Voxel* aVoxel)
     {
+      /*
       if(isMultiscale)
         {
           Species* aSpecies(theSpecies[getID(aVoxel)]);
+          //Only remove the molecule if we are currently removing the
+          //molecule from the vacant compartment instead of the
+          //multiscale lipid compartment. Here theMultiscaleVacantSpecies is
+          //theLipidSpecies:
           if(aSpecies->getVacantSpecies() != theMultiscaleVacantSpecies)
             {
               softRemoveMolecule(getIndex(aVoxel));
@@ -2186,20 +2237,28 @@ public:
         {
           softRemoveMolecule(getIndex(aVoxel));
         }
+        */
+      softRemoveMolecule(getIndex(aVoxel));
     }
   void removeMolecule(Voxel* aVoxel)
     {
+      /*
       //TODO: remove this multiscale part into another function specially
       //for multiscale:
       if(isMultiscale)
         {
-          //TODO: don't know what is this for
           Species* aSpecies(theSpecies[getID(aVoxel)]);
+          //Only remove the molecule if we are currently removing the
+          //molecule from the vacant compartment instead of the
+          //multiscale lipid compartment. Here theMultiscaleVacantSpecies is
+          //theLipidSpecies:
           if(aSpecies->getVacantSpecies() != theMultiscaleVacantSpecies)
             {
               removeMolecule(getIndex(aVoxel));
             }
+          return;
         }
+        */
       removeMolecule(getIndex(aVoxel));
     }
   void removeMolecule(unsigned anIndex)
@@ -2208,6 +2267,23 @@ public:
         {
           theMolecules[anIndex]->idx = theVacantID*theStride;
           softRemoveMolecule(anIndex);
+        }
+    }
+  void softRemoveMolecule(unsigned anIndex)
+    {
+      if(isDeoligomerize)
+        {
+          removeBounds(anIndex);
+          return;
+        }
+      if(isMultiscale)
+        {
+          removeMultiscaleMolecule(theMolecules[anIndex],
+                                   theTags[anIndex].rotIndex);
+        }
+      if(!isVacant)
+        {
+          removeMoleculeDirect(anIndex);
         }
     }
   void addBound(const unsigned index)
@@ -2303,23 +2379,6 @@ public:
           theTags[anIndex] = theTags[theMoleculeSize];
         }
       theVariable->setValue(theMoleculeSize);
-    }
-  void softRemoveMolecule(unsigned anIndex)
-    {
-      if(isDeoligomerize)
-        {
-          removeBounds(anIndex);
-          return;
-        }
-      if(isMultiscale)
-        {
-          removeMultiscaleMolecule(theMolecules[anIndex],
-                                   theTags[anIndex].rotIndex);
-        }
-      if(!isVacant)
-        {
-          removeMoleculeDirect(anIndex);
-        }
     }
   //Used to remove all molecules and free memory used to store the molecules
   void clearMolecules()
@@ -3088,10 +3147,32 @@ public:
             }
         }
     }
+  void setMultiMultiReactant(unsigned anID)
+    {
+      isMultiMultiReactive = true;
+      isMultiMultiReactantID[anID] = true;
+      for(unsigned i(0); i != isMultiscaleBoundID.size(); ++i)
+        {
+          if(isMultiscaleBoundID[i])
+            {
+              theSpecies[anID]->setMultiMultiReactant(i);
+            }
+        }
+    }
   void setMultiscaleBindIDs(unsigned subID, unsigned prodID)
     {
       isMultiscaleBoundID[prodID] = true;
       isMultiscaleBinderID[subID] = true;
+      if(isMultiMultiReactive)
+        {
+          for(unsigned i(0); i != isMultiMultiReactantID.size(); ++i)
+            {
+              if(isMultiMultiReactantID[i])
+                {
+                  theSpecies[i]->setMultiMultiReactant(prodID);
+                }
+            }
+        }
     }
   void setMultiscaleUnbindIDs(unsigned subID, unsigned prodID)
     {
@@ -3333,6 +3414,7 @@ private:
   bool isGaussianPopulation;
   bool isInContact;
   bool isInterface;
+  bool isMultiMultiReactive;
   bool isMultiscale;
   bool isMultiscaleComp;
   bool isOffLattice;
@@ -3395,6 +3477,7 @@ private:
   std::vector<std::vector<std::vector<std::vector<int> > > > theRotOffsets;
   std::vector<bool> isFinalizeReactions;
   std::vector<bool> isMultiscaleBinderID;
+  std::vector<bool> isMultiMultiReactantID;
   std::vector<bool> isMultiscaleBoundID;
   std::vector<unsigned> collisionCnts;
   std::vector<unsigned> theCoords;
