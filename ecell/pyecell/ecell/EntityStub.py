@@ -87,7 +87,7 @@ class EntityStub( ObjectStub ):
         return -> exist:TRUE / not exist:FALSE
         This method can throw exceptions.
         """
-        return self.theSimulator().isEntityExist( self.theFullIDString )
+        return self.theSimulator().entityExists( self.theFullIDString )
 
     def setProperty( self, aPropertyName, aValue ):
         """
