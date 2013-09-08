@@ -437,7 +437,7 @@ class MainWindow(OsogoWindow):
             if aType == 'Load' and aTarget == 'Model':
                 self.theFileSelection.action = 'open'
                 self.theFileSelection.ok_button.connect('clicked', self.__loadData, aTarget)
-                self.theFileSelection.complete( '*.'+ MODEL_FILE_EXTENSION )
+                self.theFileSelection.complete( '*.em; *.eml' )
                 self.theFileSelection.set_title("Select %s File (%s)" %(aTarget,MODEL_FILE_EXTENSION) )
 
             # when 'Load Script' is selected
