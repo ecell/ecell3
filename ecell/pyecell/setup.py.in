@@ -46,8 +46,8 @@ class build_py(_build_py):
 def ply_generation_hook(builder):
     old_path = sys.path
     sys.path[0:0] = builder.build_lib
-    __import__('ecell.emparser').emparser.initializePLY(builder.build_lib)
-    __import__('ecell.expressionparser').emparser.initializePLY(builder.build_lib)
+    __import__('ecell.emparser.parser').emparser.parser.initializePLY(builder.build_lib)
+    __import__('ecell.expressionparser').expressionparser.initializePLY(builder.build_lib)
     sys.path = old_path
 
 old_setup = core.old_setup
@@ -64,7 +64,7 @@ core.setup(
     author = 'E-Cell project',
     author_email = 'info@e-cell.org',
     url = 'http://www.e-cell.org/',
-    packages = [ 'ecell', 'ecell.session_manager', 'ecell.analysis' ],
+    packages = [ 'ecell', 'ecell.emparser', 'ecell.session_manager', 'ecell.analysis' ],
     cmdclass = { 'build_py': build_py },
     ext_modules = [
         core.Extension( 'ecell._tableio',

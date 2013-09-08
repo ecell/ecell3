@@ -35,9 +35,11 @@ EXTRA_DIST = \
 	ecell/emc.py \
 	ecell/ecs_constants.py \
 	ecell/ecssupport.py \
-	ecell/em.py \
 	ecell/eml.py \
-	ecell/emparser.py \
+	ecell/emparser/__init__.py \
+	ecell/emparser/parser.py \
+	ecell/emparser/preprocessor.py \
+	ecell/emparser/em.py \
 	ecell/expressionparser.py \
 	ecell/util.py \
 	ecell/_tableio.c \

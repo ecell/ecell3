@@ -47,8 +47,8 @@ __author__ = 'Kentarou Takahashi and Koichi Takahashi <shafi@e-cell.org>'
 __copyright__ = 'Copyright (C) 2002-2003 Keio University'
 __license__ = 'GPL'
 
-LEXTAB = "ecell.emlextab"
-PARSERTAB = "ecell.emparsetab"
+LEXTAB = "ecell.emparser.lextab"
+PARSERTAB = "ecell.emparser.parsetab"
 
 # List of token names.
 tokens = [
@@ -355,8 +355,20 @@ def p_error(t):
 def initializePLY(outputdir):
     lextabmod = LEXTAB.split('.')
     parsertabmod = PARSERTAB.split('.')
-    lex.lex( lextab=lextabmod[-1], optimize=1, outputdir=os.path.join( outputdir,*lextabmod[:-1] ) )
-    yacc.yacc( tabmodule=parsertabmod[-1], outputdir=os.path.join( outputdir, *parsertabmod[:-1] ) )
+
+    lextabOutputDir = os.path.join( outputdir, *lextabmod[:-1] )
+    try:
+        os.makedirs( lextabOutputDir )
+    except:
+        pass
+    lex.lex( lextab=lextabmod[-1], optimize=1, outputdir=lextabOutputDir )
+
+    parsertabOutputDir = os.path.join( outputdir, *parsertabmod[:-1] )
+    try:
+        os.makedirs( parsertabOutputDir )
+    except:
+        pass
+    yacc.yacc( tabmodule=parsertabmod[-1], outputdir=parsertabOutputDir )
 
 def convertEm2Eml( anEmFileObject, debug=0 ):
     # initialize eml object
@@ -396,93 +408,3 @@ def patchEm2Eml( anEml, anEmFileObject, debug=0 ):
             raise NotImplementedError
 
     return anEml
-
-#
-# preprocessing methods
-#
-
-import StringIO
-
-import ecell.em
-em = ecell.em ; del ecell.em
-
-class ecellHookClass(em.Hook):
-    def __init__(self, aPreprocessor, anInterpreter):
-        self.theInterpreter = anInterpreter
-        self.thePreprocessor = aPreprocessor
-    def afterInclude( self ):          # def afterInclude( self, interpreter, keywords ):
-        ( file, line ) = self.interpreter.context().identify()
-        self.thePreprocessor.lineControl( self.theInterpreter, file, line )
-
-    def beforeIncludeHook( self, name, file, locals ):  
-        self.thePreprocessor.lineControl( self.theInterpreter, name, 1 )  
-
-    def afterExpand( self, result ):
-        self.thePreprocessor.need_linecontrol = 1
-
-    def afterEvaluate(self, result):
-        self.thePreprocessor.need_linecontrol = 1
-        return
-
-    def afterSignificate(self):
-        self.thePreprocessor.need_linecontrol = 1
-        return
-                         
-    def atParse(self, scanner, locals):
-        if not self.thePreprocessor.need_linecontrol:
-            return
-
-        ( file, line ) = self.theInterpreter.context().identify()
-        self.thePreprocessor.lineControl( self.theInterpreter, file, line )
-        self.thePreprocessor.need_linecontrol = 0        
-
-
-
-class Preprocessor:
-
-    def __init__( self, file, filename ):
-        self.need_linecontrol = 0
-        self.file = file
-        self.filename = filename
-        self.interpreter = None
-
-    def __del__( self ):
-        self.shutdown()
-
-    def lineControl( self, interpreter, file, line ):
-        interpreter.write( '%%line %d %s\n' % ( line, file ) )
-
-    def needLineControl( self, *args ):
-        self.need_linecontrol = 1
-
-    def preprocess( self ):
-
-        #
-        # init
-        #
-        Output = StringIO.StringIO()
-        self.interpreter = em.Interpreter( output = Output )
-        self.interpreter.flatten()
-        self.interpreter.addHook(ecellHookClass(self, self.interpreter))   # pseudo.addHook(ecellHookClass(self, self.interpreter))
-
-        #
-        # processing
-        #
-
-        # write first line
-        self.lineControl( self.interpreter, self.filename, 1 )
-
-        if self.file is not None:
-            self.interpreter.wrap( self.interpreter.file,\
-                      ( self.file, self.filename ) )
-
-        self.interpreter.flush()
-
-        return Output
-
-
-    def shutdown( self ):
-        
-        self.interpreter.shutdown()
-
-
