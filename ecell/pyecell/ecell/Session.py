@@ -37,6 +37,7 @@ import ecell.ecs
 import ecell.config as config
 
 from ecell.ecssupport import *
+from ecell.emparser import Preprocessor, convertEm2Eml
 from ecell.DataFileManager import *
 from ecell.ECDDataFile import *
 
@@ -74,9 +75,17 @@ class Session:
             aModelName = '<eml.Eml>'  # what should this be?
         elif isinstance( aModel, str ) or isinstance( aModel, unicode ):
             # if the type is string
-            aFileObject = open( aModel )
+            _, ext = os.path.splitext( aModel )
+            ext = ext.lower()
+            if ext == '.eml':
+                aFileObject = open( aModel )
+                anEml = eml.Eml( aFileObject )
+            elif ext == '.em':
+                aPreprocessor = Preprocessor( open( aModel ), aModel )
+                anEmFile = aPreprocessor.preprocess()
+                anEmFile.seek( 0 )
+                anEml = convertEm2Eml( anEmFile, False )
             aModelName = aModel
-            anEml = eml.Eml( aFileObject )
         elif isinstance( aModel, file ):
             # change directory to file's home directory
             # if the type is file object
