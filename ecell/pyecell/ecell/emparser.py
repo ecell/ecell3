@@ -30,7 +30,7 @@ import sys
 import os
 import tempfile
 
-import ecell.eml
+from ecell.eml import convertSystemID2SystemFullID, Eml
 from ecell.ecssupport import *
 
 import ply.lex as lex
@@ -50,15 +50,8 @@ __license__ = 'GPL'
 LEXTAB = "ecell.emlextab"
 PARSERTAB = "ecell.emparsetab"
 
-
-# Reserved words
-reserved = (
-#   'Process', 'Variable', 'Stepper', 'System'
-#    '(', ')', '{', '}', '[', ']'
-)
-
 # List of token names.
-tokens = reserved + (
+tokens = [
     'Stepper',
     'System',
     'Variable',
@@ -69,17 +62,13 @@ tokens = reserved + (
     'systempath',
     'quotedstring',
     'quotedstrings',
-    # Delimeters ( ) [ ] { } ;
     'LPAREN', 'RPAREN',
     'LBRACKET', 'RBRACKET',
     'LBRACE', 'RBRACE',
     'SEMI',
-    )
+    ]
 
 filename = ''
-reserved_map = { }
-for r in reserved:
-    reserved_map['r'] = r
 
 # Delimeters
 t_LPAREN   = r'\('
@@ -111,15 +100,8 @@ def t_Variable(t):
     t.value = t.value[:-1]
     return t
 
-
 def t_number(t):
     r' [+-]?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)? '
-        #try:
-        #     t.value = int(t.value)    
-        #except ValueError:
-        #     print "Line %d: Number %s is too large!" % (t.lineno,t.value)
-        #     t.value = 0
-    #t.value = Token( 'number', t.value )
     return t
 
 def t_fullid(t):
@@ -162,18 +144,6 @@ def t_whitespace(t):
     r' [ |\t]+ '
     pass
 
-#def t_default(t):
-#    r' .+ '
-#    raise ValueError, "Unexpected error: unmatched input: %s, line %d." % (t.value, t.lineno)
-
-# Define a rule so we can track line numbers
-#def t_newline(t):
-#    r'\n+'
-#    t.lineno += len(t.value)
-
-# A string containing ignored characters (spaces and tabs)
-#t_ignore  = ' \t'
-
 # Error handling rule
 def t_error(t):
     print "Illegal character '%s' at line %d in %s." % ( t.value[0], t.lineno , t.lexer.filename)
@@ -187,78 +157,79 @@ precedence = (
     ( 'left', 'identifier' )
     )
 
+def createListleft( t ):
+    if hasattr(t, 'slice'):
+        length = len(t.slice) - 1
+    else:
+        return [t]
+    
+    if length == 2:
+        aList = t[1]
+        aList.append(t[2])
+        return aList
+
+    elif t[1] == None:
+        return []
+    else:
+        return [t[1]]
+
+class StepperStmt(object):
+    def __init__(self, classname, id, properties):
+        self.classname = classname
+        self.id = id
+        self.properties = properties
+
+class SystemStmt(object):
+    def __init__(self, classname, id, properties):
+        self.classname = classname
+        self.id = id
+        self.properties = properties
+
+class EntityStmt(object):  
+    def __init__(self, type, classname, id, properties):
+        self.type = type
+        self.classname = classname
+        self.id = id
+        self.properties = properties
+
+class PropertyDef(object):
+    def __init__(self, name, valuelist):
+        self.name = name
+        self.valuelist = valuelist
+
 def p_stmts(t):
     '''
-        stmts : stmts stmt
+    stmts : stmts stmt
           | stmt
-        '''
+    '''
     t[0] = createListleft( t )
-
 
 def p_stmt(t):
     '''
-        stmt : stepper_stmt
-             | system_stmt
-         | ecs
-        '''
-
+    stmt : stepper_stmt
+         | system_stmt
+    '''
     t[0] = t[1]
-    
+
 def p_stepper_stmt(t):
     '''
     stepper_stmt : stepper_decl LBRACE propertylist RBRACE
     '''
-    t[0] = t[1], t[3]
+    t[0] = StepperStmt(t[1][0], t[1][1], t[3])
     
 def p_system_stmt(t):
     '''
     system_stmt : system_decl LBRACE property_entity_list RBRACE
     '''
-    t[0] = t[1], t[3]
+    t[0] = SystemStmt(t[1][0], t[1][1], t[3])
 
 def p_entity_other_stmt (t):
     '''
     entity_other_stmt : entity_other_decl LBRACE propertylist RBRACE
-        '''
-    t[0] = t[1], t[3]
-
-# ecs support
-def p_ecs(t):
     '''
-    ecs : fullid valuelist SEMI
-    '''
-    aFullPN = createFullPN( t[1] )
-    aFullID, aPropertyName = convertFullPNToFullID( aFullPN )
-
-    # for update property
-    if anEml.getEntityProperty( t[1] ):
-        anEml.deleteEntityProperty( createFullIDString( aFullID ), aPropertyName )
-        
-    anEml.setEntityProperty(aFullID, aPropertyName, t[2])
-
-    t[0] = t[1], t[2]
+    t[0] = EntityStmt(t[1][0], t[1][1], t[1][2], t[3])
 
 # object declarations
-
-def p_object_decl(t):
-    '''
-    object_decl : name LPAREN name RPAREN 
-                | name LPAREN name RPAREN info
-    '''
-    if len(t.slice) == 6:
-        t[0] = t[1], t[3], t[5]
-    else:
-        t[0] = t[1], t[3]
-
-def p_system_object_decl(t):
-    '''
-    system_object_decl : name LPAREN systempath RPAREN 
-                       | name LPAREN systempath RPAREN info
-    '''
-    if len(t.slice) == 6:
-        t[0] = t[1], t[3], t[5]
-    else:
-        t[0] = t[1], t[3]
 
 def p_info(t):
     '''
@@ -269,45 +240,32 @@ def p_info(t):
 
 def p_stepper_decl(t):
     '''
-    stepper_decl : Stepper object_decl
+    stepper_decl : Stepper name LPAREN name RPAREN 
+                 | Stepper name LPAREN name RPAREN info
     '''
-    t.type = t[1]
-    t.classname = t[2][0]
-    t.id = t[2][1]
-    anEml.createStepper(t.classname, t.id)
-    if len(t[2]) == 3:
-        anEml.setStepperInfo( t.id, t[2][2])
-    
-    t[0] = t[1], t[2]
-    
+    t[0] = t[2], t[4]
+
 def p_system_decl(t):
     '''
-    system_decl : System system_object_decl
+    system_decl : System name LPAREN systempath RPAREN 
+                | System name LPAREN systempath RPAREN info
+
     '''
-    t.type = t[1]
-    t.classname = t[2][0]
-    t.path      = t[2][1]
-    t.id = ecell.eml.convertSystemID2SystemFullID( t.path )
-    anEml.createEntity(t.classname, t.id)
-    if len(t[2]) == 3:
-        anEml.setEntityInfo( t.id, t[2][2] )
-    
-    t[0] = t[1], t[2]
-    
-def p_entity_other_decl (t):
+    t[0] = t[2], t[4]
+   
+def p_variable_or_process(t):
     '''
-    entity_other_decl : Variable object_decl
-                          | Process object_decl
-        '''
-    t.type = t[1]
-    t.classname = t[2][0]
-    t.id        = t.path + ':' + t[2][1]
-    t.id = t.type + ':' + t.id
-    anEml.createEntity( t.classname, t.id )
-    if len(t[2]) == 3:
-        anEml.setEntityInfo( t.id, t[2][2] )
-    
-    t[0] = t[1], t[2]
+    variable_or_process : Variable
+                        | Process
+    '''
+    t[0] = t[1]
+
+def p_entity_other_decl(t):
+    '''
+    entity_other_decl : variable_or_process name LPAREN name RPAREN
+                      | variable_or_process name LPAREN name RPAREN info
+    '''
+    t[0] = t[1], t[2], t[4]
 
 # property
 
@@ -315,52 +273,42 @@ def p_propertylist(t):
     '''
     propertylist : propertylist property
                  | property
-                     | empty
-        '''
+                 | empty
+    '''
     t[0] = createListleft( t )
 
 def p_property(t):
     '''
     property : name valuelist SEMI
     '''
-    if type(t[2]) == str:
-        t[2] = [t[2]]
-
-    if t.type == 'Stepper':
-        anEml.setStepperProperty(t.id, t[1], t[2])
-    else:
-        anEml.setEntityProperty(t.id, t[1], t[2])
-        
-    #t[0] = t[1], t[2]
+    t[0] = PropertyDef(t[1], t[2])
 
 # property or entity ( for System statement )
 
 def p_property_entity_list(t):
     '''
-        property_entity_list : property_entity_list property_entity
-                             | property_entity
-                             | empty
-        '''
-    t[0] =  createListleft( t )
-
+    property_entity_list : property_entity_list property_entity
+                         | property_entity
+                         | empty
+    '''
+    t[0] = createListleft( t )
 
 def p_property_entity(t):
     '''
     property_entity : property
                     | entity_other_stmt
-        '''
+    '''
     t[0] = t[1]
 
 # value
-
 def p_value(t):
     '''
     value : quotedstring
-              | number
+          | number
           | string
           | LBRACKET valuelist RBRACKET
           | quotedstrings
-        '''
+    '''
     if t[1] == '[':
         t[0] = t[2]
     else:
@@ -379,16 +327,16 @@ def p_string(t):
     string : name
            | fullid
            | systempath
-        '''
+    '''
     t[0] = t[1]
 
 def p_name(t):
     '''
     name : identifier
          | Variable
-             | Process
-          | System
-           | Stepper
+         | Process
+         | System
+         | Stepper
     '''
     t[0] = t[1]
 
@@ -403,29 +351,6 @@ def p_error(t):
         print "Syntax error"
     else:
         print "Syntax error at line %d in %s. " % ( t.lineno, t.value )
-    
-# Constract List
-    
-def createListleft( t ):
-
-    if hasattr(t, 'slice'):
-        length = len(t.slice) - 1
-    else:
-        return [t]
-
-    
-    if length == 2:
-        aList = t[1]
-            
-        aList.append( t[2] )
-        return aList
-
-    elif t[1] == None:
-        return []
-
-    else:
-        return [t[1]]
-
 
 def initializePLY(outputdir):
     lextabmod = LEXTAB.split('.')
@@ -434,33 +359,42 @@ def initializePLY(outputdir):
     yacc.yacc( tabmodule=parsertabmod[-1], outputdir=os.path.join( outputdir, *parsertabmod[:-1] ) )
 
 def convertEm2Eml( anEmFileObject, debug=0 ):
-
     # initialize eml object
-    anEml = ecell.eml.Eml()
+    anEml = Eml()
     patchEm2Eml( anEml, anEmFileObject, debug=debug)
-
     return anEml
 
-def patchEm2Eml( anEmlObject, anEmFileObject, debug=0 ):
-
-    # initialize eml object
-    global anEml
-    anEml = anEmlObject
-    
+def patchEm2Eml( anEml, anEmFileObject, debug=0 ):
     # Build the lexer
     aLexer = lex.lex(lextab=LEXTAB)
     aLexer.filename = 'undefined'
     # Parsing
     aParser = yacc.yacc(optimize=0, tabmodule=PARSERTAB)
-    anAst = aParser.parse( anEmFileObject.read(), lexer=aLexer ,debug=debug )
-        
-    if debug != 0:
-        import pprint
-        print pprint.pprint(anAst)
-        
-    if anAst == None:
-        sys.exit(1)
-    
+    aParser.anEml = anEml
+    anAst = aParser.parse( anEmFileObject.read(), lexer=aLexer, debug=debug )
+
+    for aNode in anAst:
+        if isinstance( aNode, StepperStmt ):
+            anEml.createStepper( aNode.classname, aNode.id )
+            for aProperty in aNode.properties:
+                assert isinstance( aProperty, PropertyDef )
+                anEml.setStepperProperty( aNode.id, aProperty.name, aProperty.valuelist )
+        elif isinstance( aNode, SystemStmt ):
+            anId = convertSystemID2SystemFullID( aNode.id )
+            anEml.createEntity( aNode.classname, anId )
+            for aPropertyOrEntity in aNode.properties:
+                if isinstance( aPropertyOrEntity, EntityStmt ):
+                    anEntityId = '%s:%s:%s' % ( aPropertyOrEntity.type, aNode.id, aPropertyOrEntity.id )
+                    anEml.createEntity( aPropertyOrEntity.classname, anEntityId )
+                    for aProperty in aPropertyOrEntity.properties:
+                        assert isinstance( aProperty, PropertyDef )
+                        anEml.setEntityProperty( anEntityId, aProperty.name, aProperty.valuelist )
+                                
+                elif isinstance( aPropertyOrEntity, PropertyDef ):
+                    anEml.setEntityProperty( anId, aPropertyOrEntity.name, aPropertyOrEntity.valuelist )
+        else:
+            raise NotImplementedError
+
     return anEml
 
 #
