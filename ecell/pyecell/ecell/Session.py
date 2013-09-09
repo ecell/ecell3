@@ -85,6 +85,8 @@ class Session:
                 anEmFile = aPreprocessor.preprocess()
                 anEmFile.seek( 0 )
                 anEml = convertEm2Eml( anEmFile, False )
+            else:
+                raise Exception( "Unsupported file type: %s" % ext )
             aModelName = aModel
         elif isinstance( aModel, file ):
             # change directory to file's home directory
