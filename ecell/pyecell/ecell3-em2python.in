@@ -1,0 +1,248 @@
+#!/usr/bin/env @prefix@/bin/ecell3-python
+
+"""
+A program for converting EM to Python.
+This program is part of E-Cell Simulation Environment Version 3.
+"""
+
+__program__ = 'ecell3-em2python'
+__version__ = '0.1'
+__author__ = 'Moriyoshi Koizumi <moriyoshi@e-cell.org>'
+__copyright__ = 'Copyright (C) 2002-2013 Keio University'
+__license__ = 'GPL'
+
+
+import sys
+import os
+import getopt
+import tempfile
+
+import ecell.ecs
+import ecell.config
+import ecell.emparser
+import ecell.eml
+
+from ecell.ecssupport import convertFullIDToFullPN, createFullID, createSystemPathFromFullID, createFullIDString, createFullPNString
+from ecell.ecs_constants import ENTITYTYPE_STRING_LIST, VARIABLE, PROCESS, SYSTEM
+
+def usage():
+    aProgramName = os.path.basename( sys.argv[0] )
+    print \
+    '''%(appname)s -- convert a EM / EML file to a Python script file
+
+Usage:
+    %(appname)s [-h] [-o SCRIPT] infile.(em|eml)
+    By default this command automatically overwrite EMLFILE.
+
+Options:
+    -h or --help            : Print this message.
+    -o or --outfile=SCRIPT  : Specify the output file name. '-' means stdout.
+''' % { 'appname': aProgramName }
+
+def identityCoercer( value ):
+    return value
+
+def listOrTuple( value ):
+    return isinstance( value, list ) or isinstance( value, tuple ) 
+
+def suspiciouslyVariableReference( value ):
+    return listOrTuple( value ) and len( value ) in ( 3, 4 )
+
+def unwrap( value ):
+    if listOrTuple( value ):
+        if len( value ) == 1 and not suspiciouslyVariableReference( value[ 0 ] ):
+            return value[ 0 ]
+    return value
+
+class Eml2Script( object ):
+    stepperCoercerMap = {
+        'id': str,
+        'Priority': int,
+        'StepInterval': float,
+        'MaxStepInterval': float,
+        'MinStepInterval': float,
+        'RngSeed': int,
+        }
+    entityCoercerMap = {
+        SYSTEM: {
+            'ID': str,
+            'Size': float,
+            'SizeN_A': float,
+            'StepperID': str,
+            },
+        PROCESS: {
+            'ID': str,
+            'Activity': float,
+            'IsContinuous': bool,
+            'Priority': int,
+            'StepperID': str,
+            },
+        VARIABLE: {
+            'Value': float,
+            'MolarConc': float,
+            'NumberConc': float,
+            }
+        }
+
+    def __init__( self, anEmlObject ):
+        self.emlObject = anEmlObject
+        self.lines = []
+        self.p = ''
+
+    def append( self, line ):
+        self.lines.append( self.p + line )
+
+    def indent( self ):
+        self.p += '    '
+
+    def dedent( self ):
+        self.p = p[ : -4 ]
+
+    def valueAsString( self, value ):
+        if isinstance( value, basestring ):
+            return '"' + value.replace( '\\', '\\\\' ).replace( '"', '\\"' ) + '"'
+        elif isinstance( value, int ) or isinstance( value, float ):
+            return str( value )
+        elif listOrTuple( value ):
+            return '[' + ', '. join( self.valueAsString( item ) for item in value ) + ']'
+        raise NotImplementedError
+
+    def encodeStepperID( self, aStepperID ):
+        return 'stepper_%s' % aStepperID
+
+    def encodeEntityID( self, aFullID ):
+        return aFullID.replace(':', '_').replace('/', '_')
+
+    def getStepperCoercer( self, aPropertyName ):
+        return self.stepperCoercerMap.get( aPropertyName, identityCoercer )
+
+    def getEntityCoercer( self, anEntityType, aPropertyName ):
+        return self.entityCoercerMap.get( anEntityType, {} ).get( aPropertyName, identityCoercer )
+
+    def addSteppers( self ):
+        # create Steppers
+        aStepperList = self.emlObject.getStepperList()
+        for aStepperID in aStepperList:
+            aStepperClass = self.emlObject.getStepperClass( aStepperID )
+            anEncodedStepperID = self.encodeStepperID( aStepperID )
+            self.append( '%s = theSimulator.createStepper(%s, %s)' % ( anEncodedStepperID, self.valueAsString( aStepperClass ), self.valueAsString( aStepperID ) ) )
+            aStepperPropertyList = self.emlObject.getStepperPropertyList( aStepperID )
+            for aStepperProperty in aStepperPropertyList:
+                aStepperPropertyValue = self.emlObject.getStepperProperty( aStepperID, aStepperProperty )
+                aStepperPropertyValue = unwrap( aStepperPropertyValue )
+                aStepperPropertyValue = self.getStepperCoercer( aStepperProperty )( aStepperPropertyValue )
+                self.append( '%s.%s = %s' % ( anEncodedStepperID, aStepperProperty, self.valueAsString( aStepperPropertyValue ) ) )
+
+    def addEntity( self, aFullID ):
+        aFullIDTuple = createFullID( aFullID )
+        anEntityType = aFullIDTuple[ 0 ]
+        anEntityTypeString = ENTITYTYPE_STRING_LIST[ anEntityType ]
+        if anEntityType == SYSTEM and aFullIDTuple[ 1 ] == '':
+            anEncodedEntityID = 'theSimulator.rootSystem'
+        else:
+            anEncodedEntityID = self.encodeEntityID( aFullID )
+            aClassName = self.emlObject.getEntityClass( aFullID )
+            self.append( '%s = theSimulator.createEntity(%s, %s)' % ( anEncodedEntityID, self.valueAsString( aClassName ), self.valueAsString( aFullID ) ) )
+        aPropertyList = self.emlObject.getEntityPropertyList( aFullID )
+        for aProperty in aPropertyList:
+            aPropertyValue = self.emlObject.getEntityProperty( createFullPNString( convertFullIDToFullPN( aFullIDTuple, aProperty ) ) )
+            aPropertyValue = unwrap( aPropertyValue )
+            aPropertyValue = self.getEntityCoercer( anEntityType, aProperty )( aPropertyValue )
+            self.append( '%s.%s = %s' % ( anEncodedEntityID, aProperty, self.valueAsString( aPropertyValue ) ) )
+
+        if anEntityType == SYSTEM:
+            aSystemPath = createSystemPathFromFullID( aFullIDTuple ) 
+            for aChildEntityType in (VARIABLE, PROCESS, SYSTEM):
+                aChildEntityTypeString = ENTITYTYPE_STRING_LIST[ aChildEntityType ]
+                aChildEntityList = self.emlObject.getEntityList( aChildEntityTypeString, aSystemPath )
+                for aChildEntityLocalID in aChildEntityList:
+                    self.addEntity( createFullIDString( ( aChildEntityType, aSystemPath, aChildEntityLocalID ) ) )
+
+    def addSystemsAndEntities( self ):
+        self.addEntity( 'System::/' )
+
+    def __call__( self ):
+        self.append( 'def buildModel( theSimulator ): ' )  
+        self.indent()
+        self.addSteppers()
+        self.addSystemsAndEntities()
+        return '\n'.join( self.lines )
+
+def convertEml2Script( anEml ):
+    return Eml2Script( anEml )()
+
+def main():
+    try:
+        opts, args = getopt.getopt( sys.argv[1:] , 'DEho:',
+                         ['help', 'debug', 'outfile='])
+    except:
+        usage()
+        sys.exit( 255 )
+
+    aScriptName = None
+    aForceFlag = 1 # Default Automatic overwrite mode
+    aPatchFlag = 0
+    debug = 0
+    for anOption, anArg in opts:
+        if anOption in ( "-h", '--help' ):
+            usage()
+            sys.exit( 0 )
+            
+        if anOption in ( "-D", '--debug' ):
+            debug = 1
+            
+        if anOption in ( "-o", '--outfile'):
+            aScriptName = anArg
+            
+    if len( args ) == 0:
+        sys.stderr.write( "No input file.\n" )
+        sys.exit( 1 )
+
+    aModelFileName = args[0]
+
+    if aScriptName is None:
+        name, _ = os.path.splitext( aModelFileName )
+        aScriptName = name + '.py'
+
+    aModelFile = open( aModelFileName, 'r' )
+    aBaseName = os.path.basename( aModelFileName )
+    aBaseName, anExt = os.path.splitext( aBaseName )
+
+    anExt = anExt.lower()
+
+    if anExt == '.em':
+        aPreprocessor = ecell.emparser.Preprocessor( aModelFile, aModelFileName )
+        aTempFile = aPreprocessor.preprocess()
+
+        aTempFile.seek( 0 )
+
+        anEmlObject = ecell.emparser.convertEm2Eml( aTempFile, debug )
+    elif anExt == '.eml':
+        anEmlObject = ecell.eml.Eml( aModelFile )
+
+    aString = convertEml2Script( anEmlObject )
+
+    if aScriptName == '-':
+        aScriptFile = sys.stdout
+    else:
+        # Default automatic overwrite mode
+        if os.path.isfile( aScriptName ) and aForceFlag:
+            pass
+        
+        elif not os.path.isfile( aScriptName) :
+            pass
+        else:
+            sys.stderr.write( "The output file already exists. To overwrite, use -f or --force.\n" )
+            sys.exit( 1 )
+            
+        aScriptFile = open(aScriptName, 'w')
+       
+    try:
+        aScriptFile.write(aString)
+    finally:
+        aScriptFile.close()
+
+
+if __name__ == '__main__':
+    main()
+    sys.exit( 0 )
