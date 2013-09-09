@@ -96,7 +96,7 @@ class Eml2Script( object ):
         self.p += '    '
 
     def dedent( self ):
-        self.p = p[ : -4 ]
+        self.p = self.p[ : -4 ]
 
     def valueAsString( self, value ):
         if isinstance( value, basestring ):
