@@ -60,6 +60,7 @@ LocalSimulatorImplementation::LocalSimulatorImplementation()
       thePropertiedObjectMaker( libecs::createDefaultModuleMaker() ),
       theModel( *thePropertiedObjectMaker )
 {
+    theModel.setup();
     clearEventChecker();
 }
 
