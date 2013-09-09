@@ -29,6 +29,7 @@ depcomp
 /ecell/libecs/Defs.hpp
 /ecell/pyecell/build
 /ecell/pyecell/ecell3-em2eml
+/ecell/pyecell/ecell3-em2python
 /ecell/pyecell/ecell3-eml2em
 /ecell/pyecell/ecell3-eml2sbml
 /ecell/pyecell/ecell3-python

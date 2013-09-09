@@ -76,6 +76,7 @@ bin_SCRIPTS = \
 	ecell3-sbml2eml \
 	ecell3-eml2sbml \
 	ecell3-em2eml \
+	ecell3-em2python \
 	ecell3-eml2em
 
 all-local:
