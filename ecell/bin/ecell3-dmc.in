@@ -163,7 +163,8 @@ def main():
     try:
         opts , args = getopt.getopt( sys.argv[1:], "hvo:",
                 ["help", "verbose", "no-stdinclude","no-stdlibdir", "ldflags=",
-                 "cxxflags=", "no-define-cxxflags=", "dmcompile=", "output="])
+                 "libs=", "cxxflags=", "no-define-cxxflags=", "dmcompile=",
+                 "output="])
     except:
         help()
         sys.exit( 1 ) 
@@ -173,6 +174,7 @@ def main():
     NO_STDLIBDIR = False
     NO_DEFINE_CXXFLAGS = False
     LDFLAGS = []
+    LIBS = []
     CXXFLAGS = []
     CXXCOMPILEFLAGS = []
     OUTPUT = None
@@ -204,6 +206,10 @@ def main():
         # set ldflags
         if anOption == "--ldflags":
             LDFLAGS.extend( split_quoted( anArg ) )
+
+        # set libs
+        if anOption == "--libs":
+            LIBS.extend( split_quoted( anArg ) )
 
         # set no-define-cxxflags
         if anOption == "--no-define-cxxflags":
@@ -257,8 +263,8 @@ def main():
     if not NO_STDLIBDIR:
         LDFLAGS.extend( STDLIBDIRS )
   
-    LDFLAGS.append( '-lecs' )
-    LDFLAGS.append( '-lgsl' )
+    LIBS.append( '-lecs' )
+    LIBS.append( '-lgsl' )
 
     cmdList.extend( STDINCLUDE )
     cmdList.extend( CXXFLAGS )
@@ -267,7 +273,7 @@ def main():
     for src in srcs:
         ext = os.path.basename( src )
         classname, ext = os.path.splitext( ext )
-        argList = cmdList + [ '-D%s=%s' % ( CLASS_NAME_MACRO_NAME, classname ), src ]
+        argList = cmdList + [ '-D%s=%s' % ( CLASS_NAME_MACRO_NAME, classname ), src ] + LIBS
 
         if VERBOSE:
             print ' '.join( argList[0:] )
