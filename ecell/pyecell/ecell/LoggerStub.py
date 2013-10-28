@@ -66,11 +66,17 @@ class LoggerStub( ObjectStub ):
         else:
             self.theSimulator().createLogger( self.theFullPNString )
 
+    def remove( self ):
+        """
+        Deletes the logger created by create()
+        """
+        self.theSimulator().removeLogger( self.theFullPNString )
+
     def delete( self ):
         """
         Deletes the logger created by create()
         """
-        self.theSimulator().deleteLogger( self.theFullPNString )
+        self.remove()
 
     def exists( self ):
         """
