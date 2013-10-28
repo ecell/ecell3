@@ -3226,8 +3226,7 @@ BOOST_PYTHON_MODULE( _ecs )
               py::return_internal_reference<> () )
         .def( "getLogger", &AbstractSimulator::getLogger,
               py::return_internal_reference<>() )
-        .def( "removeLogger", &AbstractSimulator::removeLogger,
-              py::return_internal_reference<>() )
+        .def( "removeLogger", &AbstractSimulator::removeLogger )
         .def( "getLoggerData", 
               ( boost::shared_ptr< DataPointVector >( AbstractSimulator::* )(
                     String const& ) const )
