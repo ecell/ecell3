@@ -31,6 +31,8 @@ CXX="@CXX@"
 LDFLAGS="@LDFLAGS@"
 ECELL3_LIBDIR="${libdir}/${ECELL_DIRNAME}"
 
+LD_LIBRARY_PATH="${libdir}"
+
 export ECELL3_PREFIX
 export ECELL_DIRNAME
 export PYTHONDIR
@@ -43,6 +45,7 @@ export CXXFLAGS
 export CXX
 export LDFLAGS
 export ECELL3_LIBDIR
+export LD_LIBRARY_PATH
 
 ecell3_usage() 
 {
