@@ -4,7 +4,12 @@ import os
 import sys
 from glob import glob
 from distutils.core import setup, Extension
+from distutils.core import Distribution
 import ecell.config as config
+
+class SessionMonitorDistribution(Distribution):
+	def is_pure(self):
+		return False
 
 def relative( basePath, path ):
 	separators = os.sep + ( os.altsep or "" )
@@ -21,6 +26,7 @@ plugins = glob(
     os.path.join( os.path.dirname( __file__ ), 'plugins', '*' ) )
 
 setup(
+    distclass = SessionMonitorDistribution,
     name = 'ecell.session-monitor',
     version = config.version,
     description = 'E-Cell Osogo -- Session Monitor',
@@ -35,3 +41,6 @@ setup(
         ( os.path.join( relative( config.prefix, config.lib_dir), 'session-monitor', 'plugins' ), plugins ),
         ]
     )
+
+
+distutils.sysconfig.get_python_lib( True )
