@@ -41,6 +41,3 @@ setup(
         ( os.path.join( relative( config.prefix, config.lib_dir), 'session-monitor', 'plugins' ), plugins ),
         ]
     )
-
-
-distutils.sysconfig.get_python_lib( True )
