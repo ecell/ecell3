@@ -44,11 +44,11 @@ EXTRA_DIST +=\
 	setup.py
 
 EXTRA_DIST +=\
-	ecell3-session-monitor
+	ecell3-session-monitor.in
 
 all-local:
 	$(PYTHON_) setup.py config
-	$(PYTHON_) setup.py build
+	$(PYTHON_) setup.py build --executable="/usr/bin/env $(PREFIX)/bin/ecell3-python"
 
 mostlyclean-local:
 	rm -rf build
