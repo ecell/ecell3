@@ -4,12 +4,7 @@ import os
 import sys
 from glob import glob
 from distutils.core import setup, Extension
-from distutils.core import Distribution
 import ecell.config as config
-
-class SessionMonitorDistribution(Distribution):
-	def is_pure(self):
-		return False
 
 def relative( basePath, path ):
 	separators = os.sep + ( os.altsep or "" )
@@ -26,7 +21,6 @@ plugins = glob(
     os.path.join( os.path.dirname( __file__ ), 'plugins', '*' ) )
 
 setup(
-    distclass = SessionMonitorDistribution,
     name = 'ecell.session-monitor',
     version = config.version,
     description = 'E-Cell Osogo -- Session Monitor',
@@ -36,8 +30,9 @@ setup(
     packages = [ 'ecell.ui', 'ecell.ui.osogo' ],
     scripts = [ 'ecell3-session-monitor' ],
     data_files = [
-        ( relative( config.prefix, config.conf_dir ), [ 'osogo.ini' ] ),
-        ( os.path.join( relative( config.prefix, config.data_dir ), 'session-monitor', 'glade' ), resources ),
-        ( os.path.join( relative( config.prefix, config.lib_dir), 'session-monitor', 'plugins' ), plugins ),
+        ( os.path.join( '@PREFIX@', relative( config.prefix, config.conf_dir )), [ 'osogo.ini' ] ),
+        ( os.path.join( '@PREFIX@', relative( config.prefix, config.data_dir ), 'session-monitor', 'glade' ), resources ),
+        ( os.path.join( '@PREFIX@', relative( config.prefix, config.lib_dir), 'session-monitor', 'plugins' ), plugins ),
         ]
     )
+
