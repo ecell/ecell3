@@ -322,6 +322,7 @@ AC_CONFIG_FILES([
     frontend/session-monitor/glade/Makefile
     frontend/session-monitor/plugins/Makefile
     frontend/model-editor/Makefile
+    frontend/model-editor/setup.py
     frontend/model-editor/doc/Makefile
     frontend/model-editor/glade/Makefile
     frontend/model-editor/plugins/Makefile

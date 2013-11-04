@@ -93,10 +93,10 @@ EXTRA_DIST +=\
 
 all-local:
 	$(PYTHON_) setup.py config
-	$(PYTHON_) setup.py build
+	$(PYTHON_) setup.py build --executable="/usr/bin/env $(PREFIX)/bin/ecell3-python"
 
 mostlyclean-local:
 	rm -rf build
 
 install-exec-local:
-	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) --install-scripts=$(bindir) $(if $(DESTDIR),--root $(DESTDIR), )
+	$(PYTHON_) setup.py install -f --prefix=$(PREFIX) --install-scripts=$(bindir) $(if $(DESTDIR),--root $(DESTDIR), ) --install-purelib=$(pyexecdir)

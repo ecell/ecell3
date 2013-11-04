@@ -30,8 +30,8 @@ setup(
     packages = [ 'ecell.ui.model_editor' ],
     scripts = [ 'ecell3-model-editor' ],
     data_files = [
-        ( relative( config.prefix, config.conf_dir ), [ 'model-editor.ini' ] ),
-        ( os.path.join( relative( config.prefix, config.data_dir ), 'model-editor', 'glade' ), resources ),
-        ( os.path.join( relative( config.prefix, config.lib_dir ), 'model-editor', 'plugins' ), plugins ),
+        ( os.path.join( '@PREFIX@', relative( config.prefix, config.conf_dir )), [ 'model-editor.ini' ] ),
+        ( os.path.join( '@PREFIX@', relative( config.prefix, config.data_dir ), 'model-editor', 'glade' ), resources ),
+        ( os.path.join( '@PREFIX@', relative( config.prefix, config.lib_dir ), 'model-editor', 'plugins' ), plugins ),
         ]
     )
