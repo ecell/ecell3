@@ -2290,6 +2290,11 @@ public:
         return getLoggerBroker().getLogger( aFullPNString );
     }
 
+    void removeLogger( String const& aFullPNString )
+    {
+        getLoggerBroker().removeLogger( FullPN( aFullPNString ) );
+    }
+
     static char getDMSearchPathSeparator()
     {
         return Model::PATH_SEPARATOR;
@@ -3221,6 +3226,7 @@ BOOST_PYTHON_MODULE( _ecs )
               py::return_internal_reference<> () )
         .def( "getLogger", &AbstractSimulator::getLogger,
               py::return_internal_reference<>() )
+        .def( "removeLogger", &AbstractSimulator::removeLogger )
         .def( "getLoggerData", 
               ( boost::shared_ptr< DataPointVector >( AbstractSimulator::* )(
                     String const& ) const )
