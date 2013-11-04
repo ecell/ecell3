@@ -15,23 +15,23 @@ def relative( basePath, path ):
 		return path[ len( commonPrefix ): ].lstrip( separators )
 
 resources = glob(
-    os.path.join( os.path.dirname( __file__ ), 'glade', '*' ) )
+	os.path.join( os.path.dirname( __file__ ), 'glade', '*' ) )
 
 plugins = glob(
-    os.path.join( os.path.dirname( __file__ ), 'plugins', '*' ) )
+	os.path.join( os.path.dirname( __file__ ), 'plugins', '*' ) )
 
 setup(
-    name = 'ecell.model-editor',
-    version = config.version,
-    description = 'E-Cell Model Editor',
-    author = 'E-Cell project',
-    author_email = 'info@e-cell.org',
-    url = 'http://www.e-cell.org/',
-    packages = [ 'ecell.ui.model_editor' ],
-    scripts = [ 'ecell3-model-editor' ],
-    data_files = [
-        ( os.path.join( '@PREFIX@', relative( config.prefix, config.conf_dir )), [ 'model-editor.ini' ] ),
-        ( os.path.join( '@PREFIX@', relative( config.prefix, config.data_dir ), 'model-editor', 'glade' ), resources ),
-        ( os.path.join( '@PREFIX@', relative( config.prefix, config.lib_dir ), 'model-editor', 'plugins' ), plugins ),
-        ]
-    )
+	name = 'ecell.model-editor',
+	version = config.version,
+	description = 'E-Cell Model Editor',
+	author = 'E-Cell project',
+	author_email = 'info@e-cell.org',
+	url = 'http://www.e-cell.org/',
+	packages = [ 'ecell.ui.model_editor' ],
+	scripts = [ 'ecell3-model-editor' ],
+	data_files = [
+		( os.path.join( '@PREFIX@', relative( config.prefix, config.conf_dir )), [ 'model-editor.ini' ] ),
+		( os.path.join( '@PREFIX@', relative( config.prefix, config.data_dir ), 'model-editor', 'glade' ), resources ),
+		( os.path.join( '@PREFIX@', relative( config.prefix, config.lib_dir ), 'model-editor', 'plugins' ), plugins ),
+		]
+	)
