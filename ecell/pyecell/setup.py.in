@@ -4,84 +4,84 @@ import os
 import sys
 import numpy.distutils.core as core
 try:
-    from numpy.distutils.numpy_distribution import NumpyDistribution
+	from numpy.distutils.numpy_distribution import NumpyDistribution
 except:
-    from distutils.dist import Distribution as NumpyDistribution
+	from distutils.dist import Distribution as NumpyDistribution
 from numpy.distutils.command.build_py import build_py as _build_py
 from types import *
 
 include_dirs = [
-    r'@DMTOOL_INCLUDE_DIR@',
-    os.environ['INCLTDL'][2:],
-    r'@top_srcdir@',
-    r'@top_srcdir@/libecs',
-    ]
+	r'@DMTOOL_INCLUDE_DIR@',
+	os.environ['INCLTDL'][2:],
+	r'@top_srcdir@',
+	r'@top_srcdir@/libecs',
+	]
 
 common_libraries = [
-    os.environ.get('BOOST_PYTHON_LIBNAME', 'boost_python'),
-    'gsl'
-    ]
+	os.environ.get('BOOST_PYTHON_LIBNAME', 'boost_python'),
+	'gsl'
+	]
 
 ecell_staging_home = r'@abs_top_builddir@/tmp'
 
 class Distribution(NumpyDistribution):
-    def __init__(self, attrs = None):
-        self.generation_hooks = []
-        NumpyDistribution.__init__(self, attrs)
+	def __init__(self, attrs = None):
+		self.generation_hooks = []
+		NumpyDistribution.__init__(self, attrs)
 
 class build_py(_build_py):
-    def initialize_options(self):
-        _build_py.initialize_options(self)
-        self.generation_hooks = self.distribution.generation_hooks
+	def initialize_options(self):
+		_build_py.initialize_options(self)
+		self.generation_hooks = self.distribution.generation_hooks
 
-    def byte_compile(self, *arg, **kwarg):
-        self.generate_modules()
-        _build_py.byte_compile(self, *arg, **kwarg)
+	def byte_compile(self, *arg, **kwarg):
+		self.generate_modules()
+		_build_py.byte_compile(self, *arg, **kwarg)
 
-    def generate_modules(self):
-        if self.generation_hooks:
-            for hook in self.generation_hooks:
-                hook(self)
+	def generate_modules(self):
+		if self.generation_hooks:
+			for hook in self.generation_hooks:
+				hook(self)
 
 def ply_generation_hook(builder):
-    old_path = sys.path
-    sys.path[0:0] = builder.build_lib
-    __import__('ecell.emparser.parser').emparser.parser.initializePLY(builder.build_lib)
-    __import__('ecell.expressionparser').expressionparser.initializePLY(builder.build_lib)
-    sys.path = old_path
+	old_path = sys.path
+	sys.path[0:0] = builder.build_lib
+	__import__('ecell.emparser.parser').emparser.parser.initializePLY(builder.build_lib)
+	__import__('ecell.expressionparser').expressionparser.initializePLY(builder.build_lib)
+	sys.path = old_path
 
 old_setup = core.old_setup
 def _setup(**attr):
-    attr['distclass'] = Distribution
-    old_setup(**attr)
+	attr['distclass'] = Distribution
+	old_setup(**attr)
 
 core.old_setup = _setup
 
 core.setup(
-    name = 'E-Cell',
-    version = @ECELL_VERSION_STRING@,
-    description = 'E-Cell python library',
-    author = 'E-Cell project',
-    author_email = 'info@e-cell.org',
-    url = 'http://www.e-cell.org/',
-    packages = [ 'ecell', 'ecell.emparser', 'ecell.session_manager', 'ecell.analysis' ],
-    cmdclass = { 'build_py': build_py },
-    ext_modules = [
-        core.Extension( 'ecell._tableio',
+	name = 'E-Cell',
+	version = @ECELL_VERSION_STRING@,
+	description = 'E-Cell python library',
+	author = 'E-Cell project',
+	author_email = 'info@e-cell.org',
+	url = 'http://www.e-cell.org/',
+	packages = [ 'ecell', 'ecell.emparser', 'ecell.session_manager', 'ecell.analysis' ],
+	cmdclass = { 'build_py': build_py },
+	ext_modules = [
+		core.Extension( 'ecell._tableio',
 			sources = [ 'ecell/_tableio.c' ],
-            define_macros = sys.platform == 'win32' and
+			define_macros = sys.platform == 'win32' and
 				[ ('WIN32','1'), ('_WIN32','1'), ('_SECURE_SCL', '0') ]
 			),
-        core.Extension(
-            'ecell._ecs',
-            include_dirs = include_dirs,
-            library_dirs = [ ecell_staging_home + os.environ['libdir'] ],
-            libraries = common_libraries + [ 'ecs' ],
-            define_macros = sys.platform == 'win32' and
+		core.Extension(
+			'ecell._ecs',
+			include_dirs = include_dirs,
+			library_dirs = [ ecell_staging_home + os.environ['libdir'] ],
+			libraries = common_libraries + [ 'ecs' ],
+			define_macros = sys.platform == 'win32' and
 				[ ('BOOST_ALL_NO_LIB', '1'), ('WIN32','1'), ('_WIN32','1'), ('__STDC__', 1), ('_WIN32_WINNT', 0x500), ('_SECURE_SCL', '0') ],
-            sources = [ 'ecell/_ecs.cpp' ] ),
-        ],
-    generation_hooks = [
-        ply_generation_hook,
-        ]
-    )
+			sources = [ 'ecell/_ecs.cpp' ] ),
+		],
+	generation_hooks = [
+		ply_generation_hook,
+		]
+	)

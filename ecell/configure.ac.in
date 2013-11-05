@@ -317,9 +317,12 @@ AC_CONFIG_FILES([
     pyecell/ecell/config.py
     frontend/Makefile
     frontend/session-monitor/Makefile
+    frontend/session-monitor/setup.py
+    frontend/session-monitor/ecell3-session-monitor
     frontend/session-monitor/glade/Makefile
     frontend/session-monitor/plugins/Makefile
     frontend/model-editor/Makefile
+    frontend/model-editor/setup.py
     frontend/model-editor/doc/Makefile
     frontend/model-editor/glade/Makefile
     frontend/model-editor/plugins/Makefile
