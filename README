@@ -110,10 +110,8 @@ Osogo
 
 Documentation
 =============
-E-Cell 3 users manual is placed under ``{PREFIX}/share/doc/users-manual``.
-
-If you have doxygen, API reference will be built and installed in
-``{PREFIX}/share/doc/api`` .
+E-Cell 3 users manual is hosted on Read the Docs.
+http://ecell3.readthedocs.org/en/latest/
 
 Basic Usage
 ===========
