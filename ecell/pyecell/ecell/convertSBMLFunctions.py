@@ -585,9 +585,13 @@ class SBML_Rule( SBML_Model ):
 
     # =========================================================
     
-    def getRuleID( self ):
+    def getRuleID( self, aRule ):
 
-        return 'Process:/SBMLRule:Rule' + str( self.RuleNumber )
+        if ( aRule[0] == libsbml.SBML_ASSIGNMENT_RULE ):
+            return 'Process:/SBMLRule:Assignment_' + str( aRule[2] )
+
+        else:
+            return 'Process:/SBMLRule:Rule' + str( self.RuleNumber )
 
 
     # =========================================================
@@ -1017,6 +1021,58 @@ class SBML_Reaction( SBML_Model ):
 
         else:
            raise Exception,"Version"+str(self.Level)+" ????"
+
+
+    # =========================================================
+
+    def getChemicalEquation( self, aReaction ):
+
+        # Left side (reactant terms)
+        if ( len( aReaction[5] ) > 0 ):
+            if ( aReaction[5][0][1] == 1.0 ):
+                theLeftSide = "[%s]" % aReaction[5][0][0]
+            else:
+                theLeftSide = "%s x [%s]" % ( aReaction[5][0][1], aReaction[5][0][0] )
+
+            for aSubstrate in aReaction[5][1:]:
+                if ( aSubstrate[1] == 1.0 ):
+                    theLeftSide += " + [%s]" % aSubstrate[0]
+                else:
+                    theLeftSide += " + %s x [%s]" % ( aSubstrate[1], aSubstrate[0] )
+
+            theLeftSide += " "
+
+        else:
+            theLeftSide = ""
+
+        # Right side (reactant terms)
+        if ( len( aReaction[6] ) > 0 ):
+            if ( aReaction[6][0][1] == 1.0 ):
+                theRightSide = "[%s]" % aReaction[6][0][0]
+            else:
+                theRightSide = "%s x [%s]" % ( aReaction[6][0][1], aReaction[6][0][0] )
+
+            for aProduct in aReaction[6][1:]:
+                if ( aProduct[1] == 1.0 ):
+                    theRightSide += " + [%s]" % aProduct[0]
+                else:
+                    theRightSide += " + %s x [%s]" % ( aProduct[1], aProduct[0] )
+
+        else:
+            theRightSide = ""
+
+        if ( aReaction[3] == 0 ):
+            theArrow = "->"
+        else:
+            theArrow = "<->"
+
+        theEquation = "%s%s %s;" % ( theLeftSide, theArrow, theRightSide )
+
+        # Effector
+        if ( len( aReaction[7] ) > 0 ):
+            theEquation = "%s { %s };" % ( theEquation, ", ".join( aReaction[7] ) )
+
+        return theEquation
 
 
     # =========================================================

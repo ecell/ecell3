@@ -56,8 +56,10 @@ def convertSBML2EML( aSBMLString ):
     #  Set Stepper
     # ------------------------------
 
-    anEml.createStepper( 'ODEStepper', 'DE' )
+##    anEml.createStepper( 'ODEStepper', 'DE' )
 ##    anEml.createStepper( 'ODE45Stepper', 'DE' )
+    anEml.createStepper( 'FixedODE1Stepper', 'DE' )
+    anEml.createStepper( 'DiscreteTimeStepper', 'DT' )
 
 
     # ------------------------------
@@ -217,16 +219,19 @@ def convertSBML2EML( aSBMLString ):
         
     for aRule in theModel.RuleList:
 
+        print "Rule: " + str( aRule )
+
         theRule.initialize()
 
         ### setFullID ###        
-        aSystemFullID = theRule.getRuleID()
+        aSystemFullID = theRule.getRuleID( aRule )
 
 
         ### Algebraic Rule ###
         if ( aRule[0] == libsbml.SBML_ALGEBRAIC_RULE ):
 
             anEml.createEntity( 'ExpressionAlgebraicProcess', aSystemFullID )
+            anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DT'] )
 
 
         ### Assignment Rule ###
@@ -236,6 +241,10 @@ def convertSBML2EML( aSBMLString ):
                aRule[0] == libsbml.SBML_PARAMETER_RULE ):
 
             anEml.createEntity( 'ExpressionAssignmentProcess', aSystemFullID )
+            anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DT'] )
+
+            if( aRule[0] == libsbml.SBML_ASSIGNMENT_RULE ):
+                anEml.setEntityProperty( aSystemFullID, 'Name', [ "Assignment rule for '%s'" % aRule[2] ] )
 
             aVariableType = theRule.getVariableType( aRule[2] )
 
@@ -253,6 +262,7 @@ def convertSBML2EML( aSBMLString ):
         elif ( aRule[0] == libsbml.SBML_RATE_RULE ):
 
             anEml.createEntity( 'ExpressionFluxProcess', aSystemFullID )
+            anEml.setEntityProperty( aSystemFullID, 'Name', [ "Rate rule for '%s'" % aRule[2] ] )
 
             aVariableType = theRule.getVariableType( aRule[2] )
 
@@ -292,6 +302,8 @@ def convertSBML2EML( aSBMLString ):
 
     for aReaction in theModel.ReactionList:
 
+##        print "Reaction: " + str( aReaction )
+
         theReaction.initialize()
 
         # setFullID
@@ -302,6 +314,10 @@ def convertSBML2EML( aSBMLString ):
         if ( theModel.Level == 2 ):
             if( aReaction[1] != '' ):
                 anEml.setEntityProperty( aSystemFullID, 'Name', aReaction[1:2] )
+            else:
+                anEml.setEntityProperty( aSystemFullID, 'Name', [ theReaction.getChemicalEquation( aReaction ) ] )
+        else:
+            anEml.setEntityProperty( aSystemFullID, 'Name', [ theReaction.getChemicalEquation( aReaction ) ] )
 
         # setSubstrate
         for aSubstrate in aReaction[5]:
