@@ -219,7 +219,7 @@ def convertSBML2EML( aSBMLString ):
         
     for aRule in theModel.RuleList:
 
-        print "Rule: " + str( aRule )
+##        print "Rule: " + str( aRule )
 
         theRule.initialize()
 

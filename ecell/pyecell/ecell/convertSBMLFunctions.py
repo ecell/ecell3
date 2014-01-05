@@ -132,13 +132,15 @@ class SBML_Model:
         self.Level = aSBMLDocument.getLevel()
         self.Version = aSBMLDocument.getVersion() 
 
-        self.CompartmentList = getCompartment( aSBMLmodel )
+        self.DerivedValueDic = {}
+
+        self.CompartmentList = getCompartment( aSBMLmodel,  )
         self.EventList = getEvent( aSBMLmodel )
         self.FunctionDefinitionList = getFunctionDefinition( aSBMLmodel )
-        self.ParameterList = getParameter( aSBMLmodel )
+        self.ParameterList = getParameter( aSBMLmodel, self.DerivedValueDic )
         self.ReactionList = getReaction( aSBMLmodel, aSBMLDocument )
         self.RuleList = getRule( aSBMLmodel )
-        self.SpeciesList = getSpecies( aSBMLmodel )
+        self.SpeciesList = getSpecies( aSBMLmodel, self.DerivedValueDic )
         self.UnitDefinitionList = getUnitDefinition( aSBMLmodel )
 
         self.setFunctionDefinitionToDictionary()
