@@ -134,7 +134,7 @@ class SBML_Model:
 
         self.DerivedValueDic = {}
 
-        self.CompartmentList = getCompartment( aSBMLmodel,  )
+        self.CompartmentList = getCompartment( aSBMLmodel )
         self.EventList = getEvent( aSBMLmodel )
         self.FunctionDefinitionList = getFunctionDefinition( aSBMLmodel )
         self.ParameterList = getParameter( aSBMLmodel, self.DerivedValueDic )
