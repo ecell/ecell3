@@ -47,16 +47,8 @@ def convertSBML2EML( aSBMLString ):
 
     theFunctionDefinitionConverter = libsbml.SBMLFunctionDefinitionConverter()
     theFunctionDefinitionConverter.setDocument( aSBMLDocument )
-    theFunctionDefinitionConverterResult = theFunctionDefinitionConverter.convert()
-    
-    if   theFunctionDefinitionConverterResult == libsbml.LIBSBML_OPERATION_SUCCESS:
-        print "    FunctionDefinitionConverter: Succeeded"
-    elif theFunctionDefinitionConverterResult == libsbml.LIBSBML_OPERATION_FAILED:
-        print "    FunctionDefinitionConverter: Failed"
-    elif theFunctionDefinitionConverterResult == libsbml.LIBSBML_INVALID_OBJECT:
-        print "    FunctionDefinitionConverter: Invalid Object"
-    elif theFunctionDefinitionConverterResult == libsbml.LIBSBML_CONV_INVALID_SRC_DOCUMENT:
-        print "    FunctionDefinitionConverter: Invalid SBML document"
+    print "    FunctionDefinitionConverter: %s" % \
+        libsbml.OperationReturnValue_toString( theFunctionDefinitionConverter.convert() )
 
     # ------------------------------
     #  Initial Assignment Converter
@@ -64,16 +56,10 @@ def convertSBML2EML( aSBMLString ):
 
     theInitialAssignmentConverter = libsbml.SBMLInitialAssignmentConverter()
     theInitialAssignmentConverter.setDocument( aSBMLDocument )
-##    print "    InitialAssignmentConverter:  %s" % theInitialAssignmentConverter.getDefaultProperties()
-    theInitialAssignmentConverterResult = theInitialAssignmentConverter.convert()
-##    print "    InitialAssignmentConverter:  Finished"
-    
-    if   theInitialAssignmentConverterResult == libsbml.LIBSBML_OPERATION_SUCCESS:
-        print "    InitialAssignmentConverter:  Succeeded"
-    elif theInitialAssignmentConverterResult == libsbml.LIBSBML_OPERATION_FAILED:
-        print "    InitialAssignmentConverter:  Failed"
-    elif theInitialAssignmentConverterResult == libsbml.LIBSBML_INVALID_OBJECT:
-        print "    InitialAssignmentConverter:  Invalid Object"
+    print "    InitialAssignmentConverter:  %s" % \
+        libsbml.OperationReturnValue_toString( theInitialAssignmentConverter.convert() )
+
+    ## FIXME: theInitialAssignmentConverter.convert() always returns None.
 
     
     aSBMLModel = aSBMLDocument.getModel()
