@@ -40,6 +40,25 @@ import libsbml
 def convertSBML2EML( aSBMLString ):
 
     aSBMLDocument = libsbml.readSBMLFromString( aSBMLString )
+
+    # ------------------------------
+    #  Function Definition Converter
+    # ------------------------------
+
+    theFunctionDefinitionConverter = libsbml.SBMLFunctionDefinitionConverter()
+    theFunctionDefinitionConverter.setDocument( aSBMLDocument )
+    theFunctionDefinitionConverterResult = theFunctionDefinitionConverter.convert()
+    
+    if   theFunctionDefinitionConverterResult == libsbml.LIBSBML_OPERATION_SUCCESS:
+        print "    FunctionDefinitionConverter: Finished."
+    elif theFunctionDefinitionConverterResult == libsbml.LIBSBML_OPERATION_FAILED:
+        print "    FunctionDefinitionConverter: Failed"
+    elif theFunctionDefinitionConverterResult == libsbml.LIBSBML_INVALID_OBJECT:
+        print "    FunctionDefinitionConverter: Invalid Object"
+    elif theFunctionDefinitionConverterResult == libsbml.LIBSBML_CONV_INVALID_SRC_DOCUMENT:
+        print "    FunctionDefinitionConverter: Invalid SBML document"
+
+    
     aSBMLModel = aSBMLDocument.getModel()
 
     theModel = SBML_Model( aSBMLDocument, aSBMLModel )
@@ -49,6 +68,12 @@ def convertSBML2EML( aSBMLString ):
     theRule = SBML_Rule( theModel )
     theReaction = SBML_Reaction( theModel )
 #    theEvent = SBML_Event( theModel )
+
+##    # damp FunctionDefinition
+##    print "\n"
+##    for aFunctionDefinition in theModel.FunctionDefinitionList:
+##        print "FunctionDefinition: %s\n" % str( aFunctionDefinition )
+
 
     anEml = Eml()
 
