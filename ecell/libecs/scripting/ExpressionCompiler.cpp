@@ -99,7 +99,7 @@ public:
 
             negative    = rootNode( ch_p('-') ) >> factor;
 
-            identifier  =   leafNode( alpha_p >> *( alnum_p | ch_p('_') ) );
+            identifier  =   leafNode( ( alpha_p | ch_p('_') ) >> *( alnum_p | ch_p('_') ) );
 
             variable    =   identifier >> rootNode( ch_p('.') ) >> identifier;
 
