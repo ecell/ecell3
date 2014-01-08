@@ -643,7 +643,7 @@ class SBML_Rule( SBML_Model ):
 
                 aVariableList = []
 
-                variableName = 'V%d' % ( self.VariableNumber )
+                variableName = aSpecies[0]
                 aVariableList.append( variableName )
                 self.VariableNumber = self.VariableNumber + 1
 
@@ -678,7 +678,7 @@ class SBML_Rule( SBML_Model ):
                         return aVariableReference[ 0 ]
 
                 aParameterList = []
-                variableName = 'P%d' % ( self.ParameterNumber )
+                variableName = aParameter[0]
                 aParameterList.append( variableName )
                 self.ParameterNumber = self.ParameterNumber + 1
                 aParameterList.append( 'Variable:/SBMLParameter:' + aName )

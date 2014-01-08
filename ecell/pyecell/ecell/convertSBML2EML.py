@@ -350,7 +350,7 @@ def convertSBML2EML( aSBMLString ):
         # setSubstrate
         for aSubstrate in aReaction[5]:
             aSubstrateList = []
-            aSubstrateList.append( 'S' + str( theReaction.SubstrateNumber ) )
+            aSubstrateList.append( aSubstrate[0] )
             theReaction.SubstrateNumber = theReaction.SubstrateNumber + 1
             aSubstrateID = theModel.getSpeciesReferenceID( aSubstrate[0] )
             if ( aSubstrateID == None ):
@@ -367,7 +367,7 @@ def convertSBML2EML( aSBMLString ):
         # setProduct
         for aProduct in aReaction[6]:
             aProductList = []
-            aProductList.append( 'P' + str(theReaction.ProductNumber) )
+            aProductList.append( aProduct[0] )
             theReaction.ProductNumber = theReaction.ProductNumber + 1
             aProductID = theModel.getSpeciesReferenceID( aProduct[0] )
             if ( aProductID == None ):
@@ -385,7 +385,7 @@ def convertSBML2EML( aSBMLString ):
         # setCatalyst
         for aModifier in aReaction[7]:
             aModifierList = []
-            aModifierList.append( 'C' + str( theReaction.ModifierNumber ) )
+            aModifierList.append( aModifier )
             theReaction.ModifierNumber = theReaction.ModifierNumber + 1
             aModifierID = theModel.getSpeciesReferenceID( aModifier )
             if ( aModifierID == None ):
