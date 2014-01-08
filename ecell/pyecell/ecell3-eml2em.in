@@ -81,8 +81,13 @@ def createObjectDef( aType, aClass, anArgList, aPropertyList, anOptional='' ):
         for aProperty in aPropertyList:
             aPropertyName = aProperty[0]
             aPropertyValueListString = expandValueList( aProperty[1] )
-            aBuffer += '\t%s\t%s;\n' % ( aPropertyName,
-                                         aPropertyValueListString )
+            if aPropertyName == 'VariableReferenceList':
+                aPropertyValueListString = arrangeVariableReferenceListString( aPropertyValueListString )
+                aBuffer += '\t%s\n%s;\n' % ( aPropertyName,
+                                             aPropertyValueListString )
+            else:
+                aBuffer += '\t%s\t%s;\n' % ( aPropertyName,
+                                             aPropertyValueListString )
 #            print aPropertyName
     else:
         aBuffer += '\t# no property\n'
@@ -96,6 +101,28 @@ def createObjectDef( aType, aClass, anArgList, aPropertyList, anOptional='' ):
     aBuffer += '}\n'
     
     return aBuffer
+
+
+def arrangeVariableReferenceListString( aVariableReferenceListString ):
+
+    aVariableReferenceStringList = aVariableReferenceListString[ 2:-2 ].split( ' ] [ ' )
+
+    aVariableReferenceElementTupleList = []
+    aMaxLengthList = [ 0, 0, 0 ]
+    for aVariableReferenceElementString in aVariableReferenceStringList:
+        aVariableReferenceElementTupleList.append( tuple( aVariableReferenceElementString.split( ' ' )))
+        for i in range( 3 ):
+            aVariableReferenceElementLength = len( aVariableReferenceElementTupleList[ -1 ][ i ] )
+            if aVariableReferenceElementLength > aMaxLengthList[ i ]:
+                aMaxLengthList[ i ] = aVariableReferenceElementLength
+    aFormatTemplate = '\t\t[ %%#-%us %%#-%us %%%us ]\n' % tuple( aMaxLengthList )
+##    print aFormatTemplate
+
+    aBuffer = ''
+    for aVariableReferenceElementTuple in aVariableReferenceElementTupleList:
+##        print aVariableReferenceElementTuple
+        aBuffer += aFormatTemplate % aVariableReferenceElementTuple
+    return aBuffer[ :-1 ]
 
 
 def createStepperList( anEml ):
