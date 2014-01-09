@@ -912,14 +912,43 @@ def _calcInitialValue( aNode ):
                 x = float( _getNodeValue( aNode.getChild( 0 )))
                 aNode.setValue( 0.5 * math.log( ( x + 1.0 ) / ( x - 1.0 )))
 
+        ##     Other functions
+
+        elif ( aNodeType == libsbml.AST_FUNCTION_DELAY ):
+            ### At t = 0, delayed value is not available, thus value at t = 0 is used.
+            aNode.setType( libsbml.AST_REAL )
+            aNode.setValue( _getNodeValue( aNode.getChild( 0 )))
+
+        elif ( aNodeType == libsbml.AST_FUNCTION_PIECEWISE ):
+##            print "\nCulc AST_FUNCTION_PIECEWISE:"
+##            _dumpTreeConstructionOfNode( aNode )
+##
+##            print "  #Children = %d" % aNode.getNumChildren()
+            for i in range( aNode.getNumChildren() / 2 ):
+                if ( _getNodeValue( aNode.getChild( i * 2 + 1 )) != 0 ):
+##                    aNode = aNode.getChild( i * 2 ).deepCopy()
+                    aNode.setType( aNode.getChild( i * 2 ).getType() )
+                    aNode.setValue( _getNodeValue( aNode.getChild( i * 2 )))
+##                    print "  piece(%d) is True! Value is %s" % ( i, _getNodeValue( aNode ))
+                    break
+            
+            if ( aNode.getType() == libsbml.AST_FUNCTION_PIECEWISE ):
+                if ( aNode.getNumChildren() % 2 == 1 ):
+##                    aNode = aNode.getRightChild().deepCopy()
+                    aNode.setType( aNode.getRightChild().getType() )
+                    aNode.setValue( _getNodeValue( aNode.getRightChild()))
+                else:
+                    raise TypeError,\
+                    "Can't derive an initial value from a piecewise function"
+
+        ## Unknown
+
         elif ( aNodeType == libsbml.AST_UNKNOWN ):
             raise TypeError,\
             "Unknown operator is detected in Formula"
 
         '''
-AST_FUNCTION
-AST_FUNCTION_DELAY
-AST_FUNCTION_PIECEWISE
+AST_FUNCTION            : Solved by converter
 AST_LAMBDA
 AST_NAME_TIME
         '''
