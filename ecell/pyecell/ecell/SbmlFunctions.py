@@ -551,15 +551,17 @@ def getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic 
 
     aFormulaTree = anAssignmentRule.getMath().deepCopy()
 
-##    print "\n" + anAssignmentRule.getFormula()
-##    _dumpFormulaTree( aFormulaTree )
+##    print "\n%s\n" % anAssignmentRule.getFormula()
+##    print "Initial Construction:\n"
+##    _dumpTreeConstructionOfNode( aFormulaTree )
+##    print '\n'
 
     aCounter = 1
     while ( aCounter > 0 ):
         aCounter = 0
         _convertName2Value( aSBMLmodel, aFormulaTree, aCounter, DerivedValueDic )
 
-##    _dumpFormulaTree( aFormulaTree )
+##    _dumpTreeConstructionOfNode( aFormulaTree )
 
     while ( aFormulaTree.getNumChildren() > 0 ):
         _calcInitialValue( aFormulaTree )
@@ -912,7 +914,7 @@ def _calcInitialValue( aNode ):
 
         elif ( aNodeType == libsbml.AST_UNKNOWN ):
             raise TypeError,\
-        "Unknown operator is detected in Formula"
+            "Unknown operator is detected in Formula"
 
         '''
 AST_FUNCTION
@@ -945,140 +947,140 @@ def _removeAllChildren( aNode ):
     return
 
 
-def _dumpFormulaTree( aNode ):
+def _dumpTreeConstructionOfNode( aNode ):
 
 ##    print aNode.getType()
 
     if ( aNode.getType() == libsbml.AST_CONSTANT_E ):
-        print "AST_CONSTANT_E"
+        print "  AST_CONSTANT_E"
     elif ( aNode.getType() == libsbml.AST_CONSTANT_FALSE ):
-        print "AST_CONSTANT_FALSE"
+        print "  AST_CONSTANT_FALSE"
     elif ( aNode.getType() == libsbml.AST_CONSTANT_PI ):
-        print "AST_CONSTANT_PI"
+        print "  AST_CONSTANT_PI"
     elif ( aNode.getType() == libsbml.AST_CONSTANT_TRUE ):
-        print "AST_CONSTANT_TRUE"
+        print "  AST_CONSTANT_TRUE"
     elif ( aNode.getType() == libsbml.AST_DIVIDE ):
-        print "AST_DIVIDE"
+        print "  AST_DIVIDE"
     elif ( aNode.getType() == libsbml.AST_FUNCTION ):
-        print "AST_FUNCTION"
+        print "  AST_FUNCTION"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_ABS ):
-        print "AST_FUNCTION_ABS"
+        print "  AST_FUNCTION_ABS"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_ARCCOS ):
-        print "AST_FUNCTION_ARCCOS"
+        print "  AST_FUNCTION_ARCCOS"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_ARCCOSH ):
-        print "AST_FUNCTION_ARCCOSH"
+        print "  AST_FUNCTION_ARCCOSH"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_ARCCOT ):
-        print "AST_FUNCTION_ARCCOT"
+        print "  AST_FUNCTION_ARCCOT"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_ARCCOTH ):
-        print "AST_FUNCTION_ARCCOTH"
+        print "  AST_FUNCTION_ARCCOTH"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_ARCCSC ):
-        print "AST_FUNCTION_ARCCSC"
+        print "  AST_FUNCTION_ARCCSC"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_ARCCSCH ):
-        print "AST_FUNCTION_ARCCSCH"
+        print "  AST_FUNCTION_ARCCSCH"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_ARCSEC ):
-        print "AST_FUNCTION_ARCSEC"
+        print "  AST_FUNCTION_ARCSEC"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_ARCSECH ):
-        print "AST_FUNCTION_ARCSECH"
+        print "  AST_FUNCTION_ARCSECH"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_ARCSIN ):
-        print "AST_FUNCTION_ARCSIN"
+        print "  AST_FUNCTION_ARCSIN"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_ARCSINH ):
-        print "AST_FUNCTION_ARCSINH"
+        print "  AST_FUNCTION_ARCSINH"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_ARCTAN ):
-        print "AST_FUNCTION_ARCTAN"
+        print "  AST_FUNCTION_ARCTAN"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_ARCTANH ):
-        print "AST_FUNCTION_ARCTANH"
+        print "  AST_FUNCTION_ARCTANH"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_CEILING ):
-        print "AST_FUNCTION_CEILING"
+        print "  AST_FUNCTION_CEILING"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_COS ):
-        print "AST_FUNCTION_COS"
+        print "  AST_FUNCTION_COS"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_COSH ):
-        print "AST_FUNCTION_COSH"
+        print "  AST_FUNCTION_COSH"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_COT ):
-        print "AST_FUNCTION_COT"
+        print "  AST_FUNCTION_COT"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_COTH ):
-        print "AST_FUNCTION_COTH"
+        print "  AST_FUNCTION_COTH"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_CSC ):
-        print "AST_FUNCTION_CSC"
+        print "  AST_FUNCTION_CSC"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_CSCH ):
-        print "AST_FUNCTION_CSCH"
+        print "  AST_FUNCTION_CSCH"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_DELAY ):
-        print "AST_FUNCTION_DELAY"
+        print "  AST_FUNCTION_DELAY"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_EXP ):
-        print "AST_FUNCTION_EXP"
+        print "  AST_FUNCTION_EXP"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_FACTORIAL ):
-        print "AST_FUNCTION_FACTORIAL"
+        print "  AST_FUNCTION_FACTORIAL"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_FLOOR ):
-        print "AST_FUNCTION_FLOOR"
+        print "  AST_FUNCTION_FLOOR"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_LN ):
-        print "AST_FUNCTION_LN"
+        print "  AST_FUNCTION_LN"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_LOG ):
-        print "AST_FUNCTION_LOG"
+        print "  AST_FUNCTION_LOG"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_PIECEWISE ):
-        print "AST_FUNCTION_PIECEWISE"
+        print "  AST_FUNCTION_PIECEWISE"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_POWER ):
-        print "AST_FUNCTION_POWER"
+        print "  AST_FUNCTION_POWER"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_ROOT ):
-        print "AST_FUNCTION_ROOT"
+        print "  AST_FUNCTION_ROOT"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_SEC ):
-        print "AST_FUNCTION_SEC"
+        print "  AST_FUNCTION_SEC"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_SECH ):
-        print "AST_FUNCTION_SECH"
+        print "  AST_FUNCTION_SECH"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_SIN ):
-        print "AST_FUNCTION_SIN"
+        print "  AST_FUNCTION_SIN"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_SINH ):
-        print "AST_FUNCTION_SINH"
+        print "  AST_FUNCTION_SINH"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_TAN ):
-        print "AST_FUNCTION_TAN"
+        print "  AST_FUNCTION_TAN"
     elif ( aNode.getType() == libsbml.AST_FUNCTION_TANH ):
-        print "AST_FUNCTION_TANH"
+        print "  AST_FUNCTION_TANH"
     elif ( aNode.getType() == libsbml.AST_INTEGER ):
-        print "AST_INTEGER"
+        print "  AST_INTEGER: %d" % aNode.getInteger()
     elif ( aNode.getType() == libsbml.AST_LAMBDA ):
-        print "AST_LAMBDA"
+        print "  AST_LAMBDA"
     elif ( aNode.getType() == libsbml.AST_LOGICAL_AND ):
-        print "AST_LOGICAL_AND"
+        print "  AST_LOGICAL_AND"
     elif ( aNode.getType() == libsbml.AST_LOGICAL_NOT ):
-        print "AST_LOGICAL_NOT"
+        print "  AST_LOGICAL_NOT"
     elif ( aNode.getType() == libsbml.AST_LOGICAL_OR ):
-        print "AST_LOGICAL_OR"
+        print "  AST_LOGICAL_OR"
     elif ( aNode.getType() == libsbml.AST_LOGICAL_XOR ):
-        print "AST_LOGICAL_XOR"
+        print "  AST_LOGICAL_XOR"
     elif ( aNode.getType() == libsbml.AST_MINUS ):
-        print "AST_MINUS"
+        print "  AST_MINUS"
     elif ( aNode.getType() == libsbml.AST_NAME ):
-        print "AST_NAME: %s" % aNode.getName()
+        print "  AST_NAME: %s" % aNode.getName()
     elif ( aNode.getType() == libsbml.AST_NAME_AVOGADRO ):
-        print "AST_NAME_AVOGADRO"
+        print "  AST_NAME_AVOGADRO"
     elif ( aNode.getType() == libsbml.AST_NAME_TIME ):
-        print "AST_NAME_TIME"
+        print "  AST_NAME_TIME"
     elif ( aNode.getType() == libsbml.AST_PLUS ):
-        print "AST_PLUS"
+        print "  AST_PLUS"
     elif ( aNode.getType() == libsbml.AST_POWER ):
-        print "AST_POWER"
+        print "  AST_POWER"
     elif ( aNode.getType() == libsbml.AST_RATIONAL ):
-        print "AST_RATIONAL"
+        print "  AST_RATIONAL"
     elif ( aNode.getType() == libsbml.AST_REAL ):
-        print "AST_REAL: %f" % aNode.getReal()
+        print "  AST_REAL: %f" % aNode.getReal()
     elif ( aNode.getType() == libsbml.AST_REAL_E ):
-        print "AST_REAL_E"
+        print "  AST_REAL_E"
     elif ( aNode.getType() == libsbml.AST_RELATIONAL_EQ ):
-        print "AST_RELATIONAL_EQ"
+        print "  AST_RELATIONAL_EQ"
     elif ( aNode.getType() == libsbml.AST_RELATIONAL_GEQ ):
-        print "AST_RELATIONAL_GEQ"
+        print "  AST_RELATIONAL_GEQ"
     elif ( aNode.getType() == libsbml.AST_RELATIONAL_GT ):
-        print "AST_RELATIONAL_GT"
+        print "  AST_RELATIONAL_GT"
     elif ( aNode.getType() == libsbml.AST_RELATIONAL_LEQ ):
-        print "AST_RELATIONAL_LEQ"
+        print "  AST_RELATIONAL_LEQ"
     elif ( aNode.getType() == libsbml.AST_RELATIONAL_LT ):
-        print "AST_RELATIONAL_LT"
+        print "  AST_RELATIONAL_LT"
     elif ( aNode.getType() == libsbml.AST_RELATIONAL_NEQ ):
-        print "AST_RELATIONAL_NEQ"
+        print "  AST_RELATIONAL_NEQ"
     elif ( aNode.getType() == libsbml.AST_TIMES ):
-        print "AST_TIMES"
+        print "  AST_TIMES"
     elif ( aNode.getType() == libsbml.AST_UNKNOWN ):
-        print "AST_UNKNOWN"
+        print "  AST_UNKNOWN"
 
     for i in range( aNode.getNumChildren() ):
-        _dumpFormulaTree( aNode.getChild( i ) )
+        _dumpTreeConstructionOfNode( aNode.getChild( i ) )
 
 
