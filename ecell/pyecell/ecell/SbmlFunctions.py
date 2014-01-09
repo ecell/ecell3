@@ -194,9 +194,8 @@ def getParameter( aSBMLmodel, DerivedValueDic ):
             if aParameter.isSetValue():
                 aValue_Pa = aParameter.getValue()
             else:
-                aDerivedValue = getInitialValueFromAssignmentRule( aSBMLmodel, anId_Pa, DerivedValueDic )
-                if ( aDerivedValue != False ):
-                    aValue_Pa = aDerivedValue
+                if getInitialValueFromAssignmentRule( aSBMLmodel, anId_Pa, DerivedValueDic ):
+                    aValue_Pa = DerivedValueDic[ anId_Pa ]
                 else:
                     aValue_Pa = 'Unknown'
                 
@@ -460,9 +459,8 @@ def getSpecies( aSBMLmodel, DerivedValueDic ):
                 
 
             if (( anInitialAmount_Sp == "Unknown" ) and ( anInitialConcentration_Sp == "Unknown" )):
-                aDerivedInitialValue = getInitialValueFromAssignmentRule( aSBMLmodel, anId_Sp, DerivedValueDic )
-                if ( aDerivedInitialValue != False ):
-                    anInitialAmount_Sp = aDerivedInitialValue
+                if getInitialValueFromAssignmentRule( aSBMLmodel, anId_Sp, DerivedValueDic ):
+                    anInitialAmount_Sp = DerivedValueDic[ anId_Sp ]
 
             aSubstanceUnit_Sp = aSpecies.getSubstanceUnits()
             aSpatialSizeUnit_Sp = aSpecies.getSpatialSizeUnits()
@@ -551,15 +549,20 @@ def getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic 
 
     aFormulaTree = anAssignmentRule.getMath().deepCopy()
 
-##    print "\n%s\n" % anAssignmentRule.getFormula()
-##    print "Initial Construction:\n"
-##    _dumpTreeConstructionOfNode( aFormulaTree )
-##    print '\n'
+    print "\nAssignmentRule for %s" % aVariableID
+    print "  %s\n" % anAssignmentRule.getFormula()
+    print "Initial Construction:\n"
+    _dumpTreeConstructionOfNode( aFormulaTree )
+    print '\n'
 
     aCounter = 1
     while ( aCounter > 0 ):
         aCounter = 0
         _convertName2Value( aSBMLmodel, aFormulaTree, aCounter, DerivedValueDic )
+
+    print "Name replaced with value:\n"
+    _dumpTreeConstructionOfNode( aFormulaTree )
+    print '\n'
 
 ##    _dumpTreeConstructionOfNode( aFormulaTree )
 
@@ -569,7 +572,7 @@ def getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic 
 ##    print "Initial Value of %s: %s" % ( aVariableID, _getNodeValue( aFormulaTree ))
 
     DerivedValueDic[ aVariableID ] = _getNodeValue( aFormulaTree )
-    return DerivedValueDic[ aVariableID ]
+    return True
 
 
 def _convertName2Value( aSBMLmodel, aNode, aCounter, DerivedValueDic ):
@@ -615,16 +618,22 @@ def _convertName2Value( aSBMLmodel, aNode, aCounter, DerivedValueDic ):
                 aNode.setType( libsbml.AST_REAL )
                 aNode.setValue( anElement.getInitialConcentration() * aSBMLmodel.getCompartment( anElement.getCompartment() ).getSize() )
             else:
-                anInitialValue = getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic )
-                if ( anInitialValue ):
+                if getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic ):
                     aNode.setType( libsbml.AST_REAL )
-                    aNode.setValue( anInitialValue )
+                    aNode.setValue( DerivedValueDic[ aVariableID ] )
                 else:
                     aCounter += 1
         
         elif ( anElementType == libsbml.SBML_PARAMETER ):
-            aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( anElement.getValue() )
+            if anElement.isSetValue() == True:
+                aNode.setType( libsbml.AST_REAL )
+                aNode.setValue( anElement.getValue() )
+            else:
+                if getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic ):
+                    aNode.setType( libsbml.AST_REAL )
+                    aNode.setValue( DerivedValueDic[ aVariableID ] )
+                else:
+                    aCounter += 1
         
         elif ( anElementType == libsbml.SBML_COMPARTMENT ):
             aNode.setType( libsbml.AST_REAL )
