@@ -641,7 +641,7 @@ def _convertName2Value( aSBMLmodel, aNode, aCounter, DerivedValueDic ):
         
         else:
             raise TypeError,\
-        "_convertName2Value: Element type must be Species, Parameter, or Compartment"
+            "_convertName2Value: Element type must be Species, Parameter, or Compartment"
 
     for i in range( aNode.getNumChildren() ):
         _convertName2Value( aSBMLmodel, aNode.getChild( i ), aCounter, DerivedValueDic )
