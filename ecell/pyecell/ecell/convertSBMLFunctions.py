@@ -588,12 +588,21 @@ class SBML_Rule( SBML_Model ):
     # =========================================================
     
     def getRuleID( self, aRule ):
+        if ( aRule[0] == libsbml.SBML_ALGEBRAIC_RULE ):
+            return 'Process:/SBMLRule:Algebraic_%s' % str( aRule[2] )
 
-        if ( aRule[0] == libsbml.SBML_ASSIGNMENT_RULE ):
-            return 'Process:/SBMLRule:Assignment_' + str( aRule[2] )
+        elif ( aRule[0] == libsbml.SBML_ASSIGNMENT_RULE            or
+               aRule[0] == libsbml.SBML_SPECIES_CONCENTRATION_RULE or
+               aRule[0] == libsbml.SBML_COMPARTMENT_VOLUME_RULE    or
+               aRule[0] == libsbml.SBML_PARAMETER_RULE ):
+            return 'Process:/SBMLRule:Assignment_%s' % str( aRule[2] )
+
+        elif ( aRule[0] == libsbml.SBML_RATE_RULE ):
+            return 'Process:/SBMLRule:Rate_%s' % str( aRule[2] )
 
         else:
-            return 'Process:/SBMLRule:Rule' + str( self.RuleNumber )
+            raise TypeError,\
+                "Variable type must be Species, Parameter, or Compartment"
 
 
     # =========================================================
@@ -635,8 +644,7 @@ class SBML_Rule( SBML_Model ):
                     
                     if aVariableReference[1].split(':')[2] == aName:
 
-                        if aStoichiometry != 0:
-                            aVariableReference[ 2 ] = aStoichiometry
+                        aVariableReference[ 2 ] = str( int( aVariableReference[ 2 ] ) + int( aStoichiometry ))
 
                         compartmentName = self.setCompartmentToVariableReference( aSpecies[ 2 ] )
                         return ( aVariableReference[ 0 ], compartmentName )
@@ -672,8 +680,7 @@ class SBML_Rule( SBML_Model ):
                     
                     if aVariableReference[1].split(':')[2] == aName:
 
-                        if aStoichiometry != 0:
-                            aVariableReference[ 2 ] = aStoichiometry
+                        aVariableReference[ 2 ] = str( int( aVariableReference[ 2 ] ) + int( aStoichiometry ))
 
                         return aVariableReference[ 0 ]
 
@@ -703,8 +710,7 @@ class SBML_Rule( SBML_Model ):
                        self.Model.getPath( aName ) ) and\
                     ( aVariableReference[1].split(':')[2] == 'SIZE' ):
 
-                        if aStoichiometry != 0:
-                            aVariableReference[ 2 ] = aStoichiometry
+                        aVariableReference[ 2 ] = str( int( aVariableReference[ 2 ] ) + int( aStoichiometry ))
 
                         return aVariableReference[ 0 ]
 
@@ -725,12 +731,9 @@ class SBML_Rule( SBML_Model ):
 
         aNumChildren = anASTNode.getNumChildren()
 
-        if ( aNumChildren == 2 ):
-            self.__convertVariableName( anASTNode.getLeftChild() )
-            self.__convertVariableName( anASTNode.getRightChild() )
-
-        elif ( aNumChildren == 1 ):
-            self.__convertVariableName( anASTNode.getLeftChild() )
+        if ( aNumChildren > 0 ):
+            for n in range( aNumChildren ):
+                self.__convertVariableName( anASTNode.getChild( n ) )
 
         elif ( aNumChildren == 0 ):
             if ( anASTNode.isNumber() == 1 ):
@@ -865,7 +868,7 @@ class SBML_Reaction( SBML_Model ):
         
         aNumChildren = anASTNode.getNumChildren()
 
-        if ( aNumChildren == 2 ):
+        if ( aNumChildren > 0 ):
 
             #if ( anASTNode.isFunction() ):
 
@@ -873,23 +876,8 @@ class SBML_Reaction( SBML_Model ):
                 #if( self.Model.FunctionDefinition[ anASTNode.getName() ] != None ):
                 #    self.Model.macroExpand( anASTNode )
 
-
-            self.__convertVariableName( anASTNode.getLeftChild() )
-            self.__convertVariableName( anASTNode.getRightChild() )
-
-            return anASTNode
-        
-
-        elif ( aNumChildren == 1 ):
-
-            #if ( anASTNode.isFunction() ):
-
-                # Macro expand
-                #if( self.Model.FunctionDefinition[ anASTNode.getName() ] != None ):
-                #    self.Model.macroExpand( anASTNode )
-
-                
-            self.__convertVariableName( anASTNode.getLeftChild() )
+            for n in range( aNumChildren ):
+                self.__convertVariableName( anASTNode.getChild( n ) )
 
             return anASTNode
         

@@ -284,7 +284,7 @@ def convertSBML2EML( aSBMLString ):
                 theRule.setCompartmentToVariableReference( aRule[2], '1' )
             else:
                 raise TypeError,\
-            "Variable type must be Species, Parameter, or Compartment"
+                    "Variable type must be Species, Parameter, or Compartment"
 
         ### Rate Rule ###
         elif ( aRule[0] == libsbml.SBML_RATE_RULE ):
@@ -302,12 +302,12 @@ def convertSBML2EML( aSBMLString ):
                 theRule.setCompartmentToVariableReference( aRule[2], '1' )
             else:
                 raise TypeError,\
-            "Variable type must be Species, Parameter, or Compartment"
+                    "Variable type must be Species, Parameter, or Compartment"
 
 
         else:
             raise TypeError,\
-        " The type of Rule must be Algebraic, Assignment or Rate Rule"
+                " The type of Rule must be Algebraic, Assignment or Rate Rule"
 
         # convert SBML formula  to E-Cell formula
         convertedFormula = [ str( theRule.convertRuleFormula( aRule[1] ) ) ]
@@ -330,7 +330,7 @@ def convertSBML2EML( aSBMLString ):
 
     for aReaction in theModel.ReactionList:
 
-##        print "Reaction: " + str( aReaction )
+        print "Reaction: " + str( aReaction )
 
         theReaction.initialize()
 

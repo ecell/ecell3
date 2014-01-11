@@ -32,6 +32,8 @@
 // E-Cell Project.
 //
 
+// #include <iostream>
+
 #include "libecs/libecs.hpp"
 #include "libecs/Exceptions.hpp"
 #include "libecs/scripting/VirtualMachine.hpp"
@@ -74,6 +76,7 @@ DEFINE_OPCODE2INSTRUCTION( DIV );
 DEFINE_OPCODE2INSTRUCTION( LOAD_REAL );
 DEFINE_OPCODE2INSTRUCTION( CALL_FUNC1 );
 DEFINE_OPCODE2INSTRUCTION( CALL_FUNC2 );
+DEFINE_OPCODE2INSTRUCTION( CALL_FUNCA );
 DEFINE_OPCODE2INSTRUCTION( OBJECT_METHOD_INTEGER );
 DEFINE_OPCODE2INSTRUCTION( OBJECT_METHOD_REAL );
 DEFINE_OPCODE2INSTRUCTION( RET );
@@ -167,6 +170,11 @@ const Real VirtualMachine::execute( Code const& aCode )
 
         case ADD:
             SIMPLE_ARITHMETIC( ADD, + );
+            /*
+            aStack.peek< 1 >().theReal += aStack.peek< 0 >().theReal, 
+            aStack.pop_back(), 
+            aPC += sizeof( Opcode2Instruction<ADD>::type );
+            */
             break;
 
         case SUB:
@@ -182,6 +190,33 @@ const Real VirtualMachine::execute( Code const& aCode )
             break;
 #undef SIMPLE_ARITHMETIC
 
+        case CALL_FUNCA:
+            {
+                DECODE_INSTRUCTION( CALL_FUNCA );
+                
+                std::vector< libecs::Real > args;
+
+                // std::cout << "Parse Piecewise Function: numArg = " << aStack.peek< 0 >().theReal << std::endl;
+/*
+                libecs::Integer numArg( ( libecs::Integer ) aStack.pop().theReal ), i( 0 );
+                for ( i = 0; i < numArg; i++ ) {
+                    // std::cout << "  arg = " << aStack.peek< 0 >().theReal << std::endl;
+                    args.push_back( aStack.pop().theReal );}
+                
+                aStack.push_back( anInstruction->getOperand()( args ));
+*/
+                libecs::Integer numArg( ( libecs::Integer ) aStack.peek< 0 >().theReal ), i( 0 );
+                for ( i = 0; i < numArg; i++ ) {
+                    aStack.pop_back();
+                    // std::cout << "  arg = " << aStack.peek< 0 >().theReal << std::endl;
+                    args.push_back( aStack.peek< 0 >().theReal );}
+                
+                aStack.peek< 0 >().theReal = anInstruction->getOperand()( args );
+                
+                INCREMENT_PC( CALL_FUNCA );
+                break;
+            }
+
         case CALL_FUNC2:
             {
                 DECODE_INSTRUCTION( CALL_FUNC2 );
@@ -192,6 +227,19 @@ const Real VirtualMachine::execute( Code const& aCode )
                 aStack.pop_back();
 
                 INCREMENT_PC( CALL_FUNC2 );
+                /*
+                typedef Opcode2Instruction<CALL_FUNC2>::type
+                 CurrentInstruction;
+                 const CurrentInstruction* const anInstruction( 
+                    reinterpret_cast<const CurrentInstruction* const>( aPC ) );
+
+                aStack.peek< 1 >().theReal = anInstruction->getOperand()(
+                       aStack.peek< 1 >().theReal,
+                       aStack.peek< 0 >().theReal );
+                aStack.pop_back();
+
+                aPC += sizeof( Opcode2Instruction<CALL_FUNC2>::type );
+                */
                 break;
             }
 

@@ -32,7 +32,10 @@
 // E-Cell Project.
 //
 
+// #include <iostream>
+
 #include <boost/assert.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "libecs/Util.hpp"
 #include "libecs/RealMath.hpp"
@@ -56,7 +59,10 @@ typedef Loki::AssocVector< String, Real(*)(Real),
                            std::less<String> > FunctionMap1;
 typedef Loki::AssocVector< String,
                            libecs::Real(*)(Real, Real),
-                           std::less<String> > FunctionMap2;   
+                           std::less<String> > FunctionMap2;
+typedef Loki::AssocVector< String,
+                           libecs::Real(*)(std::vector<libecs::Real>),
+                           std::less<String> > FunctionMapA;
 typedef Loki::AssocVector< String, Real, std::less<String> > ConstantMap;
 
 class Tokens
@@ -156,6 +162,7 @@ public:
                             | rootNode( str_p("sec") )
                             | rootNode( str_p("csc") )
                             | rootNode( str_p("cot") )
+                            | rootNode( str_p("piecewise") )
                         ) >>
                         inner_node_d[ ch_p('(') >>
                                       ( expression >>
@@ -221,6 +228,7 @@ struct CompilerConfig
     ConstantMap  theConstantMap;
     FunctionMap1 theFunctionMap1;
     FunctionMap2 theFunctionMap2;
+    FunctionMapA theFunctionMapA;
     CompileGrammar theGrammar;
 
     CompilerConfig()
@@ -281,6 +289,10 @@ struct CompilerConfig
         theFunctionMap2["lt"]    = real_lt;
         theFunctionMap2["geq"]   = real_geq;
         theFunctionMap2["leq"]   = real_leq;
+
+
+        // set ExpressionCompiler::FunctionMapA  ('A' is for 'Arbitrary'.)
+        theFunctionMapA["piecewise"]   = piecewise;
     }
 };
 
@@ -452,9 +464,44 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
 
             FunctionMap1::const_iterator aFunctionMap1Iterator;
             FunctionMap2::const_iterator aFunctionMap2Iterator;
+            FunctionMapA::const_iterator aFunctionMapAIterator;
 
 
-            if ( aChildTreeSize == 1 ) {
+            aFunctionMapAIterator = theConfig.theFunctionMapA.find( aFunctionString );
+
+            if ( aFunctionMapAIterator != theConfig.theFunctionMapA.end() ) {
+                
+                // Insert aChildNode that has the number of arguments
+                libecs::String numArgString = boost::lexical_cast< libecs::String >( aChildTreeSize );
+                // std::cout << "Compile Piecewise Function:" << std::endl << "  numArg = " << numArgString << std::endl;
+                tree_parse_info<> numArgInfo(
+                    ast_parse( numArgString.c_str(), theConfig.theGrammar, space_p ) );
+                aTreeIterator->children.push_back( *( numArgInfo.trees.begin() ) );
+
+                // std::cout << "  Updated numArg = " << aTreeIterator->children.size() << std::endl;
+
+                TreeIterator aChildTreeIterator( aTreeIterator->children.begin() );
+
+                // std::cout << "  Before compile children:" << std::endl;
+                while ( aChildTreeIterator != aTreeIterator->children.end() ) {
+                    // libecs::String aChildValue( aChildTreeIterator->value.begin(), aChildTreeIterator->value.end() );
+                    // std::cout << "    Child Value = " << aChildValue << std::endl;
+                    compileTree( aChildTreeIterator );
+                    aChildTreeIterator++;
+                }
+/*
+                std::cout << "  After compile children:" << std::endl;
+                while ( aChildTreeIterator != aTreeIterator->children.end() ) {
+                    libecs::String aChildValue( aChildTreeIterator->value.begin(), aChildTreeIterator->value.end() );
+                    std::cout << "    Child Value = " << aChildValue << std::endl;
+                    aChildTreeIterator++;
+                }
+*/
+                theAssembler.appendInstruction(
+                    Instruction<CALL_FUNCA>(
+                        aFunctionMapAIterator->second ) );
+                        
+            } else if ( aChildTreeSize == 1 ) {
                 aFunctionMap1Iterator =
                     theConfig.theFunctionMap1.find( aFunctionString );
 

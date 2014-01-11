@@ -549,20 +549,20 @@ def getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic 
 
     aFormulaTree = anAssignmentRule.getMath().deepCopy()
 
-    print "\nAssignmentRule for %s" % aVariableID
-    print "  %s\n" % anAssignmentRule.getFormula()
-    print "Initial Construction:\n"
-    _dumpTreeConstructionOfNode( aFormulaTree )
-    print '\n'
+##    print "\nAssignmentRule for %s" % aVariableID
+##    print "  %s\n" % anAssignmentRule.getFormula()
+##    print "Initial Construction:\n"
+##    _dumpTreeConstructionOfNode( aFormulaTree )
+##    print '\n'
 
     aCounter = 1
     while ( aCounter > 0 ):
         aCounter = 0
         _convertName2Value( aSBMLmodel, aFormulaTree, aCounter, DerivedValueDic )
 
-    print "Name replaced with value:\n"
-    _dumpTreeConstructionOfNode( aFormulaTree )
-    print '\n'
+##    print "Name replaced with value:\n"
+##    _dumpTreeConstructionOfNode( aFormulaTree )
+##    print '\n'
 
 ##    _dumpTreeConstructionOfNode( aFormulaTree )
 
