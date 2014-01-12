@@ -808,7 +808,7 @@ class SBML_Reaction( SBML_Model ):
     
     def initialize( self ):
 
-        self.SubstrateNumber = 0
+##        self.SubstrateNumber = 0
         self.ProductNumber = 0
         self.ModifierNumber = 0
         self.ParameterNumber = 0
@@ -987,6 +987,17 @@ class SBML_Reaction( SBML_Model ):
 
 
 ##         return aConvertedFormula
+
+
+    # =========================================================
+
+    def getVariableReference( self, anID ):
+
+        for aVariableReference in self.VariableReferenceList:
+            if( aVariableReference[0] == anID ):
+                return aVariableReference
+        
+        return False
 
 
     # =========================================================

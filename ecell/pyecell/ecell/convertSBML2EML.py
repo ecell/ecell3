@@ -348,52 +348,11 @@ def convertSBML2EML( aSBMLString ):
             anEml.setEntityProperty( aSystemFullID, 'Name', [ theReaction.getChemicalEquation( aReaction ) ] )
 
         # setSubstrate
-        for aSubstrate in aReaction[5]:
-            aSubstrateList = []
-            aSubstrateList.append( aSubstrate[0] )
-            theReaction.SubstrateNumber = theReaction.SubstrateNumber + 1
-            aSubstrateID = theModel.getSpeciesReferenceID( aSubstrate[0] )
-            if ( aSubstrateID == None ):
-                raise NameError,"Species "+aSubstrate[0]+" not found"
-
-            aSubstrateList.append( 'Variable:' + aSubstrateID )
-            if ( aSubstrate[2] != 1 ):
-                raise Exception,"Stoichiometry Error : E-Cell System can't set a floating Stoichiometry"
- 
-            aSubstrateList.append( str( -1 * theReaction.getStoichiometry(
-                aSubstrate[0], aSubstrate[1] ) ) )
-            theReaction.VariableReferenceList.append( aSubstrateList )
-
+        updateVariableReferenceListBySpeciesList( theModel, theReaction, aReaction[5], -1 )
         # setProduct
-        for aProduct in aReaction[6]:
-            aProductList = []
-            aProductList.append( aProduct[0] )
-            theReaction.ProductNumber = theReaction.ProductNumber + 1
-            aProductID = theModel.getSpeciesReferenceID( aProduct[0] )
-            if ( aProductID == None ):
-                raise NameError,"Species "+aProduct[0]+" not found"
-            
-            aProductList.append( 'Variable:' + aProductID )
-            if ( aProduct[2] != 1 ):
-                raise Exception,"Stoichiometry Error : E-Cell System can't set a floating Stoichiometry"
-
-            aProductList.append( str( 1 * theReaction.getStoichiometry(
-                aProduct[0],  aProduct[1] ) ) )
-
-            theReaction.VariableReferenceList.append( aProductList )
-
+        updateVariableReferenceListBySpeciesList( theModel, theReaction, aReaction[6] )
         # setCatalyst
-        for aModifier in aReaction[7]:
-            aModifierList = []
-            aModifierList.append( aModifier )
-            theReaction.ModifierNumber = theReaction.ModifierNumber + 1
-            aModifierID = theModel.getSpeciesReferenceID( aModifier )
-            if ( aModifierID == None ):
-                raise NameError,"Species "+aModifier[0]+" not found"
-
-            aModifierList.append( 'Variable:' + aModifierID )
-            aModifierList.append( '0' )
-            theReaction.VariableReferenceList.append( aModifierList )
+        updateVariableReferenceListBySpeciesList( theModel, theReaction, aReaction[7] )
 
 
         # setProperty
@@ -432,3 +391,35 @@ def convertSBML2EML( aSBMLString ):
                                          theReaction.VariableReferenceList )
 
     return anEml
+
+
+def updateVariableReferenceListBySpeciesList( theModel, theReaction, aReactingSpeciesList, theDirection = 1 ):
+    for aReactingSpecies in aReactingSpeciesList:
+        if isinstance( aReactingSpecies, list ):
+            _aReactingSpecies = aReactingSpecies
+        elif isinstance( aReactingSpecies, str ):
+            _aReactingSpecies = [ aReactingSpecies, 0, 1 ]
+        else:
+            raise Exception,"DEBUG : Unexpected instance during converting Reaction"
+        
+        if ( _aReactingSpecies[2] != 1 ):     # ReactantDenominator
+            raise Exception,"Stoichiometry Error : E-Cell System can't set a floating Stoichiometry"
+        
+        aStoichiometryInt = theDirection * theReaction.getStoichiometry( _aReactingSpecies[0], _aReactingSpecies[1] )
+        
+        aCorrespondingVariableReference = theReaction.getVariableReference( _aReactingSpecies[0] )
+        if aCorrespondingVariableReference:
+            aCorrespondingVariableReference[ 2 ] = str( int( aCorrespondingVariableReference[ 2 ] ) + aStoichiometryInt )
+        
+        else:
+            aReactingSpeciesList = []
+            aReactingSpeciesList.append( _aReactingSpecies[0] )
+##            theReaction.SubstrateNumber = theReaction.SubstrateNumber + 1
+            aVariableFullID = theModel.getSpeciesReferenceID( _aReactingSpecies[0] )
+            if ( aVariableFullID == None ):
+                raise NameError,"Species "+ _aReactingSpecies[0] +" not found"
+
+            aReactingSpeciesList.append( 'Variable:' + aVariableFullID )
+ 
+            aReactingSpeciesList.append( str( aStoichiometryInt ) )
+            theReaction.VariableReferenceList.append( aReactingSpeciesList )
