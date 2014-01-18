@@ -37,6 +37,9 @@
 
 #include "libecs/libecs.hpp"
 #include "libecs/scripting/ExpressionCompiler.hpp"
+#include "libecs/AssocVector.h"
+#include <map>
+#include "libecs/Model.hpp"
 
 namespace libecs { namespace scripting
 {
@@ -46,6 +49,7 @@ class LIBECS_API VirtualMachine
 public:
   
     VirtualMachine()
+    : theModel( 0 )
     {
       // ; do nothing
     }
@@ -53,6 +57,21 @@ public:
     ~VirtualMachine() {}
   
     const libecs::Real execute( Code const& aCode );
+    
+    const libecs::Real getDelayedValue( libecs::Integer x, libecs::Real t );
+    
+    void setModel( Model* const aModel )
+    {
+        theModel = aModel;
+    }
+
+private:
+    typedef std::map< Real, Real > TimeSeries;
+    typedef Loki::AssocVector< Integer, TimeSeries > DelayMap;
+    DelayMap theDelayMap;
+    
+    libecs::Model*  theModel;
+
 };
 
 } } // namespace libecs::scripting

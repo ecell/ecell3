@@ -293,6 +293,13 @@ inline Real piecewise( std::vector<T> p )
                          "piecewise function has no argument." );
 }
 
+template <typename T>
+inline Real delay( T n1, T n2, T n3 )
+{
+    // This method is never used. Just a dummy.
+    return 0.0;
+}
+
 } } // namespace libecs::math
 
 #endif /* __REALMATH_HPP */

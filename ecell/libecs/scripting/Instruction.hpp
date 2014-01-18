@@ -53,6 +53,7 @@ enum Opcode { // the order of items is optimized. don't change.
     SUB,        // no arg
     MUL,        // no arg
     DIV,        // no arg
+    CALL_DELAY, // Delay
     CALL_FUNCA, // RealFuncA
     CALL_FUNC2, // RealFunc2
     // Those instructions above are candidates of stack operations folding
@@ -75,6 +76,7 @@ typedef libecs::Real( *RealFunc0 )();
 typedef libecs::Real( *RealFunc1 )( libecs::Real );
 typedef libecs::Real( *RealFunc2 )( libecs::Real, libecs::Real );
 typedef libecs::Real( *RealFuncA )( std::vector<libecs::Real> );
+typedef libecs::Real( *Delay )( libecs::Real, libecs::Real, libecs::Real );
 typedef libecs::ObjectMethodProxy<libecs::Real> RealObjectMethodProxy;
 typedef libecs::ObjectMethodProxy<libecs::Integer> IntegerObjectMethodProxy;
 
@@ -186,6 +188,7 @@ SPECIALIZE_OPCODE2OPERAND( LOAD_REAL,                const libecs::Real* );
 SPECIALIZE_OPCODE2OPERAND( CALL_FUNC1,               RealFunc1 );
 SPECIALIZE_OPCODE2OPERAND( CALL_FUNC2,               RealFunc2 );
 SPECIALIZE_OPCODE2OPERAND( CALL_FUNCA,               RealFuncA );
+SPECIALIZE_OPCODE2OPERAND( CALL_DELAY,               Delay );
 SPECIALIZE_OPCODE2OPERAND( OBJECT_METHOD_REAL,       RealObjectMethodProxy );
 SPECIALIZE_OPCODE2OPERAND( OBJECT_METHOD_INTEGER,    IntegerObjectMethodProxy );
 
@@ -229,6 +232,15 @@ operator <<(std::basic_ostream<CharT, Traits>& strm,
         const libecs::scripting::RealFuncA& dp)
 {
     strm << "(libecs::Real(*)(std::vector<libecs::Real>))" << (void *)dp;
+    return strm;
+}
+
+template<typename CharT, typename Traits>
+inline std::basic_ostream<CharT, Traits>&
+operator <<(std::basic_ostream<CharT, Traits>& strm,
+        const libecs::scripting::Delay& dp)
+{
+    strm << "(libecs::Real(*)(libecs::Real, libecs::Real, libecs::Real))" << (void *)dp;
     return strm;
 }
 

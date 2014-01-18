@@ -92,9 +92,11 @@ public:
 
     virtual void initialize()
     {
+        theVirtualMachine.setModel( getModel() );
+        
         Process::initialize();
         _LIBECS_MIXIN_CLASS_::initialize();
-            
+        
         for( VariableReferenceVector::const_iterator i(
                     getVariableReferenceVector().begin() );
              i != getVariableReferenceVector().end(); ++i )

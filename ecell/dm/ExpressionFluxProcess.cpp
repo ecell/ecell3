@@ -61,6 +61,8 @@ public:
 
     virtual void initialize()
     {
+        theVirtualMachine.setModel( getModel() );
+        
         _LIBECS_MIXIN_CLASS_::initialize();
         ContinuousProcess::initialize();
     }

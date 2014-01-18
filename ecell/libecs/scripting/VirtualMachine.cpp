@@ -34,6 +34,8 @@
 
 // #include <iostream>
 
+#include <boost/assert.hpp>
+
 #include "libecs/libecs.hpp"
 #include "libecs/Exceptions.hpp"
 #include "libecs/scripting/VirtualMachine.hpp"
@@ -77,6 +79,7 @@ DEFINE_OPCODE2INSTRUCTION( LOAD_REAL );
 DEFINE_OPCODE2INSTRUCTION( CALL_FUNC1 );
 DEFINE_OPCODE2INSTRUCTION( CALL_FUNC2 );
 DEFINE_OPCODE2INSTRUCTION( CALL_FUNCA );
+DEFINE_OPCODE2INSTRUCTION( CALL_DELAY );
 DEFINE_OPCODE2INSTRUCTION( OBJECT_METHOD_INTEGER );
 DEFINE_OPCODE2INSTRUCTION( OBJECT_METHOD_REAL );
 DEFINE_OPCODE2INSTRUCTION( RET );
@@ -190,6 +193,32 @@ const Real VirtualMachine::execute( Code const& aCode )
             break;
 #undef SIMPLE_ARITHMETIC
 
+        case CALL_DELAY:
+            {
+                DECODE_INSTRUCTION( CALL_DELAY );
+                
+                // std::cout << "Parse Dealy Function# " << aStack.peek< 0 >().theReal << std::endl;
+                // std::cout << "  time  = " << aStack.peek< 1 >().theReal << std::endl;
+                // std::cout << "  value = " << aStack.peek< 2 >().theReal << std::endl;
+                
+                Integer n = (Integer) aStack.peek< 0 >().theReal;
+                
+                if (( theDelayMap.find( n ) == theDelayMap.end() ) ||
+                    ((*(theDelayMap[ n ].rbegin())).second != aStack.peek< 2 >().theReal ))
+                {
+                    theDelayMap[ n ][ theModel->getCurrentTime() ] = aStack.peek< 2 >().theReal;
+                }
+
+                // std::cout << "theDelayMap[ " << n << " ].begin() = " << (*(theDelayMap[ n ].begin())).second << std::endl;
+
+                aStack.peek< 2 >().theReal =  getDelayedValue( n, aStack.peek< 1 >().theReal );
+                aStack.pop_back();
+                aStack.pop_back();
+
+                INCREMENT_PC( CALL_DELAY );
+                break;
+            }
+
         case CALL_FUNCA:
             {
                 DECODE_INSTRUCTION( CALL_FUNCA );
@@ -206,7 +235,7 @@ const Real VirtualMachine::execute( Code const& aCode )
                 aStack.push_back( anInstruction->getOperand()( args ));
 */
                 libecs::Integer numArg( ( libecs::Integer ) aStack.peek< 0 >().theReal ), i( 0 );
-                for ( i = 0; i < numArg; i++ ) {
+                for ( i = 0; i < numArg; ++i ) {
                     aStack.pop_back();
                     // std::cout << "  arg = " << aStack.peek< 0 >().theReal << std::endl;
                     args.push_back( aStack.peek< 0 >().theReal );}
@@ -315,6 +344,25 @@ const Real VirtualMachine::execute( Code const& aCode )
 #undef DECODE_INSTRUCTION
 #undef FETCH_INSTRUCTION
 #undef INCREMENT_PC
+
+}
+
+const Real VirtualMachine::getDelayedValue( libecs::Integer n, libecs::Real t )
+{
+    BOOST_ASSERT( ! theDelayMap[ n ].empty() );
+    BOOST_ASSERT( t >= 0.0 );
+
+    TimeSeries::iterator i = theDelayMap[ n ].end();
+
+    if ( theModel->getCurrentTime() >= t )
+    {
+        // std::cout << "(2) theDelayMap[ " << n << " ].size() = " << theDelayMap[ n ].size() << std::endl;
+        i = theDelayMap[ n ].upper_bound( theModel->getCurrentTime() - t );
+        // std::cout << "        upper_bound() = " << (*i).first << std::endl;
+    }
+    
+    if ( i != theDelayMap[ n ].begin() ) --i;
+    return (*i).second;
 
 }
 

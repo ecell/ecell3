@@ -36,6 +36,8 @@
 
 #include <boost/assert.hpp>
 #include <boost/lexical_cast.hpp>
+#include <vector>
+#include <boost/algorithm/string/join.hpp>
 
 #include "libecs/Util.hpp"
 #include "libecs/RealMath.hpp"
@@ -58,10 +60,13 @@ typedef void (*InstructionAppender)( Code& );
 typedef Loki::AssocVector< String, Real(*)(Real),
                            std::less<String> > FunctionMap1;
 typedef Loki::AssocVector< String,
-                           libecs::Real(*)(Real, Real),
+                           Real(*)(Real, Real),
                            std::less<String> > FunctionMap2;
 typedef Loki::AssocVector< String,
-                           libecs::Real(*)(std::vector<libecs::Real>),
+                           Real(*)(Real, Real, Real),
+                           std::less<String> > FunctionMap3;
+typedef Loki::AssocVector< String,
+                           Real(*)(std::vector<Real>),
                            std::less<String> > FunctionMapA;
 typedef Loki::AssocVector< String, Real, std::less<String> > ConstantMap;
 
@@ -83,6 +88,7 @@ public:
     static const int SYSTEM_PROPERTY = 13;
     static const int IDENTIFIER      = 14;
     static const int CONSTANT        = 15;
+    static const int DELAY           = 16;
 };
 
 class CompileGrammar: public grammar<CompileGrammar>, public Tokens
@@ -170,12 +176,16 @@ public:
                                            expression ) ) >>
                                       ch_p(')') ];
 
+            delay       =   rootNode( str_p("delay") ) >> inner_node_d[ ch_p('(') >>
+                                ( expression >> discard_node_d[ ch_p(',') ] >> expression ) >>
+                                ch_p(')') ];
 
             group       =   inner_node_d[ ch_p('(') >> expression >> ch_p(')')];
 
             constant    =   exponent | floating | integer;
 
             factor      =   call_func
+                            |   delay
                             |   system_func
                             |   variable
                             |   constant
@@ -198,6 +208,7 @@ public:
 
         rule<ScannerT, PARSER_CONTEXT, parser_tag<VARIABLE> >     variable;
         rule<ScannerT, PARSER_CONTEXT, parser_tag<CALL_FUNC> >    call_func;
+        rule<ScannerT, PARSER_CONTEXT, parser_tag<DELAY> >        delay;
         rule<ScannerT, PARSER_CONTEXT, parser_tag<EXPRESSION> >   expression;
         rule<ScannerT, PARSER_CONTEXT, parser_tag<TERM> >         term;
         rule<ScannerT, PARSER_CONTEXT, parser_tag<POWER> >        power;
@@ -228,6 +239,7 @@ struct CompilerConfig
     ConstantMap  theConstantMap;
     FunctionMap1 theFunctionMap1;
     FunctionMap2 theFunctionMap2;
+    FunctionMap3 theFunctionMap3;
     FunctionMapA theFunctionMapA;
     CompileGrammar theGrammar;
 
@@ -291,6 +303,10 @@ struct CompilerConfig
         theFunctionMap2["leq"]   = real_leq;
 
 
+        // set ExpressionCompiler::FunctionMap3
+        theFunctionMap3["delay"]   = delay;
+
+
         // set ExpressionCompiler::FunctionMapA  ('A' is for 'Arbitrary'.)
         theFunctionMapA["piecewise"]   = piecewise;
     }
@@ -304,8 +320,8 @@ struct ObjectMethodOperand {
     MethodPtr theOperand2;
 };
 
-typedef ObjectMethodOperand<libecs::Process, libecs::Real> ProcessMethod;
-typedef ObjectMethodOperand<libecs::System, libecs::Real>  SystemMethod;
+typedef ObjectMethodOperand<Process, Real> ProcessMethod;
+typedef ObjectMethodOperand<System, Real>  SystemMethod;
 
 // {{{ CompilerHelper
 template<typename Tconfig_>
@@ -327,7 +343,8 @@ public:
           theErrorReporter( anErrorReporter ),
           thePropertyAccess( aPropertyAccess ),
           theEntityResolver( anEntityResolver ),
-          theVarRefResolver( aVarRefResolver )
+          theVarRefResolver( aVarRefResolver ),
+          theDelayNum( -1 )
     {
     }
 
@@ -339,6 +356,8 @@ protected:
     void compileSystemProperty(
         TreeIterator const& aTreeIterator,
         System* aSystemPtr, const String aMethodName );
+    
+    // String getTreeValueString( TreeIterator const& aTreeIterator ) const;
 
 private:
     String const& theExpression;
@@ -348,6 +367,7 @@ private:
     ErrorReporter& theErrorReporter;
     Assembler& theAssembler;
     static configuration_type theConfig;
+    Integer theDelayNum;
 };
 
 template<typename Tconfig_>
@@ -464,6 +484,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
 
             FunctionMap1::const_iterator aFunctionMap1Iterator;
             FunctionMap2::const_iterator aFunctionMap2Iterator;
+            FunctionMap3::const_iterator aFunctionMap3Iterator;
             FunctionMapA::const_iterator aFunctionMapAIterator;
 
 
@@ -472,7 +493,7 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
             if ( aFunctionMapAIterator != theConfig.theFunctionMapA.end() ) {
                 
                 // Insert aChildNode that has the number of arguments
-                libecs::String numArgString = boost::lexical_cast< libecs::String >( aChildTreeSize );
+                String numArgString = boost::lexical_cast< String >( aChildTreeSize );
                 // std::cout << "Compile Piecewise Function:" << std::endl << "  numArg = " << numArgString << std::endl;
                 tree_parse_info<> numArgInfo(
                     ast_parse( numArgString.c_str(), theConfig.theGrammar, space_p ) );
@@ -484,15 +505,15 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
 
                 // std::cout << "  Before compile children:" << std::endl;
                 while ( aChildTreeIterator != aTreeIterator->children.end() ) {
-                    // libecs::String aChildValue( aChildTreeIterator->value.begin(), aChildTreeIterator->value.end() );
+                    // String aChildValue( aChildTreeIterator->value.begin(), aChildTreeIterator->value.end() );
                     // std::cout << "    Child Value = " << aChildValue << std::endl;
                     compileTree( aChildTreeIterator );
-                    aChildTreeIterator++;
+                    ++aChildTreeIterator;
                 }
 /*
                 std::cout << "  After compile children:" << std::endl;
                 while ( aChildTreeIterator != aTreeIterator->children.end() ) {
-                    libecs::String aChildValue( aChildTreeIterator->value.begin(), aChildTreeIterator->value.end() );
+                    String aChildValue( aChildTreeIterator->value.begin(), aChildTreeIterator->value.end() );
                     std::cout << "    Child Value = " << aChildValue << std::endl;
                     aChildTreeIterator++;
                 }
@@ -743,6 +764,31 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
         }
         break;
 
+    case DELAY:
+        {
+            TreeMatch::container_t::size_type aChildTreeSize( aTreeIterator->children.size() );
+
+            BOOST_ASSERT( aChildTreeSize == 2 );
+
+            // Insert aChildNode that has an unique number for Delay function
+            String aDelayNumString = boost::lexical_cast< String >( ++theDelayNum );
+            // std::cout << "Compile Delay Function Number:" << std::endl << "  theDelayNum = " << theDelayNumString << std::endl;
+            tree_parse_info<> aDelayNumInfo(
+                ast_parse( aDelayNumString.c_str(), theConfig.theGrammar, space_p ) );
+            aTreeIterator->children.push_back( *( aDelayNumInfo.trees.begin() ) );
+
+            TreeIterator aChildTreeIterator( aTreeIterator->children.begin() );
+            while ( aChildTreeIterator != aTreeIterator->children.end() ) {
+                compileTree( aChildTreeIterator );
+                ++aChildTreeIterator;
+            }
+
+            theAssembler.appendInstruction(
+                Instruction<CALL_DELAY>(
+                    theConfig.theFunctionMap3["delay"] ) );
+        }
+        break;
+
     case POWER:
         {
             BOOST_ASSERT(aTreeIterator->children.size() == 2);
@@ -956,6 +1002,7 @@ CompilerHelper<Tconfig_>::compileSystemProperty(
         );
     }
 }
+
 // }}}
 
 const Code*
