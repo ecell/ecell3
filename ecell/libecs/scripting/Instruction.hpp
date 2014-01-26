@@ -60,6 +60,7 @@ enum Opcode { // the order of items is optimized. don't change.
     // in the stack machine, and grouped here to optimize the switch().
     CALL_FUNC1, // RealFunc1
     NEG,        // no arg
+    PUSH_TIME,  // Time
     PUSH_REAL,  // Real
     LOAD_REAL,  // Real*
     OBJECT_METHOD_REAL, //VariableReferencePtr, VariableReferenceMethodPtr
@@ -189,6 +190,7 @@ SPECIALIZE_OPCODE2OPERAND( CALL_FUNC1,               RealFunc1 );
 SPECIALIZE_OPCODE2OPERAND( CALL_FUNC2,               RealFunc2 );
 SPECIALIZE_OPCODE2OPERAND( CALL_FUNCA,               RealFuncA );
 SPECIALIZE_OPCODE2OPERAND( CALL_DELAY,               Delay );
+SPECIALIZE_OPCODE2OPERAND( PUSH_TIME,                libecs::Real );
 SPECIALIZE_OPCODE2OPERAND( OBJECT_METHOD_REAL,       RealObjectMethodProxy );
 SPECIALIZE_OPCODE2OPERAND( OBJECT_METHOD_INTEGER,    IntegerObjectMethodProxy );
 

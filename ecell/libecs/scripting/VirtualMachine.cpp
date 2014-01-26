@@ -80,6 +80,7 @@ DEFINE_OPCODE2INSTRUCTION( CALL_FUNC1 );
 DEFINE_OPCODE2INSTRUCTION( CALL_FUNC2 );
 DEFINE_OPCODE2INSTRUCTION( CALL_FUNCA );
 DEFINE_OPCODE2INSTRUCTION( CALL_DELAY );
+DEFINE_OPCODE2INSTRUCTION( PUSH_TIME );
 DEFINE_OPCODE2INSTRUCTION( OBJECT_METHOD_INTEGER );
 DEFINE_OPCODE2INSTRUCTION( OBJECT_METHOD_REAL );
 DEFINE_OPCODE2INSTRUCTION( RET );
@@ -216,6 +217,16 @@ const Real VirtualMachine::execute( Code const& aCode )
                 aStack.pop_back();
 
                 INCREMENT_PC( CALL_DELAY );
+                break;
+            }
+
+        case PUSH_TIME:
+            {
+                DECODE_INSTRUCTION( PUSH_TIME );
+
+                aStack.push_back( StackElement( theModel->getCurrentTime() ) );
+
+                INCREMENT_PC( PUSH_TIME );
                 break;
             }
 

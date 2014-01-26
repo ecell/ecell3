@@ -89,6 +89,7 @@ public:
     static const int IDENTIFIER      = 14;
     static const int CONSTANT        = 15;
     static const int DELAY           = 16;
+    static const int TIME            = 17;
 };
 
 class CompileGrammar: public grammar<CompileGrammar>, public Tokens
@@ -100,6 +101,7 @@ public:
 #define rootNode( str ) lexeme_d[root_node_d[str]]
 
         definition( CompileGrammar const& /*self*/ ) {
+            time        =   rootNode( str_p("[[time]]") );
             integer     =   leafNode( +digit_p );
             floating    =   leafNode( +digit_p >> ch_p('.') >> +digit_p );
 
@@ -182,7 +184,7 @@ public:
 
             group       =   inner_node_d[ ch_p('(') >> expression >> ch_p(')')];
 
-            constant    =   exponent | floating | integer;
+            constant    =   exponent | floating | integer| time;
 
             factor      =   call_func
                             |   delay
@@ -208,6 +210,7 @@ public:
 
         rule<ScannerT, PARSER_CONTEXT, parser_tag<VARIABLE> >     variable;
         rule<ScannerT, PARSER_CONTEXT, parser_tag<CALL_FUNC> >    call_func;
+        rule<ScannerT, PARSER_CONTEXT, parser_tag<TIME> >         time;
         rule<ScannerT, PARSER_CONTEXT, parser_tag<DELAY> >        delay;
         rule<ScannerT, PARSER_CONTEXT, parser_tag<EXPRESSION> >   expression;
         rule<ScannerT, PARSER_CONTEXT, parser_tag<TERM> >         term;
@@ -786,6 +789,14 @@ CompilerHelper<Tconfig_>::compileTree( TreeIterator const& aTreeIterator )
             theAssembler.appendInstruction(
                 Instruction<CALL_DELAY>(
                     theConfig.theFunctionMap3["delay"] ) );
+        }
+        break;
+
+    case TIME:
+        {
+            BOOST_ASSERT( aTreeIterator->children.size() == 0 );
+
+            theAssembler.appendInstruction( Instruction<PUSH_TIME>() );
         }
         break;
 
