@@ -25,7 +25,7 @@
 # 
 #END_HEADER
 import libsbml
-import math, sys
+import math, sys, re
 
 #---Other functions are using this 'sub'funtion in this file.---
 def sub( fun , indata ):
@@ -92,7 +92,7 @@ def getCompartment( aSBMLmodel ):
     return LIST
 
 
-def getEvent( aSBMLmodel ):
+def getEvent( aSBMLmodel, timeSymbol ):
     " [[ Id , Name , StringTrigger , StringDelay , TimeUnit , [[ VariableAssignment , StringAssignment ]] ]] "
     LIST = []
     if aSBMLmodel.getEvent(0):
@@ -109,13 +109,15 @@ def getEvent( aSBMLmodel ):
 
             aNode_Ev_Tr = anEvent.getTrigger()
             if aNode_Ev_Tr is not None and aNode_Ev_Tr.isSetMath():
+                print "Event Trigger Math: " + str( _dumpTreeConstructionOfNode( preprocessMathTree( aNode_Ev_Tr.getMath(), timeSymbol ) ) )
                 aString_Ev_Tr = sub( libsbml.formulaToString,
-                    aNode_Ev_Tr.getMath() )
+                    preprocessMathTree( aNode_Ev_Tr.getMath(), timeSymbol ) )
+                print "    String  : " + str( libsbml.formulaToString( preprocessMathTree( aNode_Ev_Tr.getMath(), timeSymbol ) ) )
 
             aNode_Ev_De = anEvent.getDelay()
             if aNode_Ev_De is not None and aNode_Ev_De.isSetMath():
                 aString_Ev_De = sub( libsbml.formulaToString,
-                    aNode_Ev_Tr.getMath() )
+                    preprocessMathTree( aNode_Ev_Tr.getMath(), timeSymbol ) )
 
             aTimeUnit_Ev = anEvent.getTimeUnits()
             
@@ -132,17 +134,17 @@ def getEvent( aSBMLmodel ):
 
                     if anEventAssignment.isSetMath():
                         aString_Ev_As = sub( libsbml.formulaToString,
-                                anEventAssignment.getMath() )
+                                preprocessMathTree( anEventAssignment.getMath(), timeSymbol ) )
 
                     ListOfEventAssignment.append( aVariable_Ev_As )
-                    ListOfEventAssignment.append( aString_Ev_As )
+                    ListOfEventAssignment.append( postprocessMathString( aString_Ev_As, timeSymbol ) )
                     
                     ListOfEventAssignments.append( ListOfEventAssignment )
 
             ListOfEvent.append( anId_Ev )
             ListOfEvent.append( aName_Ev )
-            ListOfEvent.append( aString_Ev_Tr )
-            ListOfEvent.append( aString_Ev_De )
+            ListOfEvent.append( postprocessMathString( aString_Ev_Tr, timeSymbol ) )
+            ListOfEvent.append( postprocessMathString( aString_Ev_De, timeSymbol ) )
             ListOfEvent.append( aTimeUnit_Ev )
             ListOfEvent.append( ListOfEventAssignments )
             
@@ -151,7 +153,7 @@ def getEvent( aSBMLmodel ):
     return LIST
 
 
-def getFunctionDefinition( aSBMLmodel ):
+def getFunctionDefinition( aSBMLmodel, timeSymbol ):
     " [[ Id , Name , String ]] "
     LIST = []
     if aSBMLmodel.getFunctionDefinition(0):
@@ -167,11 +169,11 @@ def getFunctionDefinition( aSBMLmodel ):
 
             if aFunctionDefinition.isSetMath():
                 aString_FD = sub( libsbml.formulaToString,
-                    aFunctionDefinition.getMath() )
+                    preprocessMathTree( aFunctionDefinition.getMath(), timeSymbol ) )
 
             ListOfFunctionDefinition.append( anId_FD )
             ListOfFunctionDefinition.append( aName_FD )
-            ListOfFunctionDefinition.append( aString_FD )
+            ListOfFunctionDefinition.append( postprocessMathString( aString_FD, timeSymbol ) )
 
             LIST.append( ListOfFunctionDefinition )
 
@@ -213,7 +215,7 @@ def getParameter( aSBMLmodel, DerivedValueDic ):
     return LIST
 
 
-def getReaction( aSBMLmodel, aSBMLDocument ):
+def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
     " [[ Id , Name , [ Formula , String , TimeUnit , SubstanceUnit , [[ ParameterId , ParameterName , ParameterValue , ParameterUnit , ParameterConstant ]] ] , Reversible , Fast , [[ ReactantSpecies , ( ReactantStoichiometry , ReactantStoichiometryMath ) , ReactantDenominator  ]] , [[  ProductSpecies , ( ProductStoichiometry , ProductStoichiometryMath ) , ProductDenominator ]] , [[ ModifierSpecies ]] ]] "
     LIST = []
     if aSBMLmodel.getReaction(0):
@@ -234,7 +236,7 @@ def getReaction( aSBMLmodel, aSBMLDocument ):
                 if aKineticLaw != []:
 
                     if aKineticLaw.isSetFormula():
-                        aFormula_KL = aKineticLaw.getFormula()
+                        aFormula_KL = postprocessMathString( libsbml.formulaToString( preprocessMathTree( aKineticLaw.getMath(), timeSymbol ) ), timeSymbol )
                     else:
                         aFormula_KL = ''
                   
@@ -244,7 +246,7 @@ def getReaction( aSBMLmodel, aSBMLDocument ):
                     else:
                         if aKineticLaw.isSetMath():
                             aMath.append(
-                                libsbml.formulaToString( aKineticLaw.getMath() )
+                                postprocessMathString( libsbml.formulaToString( preprocessMathTree( aKineticLaw.getMath(), timeSymbol ) ), timeSymbol )
                                 )
                         else:
                             aMath.append( '' )
@@ -308,8 +310,7 @@ def getReaction( aSBMLmodel, aSBMLDocument ):
                     if aSpeciesReference.isSetStoichiometryMath():
                         aNode_R = aSpeciesReference.getStoichiometryMath()
                         if aNode_R.isSetMath():
-                            aString_R = sub( libsbml.formulaToString,
-                                aNode_R.getMath() )
+                            aString_R = postprocessMathString( libsbml.formulaToString( preprocessMathTree( aNode_R.getMath(), timeSymbol ) ), timeSymbol )
 
                     aDenominator_R = aSpeciesReference.getDenominator()
 
@@ -345,8 +346,7 @@ def getReaction( aSBMLmodel, aSBMLDocument ):
                     if aSpeciesReference.isSetStoichiometryMath():
                         aNode_P = aSpeciesReference.getStoichiometryMath()
                         if aNode_P.isSetMath():
-                            aString_P = sub( libsbml.formulaToString,
-                                    aNode_P.getMath() )
+                            aString_P = postprocessMathString( libsbml.formulaToString( preprocessMathTree( aNode_P.getMath(), timeSymbol ) ), timeSymbol )
 
                     aDenominator_P = aSpeciesReference.getDenominator()
 
@@ -389,7 +389,7 @@ def getReaction( aSBMLmodel, aSBMLDocument ):
     return LIST
 
 
-def getRule( aSBMLmodel ):
+def getRule( aSBMLmodel, timeSymbol ):
     " [[ RuleType, Formula, Variable ]] "
     LIST = []
     if aSBMLmodel.getRule(0):
@@ -399,7 +399,7 @@ def getRule( aSBMLmodel ):
             aRule = aSBMLmodel.getRule( Num )
 
             aRuleType = aRule.getTypeCode()
-            aFormula = aRule.getFormula()
+            aFormula = postprocessMathString( libsbml.formulaToString( preprocessMathTree( aRule.getMath(), timeSymbol ) ), timeSymbol )
              
             if ( aRuleType == libsbml.SBML_ALGEBRAIC_RULE ):
 
@@ -535,6 +535,40 @@ def getUnitDefinition( aSBMLmodel ):
     return LIST
 
 
+def getTimeSymbol( aSBMLmodel ):
+
+    timeSymbol = "time"
+
+    while ( aSBMLmodel.getElementBySId( timeSymbol ) ):
+        timeSymbol = "_%s" % timeSymbol
+
+##    print "Time Symbol =\"%s\"" % timeSymbol
+    return timeSymbol
+
+
+def preprocessMathTree( aNode, timeSymbol ):
+
+    # Set AST_NAME_TIME node's name (SBML does not guarantee its uniqueness)
+    if ( aNode.getType() == libsbml.AST_NAME_TIME ):
+        aNode.setName( timeSymbol )
+
+    for i in range( aNode.getNumChildren() ):
+        preprocessMathTree( aNode.getChild( i ), timeSymbol )
+
+    return aNode
+
+
+def postprocessMathString( aFormula, timeSymbol ):
+
+    ## It's OK if timeSymbol = "time"
+    aFormula = re.sub( r"(\W)%s(\W)" % timeSymbol, r'\1[[time]]\2', aFormula )
+    aFormula = re.sub( r"^%s(\W)" % timeSymbol, r'[[time]]\1', aFormula )
+    aFormula = re.sub( r"(\W)%s$" % timeSymbol, r'\1[[time]]', aFormula )
+    aFormula = re.sub( r"^%s$" % timeSymbol, r'[[time]]', aFormula )
+
+    return aFormula
+
+
 def getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic ):
     '''
     return False when the initial value can not calculate.
@@ -550,7 +584,7 @@ def getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic 
     aFormulaTree = anAssignmentRule.getMath().deepCopy()
 
 ##    print "\nAssignmentRule for %s" % aVariableID
-##    print "  %s\n" % anAssignmentRule.getFormula()
+##    print "  %s\n" % postprocessMathString( libsbml.formulaToString( preprocessMathTree( anAssignmentRule.getMath(), timeSymbol ) ), timeSymbol )
 ##    print "Initial Construction:\n"
 ##    _dumpTreeConstructionOfNode( aFormulaTree )
 ##    print '\n'
@@ -642,6 +676,12 @@ def _convertName2Value( aSBMLmodel, aNode, aCounter, DerivedValueDic ):
         else:
             raise TypeError,\
             "_convertName2Value: Element type must be Species, Parameter, or Compartment"
+
+    ##     Time ( initial value = 0.0 )
+
+    elif ( aNode.getType() == libsbml.AST_NAME_TIME ):
+        aNode.setType( libsbml.AST_REAL )
+        aNode.setValue( 0.0 )
 
     for i in range( aNode.getNumChildren() ):
         _convertName2Value( aSBMLmodel, aNode.getChild( i ), aCounter, DerivedValueDic )
@@ -959,7 +999,6 @@ def _calcInitialValue( aNode ):
         '''
 AST_FUNCTION            : Solved by converter
 AST_LAMBDA
-AST_NAME_TIME
         '''
 
         _removeAllChildren( aNode )

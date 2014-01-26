@@ -64,13 +64,13 @@ def convertSBML2EML( aSBMLString ):
     
     aSBMLModel = aSBMLDocument.getModel()
 
-    theModel = SBML_Model( aSBMLDocument, aSBMLModel )
+    theModel       = SBML_Model( aSBMLDocument, aSBMLModel )
     theCompartment = SBML_Compartment( theModel )
-    theParameter = SBML_Parameter( theModel )
-    theSpecies = SBML_Species( theModel )
-    theRule = SBML_Rule( theModel )
-    theReaction = SBML_Reaction( theModel )
-#    theEvent = SBML_Event( theModel )
+    theParameter   = SBML_Parameter( theModel )
+    theSpecies     = SBML_Species( theModel )
+    theRule        = SBML_Rule( theModel )
+    theReaction    = SBML_Reaction( theModel )
+    theEvent       = SBML_Event( theModel )
 
 ##    # damp FunctionDefinition
 ##    print "\n"
@@ -330,7 +330,7 @@ def convertSBML2EML( aSBMLString ):
 
     for aReaction in theModel.ReactionList:
 
-        print "Reaction: " + str( aReaction )
+##        print "Reaction: " + str( aReaction )
 
         theReaction.initialize()
 
@@ -389,6 +389,14 @@ def convertSBML2EML( aSBMLString ):
                 anEml.setEntityProperty( aSystemFullID,
                                          'VariableReferenceList',
                                          theReaction.VariableReferenceList )
+
+    # ------------------------------
+    #  Set Event ( Process )
+    # ------------------------------
+
+    for anEvent in theModel.EventList:
+
+        print "Event: " + str( anEvent )
 
     return anEml
 

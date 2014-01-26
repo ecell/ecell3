@@ -133,13 +133,14 @@ class SBML_Model:
         self.Version = aSBMLDocument.getVersion() 
 
         self.DerivedValueDic = {}
+        self.TimeSymbol = getTimeSymbol( aSBMLmodel )
 
         self.CompartmentList = getCompartment( aSBMLmodel )
-        self.EventList = getEvent( aSBMLmodel )
-        self.FunctionDefinitionList = getFunctionDefinition( aSBMLmodel )
+        self.EventList = getEvent( aSBMLmodel, self.TimeSymbol )
+        self.FunctionDefinitionList = getFunctionDefinition( aSBMLmodel, self.TimeSymbol )
         self.ParameterList = getParameter( aSBMLmodel, self.DerivedValueDic )
-        self.ReactionList = getReaction( aSBMLmodel, aSBMLDocument )
-        self.RuleList = getRule( aSBMLmodel )
+        self.ReactionList = getReaction( aSBMLmodel, aSBMLDocument, self.TimeSymbol )
+        self.RuleList = getRule( aSBMLmodel, self.TimeSymbol )
         self.SpeciesList = getSpecies( aSBMLmodel, self.DerivedValueDic )
         self.UnitDefinitionList = getUnitDefinition( aSBMLmodel )
 
