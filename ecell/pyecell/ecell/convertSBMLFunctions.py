@@ -581,7 +581,7 @@ class SBML_Rule( SBML_Model ):
 
         self.VariableReferenceList = []
         self.VariableNumber = 0
-        self.ParameterNumber = 0
+##        self.ParameterNumber = 0
         self.RuleNumber = self.RuleNumber + 1
 
 
@@ -687,7 +687,7 @@ class SBML_Rule( SBML_Model ):
                 aParameterList = []
                 variableName = aParameter[0]
                 aParameterList.append( variableName )
-                self.ParameterNumber = self.ParameterNumber + 1
+##                self.ParameterNumber = self.ParameterNumber + 1
                 aParameterList.append( 'Variable:/SBMLParameter:' + aName )
                 aParameterList.append( aStoichiometry )
                 self.VariableReferenceList.append( aParameterList )
@@ -811,7 +811,7 @@ class SBML_Reaction( SBML_Model ):
 ##        self.SubstrateNumber = 0
         self.ProductNumber = 0
         self.ModifierNumber = 0
-        self.ParameterNumber = 0
+##        self.ParameterNumber = 0
 
         self.VariableReferenceList = []
 
@@ -935,10 +935,9 @@ class SBML_Reaction( SBML_Model ):
                         if( variableName == '' ):
 
                             aParameterList = []
-                            aParameterList.append(
-                                'Param' + str( self.ParameterNumber ) )
+                            aParameterList.append( aName )
                             
-                            self.ParameterNumber = self.ParameterNumber + 1
+##                            self.ParameterNumber = self.ParameterNumber + 1
 
                             aParameterList.append(
                                 'Variable:/SBMLParameter:' + aName )
