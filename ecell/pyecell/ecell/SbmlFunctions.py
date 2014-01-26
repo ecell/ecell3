@@ -561,10 +561,10 @@ def preprocessMathTree( aNode, timeSymbol ):
 def postprocessMathString( aFormula, timeSymbol ):
 
     ## It's OK if timeSymbol = "time"
-    aFormula = re.sub( r"(\W)%s(\W)" % timeSymbol, r'\1[[time]]\2', aFormula )
-    aFormula = re.sub( r"^%s(\W)" % timeSymbol, r'[[time]]\1', aFormula )
-    aFormula = re.sub( r"(\W)%s$" % timeSymbol, r'\1[[time]]', aFormula )
-    aFormula = re.sub( r"^%s$" % timeSymbol, r'[[time]]', aFormula )
+    aFormula = re.sub( r"(\W)%s(\W)" % timeSymbol, r'\1<t>\2', aFormula )
+    aFormula = re.sub( r"^%s(\W)" % timeSymbol, r'<t>\1', aFormula )
+    aFormula = re.sub( r"(\W)%s$" % timeSymbol, r'\1<t>', aFormula )
+    aFormula = re.sub( r"^%s$" % timeSymbol, r'<t>', aFormula )
 
     return aFormula
 

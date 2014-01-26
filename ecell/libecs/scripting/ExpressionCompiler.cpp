@@ -101,7 +101,7 @@ public:
 #define rootNode( str ) lexeme_d[root_node_d[str]]
 
         definition( CompileGrammar const& /*self*/ ) {
-            time        =   rootNode( str_p("[[time]]") );
+            time        =   rootNode( str_p("<t>") );
             integer     =   leafNode( +digit_p );
             floating    =   leafNode( +digit_p >> ch_p('.') >> +digit_p );
 
