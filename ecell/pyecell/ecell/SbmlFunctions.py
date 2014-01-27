@@ -534,6 +534,9 @@ def getUnitDefinition( aSBMLmodel ):
 
     return LIST
 
+# --------------------------------------------------
+#  Pre/Post-process of Formula
+# --------------------------------------------------
 
 def getTimeSymbol( aSBMLmodel ):
 
@@ -568,6 +571,9 @@ def postprocessMathString( aFormula, timeSymbol ):
 
     return aFormula
 
+# --------------------------------------------------
+#  Computation of Initial Value
+# --------------------------------------------------
 
 def getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic ):
     '''
@@ -1023,6 +1029,9 @@ def _removeAllChildren( aNode ):
         aNode.removeChild( 0 )
     return
 
+# --------------------------------------------------
+#  Output the Construction of Math Tree (ASTNode)
+# --------------------------------------------------
 
 def _dumpTreeConstructionOfNode( aNode ):
 
