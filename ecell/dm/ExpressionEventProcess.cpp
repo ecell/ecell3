@@ -43,7 +43,10 @@ public:
     {
         INHERIT_PROPERTIES( _LIBECS_MIXIN_CLASS_ );
         INHERIT_PROPERTIES( Process );
-        PROPERTYSLOT_SET_GET( String, Variable );
+        // PROPERTYSLOT_SET_GET( String, Variable );
+        PROPERTYSLOT_SET_GET( String, Trigger );
+        PROPERTYSLOT_SET_GET( String, Delay );
+        PROPERTYSLOT_SET_GET( String, EventAssignmentList );
     }
 
     ExpressionEventProcess()
@@ -57,7 +60,12 @@ public:
     {
         // ; do nothing
     }
- 
+
+    SIMPLE_SET_GET_METHOD( String, Trigger );
+    SIMPLE_SET_GET_METHOD( String, Delay );
+    SIMPLE_SET_GET_METHOD( String, EventAssignmentList );
+
+    /*
     SET_METHOD( String, Variable )
     {
         theVariable = value;
@@ -67,6 +75,7 @@ public:
     {
         return theVariable;
     }
+    */
 
     virtual void defaultSetProperty( libecs::String const& aPropertyName,
                                      libecs::Polymorph const& aValue )
@@ -117,8 +126,14 @@ public:
                 theVirtualMachine.execute( *theCompiledCode ) );
     }
 
+protected:
+
+    String Trigger;
+    String Delay;
+    String EventAssignmentList;
+
 private:
-    String theVariable;
+    // String theVariable;
     VariableReference theVariableReference;
 };
 
