@@ -31,12 +31,12 @@
 // E-Cell Project.
 //
 
-#include "ExpressionProcessBase.hpp"
+#include "SingleExpressionProcessBase.hpp"
 
 USE_LIBECS;
 
 LIBECS_DM_CLASS_MIXIN( ExpressionAssignmentProcess, Process,
-                       ExpressionProcessBase )
+                       SingleExpressionProcessBase )
 {
 public:
     LIBECS_DM_OBJECT( ExpressionAssignmentProcess, Process )

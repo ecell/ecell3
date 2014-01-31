@@ -32,12 +32,12 @@
 //
 
 #include <libecs/ContinuousProcess.hpp>
-#include "ExpressionProcessBase.hpp"
+#include "SingleExpressionProcessBase.hpp"
 
 USE_LIBECS;
 
 LIBECS_DM_CLASS_MIXIN( ExpressionFluxProcess, ContinuousProcess,
-                       ExpressionProcessBase )
+                       SingleExpressionProcessBase )
 {
 public:
     LIBECS_DM_OBJECT( ExpressionFluxProcess, Process )
