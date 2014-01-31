@@ -198,7 +198,7 @@ public:
                 true, true, true, true, true );
     }
 
-    void compileExpression( libecs::String const& anExpression, libecs::scripting::Code* aCompiledCode )
+    void compileExpression( libecs::String const& anExpression, const libecs::scripting::Code* & aCompiledCode )
     {
         ErrorReporter anErrorReporter( *static_cast< Tmixin_* >( this ) );
         PropertyAccess aPropertyAccess( *static_cast< Tmixin_* >( this ) );

@@ -32,14 +32,21 @@
 // E-Cell Project.
 //
 
+#ifndef __SINGLEEXPRESSIONPROCESSBASE_HPP
+#define __SINGLEEXPRESSIONPROCESSBASE_HPP
+
 #include "ExpressionProcessBase.hpp"
 
 template< typename Tmixin_ >
-class SingleExpressionProcessBase : public ExpressionProcessBase
+class SingleExpressionProcessBase : public ExpressionProcessBase< Tmixin_ >
 {
 protected:
 
 private:
+    friend class PropertyAccess;
+    friend class EntityResolver;
+    friend class VariableReferenceResolver;
+    friend class ErrorReporter;
 
 public:
 
@@ -77,7 +84,7 @@ public:
         {
             try
             {
-                compileExpression( theExpression, theCompiledCode );
+                this->compileExpression( theExpression, theCompiledCode );
             }
             catch ( libecs::Exception const& e )
             {
@@ -98,5 +105,5 @@ protected:
     bool theRecompileFlag;
 };
 
-#endif /* __EXPRESSIONPROCESSBASE_HPP */
+#endif /* __SINGLEEXPRESSIONPROCESSBASE_HPP */
 
