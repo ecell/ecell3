@@ -28,6 +28,7 @@
 // authors:
 //   Koichi Takahashi
 //   Tatsuya Ishida
+//   Yasuhiro Naito
 //
 // E-Cell Project.
 //

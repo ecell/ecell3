@@ -26,7 +26,7 @@
 //END_HEADER
 //
 // authors:
-//    Tatsuya Ishida
+//    Yasuhiro Naito
 //
 // E-Cell Project.
 //
@@ -39,17 +39,24 @@ LIBECS_DM_CLASS_MIXIN( ExpressionEventProcess, Process,
                        ExpressionProcessBase )
 {
 public:
+
     LIBECS_DM_OBJECT( ExpressionEventProcess, Process )
     {
         INHERIT_PROPERTIES( _LIBECS_MIXIN_CLASS_ );
         INHERIT_PROPERTIES( Process );
-        // PROPERTYSLOT_SET_GET( String, Variable );
         PROPERTYSLOT_SET_GET( String, Trigger );
         PROPERTYSLOT_SET_GET( String, Delay );
-        PROPERTYSLOT_SET_GET( String, EventAssignmentList );
+        PROPERTYSLOT_LOAD_SAVE( Polymorph, EventAssignmentList,
+                                &ExpressionEventProcess::setEventAssignmentList,
+                                &ExpressionEventProcess::getEventAssignmentList,
+                                &ExpressionEventProcess::setEventAssignmentList,
+                                &ExpressionEventProcess::getEventAssignmentList );
     }
 
     ExpressionEventProcess()
+      : theFireTime( 0.0 ),
+        theTriggerFlag( false ),
+        theFireFlag( false )
     {
         //FIXME: additional properties:
         // Unidirectional     -> call declareUnidirectional() in initialize()
@@ -61,21 +68,77 @@ public:
         // ; do nothing
     }
 
-    SIMPLE_SET_GET_METHOD( String, Trigger );
-    SIMPLE_SET_GET_METHOD( String, Delay );
-    SIMPLE_SET_GET_METHOD( String, EventAssignmentList );
-
-    /*
-    SET_METHOD( String, Variable )
+    SET_METHOD( libecs::String, Trigger )
     {
-        theVariable = value;
+        theTrigger = value;
     }
 
-    GET_METHOD( String, Variable )
+    GET_METHOD( libecs::String, Trigger )
     {
-        return theVariable;
+        return theTrigger;
     }
-    */
+
+    SET_METHOD( libecs::String, Delay )
+    {
+        theDelay = value;
+    }
+
+    GET_METHOD( libecs::String, Delay )
+    {
+        return theDelay;
+    }
+
+    SET_METHOD( libecs::Polymorph, EventAssignmentList )
+    {
+        if ( value.getType() != PolymorphValue::TUPLE )
+        {
+            THROW_EXCEPTION_INSIDE( ValueError,
+                                    asString() + ": argument must be a tuple" );
+        }
+    
+        typedef boost::range_const_iterator< PolymorphValue::Tuple >::type const_iterator;
+        PolymorphValue::Tuple const& aTuple( value.as< PolymorphValue::Tuple const& >() );
+    
+        for ( const_iterator i( boost::begin( aTuple ) );
+              i != boost::end( aTuple ); ++i )
+        {
+            if ( (*i).getType() != PolymorphValue::TUPLE )
+            {
+                THROW_EXCEPTION_INSIDE( ValueError,
+                                        asString() + ": every element of the tuple "
+                                        "must also be a tuple" );
+            }
+            
+            PolymorphValue::Tuple const& anElem( (*i).as< PolymorphValue::Tuple const & >() );
+            if ( anElem.size() != 2 )
+            {
+                THROW_EXCEPTION_INSIDE( ValueError,
+                                        asString() + ": each element of the tuple "
+                                        "must have exactly 2 elements" );
+            }
+            
+            theEANameVector.push_back( anElem[ 0 ].as< String >() );
+            theEventAssignmentMap[ anElem[ 0 ].as< String >() ] = 
+                ExpressionProcessor( this, anElem[ 1 ].as< String >() );
+        }
+    }
+
+    GET_METHOD( libecs::Polymorph, EventAssignmentList )
+    {
+        PolymorphVector aVector;
+        aVector.reserve( theEventAssignmentMap.size() );
+    
+        for( EventAssignmentMap::const_iterator i(
+                theEventAssignmentMap.begin() );
+             i != theEventAssignmentMap.end() ; ++i )
+        {
+            aVector.push_back( boost::tuple< libecs::String, libecs::String >(
+                (*i).first,
+                (*i).second.getExpression() ) );
+        }
+    
+        return Polymorph( aVector );
+    }
 
     virtual void defaultSetProperty( libecs::String const& aPropertyName,
                                      libecs::Polymorph const& aValue )
@@ -101,8 +164,18 @@ public:
 
     virtual void initialize()
     {
-        theVirtualMachine.setModel( getModel() );
+        theTriggerProcessor = ExpressionProcessor( this, theTrigger );
+        theTriggerProcessor.initialize( getModel() );
         
+        theDelayProcessor = ExpressionProcessor( this, theDelay );
+        theDelayProcessor.initialize( getModel() );
+        
+        for( EANameVector::const_iterator aName( theEANameVector.begin() );
+             aName != theEANameVector.end(); ++aName )
+        {
+            theEventAssignmentMap[ *aName ].initialize( getModel() );
+        }
+
         Process::initialize();
         _LIBECS_MIXIN_CLASS_::initialize();
         
@@ -121,20 +194,113 @@ public:
 
     virtual void fire()
     { 
-        theVariableReference.getVariable()->setValue(
-            theVariableReference.getCoefficient() * 
-                theVirtualMachine.execute( *theCompiledCode ) );
+        if ( theTriggerFlag == false && theFireFlag == false )
+        {
+            if ( theTriggerProcessor.execute() != 0.0 )
+            {
+                theFireTime = getModel()->getCurrentTime() + 
+                              theDelayProcessor.execute();
+                theTriggerFlag = true;
+            }
+        }
+        
+        if ( theFireTime <= getModel()->getCurrentTime() && theTriggerFlag == true )
+        {
+            theFireFlag = true;
+            theTriggerFlag = false;
+            for( EANameVector::const_iterator aName = theEANameVector.begin();
+                 aName != theEANameVector.end(); ++aName )
+            {
+                getVariableReference( *aName ).getVariable()->setValue( getVariableReference( *aName ).getCoefficient() * theEventAssignmentMap[ *aName ].execute() );
+            }
+        }
     }
 
 protected:
+    
+    class ExpressionProcessor
+    {
+       public:
+        
+        ExpressionProcessor()
+            : theCompiledCode( 0 ), theRecompileFlag( true )
+        {}
+        
+        ExpressionProcessor( ExpressionEventProcess* thisProcess,
+                             libecs::String anExpression )
+            : theExpression( anExpression ), theCompiledCode( 0 ), theRecompileFlag( true )
+        {
+            setThisProcess( thisProcess );
+        }
+        
+        void initialize( libecs::Model* const aModel )
+        {
+             setModel( aModel );
+             compileExpression();
+        }
+        
+        libecs::String getExpression() const
+        {
+            return theExpression;
+        }
+        
+        void setThisProcess( ExpressionEventProcess* thisProcess )
+        {
+            _thisProcess = thisProcess;
+        }
 
-    String Trigger;
-    String Delay;
-    String EventAssignmentList;
+        void compileExpression()
+        {
+            try
+            {
+                _thisProcess->compileExpression( theExpression, theCompiledCode );
+            }
+            catch ( libecs::Exception const& e )
+            {
+                throw libecs::InitializationFailed( e, static_cast< Process * >( _thisProcess ) );
+            }
+        }
+
+        void setModel( libecs::Model* const aModel )
+        {
+            theVirtualMachine.setModel( aModel );
+        }
+        
+        libecs::Real execute() const
+        {
+            return theVirtualMachine.execute( *theCompiledCode );
+        }
+        
+      private:
+        libecs::String theExpression;
+        const libecs::scripting::Code* theCompiledCode;
+        mutable libecs::scripting::VirtualMachine theVirtualMachine;
+        bool theRecompileFlag;
+        ExpressionEventProcess* _thisProcess;
+    };
+    friend class ExpressionProcessor;
+
+    typedef Loki::AssocVector< libecs::String, ExpressionProcessor,
+                               std::less<const libecs::String> > EventAssignmentMap;
+    typedef std::vector< libecs::String > EANameVector;
+
+    libecs::String theTrigger;
+    ExpressionProcessor theTriggerProcessor;
+
+    libecs::String theDelay;
+    ExpressionProcessor theDelayProcessor;
+
+    libecs::Real theFireTime;
+    bool theTriggerFlag;
+    bool theFireFlag;
+
+    EventAssignmentMap theEventAssignmentMap;
+    EANameVector theEANameVector;
 
 private:
-    // String theVariable;
     VariableReference theVariableReference;
+    
 };
 
 LIBECS_DM_INIT( ExpressionEventProcess, Process );
+

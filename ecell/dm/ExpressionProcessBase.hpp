@@ -28,6 +28,7 @@
 // authors:
 //   Koichi Takahashi
 //   Tatsuya Ishida
+//   Yasuhiro Naito
 //
 // E-Cell Project.
 //
@@ -149,6 +150,10 @@ private:
 
 public:
 
+    LIBECS_DM_OBJECT_MIXIN( ExpressionProcessBase, Tmixin_ )
+    {
+    }
+
     ExpressionProcessBase()
     {
         // ; do nothing
@@ -219,6 +224,10 @@ public:
     PropertyMap const& getPropertyMap() const
     {
         return thePropertyMap;
+    }
+
+    void initialize()
+    {
     }
 
 protected:
