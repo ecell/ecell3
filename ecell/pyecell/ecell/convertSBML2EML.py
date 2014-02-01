@@ -394,9 +394,82 @@ def convertSBML2EML( aSBMLString ):
     #  Set Event ( Process )
     # ------------------------------
 
+    if ( theModel.EventList != [] ):
+
+        ### make Event System ###
+        
+        aSystemFullID='System:/:SBMLEvent'
+        anEml.createEntity( 'System', aSystemFullID )
+        anEml.setEntityProperty( aSystemFullID,
+                                 'Name',
+                                 ['System for SBML Event'] )
+
+        anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DE'] )
+
     for anEvent in theModel.EventList:
 
-        print "Event: " + str( anEvent )
+##        print "Event: " + str( anEvent )
+
+        theEvent.initialize()
+
+        ### setFullID ###        
+        aSystemFullID = theEvent.getEventID( anEvent )
+
+        anEml.createEntity( 'ExpressionEventProcess', aSystemFullID )
+        anEml.setEntityProperty( aSystemFullID, 'StepperID', [ 'DT' ] )
+        anEml.setEntityProperty( aSystemFullID, 'Name', [ str( theEvent.getEventName( anEvent ) ) ] )
+
+        # convert EventAssignment
+        
+        theEventAssignmentList = []
+        for anEventAssignment in anEvent[5]:
+            
+            aVariableType = theEvent.getVariableType( anEventAssignment[ 0 ] )
+
+            if   ( aVariableType == libsbml.SBML_SPECIES ):
+                theEvent.setSpeciesToVariableReference( anEventAssignment[ 0 ], '1' )
+            elif ( aVariableType == libsbml.SBML_PARAMETER ):
+                theEvent.setParameterToVariableReference( anEventAssignment[ 0 ], '1' )
+            elif ( aVariableType == libsbml.SBML_COMPARTMENT ):
+                theEvent.setCompartmentToVariableReference( anEventAssignment[ 0 ], '1' )
+            else:
+                raise TypeError,\
+                    "Variable type must be Species, Parameter, or Compartment"
+            
+            aConvertedEventAssignment = []
+            aConvertedEventAssignment.append( anEventAssignment[ 0 ] )
+            aConvertedEventAssignment.append( str( theEvent.convertEventFormula( anEventAssignment[ 1 ] )))
+            theEventAssignmentList.append( aConvertedEventAssignment )
+
+        # convert Trigger
+        convertedTrigger = [ str( theEvent.convertEventFormula( anEvent[ 2 ] )) ]
+
+        # convert Delay
+        if ( anEvent[ 3 ] != '' ):
+            convertedDelay = [ str( theEvent.convertEventFormula( anEvent[ 3 ] )) ]
+        else:
+            convertedDelay = '0.0'
+
+        # set Expression Property
+        anEml.setEntityProperty( aSystemFullID,
+                                 'EventAssignmentList',
+                                 theEventAssignmentList )
+        
+        # set Expression Property
+        anEml.setEntityProperty( aSystemFullID,
+                                 'Trigger',
+                                 convertedTrigger )
+        
+        # set Expression Property
+        anEml.setEntityProperty( aSystemFullID,
+                                 'Delay',
+                                 convertedDelay )
+        
+        # setVariableReferenceList
+        anEml.setEntityProperty( aSystemFullID,
+                                 'VariableReferenceList',
+                                 theEvent.VariableReferenceList )
+
 
     return anEml
 

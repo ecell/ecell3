@@ -632,7 +632,9 @@ class SBML_Rule( SBML_Model ):
                 return libsbml.SBML_COMPARTMENT
 
         raise TypeError, "Variable type must be Species, Parameter, or Compartment (got %s)" % aName
-    
+
+    # =========================================================
+
     def setSpeciesToVariableReference( self, aName, aStoichiometry='0' ):
 
         for aSpecies in self.Model.SpeciesList:
@@ -780,12 +782,12 @@ class SBML_Rule( SBML_Model ):
 
     def convertRuleFormula( self, aFormula ):
 
-        aASTRootNode = libsbml.parseFormula( aFormula )
+        preprocessedFormula = aFormula.replace( '<t>', self.Model.TimeSymbol )
+        aASTRootNode = libsbml.parseFormula( preprocessedFormula )
 
         convertedAST = self.__convertVariableName( aASTRootNode )
-        convertedFormula = libsbml.formulaToString( convertedAST )
-        
-        return convertedFormula
+
+        return postprocessMathString( libsbml.formulaToString( convertedAST ), self.Model.TimeSymbol )
 
 
     # =========================================================
@@ -965,10 +967,11 @@ class SBML_Reaction( SBML_Model ):
     
     def convertKineticLawFormula( self, aFormula ):
 
-        aASTRootNode = libsbml.parseFormula( aFormula )
+        preprocessedFormula = aFormula.replace( '<t>', self.Model.TimeSymbol )
+        aASTRootNode = libsbml.parseFormula( preprocessedFormula )
         convertedAST = self.__convertVariableName( aASTRootNode )
 
-        return libsbml.formulaToString( convertedAST )
+        return postprocessMathString( libsbml.formulaToString( convertedAST ), self.Model.TimeSymbol )
     
 ##         if( self.VariableReferenceList[0][0] == "S0" ):
 
@@ -1145,15 +1148,228 @@ class SBML_Event( SBML_Model ):
 
     # =========================================================
 
-    def getEventID( self, aEvent ):
+    def initialize( self ):
 
-        if( aEvent[0] != '' ):
-            return 'Process:/:' + aEvent[0]
-        elif( aEvent[1] != '' ):
-            return 'Process:/:' + aEvent[1]
+        self.VariableReferenceList = []
+        self.VariableNumber = 0
+##        self.ParameterNumber = 0
+        self.EventNumber = self.EventNumber + 1
+
+
+    # =========================================================
+
+    def getEventID( self, anEvent ):
+
+        if( anEvent[0] != '' ):
+            return 'Process:/SBMLEvent:' + anEvent[0]
+        elif( anEvent[1] != '' ):
+            return 'Process:/SBMLEvent:' + anEvent[1]
         else:
-            anID = 'Process:/:Event' + self.EventNumber
+            anID = 'Process:/SBMLEvent:Event' + self.EventNumber
             self.EventNumber = self.EventNumber + 1
             return anID
 
     # =========================================================
+
+    def getEventName( self, anEvent ):
+
+        if( anEvent[ 0 ] != '' ):
+            return anEvent[ 0 ]
+        elif( anEvent[1] != '' ):
+            return anEvent[ 1 ]
+        else:
+            return ""
+
+    # =========================================================
+
+    def getVariableType( self, aName ):
+
+        for aSpecies in self.Model.SpeciesList:
+
+            if ( ( self.Model.Level == 1 and aSpecies[1] == aName ) or
+                 ( self.Model.Level == 2 and aSpecies[0] == aName ) ):
+
+                return libsbml.SBML_SPECIES
+
+        for aParameter in self.Model.ParameterList:
+
+            if ( ( self.Model.Level == 1 and aParameter[1] == aName ) or
+                 ( self.Model.Level == 2 and aParameter[0] == aName ) ):
+
+                return libsbml.SBML_PARAMETER
+
+        for aCompartment in self.Model.CompartmentList:
+
+            if ( ( self.Model.Level == 1 and aCompartment[1] == aName ) or
+                 ( self.Model.Level == 2 and aCompartment[0] == aName ) ):
+
+                return libsbml.SBML_COMPARTMENT
+
+        raise TypeError, "Variable type must be Species, Parameter, or Compartment (got %s)" % aName
+
+    # =========================================================
+
+    def setSpeciesToVariableReference( self, aName, aStoichiometry='0' ):
+
+        for aSpecies in self.Model.SpeciesList:
+
+            if ( ( self.Model.Level == 1 and aSpecies[1] == aName ) or
+                 ( self.Model.Level == 2 and aSpecies[0] == aName ) ):
+            
+                for c in range( len( self.VariableReferenceList ) ):
+                    aVariableReference = self.VariableReferenceList[ c ]
+                    
+                    if aVariableReference[1].split(':')[2] == aName:
+
+                        aVariableReference[ 2 ] = str( int( aVariableReference[ 2 ] ) + int( aStoichiometry ))
+
+                        compartmentName = self.setCompartmentToVariableReference( aSpecies[ 2 ] )
+                        return ( aVariableReference[ 0 ], compartmentName )
+
+                aVariableList = []
+
+                variableName = aSpecies[0]
+                aVariableList.append( variableName )
+                self.VariableNumber = self.VariableNumber + 1
+
+                aVariableID = self.Model.getSpeciesReferenceID( aName )
+                aVariableList.append( 'Variable:' + aVariableID )
+                aVariableList.append( aStoichiometry )
+                
+                self.VariableReferenceList.append( aVariableList )
+                
+                compartmentID = aSpecies[ 2 ]
+                compartmentName = self.setCompartmentToVariableReference( compartmentID )
+
+                return ( variableName, compartmentName )
+
+    # =========================================================
+
+    def setParameterToVariableReference( self, aName, aStoichiometry='0' ):
+
+        for aParameter in self.Model.ParameterList:
+
+            if ( ( self.Model.Level == 1 and aParameter[1] == aName ) or
+                 ( self.Model.Level == 2 and aParameter[0] == aName ) ):
+                
+                for c in range( len( self.VariableReferenceList ) ):
+                    aVariableReference = self.VariableReferenceList[ c ]
+                    
+                    if aVariableReference[1].split(':')[2] == aName:
+
+                        aVariableReference[ 2 ] = str( int( aVariableReference[ 2 ] ) + int( aStoichiometry ))
+
+                        return aVariableReference[ 0 ]
+
+                aParameterList = []
+                variableName = aParameter[0]
+                aParameterList.append( variableName )
+##                self.ParameterNumber = self.ParameterNumber + 1
+                aParameterList.append( 'Variable:/SBMLParameter:' + aName )
+                aParameterList.append( aStoichiometry )
+                self.VariableReferenceList.append( aParameterList )
+
+                return variableName
+
+    # =========================================================
+
+    def setCompartmentToVariableReference( self, aName, aStoichiometry='0' ):
+
+        for aCompartment in self.Model.CompartmentList:
+
+            if ( ( self.Model.Level == 1 and aCompartment[1] == aName ) or
+                 ( self.Model.Level == 2 and aCompartment[0] == aName ) ):
+                
+                for c in range( len( self.VariableReferenceList ) ):
+                    aVariableReference = self.VariableReferenceList[ c ]
+                    
+                    if ( aVariableReference[1].split(':')[1] ==\
+                       self.Model.getPath( aName ) ) and\
+                    ( aVariableReference[1].split(':')[2] == 'SIZE' ):
+
+                        aVariableReference[ 2 ] = str( int( aVariableReference[ 2 ] ) + int( aStoichiometry ))
+
+                        return aVariableReference[ 0 ]
+
+                aCompartmentList = []
+                aCompartmentList.append( aName )
+                
+                aCompartmentList.append(
+                    'Variable:' + self.Model.getPath( aName ) + ':SIZE' )
+                
+                aCompartmentList.append( aStoichiometry )
+                self.VariableReferenceList.append( aCompartmentList )
+                
+                return aName
+
+    # =========================================================
+
+    def convertEventFormula( self, aFormula ):
+
+        preprocessedFormula = aFormula.replace( '<t>', self.Model.TimeSymbol )
+        aASTRootNode = libsbml.parseFormula( preprocessedFormula )
+
+        convertedAST = self.__convertVariableName( aASTRootNode )
+
+        return postprocessMathString( libsbml.formulaToString( convertedAST ), self.Model.TimeSymbol )
+
+
+    # =========================================================
+
+    def __convertVariableName( self, anASTNode ):
+
+        aNumChildren = anASTNode.getNumChildren()
+
+        if ( aNumChildren > 0 ):
+            for n in range( aNumChildren ):
+                self.__convertVariableName( anASTNode.getChild( n ) )
+
+        elif ( aNumChildren == 0 ):
+            if ( anASTNode.isNumber() == 1 ):
+                pass
+
+            else:
+                aName = anASTNode.getName()
+                
+                # Time
+                if ( aName == self.Model.TimeSymbol ):
+                    anASTNode.setType( libsbml.AST_NAME_TIME )
+                    return anASTNode
+
+                else:
+                    aType = self.getVariableType( aName )
+
+                    # Species
+                    if ( aType == libsbml.SBML_SPECIES ):
+
+                        ( variableName, compartmentName ) = self.setSpeciesToVariableReference( aName )
+                        if( variableName != '' ):
+
+                            anASTNode.setType( libsbml.AST_DIVIDE )
+                            anASTNode.addChild( libsbml.ASTNode( libsbml.AST_NAME ) )
+                            anASTNode.addChild( libsbml.ASTNode( libsbml.AST_NAME ) )
+                            anASTNode.getLeftChild().setName( '%s.Value' % ( variableName ) )      
+                            anASTNode.getRightChild().setName( '%s.Value' % ( compartmentName ) )      
+                            return anASTNode
+
+                    # Parameter
+                    elif ( aType == libsbml.SBML_PARAMETER ):
+                        
+                        variableName = self.setParameterToVariableReference( aName )
+                        if( variableName != '' ):
+                            anASTNode.setName( '%s.Value' % ( variableName ) )
+                            return anASTNode
+
+                    # Compartment
+                    elif ( aType == libsbml.SBML_COMPARTMENT ):
+                        
+                        variableName = self.setCompartmentToVariableReference( aName )
+                        if( variableName != '' ):
+                            anASTNode.setName( '%s.Value' % ( variableName ) )
+                            return anASTNode
+
+        return anASTNode
+
+
+    # =========================================================
+

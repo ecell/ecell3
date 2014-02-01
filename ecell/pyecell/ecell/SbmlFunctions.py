@@ -109,10 +109,10 @@ def getEvent( aSBMLmodel, timeSymbol ):
 
             aNode_Ev_Tr = anEvent.getTrigger()
             if aNode_Ev_Tr is not None and aNode_Ev_Tr.isSetMath():
-                print "Event Trigger Math: " + str( _dumpTreeConstructionOfNode( preprocessMathTree( aNode_Ev_Tr.getMath(), timeSymbol ) ) )
+##                print "Event Trigger Math: " + str( _dumpTreeConstructionOfNode( preprocessMathTree( aNode_Ev_Tr.getMath(), timeSymbol ) ) )
                 aString_Ev_Tr = sub( libsbml.formulaToString,
                     preprocessMathTree( aNode_Ev_Tr.getMath(), timeSymbol ) )
-                print "    String  : " + str( libsbml.formulaToString( preprocessMathTree( aNode_Ev_Tr.getMath(), timeSymbol ) ) )
+##                print "    String  : " + str( libsbml.formulaToString( preprocessMathTree( aNode_Ev_Tr.getMath(), timeSymbol ) ) )
 
             aNode_Ev_De = anEvent.getDelay()
             if aNode_Ev_De is not None and aNode_Ev_De.isSetMath():
