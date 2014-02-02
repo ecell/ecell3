@@ -222,10 +222,12 @@ def convertSBML2EML( aSBMLString ):
 
         ### setFixed ###
 
-        aConstant = theSpecies.getConstant( aSpecies )
+        if ( theSpecies.isConstant( aSpecies )): aFixedValue = "1"
+        else: aFixedValue = "0"
+        
         anEml.setEntityProperty( aSystemFullID,
                                  'Fixed',
-                                 [ str( aConstant ) ] )
+                                 [ aFixedValue ] )
 
 
     # ------------------------------

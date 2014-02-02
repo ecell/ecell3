@@ -541,25 +541,25 @@ class SBML_Species( SBML_Model ):
     
     # =========================================================
 
-    def getConstant( self, aSpecies ):
+    def isConstant( self, aSpecies ):
 
         if ( self.Model.Level == 1 ):
 
             if ( aSpecies[9] == 1 ):
 
-                return 1
+                return True
 
             else:
-                return 0
+                return False
             
         elif ( self.Model.Level == 2 ):
 
             if ( aSpecies[11] == 1 ):
                 
-                return 1
+                return True
 
             else:
-                return 0
+                return False
 
     # =========================================================
 
