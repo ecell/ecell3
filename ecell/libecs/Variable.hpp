@@ -80,9 +80,11 @@ public:
                                 &Variable::loadMolarConc,
                                 NOMETHOD );
 
-        PROPERTYSLOT_NO_LOAD_SAVE( Real, NumberConc,
-                                   &Variable::setNumberConc,
-                                   &Variable::getNumberConc );
+        PROPERTYSLOT_LOAD_SAVE( Real, NumberConc,
+                                &Variable::setNumberConc,
+                                &Variable::getNumberConc,
+                                &Variable::loadNumberConc,
+                                NOMETHOD );
     }
 
     Variable();
