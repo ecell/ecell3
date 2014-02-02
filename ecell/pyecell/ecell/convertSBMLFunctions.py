@@ -597,8 +597,7 @@ class SBML_Rule( SBML_Model ):
 
                         aVariableReference[ 2 ] = str( int( aVariableReference[ 2 ] ) + int( aStoichiometry ))
 
-                        compartmentName = self.setCompartmentToVariableReference( aSpecies[ 'Compartment' ] )
-                        return ( aVariableReference[ 0 ], compartmentName )
+                        return aVariableReference[ 0 ]
 
                 aVariableList = []
 
@@ -611,11 +610,8 @@ class SBML_Rule( SBML_Model ):
                 aVariableList.append( aStoichiometry )
                 
                 self.VariableReferenceList.append( aVariableList )
-                
-                compartmentID = aSpecies[ 'Compartment' ]
-                compartmentName = self.setCompartmentToVariableReference( compartmentID )
 
-                return ( variableName, compartmentName )
+                return variableName
 
     # =========================================================
 
@@ -697,14 +693,11 @@ class SBML_Rule( SBML_Model ):
                 # Species
                 if ( aType == libsbml.SBML_SPECIES ):
 
-                    ( variableName, compartmentName ) = self.setSpeciesToVariableReference( aName )
+                    variableName = self.setSpeciesToVariableReference( aName )
                     if( variableName != '' ):
 
-                        anASTNode.setType( libsbml.AST_DIVIDE )
-                        anASTNode.addChild( libsbml.ASTNode( libsbml.AST_NAME ) )
-                        anASTNode.addChild( libsbml.ASTNode( libsbml.AST_NAME ) )
-                        anASTNode.getLeftChild().setName( '%s.Value' % ( variableName ) )      
-                        anASTNode.getRightChild().setName( '%s.Value' % ( compartmentName ) )      
+                        anASTNode.setType( libsbml.AST_NAME )
+                        anASTNode.setName( '%s.NumberConc' % ( variableName ) )
                         return anASTNode
 
                 # Parameter
@@ -864,13 +857,8 @@ class SBML_Reaction( SBML_Model ):
                             
                             variableName = aModifierList[0]
 
-                        compartmentName = self.setCompartmentToVariableReference( aSpecies[ 'Compartment' ] )
-
-                        anASTNode.setType( libsbml.AST_DIVIDE )
-                        anASTNode.addChild( libsbml.ASTNode( libsbml.AST_NAME ) )
-                        anASTNode.addChild( libsbml.ASTNode( libsbml.AST_NAME ) )
-                        anASTNode.getLeftChild().setName( '%s.Value' % ( variableName ) )      
-                        anASTNode.getRightChild().setName( '%s.Value' % ( compartmentName ) )      
+                        anASTNode.setType( libsbml.AST_NAME )
+                        anASTNode.setName( '%s.NumberConc' % ( variableName ) )
                         
                         return anASTNode
 
@@ -1171,8 +1159,7 @@ class SBML_Event( SBML_Model ):
 
                         aVariableReference[ 2 ] = str( int( aVariableReference[ 2 ] ) + int( aStoichiometry ))
 
-                        compartmentName = self.setCompartmentToVariableReference( aSpecies[ 'Compartment' ] )
-                        return ( aVariableReference[ 0 ], compartmentName )
+                        return aVariableReference[ 0 ]
 
                 aVariableList = []
 
@@ -1185,11 +1172,8 @@ class SBML_Event( SBML_Model ):
                 aVariableList.append( aStoichiometry )
                 
                 self.VariableReferenceList.append( aVariableList )
-                
-                compartmentID = aSpecies[ 'Compartment' ]
-                compartmentName = self.setCompartmentToVariableReference( compartmentID )
 
-                return ( variableName, compartmentName )
+                return variableName
 
     # =========================================================
 
@@ -1290,14 +1274,11 @@ class SBML_Event( SBML_Model ):
                     # Species
                     if ( aType == libsbml.SBML_SPECIES ):
 
-                        ( variableName, compartmentName ) = self.setSpeciesToVariableReference( aName )
+                        variableName = self.setSpeciesToVariableReference( aName )
                         if( variableName != '' ):
 
-                            anASTNode.setType( libsbml.AST_DIVIDE )
-                            anASTNode.addChild( libsbml.ASTNode( libsbml.AST_NAME ) )
-                            anASTNode.addChild( libsbml.ASTNode( libsbml.AST_NAME ) )
-                            anASTNode.getLeftChild().setName( '%s.Value' % ( variableName ) )      
-                            anASTNode.getRightChild().setName( '%s.Value' % ( compartmentName ) )      
+                            anASTNode.setType( libsbml.AST_NAME )
+                            anASTNode.setName( '%s.NumberConc' % ( variableName ) )
                             return anASTNode
 
                     # Parameter
