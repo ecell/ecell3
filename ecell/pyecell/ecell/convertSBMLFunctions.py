@@ -117,19 +117,181 @@ N_A = 6.0221367e+23
 
 
 # --------------------------------
-# Model Class
+# Base Class
 # --------------------------------
 
-class SBML_Model:
+class SBML_Base:
 
 
-    def __init__( self, aSBMLDocument, aSBMLmodel ):
+    def __init__( self ):
 
         self.EntityPath = {
             'Parameter' : '/SBMLParameter',
             'Rule'      : '/SBMLRule',
             'Reaction'  : '/',
             'Event'     : '/SBMLEvent' }
+
+    # =========================================================
+
+    #def macroExpand( self, anASTNode ):
+
+    #    aNumChildren = anASTNode.getNumChildren()
+
+    #if ( aNumChildren == 2 ):
+
+    #        aString = self.FunctionDefinition[ anASTNode.getName() ]
+
+    #        anASTNode.getLeftChild().getName()
+    #        anASTNode.getRightChild().getName
+
+            
+    #    if ( aNumChildren == 1 ):
+
+
+
+    # =========================================================
+
+    def getPath( self, aCompartmentID, aModel ):
+
+        if( aCompartmentID == 'default' ):
+            return '/'
+        
+        if ( aModel.Level == 1 ):
+            for aCompartment in aModel.CompartmentList:
+                if ( aCompartment[ 'Name' ] == aCompartmentID ):
+                    if ( aCompartment[ 'Outside' ] == '' or\
+                         aCompartment[ 'Outside' ] == 'default' ):
+                        aPath = '/' + aCompartmentID
+                        return aPath
+                    else:
+                        aPath = self.getPath( aCompartment[ 'Outside' ] ) + '/' +\
+                                aCompartmentID
+                        return aPath
+
+        elif( aModel.Level >= 2 ):
+            for aCompartment in aModel.CompartmentList:
+                if( aCompartment[ 'Id' ] == aCompartmentID ):
+                    if ( aCompartment[ 'Outside' ] == '' or\
+                         aCompartment[ 'Outside' ] == 'default' ):
+                        aPath = '/' + aCompartmentID
+                        return aPath
+                    else:
+                        aPath = self.getPath( aCompartment[ 'Outside' ] ) + '/' +\
+                                aCompartmentID
+                        return aPath
+
+        else:
+            raise Exception,"Version"+str(self.Level)+" ????"
+        
+        
+    # =========================================================
+
+    def getSpeciesReferenceID( self, aSpeciesID, aModel ):
+
+        if ( aModel.Level == 1 ):
+            for aSpecies in aModel.SpeciesList:
+                if ( aSpecies[ 'Name' ] == aSpeciesID ):
+                    return self.getPath( aSpecies[ 'Compartment' ] ) + ":" + aSpeciesID
+                    
+        elif ( aModel.Level >= 2 ):
+            for aSpecies in aModel.SpeciesList:
+                if ( aSpecies[ 'Id' ] == aSpeciesID ):
+                    return self.getPath( aSpecies[ 'Compartment' ] ) + ":" + aSpeciesID
+
+        else:
+            raise Exception,"Version"+str(self.Level)+" ????"
+
+
+    # =========================================================
+
+    def convertUnit( self, aValueUnit, aValue ):
+
+        newValue = []
+        if ( self.Level == 1 ):
+            for unitList in self.UnitDefinitionList:
+                if ( unitList[1] == aValueUnit ):
+
+                    for anUnit in unitList[2]:
+                        aValue = aValue * self.__getNewUnitValue( anUnit )
+
+                newValue.append( aValue )
+
+        elif ( self.Level >= 2 ):
+            for unitList in self.UnitDefinitionList:
+                if ( unitList[0] == aValueUnit ):
+
+                    for anUnit in unitList[2]:
+
+                        aValue = aValue * self.__getNewUnitValue( anUnit )
+
+                newValue.append( aValue )
+
+        if( newValue == [] ):
+            return aValue
+        else:
+            return newValue[0]
+
+
+    # =========================================================
+
+    def dic2FullID( self, anEntityDic ):
+
+        return "%(Type)s:%(Path)s:%(EntityName)s" % anEntityDic
+
+    # =========================================================
+
+    def getVariableType( self, aName, aModel ):
+
+        for aSpecies in aModel.SpeciesList:
+
+            if ( ( aModel.Level == 1 and aSpecies[ 'Name' ] == aName ) or
+                 ( aModel.Level >= 2 and aSpecies[ 'Id' ] == aName ) ):
+
+                return libsbml.SBML_SPECIES
+
+        for aParameter in aModel.ParameterList:
+
+            if ( ( aModel.Level == 1 and aParameter[ 'Name' ] == aName ) or
+                 ( aModel.Level >= 2 and aParameter[ 'Id' ] == aName ) ):
+
+                return libsbml.SBML_PARAMETER
+
+        for aCompartment in aModel.CompartmentList:
+
+            if ( ( aModel.Level == 1 and aCompartment[ 'Name' ] == aName ) or
+                 ( aModel.Level >= 2 and aCompartment[ 'Id' ] == aName ) ):
+
+                return libsbml.SBML_COMPARTMENT
+
+        raise TypeError, "Variable type must be Species, Parameter, or Compartment (got %s)" % aName
+
+    # =========================================================
+    
+    def getID( self, anEntity, aModel ):
+
+        if ( aModel.Level == 1 ):
+            return anEntity[ 'Name' ]
+
+        elif ( aModel.Level >= 2 ):
+            return anEntity[ 'Id' ]
+
+        else:
+            raise Exception,"Version"+str(self.Level)+" ????"
+
+    # =========================================================
+
+
+
+# --------------------------------
+# Model Class
+# --------------------------------
+
+class SBML_Model( SBML_Base ):
+
+
+    def __init__( self, aSBMLDocument, aSBMLmodel ):
+
+        SBML_Base.__init__( self )
 
         self.CompartmentSize = {}
         self.CompartmentUnit = {}
@@ -155,121 +317,34 @@ class SBML_Model:
 
     # =========================================================
 
+    def getPath( self, aCompartmentID ):
+        return SBML_Base.getPath( self, aCompartmentID, self )
+
+    # =========================================================
+
+    def getSpeciesReferenceID( self, aSpeciesID ):
+        return SBML_Base.getSpeciesReferenceID( self, aSpeciesID, self )
+
+    # =========================================================
+
+    def getVariableType( self, aName ):
+        return SBML_Base.getVariableType( self, aName, self )
+
+    # =========================================================
+    
+    def getID( self, anEntity ):
+        return SBML_Base.getID( self, anEntity, self )
+
+    # =========================================================
+
     def setFunctionDefinitionToDictionary( self ):
 
         if ( self.FunctionDefinitionList != [] ):
 
             for aFunctionDefinition in ( self.FunctionDefinitionList ):
                 
-                self.FunctionDefinition[ aFunctionDefinition[0] ] = aFunctionDefinition[2]
+                self.FunctionDefinition[ aFunctionDefinition.getID() ] = aFunctionDefinition[ 'Formula' ]
             
-
-    # =========================================================
-
-    #def macroExpand( self, anASTNode ):
-
-    #    aNumChildren = anASTNode.getNumChildren()
-
-    #if ( aNumChildren == 2 ):
-
-    #        aString = self.FunctionDefinition[ anASTNode.getName() ]
-
-    #        anASTNode.getLeftChild().getName()
-    #        anASTNode.getRightChild().getName
-
-            
-    #    if ( aNumChildren == 1 ):
-
-
-
-    # =========================================================
-
-    def getPath( self, aCompartmentID ):
-
-        if( aCompartmentID == 'default' ):
-            return '/'
-        
-        if ( self.Level == 1 ):
-            for aCompartment in self.CompartmentList:
-                if ( aCompartment[1] == aCompartmentID ):
-                    if ( aCompartment[6] == '' or\
-                         aCompartment[6] == 'default' ):
-                        aPath = '/' + aCompartmentID
-                        return aPath
-                    else:
-                        aPath = self.getPath( aCompartment[6] ) + '/' +\
-                                aCompartmentID
-                        return aPath
-
-        elif( self.Level == 2 ):
-            for aCompartment in self.CompartmentList:
-                if( aCompartment[0] == aCompartmentID ):
-                    if ( aCompartment[6] == '' or\
-                         aCompartment[6] == 'default' ):
-                        aPath = '/' + aCompartmentID
-                        return aPath
-                    else:
-                        aPath = self.getPath( aCompartment[6] ) + '/' +\
-                                aCompartmentID
-                        return aPath
-
-        else:
-            raise Exception,"Version"+str(self.Level)+" ????"
-        
-        
-    # =========================================================
-
-    def getSpeciesReferenceID( self, aSpeciesID ):
-
-        if ( self.Level == 1 ):
-            for aSpecies in self.SpeciesList:
-                if ( aSpecies[ 'Name' ] == aSpeciesID ):
-                    return self.getPath( aSpecies[ 'Compartment' ] ) + ":" + aSpeciesID
-                    
-        elif ( self.Level == 2 ):
-            for aSpecies in self.SpeciesList:
-                if ( aSpecies[ 'Id' ] == aSpeciesID ):
-                    return self.getPath( aSpecies[ 'Compartment' ] ) + ":" + aSpeciesID
-
-        else:
-            raise Exception,"Version"+str(self.Level)+" ????"
-
-
-    # =========================================================
-
-    def convertUnit( self, aValueUnit, aValue ):
-
-        newValue = []
-        if ( self.Level == 1 ):
-            for unitList in self.UnitDefinitionList:
-                if ( unitList[1] == aValueUnit ):
-
-                    for anUnit in unitList[2]:
-                        aValue = aValue * self.__getNewUnitValue( anUnit )
-
-                newValue.append( aValue )
-
-        elif ( self.Level == 2 ):
-            for unitList in self.UnitDefinitionList:
-                if ( unitList[0] == aValueUnit ):
-
-                    for anUnit in unitList[2]:
-
-                        aValue = aValue * self.__getNewUnitValue( anUnit )
-
-                newValue.append( aValue )
-
-        if( newValue == [] ):
-            return aValue
-        else:
-            return newValue[0]
-
-
-    # =========================================================
-
-    def dic2FullID( self, anEntityDic ):
-
-        return "%(Type)s:%(Path)s:%(EntityName)s" % anEntityDic
 
     # =========================================================
 
@@ -301,10 +376,10 @@ class SBML_Model:
 # Compartment Class
 # --------------------------------
 
-class SBML_Compartment( SBML_Model ):
-
+class SBML_Compartment( SBML_Base ):
 
     def __init__( self, aModel ):
+        SBML_Base.__init__( self )
         self.Model = aModel
 
     # =========================================================
@@ -314,24 +389,43 @@ class SBML_Compartment( SBML_Model ):
         self.__setSizeToDictionary( aCompartment )
         self.__setUnitToDictionary( aCompartment )
 
-        
+    # =========================================================
+
+    def getPath( self, aCompartmentID ):
+        return SBML_Base.getPath( self, aCompartmentID, self.Model )
+
+    # =========================================================
+
+    def getSpeciesReferenceID( self, aSpeciesID ):
+        return SBML_Base.getSpeciesReferenceID( self, aSpeciesID, self.Model )
+
+    # =========================================================
+
+    def getVariableType( self, aName ):
+        return SBML_Base.getVariableType( self, aName, self.Model )
+
+    # =========================================================
+
+    def getID( self, aSpecies ):
+        return SBML_Base.getID( self, aSpecies, self.Model )
+
     # =========================================================
     
     def getCompartmentID( self, aCompartment ):
         
-        if ( aCompartment[6] == '' ):
+        if ( aCompartment[ 'Outside' ] == '' ):
             if ( self.Model.Level == 1 ):
-                aSystemID = '/:' + aCompartment[1]
-            elif ( self.Model.Level == 2 ):
-                aSystemID = '/:' + aCompartment[0]
+                aSystemID = '/:' + aCompartment[ 'Name' ]
+            elif ( self.Model.Level >= 2 ):
+                aSystemID = '/:' + aCompartment[ 'Id' ]
             else:
                 raise NameError,"Compartment Class needs a ['ID']"
 
         else:
             if( self.Model.Level == 1 ):
-                aSystemID = self.Model.getPath( aCompartment[6] ) + ':'+ aCompartment[1]
-            elif( self.Model.Level == 2 ):
-                aSystemID = self.Model.getPath( aCompartment[6] ) + ':'+ aCompartment[0]
+                aSystemID = self.getPath( aCompartment[ 'Outside' ] ) + ':'+ aCompartment[ 'Name' ]
+            elif( self.Model.Level >= 2 ):
+                aSystemID = self.getPath( aCompartment[ 'Outside' ] ) + ':'+ aCompartment[ 'Id' ]
 
         return 'System:' + aSystemID
 
@@ -341,18 +435,18 @@ class SBML_Compartment( SBML_Model ):
     def __setSizeToDictionary( self, aCompartment ):
 
         if( self.Model.Level == 1 ):
-            if( aCompartment[4] != "Unknown" ):
-                self.Model.CompartmentSize[ aCompartment[1] ] = aCompartment[4]
+            if( aCompartment[ 'Volume' ] != "Unknown" ):
+                self.Model.CompartmentSize[ aCompartment[ 'Name' ] ] = aCompartment[ 'Volume' ]
 
             else:
-                self.Model.CompartmentSize[ aCompartment[1] ] = self.__getOutsideSize( aCompartment[6] )
+                self.Model.CompartmentSize[ aCompartment[ 'Name' ] ] = self.__getOutsideSize( aCompartment[ 'Outside' ] )
                 
-        elif( self.Model.Level == 2 ):
-            if( aCompartment[3] != "Unknown" ):
-                self.Model.CompartmentSize[ aCompartment[0] ] = aCompartment[3]
+        elif( self.Model.Level >= 2 ):
+            if( aCompartment[ 'Size' ] != "Unknown" ):
+                self.Model.CompartmentSize[ aCompartment[ 'Id' ] ] = aCompartment[ 'Size' ]
 
             else:
-                self.Model.CompartmentSize[ aCompartment[0] ] = self.__getOutsideSize( aCompartment[6] )
+                self.Model.CompartmentSize[ aCompartment[ 'Id' ] ] = self.__getOutsideSize( aCompartment[ 'Outside' ] )
 
 
     # =========================================================
@@ -360,17 +454,17 @@ class SBML_Compartment( SBML_Model ):
     def __setUnitToDictionary( self, aCompartment ):
 
         if( self.Model.Level == 1 ):
-            aCompartmentID = aCompartment[1]
+            aCompartmentID = aCompartment[ 'Name' ]
 
-        elif( self.Model.Level == 2 ):
-            aCompartmentID = aCompartment[0]
+        elif( self.Model.Level >= 2 ):
+            aCompartmentID = aCompartment[ 'Id' ]
 
 
-        if( aCompartment[5] != '' ):
-            self.Model.CompartmentUnit[ aCompartmentID ] = aCompartment[5]
+        if( aCompartment[ 'Unit' ] != '' ):
+            self.Model.CompartmentUnit[ aCompartmentID ] = aCompartment[ 'Unit' ]
 
         else:
-            self.Model.CompartmentUnit[ aCompartmentID ] = self.__getOutsideUnit( aCompartment[6] )
+            self.Model.CompartmentUnit[ aCompartmentID ] = self.__getOutsideUnit( aCompartment[ 'Outside' ] )
 
 
     # =========================================================
@@ -402,11 +496,11 @@ class SBML_Compartment( SBML_Model ):
 
         if ( self.Model.Level == 1 ):
 
-            return self.Model.CompartmentSize[ aCompartment[1] ]
+            return self.Model.CompartmentSize[ aCompartment[ 'Name' ] ]
 
-        elif ( self.Model.Level == 2 ):
+        elif ( self.Model.Level >= 2 ):
 
-            return self.Model.CompartmentSize[ aCompartment[0] ]
+            return self.Model.CompartmentSize[ aCompartment[ 'Id' ] ]
 
 
     # =========================================================    
@@ -415,28 +509,46 @@ class SBML_Compartment( SBML_Model ):
 
         if ( self.Model.Level == 1 ):
 
-            return self.Model.CompartmentUnit[ aCompartment[1] ]
+            return self.Model.CompartmentUnit[ aCompartment[ 'Name' ] ]
 
-        elif ( self.Model.Level == 2 ):
+        elif ( self.Model.Level >= 2 ):
 
-            return self.Model.CompartmentUnit[ aCompartment[0] ]
+            return self.Model.CompartmentUnit[ aCompartment[ 'Id' ] ]
 
 
     # =========================================================    
-
-
 
 
 # --------------------------------
 # Species Class
 # --------------------------------
 
-class SBML_Species( SBML_Model ):
+class SBML_Species( SBML_Base ):
 
-    
     def __init__( self, aModel ):
+        SBML_Base.__init__( self )
         self.Model = aModel
     
+
+    # =========================================================
+
+    def getPath( self, aCompartmentID ):
+        return SBML_Base.getPath( self, aCompartmentID, self.Model )
+
+    # =========================================================
+
+    def getSpeciesReferenceID( self, aSpeciesID ):
+        return SBML_Base.getSpeciesReferenceID( self, aSpeciesID, self.Model )
+
+    # =========================================================
+
+    def getVariableType( self, aName ):
+        return SBML_Base.getVariableType( self, aName, self.Model )
+
+    # =========================================================
+
+    def getID( self, aSpecies ):
+        return SBML_Base.getID( self, aSpecies, self.Model )
 
     # =========================================================
     
@@ -448,19 +560,11 @@ class SBML_Species( SBML_Model ):
             raise NameError, 'compartment property of Species must be defined'
 
         anEntityDic = {
-            'Type' : 'Variable',
-            'Path' : self.Model.getPath( aCompartmentID ) }
+            'Type'       : 'Variable',
+            'Path'       : self.getPath( aCompartmentID ),
+            'EntityName' : self.getID( aSpecies ) }
 
-        if ( self.Model.Level == 1 ):
-            anEntityDic[ 'EntityName' ] = aSpecies[ 'Name' ]
-
-        elif ( self.Model.Level == 2 ):
-            anEntityDic[ 'EntityName' ] = aSpecies[ 'Id' ]
-
-        else:
-            raise Exception,"Version"+str(self.Level)+" ????"
-
-        return self.Model.dic2FullID( anEntityDic )
+        return self.dic2FullID( anEntityDic )
 
 
     # =========================================================
@@ -472,7 +576,7 @@ class SBML_Species( SBML_Model ):
                 'Property' : 'Value',
                 'Value'    : float( aSpecies[ 'InitialAmount' ] ) }
         
-        elif ( self.Model.Level == 2 ):
+        elif ( self.Model.Level >= 2 ):
             if ( aSpecies[ 'InitialConcentration' ] != 'Unknown' ): # initialConcentration
 
                 if ( aSpecies[ 'Unit' ] == '' ):
@@ -482,30 +586,24 @@ class SBML_Species( SBML_Model ):
                     return { 
                         'Property' : 'NumberConc',
                         'Value'    : float( aSpecies[ 'InitialConcentration' ] ) }
+                else:
+                    raise ValueError, 'InitialAmount or InitialConcentration of Species [%s] must be defined.' % self.getID( aSpecies )
 
-        raise ValueError, 'InitialAmount or InitialConcentration of Species [%s] must be defined.' % ( aSpecies[ 'Id' ] )
+        raise ValueError, 'InitialAmount or InitialConcentration of Species [%s] must be defined.' % self.getID( aSpecies )
 
-
-    
     # =========================================================
 
     def isConstant( self, aSpecies ):
 
         if ( self.Model.Level == 1 ):
-
             if ( aSpecies[ 'BoundaryCondition' ] == 1 ):
-
                 return True
-
             else:
                 return False
             
-        elif ( self.Model.Level == 2 ):
-
+        elif ( self.Model.Level >= 2 ):
             if ( aSpecies[ 'Constant' ] == 1 ):
-                
                 return True
-
             else:
                 return False
 
@@ -516,12 +614,11 @@ class SBML_Species( SBML_Model ):
 # Rule Class
 # --------------------------------
 
-class SBML_Rule( SBML_Model ):
+class SBML_Rule( SBML_Base ):
 
     def __init__( self, aModel ):
-
+        SBML_Base.__init__( self )
         self.Model = aModel
-        self.RuleNumber = 0
 
 
     # =========================================================
@@ -531,55 +628,54 @@ class SBML_Rule( SBML_Model ):
         self.VariableReferenceList = []
         self.VariableNumber = 0
 ##        self.ParameterNumber = 0
-        self.RuleNumber = self.RuleNumber + 1
 
+
+    # =========================================================
+
+    def getPath( self, aCompartmentID ):
+        return SBML_Base.getPath( self, aCompartmentID, self.Model )
+
+    # =========================================================
+
+    def getSpeciesReferenceID( self, aSpeciesID ):
+        return SBML_Base.getSpeciesReferenceID( self, aSpeciesID, self.Model )
+
+    # =========================================================
+
+    def getVariableType( self, aName ):
+        return SBML_Base.getVariableType( self, aName, self.Model )
+
+    # =========================================================
+
+    def getID( self, aSpecies ):
+        return SBML_Base.getID( self, aSpecies, self.Model )
 
     # =========================================================
     
     def generateFullID( self, aRule ):
-        if ( aRule[0] == libsbml.SBML_ALGEBRAIC_RULE ):
-            return 'Process:/SBMLRule:Algebraic_%s' % str( aRule[2] )
+        if ( aRule[ 'Type' ] == libsbml.SBML_ALGEBRAIC_RULE ):
+            anIDHeader = 'Algebraic'
 
-        elif ( aRule[0] == libsbml.SBML_ASSIGNMENT_RULE            or
-               aRule[0] == libsbml.SBML_SPECIES_CONCENTRATION_RULE or
-               aRule[0] == libsbml.SBML_COMPARTMENT_VOLUME_RULE    or
-               aRule[0] == libsbml.SBML_PARAMETER_RULE ):
-            return 'Process:/SBMLRule:Assignment_%s' % str( aRule[2] )
+        elif ( aRule[ 'Type' ] == libsbml.SBML_ASSIGNMENT_RULE            or
+               aRule[ 'Type' ] == libsbml.SBML_SPECIES_CONCENTRATION_RULE or
+               aRule[ 'Type' ] == libsbml.SBML_COMPARTMENT_VOLUME_RULE    or
+               aRule[ 'Type' ] == libsbml.SBML_PARAMETER_RULE ):
+            anIDHeader = 'Assignment'
 
-        elif ( aRule[0] == libsbml.SBML_RATE_RULE ):
-            return 'Process:/SBMLRule:Rate_%s' % str( aRule[2] )
+        elif ( aRule[ 'Type' ] == libsbml.SBML_RATE_RULE ):
+            anIDHeader = 'Rate'
 
         else:
             raise TypeError,\
                 "Variable type must be Species, Parameter, or Compartment"
 
+        anEntityDic = {
+            'Type'       : 'Process',
+            'Path'       : self.Model.EntityPath[ 'Rule' ],
+            'EntityName' : '%s_%s' % ( anIDHeader, aRule[ 'Variable' ] ) }
 
-    # =========================================================
+        return self.dic2FullID( anEntityDic )
 
-    def getVariableType( self, aName ):
-
-        for aSpecies in self.Model.SpeciesList:
-
-            if ( ( self.Model.Level == 1 and aSpecies[ 'Name' ] == aName ) or
-                 ( self.Model.Level == 2 and aSpecies[ 'Id' ] == aName ) ):
-
-                return libsbml.SBML_SPECIES
-
-        for aParameter in self.Model.ParameterList:
-
-            if ( ( self.Model.Level == 1 and aParameter[1] == aName ) or
-                 ( self.Model.Level == 2 and aParameter[0] == aName ) ):
-
-                return libsbml.SBML_PARAMETER
-
-        for aCompartment in self.Model.CompartmentList:
-
-            if ( ( self.Model.Level == 1 and aCompartment[1] == aName ) or
-                 ( self.Model.Level == 2 and aCompartment[0] == aName ) ):
-
-                return libsbml.SBML_COMPARTMENT
-
-        raise TypeError, "Variable type must be Species, Parameter, or Compartment (got %s)" % aName
 
     # =========================================================
 
@@ -587,13 +683,12 @@ class SBML_Rule( SBML_Model ):
 
         for aSpecies in self.Model.SpeciesList:
 
-            if ( ( self.Model.Level == 1 and aSpecies[ 'Name' ] == aName ) or
-                 ( self.Model.Level == 2 and aSpecies[ 'Id' ] == aName ) ):
+            if ( self.getID( aSpecies ) == aName ):
             
                 for c in range( len( self.VariableReferenceList ) ):
                     aVariableReference = self.VariableReferenceList[ c ]
                     
-                    if aVariableReference[1].split(':')[2] == aName:
+                    if aVariableReference[ 1 ].split(':')[ 2 ] == aName:
 
                         aVariableReference[ 2 ] = str( int( aVariableReference[ 2 ] ) + int( aStoichiometry ))
 
@@ -601,11 +696,11 @@ class SBML_Rule( SBML_Model ):
 
                 aVariableList = []
 
-                variableName = aSpecies[ 'Id' ]
+                variableName = self.getID( aSpecies )
                 aVariableList.append( variableName )
                 self.VariableNumber = self.VariableNumber + 1
 
-                aVariableID = self.Model.getSpeciesReferenceID( aName )
+                aVariableID = self.getSpeciesReferenceID( aName )
                 aVariableList.append( 'Variable:' + aVariableID )
                 aVariableList.append( aStoichiometry )
                 
@@ -619,8 +714,7 @@ class SBML_Rule( SBML_Model ):
 
         for aParameter in self.Model.ParameterList:
 
-            if ( ( self.Model.Level == 1 and aParameter[1] == aName ) or
-                 ( self.Model.Level == 2 and aParameter[0] == aName ) ):
+            if ( self.getID( aParameter ) == aName ):
                 
                 for c in range( len( self.VariableReferenceList ) ):
                     aVariableReference = self.VariableReferenceList[ c ]
@@ -632,10 +726,10 @@ class SBML_Rule( SBML_Model ):
                         return aVariableReference[ 0 ]
 
                 aParameterList = []
-                variableName = aParameter[0]
+                variableName = aParameter[ 'Id' ]
                 aParameterList.append( variableName )
 ##                self.ParameterNumber = self.ParameterNumber + 1
-                aParameterList.append( 'Variable:/SBMLParameter:' + aName )
+                aParameterList.append( ':'.join( [ 'Variable', self.EntityPath[ 'Parameter' ], aName ] ))
                 aParameterList.append( aStoichiometry )
                 self.VariableReferenceList.append( aParameterList )
 
@@ -647,14 +741,13 @@ class SBML_Rule( SBML_Model ):
 
         for aCompartment in self.Model.CompartmentList:
 
-            if ( ( self.Model.Level == 1 and aCompartment[1] == aName ) or
-                 ( self.Model.Level == 2 and aCompartment[0] == aName ) ):
+            if ( self.getID( aCompartment ) ==aName ):
                 
                 for c in range( len( self.VariableReferenceList ) ):
                     aVariableReference = self.VariableReferenceList[ c ]
                     
                     if ( aVariableReference[1].split(':')[1] ==\
-                       self.Model.getPath( aName ) ) and\
+                       self.getPath( aName ) ) and\
                     ( aVariableReference[1].split(':')[2] == 'SIZE' ):
 
                         aVariableReference[ 2 ] = str( int( aVariableReference[ 2 ] ) + int( aStoichiometry ))
@@ -665,7 +758,7 @@ class SBML_Rule( SBML_Model ):
                 aCompartmentList.append( aName )
                 
                 aCompartmentList.append(
-                    'Variable:' + self.Model.getPath( aName ) + ':SIZE' )
+                    'Variable:' + self.getPath( aName ) + ':SIZE' )
                 
                 aCompartmentList.append( aStoichiometry )
                 self.VariableReferenceList.append( aCompartmentList )
@@ -722,14 +815,12 @@ class SBML_Rule( SBML_Model ):
     # =========================================================
 
     def convertRuleFormula( self, aFormula ):
-
         preprocessedFormula = aFormula.replace( '<t>', self.Model.TimeSymbol )
         aASTRootNode = libsbml.parseFormula( preprocessedFormula )
 
         convertedAST = self.__convertVariableName( aASTRootNode )
 
         return postprocessMathString( libsbml.formulaToString( convertedAST ), self.Model.TimeSymbol )
-
 
     # =========================================================
 
@@ -738,13 +829,12 @@ class SBML_Rule( SBML_Model ):
 
 # --------------------------------
 # Reaction Class
-# --------------------------------    
+# --------------------------------
 
-class SBML_Reaction( SBML_Model ):
-    
+class SBML_Reaction( SBML_Base ):
 
     def __init__( self, aModel ):
-        
+        SBML_Base.__init__( self )
         self.Model = aModel
 
 
@@ -761,6 +851,26 @@ class SBML_Reaction( SBML_Model ):
 
 
     # =========================================================
+
+    def getPath( self, aCompartmentID ):
+        return SBML_Base.getPath( self, aCompartmentID, self.Model )
+
+    # =========================================================
+
+    def getSpeciesReferenceID( self, aSpeciesID ):
+        return SBML_Base.getSpeciesReferenceID( self, aSpeciesID, self.Model )
+
+    # =========================================================
+
+    def getVariableType( self, aName ):
+        return SBML_Base.getVariableType( self, aName, self.Model )
+
+    # =========================================================
+
+    def getID( self, aSpecies ):
+        return SBML_Base.getID( self, aSpecies, self.Model )
+
+    # =========================================================
     
     def generateFullID( self, aReaction ):
 
@@ -770,9 +880,9 @@ class SBML_Reaction( SBML_Model ):
             else:
                 raise NameError,"Reaction must set the Reaction name"
                 
-        elif ( self.Model.Level == 2 ):
-            if ( aReaction[0] != '' ):
-                return 'Process:/:' + aReaction[0]
+        elif ( self.Model.Level >= 2 ):
+            if ( aReaction[ 'Id' ] != '' ):
+                return 'Process:/:' + aReaction[ 'Id' ]
             else:
                 raise NameError,"Reaction must set the Reaction ID"
 
@@ -782,8 +892,8 @@ class SBML_Reaction( SBML_Model ):
     def setCompartmentToVariableReference( self, aName ):
 
         for aCompartment in self.Model.CompartmentList:
-            if ( aCompartment[0] == aName or
-                 aCompartment[1] == aName ):
+            if ( aCompartment[ 'Id' ] == aName or
+                 aCompartment[ 'Name' ] == aName ):
 
                 for aVariableReference in self.VariableReferenceList:
                     if( aVariableReference[1].split(':')[2] == 'SIZE' ):
@@ -797,7 +907,7 @@ class SBML_Reaction( SBML_Model ):
                 aCompartmentList.append( aName )
                             
                 aCompartmentList.append(
-                    'Variable:' + self.Model.getPath( aName ) + ':SIZE' )
+                    'Variable:' + self.getPath( aName ) + ':SIZE' )
                             
                 aCompartmentList.append( '0' )
                 self.VariableReferenceList.append( aCompartmentList )
@@ -818,7 +928,7 @@ class SBML_Reaction( SBML_Model ):
 
                 # Macro expand
                 #if( self.Model.FunctionDefinition[ anASTNode.getName() ] != None ):
-                #    self.Model.macroExpand( anASTNode )
+                #    self.macroExpand( anASTNode )
 
             for n in range( aNumChildren ):
                 self.__convertVariableName( anASTNode.getChild( n ) )
@@ -840,7 +950,7 @@ class SBML_Reaction( SBML_Model ):
                             if aVariableReference[1].split(':')[2] == aName:
                                 variableName =  aVariableReference[0]
 
-                        if( self.Model.Level == 2 and variableName == '' ):
+                        if( self.Model.Level >= 2 and variableName == '' ):
                             raise NameError,"in libSBML :"+aName+" isn't defined in VariableReferenceList"
 
                         elif( self.Model.Level == 1 and variableName == '' ):
@@ -850,7 +960,7 @@ class SBML_Reaction( SBML_Model ):
                                 'C' + str( self.ModifierNumber ) )
                             self.ModifierNumber = self.ModifierNumber + 1
                             
-                            aModifierID = self.Model.getSpeciesReferenceID( aName )
+                            aModifierID = self.getSpeciesReferenceID( aName )
                             aModifierList.append( 'Variable:' + aModifierID )
                             aModifierList.append( '0' )
                             self.VariableReferenceList.append( aModifierList )
@@ -864,8 +974,8 @@ class SBML_Reaction( SBML_Model ):
 
 ##                if variableName == '':
                 for aParameter in self.Model.ParameterList:
-                    if ( aParameter[0] == aName or
-                         aParameter[1] == aName ):
+                    if ( aParameter[ 'Id' ] == aName or
+                         aParameter[ 'Name' ] == aName ):
 
                         for aVariableReference in self.VariableReferenceList:
                             if aVariableReference[1].split(':')[2] == aName:
@@ -902,31 +1012,12 @@ class SBML_Reaction( SBML_Model ):
     # =========================================================
     
     def convertKineticLawFormula( self, aFormula ):
-
         preprocessedFormula = aFormula.replace( '<t>', self.Model.TimeSymbol )
         aASTRootNode = libsbml.parseFormula( preprocessedFormula )
+
         convertedAST = self.__convertVariableName( aASTRootNode )
 
         return postprocessMathString( libsbml.formulaToString( convertedAST ), self.Model.TimeSymbol )
-    
-##         if( self.VariableReferenceList[0][0] == "S0" ):
-
-##             aConvertedFormula = "( " + libsbml.formulaToString( convertedAST ) + " )" + " * S0.getSuperSystem().SizeN_A"
-                
-##         elif( self.VariableReferenceList[0][0] == "P0" ):
-            
-##             aConvertedFormula = "( " + libsbml.formulaToString( convertedAST ) + " )" + " * P0.getSuperSystem().SizeN_A"
-            
-##         elif( self.VariableReferenceList[0][0] == "C0" ):
-
-##             aConvertedFormula = "( " + libsbml.formulaToString( convertedAST ) + " )" +" * C0.getSuperSystem().SizeN_A" 
-
-##         else:
-##             aConvertedFormula = libsbml.formulaToString( convertedAST )
-
-
-##         return aConvertedFormula
-
 
     # =========================================================
 
@@ -951,7 +1042,7 @@ class SBML_Reaction( SBML_Model ):
                     else:
                         return int( aStoichiometry )
 
-        elif ( self.Model.Level == 2 ):
+        elif ( self.Model.Level >= 2 ):
             for aSpecies in self.Model.SpeciesList:
                 if ( aSpecies[ 'Id' ] == aSpeciesID ):
                     if( aSpecies[ 'Constant' ] == 1 ):
@@ -968,13 +1059,13 @@ class SBML_Reaction( SBML_Model ):
     def getChemicalEquation( self, aReaction ):
 
         # Left side (reactant terms)
-        if ( len( aReaction[5] ) > 0 ):
-            if ( aReaction[5][0][1] == 1.0 ):
-                theLeftSide = "[%s]" % aReaction[5][0][0]
+        if ( len( aReaction[ 'Reactants' ] ) > 0 ):
+            if ( aReaction[ 'Reactants' ][0][1] == 1.0 ):
+                theLeftSide = "[%s]" % aReaction[ 'Reactants' ][0][0]
             else:
-                theLeftSide = "%s x [%s]" % ( aReaction[5][0][1], aReaction[5][0][0] )
+                theLeftSide = "%s x [%s]" % ( aReaction[ 'Reactants' ][0][1], aReaction[ 'Reactants' ][0][0] )
 
-            for aSubstrate in aReaction[5][1:]:
+            for aSubstrate in aReaction[ 'Reactants' ][1:]:
                 if ( aSubstrate[1] == 1.0 ):
                     theLeftSide += " + [%s]" % aSubstrate[0]
                 else:
@@ -986,13 +1077,13 @@ class SBML_Reaction( SBML_Model ):
             theLeftSide = ""
 
         # Right side (reactant terms)
-        if ( len( aReaction[6] ) > 0 ):
-            if ( aReaction[6][0][1] == 1.0 ):
-                theRightSide = "[%s]" % aReaction[6][0][0]
+        if ( len( aReaction[ 'Products' ] ) > 0 ):
+            if ( aReaction[ 'Products' ][0][1] == 1.0 ):
+                theRightSide = "[%s]" % aReaction[ 'Products' ][0][0]
             else:
-                theRightSide = "%s x [%s]" % ( aReaction[6][0][1], aReaction[6][0][0] )
+                theRightSide = "%s x [%s]" % ( aReaction[ 'Products' ][0][1], aReaction[ 'Products' ][0][0] )
 
-            for aProduct in aReaction[6][1:]:
+            for aProduct in aReaction[ 'Products' ][1:]:
                 if ( aProduct[1] == 1.0 ):
                     theRightSide += " + [%s]" % aProduct[0]
                 else:
@@ -1001,7 +1092,7 @@ class SBML_Reaction( SBML_Model ):
         else:
             theRightSide = ""
 
-        if ( aReaction[3] == 0 ):
+        if ( aReaction[ 'Reversible' ] == 0 ):
             theArrow = "->"
         else:
             theArrow = "<->"
@@ -1009,8 +1100,8 @@ class SBML_Reaction( SBML_Model ):
         theEquation = "%s%s %s;" % ( theLeftSide, theArrow, theRightSide )
 
         # Effector
-        if ( len( aReaction[7] ) > 0 ):
-            theEquation = "%s { %s };" % ( theEquation, ", ".join( aReaction[7] ) )
+        if ( len( aReaction[ 'Modifiers' ] ) > 0 ):
+            theEquation = "%s { %s };" % ( theEquation, ", ".join( aReaction[ 'Modifiers' ] ) )
 
         return theEquation
 
@@ -1023,48 +1114,68 @@ class SBML_Reaction( SBML_Model ):
 
 # --------------------------------
 # Parameter Class
-# --------------------------------    
+# --------------------------------
 
-class SBML_Parameter( SBML_Model ):
+class SBML_Parameter( SBML_Base ):
 
-
-   def __init__( self, aModel ):
+    def __init__( self, aModel ):
+        SBML_Base.__init__( self )
         self.Model = aModel
 
 
     # =========================================================
 
-   def generateFullID( self, aParameter ):
+    def getPath( self, aCompartmentID ):
+        return SBML_Base.getPath( self, aCompartmentID, self.Model )
 
-       if ( self.Model.Level == 1 ):
-           if ( aParameter[1] != '' ):
-               return 'Variable:/SBMLParameter:' + aParameter[1]
-           else:
-               raise NameError, "Parameter must set the Parameter Name"
+    # =========================================================
 
-       elif ( self.Model.Level == 2 ):
-           if ( aParameter[0] != '' ):
-               return 'Variable:/SBMLParameter:' + aParameter[0]
-           else:
-               raise NameError, "Parameter must set the Parameter ID"
+    def getSpeciesReferenceID( self, aSpeciesID ):
+        return SBML_Base.getSpeciesReferenceID( self, aSpeciesID, self.Model )
 
-       else:
-           raise Exception,"Version"+str(self.Level)+" ????"
-                
+    # =========================================================
+
+    def getVariableType( self, aName ):
+        return SBML_Base.getVariableType( self, aName, self.Model )
+
+    # =========================================================
+
+    def getID( self, aSpecies ):
+        return SBML_Base.getID( self, aSpecies, self.Model )
+
+    # =========================================================
+
+    def generateFullID( self, aParameter ):
+
+        if ( self.Model.Level == 1 ):
+            if ( aParameter[ 'Name' ] != '' ):
+                return 'Variable:/SBMLParameter:' + aParameter[ 'Name' ]
+            else:
+                raise NameError, "Parameter must set the Parameter Name"
+ 
+        elif ( self.Model.Level >= 2 ):
+            if ( aParameter[ 'Id' ] != '' ):
+                return 'Variable:/SBMLParameter:' + aParameter[ 'Id' ]
+            else:
+                raise NameError, "Parameter must set the Parameter ID"
+ 
+        else:
+            raise Exception,"Version"+str(self.Level)+" ????"
+                 
 
    # =========================================================
 
-   def getParameterValue( self, aParameter ):
+    def getParameterValue( self, aParameter ):
 
-       return aParameter[ 2 ]
+        return aParameter[ 'Value' ]
    
-##        if ( aParameter[3] != '' and aParameter[2] != 0 ):
+##         if ( aParameter[ 'Unit' ] != '' and aParameter[ 'Value' ] != 0 ):
 
-##            return self.Model.convertUnit( aParameter[3], aParameter[2] )
+##             return self.convertUnit( aParameter[ 'Unit' ], aParameter[ 'Value' ] )
        
-##        else:
+##         else:
 
-##            return aParameter[2]
+##             return aParameter[ 'Value' ]
         
 
     # =========================================================
@@ -1073,11 +1184,12 @@ class SBML_Parameter( SBML_Model ):
 
 # --------------------------------
 # Event Class
-# --------------------------------    
+# --------------------------------
 
-class SBML_Event( SBML_Model ):
+class SBML_Event( SBML_Base ):
 
     def __init__( self, aModel ):
+        SBML_Base.__init__( self )
         self.Model = aModel
         self.EventNumber = 0
 
@@ -1094,12 +1206,32 @@ class SBML_Event( SBML_Model ):
 
     # =========================================================
 
+    def getPath( self, aCompartmentID ):
+        return SBML_Base.getPath( self, aCompartmentID, self.Model )
+
+    # =========================================================
+
+    def getSpeciesReferenceID( self, aSpeciesID ):
+        return SBML_Base.getSpeciesReferenceID( self, aSpeciesID, self.Model )
+
+    # =========================================================
+
+    def getVariableType( self, aName ):
+        return SBML_Base.getVariableType( self, aName, self.Model )
+
+    # =========================================================
+
+    def getID( self, aSpecies ):
+        return SBML_Base.getID( self, aSpecies, self.Model )
+
+    # =========================================================
+
     def generateFullID( self, anEvent ):
 
-        if( anEvent[0] != '' ):
-            return 'Process:/SBMLEvent:' + anEvent[0]
-        elif( anEvent[1] != '' ):
-            return 'Process:/SBMLEvent:' + anEvent[1]
+        if( anEvent[ 'Id' ] != '' ):
+            return 'Process:/SBMLEvent:' + anEvent[ 'Id' ]
+        elif( anEvent[ 'Name' ] != '' ):
+            return 'Process:/SBMLEvent:' + anEvent[ 'Name' ]
         else:
             anID = 'Process:/SBMLEvent:Event' + self.EventNumber
             self.EventNumber = self.EventNumber + 1
@@ -1109,39 +1241,12 @@ class SBML_Event( SBML_Model ):
 
     def getEventName( self, anEvent ):
 
-        if( anEvent[ 0 ] != '' ):
-            return anEvent[ 0 ]
-        elif( anEvent[1] != '' ):
-            return anEvent[ 1 ]
+        if( anEvent[ 'Id' ] != '' ):
+            return anEvent[ 'Id' ]
+        elif( anEvent[ 'Name' ] != '' ):
+            return anEvent[ 'Name' ]
         else:
             return ""
-
-    # =========================================================
-
-    def getVariableType( self, aName ):
-
-        for aSpecies in self.Model.SpeciesList:
-
-            if ( ( self.Model.Level == 1 and aSpecies[ 'Name' ] == aName ) or
-                 ( self.Model.Level == 2 and aSpecies[ 'Id' ] == aName ) ):
-
-                return libsbml.SBML_SPECIES
-
-        for aParameter in self.Model.ParameterList:
-
-            if ( ( self.Model.Level == 1 and aParameter[1] == aName ) or
-                 ( self.Model.Level == 2 and aParameter[0] == aName ) ):
-
-                return libsbml.SBML_PARAMETER
-
-        for aCompartment in self.Model.CompartmentList:
-
-            if ( ( self.Model.Level == 1 and aCompartment[1] == aName ) or
-                 ( self.Model.Level == 2 and aCompartment[0] == aName ) ):
-
-                return libsbml.SBML_COMPARTMENT
-
-        raise TypeError, "Variable type must be Species, Parameter, or Compartment (got %s)" % aName
 
     # =========================================================
 
@@ -1150,7 +1255,7 @@ class SBML_Event( SBML_Model ):
         for aSpecies in self.Model.SpeciesList:
 
             if ( ( self.Model.Level == 1 and aSpecies[ 'Name' ] == aName ) or
-                 ( self.Model.Level == 2 and aSpecies[ 'Id' ] == aName ) ):
+                 ( self.Model.Level >= 2 and aSpecies[ 'Id' ] == aName ) ):
             
                 for c in range( len( self.VariableReferenceList ) ):
                     aVariableReference = self.VariableReferenceList[ c ]
@@ -1167,7 +1272,7 @@ class SBML_Event( SBML_Model ):
                 aVariableList.append( variableName )
                 self.VariableNumber = self.VariableNumber + 1
 
-                aVariableID = self.Model.getSpeciesReferenceID( aName )
+                aVariableID = self.getSpeciesReferenceID( aName )
                 aVariableList.append( 'Variable:' + aVariableID )
                 aVariableList.append( aStoichiometry )
                 
@@ -1181,8 +1286,8 @@ class SBML_Event( SBML_Model ):
 
         for aParameter in self.Model.ParameterList:
 
-            if ( ( self.Model.Level == 1 and aParameter[1] == aName ) or
-                 ( self.Model.Level == 2 and aParameter[0] == aName ) ):
+            if ( ( self.Model.Level == 1 and aParameter[ 'Name' ] == aName ) or
+                 ( self.Model.Level >= 2 and aParameter[ 'Id' ] == aName ) ):
                 
                 for c in range( len( self.VariableReferenceList ) ):
                     aVariableReference = self.VariableReferenceList[ c ]
@@ -1194,7 +1299,7 @@ class SBML_Event( SBML_Model ):
                         return aVariableReference[ 0 ]
 
                 aParameterList = []
-                variableName = aParameter[0]
+                variableName = aParameter[ 'Id' ]
                 aParameterList.append( variableName )
 ##                self.ParameterNumber = self.ParameterNumber + 1
                 aParameterList.append( 'Variable:/SBMLParameter:' + aName )
@@ -1209,14 +1314,14 @@ class SBML_Event( SBML_Model ):
 
         for aCompartment in self.Model.CompartmentList:
 
-            if ( ( self.Model.Level == 1 and aCompartment[1] == aName ) or
-                 ( self.Model.Level == 2 and aCompartment[0] == aName ) ):
+            if ( ( self.Model.Level == 1 and aCompartment[ 'Name' ] == aName ) or
+                 ( self.Model.Level >= 2 and aCompartment[ 'Id' ] == aName ) ):
                 
                 for c in range( len( self.VariableReferenceList ) ):
                     aVariableReference = self.VariableReferenceList[ c ]
                     
                     if ( aVariableReference[1].split(':')[1] ==\
-                       self.Model.getPath( aName ) ) and\
+                       self.getPath( aName ) ) and\
                     ( aVariableReference[1].split(':')[2] == 'SIZE' ):
 
                         aVariableReference[ 2 ] = str( int( aVariableReference[ 2 ] ) + int( aStoichiometry ))
@@ -1227,7 +1332,7 @@ class SBML_Event( SBML_Model ):
                 aCompartmentList.append( aName )
                 
                 aCompartmentList.append(
-                    'Variable:' + self.Model.getPath( aName ) + ':SIZE' )
+                    'Variable:' + self.getPath( aName ) + ':SIZE' )
                 
                 aCompartmentList.append( aStoichiometry )
                 self.VariableReferenceList.append( aCompartmentList )
@@ -1237,14 +1342,12 @@ class SBML_Event( SBML_Model ):
     # =========================================================
 
     def convertEventFormula( self, aFormula ):
-
         preprocessedFormula = aFormula.replace( '<t>', self.Model.TimeSymbol )
         aASTRootNode = libsbml.parseFormula( preprocessedFormula )
 
         convertedAST = self.__convertVariableName( aASTRootNode )
 
         return postprocessMathString( libsbml.formulaToString( convertedAST ), self.Model.TimeSymbol )
-
 
     # =========================================================
 

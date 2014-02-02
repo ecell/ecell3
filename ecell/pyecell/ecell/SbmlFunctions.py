@@ -50,7 +50,7 @@ def getCompartment( aSBMLmodel ):
     NumCompartment = len( theList )
         
     for Num in range( NumCompartment ):
-        ListOfCompartment = []
+        aCompartmentDic = {}
             #aCompartment = Model_getCompartment( aSBMLmodel , Num )
 
         anId = theList[Num].getId()
@@ -78,16 +78,16 @@ def getCompartment( aSBMLmodel ):
         aConstant = theList[Num].getConstant()
             #aConstant = Compartment_getConstant( aCompartment )
 
-        ListOfCompartment.append( anId )
-        ListOfCompartment.append( aName )
-        ListOfCompartment.append( aSpatialDimension )
-        ListOfCompartment.append( aSize )
-        ListOfCompartment.append( aVolume )
-        ListOfCompartment.append( anUnit )
-        ListOfCompartment.append( anOutside )
-        ListOfCompartment.append( aConstant )
+        aCompartmentDic[ 'Id' ]               =  anId 
+        aCompartmentDic[ 'Name' ]             =  aName 
+        aCompartmentDic[ 'SpatialDimension' ] =  aSpatialDimension 
+        aCompartmentDic[ 'Size' ]             =  aSize 
+        aCompartmentDic[ 'Volume' ]           =  aVolume 
+        aCompartmentDic[ 'Unit' ]             =  anUnit 
+        aCompartmentDic[ 'Outside' ]          =  anOutside 
+        aCompartmentDic[ 'Constant' ]         =  aConstant 
 
-        LIST.append( ListOfCompartment )
+        LIST.append( aCompartmentDic )
 
     return LIST
 
@@ -98,7 +98,7 @@ def getEvent( aSBMLmodel, timeSymbol ):
     if aSBMLmodel.getEvent(0):
         NumEvent = aSBMLmodel.getNumEvents()
         for Num_Ev in range( NumEvent ):
-            ListOfEvent = []
+            aEventDic = {}
             
             anEvent = aSBMLmodel.getEvent( Num_Ev )
             
@@ -141,14 +141,14 @@ def getEvent( aSBMLmodel, timeSymbol ):
                     
                     ListOfEventAssignments.append( ListOfEventAssignment )
 
-            ListOfEvent.append( anId_Ev )
-            ListOfEvent.append( aName_Ev )
-            ListOfEvent.append( postprocessMathString( aString_Ev_Tr, timeSymbol ) )
-            ListOfEvent.append( postprocessMathString( aString_Ev_De, timeSymbol ) )
-            ListOfEvent.append( aTimeUnit_Ev )
-            ListOfEvent.append( ListOfEventAssignments )
+            aEventDic[ 'Id' ]               =  anId_Ev 
+            aEventDic[ 'Name' ]             =  aName_Ev 
+            aEventDic[ 'Trigger' ]          =  postprocessMathString( aString_Ev_Tr, timeSymbol ) 
+            aEventDic[ 'Delay' ]            =  postprocessMathString( aString_Ev_De, timeSymbol ) 
+            aEventDic[ 'Unit' ]             =  aTimeUnit_Ev 
+            aEventDic[ 'EventAssignments' ] =  ListOfEventAssignments 
             
-            LIST.append( ListOfEvent )
+            LIST.append( aEventDic )
 
     return LIST
 
@@ -159,7 +159,7 @@ def getFunctionDefinition( aSBMLmodel, timeSymbol ):
     if aSBMLmodel.getFunctionDefinition(0):
         NumFunctionDefinition = aSBMLmodel.getNumFunctionDefinitions()
         for Num_FD in range( NumFunctionDefinition ):
-            ListOfFunctionDefinition = []
+            aFunctionDefinitionDic = {}
 
             aFunctionDefinition = aSBMLmodel.getFunctionDefinition( Num_FD )
 
@@ -171,11 +171,11 @@ def getFunctionDefinition( aSBMLmodel, timeSymbol ):
                 aString_FD = sub( libsbml.formulaToString,
                     preprocessMathTree( aFunctionDefinition.getMath(), timeSymbol ) )
 
-            ListOfFunctionDefinition.append( anId_FD )
-            ListOfFunctionDefinition.append( aName_FD )
-            ListOfFunctionDefinition.append( postprocessMathString( aString_FD, timeSymbol ) )
+            aFunctionDefinitionDic[ 'Id' ]      =  anId_FD 
+            aFunctionDefinitionDic[ 'Name' ]    =  aName_FD 
+            aFunctionDefinitionDic[ 'Formula' ] =  postprocessMathString( aString_FD, timeSymbol ) 
 
-            LIST.append( ListOfFunctionDefinition )
+            LIST.append( aFunctionDefinitionDic )
 
     return LIST
 
@@ -186,7 +186,7 @@ def getParameter( aSBMLmodel, DerivedValueDic ):
     if aSBMLmodel.getParameter(0):
         NumParameter = aSBMLmodel.getNumParameters()
         for Num_Pa in range( NumParameter ):
-            ListOfParameter = []
+            aParameterDic = {}
 
             aParameter = aSBMLmodel.getParameter( Num_Pa )
 
@@ -204,13 +204,13 @@ def getParameter( aSBMLmodel, DerivedValueDic ):
             anUnit_Pa = aParameter.getUnits()
             aConstant_Pa = aParameter.getConstant()
 
-            ListOfParameter.append( anId_Pa )
-            ListOfParameter.append( aName_Pa )
-            ListOfParameter.append( aValue_Pa )
-            ListOfParameter.append( anUnit_Pa )
-            ListOfParameter.append( aConstant_Pa )
+            aParameterDic[ 'Id' ]       =  anId_Pa 
+            aParameterDic[ 'Name' ]     =  aName_Pa 
+            aParameterDic[ 'Value' ]    =  aValue_Pa 
+            aParameterDic[ 'Unit' ]     =  anUnit_Pa 
+            aParameterDic[ 'Constant' ] =  aConstant_Pa 
 
-            LIST.append( ListOfParameter )
+            LIST.append( aParameterDic )
 
     return LIST
 
@@ -221,7 +221,7 @@ def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
     if aSBMLmodel.getReaction(0):
         NumReaction = aSBMLmodel.getNumReactions()
         for Num in range( NumReaction ):
-            ListOfReaction = []
+            aReactionDic = {}
             aReaction = aSBMLmodel.getReaction( Num )
 
             anId = aReaction.getId()
@@ -260,22 +260,22 @@ def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
                         ListOfParameters = []
                         NumParameter_KL = aKineticLaw.getNumParameters()
                         for NumPara in range( NumParameter_KL ):
-                            ListOfParameter = []
+                            aParameterDic = {}
                             aParameter = aKineticLaw.getParameter( NumPara )
 
-                            anId_KL_P = aParameter.getId()
-                            aName_KL_P = aParameter.getName()
-                            aValue_KL_P = str( aParameter.getValue() )
-                            aUnit_KL_P = aParameter.getUnits()
+                            anId_KL_P      = aParameter.getId()
+                            aName_KL_P     = aParameter.getName()
+                            aValue_KL_P    = str( aParameter.getValue() )
+                            aUnit_KL_P     = aParameter.getUnits()
                             aConstant_KL_P = aParameter.getConstant()
 
-                            ListOfParameter.append( anId_KL_P )
-                            ListOfParameter.append( aName_KL_P )
-                            ListOfParameter.append( aValue_KL_P )
-                            ListOfParameter.append( aUnit_KL_P )
-                            ListOfParameter.append( aConstant_KL_P )
+                            aParameterDic[ 'Id' ]       =  anId_KL_P 
+                            aParameterDic[ 'Name' ]     =  aName_KL_P 
+                            aParameterDic[ 'Value' ]    =  aValue_KL_P 
+                            aParameterDic[ 'Unit' ]     =  aUnit_KL_P 
+                            aParameterDic[ 'Constant' ] =  aConstant_KL_P 
 
-                            ListOfParameters.append( ListOfParameter )
+                            ListOfParameters.append( aParameterDic )
                     else:
                         ListOfParameters = []
 
@@ -376,15 +376,15 @@ def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
                     aSpecies_M = aSpeciesReference.getSpecies()
                     ListOfModifiers.append( aSpecies_M )
 
-            ListOfReaction.append( anId )
-            ListOfReaction.append( aName )
-            ListOfReaction.append( ListOfKineticLaw )
-            ListOfReaction.append( aReversible )
-            ListOfReaction.append( aFast )
-            ListOfReaction.append( ListOfReactants )
-            ListOfReaction.append( ListOfProducts )
-            ListOfReaction.append( ListOfModifiers )
-            LIST.append( ListOfReaction )
+            aReactionDic[ 'Id' ]         =  anId 
+            aReactionDic[ 'Name' ]       =  aName 
+            aReactionDic[ 'KineticLaw' ] =  ListOfKineticLaw 
+            aReactionDic[ 'Reversible' ] =  aReversible 
+            aReactionDic[ 'Fast' ]       =  aFast 
+            aReactionDic[ 'Reactants' ]  =  ListOfReactants 
+            aReactionDic[ 'Products' ]   =  ListOfProducts 
+            aReactionDic[ 'Modifiers' ]  =  ListOfModifiers 
+            LIST.append( aReactionDic )
 
     return LIST
 
@@ -395,7 +395,7 @@ def getRule( aSBMLmodel, timeSymbol ):
     if aSBMLmodel.getRule(0):
         NumRule = aSBMLmodel.getNumRules()
         for Num in range( NumRule ):
-            ListOfRules = []
+            aRuleDic = {}
             aRule = aSBMLmodel.getRule( Num )
 
             aRuleType = aRule.getTypeCode()
@@ -425,11 +425,11 @@ def getRule( aSBMLmodel, timeSymbol ):
             else:
                 raise TypeError, " The type of Rule must be Algebraic, Assignment or Rate Rule"
 
-            ListOfRules.append( aRuleType )
-            ListOfRules.append( aFormula )
-            ListOfRules.append( aVariable )
+            aRuleDic[ 'Type' ]     =  aRuleType 
+            aRuleDic[ 'Formula' ]  =  aFormula 
+            aRuleDic[ 'Variable' ] =  aVariable 
 
-            LIST.append( ListOfRules )
+            LIST.append( aRuleDic )
 
     return LIST
 
@@ -495,7 +495,7 @@ def getUnitDefinition( aSBMLmodel ):
     if aSBMLmodel.getUnitDefinition(0):
         NumUnitDefinition = aSBMLmodel.getNumUnitDefinitions()
         for Num1 in range( NumUnitDefinition ):
-            ListOfUnitDefinition = []
+            aUnitDefinitionDic = {}
 
             anUnitDefinition = aSBMLmodel.getUnitDefinition( Num1 )
 
@@ -525,12 +525,12 @@ def getUnitDefinition( aSBMLmodel ):
 
                     ListOfUnits.append( ListOfUnit )
 
-            ListOfUnitDefinition.append( anId )
-            ListOfUnitDefinition.append( aName )
-            ListOfUnitDefinition.append( ListOfUnits )
+            aUnitDefinitionDic[ 'Id' ]         =  anId 
+            aUnitDefinitionDic[ 'Name' ]       =  aName 
+            aUnitDefinitionDic[ 'Definition' ] =  ListOfUnits 
 
                 
-            LIST.append( ListOfUnitDefinition )
+            LIST.append( aUnitDefinitionDic )
 
     return LIST
 
