@@ -1004,7 +1004,7 @@ def _calcInitialValue( aNode ):
 
         '''
 AST_FUNCTION            : Solved by converter
-AST_LAMBDA
+AST_LAMBDA              : Solved by converter
         '''
 
         _removeAllChildren( aNode )
