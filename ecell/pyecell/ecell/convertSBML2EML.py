@@ -104,6 +104,8 @@ def convertSBML2EML( aSBMLString ):
 
     for aCompartment in ( theModel.CompartmentList ):
 
+        print "Compartment: " + str( aCompartment )
+
         # initialize
         theCompartment.initialize( aCompartment )
 
@@ -175,7 +177,7 @@ def convertSBML2EML( aSBMLString ):
     for aParameter in theModel.ParameterList:
 
         # setFullID
-        aSystemFullID = theParameter.getParameterID( aParameter )
+        aSystemFullID = theParameter.generateFullID( aParameter )
         anEml.createEntity( 'Variable', aSystemFullID )
             
         # setName
@@ -200,9 +202,11 @@ def convertSBML2EML( aSBMLString ):
 
     for aSpecies in theModel.SpeciesList:
         
+        print "Species: " + str( aSpecies )
+        
         ### setFullID ###
         
-        aSystemFullID = theSpecies.getSpeciesID( aSpecies )
+        aSystemFullID = theSpecies.generateFullID( aSpecies )
         anEml.createEntity( 'Variable', aSystemFullID )
 
 
@@ -210,14 +214,16 @@ def convertSBML2EML( aSBMLString ):
         
         if( theModel.Level == 2 ):
 
-            if ( aSpecies[1] != '' ):
-                anEml.setEntityProperty( aSystemFullID, 'Name', aSpecies[1:2] )
+            if ( aSpecies[ 'Name' ] != '' ):
+                anEml.setEntityProperty( aSystemFullID, 'Name', [ aSpecies[ 'Name' ] ] )
 
 
         ### setValue ###
         
-        aTmpList = [ str( theSpecies.getSpeciesValue( aSpecies ) ) ]
-        anEml.setEntityProperty( aSystemFullID, 'Value', aTmpList[0:1] )
+        aInitialValueDic = theSpecies.getInitialValue( aSpecies )
+        anEml.setEntityProperty( 
+            aSystemFullID, aInitialValueDic[ 'Property' ],
+            [ str( aInitialValueDic[ 'Value' ] ) ] )
 
 
         ### setFixed ###
@@ -254,7 +260,7 @@ def convertSBML2EML( aSBMLString ):
         theRule.initialize()
 
         ### setFullID ###        
-        aSystemFullID = theRule.getRuleID( aRule )
+        aSystemFullID = theRule.generateFullID( aRule )
 
 
         ### Algebraic Rule ###
@@ -337,7 +343,7 @@ def convertSBML2EML( aSBMLString ):
         theReaction.initialize()
 
         # setFullID
-        aSystemFullID = theReaction.getReactionID( aReaction )
+        aSystemFullID = theReaction.generateFullID( aReaction )
         anEml.createEntity( 'ExpressionFluxProcess', aSystemFullID )
 
         # setName
@@ -415,7 +421,7 @@ def convertSBML2EML( aSBMLString ):
         theEvent.initialize()
 
         ### setFullID ###        
-        aSystemFullID = theEvent.getEventID( anEvent )
+        aSystemFullID = theEvent.generateFullID( anEvent )
 
         anEml.createEntity( 'ExpressionEventProcess', aSystemFullID )
         anEml.setEntityProperty( aSystemFullID, 'StepperID', [ 'DT' ] )

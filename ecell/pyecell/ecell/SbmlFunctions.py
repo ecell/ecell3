@@ -440,7 +440,7 @@ def getSpecies( aSBMLmodel, DerivedValueDic ):
     if aSBMLmodel.getSpecies(0):
         NumSpecies = aSBMLmodel.getNumSpecies()
         for Num in range( NumSpecies ):
-            ListOfSpecies = []
+            aSpeciesDic = {}
             aSpecies = aSBMLmodel.getSpecies( Num )
 
             anId_Sp = aSpecies.getId()
@@ -471,20 +471,20 @@ def getSpecies( aSBMLmodel, DerivedValueDic ):
             aConstant_Sp = aSpecies.getConstant()
 
 
-            ListOfSpecies.append( anId_Sp )
-            ListOfSpecies.append( aName_Sp )
-            ListOfSpecies.append( aCompartment_Sp )
-            ListOfSpecies.append( anInitialAmount_Sp )
-            ListOfSpecies.append( anInitialConcentration_Sp )
-            ListOfSpecies.append( aSubstanceUnit_Sp )
-            ListOfSpecies.append( aSpatialSizeUnit_Sp )
-            ListOfSpecies.append( anUnit_Sp )
-            ListOfSpecies.append( aHasOnlySubstanceUnit_Sp )
-            ListOfSpecies.append( aBoundaryCondition_Sp )
-            ListOfSpecies.append( aCharge_Sp )
-            ListOfSpecies.append( aConstant_Sp )
+            aSpeciesDic[ 'Id' ]                   =  anId_Sp 
+            aSpeciesDic[ 'Name' ]                 =  aName_Sp 
+            aSpeciesDic[ 'Compartment' ]          =  aCompartment_Sp 
+            aSpeciesDic[ 'InitialAmount' ]        =  anInitialAmount_Sp 
+            aSpeciesDic[ 'InitialConcentration' ] =  anInitialConcentration_Sp 
+            aSpeciesDic[ 'SubstanceUnit' ]        =  aSubstanceUnit_Sp 
+            aSpeciesDic[ 'SpatialSizeUnit' ]      =  aSpatialSizeUnit_Sp 
+            aSpeciesDic[ 'Unit' ]                 =  anUnit_Sp 
+            aSpeciesDic[ 'HasOnlySubstanceUnit' ] =  aHasOnlySubstanceUnit_Sp 
+            aSpeciesDic[ 'BoundaryCondition' ]    =  aBoundaryCondition_Sp 
+            aSpeciesDic[ 'Charge' ]               =  aCharge_Sp 
+            aSpeciesDic[ 'Constant' ]             =  aConstant_Sp 
        
-            LIST.append( ListOfSpecies )
+            LIST.append( aSpeciesDic )
 
     return LIST
 
