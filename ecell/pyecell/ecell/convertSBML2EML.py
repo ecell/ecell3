@@ -318,7 +318,7 @@ def convertSBML2EML( aSBMLString ):
                 " The type of Rule must be Algebraic, Assignment or Rate Rule"
 
         # convert SBML formula  to E-Cell formula
-        convertedFormula = [ str( theRule.convertRuleFormula( aRule[ 'Formula' ] ) ) ]
+        convertedFormula = [ str( theRule.convertFormula( aRule[ 'Formula' ] ) ) ]
 
         # set Expression Property
         anEml.setEntityProperty( aSystemFullID,
@@ -384,7 +384,7 @@ def convertSBML2EML( aSBMLString ):
             # convert SBML format formula to E-Cell format formula
             if( aReaction[ 'KineticLaw' ][0] != '' ):
                 anExpression =\
-                [ str( theReaction.convertKineticLawFormula( aReaction[ 'KineticLaw' ][0] ) ) ]
+                [ str( theReaction.convertFormula( aReaction[ 'KineticLaw' ][0] ) ) ]
 
 
 
@@ -446,15 +446,15 @@ def convertSBML2EML( aSBMLString ):
             
             aConvertedEventAssignment = []
             aConvertedEventAssignment.append( anEventAssignment[ 0 ] )
-            aConvertedEventAssignment.append( str( theEvent.convertEventFormula( anEventAssignment[ 1 ] )))
+            aConvertedEventAssignment.append( str( theEvent.convertFormula( anEventAssignment[ 1 ] )))
             theEventAssignmentList.append( aConvertedEventAssignment )
 
         # convert Trigger
-        convertedTrigger = [ str( theEvent.convertEventFormula( anEvent[ 'Trigger' ] )) ]
+        convertedTrigger = [ str( theEvent.convertFormula( anEvent[ 'Trigger' ] )) ]
 
         # convert Delay
         if ( anEvent[ 'Delay' ] != '' ):
-            convertedDelay = [ str( theEvent.convertEventFormula( anEvent[ 'Delay' ] )) ]
+            convertedDelay = [ str( theEvent.convertFormula( anEvent[ 'Delay' ] )) ]
         else:
             convertedDelay = '0.0'
 

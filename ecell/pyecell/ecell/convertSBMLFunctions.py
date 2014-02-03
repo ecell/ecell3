@@ -814,7 +814,7 @@ class SBML_Rule( SBML_Base ):
 
     # =========================================================
 
-    def convertRuleFormula( self, aFormula ):
+    def convertFormula( self, aFormula ):
         preprocessedFormula = aFormula.replace( '<t>', self.Model.TimeSymbol )
         aASTRootNode = libsbml.parseFormula( preprocessedFormula )
 
@@ -1011,7 +1011,7 @@ class SBML_Reaction( SBML_Base ):
 
     # =========================================================
     
-    def convertKineticLawFormula( self, aFormula ):
+    def convertFormula( self, aFormula ):
         preprocessedFormula = aFormula.replace( '<t>', self.Model.TimeSymbol )
         aASTRootNode = libsbml.parseFormula( preprocessedFormula )
 
@@ -1341,7 +1341,7 @@ class SBML_Event( SBML_Base ):
 
     # =========================================================
 
-    def convertEventFormula( self, aFormula ):
+    def convertFormula( self, aFormula ):
         preprocessedFormula = aFormula.replace( '<t>', self.Model.TimeSymbol )
         aASTRootNode = libsbml.parseFormula( preprocessedFormula )
 
