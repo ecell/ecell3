@@ -125,7 +125,7 @@ def getEvent( aSBMLmodel, timeSymbol ):
             if anEvent.getEventAssignment(0):
                 NumEventAssignment = anEvent.getNumEventAssignments()
                 for Num_Ev_As in range( NumEventAssignment ):
-                    ListOfEventAssignment = []
+                    anEventAssignmentDic = {}
                     
                     anEventAssignment = anEvent.getEventAssignment( Num_Ev_As )
                     
@@ -136,10 +136,10 @@ def getEvent( aSBMLmodel, timeSymbol ):
                         aString_Ev_As = sub( libsbml.formulaToString,
                                 preprocessMathTree( anEventAssignment.getMath(), timeSymbol ) )
 
-                    ListOfEventAssignment.append( aVariable_Ev_As )
-                    ListOfEventAssignment.append( postprocessMathString( aString_Ev_As, timeSymbol ) )
+                    anEventAssignmentDic[ 'Variable' ] = aVariable_Ev_As
+                    anEventAssignmentDic[ 'String' ]   = postprocessMathString( aString_Ev_As, timeSymbol )
                     
-                    ListOfEventAssignments.append( ListOfEventAssignment )
+                    ListOfEventAssignments.append( anEventAssignmentDic )
 
             aEventDic[ 'Id' ]               =  anId_Ev 
             aEventDic[ 'Name' ]             =  aName_Ev 
@@ -228,7 +228,7 @@ def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
             aName =aReaction.getName()
 
 #----------KineticLaw----------------------------------
-            ListOfKineticLaw = []
+            aKineticLawDic = {}
             if aReaction.isSetKineticLaw():
 
                 aKineticLaw = aReaction.getKineticLaw()
@@ -237,8 +237,10 @@ def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
 
                     if aKineticLaw.isSetFormula():
                         aFormula_KL = postprocessMathString( libsbml.formulaToString( preprocessMathTree( aKineticLaw.getMath(), timeSymbol ) ), timeSymbol )
+                        aDiscontinuity_KL = isDiscontinuous( aKineticLaw.getMath() )
                     else:
                         aFormula_KL = ''
+                        aDiscontinuity_KL = False
                   
                     aMath = []
                     if( aSBMLDocument.getLevel() == 1 ):
@@ -281,12 +283,13 @@ def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
 
                     anExpressionAnnotation = aKineticLaw.getAnnotation()
 
-                    ListOfKineticLaw.append( aFormula_KL )
-                    ListOfKineticLaw.append( aString_KL )
-                    ListOfKineticLaw.append( aTimeUnit_KL )
-                    ListOfKineticLaw.append( aSubstanceUnit_KL )
-                    ListOfKineticLaw.append( ListOfParameters )
-                    ListOfKineticLaw.append( anExpressionAnnotation )
+                    aKineticLawDic[ 'Formula' ]              = aFormula_KL
+                    aKineticLawDic[ 'String' ]               = aString_KL
+                    aKineticLawDic[ 'TimeUnit' ]             = aTimeUnit_KL
+                    aKineticLawDic[ 'SubstanceUnit' ]        = aSubstanceUnit_KL
+                    aKineticLawDic[ 'Parameters' ]           = ListOfParameters
+                    aKineticLawDic[ 'ExpressionAnnotation' ] = anExpressionAnnotation
+                    aKineticLawDic[ 'isDiscontinuous' ]      = aDiscontinuity_KL
 
 #---------------------------------------------------------
 
@@ -378,7 +381,7 @@ def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
 
             aReactionDic[ 'Id' ]         =  anId 
             aReactionDic[ 'Name' ]       =  aName 
-            aReactionDic[ 'KineticLaw' ] =  ListOfKineticLaw 
+            aReactionDic[ 'KineticLaw' ] =  aKineticLawDic 
             aReactionDic[ 'Reversible' ] =  aReversible 
             aReactionDic[ 'Fast' ]       =  aFast 
             aReactionDic[ 'Reactants' ]  =  ListOfReactants 
@@ -399,8 +402,15 @@ def getRule( aSBMLmodel, timeSymbol ):
             aRule = aSBMLmodel.getRule( Num )
 
             aRuleType = aRule.getTypeCode()
-            aFormula = postprocessMathString( libsbml.formulaToString( preprocessMathTree( aRule.getMath(), timeSymbol ) ), timeSymbol )
-             
+            
+            if aRule.isSetFormula():
+                aFormula = postprocessMathString( libsbml.formulaToString( preprocessMathTree( aRule.getMath(), timeSymbol ) ), timeSymbol )
+                aDiscontinuity = isDiscontinuous( aRule.getMath() )
+
+            else:
+                aFormula = ''
+                aDiscontinuity = False
+
             if ( aRuleType == libsbml.SBML_ALGEBRAIC_RULE ):
 
                 aVariable = ''
@@ -425,9 +435,11 @@ def getRule( aSBMLmodel, timeSymbol ):
             else:
                 raise TypeError, " The type of Rule must be Algebraic, Assignment or Rate Rule"
 
-            aRuleDic[ 'Type' ]     =  aRuleType 
-            aRuleDic[ 'Formula' ]  =  aFormula 
-            aRuleDic[ 'Variable' ] =  aVariable 
+            aRuleDic[ 'Type' ]            =  aRuleType 
+            aRuleDic[ 'Formula' ]         =  aFormula 
+            aRuleDic[ 'Variable' ]        =  aVariable 
+            aRuleDic[ 'hasDelay' ]        =  aVariable 
+            aRuleDic[ 'isDiscontinuous' ] =  aDiscontinuity
 
             LIST.append( aRuleDic )
 
@@ -506,7 +518,7 @@ def getUnitDefinition( aSBMLmodel ):
             if anUnitDefinition.getUnit(0):
                 NumUnit = anUnitDefinition.getNumUnits()
                 for Num2 in range( NumUnit ):
-                    ListOfUnit = []
+                    anUnitDic = {}
                     anUnit = anUnitDefinition.getUnit( Num2 )
 
                     anUnitKind = anUnit.getKind()
@@ -517,13 +529,13 @@ def getUnitDefinition( aSBMLmodel ):
                     aMultiplier = anUnit.getMultiplier()
                     anOffset = anUnit.getOffset()
 
-                    ListOfUnit.append( aKind  )
-                    ListOfUnit.append( anExponent )
-                    ListOfUnit.append( aScale )
-                    ListOfUnit.append( aMultiplier )
-                    ListOfUnit.append( anOffset )
+                    anUnitDic[ 'Kind' ]       = aKind
+                    anUnitDic[ 'Exponent' ]   = anExponent
+                    anUnitDic[ 'Scale' ]      = aScale
+                    anUnitDic[ 'Multiplier' ] = aMultiplier
+                    anUnitDic[ 'Offset' ]     = anOffset
 
-                    ListOfUnits.append( ListOfUnit )
+                    ListOfUnits.append( anUnitDic )
 
             aUnitDefinitionDic[ 'Id' ]         =  anId 
             aUnitDefinitionDic[ 'Name' ]       =  aName 
@@ -533,6 +545,41 @@ def getUnitDefinition( aSBMLmodel ):
             LIST.append( aUnitDefinitionDic )
 
     return LIST
+
+
+
+# --------------------------------------------------
+#  Check the Continuity of a Formula
+# --------------------------------------------------
+
+def isDiscontinuous( aMathNode ):
+
+    discontinuousTypes = (
+        libsbml.AST_FUNCTION_DELAY,
+        libsbml.AST_FUNCTION_PIECEWISE,
+        libsbml.AST_LOGICAL_AND,
+        libsbml.AST_LOGICAL_NOT,
+        libsbml.AST_LOGICAL_OR,
+        libsbml.AST_LOGICAL_XOR,
+        libsbml.AST_NAME_TIME,
+        libsbml.AST_RELATIONAL_EQ,
+        libsbml.AST_RELATIONAL_GEQ,
+        libsbml.AST_RELATIONAL_GT,
+        libsbml.AST_RELATIONAL_LEQ,
+        libsbml.AST_RELATIONAL_LT,
+        libsbml.AST_RELATIONAL_NEQ )
+
+    if aMathNode.getType() in discontinuousTypes:
+        return True
+    
+    numChildren = aMathNode.getNumChildren()
+    if numChildren != 0:
+        for i in range( numChildren ):
+            if isDiscontinuous( aMathNode.getChild( i ) ):
+                return True
+    
+    return False
+
 
 # --------------------------------------------------
 #  Pre/Post-process of Formula

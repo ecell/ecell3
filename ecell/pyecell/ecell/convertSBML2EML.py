@@ -37,7 +37,25 @@ from convertSBMLFunctions import *
 import libsbml
 
 
-def convertSBML2EML( aSBMLString ):
+def convertSBML2EML( aSBMLString,
+                     anODEStepper     = "ODEStepper",
+                     aFixedODEStepper = 'FixedODE1Stepper',
+                     aDiscreteStepper = 'DiscreteTimeStepper' ):   ## 'PassiveStepper'
+
+    theDefaultStepperID         = 'Default'
+    theDefaultODEStepperID      = 'ODE'
+    theDefaultDiscreteStepperID = 'Discrete'
+
+    Steppers = dict(
+        ODE      = anODEStepper,
+        FixedODE = aFixedODEStepper,
+        Discrete = aDiscreteStepper )
+
+    StepperIDs = dict(
+        default  = theDefaultStepperID,
+        ODE      = theDefaultODEStepperID,
+        Discrete = theDefaultDiscreteStepperID )
+
 
     aSBMLDocument = libsbml.readSBMLFromString( aSBMLString )
 
@@ -72,48 +90,55 @@ def convertSBML2EML( aSBMLString ):
     theReaction    = SBML_Reaction( theModel )
     theEvent       = SBML_Event( theModel )
 
-##    # damp FunctionDefinition
+##    # dump FunctionDefinition
 ##    print "\n"
 ##    for aFunctionDefinition in theModel.FunctionDefinitionList:
 ##        print "FunctionDefinition: %s\n" % str( aFunctionDefinition )
 
-
     anEml = Eml()
 
-    # ------------------------------
-    #  Set Stepper
-    # ------------------------------
+    setStepper( theModel, anEml, Steppers, StepperIDs )
+    setCompartment( theCompartment, anEml, StepperIDs )
+    setParameter( theParameter, anEml, StepperIDs )
+    setSpecies( theSpecies, anEml )
+    setRule( theRule, anEml, StepperIDs )
+    setReaction( theReaction, anEml, StepperIDs )
+    setEvent( theEvent, anEml, StepperIDs )
 
-##    anEml.createStepper( 'ODEStepper', 'DE' )
-##    anEml.createStepper( 'ODE45Stepper', 'DE' )
-    anEml.createStepper( 'FixedODE1Stepper', 'DE' )
-    anEml.createStepper( 'DiscreteTimeStepper', 'DT' )
-
-
-    # ------------------------------
-    #  Set Compartment ( System )
-    # ------------------------------
-
-    # setFullID
-    aSystemFullID='System::/'
-    anEml.createEntity( 'System', aSystemFullID )
-    anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DE'] )
-    anEml.setEntityProperty( aSystemFullID, 'Name', ['Default'] )
+    return anEml
 
 
 
-    for aCompartment in ( theModel.CompartmentList ):
+# ------------------------------
+#   Set Stepper
+# ------------------------------
 
-        print "Compartment: " + str( aCompartment )
+def setStepper( theModel, anEml, Steppers, StepperIDs ):
+
+    if theModel.isApplicableVariableTimeStep():
+        anEml.createStepper( Steppers[ 'ODE' ], StepperIDs[ 'default' ] )
+    else:
+        anEml.createStepper( Steppers[ 'FixedODE' ], StepperIDs[ 'default' ] )
+##        anEml.createStepper( Steppers[ 'Discrete' ], StepperIDs[ 'default' ] )
+
+
+# ------------------------------
+#   Set Compartment ( System )
+# ------------------------------
+
+def setCompartment( theCompartment, anEml, StepperIDs ):
+
+    createRootSystem( anEml, StepperIDs[ 'default' ] )
+
+    for aCompartment in ( theCompartment.Model.CompartmentList ):
+
+##        print "Compartment: " + str( aCompartment )
 
         # initialize
         theCompartment.initialize( aCompartment )
 
         # getPath
-        if ( theModel.Level == 1 ):
-            aPath = theModel.getPath( aCompartment[ 'Name' ] )
-        elif ( theModel.Level >= 2 ):
-            aPath = theModel.getPath( aCompartment[ 'Id' ] )           
+        aPath = theCompartment.Model.getPath( aCompartment[ theCompartment.Model.getKey()[ 'ID' ] ] )
         
         # setFullID
         if( aPath == '/' ):
@@ -122,13 +147,11 @@ def convertSBML2EML( aSBMLString ):
             aSystemFullID = theCompartment.getCompartmentID( aCompartment )
             anEml.createEntity( 'System', aSystemFullID )
 
-
             # setStepper 
-            anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DE'] )
-
+            anEml.setEntityProperty( aSystemFullID, 'StepperID', [ StepperIDs[ 'default' ] ] )
 
         # setName( default = [] )
-        if ( theModel.Level >= 2 ):
+        if ( theCompartment.Model.Level >= 2 ):
             if ( aCompartment[ 'Name' ] != '' ):
                 anEml.setEntityProperty( aSystemFullID,
                                          'Name',
@@ -140,7 +163,6 @@ def convertSBML2EML( aSBMLString ):
         aTmpList = [ str( aCompartment[ 'SpatialDimension' ] ) ]
         anEml.setEntityProperty( aDimensionsFullID, 'Value', aTmpList[0:1] )
 
-                  
         # setSIZE
         aSizeFullID = 'Variable:' + aPath + ':SIZE'
         anEml.createEntity( 'Variable', aSizeFullID )
@@ -150,31 +172,35 @@ def convertSBML2EML( aSBMLString ):
 
         # convert to ECELL Unit
         if ( aSizeUnit != '' ):
-            aSizeValue = theModel.convertUnit( aSizeUnit, aSizeValue )
+            aSizeValue = theCompartment.Model.convertUnit( aSizeUnit, aSizeValue, theCompartment.Model )
 
-        aTmpList = [ str( aSizeValue ) ]
-        anEml.setEntityProperty( aSizeFullID, 'Value', aTmpList[0:1] )
-
+        anEml.setEntityProperty( aSizeFullID, 'Value', [ str( aSizeValue ) ] )
 
         # setConstant( default = 1 )
         if ( aCompartment[ 'Constant' ] == 1 ):
-            anEml.setEntityProperty( aSizeFullID, 'Fixed', ['1',] )
-           
-           
-    # ------------------------------
-    #  Set GlobalParameter ( Variable )
-    # ------------------------------
+            anEml.setEntityProperty( aSizeFullID, 'Fixed', [ '1' ] )
 
-    if ( theModel.ParameterList != [] ):
+
+# ----------------------------------
+#   Set GlobalParameter ( Variable )
+# ----------------------------------
+
+def setParameter( theParameter, anEml, StepperIDs ):
+
+    if ( theParameter.Model.ParameterList != [] ):
     
         # setGlobalParameterSystem
-        aSystemFullID='System:/:SBMLParameter'
-        anEml.createEntity( 'System', aSystemFullID )
-        anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DE'] )
-        anEml.setEntityProperty( aSystemFullID, 'Name', ['Global Parameter'] )
+        theParameterSystemFullID = theParameter.getSystemFullID()
+        anEml.createEntity( 'System', theParameterSystemFullID )
+        anEml.setEntityProperty( theParameterSystemFullID,
+                                 'StepperID',
+                                 [ StepperIDs[ 'default' ] ] )
+        anEml.setEntityProperty( theParameterSystemFullID,
+                                 'Name',
+                                 [ 'Global Parameter' ] )
 
 
-    for aParameter in theModel.ParameterList:
+    for aParameter in theParameter.Model.ParameterList:
 
         # setFullID
         aSystemFullID = theParameter.generateFullID( aParameter )
@@ -182,51 +208,50 @@ def convertSBML2EML( aSBMLString ):
             
         # setName
         if ( aParameter[ 'Name' ] != '' ):
-            anEml.setEntityProperty( aSystemFullID, 'Name', [ aParameter[ 'Name' ] ] )
+            anEml.setEntityProperty( aSystemFullID,
+                                     'Name',
+                                     [ aParameter[ 'Name' ] ] )
 
         # setValue
-        aTmpList = [ str( theParameter.getParameterValue( aParameter ) ) ]
-        anEml.setEntityProperty( aSystemFullID, 'Value', aTmpList[0:1] )
-
+        anEml.setEntityProperty( aSystemFullID,
+                                 'Value',
+                                 [ str( theParameter.getParameterValue( aParameter ) ) ] )
 
         # setFixed ( default = 1 )
         if ( aParameter[ 'Constant' ] == 1 ):
-            # aTmpList = [ str( aParameter[ 'Constant' ] ) ]
-            aTmpList = [ '1' ]
-            anEml.setEntityProperty( aSystemFullID, 'Fixed', aTmpList[0:1] )
+            anEml.setEntityProperty( aSystemFullID, 'Fixed', [ '1' ] )
 
 
-    # ------------------------------
-    #  Set Species ( Variable )
-    # ------------------------------
+# ------------------------------
+#   Set Species ( Variable )
+# ------------------------------
 
-    for aSpecies in theModel.SpeciesList:
+def setSpecies( theSpecies, anEml ):
+
+    for aSpecies in theSpecies.Model.SpeciesList:
         
-        print "Species: " + str( aSpecies )
+##        print "Species: " + str( aSpecies )
         
-        ### setFullID ###
+        ### set FullID ###
         
         aSystemFullID = theSpecies.generateFullID( aSpecies )
         anEml.createEntity( 'Variable', aSystemFullID )
 
-
-        ### setName ###
+        ### set Name ###
         
-        if( theModel.Level >= 2 ):
+        if( theSpecies.Model.Level >= 2 ):
 
             if ( aSpecies[ 'Name' ] != '' ):
                 anEml.setEntityProperty( aSystemFullID, 'Name', [ aSpecies[ 'Name' ] ] )
 
-
-        ### setValue ###
+        ### set Value ###
         
         aInitialValueDic = theSpecies.getInitialValue( aSpecies )
-        anEml.setEntityProperty( 
-            aSystemFullID, aInitialValueDic[ 'Property' ],
-            [ str( aInitialValueDic[ 'Value' ] ) ] )
+        anEml.setEntityProperty( aSystemFullID,
+                                 aInitialValueDic[ 'Property' ],
+                                 [ str( aInitialValueDic[ 'Value' ] ) ] )
 
-
-        ### setFixed ###
+        ### set Fixed ###
 
         if ( theSpecies.isConstant( aSpecies )): aFixedValue = "1"
         else: aFixedValue = "0"
@@ -236,24 +261,26 @@ def convertSBML2EML( aSBMLString ):
                                  [ aFixedValue ] )
 
 
-    # ------------------------------
-    #  Set Rule ( Process )
-    # ------------------------------
+# ------------------------------
+#   Set Rule ( Process )
+# ------------------------------
 
-    if ( theModel.RuleList != [] ):
+def setRule( theRule, anEml, StepperIDs ):
+
+    if ( theRule.Model.RuleList != [] ):
 
         ### make Rule System ###
         
-        aSystemFullID='System:/:SBMLRule'
-        anEml.createEntity( 'System', aSystemFullID )
-        anEml.setEntityProperty( aSystemFullID,
+        theRuleSystemFullID = theRule.getSystemFullID()
+        anEml.createEntity( 'System', theRuleSystemFullID )
+        anEml.setEntityProperty( theRuleSystemFullID,
                                  'Name',
                                  ['System for SBML Rule'] )
+        anEml.setEntityProperty( theRuleSystemFullID,
+                                 'StepperID',
+                                 [ StepperIDs[ 'default' ] ] )
 
-        anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DE'] )
-
-        
-    for aRule in theModel.RuleList:
+    for aRule in theRule.Model.RuleList:
 
 ##        print "Rule: " + str( aRule )
 
@@ -267,32 +294,22 @@ def convertSBML2EML( aSBMLString ):
         if ( aRule[ 'Type' ] == libsbml.SBML_ALGEBRAIC_RULE ):
 
             anEml.createEntity( 'ExpressionAlgebraicProcess', aSystemFullID )
-            anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DT'] )
+            anEml.setEntityProperty( aSystemFullID, 'StepperID', [ StepperIDs[ 'default' ] ] )
 
 
         ### Assignment Rule ###
-        elif ( aRule[ 'Type' ] == libsbml.SBML_ASSIGNMENT_RULE or
-               aRule[ 'Type' ] == libsbml.SBML_SPECIES_CONCENTRATION_RULE or
-               aRule[ 'Type' ] == libsbml.SBML_COMPARTMENT_VOLUME_RULE or
-               aRule[ 'Type' ] == libsbml.SBML_PARAMETER_RULE ):
+        elif aRule[ 'Type' ] in ( libsbml.SBML_ASSIGNMENT_RULE,
+                                    libsbml.SBML_SPECIES_CONCENTRATION_RULE,
+                                    libsbml.SBML_COMPARTMENT_VOLUME_RULE,
+                                    libsbml.SBML_PARAMETER_RULE ):
 
             anEml.createEntity( 'ExpressionAssignmentProcess', aSystemFullID )
-            anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DT'] )
+            anEml.setEntityProperty( aSystemFullID, 'StepperID', [ StepperIDs[ 'default' ] ] )
 
             if( aRule[ 'Type' ] == libsbml.SBML_ASSIGNMENT_RULE ):
                 anEml.setEntityProperty( aSystemFullID, 'Name', [ "Assignment rule for '%s'" % aRule[ 'Variable' ] ] )
 
-            aVariableType = theRule.getVariableType( aRule[ 'Variable' ] )
-
-            if ( aVariableType == libsbml.SBML_SPECIES ):
-                theRule.setSpeciesToVariableReference( aRule[ 'Variable' ], '1' )
-            elif ( aVariableType == libsbml.SBML_PARAMETER ):
-                theRule.setParameterToVariableReference( aRule[ 'Variable' ], '1' )
-            elif ( aVariableType == libsbml.SBML_COMPARTMENT ):
-                theRule.setCompartmentToVariableReference( aRule[ 'Variable' ], '1' )
-            else:
-                raise TypeError,\
-                    "Variable type must be Species, Parameter, or Compartment"
+            theRule.updateVariableReferenceList( aRule[ 'Variable' ], '1' )
 
         ### Rate Rule ###
         elif ( aRule[ 'Type' ] == libsbml.SBML_RATE_RULE ):
@@ -300,17 +317,7 @@ def convertSBML2EML( aSBMLString ):
             anEml.createEntity( 'ExpressionFluxProcess', aSystemFullID )
             anEml.setEntityProperty( aSystemFullID, 'Name', [ "Rate rule for '%s'" % aRule[ 'Variable' ] ] )
 
-            aVariableType = theRule.getVariableType( aRule[ 'Variable' ] )
-
-            if ( aVariableType == libsbml.SBML_SPECIES ):
-                theRule.setSpeciesToVariableReference( aRule[ 'Variable' ], '1' )
-            elif ( aVariableType == libsbml.SBML_PARAMETER ):
-                theRule.setParameterToVariableReference( aRule[ 'Variable' ], '1' )
-            elif ( aVariableType == libsbml.SBML_COMPARTMENT ):
-                theRule.setCompartmentToVariableReference( aRule[ 'Variable' ], '1' )
-            else:
-                raise TypeError,\
-                    "Variable type must be Species, Parameter, or Compartment"
+            theRule.updateVariableReferenceList( aRule[ 'Variable' ], '1' )
 
 
         else:
@@ -331,12 +338,13 @@ def convertSBML2EML( aSBMLString ):
                                  theRule.VariableReferenceList )
 
 
+# ------------------------------
+#   Set Reaction ( Process )
+# ------------------------------
 
-    # ------------------------------
-    #  Set Reaction ( Process )
-    # ------------------------------
+def setReaction( theReaction, anEml, StepperIDs ):
 
-    for aReaction in theModel.ReactionList:
+    for aReaction in theReaction.Model.ReactionList:
 
 ##        print "Reaction: " + str( aReaction )
 
@@ -347,7 +355,7 @@ def convertSBML2EML( aSBMLString ):
         anEml.createEntity( 'ExpressionFluxProcess', aSystemFullID )
 
         # setName
-        if ( theModel.Level >= 2 ):
+        if ( theReaction.Model.Level >= 2 ):
             if( aReaction[ 'Name' ] != '' ):
                 anEml.setEntityProperty( aSystemFullID, 'Name', [ aReaction[ 'Name' ] ] )
             else:
@@ -356,35 +364,31 @@ def convertSBML2EML( aSBMLString ):
             anEml.setEntityProperty( aSystemFullID, 'Name', [ theReaction.getChemicalEquation( aReaction ) ] )
 
         # setSubstrate
-        updateVariableReferenceListBySpeciesList( theModel, theReaction, aReaction[ 'Reactants' ], -1 )
+        updateVariableReferenceListBySpeciesList( theReaction, aReaction[ 'Reactants' ], -1 )
         # setProduct
-        updateVariableReferenceListBySpeciesList( theModel, theReaction, aReaction[ 'Products' ] )
+        updateVariableReferenceListBySpeciesList( theReaction, aReaction[ 'Products' ] )
         # setCatalyst
-        updateVariableReferenceListBySpeciesList( theModel, theReaction, aReaction[ 'Modifiers' ] )
+        updateVariableReferenceListBySpeciesList( theReaction, aReaction[ 'Modifiers' ] )
 
 
         # setProperty
         if( aReaction[ 'KineticLaw' ] != [] ):
-            if( aReaction[ 'KineticLaw' ][4] != [] ):
-                for aParameter in aReaction[ 'KineticLaw' ][4]:
+            if( aReaction[ 'KineticLaw' ][ 'Parameters' ] != [] ):
+                for aParameter in aReaction[ 'KineticLaw' ][ 'Parameters' ]:
                     if ( aParameter[ 'Value' ] != '' ): 
-                        aTmpList = [ str( aParameter[ 'Value' ] ) ]
-                        if ( theModel.Level == 1 ):
-                            anEml.setEntityProperty\
-                            ( aSystemFullID, aParameter[ 'Name' ], aTmpList[0:1] )
-                        elif ( theModel.Level >= 2 ):
-                            anEml.setEntityProperty\
-                            ( aSystemFullID, aParameter[ 'Id' ], aTmpList[0:1] )
-                            
-                          
+                        anEml.setEntityProperty( aSystemFullID,
+                                                 aParameter[ theReaction.Model.getKey()[ 'ID' ] ],
+                                                 [ str( aParameter[ 'Value' ] ) ] )
+
+
             # --------------------------
             # set "Expression" Property
             # --------------------------
         
             # convert SBML format formula to E-Cell format formula
-            if( aReaction[ 'KineticLaw' ][0] != '' ):
+            if( aReaction[ 'KineticLaw' ][ 'Formula' ] != '' ):
                 anExpression =\
-                [ str( theReaction.convertFormula( aReaction[ 'KineticLaw' ][0] ) ) ]
+                [ str( theReaction.convertFormula( aReaction[ 'KineticLaw' ][ 'Formula' ] ) ) ]
 
 
 
@@ -398,23 +402,28 @@ def convertSBML2EML( aSBMLString ):
                                          'VariableReferenceList',
                                          theReaction.VariableReferenceList )
 
-    # ------------------------------
-    #  Set Event ( Process )
-    # ------------------------------
 
-    if ( theModel.EventList != [] ):
+# ------------------------------
+#   Set Event ( Process )
+# ------------------------------
+
+def setEvent( theEvent, anEml, StepperIDs ):
+
+    if ( theEvent.Model.EventList != [] ):
 
         ### make Event System ###
         
-        aSystemFullID='System:/:SBMLEvent'
-        anEml.createEntity( 'System', aSystemFullID )
-        anEml.setEntityProperty( aSystemFullID,
+        theEventSystemFullID = theEvent.getSystemFullID()
+        anEml.createEntity( 'System', theEventSystemFullID )
+        anEml.setEntityProperty( theEventSystemFullID,
                                  'Name',
                                  ['System for SBML Event'] )
+        anEml.setEntityProperty( theEventSystemFullID,
+                                 'StepperID',
+                                 [ StepperIDs[ 'default' ] ] )
 
-        anEml.setEntityProperty( aSystemFullID, 'StepperID', ['DE'] )
 
-    for anEvent in theModel.EventList:
+    for anEvent in theEvent.Model.EventList:
 
 ##        print "Event: " + str( anEvent )
 
@@ -424,7 +433,7 @@ def convertSBML2EML( aSBMLString ):
         aSystemFullID = theEvent.generateFullID( anEvent )
 
         anEml.createEntity( 'ExpressionEventProcess', aSystemFullID )
-        anEml.setEntityProperty( aSystemFullID, 'StepperID', [ 'DT' ] )
+        anEml.setEntityProperty( aSystemFullID, 'StepperID', [ StepperIDs[ 'default' ] ] )
         anEml.setEntityProperty( aSystemFullID, 'Name', [ str( theEvent.getEventName( anEvent ) ) ] )
 
         # convert EventAssignment
@@ -432,21 +441,11 @@ def convertSBML2EML( aSBMLString ):
         theEventAssignmentList = []
         for anEventAssignment in anEvent[ 'EventAssignments' ]:
             
-            aVariableType = theEvent.getVariableType( anEventAssignment[ 0 ] )
-
-            if   ( aVariableType == libsbml.SBML_SPECIES ):
-                theEvent.setSpeciesToVariableReference( anEventAssignment[ 0 ], '1' )
-            elif ( aVariableType == libsbml.SBML_PARAMETER ):
-                theEvent.setParameterToVariableReference( anEventAssignment[ 0 ], '1' )
-            elif ( aVariableType == libsbml.SBML_COMPARTMENT ):
-                theEvent.setCompartmentToVariableReference( anEventAssignment[ 0 ], '1' )
-            else:
-                raise TypeError,\
-                    "Variable type must be Species, Parameter, or Compartment"
+            theEvent.updateVariableReferenceList( anEventAssignment[ 'Variable' ], '1' )
             
             aConvertedEventAssignment = []
-            aConvertedEventAssignment.append( anEventAssignment[ 0 ] )
-            aConvertedEventAssignment.append( str( theEvent.convertFormula( anEventAssignment[ 1 ] )))
+            aConvertedEventAssignment.append( anEventAssignment[ 'Variable' ] )
+            aConvertedEventAssignment.append( str( theEvent.convertFormula( anEventAssignment[ 'String' ] )))
             theEventAssignmentList.append( aConvertedEventAssignment )
 
         # convert Trigger
@@ -479,10 +478,7 @@ def convertSBML2EML( aSBMLString ):
                                  theEvent.VariableReferenceList )
 
 
-    return anEml
-
-
-def updateVariableReferenceListBySpeciesList( theModel, theReaction, aReactingSpeciesList, theDirection = 1 ):
+def updateVariableReferenceListBySpeciesList( theReaction, aReactingSpeciesList, theDirection = 1 ):
     for aReactingSpecies in aReactingSpeciesList:
         if isinstance( aReactingSpecies, list ):
             _aReactingSpecies = aReactingSpecies
@@ -504,7 +500,7 @@ def updateVariableReferenceListBySpeciesList( theModel, theReaction, aReactingSp
             aReactingSpeciesList = []
             aReactingSpeciesList.append( _aReactingSpecies[0] )
 ##            theReaction.SubstrateNumber = theReaction.SubstrateNumber + 1
-            aVariableFullID = theModel.getSpeciesReferenceID( _aReactingSpecies[0] )
+            aVariableFullID = theReaction.Model.getSpeciesReferenceID( _aReactingSpecies[0] )
             if ( aVariableFullID == None ):
                 raise NameError,"Species "+ _aReactingSpecies[0] +" not found"
 
@@ -512,3 +508,10 @@ def updateVariableReferenceListBySpeciesList( theModel, theReaction, aReactingSp
  
             aReactingSpeciesList.append( str( aStoichiometryInt ) )
             theReaction.VariableReferenceList.append( aReactingSpeciesList )
+
+
+def createRootSystem( anEml, aStepperID ):
+    aSystemFullID='System::/'
+    anEml.createEntity( 'System', aSystemFullID )
+    anEml.setEntityProperty( aSystemFullID, 'StepperID', [ aStepperID ] )
+    anEml.setEntityProperty( aSystemFullID, 'Name', [ 'default' ] )
