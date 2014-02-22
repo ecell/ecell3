@@ -387,8 +387,9 @@ def setReaction( theReaction, anEml, StepperIDs ):
         
             # convert SBML format formula to E-Cell format formula
             if( aReaction[ 'KineticLaw' ][ 'Formula' ] != '' ):
+##                print "Kinetic Law: %s" % aReaction[ 'KineticLaw' ]
                 anExpression =\
-                [ str( theReaction.convertFormula( aReaction[ 'KineticLaw' ][ 'Formula' ] ) ) ]
+                [ str( theReaction.convertFormula( aReaction[ 'KineticLaw' ][ 'Formula' ], aReaction[ 'KineticLaw' ][ 'Parameters' ] ) ) ]
 
 
 

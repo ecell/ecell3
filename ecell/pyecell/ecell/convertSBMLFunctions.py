@@ -228,6 +228,8 @@ class SBML_Base( object ):
 
     def getVariableType( self, aName, aModel ):
 
+##        print "SBML_Base.getVariableType( %s )" % aName
+        
         IdKey = SBML_Base.getKey( self, aModel )[ 'ID' ]
 
         for aSpecies in aModel.SpeciesList:
@@ -313,23 +315,23 @@ class SBML_Base( object ):
 
     # =========================================================
 
-    def convertFormula( self, aFormula, aModel ):
+    def convertFormula( self, aFormula, aModel, aLocalParameterList = [] ):
         preprocessedFormula = aFormula.replace( '<t>', aModel.TimeSymbol )
         aASTRootNode = libsbml.parseFormula( preprocessedFormula )
 
-        convertedAST = self._convertVariableName( aASTRootNode )
+        convertedAST = self._convertVariableName( aASTRootNode, aLocalParameterList )
 
         return postprocessMathString( libsbml.formulaToString( convertedAST ), aModel.TimeSymbol )
 
     # =========================================================
 
-    def _convertVariableName( self, anASTNode ):
+    def _convertVariableName( self, anASTNode, aLocalParameterList = [] ):
 
         aNumChildren = anASTNode.getNumChildren()
 
         if ( aNumChildren > 0 ):
             for n in range( aNumChildren ):
-                self._convertVariableName( anASTNode.getChild( n ) )
+                self._convertVariableName( anASTNode.getChild( n ), aLocalParameterList )
 
         elif ( aNumChildren == 0 ):
             if ( anASTNode.isNumber() == 1 ):
@@ -770,8 +772,8 @@ class SBML_Rule( SBML_Base ):
 
     # =========================================================
 
-    def convertFormula( self, aFormula ):
-        return SBML_Base.convertFormula( self, aFormula, self.Model )
+    def convertFormula( self, aFormula, aLocalParameterList = [] ):
+        return SBML_Base.convertFormula( self, aFormula, self.Model, aLocalParameterList )
 
 
     # =========================================================
@@ -851,7 +853,7 @@ class SBML_Reaction( SBML_Base ):
 
     # =========================================================
 
-    def _convertVariableName( self, anASTNode ):
+    def _convertVariableName( self, anASTNode, aLocalParameterList = [] ):
         
         aNumChildren = anASTNode.getNumChildren()
 
@@ -864,7 +866,7 @@ class SBML_Reaction( SBML_Base ):
                 #    self.macroExpand( anASTNode )
 
             for n in range( aNumChildren ):
-                self._convertVariableName( anASTNode.getChild( n ) )
+                self._convertVariableName( anASTNode.getChild( n ), aLocalParameterList )
 
             return anASTNode
         
@@ -872,8 +874,16 @@ class SBML_Reaction( SBML_Base ):
         elif ( aNumChildren == 0 ):
             if ( anASTNode.isNumber() == 1 ):
                 pass
+            
             else:
+            
                 aName = anASTNode.getName()
+                
+##                print "Local Parameter: %s" % aLocalParameterList
+                for aLocalParameter in aLocalParameterList:
+                    if aLocalParameter[ self.Model.getKey()[ 'ID' ] ] == aName:
+                        return anASTNode
+                        
                 variableName = ''
 
                 for aSpecies in self.Model.SpeciesList:
@@ -944,11 +954,11 @@ class SBML_Reaction( SBML_Base ):
 
     # =========================================================
     
-    def convertFormula( self, aFormula ):
+    def convertFormula( self, aFormula, aLocalParameterList = [] ):
         preprocessedFormula = aFormula.replace( '<t>', self.Model.TimeSymbol )
         aASTRootNode = libsbml.parseFormula( preprocessedFormula )
 
-        convertedAST = self._convertVariableName( aASTRootNode )
+        convertedAST = self._convertVariableName( aASTRootNode, aLocalParameterList )
 
         return postprocessMathString( libsbml.formulaToString( convertedAST ), self.Model.TimeSymbol )
 
@@ -1206,8 +1216,8 @@ class SBML_Event( SBML_Base ):
 
     # =========================================================
 
-    def convertFormula( self, aFormula ):
-        return SBML_Base.convertFormula( self, aFormula, self.Model )
+    def convertFormula( self, aFormula, aLocalParameterList = [] ):
+        return SBML_Base.convertFormula( self, aFormula, self.Model, aLocalParameterList )
 
 
     # =========================================================
