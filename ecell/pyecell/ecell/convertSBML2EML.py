@@ -456,7 +456,7 @@ def setEvent( theEvent, anEml, StepperIDs ):
         if ( anEvent[ 'Delay' ] != '' ):
             convertedDelay = [ str( theEvent.convertFormula( anEvent[ 'Delay' ] )) ]
         else:
-            convertedDelay = '0.0'
+            convertedDelay = [ '0.0' ]
 
         # set Expression Property
         anEml.setEntityProperty( aSystemFullID,
