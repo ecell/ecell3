@@ -138,7 +138,7 @@ def setCompartment( theCompartment, anEml, StepperIDs ):
         theCompartment.initialize( aCompartment )
 
         # getPath
-        aPath = theCompartment.Model.getPath( aCompartment[ theCompartment.Model.getKey()[ 'ID' ] ] )
+        aPath = theCompartment.Model.getPath( aCompartment[ theCompartment.Model.keys[ 'ID' ] ] )
         
         # setFullID
         if( aPath == '/' ):
@@ -377,7 +377,7 @@ def setReaction( theReaction, anEml, StepperIDs ):
                 for aParameter in aReaction[ 'KineticLaw' ][ 'Parameters' ]:
                     if ( aParameter[ 'Value' ] != '' ): 
                         anEml.setEntityProperty( aSystemFullID,
-                                                 aParameter[ theReaction.Model.getKey()[ 'ID' ] ],
+                                                 aParameter[ theReaction.Model.keys[ 'ID' ] ],
                                                  [ str( aParameter[ 'Value' ] ) ] )
 
 
