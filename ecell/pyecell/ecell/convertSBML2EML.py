@@ -82,6 +82,8 @@ def convertSBML2EML( aSBMLString,
     
     aSBMLModel = aSBMLDocument.getModel()
 
+##    theUndetermined = 
+
     theModel       = SBML_Model( aSBMLDocument, aSBMLModel )
     theCompartment = SBML_Compartment( theModel )
     theParameter   = SBML_Parameter( theModel )
@@ -368,13 +370,7 @@ def setReaction( theReaction, anEml, StepperIDs ):
 
         anEml.setEntityProperty( aSystemFullID, 'Name', [ aName ] )
 
-        # setSubstrate
-        updateVariableReferenceListBySpeciesList( theReaction, aReaction[ 'Reactants' ], -1, aReaction[ 'CommonDemoninator' ] )
-        # setProduct
-        updateVariableReferenceListBySpeciesList( theReaction, aReaction[ 'Products' ],   1, aReaction[ 'CommonDemoninator' ] )
-        # setCatalyst
-        updateVariableReferenceListBySpeciesList( theReaction, aReaction[ 'Modifiers' ],  1, aReaction[ 'CommonDemoninator' ] )
-
+        updateVariableReferenceList( theReaction, aReaction )
 
         # setProperty
         if( aReaction[ 'KineticLaw' ] != [] ):
@@ -486,7 +482,16 @@ def setEvent( theEvent, anEml, StepperIDs ):
                                  theEvent.VariableReferenceList )
 
 
-def updateVariableReferenceListBySpeciesList( theReaction, aReactingSpeciesList, theDirection = 1, denominator = 1 ):
+def updateVariableReferenceList( theReaction, aReaction  ):
+    # setSubstrate
+    updateVariableReferenceListBySpeciesList( theReaction, aReaction[ theReaction.Model.keys[ 'ID' ] ], aReaction[ 'Reactants' ], -1, aReaction[ 'CommonDemoninator' ] )
+    # setProduct
+    updateVariableReferenceListBySpeciesList( theReaction, aReaction[ theReaction.Model.keys[ 'ID' ] ], aReaction[ 'Products' ],   1, aReaction[ 'CommonDemoninator' ] )
+    # setCatalyst
+    updateVariableReferenceListBySpeciesList( theReaction, aReaction[ theReaction.Model.keys[ 'ID' ] ], aReaction[ 'Modifiers' ],  1, aReaction[ 'CommonDemoninator' ] )
+
+
+def updateVariableReferenceListBySpeciesList( theReaction, aReactionID, aReactingSpeciesList, theDirection = 1, denominator = 1 ):
     for aReactingSpecies in aReactingSpeciesList:
         if isinstance( aReactingSpecies, dict ):
             _aReactingSpecies = aReactingSpecies
@@ -503,7 +508,7 @@ def updateVariableReferenceListBySpeciesList( theReaction, aReactingSpeciesList,
             raise Exception,"Stoichiometry Error : E-Cell System can't set a floating Stoichiometry"
         
         elif ( _aReactingSpecies[ 'StoichiometryMath' ] != [] ):
-            raise Exception,"At present, StoichiometryMath is not supported."
+            raise Exception,"At present, StoichiometryMath is not supported. ( Reaction ID: %s, Reactant ID: %s, StoichiometryMath: %s )" % ( aReactionID, _aReactingSpecies[ theReaction.Model.keys[ 'ID' ] ], _aReactingSpecies[ 'StoichiometryMath' ] )
         
         _aReactingSpeciesEntity = theReaction.Model.getEntitybyID( _aReactingSpecies[ theReaction.Model.keys[ 'ID' ] ] )
         if ( _aReactingSpeciesEntity == False ) or ( _aReactingSpeciesEntity[ 0 ] != libsbml.SBML_SPECIES ):

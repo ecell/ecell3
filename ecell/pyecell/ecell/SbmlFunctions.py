@@ -194,13 +194,23 @@ def getParameter( aSBMLmodel, DerivedValueDic ):
             anId_Pa = aParameter.getId()
             aName_Pa = aParameter.getName()
             
-            if aParameter.isSetValue():
-                aValue_Pa = aParameter.getValue()
+            """ ## -------------------------------------------------------- 
+            SBML file sometime allows inappropriate initial value(s).
+            Thus it's more safety to assignment the initial value using 
+            AssignmentRule when it is available than to use the 
+            described initial value as is.
+            """ ## -------------------------------------------------------- 
+            
+            if aSBMLmodel.getAssignmentRule( anId_Pa ) == None:
+                if aParameter.isSetValue():
+                    aValue_Pa = aParameter.getValue()
+                else:
+                    raise TypeError, 'Initial value of %s can not been determined.' % anId_Pa
             else:
                 if getInitialValueFromAssignmentRule( aSBMLmodel, anId_Pa, DerivedValueDic ):
                     aValue_Pa = DerivedValueDic[ anId_Pa ]
                 else:
-                    aValue_Pa = 'Unknown'
+                    raise TypeError, 'Initial value of %s can not been determined.' % anId_Pa
                 
             anUnit_Pa = aParameter.getUnits()
             aConstant_Pa = aParameter.getConstant()
@@ -660,7 +670,7 @@ def getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic 
     aFormulaTree = anAssignmentRule.getMath().deepCopy()
 
 ##    print "\nAssignmentRule for %s" % aVariableID
-##    print "  %s\n" % postprocessMathString( libsbml.formulaToString( preprocessMathTree( anAssignmentRule.getMath(), timeSymbol ) ), timeSymbol )
+##    print "  %s\n" % postprocessMathString( libsbml.formulaToString( preprocessMathTree( anAssignmentRule.getMath(), getTimeSymbol( aSBMLmodel ) ) ), getTimeSymbol( aSBMLmodel ) )
 ##    print "Initial Construction:\n"
 ##    _dumpTreeConstructionOfNode( aFormulaTree )
 ##    print '\n'
@@ -669,6 +679,8 @@ def getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic 
     while ( aCounter > 0 ):
         aCounter = 0
         _convertName2Value( aSBMLmodel, aFormulaTree, aCounter, DerivedValueDic )
+##        if aCounter == 0:
+##            print 'Initial Value: %s = %f' % ( aVariableID, aSBMLmodel.getElementBySId( aVariableID ).getValue() )
 
 ##    print "Name replaced with value:\n"
 ##    _dumpTreeConstructionOfNode( aFormulaTree )
