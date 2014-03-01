@@ -25,12 +25,12 @@
 # 
 #END_HEADER
 
-import sys
+import sys, os
 import re
-import os
 import time
 import getopt
 import types
+import decimal, fractions
 
 from ecell.eml import *
 from convertSBMLFunctions import *
@@ -357,18 +357,23 @@ def setReaction( theReaction, anEml, StepperIDs ):
         # setName
         if ( theReaction.Model.Level >= 2 ):
             if( aReaction[ 'Name' ] != '' ):
-                anEml.setEntityProperty( aSystemFullID, 'Name', [ aReaction[ 'Name' ] ] )
+                aName = aReaction[ 'Name' ]
             else:
-                anEml.setEntityProperty( aSystemFullID, 'Name', [ theReaction.getChemicalEquation( aReaction ) ] )
+                aName = theReaction.getChemicalEquation( aReaction )
         else:
-            anEml.setEntityProperty( aSystemFullID, 'Name', [ theReaction.getChemicalEquation( aReaction ) ] )
+            aName = theReaction.getChemicalEquation( aReaction )
+
+        if aReaction[ 'CommonDemoninator' ] != 1.0:
+            aName = '%s, ( denominatior = %i )' % ( aName, aReaction[ 'CommonDemoninator' ] )
+
+        anEml.setEntityProperty( aSystemFullID, 'Name', [ aName ] )
 
         # setSubstrate
-        updateVariableReferenceListBySpeciesList( theReaction, aReaction[ 'Reactants' ], -1 )
+        updateVariableReferenceListBySpeciesList( theReaction, aReaction[ 'Reactants' ], -1, aReaction[ 'CommonDemoninator' ] )
         # setProduct
-        updateVariableReferenceListBySpeciesList( theReaction, aReaction[ 'Products' ] )
+        updateVariableReferenceListBySpeciesList( theReaction, aReaction[ 'Products' ],   1, aReaction[ 'CommonDemoninator' ] )
         # setCatalyst
-        updateVariableReferenceListBySpeciesList( theReaction, aReaction[ 'Modifiers' ] )
+        updateVariableReferenceListBySpeciesList( theReaction, aReaction[ 'Modifiers' ],  1, aReaction[ 'CommonDemoninator' ] )
 
 
         # setProperty
@@ -389,7 +394,9 @@ def setReaction( theReaction, anEml, StepperIDs ):
             if( aReaction[ 'KineticLaw' ][ 'Formula' ] != '' ):
 ##                print "Kinetic Law: %s" % aReaction[ 'KineticLaw' ]
                 anExpression =\
-                [ str( theReaction.convertFormula( aReaction[ 'KineticLaw' ][ 'Formula' ], aReaction[ 'KineticLaw' ][ 'Parameters' ] ) ) ]
+                [ str( theReaction.convertFormula( aReaction[ 'KineticLaw' ][ 'Formula' ],
+                                                   aReaction[ 'KineticLaw' ][ 'Parameters' ],
+                                                   aReaction[ 'CommonDemoninator' ] ) ) ]
 
 
 
@@ -479,31 +486,52 @@ def setEvent( theEvent, anEml, StepperIDs ):
                                  theEvent.VariableReferenceList )
 
 
-def updateVariableReferenceListBySpeciesList( theReaction, aReactingSpeciesList, theDirection = 1 ):
+def updateVariableReferenceListBySpeciesList( theReaction, aReactingSpeciesList, theDirection = 1, denominator = 1 ):
     for aReactingSpecies in aReactingSpeciesList:
-        if isinstance( aReactingSpecies, list ):
+        if isinstance( aReactingSpecies, dict ):
             _aReactingSpecies = aReactingSpecies
         elif isinstance( aReactingSpecies, str ):
-            _aReactingSpecies = [ aReactingSpecies, 0, 1 ]
+            _aReactingSpecies = {
+                theReaction.Model.keys[ 'ID' ] : aReactingSpecies,
+                'Stoichiometry'                : 0,
+                'StoichiometryMath'            : [],
+                'Denominator'                  : 1 }
         else:
             raise Exception,"DEBUG : Unexpected instance during converting Reaction"
         
-        if ( _aReactingSpecies[2] != 1 ):     # ReactantDenominator
+        if ( _aReactingSpecies[ 'Denominator' ] != 1 ):     # ReactantDenominator
             raise Exception,"Stoichiometry Error : E-Cell System can't set a floating Stoichiometry"
         
-        aStoichiometryInt = theDirection * theReaction.getStoichiometry( _aReactingSpecies[0], _aReactingSpecies[1] )
+        elif ( _aReactingSpecies[ 'StoichiometryMath' ] != [] ):
+            raise Exception,"At present, StoichiometryMath is not supported."
         
-        aCorrespondingVariableReference = theReaction.getVariableReference( _aReactingSpecies[0] )
+        _aReactingSpeciesEntity = theReaction.Model.getEntitybyID( _aReactingSpecies[ theReaction.Model.keys[ 'ID' ] ] )
+        if ( _aReactingSpeciesEntity == False ) or ( _aReactingSpeciesEntity[ 0 ] != libsbml.SBML_SPECIES ):
+            raise TypeError,\
+                'Species "%s" not found' % _aReactingSpecies[ theReaction.Model.keys[ 'ID' ] ]
+        else:
+            _aReactingSpeciesEntity = _aReactingSpeciesEntity[ 1 ]
+
+        if _aReactingSpeciesEntity[ 'Constant' ]:
+            aStoichiometryInt = 0
+            
+        else:
+##            if _aReactingSpecies[ 'Stoichiometry' ] != int( _aReactingSpecies[ 'Stoichiometry' ] ):
+##                raise TypeError, 'Stoichiometry must be integer.'
+            
+            aStoichiometryInt = theDirection * int( _aReactingSpecies[ 'Stoichiometry' ] * denominator )
+        
+        aCorrespondingVariableReference = theReaction.getVariableReference( _aReactingSpecies[ theReaction.Model.keys[ 'ID' ] ] )
         if aCorrespondingVariableReference:
             aCorrespondingVariableReference[ 2 ] = str( int( aCorrespondingVariableReference[ 2 ] ) + aStoichiometryInt )
         
         else:
             aReactingSpeciesList = []
-            aReactingSpeciesList.append( _aReactingSpecies[0] )
+            aReactingSpeciesList.append( _aReactingSpecies[ theReaction.Model.keys[ 'ID' ] ] )
 ##            theReaction.SubstrateNumber = theReaction.SubstrateNumber + 1
-            aVariableFullID = theReaction.Model.getSpeciesReferenceID( _aReactingSpecies[0] )
+            aVariableFullID = theReaction.Model.getSpeciesReferenceID( _aReactingSpecies[ theReaction.Model.keys[ 'ID' ] ] )
             if ( aVariableFullID == None ):
-                raise NameError,"Species "+ _aReactingSpecies[0] +" not found"
+                raise NameError,"Species "+ _aReactingSpecies[ theReaction.Model.keys[ 'ID' ] ] +" not found"
 
             aReactingSpeciesList.append( 'Variable:' + aVariableFullID )
  

@@ -204,7 +204,11 @@ class SBML_Base( object ):
 
     # =========================================================
 
-    def convertFormula( self, aFormula, aModel, aLocalParameterList = [] ):
+    def convertFormula( self, aFormula, aModel, aLocalParameterList = [], aDenominator = 1.0 ):
+        
+        if aDenominator != 1.0:
+            aFormula = '( 1.0 / %s ) * ( %s )' % ( aDenominator, aFormula )
+        
         preprocessedFormula = aFormula.replace( '<t>', aModel.TimeSymbol )
         aASTRootNode = libsbml.parseFormula( preprocessedFormula )
 
@@ -312,6 +316,31 @@ class SBML_Model( SBML_Base ):
             return False
         else:
             return True
+
+
+    # =========================================================
+
+    def getEntitybyID( self, anID ):
+
+        theEntityDic = {
+            libsbml.SBML_SPECIES     : self.SpeciesList,
+            libsbml.SBML_PARAMETER   : self.ParameterList,
+            libsbml.SBML_REACTION    : self.ReactionList,
+            libsbml.SBML_COMPARTMENT : self.CompartmentList,
+            libsbml.SBML_EVENT       : self.EventList
+        }
+        
+        for ( anEntityType, anEntityList ) in theEntityDic.items():
+        
+            hit = filter( 
+                lambda anElement: anElement[ self.keys[ 'ID' ] ] == anID,
+                anEntityList )
+            
+            if len( hit ):
+                return ( anEntityType, hit[ 0 ] )
+
+        return False
+
 
     # =========================================================
 
@@ -653,8 +682,8 @@ class SBML_Rule( SBML_Base ):
 
     # =========================================================
 
-    def convertFormula( self, aFormula, aLocalParameterList = [] ):
-        return SBML_Base.convertFormula( self, aFormula, self.Model, aLocalParameterList )
+    def convertFormula( self, aFormula, aLocalParameterList = [], aDenominator = 1.0 ):
+        return SBML_Base.convertFormula( self, aFormula, self.Model, aLocalParameterList, aDenominator )
 
 
     # =========================================================
@@ -677,10 +706,8 @@ class SBML_Reaction( SBML_Base ):
     
     def initialize( self ):
 
-##        self.SubstrateNumber = 0
         self.ProductNumber = 0
         self.ModifierNumber = 0
-##        self.ParameterNumber = 0
 
         self.VariableReferenceList = []
 
@@ -829,14 +856,10 @@ class SBML_Reaction( SBML_Base ):
                 return anASTNode
 
     # =========================================================
-    
-    def convertFormula( self, aFormula, aLocalParameterList = [] ):
-        preprocessedFormula = aFormula.replace( '<t>', self.Model.TimeSymbol )
-        aASTRootNode = libsbml.parseFormula( preprocessedFormula )
 
-        convertedAST = self._convertVariableName( aASTRootNode, aLocalParameterList )
+    def convertFormula( self, aFormula, aLocalParameterList = [], aDenominator = 1.0 ):
+        return SBML_Base.convertFormula( self, aFormula, self.Model, aLocalParameterList, aDenominator )
 
-        return postprocessMathString( libsbml.formulaToString( convertedAST ), self.Model.TimeSymbol )
 
     # =========================================================
 
@@ -867,16 +890,16 @@ class SBML_Reaction( SBML_Base ):
 
         # Left side (reactant terms)
         if ( len( aReaction[ 'Reactants' ] ) > 0 ):
-            if ( aReaction[ 'Reactants' ][0][1] == 1.0 ):
-                theLeftSide = "[%s]" % aReaction[ 'Reactants' ][0][0]
+            if ( aReaction[ 'Reactants' ][0][ 'Stoichiometry' ] == 1.0 ):
+                theLeftSide = "[%s]" % aReaction[ 'Reactants' ][0][ self.Model.keys[ 'ID' ] ]
             else:
-                theLeftSide = "%s x [%s]" % ( aReaction[ 'Reactants' ][0][1], aReaction[ 'Reactants' ][0][0] )
+                theLeftSide = "%s x [%s]" % ( int( aReaction[ 'Reactants' ][0][ 'Stoichiometry' ] * aReaction[ 'CommonDemoninator' ] ), aReaction[ 'Reactants' ][0][ self.Model.keys[ 'ID' ] ] )
 
             for aSubstrate in aReaction[ 'Reactants' ][1:]:
-                if ( aSubstrate[1] == 1.0 ):
-                    theLeftSide += " + [%s]" % aSubstrate[0]
+                if ( aSubstrate[ 'Stoichiometry' ] == 1.0 ):
+                    theLeftSide += " + [%s]" % aSubstrate[ self.Model.keys[ 'ID' ] ]
                 else:
-                    theLeftSide += " + %s x [%s]" % ( aSubstrate[1], aSubstrate[0] )
+                    theLeftSide += " + %s x [%s]" % ( int( aSubstrate[ 'Stoichiometry' ] * aReaction[ 'CommonDemoninator' ] ), aSubstrate[ self.Model.keys[ 'ID' ] ] )
 
             theLeftSide += " "
 
@@ -885,16 +908,16 @@ class SBML_Reaction( SBML_Base ):
 
         # Right side (reactant terms)
         if ( len( aReaction[ 'Products' ] ) > 0 ):
-            if ( aReaction[ 'Products' ][0][1] == 1.0 ):
-                theRightSide = "[%s]" % aReaction[ 'Products' ][0][0]
+            if ( aReaction[ 'Products' ][0][ 'Stoichiometry' ] == 1.0 ):
+                theRightSide = "[%s]" % aReaction[ 'Products' ][0][ self.Model.keys[ 'ID' ] ]
             else:
-                theRightSide = "%s x [%s]" % ( aReaction[ 'Products' ][0][1], aReaction[ 'Products' ][0][0] )
+                theRightSide = "%s x [%s]" % ( int( aReaction[ 'Products' ][0][ 'Stoichiometry' ] * aReaction[ 'CommonDemoninator' ] ), aReaction[ 'Products' ][0][ self.Model.keys[ 'ID' ] ] )
 
             for aProduct in aReaction[ 'Products' ][1:]:
-                if ( aProduct[1] == 1.0 ):
-                    theRightSide += " + [%s]" % aProduct[0]
+                if ( aProduct[ 'Stoichiometry' ] == 1.0 ):
+                    theRightSide += " + [%s]" % aProduct[ self.Model.keys[ 'ID' ] ]
                 else:
-                    theRightSide += " + %s x [%s]" % ( aProduct[1], aProduct[0] )
+                    theRightSide += " + %s x [%s]" % ( int( aProduct[ 'Stoichiometry' ] * aReaction[ 'CommonDemoninator' ] ), aProduct[ self.Model.keys[ 'ID' ] ] )
 
         else:
             theRightSide = ""
@@ -914,9 +937,6 @@ class SBML_Reaction( SBML_Base ):
 
 
     # =========================================================
-
-
-
 
 
 # --------------------------------
@@ -1082,8 +1102,8 @@ class SBML_Event( SBML_Base ):
 
     # =========================================================
 
-    def convertFormula( self, aFormula, aLocalParameterList = [] ):
-        return SBML_Base.convertFormula( self, aFormula, self.Model, aLocalParameterList )
+    def convertFormula( self, aFormula, aLocalParameterList = [], aDenominator = 1.0 ):
+        return SBML_Base.convertFormula( self, aFormula, self.Model, aLocalParameterList, aDenominator )
 
 
     # =========================================================

@@ -26,6 +26,7 @@
 #END_HEADER
 import libsbml
 import math, sys, re
+import decimal, fractions
 
 #---Other functions are using this 'sub'funtion in this file.---
 def sub( fun , indata ):
@@ -297,77 +298,63 @@ def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
             aReversible = aReaction.getReversible()
             aFast = aReaction.getFast()
 
+            if( aSBMLDocument.getLevel() == 1 ):
+                anIDString = 'Name'
+            else:
+                anIDString = 'Id'
 
             ListOfReactants = []
             if aReaction.getReactant(0):
                 NumReactant = aReaction.getNumReactants()
                 for NumR in range( NumReactant ):
-                    ListOfReactant = []
+                    aReactantDic = {}
 
                     aSpeciesReference= aReaction.getReactant( NumR )
 
                     aSpecies_R = aSpeciesReference.getSpecies()
                     aStoichiometry_R = aSpeciesReference.getStoichiometry()
 
-                    aString_R = []
+                    aStoichiometryMath_R = []
                     if aSpeciesReference.isSetStoichiometryMath():
                         aNode_R = aSpeciesReference.getStoichiometryMath()
                         if aNode_R.isSetMath():
-                            aString_R = postprocessMathString( libsbml.formulaToString( preprocessMathTree( aNode_R.getMath(), timeSymbol ) ), timeSymbol )
+                            aStoichiometryMath_R = postprocessMathString( libsbml.formulaToString( preprocessMathTree( aNode_R.getMath(), timeSymbol ) ), timeSymbol )
 
                     aDenominator_R = aSpeciesReference.getDenominator()
 
-                    ListOfReactant.append( aSpecies_R )
+                    aReactantDic[ anIDString ]          = aSpecies_R
+                    aReactantDic[ 'Stoichiometry' ]     = aStoichiometry_R
+                    aReactantDic[ 'StoichiometryMath' ] = aStoichiometryMath_R
+                    aReactantDic[ 'Denominator' ]       = aDenominator_R
 
-                    if aStoichiometry_R == [] and aString_R == []:
-                        ListOfReactant.append( aStoichiometry_R )
-                    elif aStoichiometry_R != [] and aString_R == []:
-                        ListOfReactant.append( aStoichiometry_R )
-                    elif aStoichiometry_R == [] and aString_R != []:
-                        ListOfReactant.append( aString_R )
-                    elif aStoichiometry_R != [] and aString_R != []:
-                        ListOfReactant.append( aStoichiometry_R )
-                        ListOfReactant.append( aString_R )
-
-                    ListOfReactant.append( aDenominator_R )
-
-                    ListOfReactants.append( ListOfReactant )
+                    ListOfReactants.append( aReactantDic )
 
 
             ListOfProducts = []
             if aReaction.getProduct(0):
                 NumProduct = aReaction.getNumProducts()
                 for NumP in range( NumProduct ):
-                    ListOfProduct = []
+                    aProductDic = {}
 
                     aSpeciesReference = aReaction.getProduct( NumP )
 
                     aSpecies_P = aSpeciesReference.getSpecies()
                     aStoichiometry_P = aSpeciesReference.getStoichiometry()
 
-                    aString_P = []
+                    aStoichiometryMath_P = []
                     if aSpeciesReference.isSetStoichiometryMath():
                         aNode_P = aSpeciesReference.getStoichiometryMath()
                         if aNode_P.isSetMath():
-                            aString_P = postprocessMathString( libsbml.formulaToString( preprocessMathTree( aNode_P.getMath(), timeSymbol ) ), timeSymbol )
+                            aStoichiometryMath_P = postprocessMathString( libsbml.formulaToString( preprocessMathTree( aNode_P.getMath(), timeSymbol ) ), timeSymbol )
 
                     aDenominator_P = aSpeciesReference.getDenominator()
 
-                    ListOfProduct.append( aSpecies_P )
+                    aProductDic[ anIDString ]          = aSpecies_P
+                    aProductDic[ 'Stoichiometry' ]     = aStoichiometry_P
+                    aProductDic[ 'StoichiometryMath' ] = aStoichiometryMath_P
+                    aProductDic[ 'Denominator' ]       = aDenominator_P
 
-                    if aStoichiometry_P == [] and aString_P == []:
-                        ListOfProduct.append( aStoichiometry_P )
-                    elif aStoichiometry_P != [] and aString_P == []:
-                        ListOfProduct.append( aStoichiometry_P )
-                    elif aStoichiometry_P == [] and aString_P != []:
-                        ListOfProduct.append( aString_P )
-                    elif aStoichiometry_P != [] and aString_P != []:
-                        ListOfProduct.append( aStoichiometry_P )
-                        ListOfProduct.append( aString_P )
-
-                    ListOfProduct.append( aDenominator_P )
-
-                    ListOfProducts.append( ListOfProduct )
+                    ListOfProducts.append( aProductDic )
 
 
             ListOfModifiers = []
@@ -379,14 +366,17 @@ def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
                     aSpecies_M = aSpeciesReference.getSpecies()
                     ListOfModifiers.append( aSpecies_M )
 
-            aReactionDic[ 'Id' ]         =  anId 
-            aReactionDic[ 'Name' ]       =  aName 
-            aReactionDic[ 'KineticLaw' ] =  aKineticLawDic 
-            aReactionDic[ 'Reversible' ] =  aReversible 
-            aReactionDic[ 'Fast' ]       =  aFast 
-            aReactionDic[ 'Reactants' ]  =  ListOfReactants 
-            aReactionDic[ 'Products' ]   =  ListOfProducts 
-            aReactionDic[ 'Modifiers' ]  =  ListOfModifiers 
+            aReactionDic[ 'Id' ]                 =  anId 
+            aReactionDic[ 'Name' ]               =  aName 
+            aReactionDic[ 'KineticLaw' ]         =  aKineticLawDic 
+            aReactionDic[ 'Reversible' ]         =  aReversible 
+            aReactionDic[ 'Fast' ]               =  aFast 
+            aReactionDic[ 'Reactants' ]          =  ListOfReactants 
+            aReactionDic[ 'Products' ]           =  ListOfProducts 
+            aReactionDic[ 'Modifiers' ]          =  ListOfModifiers 
+            
+            aReactionDic[ 'CommonDemoninator' ]  =  getCommonDenominator( aReactionDic )
+            
             LIST.append( aReactionDic )
 
     return LIST
@@ -546,6 +536,39 @@ def getUnitDefinition( aSBMLmodel ):
 
     return LIST
 
+
+# --------------------------------------------------
+#  Get a common denominator of a reaction
+# --------------------------------------------------
+
+def getCommonDenominator( aReaction ):
+
+    coefficientList = []
+    
+    for aReactant in aReaction[ 'Reactants' ]:
+        if aReactant[ 'Stoichiometry' ] != 0:
+            coefficientList.append( fractions.Fraction( decimal.Decimal.from_float( aReactant[ 'Stoichiometry' ] )))
+    
+    for aProduct in aReaction[ 'Products' ]:
+        if aProduct[ 'Stoichiometry' ] != 0:
+            coefficientList.append( fractions.Fraction( decimal.Decimal.from_float( aProduct[ 'Stoichiometry' ] )))
+
+    denominatorList = []
+    
+    for aCoefficient in coefficientList:
+        denominatorList.append( aCoefficient.denominator )
+
+    aGCD = decimal.Decimal( 1 )
+    aLCM = decimal.Decimal( 1 )
+
+    for aCoefficient in coefficientList:
+        aGCD = fractions.gcd( aGCD, aCoefficient.denominator )
+        aLCM = aLCM * aCoefficient.denominator / aGCD
+
+#    print 'Coefficient: %s' % coefficientList
+#    print 'LCM: %s' % aLCM
+
+    return float( aLCM )
 
 
 # --------------------------------------------------
