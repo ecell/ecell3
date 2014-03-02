@@ -204,13 +204,33 @@ class SBML_Base( object ):
 
     # =========================================================
 
-    def convert_SBML_Formula_to_ecell_Expression( self, aFormula, aModel, aLocalParameterList = [], aDenominator = 1.0 ):
+    def convert_SBML_Formula_to_ecell_Expression( self, formula, aModel, aLocalParameterList = [], aDenominator = 1.0 ):
         
-        if aDenominator != 1.0:
-            aFormula = '( 1.0 / %s ) * ( %s )' % ( aDenominator, aFormula )
+        '''## =================================================
+          formula: string or libsbml.ASTNode
+        '''## =================================================
         
-        preprocessedFormula = aFormula.replace( '<t>', aModel.TimeSymbol )
-        aASTRootNode = libsbml.parseFormula( preprocessedFormula )
+        if isinstance( formula, str ):
+            if aDenominator != 1.0:
+                formula = '( 1.0 / %s ) * ( %s )' % ( aDenominator, formula )
+        
+            preprocessedFormula = formula.replace( '<t>', self.Model.TimeSymbol )
+            aASTRootNode = libsbml.parseFormula( preprocessedFormula )
+
+        elif isinstance( formula, libsbml.ASTNode ):
+           if aDenominator != 1.0:
+                aASTRootNode = libsbml.parseFormula( '( 1.0 / %s ) * ( x )' % aDenominator )
+                aASTRootNode.removeChild( 1 )
+                aASTRootNode.addChild( formula.deepCopy() )
+           else:
+               aASTRootNode = formula
+
+        else:
+            raise Exception,"DEBUG : Formula must be str or libsbml.ASTNode instance."
+
+##        dump_tree_construction_of_AST_node( aASTRootNode )
+
+        aASTRootNode = preprocess_math_tree( aASTRootNode, aModel.TimeSymbol )
 
         convertedAST = self._convert_SBML_variable_to_ecell_Expression( aASTRootNode, aLocalParameterList )
 
@@ -283,6 +303,14 @@ class SBML_Model( SBML_Base ):
         self.SpeciesList = get_Species_list( aSBMLmodel, self.DerivedValueDic )
         self.UnitDefinitionList = get_UnitDefinition_list( aSBMLmodel )
 
+        self.EntityDic = {
+            libsbml.SBML_SPECIES     : self.SpeciesList,
+            libsbml.SBML_PARAMETER   : self.ParameterList,
+            libsbml.SBML_REACTION    : self.ReactionList,
+            libsbml.SBML_COMPARTMENT : self.CompartmentList,
+            libsbml.SBML_EVENT       : self.EventList
+        }
+
         self.set_FunctionDefinition_to_dict()
 
     # =========================================================
@@ -322,15 +350,7 @@ class SBML_Model( SBML_Base ):
 
     def get_Entity_by_ID( self, anID ):
 
-        theEntityDic = {
-            libsbml.SBML_SPECIES     : self.SpeciesList,
-            libsbml.SBML_PARAMETER   : self.ParameterList,
-            libsbml.SBML_REACTION    : self.ReactionList,
-            libsbml.SBML_COMPARTMENT : self.CompartmentList,
-            libsbml.SBML_EVENT       : self.EventList
-        }
-        
-        for ( anEntityType, anEntityList ) in theEntityDic.items():
+        for ( anEntityType, anEntityList ) in self.EntityDic.items():
         
             hit = filter( 
                 lambda anElement: anElement[ self.keys[ 'ID' ] ] == anID,
@@ -387,7 +407,7 @@ class SBML_Model( SBML_Base ):
 
             for aFunctionDefinition in ( self.FunctionDefinitionList ):
                 
-                self.FunctionDefinition[ aFunctionDefinition.get_ID() ] = aFunctionDefinition[ 'Formula' ]
+                self.FunctionDefinition[ aFunctionDefinition.get_ID() ] = aFunctionDefinition[ 'Math' ]
             
 
     # =========================================================
@@ -688,8 +708,8 @@ class SBML_Rule( SBML_Base ):
 
     # =========================================================
 
-    def convert_SBML_Formula_to_ecell_Expression( self, aFormula, aLocalParameterList = [], aDenominator = 1.0 ):
-        return SBML_Base.convert_SBML_Formula_to_ecell_Expression( self, aFormula, self.Model, aLocalParameterList, aDenominator )
+    def convert_SBML_Formula_to_ecell_Expression( self, formula, aLocalParameterList = [], aDenominator = 1.0 ):
+        return SBML_Base.convert_SBML_Formula_to_ecell_Expression( self, formula, self.Model, aLocalParameterList, aDenominator )
 
 
     # =========================================================
@@ -796,7 +816,7 @@ class SBML_Reaction( SBML_Base ):
                 variableName = ''
 
                 for aSpecies in self.Model.SpeciesList:
-                    if ( aSpecies[ 'Id' ] == aName or aSpecies[ 'Name' ] == aName):
+                    if aSpecies[ self.Model.keys[ 'ID' ] ] == aName:
 
                         for aVariableReference in self.VariableReferenceList:
                             if aVariableReference[1].split(':')[2] == aName:
@@ -826,8 +846,7 @@ class SBML_Reaction( SBML_Base ):
 
 ##                if variableName == '':
                 for aParameter in self.Model.ParameterList:
-                    if ( aParameter[ 'Id' ] == aName or
-                         aParameter[ 'Name' ] == aName ):
+                    if aParameter[ self.Model.keys[ 'ID' ] ] == aName:
 
                         for aVariableReference in self.VariableReferenceList:
                             if aVariableReference[1].split(':')[2] == aName:
@@ -863,8 +882,8 @@ class SBML_Reaction( SBML_Base ):
 
     # =========================================================
 
-    def convert_SBML_Formula_to_ecell_Expression( self, aFormula, aLocalParameterList = [], aDenominator = 1.0 ):
-        return SBML_Base.convert_SBML_Formula_to_ecell_Expression( self, aFormula, self.Model, aLocalParameterList, aDenominator )
+    def convert_SBML_Formula_to_ecell_Expression( self, formula, aLocalParameterList = [], aDenominator = 1.0 ):
+        return SBML_Base.convert_SBML_Formula_to_ecell_Expression( self, formula, self.Model, aLocalParameterList, aDenominator )
 
 
     # =========================================================
@@ -1081,8 +1100,8 @@ class SBML_Event( SBML_Base ):
 
     # =========================================================
 
-    def convert_SBML_Formula_to_ecell_Expression( self, aFormula, aLocalParameterList = [], aDenominator = 1.0 ):
-        return SBML_Base.convert_SBML_Formula_to_ecell_Expression( self, aFormula, self.Model, aLocalParameterList, aDenominator )
+    def convert_SBML_Formula_to_ecell_Expression( self, formula, aLocalParameterList = [], aDenominator = 1.0 ):
+        return SBML_Base.convert_SBML_Formula_to_ecell_Expression( self, formula, self.Model, aLocalParameterList, aDenominator )
 
 
     # =========================================================

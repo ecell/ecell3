@@ -103,24 +103,22 @@ def get_Event_list( aSBMLmodel, timeSymbol ):
             
             anEvent = aSBMLmodel.getEvent( Num_Ev )
             
-            anId_Ev = anEvent.getId()
-            aName_Ev = anEvent.getName()
-            aString_Ev_Tr = ''
-            aString_Ev_De = ''
+            aEventDic[ 'Id' ]   = anEvent.getId()
+            aEventDic[ 'Name' ] = anEvent.getName()
 
             aNode_Ev_Tr = anEvent.getTrigger()
             if aNode_Ev_Tr is not None and aNode_Ev_Tr.isSetMath():
-##                print "Event Trigger Math: " + str( _dump_tree_construction_of_AST_node( preprocess_math_tree( aNode_Ev_Tr.getMath(), timeSymbol ) ) )
-                aString_Ev_Tr = sub( libsbml.formulaToString,
-                    preprocess_math_tree( aNode_Ev_Tr.getMath(), timeSymbol ) )
-##                print "    String  : " + str( libsbml.formulaToString( preprocess_math_tree( aNode_Ev_Tr.getMath(), timeSymbol ) ) )
+                aEventDic[ 'Trigger' ] = aNode_Ev_Tr.getMath()
+            else:
+                aEventDic[ 'Trigger' ] = None
 
             aNode_Ev_De = anEvent.getDelay()
             if aNode_Ev_De is not None and aNode_Ev_De.isSetMath():
-                aString_Ev_De = sub( libsbml.formulaToString,
-                    preprocess_math_tree( aNode_Ev_Tr.getMath(), timeSymbol ) )
+                aEventDic[ 'Delay' ] = aNode_Ev_De.getMath()
+            else:
+                aEventDic[ 'Delay' ] = libsbml.parseFormula( '0.0' )
 
-            aTimeUnit_Ev = anEvent.getTimeUnits()
+            aEventDic[ 'Unit' ] = anEvent.getTimeUnits()
             
             ListOfEventAssignments = []
             if anEvent.getEventAssignment(0):
@@ -130,23 +128,13 @@ def get_Event_list( aSBMLmodel, timeSymbol ):
                     
                     anEventAssignment = anEvent.getEventAssignment( Num_Ev_As )
                     
-                    aVariable_Ev_As = anEventAssignment.getVariable()
-                    aString_Ev_As = ''
+                    anEventAssignmentDic[ 'Variable' ] = anEventAssignment.getVariable()
 
                     if anEventAssignment.isSetMath():
-                        aString_Ev_As = sub( libsbml.formulaToString,
-                                preprocess_math_tree( anEventAssignment.getMath(), timeSymbol ) )
+                        anEventAssignmentDic[ 'Math' ]     = anEventAssignment.getMath()
 
-                    anEventAssignmentDic[ 'Variable' ] = aVariable_Ev_As
-                    anEventAssignmentDic[ 'String' ]   = postprocess_math_string( aString_Ev_As, timeSymbol )
-                    
                     ListOfEventAssignments.append( anEventAssignmentDic )
 
-            aEventDic[ 'Id' ]               =  anId_Ev 
-            aEventDic[ 'Name' ]             =  aName_Ev 
-            aEventDic[ 'Trigger' ]          =  postprocess_math_string( aString_Ev_Tr, timeSymbol ) 
-            aEventDic[ 'Delay' ]            =  postprocess_math_string( aString_Ev_De, timeSymbol ) 
-            aEventDic[ 'Unit' ]             =  aTimeUnit_Ev 
             aEventDic[ 'EventAssignments' ] =  ListOfEventAssignments 
             
             LIST.append( aEventDic )
@@ -155,7 +143,7 @@ def get_Event_list( aSBMLmodel, timeSymbol ):
 
 
 def get_FunctionDefinition_list( aSBMLmodel, timeSymbol ):
-    " [[ Id , Name , String ]] "
+    " [[ Id , Name , Math, Formula ]] "
     LIST = []
     if aSBMLmodel.getFunctionDefinition(0):
         NumFunctionDefinition = aSBMLmodel.getNumFunctionDefinitions()
@@ -164,17 +152,15 @@ def get_FunctionDefinition_list( aSBMLmodel, timeSymbol ):
 
             aFunctionDefinition = aSBMLmodel.getFunctionDefinition( Num_FD )
 
-            anId_FD = aFunctionDefinition.getId()
-            aName_FD = aFunctionDefinition.getName()
-            aString_FD = ''
+            aFunctionDefinitionDic[ 'Id' ]   = aFunctionDefinition.getId()
+            aFunctionDefinitionDic[ 'Name' ] = aFunctionDefinition.getName()
 
             if aFunctionDefinition.isSetMath():
-                aString_FD = sub( libsbml.formulaToString,
-                    preprocess_math_tree( aFunctionDefinition.getMath(), timeSymbol ) )
-
-            aFunctionDefinitionDic[ 'Id' ]      =  anId_FD 
-            aFunctionDefinitionDic[ 'Name' ]    =  aName_FD 
-            aFunctionDefinitionDic[ 'Formula' ] =  postprocess_math_string( aString_FD, timeSymbol ) 
+                aFunctionDefinitionDic[ 'Math' ]    = aFunctionDefinition.getMath()
+                aFunctionDefinitionDic[ 'Formula' ] = math_to_string( aFunctionDefinitionDic[ 'Math' ], timeSymbol )
+            else:
+                aFunctionDefinitionDic[ 'Math' ]    = None
+                aFunctionDefinitionDic[ 'Formula' ] = None
 
             LIST.append( aFunctionDefinitionDic )
 
@@ -246,28 +232,19 @@ def get_Reaction_list( aSBMLmodel, aSBMLDocument, timeSymbol ):
                 #            anASTNode = libsbml.ASTNode()
                 if aKineticLaw != []:
 
-                    if aKineticLaw.isSetFormula():
-                        aFormula_KL = postprocess_math_string( libsbml.formulaToString( preprocess_math_tree( aKineticLaw.getMath(), timeSymbol ) ), timeSymbol )
-                        aDiscontinuity_KL = is_discontinuous( aKineticLaw.getMath() )
-                    else:
-                        aFormula_KL = ''
-                        aDiscontinuity_KL = False
-                  
-                    aMath = []
-                    if( aSBMLDocument.getLevel() == 1 ):
-                        aMath.append( '' )
-                    else:
-                        if aKineticLaw.isSetMath():
-                            aMath.append(
-                                postprocess_math_string( libsbml.formulaToString( preprocess_math_tree( aKineticLaw.getMath(), timeSymbol ) ), timeSymbol )
-                                )
-                        else:
-                            aMath.append( '' )
+                    ## aRuleDic[ 'Formula' ], aRuleDic[ 'Math' ], aRuleDic[ 'isDiscontinuous' ]
 
-                    aString_KL = aMath
-                    
-                    aTimeUnit_KL = aKineticLaw.getTimeUnits()
-                    aSubstanceUnit_KL = aKineticLaw.getSubstanceUnits()
+                    if aKineticLaw.isSetFormula():
+                        aKineticLawDic[ 'Math' ]            = aKineticLaw.getMath()
+                        aKineticLawDic[ 'Formula' ]         = math_to_string( aKineticLawDic[ 'Math' ], timeSymbol )
+                        aKineticLawDic[ 'isDiscontinuous' ] = is_discontinuous( aKineticLawDic[ 'Math' ] )
+                    else:
+                        aKineticLawDic[ 'Math' ]            = None
+                        aKineticLawDic[ 'Formula' ]         = None
+                        aKineticLawDic[ 'isDiscontinuous' ] = False
+
+                    aKineticLawDic[ 'TimeUnit' ]      = aKineticLaw.getTimeUnits()
+                    aKineticLawDic[ 'SubstanceUnit' ] = aKineticLaw.getSubstanceUnits()
             
                     if aKineticLaw.getParameter(0):
                         ListOfParameters = []
@@ -288,19 +265,17 @@ def get_Reaction_list( aSBMLmodel, aSBMLDocument, timeSymbol ):
                             aParameterDic[ 'Unit' ]     =  aUnit_KL_P 
                             aParameterDic[ 'Constant' ] =  aConstant_KL_P 
 
+##                            print 'Type( Math )    = %s' % type( aKineticLawDic[ 'Math' ] )
+##                            print 'Type( Formula ) = %s' % type( aKineticLawDic[ 'Formula' ] )
+
                             ListOfParameters.append( aParameterDic )
                     else:
                         ListOfParameters = []
 
                     anExpressionAnnotation = aKineticLaw.getAnnotation()
 
-                    aKineticLawDic[ 'Formula' ]              = aFormula_KL
-                    aKineticLawDic[ 'String' ]               = aString_KL
-                    aKineticLawDic[ 'TimeUnit' ]             = aTimeUnit_KL
-                    aKineticLawDic[ 'SubstanceUnit' ]        = aSubstanceUnit_KL
                     aKineticLawDic[ 'Parameters' ]           = ListOfParameters
                     aKineticLawDic[ 'ExpressionAnnotation' ] = anExpressionAnnotation
-                    aKineticLawDic[ 'isDiscontinuous' ]      = aDiscontinuity_KL
 
 #---------------------------------------------------------
 
@@ -324,11 +299,12 @@ def get_Reaction_list( aSBMLmodel, aSBMLDocument, timeSymbol ):
                     aSpecies_R = aSpeciesReference.getSpecies()
                     aStoichiometry_R = aSpeciesReference.getStoichiometry()
 
-                    aStoichiometryMath_R = []
+                    aStoichiometryMath_R = None
                     if aSpeciesReference.isSetStoichiometryMath():
                         aNode_R = aSpeciesReference.getStoichiometryMath()
                         if aNode_R.isSetMath():
-                            aStoichiometryMath_R = postprocess_math_string( libsbml.formulaToString( preprocess_math_tree( aNode_R.getMath(), timeSymbol ) ), timeSymbol )
+##                            aStoichiometryMath_R = postprocess_math_string( libsbml.formulaToString( preprocess_math_tree( aNode_R.getMath(), timeSymbol ) ), timeSymbol )
+                            aStoichiometryMath_R = aNode_R.getMath()
 
                     aDenominator_R = aSpeciesReference.getDenominator()
 
@@ -351,11 +327,12 @@ def get_Reaction_list( aSBMLmodel, aSBMLDocument, timeSymbol ):
                     aSpecies_P = aSpeciesReference.getSpecies()
                     aStoichiometry_P = aSpeciesReference.getStoichiometry()
 
-                    aStoichiometryMath_P = []
+                    aStoichiometryMath_P = None
                     if aSpeciesReference.isSetStoichiometryMath():
                         aNode_P = aSpeciesReference.getStoichiometryMath()
                         if aNode_P.isSetMath():
-                            aStoichiometryMath_P = postprocess_math_string( libsbml.formulaToString( preprocess_math_tree( aNode_P.getMath(), timeSymbol ) ), timeSymbol )
+##                            aStoichiometryMath_P = postprocess_math_string( libsbml.formulaToString( preprocess_math_tree( aNode_P.getMath(), timeSymbol ) ), timeSymbol )
+                            aStoichiometryMath_P = aNode_P.getMath()
 
                     aDenominator_P = aSpeciesReference.getDenominator()
 
@@ -400,46 +377,44 @@ def get_Rule_list( aSBMLmodel, timeSymbol ):
         for Num in range( NumRule ):
             aRuleDic = {}
             aRule = aSBMLmodel.getRule( Num )
-
-            aRuleType = aRule.getTypeCode()
+            
+            ## aRuleDic[ 'Type' ]
+            
+            aRuleDic[ 'Type' ] = aRule.getTypeCode()
+            
+            ## aRuleDic[ 'Formula' ], aRuleDic[ 'Math' ], aRuleDic[ 'isDiscontinuous' ]
             
             if aRule.isSetFormula():
-                aFormula = postprocess_math_string( libsbml.formulaToString( preprocess_math_tree( aRule.getMath(), timeSymbol ) ), timeSymbol )
-                aDiscontinuity = is_discontinuous( aRule.getMath() )
+                aRuleDic[ 'Math' ] = aRule.getMath()
+                aRuleDic[ 'Formula' ]         = math_to_string( aRuleDic[ 'Math' ], timeSymbol )
+                aRuleDic[ 'isDiscontinuous' ] = is_discontinuous( aRuleDic[ 'Math' ] )
 
             else:
-                aFormula = ''
-                aDiscontinuity = False
+                aKineticLawDic[ 'Math' ] = None
+                aRuleDic[ 'Formula' ] = None
+                aRuleDic[ 'isDiscontinuous' ] = False
+            
+            ## aRuleDic[ 'Variable' ]
+            
+            if ( aRuleDic[ 'Type' ] == libsbml.SBML_ALGEBRAIC_RULE ):
+                aRuleDic[ 'Variable' ] = ''
 
-            if ( aRuleType == libsbml.SBML_ALGEBRAIC_RULE ):
+            elif ( aRuleDic[ 'Type' ] in ( libsbml.SBML_ASSIGNMENT_RULE, libsbml.SBML_RATE_RULE )):
+                aRuleDic[ 'Variable' ] = aRule.getVariable()
 
-                aVariable = ''
+            elif ( aRuleDic[ 'Type' ] == libsbml.SBML_SPECIES_CONCENTRATION_RULE ):
+                aRuleDic[ 'Variable' ] = aRule.getSpecies()
 
-            elif ( aRuleType == libsbml.SBML_ASSIGNMENT_RULE or
-                   aRuleType == libsbml.SBML_RATE_RULE ):
-                
-                aVariable = aRule.getVariable()
+            elif( aRuleDic[ 'Type' ] == libsbml.SBML_COMPARTMENT_VOLUME_RULE ):
+                aRuleDic[ 'Variable' ] = aRule.getCompartment()
 
-            elif ( aRuleType == libsbml.SBML_SPECIES_CONCENTRATION_RULE ):
-
-                aVariable = aRule.getSpecies()
-
-            elif( aRuleType == libsbml.SBML_COMPARTMENT_VOLUME_RULE ):
-                    
-                aVariable = aRule.getCompartment()
-
-            elif( aRuleType == libsbml.SBML_PARAMETER_RULE ):
-
-                aVariable = aRule.getName()
+            elif( aRuleDic[ 'Type' ] == libsbml.SBML_PARAMETER_RULE ):
+                aRuleDic[ 'Variable' ] = aRule.getName()
                 
             else:
                 raise TypeError, " The type of Rule must be Algebraic, Assignment or Rate Rule"
 
-            aRuleDic[ 'Type' ]            =  aRuleType 
-            aRuleDic[ 'Formula' ]         =  aFormula 
-            aRuleDic[ 'Variable' ]        =  aVariable 
-            aRuleDic[ 'hasDelay' ]        =  aVariable 
-            aRuleDic[ 'isDiscontinuous' ] =  aDiscontinuity
+##            aRuleDic[ 'hasDelay' ]
 
             LIST.append( aRuleDic )
 
@@ -649,7 +624,13 @@ def postprocess_math_string( aFormula, timeSymbol ):
     aFormula = re.sub( r"(\W)%s$" % timeSymbol, r'\1<t>', aFormula )
     aFormula = re.sub( r"^%s$" % timeSymbol, r'<t>', aFormula )
 
+##    print 'Formula: %s' % aFormula
+
     return aFormula
+
+
+def math_to_string( AST_node, time_symbol ):
+    return postprocess_math_string( libsbml.formulaToString( preprocess_math_tree( AST_node, time_symbol ) ), time_symbol )
 
 # --------------------------------------------------
 #  Computation of Initial Value
@@ -672,7 +653,7 @@ def get_initial_value_from_AssignmentRule( aSBMLmodel, aVariableID, DerivedValue
 ##    print "\nAssignmentRule for %s" % aVariableID
 ##    print "  %s\n" % postprocess_math_string( libsbml.formulaToString( preprocess_math_tree( anAssignmentRule.getMath(), get_TimeSymbol( aSBMLmodel ) ) ), get_TimeSymbol( aSBMLmodel ) )
 ##    print "Initial Construction:\n"
-##    _dump_tree_construction_of_AST_node( aFormulaTree )
+##    dump_tree_construction_of_AST_node( aFormulaTree )
 ##    print '\n'
 
     aCounter = 1
@@ -683,10 +664,10 @@ def get_initial_value_from_AssignmentRule( aSBMLmodel, aVariableID, DerivedValue
 ##            print 'Initial Value: %s = %f' % ( aVariableID, aSBMLmodel.getElementBySId( aVariableID ).getValue() )
 
 ##    print "Name replaced with value:\n"
-##    _dump_tree_construction_of_AST_node( aFormulaTree )
+##    dump_tree_construction_of_AST_node( aFormulaTree )
 ##    print '\n'
 
-##    _dump_tree_construction_of_AST_node( aFormulaTree )
+##    dump_tree_construction_of_AST_node( aFormulaTree )
 
     while ( aFormulaTree.getNumChildren() > 0 ):
         _calc_AST_node_value( aFormulaTree )
@@ -1058,7 +1039,7 @@ def _calc_AST_node_value( aNode ):
 
         elif ( aNodeType == libsbml.AST_FUNCTION_PIECEWISE ):
 ##            print "\nCulc AST_FUNCTION_PIECEWISE:"
-##            _dump_tree_construction_of_AST_node( aNode )
+##            dump_tree_construction_of_AST_node( aNode )
 ##
 ##            print "  #Children = %d" % aNode.getNumChildren()
             for i in range( aNode.getNumChildren() / 2 ):
@@ -1115,7 +1096,7 @@ def _remove_all_Children( aNode ):
 #  Output the Construction of Math Tree (ASTNode)
 # --------------------------------------------------
 
-def _dump_tree_construction_of_AST_node( aNode ):
+def dump_tree_construction_of_AST_node( aNode ):
 
 ##    print aNode.getType()
 
@@ -1249,6 +1230,6 @@ def _dump_tree_construction_of_AST_node( aNode ):
         print "  AST_UNKNOWN"
 
     for i in range( aNode.getNumChildren() ):
-        _dump_tree_construction_of_AST_node( aNode.getChild( i ) )
+        dump_tree_construction_of_AST_node( aNode.getChild( i ) )
 
 

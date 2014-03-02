@@ -327,7 +327,7 @@ def set_Rules( theRule, anEml, StepperIDs ):
                 " The type of Rule must be Algebraic, Assignment or Rate Rule"
 
         # convert SBML formula  to E-Cell formula
-        convertedFormula = [ str( theRule.convert_SBML_Formula_to_ecell_Expression( aRule[ 'Formula' ] ) ) ]
+        convertedFormula = [ str( theRule.convert_SBML_Formula_to_ecell_Expression( aRule[ 'Math' ] ) ) ]
 
         # set Expression Property
         anEml.setEntityProperty( aSystemFullID,
@@ -387,11 +387,11 @@ def set_Reactions( theReaction, anEml, StepperIDs ):
             # --------------------------
         
             # convert SBML format formula to E-Cell format formula
-            if( aReaction[ 'KineticLaw' ][ 'Formula' ] != '' ):
+            if( aReaction[ 'KineticLaw' ][ 'Math' ] != None ):
 ##                print "Kinetic Law: %s" % aReaction[ 'KineticLaw' ]
                 anExpression =\
                 [ str( theReaction.convert_SBML_Formula_to_ecell_Expression( 
-                    aReaction[ 'KineticLaw' ][ 'Formula' ],
+                    aReaction[ 'KineticLaw' ][ 'Math' ],
                     aReaction[ 'KineticLaw' ][ 'Parameters' ],
                     aReaction[ 'CommonDemoninator' ] ) ) ]
 
@@ -450,7 +450,7 @@ def set_Events( theEvent, anEml, StepperIDs ):
             
             aConvertedEventAssignment = []
             aConvertedEventAssignment.append( anEventAssignment[ 'Variable' ] )
-            aConvertedEventAssignment.append( str( theEvent.convert_SBML_Formula_to_ecell_Expression( anEventAssignment[ 'String' ] )))
+            aConvertedEventAssignment.append( str( theEvent.convert_SBML_Formula_to_ecell_Expression( anEventAssignment[ 'Math' ] )))
             theEventAssignmentList.append( aConvertedEventAssignment )
 
         # convert Trigger
@@ -512,7 +512,7 @@ def _update_VariableReferenceList_by_reactants_list( theReaction, aReactionID, a
             _aReactingSpecies = {
                 theReaction.Model.keys[ 'ID' ] : aReactingSpecies,
                 'Stoichiometry'                : 0,
-                'StoichiometryMath'            : [],
+                'StoichiometryMath'            : None,
                 'Denominator'                  : 1 }
         else:
             raise Exception,"DEBUG : Unexpected instance during converting Reaction"
@@ -520,7 +520,7 @@ def _update_VariableReferenceList_by_reactants_list( theReaction, aReactionID, a
         if ( _aReactingSpecies[ 'Denominator' ] != 1 ):     # ReactantDenominator
             raise Exception,"Stoichiometry Error : E-Cell System can't set a floating Stoichiometry"
         
-        elif ( _aReactingSpecies[ 'StoichiometryMath' ] != [] ):
+        elif ( _aReactingSpecies[ 'StoichiometryMath' ] != None ):
             raise Exception,"At present, StoichiometryMath is not supported. ( Reaction ID: %s, Reactant ID: %s, StoichiometryMath: %s )" % ( aReactionID, _aReactingSpecies[ theReaction.Model.keys[ 'ID' ] ], _aReactingSpecies[ 'StoichiometryMath' ] )
         
         _aReactingSpeciesEntity = theReaction.Model.get_Entity_by_ID( _aReactingSpecies[ theReaction.Model.keys[ 'ID' ] ] )
