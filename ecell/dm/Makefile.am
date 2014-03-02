@@ -23,6 +23,7 @@ DMS = \
 	ESSYNSStepper.cpp \
 	ExpressionAlgebraicProcess.cpp \
 	ExpressionAssignmentProcess.cpp \
+	ExpressionEventProcess.cpp \
 	ExpressionFluxProcess.cpp \
 	FixedDAE1Stepper.cpp \
 	FixedODE1Stepper.cpp \
@@ -46,6 +47,7 @@ DMH = \
 	ESSYNSProcessInterface.hpp \
 	PythonProcessBase.hpp \
 	ExpressionProcessBase.hpp \
+	SingleExpressionProcessBase.hpp \
 	GillespieProcess.hpp \
 	GillespieProcessInterface.hpp \
 	QuasiDynamicFluxProcess.hpp \
@@ -73,7 +75,8 @@ SOS = \
 	QuasiDynamicFluxProcess$(LTDL_SHLIB_EXT) \
 	ExpressionFluxProcess$(LTDL_SHLIB_EXT) \
 	ExpressionAlgebraicProcess$(LTDL_SHLIB_EXT) \
-	ExpressionAssignmentProcess$(LTDL_SHLIB_EXT)
+	ExpressionAssignmentProcess$(LTDL_SHLIB_EXT) \
+	ExpressionEventProcess$(LTDL_SHLIB_EXT)
 
 if HAVE_PYTHON_LIB
 SOS += \

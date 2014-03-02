@@ -7,9 +7,9 @@ This program is part of E-Cell Simulation Environment Version 3.
 """
 
 __program__ = 'ecell3-eml2em'
-__version__ = '0.1'
-__author__ = 'Kentarou Takahashi and Koichi Takahashi <shafi@e-cell.org>'
-__copyright__ = 'Copyright (C) 2002-2009 Keio University'
+__version__ = '1.0'
+__author__ = 'Kentarou Takahashi, Yasuhiro Naito and Koichi Takahashi <shafi@e-cell.org>'
+__copyright__ = 'Copyright (C) 2002-2014 Keio University'
 __license__ = 'GPL'
 
 
@@ -27,8 +27,10 @@ from ecell.eml import *
 
 # taken from emllib.
 NumberPattern = r'^[+-]?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?$'
-UnquoteStringPattern = r'^[a-zA-Z_/\:][\w\:/\.]*$'
-QuoteRe = re.compile( NumberPattern + '|' + UnquoteStringPattern )
+##UnquoteStringPattern = r'^[a-zA-Z_/\:][\w\:/\.]*$'
+UnquoteStringPattern = r'^[a-zA-Z_]\w*$'
+FullIDorFullPNStringPattern = r'^(Variable|Process|System|Stepper)?\:[\/\.][\w_\/\.]*(\:[a-zA-Z_][\w_]*){1,2}$'
+QuoteRe = re.compile( '%s|%s|%s' % ( NumberPattern, UnquoteStringPattern, FullIDorFullPNStringPattern ))
 
 def expandValueList( aValue, aLevel=0 ):
     aType = type( aValue )
@@ -81,8 +83,13 @@ def createObjectDef( aType, aClass, anArgList, aPropertyList, anOptional='' ):
         for aProperty in aPropertyList:
             aPropertyName = aProperty[0]
             aPropertyValueListString = expandValueList( aProperty[1] )
-            aBuffer += '\t%s\t%s;\n' % ( aPropertyName,
-                                         aPropertyValueListString )
+            if isListString( aPropertyValueListString ):
+                aPropertyValueListString = arrangeListString( aPropertyValueListString )
+                aBuffer += '\t%s\n%s;\n' % ( aPropertyName,
+                                             aPropertyValueListString )
+            else:
+                aBuffer += '\t%s\t%s;\n' % ( aPropertyName,
+                                             aPropertyValueListString )
 #            print aPropertyName
     else:
         aBuffer += '\t# no property\n'
@@ -96,6 +103,40 @@ def createObjectDef( aType, aClass, anArgList, aPropertyList, anOptional='' ):
     aBuffer += '}\n'
     
     return aBuffer
+
+
+def isListString( aString ):
+    if ( aString[ 0 ] == '[' ) and ( aString[ -1 ] == ']' ):
+        return True
+    else:
+        return False
+
+
+def arrangeListString( aTupleString ):
+
+    aValueStringTuple = aTupleString[ 2:-2 ].split( ' ] [ ' )
+
+    aValueTupleList = []
+    for aValueString in aValueStringTuple:
+        aValueTupleList.append( tuple( aValueString.split( ' ' )))
+
+    numElement = len( aValueTupleList[ 0 ] )
+    aMaxLengthList = [ 0 ] * numElement
+
+    for aValue in aValueTupleList:
+        for i in range( numElement ):
+            anElementLength = len( aValue[ i ] )
+            if anElementLength > aMaxLengthList[ i ]:
+                aMaxLengthList[ i ] = anElementLength
+
+    aFormatTemplate = ( '\t\t[ ' + (' '.join( [ '%%#-%us' ] * numElement )) + ' ]\n' ) % tuple( aMaxLengthList )
+##    print aFormatTemplate
+
+    aBuffer = ''
+    for aValue in aValueTupleList:
+##        print aValue
+        aBuffer += aFormatTemplate % aValue
+    return aBuffer[ :-1 ]
 
 
 def createStepperList( anEml ):

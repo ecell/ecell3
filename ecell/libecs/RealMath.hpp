@@ -32,6 +32,9 @@
 #ifndef __REALMATH_HPP
 #define __REALMATH_HPP
 
+#include <vector>
+// #include <iostream>
+
 namespace libecs { namespace math {
 
 /**
@@ -266,6 +269,35 @@ inline T fact( T n )
         return 1;
     else
         return n * fact( n-1 );
+}
+
+template <typename T>
+inline Real piecewise( std::vector<T> p )
+{
+    // std::cout << "Call Piecewise Function:" << std::endl;
+    typename std::vector<T>::reverse_iterator pi = p.rbegin();
+    while ( pi != p.rend() )
+    {
+        // std::cout << "  Value    : " << *pi << std::endl;
+        pi++;
+        // std::cout << "  Condition: " << *pi << std::endl;
+        if ( pi == p.rend() || *pi != 0.0 ) return *(--pi);
+        
+        else if ( ++pi == p.rend() )
+        {
+            THROW_EXCEPTION( UnexpectedError,
+                             "piecewise function couldn't determine suitable subdomain" );
+        }
+    }
+        THROW_EXCEPTION( UnexpectedError,
+                         "piecewise function has no argument." );
+}
+
+template <typename T>
+inline Real delay( T n1, T n2, T n3 )
+{
+    // This method is never used. Just a dummy.
+    return 0.0;
 }
 
 } } // namespace libecs::math

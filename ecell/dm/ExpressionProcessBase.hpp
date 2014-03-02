@@ -28,6 +28,7 @@
 // authors:
 //   Koichi Takahashi
 //   Tatsuya Ishida
+//   Yasuhiro Naito
 //
 // E-Cell Project.
 //
@@ -151,30 +152,15 @@ public:
 
     LIBECS_DM_OBJECT_MIXIN( ExpressionProcessBase, Tmixin_ )
     {
-        PROPERTYSLOT_SET_GET( libecs::String, Expression );
     }
 
-
     ExpressionProcessBase()
-        : theCompiledCode( 0 ), theRecompileFlag( true )
     {
         // ; do nothing
     }
 
     virtual ~ExpressionProcessBase()
     {
-        delete theCompiledCode;
-    }
-
-    SET_METHOD( libecs::String, Expression )
-    {
-        theExpression = value;
-        theRecompileFlag = true;
-    }
-
-    GET_METHOD( libecs::String, Expression )
-    {
-        return theExpression;
     }
 
     void defaultSetProperty( libecs::String const& aPropertyName,
@@ -217,7 +203,7 @@ public:
                 true, true, true, true, true );
     }
 
-    void compileExpression()
+    void compileExpression( libecs::String const& anExpression, const libecs::scripting::Code* & aCompiledCode )
     {
         ErrorReporter anErrorReporter( *static_cast< Tmixin_* >( this ) );
         PropertyAccess aPropertyAccess( *static_cast< Tmixin_* >( this ) );
@@ -227,12 +213,12 @@ public:
                 anErrorReporter, aPropertyAccess, anEntityResolver,
                 aVarRefResolver );
 
-        delete theCompiledCode;
+        delete aCompiledCode;
         // it is possible that compileExpression throws an exception and
-        // "theCompiledCode" remains uninitialized
-        theCompiledCode = 0;
+        // "aCompiledCode" remains uninitialized
+        aCompiledCode = 0;
 
-        theCompiledCode = theCompiler.compileExpression( theExpression );
+        aCompiledCode = theCompiler.compileExpression( anExpression );
     }
 
     PropertyMap const& getPropertyMap() const
@@ -242,18 +228,6 @@ public:
 
     void initialize()
     {
-        if ( theRecompileFlag )
-        {
-            try
-            {
-                compileExpression();
-            }
-            catch ( libecs::Exception const& e )
-            {
-                throw libecs::InitializationFailed( e, static_cast< Tmixin_ * >( this ) );
-            }
-            theRecompileFlag = false;
-        }
     }
 
 protected:
@@ -264,13 +238,6 @@ protected:
     }
 
 protected:
-    libecs::String    theExpression;
-
-    const libecs::scripting::Code* theCompiledCode;
-    libecs::scripting::VirtualMachine theVirtualMachine;
-
-    bool theRecompileFlag;
-
     PropertyMap thePropertyMap;
 };
 

@@ -31,12 +31,12 @@
 // E-Cell Project.
 //
 
-#include "ExpressionProcessBase.hpp"
+#include "SingleExpressionProcessBase.hpp"
 
 USE_LIBECS;
 
 LIBECS_DM_CLASS_MIXIN( ExpressionAlgebraicProcess, Process,
-                       ExpressionProcessBase )
+                       SingleExpressionProcessBase )
 {
 public:
     
@@ -82,6 +82,8 @@ public:
 
     virtual void initialize()
     {
+        theVirtualMachine.setModel( getModel() );
+        
         Process::initialize();
         _LIBECS_MIXIN_CLASS_::initialize();
     }

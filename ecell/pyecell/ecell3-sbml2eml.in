@@ -35,21 +35,22 @@ if __name__ == '__main__':
 %(appname)s -- convert a SBML file to eml file
 
 Usage:
-    %(appname)s [-h] [-f] [-o EMLFILE] infile
+    %(appname)s [-h] [-f] [-o EMLFILE] [-S STEPPER] infile
 
 Options:
     -h or --help             : Print this message.
     -f or --force            : Forcefully overwrite the output file
                                even if it already exists.
     -o or --outfile=EMLFILE  : Specify the output file name. '-' means stdout.
+    -S or --Stepper=STEPPER  : Specify the Stepper name to solve ODE. The default is ODEStepper.
        
 ''' % { 'appname': aProgramName }
 
     # commandline processing
     try:
         opts, args = getopt.getopt(
-            sys.argv[ 1: ], "hfo:",
-            [ "help", "force", "outfile=" ] )
+            sys.argv[ 1: ], "hfo:S:",
+            [ "help", "force", "outfile=", "Stepper=" ] )
 
     except getopt.GetoptError:
         usage()
@@ -57,6 +58,7 @@ Options:
 
     anEmlFileName = None
     aForceFlag = 0
+    aStepperName = "ODEStepper"
 
     for anOption, anArg in opts:
         if anOption in ( "-h", '--help' ):
@@ -68,6 +70,9 @@ Options:
 
         if anOption in ( "-o", "--outfile" ):
             anEmlFileName = anArg
+
+        if anOption in ( "-S", "--Stepper" ):
+            aStepperName = anArg
 
     if len( args ) == 0:
         sys.stderr.write("No input File.\n")
@@ -93,7 +98,7 @@ Options:
     # ----------------    sbml2eml main    ------------------  
 
     # convert SBML components into EML
-    anEml = convertSBML2EML( aSbmlString )
+    anEml = convertSBML2EML( aSbmlString, aStepperName )
 
     # save Eml File
     anEml.save( anEmlFileName )
