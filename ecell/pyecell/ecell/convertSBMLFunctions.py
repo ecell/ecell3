@@ -247,9 +247,29 @@ class SBML_Base( object ):
                 self._convert_SBML_variable_to_ecell_Expression( anASTNode.getChild( n ), aLocalParameterList )
 
         elif ( aNumChildren == 0 ):
-            if ( anASTNode.isNumber() == 1 ):
+            if ( anASTNode.getType() == libsbml.AST_CONSTANT_E ):
+                anASTNode.setType( libsbml.AST_REAL )
+                anASTNode.setValue( math.e )
+            
+            elif ( anASTNode.getType() == libsbml.AST_CONSTANT_PI ):
+                anASTNode.setType( libsbml.AST_REAL )
+                anASTNode.setValue( math.pi )
+            
+            elif ( anASTNode.getType() == libsbml.AST_CONSTANT_FALSE ):
+                anASTNode.setType( libsbml.AST_REAL )
+                anASTNode.setValue( 0.0 )
+            
+            elif ( anASTNode.getType() == libsbml.AST_CONSTANT_TRUE ):
+                anASTNode.setType( libsbml.AST_REAL )
+                anASTNode.setValue( 1.0 )
+            
+            elif ( anASTNode.getType() == libsbml.AST_NAME_AVOGADRO ):
+                anASTNode.setType( libsbml.AST_REAL )
+                anASTNode.setValue( 6.0221367e+23 )
+            
+            elif ( anASTNode.isNumber() == 1 ):
                 pass
-
+            
             else:
                 aName = anASTNode.getName()
                 
@@ -801,11 +821,30 @@ class SBML_Reaction( SBML_Base ):
         
 
         elif ( aNumChildren == 0 ):
-            if ( anASTNode.isNumber() == 1 ):
+            if ( anASTNode.getType() == libsbml.AST_CONSTANT_E ):
+                anASTNode.setType( libsbml.AST_REAL )
+                anASTNode.setValue( math.e )
+            
+            elif ( anASTNode.getType() == libsbml.AST_CONSTANT_PI ):
+                anASTNode.setType( libsbml.AST_REAL )
+                anASTNode.setValue( math.pi )
+            
+            elif ( anASTNode.getType() == libsbml.AST_CONSTANT_FALSE ):
+                anASTNode.setType( libsbml.AST_REAL )
+                anASTNode.setValue( 0.0 )
+            
+            elif ( anASTNode.getType() == libsbml.AST_CONSTANT_TRUE ):
+                anASTNode.setType( libsbml.AST_REAL )
+                anASTNode.setValue( 1.0 )
+            
+            elif ( anASTNode.getType() == libsbml.AST_NAME_AVOGADRO ):
+                anASTNode.setType( libsbml.AST_REAL )
+                anASTNode.setValue( 6.0221367e+23 )
+            
+            elif ( anASTNode.isNumber() == 1 ):
                 pass
-            
+                
             else:
-            
                 aName = anASTNode.getName()
                 
 ##                print "Local Parameter: %s" % aLocalParameterList
