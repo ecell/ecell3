@@ -27,8 +27,10 @@ from ecell.eml import *
 
 # taken from emllib.
 NumberPattern = r'^[+-]?(\d+(\.\d*)?|\d*\.\d+)([eE][+-]?\d+)?$'
-UnquoteStringPattern = r'^[a-zA-Z_/\:][\w\:/\.]*$'
-QuoteRe = re.compile( NumberPattern + '|' + UnquoteStringPattern )
+##UnquoteStringPattern = r'^[a-zA-Z_/\:][\w\:/\.]*$'
+UnquoteStringPattern = r'^[a-zA-Z_]\w*$'
+FullIDorFullPNStringPattern = r'^(Variable|Process|System|Stepper)?\:[\/\.][\w_\/\.]*(\:[a-zA-Z_][\w_]*){1,2}$'
+QuoteRe = re.compile( '%s|%s|%s' % ( NumberPattern, UnquoteStringPattern, FullIDorFullPNStringPattern ))
 
 def expandValueList( aValue, aLevel=0 ):
     aType = type( aValue )
