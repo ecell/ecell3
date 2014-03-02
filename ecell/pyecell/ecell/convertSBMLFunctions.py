@@ -58,7 +58,7 @@ class SBML_Base( object ):
 
     # =========================================================
 
-    def getPath( self, aCompartmentID, aModel ):
+    def get_path( self, aCompartmentID, aModel ):
 
         if( aCompartmentID == 'default' ):
             return '/'
@@ -69,28 +69,28 @@ class SBML_Base( object ):
                     return '/' + aCompartmentID
                 
                 else:
-                    return '%s/%s' % ( self.getPath( aCompartment[ 'Outside' ] ), aCompartmentID )
+                    return '%s/%s' % ( self.get_path( aCompartment[ 'Outside' ] ), aCompartmentID )
 
 
     # =========================================================
 
-    def getSpeciesReferenceID( self, aSpeciesID, aModel ):
+    def get_SpeciesReference_ID( self, aSpeciesID, aModel ):
 
         for aSpecies in aModel.SpeciesList:
             if ( aSpecies[ aModel.keys[ 'ID' ] ] == aSpeciesID ):
-                return '%s:%s' % ( SBML_Base.getPath( self, aSpecies[ 'Compartment' ], aModel ), aSpeciesID )
+                return '%s:%s' % ( SBML_Base.get_path( self, aSpecies[ 'Compartment' ], aModel ), aSpeciesID )
 
 
     # =========================================================
 
-    def convertUnit( self, aValueUnit, aValue, aModel ):
+    def convert_unit( self, aValueUnit, aValue, aModel ):
 
         newValue = []
         for unitList in self.UnitDefinitionList:
             if ( unitList[ aModel.keys[ 'ID' ] ] == aValueUnit ):
 
                 for anUnit in unitList[ 'Definition' ]:
-                    aValue = aValue * self._getNewUnitValue( anUnit )
+                    aValue = aValue * self._get_new_unit_value( anUnit )
 
             newValue.append( aValue )
 
@@ -103,21 +103,21 @@ class SBML_Base( object ):
 
     # =========================================================
     
-    def getID( self, anEntity, aModel ):
+    def get_ID( self, anEntity, aModel ):
         return anEntity[ aModel.keys[ 'ID' ] ]
 
 
     # =========================================================
 
-    def dic2FullID( self, anEntityDic ):
+    def convert_dic_to_FullID( self, anEntityDic ):
 
         return "%(Type)s:%(Path)s:%(EntityName)s" % anEntityDic
 
     # =========================================================
 
-    def getVariableType( self, aName, aModel ):
+    def get_variable_type( self, aName, aModel ):
 
-##        print "SBML_Base.getVariableType( %s )" % aName
+##        print "SBML_Base.get_variable_type( %s )" % aName
         
         IdKey = aModel.keys[ 'ID' ]
 
@@ -138,10 +138,10 @@ class SBML_Base( object ):
 
     # =========================================================
 
-    def getVariableFullID( self, anEntity, aModel ):
-        aVariableType = SBML_Base.getVariableType( self, anEntity[ aModel.keys[ 'ID' ] ], aModel )
+    def get_variable_FullID( self, anEntity, aModel ):
+        aVariableType = SBML_Base.get_variable_type( self, anEntity[ aModel.keys[ 'ID' ] ], aModel )
         if ( aVariableType == libsbml.SBML_SPECIES ):
-            aPath = SBML_Base.getPath( self, anEntity[ 'Compartment' ], aModel )
+            aPath = SBML_Base.get_path( self, anEntity[ 'Compartment' ], aModel )
             aName = anEntity[ aModel.keys[ 'ID' ] ]
 
         elif ( aVariableType == libsbml.SBML_PARAMETER ):
@@ -149,7 +149,7 @@ class SBML_Base( object ):
             aName = anEntity[ aModel.keys[ 'ID' ] ]
 
         elif ( aVariableType == libsbml.SBML_COMPARTMENT ):
-            aPath = SBML_Base.getPath( self, anEntity[ aModel.keys[ 'ID' ] ], aModel )
+            aPath = SBML_Base.get_path( self, anEntity[ aModel.keys[ 'ID' ] ], aModel )
             aName = 'SIZE'
 
         else:
@@ -161,14 +161,14 @@ class SBML_Base( object ):
             Path       = aPath,
             EntityName = aName )
 
-        return self.dic2FullID( anEntityDic )
+        return self.convert_dic_to_FullID( anEntityDic )
 
 
     # =========================================================
 
-    def updateVariableReferenceList( self, aModel, aVariableReferenceList, anID, aStoichiometry='0' ):
+    def add_Entity_to_VariableReferenceList( self, aModel, aVariableReferenceList, anID, aStoichiometry='0' ):
 
-        aVariableType = self.getVariableType( anID )
+        aVariableType = self.get_variable_type( anID )
         if ( aVariableType == libsbml.SBML_SPECIES ):
             anEntityList = aModel.SpeciesList
         elif ( aVariableType == libsbml.SBML_PARAMETER ):
@@ -180,7 +180,7 @@ class SBML_Base( object ):
                 "Variable type must be Species, Parameter, or Compartment"
 
         anEntity = filter( 
-            lambda anElement: self.getID( anElement ) == anID,
+            lambda anElement: self.get_ID( anElement ) == anID,
             anEntityList )[ 0 ]
         
         aVariableReference = filter(
@@ -194,7 +194,7 @@ class SBML_Base( object ):
 
         else:
             aVariableReference.append( anID )
-            aVariableReference.append( self.getVariableFullID( anEntity ) )
+            aVariableReference.append( self.get_variable_FullID( anEntity ) )
             aVariableReference.append( aStoichiometry )
             
             aVariableReferenceList.append( aVariableReference )
@@ -204,7 +204,7 @@ class SBML_Base( object ):
 
     # =========================================================
 
-    def convertFormula( self, aFormula, aModel, aLocalParameterList = [], aDenominator = 1.0 ):
+    def convert_SBML_Formula_to_ecell_Expression( self, aFormula, aModel, aLocalParameterList = [], aDenominator = 1.0 ):
         
         if aDenominator != 1.0:
             aFormula = '( 1.0 / %s ) * ( %s )' % ( aDenominator, aFormula )
@@ -212,19 +212,19 @@ class SBML_Base( object ):
         preprocessedFormula = aFormula.replace( '<t>', aModel.TimeSymbol )
         aASTRootNode = libsbml.parseFormula( preprocessedFormula )
 
-        convertedAST = self._convertVariableName( aASTRootNode, aLocalParameterList )
+        convertedAST = self._convert_SBML_variable_to_ecell_Expression( aASTRootNode, aLocalParameterList )
 
-        return postprocessMathString( libsbml.formulaToString( convertedAST ), aModel.TimeSymbol )
+        return postprocess_math_string( libsbml.formulaToString( convertedAST ), aModel.TimeSymbol )
 
     # =========================================================
 
-    def _convertVariableName( self, anASTNode, aLocalParameterList = [] ):
+    def _convert_SBML_variable_to_ecell_Expression( self, anASTNode, aLocalParameterList = [] ):
 
         aNumChildren = anASTNode.getNumChildren()
 
         if ( aNumChildren > 0 ):
             for n in range( aNumChildren ):
-                self._convertVariableName( anASTNode.getChild( n ), aLocalParameterList )
+                self._convert_SBML_variable_to_ecell_Expression( anASTNode.getChild( n ), aLocalParameterList )
 
         elif ( aNumChildren == 0 ):
             if ( anASTNode.isNumber() == 1 ):
@@ -239,7 +239,7 @@ class SBML_Base( object ):
                     return anASTNode
 
                 else:
-                    variableName = self.updateVariableReferenceList( aName )
+                    variableName = self.add_Entity_to_VariableReferenceList( aName )
                     if( variableName != '' ):
 
                         anASTNode.setType( libsbml.AST_NAME )
@@ -272,18 +272,18 @@ class SBML_Model( SBML_Base ):
         self.Version = aSBMLDocument.getVersion() 
 
         self.DerivedValueDic = {}
-        self.TimeSymbol = getTimeSymbol( aSBMLmodel )
+        self.TimeSymbol = get_TimeSymbol( aSBMLmodel )
 
-        self.CompartmentList = getCompartment( aSBMLmodel )
-        self.EventList = getEvent( aSBMLmodel, self.TimeSymbol )
-        self.FunctionDefinitionList = getFunctionDefinition( aSBMLmodel, self.TimeSymbol )
-        self.ParameterList = getParameter( aSBMLmodel, self.DerivedValueDic )
-        self.ReactionList = getReaction( aSBMLmodel, aSBMLDocument, self.TimeSymbol )
-        self.RuleList = getRule( aSBMLmodel, self.TimeSymbol )
-        self.SpeciesList = getSpecies( aSBMLmodel, self.DerivedValueDic )
-        self.UnitDefinitionList = getUnitDefinition( aSBMLmodel )
+        self.CompartmentList = get_Compartment_list( aSBMLmodel )
+        self.EventList = get_Event_list( aSBMLmodel, self.TimeSymbol )
+        self.FunctionDefinitionList = get_FunctionDefinition_list( aSBMLmodel, self.TimeSymbol )
+        self.ParameterList = get_Parameter_list( aSBMLmodel, self.DerivedValueDic )
+        self.ReactionList = get_Reaction_list( aSBMLmodel, aSBMLDocument, self.TimeSymbol )
+        self.RuleList = get_Rule_list( aSBMLmodel, self.TimeSymbol )
+        self.SpeciesList = get_Species_list( aSBMLmodel, self.DerivedValueDic )
+        self.UnitDefinitionList = get_UnitDefinition_list( aSBMLmodel )
 
-        self.setFunctionDefinitionToDictionary()
+        self.set_FunctionDefinition_to_dict()
 
     # =========================================================
 
@@ -299,19 +299,19 @@ class SBML_Model( SBML_Base ):
 
     # =========================================================
 
-    def hasEvent( self ):
+    def has_Event( self ):
         if ( self.EventList == [] ):
             return False
         else:
             return True
 
-    def hasReaction( self ):
+    def has_Reaction( self ):
         if ( self.ReactionList == [] ):
             return False
         else:
             return True
 
-    def hasSpecies( self ):
+    def has_Species( self ):
         if ( self.SpeciesList == [] ):
             return False
         else:
@@ -320,7 +320,7 @@ class SBML_Model( SBML_Base ):
 
     # =========================================================
 
-    def getEntitybyID( self, anID ):
+    def get_Entity_by_ID( self, anID ):
 
         theEntityDic = {
             libsbml.SBML_SPECIES     : self.SpeciesList,
@@ -344,7 +344,7 @@ class SBML_Model( SBML_Base ):
 
     # =========================================================
 
-    def isApplicableVariableTimeStep( self ):
+    def is_applicable_variable_time_step( self ):
 
         for aReaction in self.ReactionList:
             if aReaction[ 'KineticLaw' ][ 'isDiscontinuous' ]:
@@ -354,45 +354,45 @@ class SBML_Model( SBML_Base ):
             if aRule[ 'isDiscontinuous' ]:
                 return False
 
-        if self.hasEvent():
+        if self.has_Event():
             return False
 
         return True
 
     # =========================================================
 
-    def getPath( self, aCompartmentID ):
-        return SBML_Base.getPath( self, aCompartmentID, self )
+    def get_path( self, aCompartmentID ):
+        return SBML_Base.get_path( self, aCompartmentID, self )
 
     # =========================================================
 
-    def getSpeciesReferenceID( self, aSpeciesID ):
-        return SBML_Base.getSpeciesReferenceID( self, aSpeciesID, self )
+    def get_SpeciesReference_ID( self, aSpeciesID ):
+        return SBML_Base.get_SpeciesReference_ID( self, aSpeciesID, self )
 
     # =========================================================
 
-    def getVariableType( self, aName ):
-        return SBML_Base.getVariableType( self, aName, self )
+    def get_variable_type( self, aName ):
+        return SBML_Base.get_variable_type( self, aName, self )
 
     # =========================================================
     
-    def getID( self, anEntity ):
-        return SBML_Base.getID( self, anEntity, self )
+    def get_ID( self, anEntity ):
+        return SBML_Base.get_ID( self, anEntity, self )
 
     # =========================================================
 
-    def setFunctionDefinitionToDictionary( self ):
+    def set_FunctionDefinition_to_dict( self ):
 
         if ( self.FunctionDefinitionList != [] ):
 
             for aFunctionDefinition in ( self.FunctionDefinitionList ):
                 
-                self.FunctionDefinition[ aFunctionDefinition.getID() ] = aFunctionDefinition[ 'Formula' ]
+                self.FunctionDefinition[ aFunctionDefinition.get_ID() ] = aFunctionDefinition[ 'Formula' ]
             
 
     # =========================================================
 
-    def _getNewUnitValue( self, anUnit ):
+    def _get_new_unit_value( self, anUnit ):
         return pow( pow( 10, anUnit[ 'Scale' ] ) * anUnit[ 'Multiplier' ], anUnit[ 'Exponent' ] ) + anUnit[ 'Offset' ]
 
     # =========================================================
@@ -411,53 +411,59 @@ class SBML_Compartment( SBML_Base ):
 
     def initialize( self, aCompartment ):
 
-        self._setSizeToDictionary( aCompartment )
-        self._setUnitToDictionary( aCompartment )
+        self._set_Compartment_size( aCompartment )
+        self._set_Compartment_unit( aCompartment )
 
     # =========================================================
 
-    def getPath( self, aCompartmentID ):
-        return super( SBML_Compartment, self ).getPath( aCompartmentID, self.Model )
+    def get_path( self, aCompartmentID ):
+        return super( SBML_Compartment, self ).get_path( aCompartmentID, self.Model )
 
     # =========================================================
 
-    def getSpeciesReferenceID( self, aSpeciesID ):
-        return super( SBML_Compartment, self ).getSpeciesReferenceID( aSpeciesID, self.Model )
+    def get_SpeciesReference_ID( self, aSpeciesID ):
+        return super( SBML_Compartment, self ).get_SpeciesReference_ID( aSpeciesID, self.Model )
 
     # =========================================================
 
-    def getVariableType( self, aName ):
-        return super( SBML_Compartment, self ).getVariableType( aName, self.Model )
+    def get_variable_type( self, aName ):
+        return super( SBML_Compartment, self ).get_variable_type( aName, self.Model )
 
     # =========================================================
 
-    def getID( self, aSpecies ):
-        return super( SBML_Compartment, self ).getID( aSpecies, self.Model )
+    def get_ID( self, aSpecies ):
+        return super( SBML_Compartment, self ).get_ID( aSpecies, self.Model )
 
     # =========================================================
     
-    def getCompartmentID( self, aCompartment ):
+    def get_System_FullID( self, aCompartment ):
         
-        if ( aCompartment[ 'Outside' ] == '' ):
-            return 'System:/:%s' % aCompartment[ self.Model.keys[ 'ID' ] ]
+        anEntityDic = dict(
+            Type       = 'System',
+            EntityName = aCompartment[ self.Model.keys[ 'ID' ] ] )
 
+        if ( aCompartment[ 'Outside' ] == '' ):
+            anEntityDic[ 'Path' ] = '/'
         else:
-            return 'System:%s:%s' % ( self.getPath( aCompartment[ 'Outside' ] ), aCompartment[ self.Model.keys[ 'ID' ] ] )
+            anEntityDic[ 'Path' ] = self.get_path( aCompartment[ 'Outside' ] )
+
+        return self.convert_dic_to_FullID( anEntityDic )
+
 
     # =========================================================
     
-    def _setSizeToDictionary( self, aCompartment ):
+    def _set_Compartment_size( self, aCompartment ):
 
         if( aCompartment[ self.Model.keys[ 'Size' ] ] != "Unknown" ):
             self.Model.CompartmentSize[ aCompartment[ self.Model.keys[ 'ID' ] ] ] = aCompartment[ self.Model.keys[ 'Size' ] ]
 
         else:
-            self.Model.CompartmentSize[ aCompartment[ self.Model.keys[ 'ID' ] ] ] = self._getOutsideSize( aCompartment[ 'Outside' ] )
+            self.Model.CompartmentSize[ aCompartment[ self.Model.keys[ 'ID' ] ] ] = self._get_outside_Compartment_size( aCompartment[ 'Outside' ] )
 
 
     # =========================================================
     
-    def _setUnitToDictionary( self, aCompartment ):
+    def _set_Compartment_unit( self, aCompartment ):
 
         aCompartmentID = aCompartment[ self.Model.keys[ 'ID' ] ]
 
@@ -465,12 +471,12 @@ class SBML_Compartment( SBML_Base ):
             self.Model.CompartmentUnit[ aCompartmentID ] = aCompartment[ 'Unit' ]
 
         else:
-            self.Model.CompartmentUnit[ aCompartmentID ] = self._getOutsideUnit( aCompartment[ 'Outside' ] )
+            self.Model.CompartmentUnit[ aCompartmentID ] = self._get_outside_compartment_unit( aCompartment[ 'Outside' ] )
 
 
     # =========================================================
     
-    def _getOutsideSize( self, anOutsideCompartment ):
+    def _get_outside_Compartment_size( self, anOutsideCompartment ):
         
         if ( anOutsideCompartment == '' ):
 
@@ -482,7 +488,7 @@ class SBML_Compartment( SBML_Base ):
 
     # =========================================================
     
-    def _getOutsideUnit( self, anOutsideCompartment ):
+    def _get_outside_compartment_unit( self, anOutsideCompartment ):
 
         if ( anOutsideCompartment == '' ):
 
@@ -493,14 +499,14 @@ class SBML_Compartment( SBML_Base ):
 
     # =========================================================    
 
-    def getCompartmentSize( self, aCompartment ):
+    def get_Compartment_size( self, aCompartment ):
 
         return self.Model.CompartmentSize[ aCompartment[ self.Model.keys[ 'ID' ] ] ]
 
 
     # =========================================================    
 
-    def getCompartmentUnit( self, aCompartment ):
+    def get_Compartment_unit( self, aCompartment ):
 
         return self.Model.CompartmentUnit[ aCompartment[ self.Model.keys[ 'ID' ] ] ]
 
@@ -521,27 +527,27 @@ class SBML_Species( SBML_Base ):
 
     # =========================================================
 
-    def getPath( self, aCompartmentID ):
-        return SBML_Base.getPath( self, aCompartmentID, self.Model )
+    def get_path( self, aCompartmentID ):
+        return SBML_Base.get_path( self, aCompartmentID, self.Model )
 
     # =========================================================
 
-    def getSpeciesReferenceID( self, aSpeciesID ):
-        return SBML_Base.getSpeciesReferenceID( self, aSpeciesID, self.Model )
+    def get_SpeciesReference_ID( self, aSpeciesID ):
+        return SBML_Base.get_SpeciesReference_ID( self, aSpeciesID, self.Model )
 
     # =========================================================
 
-    def getVariableType( self, aName ):
-        return SBML_Base.getVariableType( self, aName, self.Model )
+    def get_variable_type( self, aName ):
+        return SBML_Base.get_variable_type( self, aName, self.Model )
 
     # =========================================================
 
-    def getID( self, aSpecies ):
-        return SBML_Base.getID( self, aSpecies, self.Model )
+    def get_ID( self, aSpecies ):
+        return SBML_Base.get_ID( self, aSpecies, self.Model )
 
     # =========================================================
     
-    def generateFullID( self, aSpecies ):
+    def generate_FullID_from_SBML_entity( self, aSpecies ):
 
         aCompartmentID = aSpecies[ 'Compartment' ]
 
@@ -550,15 +556,15 @@ class SBML_Species( SBML_Base ):
 
         anEntityDic = {
             'Type'       : 'Variable',
-            'Path'       : self.getPath( aCompartmentID ),
-            'EntityName' : self.getID( aSpecies ) }
+            'Path'       : self.get_path( aCompartmentID ),
+            'EntityName' : self.get_ID( aSpecies ) }
 
-        return self.dic2FullID( anEntityDic )
+        return self.convert_dic_to_FullID( anEntityDic )
 
 
     # =========================================================
     
-    def getInitialValue( self, aSpecies ):
+    def get_initial_value( self, aSpecies ):
 
         if ( aSpecies[ 'InitialAmount' ] != 'Unknown' ): # initialAmount
             return { 
@@ -576,13 +582,13 @@ class SBML_Species( SBML_Base ):
                         'Property' : 'NumberConc',
                         'Value'    : float( aSpecies[ 'InitialConcentration' ] ) }
                 else:
-                    raise ValueError, 'InitialAmount or InitialConcentration of Species [%s] must be defined.' % self.getID( aSpecies )
+                    raise ValueError, 'InitialAmount or InitialConcentration of Species [%s] must be defined.' % self.get_ID( aSpecies )
 
-        raise ValueError, 'InitialAmount or InitialConcentration of Species [%s] must be defined.' % self.getID( aSpecies )
+        raise ValueError, 'InitialAmount or InitialConcentration of Species [%s] must be defined.' % self.get_ID( aSpecies )
 
     # =========================================================
 
-    def isConstant( self, aSpecies ):
+    def is_constant( self, aSpecies ):
 
         if ( aSpecies[ self.Model.keys[ 'Constant' ] ] == 1 ):
             return True
@@ -611,51 +617,51 @@ class SBML_Rule( SBML_Base ):
 
     # =========================================================
     
-    def getSystemFullID( self ):
+    def get_System_FullID( self ):
 
         anEntityDic = dict(
             Type       = 'System',
             Path       = self.EntityPath[ 'Root' ],
             EntityName = self.SystemName[ 'Rule' ] )
 
-        return self.dic2FullID( anEntityDic )
+        return self.convert_dic_to_FullID( anEntityDic )
 
 
     # =========================================================
 
-    def getPath( self, aCompartmentID ):
-        return SBML_Base.getPath( self, aCompartmentID, self.Model )
+    def get_path( self, aCompartmentID ):
+        return SBML_Base.get_path( self, aCompartmentID, self.Model )
 
     # =========================================================
 
-    def getSpeciesReferenceID( self, aSpeciesID ):
-        return SBML_Base.getSpeciesReferenceID( self, aSpeciesID, self.Model )
+    def get_SpeciesReference_ID( self, aSpeciesID ):
+        return SBML_Base.get_SpeciesReference_ID( self, aSpeciesID, self.Model )
 
     # =========================================================
 
-    def getVariableType( self, aName ):
-        return SBML_Base.getVariableType( self, aName, self.Model )
+    def get_variable_type( self, aName ):
+        return SBML_Base.get_variable_type( self, aName, self.Model )
 
     # =========================================================
 
-    def getID( self, anEntity ):
-        return SBML_Base.getID( self, anEntity, self.Model )
+    def get_ID( self, anEntity ):
+        return SBML_Base.get_ID( self, anEntity, self.Model )
 
     # =========================================================
 
-    def updateVariableReferenceList( self, anID, aStoichiometry='0' ):
-        return SBML_Base.updateVariableReferenceList( self, self.Model, self.VariableReferenceList, anID, aStoichiometry )
+    def add_Entity_to_VariableReferenceList( self, anID, aStoichiometry='0' ):
+        return SBML_Base.add_Entity_to_VariableReferenceList( self, self.Model, self.VariableReferenceList, anID, aStoichiometry )
 
 
     # =========================================================
 
-    def getVariableFullID( self, anEntity ):
-        return SBML_Base.getVariableFullID( self, anEntity, self.Model )
+    def get_variable_FullID( self, anEntity ):
+        return SBML_Base.get_variable_FullID( self, anEntity, self.Model )
 
 
     # =========================================================
     
-    def generateFullID( self, aRule ):
+    def generate_FullID_from_SBML_entity( self, aRule ):
         if ( aRule[ 'Type' ] == libsbml.SBML_ALGEBRAIC_RULE ):
             anIDHeader = 'Algebraic'
 
@@ -677,13 +683,13 @@ class SBML_Rule( SBML_Base ):
             'Path'       : self.Model.EntityPath[ 'Rule' ],
             'EntityName' : '%s_%s' % ( anIDHeader, aRule[ 'Variable' ] ) }
 
-        return self.dic2FullID( anEntityDic )
+        return self.convert_dic_to_FullID( anEntityDic )
 
 
     # =========================================================
 
-    def convertFormula( self, aFormula, aLocalParameterList = [], aDenominator = 1.0 ):
-        return SBML_Base.convertFormula( self, aFormula, self.Model, aLocalParameterList, aDenominator )
+    def convert_SBML_Formula_to_ecell_Expression( self, aFormula, aLocalParameterList = [], aDenominator = 1.0 ):
+        return SBML_Base.convert_SBML_Formula_to_ecell_Expression( self, aFormula, self.Model, aLocalParameterList, aDenominator )
 
 
     # =========================================================
@@ -714,39 +720,39 @@ class SBML_Reaction( SBML_Base ):
 
     # =========================================================
 
-    def getPath( self, aCompartmentID ):
-        return SBML_Base.getPath( self, aCompartmentID, self.Model )
+    def get_path( self, aCompartmentID ):
+        return SBML_Base.get_path( self, aCompartmentID, self.Model )
 
     # =========================================================
 
-    def getSpeciesReferenceID( self, aSpeciesID ):
-        return SBML_Base.getSpeciesReferenceID( self, aSpeciesID, self.Model )
+    def get_SpeciesReference_ID( self, aSpeciesID ):
+        return SBML_Base.get_SpeciesReference_ID( self, aSpeciesID, self.Model )
 
     # =========================================================
 
-    def getVariableType( self, aName ):
-        return SBML_Base.getVariableType( self, aName, self.Model )
+    def get_variable_type( self, aName ):
+        return SBML_Base.get_variable_type( self, aName, self.Model )
 
     # =========================================================
 
-    def getID( self, aSpecies ):
-        return SBML_Base.getID( self, aSpecies, self.Model )
+    def get_ID( self, aSpecies ):
+        return SBML_Base.get_ID( self, aSpecies, self.Model )
 
     # =========================================================
 
-    def updateVariableReferenceList( self, anID, aStoichiometry='0' ):
-        return SBML_Base.updateVariableReferenceList( self, self.Model, self.VariableReferenceList, anID, aStoichiometry )
+    def add_Entity_to_VariableReferenceList( self, anID, aStoichiometry='0' ):
+        return SBML_Base.add_Entity_to_VariableReferenceList( self, self.Model, self.VariableReferenceList, anID, aStoichiometry )
 
 
     # =========================================================
 
-    def getVariableFullID( self, anEntity ):
-        return SBML_Base.getVariableFullID( self, anEntity, self.Model )
+    def get_variable_FullID( self, anEntity ):
+        return SBML_Base.get_variable_FullID( self, anEntity, self.Model )
 
 
     # =========================================================
     
-    def generateFullID( self, aReaction ):
+    def generate_FullID_from_SBML_entity( self, aReaction ):
 
         if ( aReaction[ self.Model.keys[ 'ID' ] ] != '' ):
             return 'Process:/:' + aReaction[ self.Model.keys[ 'ID' ] ]
@@ -756,7 +762,7 @@ class SBML_Reaction( SBML_Base ):
 
     # =========================================================
 
-    def _convertVariableName( self, anASTNode, aLocalParameterList = [] ):
+    def _convert_SBML_variable_to_ecell_Expression( self, anASTNode, aLocalParameterList = [] ):
         
         aNumChildren = anASTNode.getNumChildren()
 
@@ -769,7 +775,7 @@ class SBML_Reaction( SBML_Base ):
                 #    self.macroExpand( anASTNode )
 
             for n in range( aNumChildren ):
-                self._convertVariableName( anASTNode.getChild( n ), aLocalParameterList )
+                self._convert_SBML_variable_to_ecell_Expression( anASTNode.getChild( n ), aLocalParameterList )
 
             return anASTNode
         
@@ -806,7 +812,7 @@ class SBML_Reaction( SBML_Base ):
                                 'C' + str( self.ModifierNumber ) )
                             self.ModifierNumber = self.ModifierNumber + 1
                             
-                            aModifierID = self.getSpeciesReferenceID( aName )
+                            aModifierID = self.get_SpeciesReference_ID( aName )
                             aModifierList.append( 'Variable:' + aModifierID )
                             aModifierList.append( '0' )
                             self.VariableReferenceList.append( aModifierList )
@@ -848,7 +854,7 @@ class SBML_Reaction( SBML_Base ):
                         return anASTNode
 
 ##                if variableName == '':
-                variableName = self.updateVariableReferenceList( aName )
+                variableName = self.add_Entity_to_VariableReferenceList( aName )
                 if variableName != '':
                     anASTNode.setName( '%s.Value' % ( variableName ) )
                     return anASTNode
@@ -857,13 +863,13 @@ class SBML_Reaction( SBML_Base ):
 
     # =========================================================
 
-    def convertFormula( self, aFormula, aLocalParameterList = [], aDenominator = 1.0 ):
-        return SBML_Base.convertFormula( self, aFormula, self.Model, aLocalParameterList, aDenominator )
+    def convert_SBML_Formula_to_ecell_Expression( self, aFormula, aLocalParameterList = [], aDenominator = 1.0 ):
+        return SBML_Base.convert_SBML_Formula_to_ecell_Expression( self, aFormula, self.Model, aLocalParameterList, aDenominator )
 
 
     # =========================================================
 
-    def getVariableReference( self, anID ):
+    def get_VariableReference( self, anID ):
 
         for aVariableReference in self.VariableReferenceList:
             if( aVariableReference[0] == anID ):
@@ -874,19 +880,7 @@ class SBML_Reaction( SBML_Base ):
 
     # =========================================================
 
-    def getStoichiometry( self, aSpeciesID, aStoichiometry ):
-
-        for aSpecies in self.Model.SpeciesList:
-            if ( aSpecies[ self.Model.keys[ 'ID' ] ] == aSpeciesID ):
-                if( aSpecies[ self.Model.keys[ 'Constant' ] ] == 1 ):
-                    return int( 0 )
-                else:
-                    return int( aStoichiometry )
-
-
-    # =========================================================
-
-    def getChemicalEquation( self, aReaction ):
+    def get_chemical_equation( self, aReaction ):
 
         # Left side (reactant terms)
         if ( len( aReaction[ 'Reactants' ] ) > 0 ):
@@ -952,58 +946,43 @@ class SBML_Parameter( SBML_Base ):
 
     # =========================================================
 
-    def getPath( self, aCompartmentID ):
-        return SBML_Base.getPath( self, aCompartmentID, self.Model )
+    def get_path( self, aCompartmentID ):
+        return SBML_Base.get_path( self, aCompartmentID, self.Model )
 
     # =========================================================
 
-    def getSpeciesReferenceID( self, aSpeciesID ):
-        return SBML_Base.getSpeciesReferenceID( self, aSpeciesID, self.Model )
+    def get_SpeciesReference_ID( self, aSpeciesID ):
+        return SBML_Base.get_SpeciesReference_ID( self, aSpeciesID, self.Model )
 
     # =========================================================
 
-    def getVariableType( self, aName ):
-        return SBML_Base.getVariableType( self, aName, self.Model )
+    def get_variable_type( self, aName ):
+        return SBML_Base.get_variable_type( self, aName, self.Model )
 
     # =========================================================
 
-    def getID( self, aSpecies ):
-        return SBML_Base.getID( self, aSpecies, self.Model )
+    def get_ID( self, aSpecies ):
+        return SBML_Base.get_ID( self, aSpecies, self.Model )
 
     # =========================================================
 
-    def generateFullID( self, aParameter ):
+    def generate_FullID_from_SBML_entity( self, aParameter ):
 
         if ( aParameter[ self.Model.keys[ 'ID' ] ] != '' ):
             return 'Variable:/SBMLParameter:' + aParameter[ self.Model.keys[ 'ID' ] ]
         else:
             raise NameError, "Parameter must set the Parameter Name"
 
-   # =========================================================
-
-    def getParameterValue( self, aParameter ):
-
-        return aParameter[ 'Value' ]
-   
-##         if ( aParameter[ 'Unit' ] != '' and aParameter[ 'Value' ] != 0 ):
-
-##             return self.convertUnit( aParameter[ 'Unit' ], aParameter[ 'Value' ] )
-       
-##         else:
-
-##             return aParameter[ 'Value' ]
-        
-
     # =========================================================
     
-    def getSystemFullID( self ):
+    def get_System_FullID( self ):
 
         anEntityDic = dict(
             Type       = 'System',
             Path       = self.EntityPath[ 'Root' ],
             EntityName = self.SystemName[ 'Parameter' ] )
 
-        return self.dic2FullID( anEntityDic )
+        return self.convert_dic_to_FullID( anEntityDic )
 
 
     # =========================================================
@@ -1034,51 +1013,51 @@ class SBML_Event( SBML_Base ):
 
     # =========================================================
     
-    def getSystemFullID( self ):
+    def get_System_FullID( self ):
 
         anEntityDic = dict(
             Type       = 'System',
             Path       = self.EntityPath[ 'Root' ],
             EntityName = self.SystemName[ 'Event' ] )
 
-        return self.dic2FullID( anEntityDic )
+        return self.convert_dic_to_FullID( anEntityDic )
 
 
     # =========================================================
 
-    def getPath( self, aCompartmentID ):
-        return SBML_Base.getPath( self, aCompartmentID, self.Model )
+    def get_path( self, aCompartmentID ):
+        return SBML_Base.get_path( self, aCompartmentID, self.Model )
 
     # =========================================================
 
-    def getSpeciesReferenceID( self, aSpeciesID ):
-        return SBML_Base.getSpeciesReferenceID( self, aSpeciesID, self.Model )
+    def get_SpeciesReference_ID( self, aSpeciesID ):
+        return SBML_Base.get_SpeciesReference_ID( self, aSpeciesID, self.Model )
 
     # =========================================================
 
-    def getVariableType( self, aName ):
-        return SBML_Base.getVariableType( self, aName, self.Model )
+    def get_variable_type( self, aName ):
+        return SBML_Base.get_variable_type( self, aName, self.Model )
 
     # =========================================================
 
-    def getID( self, aSpecies ):
-        return SBML_Base.getID( self, aSpecies, self.Model )
+    def get_ID( self, aSpecies ):
+        return SBML_Base.get_ID( self, aSpecies, self.Model )
 
     # =========================================================
 
-    def updateVariableReferenceList( self, anID, aStoichiometry='0' ):
-        return SBML_Base.updateVariableReferenceList( self, self.Model, self.VariableReferenceList, anID, aStoichiometry )
-
-
-    # =========================================================
-
-    def getVariableFullID( self, anEntity ):
-        return SBML_Base.getVariableFullID( self, anEntity, self.Model )
+    def add_Entity_to_VariableReferenceList( self, anID, aStoichiometry='0' ):
+        return SBML_Base.add_Entity_to_VariableReferenceList( self, self.Model, self.VariableReferenceList, anID, aStoichiometry )
 
 
     # =========================================================
 
-    def generateFullID( self, anEvent ):
+    def get_variable_FullID( self, anEntity ):
+        return SBML_Base.get_variable_FullID( self, anEntity, self.Model )
+
+
+    # =========================================================
+
+    def generate_FullID_from_SBML_entity( self, anEvent ):
 
         if( anEvent[ 'Id' ] != '' ):
             return 'Process:/SBMLEvent:' + anEvent[ 'Id' ]
@@ -1091,7 +1070,7 @@ class SBML_Event( SBML_Base ):
 
     # =========================================================
 
-    def getEventName( self, anEvent ):
+    def get_Event_Name( self, anEvent ):
 
         if( anEvent[ 'Id' ] != '' ):
             return anEvent[ 'Id' ]
@@ -1102,8 +1081,8 @@ class SBML_Event( SBML_Base ):
 
     # =========================================================
 
-    def convertFormula( self, aFormula, aLocalParameterList = [], aDenominator = 1.0 ):
-        return SBML_Base.convertFormula( self, aFormula, self.Model, aLocalParameterList, aDenominator )
+    def convert_SBML_Formula_to_ecell_Expression( self, aFormula, aLocalParameterList = [], aDenominator = 1.0 ):
+        return SBML_Base.convert_SBML_Formula_to_ecell_Expression( self, aFormula, self.Model, aLocalParameterList, aDenominator )
 
 
     # =========================================================

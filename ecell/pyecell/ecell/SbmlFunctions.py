@@ -42,7 +42,7 @@ def sub( fun , indata ):
 #---------------------------------------------------------------
 
 
-def getCompartment( aSBMLmodel ):
+def get_Compartment_list( aSBMLmodel ):
     " [[ Id , Name , SpatialDimension , Size , Volume , Unit , Ouside , Constant ]] "
     LIST = []
     theList = aSBMLmodel.getListOfCompartments()
@@ -93,7 +93,7 @@ def getCompartment( aSBMLmodel ):
     return LIST
 
 
-def getEvent( aSBMLmodel, timeSymbol ):
+def get_Event_list( aSBMLmodel, timeSymbol ):
     " [[ Id , Name , StringTrigger , StringDelay , TimeUnit , [[ VariableAssignment , StringAssignment ]] ]] "
     LIST = []
     if aSBMLmodel.getEvent(0):
@@ -110,15 +110,15 @@ def getEvent( aSBMLmodel, timeSymbol ):
 
             aNode_Ev_Tr = anEvent.getTrigger()
             if aNode_Ev_Tr is not None and aNode_Ev_Tr.isSetMath():
-##                print "Event Trigger Math: " + str( _dumpTreeConstructionOfNode( preprocessMathTree( aNode_Ev_Tr.getMath(), timeSymbol ) ) )
+##                print "Event Trigger Math: " + str( _dump_tree_construction_of_AST_node( preprocess_math_tree( aNode_Ev_Tr.getMath(), timeSymbol ) ) )
                 aString_Ev_Tr = sub( libsbml.formulaToString,
-                    preprocessMathTree( aNode_Ev_Tr.getMath(), timeSymbol ) )
-##                print "    String  : " + str( libsbml.formulaToString( preprocessMathTree( aNode_Ev_Tr.getMath(), timeSymbol ) ) )
+                    preprocess_math_tree( aNode_Ev_Tr.getMath(), timeSymbol ) )
+##                print "    String  : " + str( libsbml.formulaToString( preprocess_math_tree( aNode_Ev_Tr.getMath(), timeSymbol ) ) )
 
             aNode_Ev_De = anEvent.getDelay()
             if aNode_Ev_De is not None and aNode_Ev_De.isSetMath():
                 aString_Ev_De = sub( libsbml.formulaToString,
-                    preprocessMathTree( aNode_Ev_Tr.getMath(), timeSymbol ) )
+                    preprocess_math_tree( aNode_Ev_Tr.getMath(), timeSymbol ) )
 
             aTimeUnit_Ev = anEvent.getTimeUnits()
             
@@ -135,17 +135,17 @@ def getEvent( aSBMLmodel, timeSymbol ):
 
                     if anEventAssignment.isSetMath():
                         aString_Ev_As = sub( libsbml.formulaToString,
-                                preprocessMathTree( anEventAssignment.getMath(), timeSymbol ) )
+                                preprocess_math_tree( anEventAssignment.getMath(), timeSymbol ) )
 
                     anEventAssignmentDic[ 'Variable' ] = aVariable_Ev_As
-                    anEventAssignmentDic[ 'String' ]   = postprocessMathString( aString_Ev_As, timeSymbol )
+                    anEventAssignmentDic[ 'String' ]   = postprocess_math_string( aString_Ev_As, timeSymbol )
                     
                     ListOfEventAssignments.append( anEventAssignmentDic )
 
             aEventDic[ 'Id' ]               =  anId_Ev 
             aEventDic[ 'Name' ]             =  aName_Ev 
-            aEventDic[ 'Trigger' ]          =  postprocessMathString( aString_Ev_Tr, timeSymbol ) 
-            aEventDic[ 'Delay' ]            =  postprocessMathString( aString_Ev_De, timeSymbol ) 
+            aEventDic[ 'Trigger' ]          =  postprocess_math_string( aString_Ev_Tr, timeSymbol ) 
+            aEventDic[ 'Delay' ]            =  postprocess_math_string( aString_Ev_De, timeSymbol ) 
             aEventDic[ 'Unit' ]             =  aTimeUnit_Ev 
             aEventDic[ 'EventAssignments' ] =  ListOfEventAssignments 
             
@@ -154,7 +154,7 @@ def getEvent( aSBMLmodel, timeSymbol ):
     return LIST
 
 
-def getFunctionDefinition( aSBMLmodel, timeSymbol ):
+def get_FunctionDefinition_list( aSBMLmodel, timeSymbol ):
     " [[ Id , Name , String ]] "
     LIST = []
     if aSBMLmodel.getFunctionDefinition(0):
@@ -170,18 +170,18 @@ def getFunctionDefinition( aSBMLmodel, timeSymbol ):
 
             if aFunctionDefinition.isSetMath():
                 aString_FD = sub( libsbml.formulaToString,
-                    preprocessMathTree( aFunctionDefinition.getMath(), timeSymbol ) )
+                    preprocess_math_tree( aFunctionDefinition.getMath(), timeSymbol ) )
 
             aFunctionDefinitionDic[ 'Id' ]      =  anId_FD 
             aFunctionDefinitionDic[ 'Name' ]    =  aName_FD 
-            aFunctionDefinitionDic[ 'Formula' ] =  postprocessMathString( aString_FD, timeSymbol ) 
+            aFunctionDefinitionDic[ 'Formula' ] =  postprocess_math_string( aString_FD, timeSymbol ) 
 
             LIST.append( aFunctionDefinitionDic )
 
     return LIST
 
 
-def getParameter( aSBMLmodel, DerivedValueDic ):
+def get_Parameter_list( aSBMLmodel, DerivedValueDic ):
     " [[ Id , Name , Value , Unit , Constant ]] "
     LIST = []
     if aSBMLmodel.getParameter(0):
@@ -207,7 +207,7 @@ def getParameter( aSBMLmodel, DerivedValueDic ):
                 else:
                     raise TypeError, 'Initial value of %s can not been determined.' % anId_Pa
             else:
-                if getInitialValueFromAssignmentRule( aSBMLmodel, anId_Pa, DerivedValueDic ):
+                if get_initial_value_from_AssignmentRule( aSBMLmodel, anId_Pa, DerivedValueDic ):
                     aValue_Pa = DerivedValueDic[ anId_Pa ]
                 else:
                     raise TypeError, 'Initial value of %s can not been determined.' % anId_Pa
@@ -226,7 +226,7 @@ def getParameter( aSBMLmodel, DerivedValueDic ):
     return LIST
 
 
-def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
+def get_Reaction_list( aSBMLmodel, aSBMLDocument, timeSymbol ):
     " [[ Id , Name , [ Formula , String , TimeUnit , SubstanceUnit , [[ ParameterId , ParameterName , ParameterValue , ParameterUnit , ParameterConstant ]] ] , Reversible , Fast , [[ ReactantSpecies , ( ReactantStoichiometry , ReactantStoichiometryMath ) , ReactantDenominator  ]] , [[  ProductSpecies , ( ProductStoichiometry , ProductStoichiometryMath ) , ProductDenominator ]] , [[ ModifierSpecies ]] ]] "
     LIST = []
     if aSBMLmodel.getReaction(0):
@@ -247,8 +247,8 @@ def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
                 if aKineticLaw != []:
 
                     if aKineticLaw.isSetFormula():
-                        aFormula_KL = postprocessMathString( libsbml.formulaToString( preprocessMathTree( aKineticLaw.getMath(), timeSymbol ) ), timeSymbol )
-                        aDiscontinuity_KL = isDiscontinuous( aKineticLaw.getMath() )
+                        aFormula_KL = postprocess_math_string( libsbml.formulaToString( preprocess_math_tree( aKineticLaw.getMath(), timeSymbol ) ), timeSymbol )
+                        aDiscontinuity_KL = is_discontinuous( aKineticLaw.getMath() )
                     else:
                         aFormula_KL = ''
                         aDiscontinuity_KL = False
@@ -259,7 +259,7 @@ def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
                     else:
                         if aKineticLaw.isSetMath():
                             aMath.append(
-                                postprocessMathString( libsbml.formulaToString( preprocessMathTree( aKineticLaw.getMath(), timeSymbol ) ), timeSymbol )
+                                postprocess_math_string( libsbml.formulaToString( preprocess_math_tree( aKineticLaw.getMath(), timeSymbol ) ), timeSymbol )
                                 )
                         else:
                             aMath.append( '' )
@@ -328,7 +328,7 @@ def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
                     if aSpeciesReference.isSetStoichiometryMath():
                         aNode_R = aSpeciesReference.getStoichiometryMath()
                         if aNode_R.isSetMath():
-                            aStoichiometryMath_R = postprocessMathString( libsbml.formulaToString( preprocessMathTree( aNode_R.getMath(), timeSymbol ) ), timeSymbol )
+                            aStoichiometryMath_R = postprocess_math_string( libsbml.formulaToString( preprocess_math_tree( aNode_R.getMath(), timeSymbol ) ), timeSymbol )
 
                     aDenominator_R = aSpeciesReference.getDenominator()
 
@@ -355,7 +355,7 @@ def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
                     if aSpeciesReference.isSetStoichiometryMath():
                         aNode_P = aSpeciesReference.getStoichiometryMath()
                         if aNode_P.isSetMath():
-                            aStoichiometryMath_P = postprocessMathString( libsbml.formulaToString( preprocessMathTree( aNode_P.getMath(), timeSymbol ) ), timeSymbol )
+                            aStoichiometryMath_P = postprocess_math_string( libsbml.formulaToString( preprocess_math_tree( aNode_P.getMath(), timeSymbol ) ), timeSymbol )
 
                     aDenominator_P = aSpeciesReference.getDenominator()
 
@@ -385,14 +385,14 @@ def getReaction( aSBMLmodel, aSBMLDocument, timeSymbol ):
             aReactionDic[ 'Products' ]           =  ListOfProducts 
             aReactionDic[ 'Modifiers' ]          =  ListOfModifiers 
             
-            aReactionDic[ 'CommonDemoninator' ]  =  getCommonDenominator( aReactionDic )
+            aReactionDic[ 'CommonDemoninator' ]  =  get_common_denominator( aReactionDic )
             
             LIST.append( aReactionDic )
 
     return LIST
 
 
-def getRule( aSBMLmodel, timeSymbol ):
+def get_Rule_list( aSBMLmodel, timeSymbol ):
     " [[ RuleType, Formula, Variable ]] "
     LIST = []
     if aSBMLmodel.getRule(0):
@@ -404,8 +404,8 @@ def getRule( aSBMLmodel, timeSymbol ):
             aRuleType = aRule.getTypeCode()
             
             if aRule.isSetFormula():
-                aFormula = postprocessMathString( libsbml.formulaToString( preprocessMathTree( aRule.getMath(), timeSymbol ) ), timeSymbol )
-                aDiscontinuity = isDiscontinuous( aRule.getMath() )
+                aFormula = postprocess_math_string( libsbml.formulaToString( preprocess_math_tree( aRule.getMath(), timeSymbol ) ), timeSymbol )
+                aDiscontinuity = is_discontinuous( aRule.getMath() )
 
             else:
                 aFormula = ''
@@ -446,7 +446,7 @@ def getRule( aSBMLmodel, timeSymbol ):
     return LIST
 
 
-def getSpecies( aSBMLmodel, DerivedValueDic ):
+def get_Species_list( aSBMLmodel, DerivedValueDic ):
     " [[ Id , Name , Compartment , InitialAmount , InitialConcentration , SubstanceUnit , SpatialSizeUnit , Unit , HasOnlySubstanceUnit , BoundaryCondition , Charge , Constant ]] "
     LIST = []
     if aSBMLmodel.getSpecies(0):
@@ -471,7 +471,7 @@ def getSpecies( aSBMLmodel, DerivedValueDic ):
                 
 
             if (( anInitialAmount_Sp == "Unknown" ) and ( anInitialConcentration_Sp == "Unknown" )):
-                if getInitialValueFromAssignmentRule( aSBMLmodel, anId_Sp, DerivedValueDic ):
+                if get_initial_value_from_AssignmentRule( aSBMLmodel, anId_Sp, DerivedValueDic ):
                     anInitialAmount_Sp = DerivedValueDic[ anId_Sp ]
 
             aSubstanceUnit_Sp = aSpecies.getSubstanceUnits()
@@ -501,7 +501,7 @@ def getSpecies( aSBMLmodel, DerivedValueDic ):
     return LIST
 
 
-def getUnitDefinition( aSBMLmodel ):
+def get_UnitDefinition_list( aSBMLmodel ):
     " [[ Id , Name , [[ Kind , Exponent , Scale , Multiplier , Offset ]] ]] "
     LIST = []
     if aSBMLmodel.getUnitDefinition(0):
@@ -551,7 +551,7 @@ def getUnitDefinition( aSBMLmodel ):
 #  Get a common denominator of a reaction
 # --------------------------------------------------
 
-def getCommonDenominator( aReaction ):
+def get_common_denominator( aReaction ):
 
     coefficientList = []
     
@@ -585,7 +585,7 @@ def getCommonDenominator( aReaction ):
 #  Check the Continuity of a Formula
 # --------------------------------------------------
 
-def isDiscontinuous( aMathNode ):
+def is_discontinuous( aMathNode ):
 
     discontinuousTypes = (
         libsbml.AST_FUNCTION_DELAY,
@@ -608,7 +608,7 @@ def isDiscontinuous( aMathNode ):
     numChildren = aMathNode.getNumChildren()
     if numChildren != 0:
         for i in range( numChildren ):
-            if isDiscontinuous( aMathNode.getChild( i ) ):
+            if is_discontinuous( aMathNode.getChild( i ) ):
                 return True
     
     return False
@@ -618,7 +618,7 @@ def isDiscontinuous( aMathNode ):
 #  Pre/Post-process of Formula
 # --------------------------------------------------
 
-def getTimeSymbol( aSBMLmodel ):
+def get_TimeSymbol( aSBMLmodel ):
 
     timeSymbol = "time"
 
@@ -629,19 +629,19 @@ def getTimeSymbol( aSBMLmodel ):
     return timeSymbol
 
 
-def preprocessMathTree( aNode, timeSymbol ):
+def preprocess_math_tree( aNode, timeSymbol ):
 
     # Set AST_NAME_TIME node's name (SBML does not guarantee its uniqueness)
     if ( aNode.getType() == libsbml.AST_NAME_TIME ):
         aNode.setName( timeSymbol )
 
     for i in range( aNode.getNumChildren() ):
-        preprocessMathTree( aNode.getChild( i ), timeSymbol )
+        preprocess_math_tree( aNode.getChild( i ), timeSymbol )
 
     return aNode
 
 
-def postprocessMathString( aFormula, timeSymbol ):
+def postprocess_math_string( aFormula, timeSymbol ):
 
     ## It's OK if timeSymbol = "time"
     aFormula = re.sub( r"(\W)%s(\W)" % timeSymbol, r'\1<t>\2', aFormula )
@@ -655,7 +655,7 @@ def postprocessMathString( aFormula, timeSymbol ):
 #  Computation of Initial Value
 # --------------------------------------------------
 
-def getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic ):
+def get_initial_value_from_AssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic ):
     '''
     return False when the initial value can not calculate.
     '''
@@ -670,34 +670,34 @@ def getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic 
     aFormulaTree = anAssignmentRule.getMath().deepCopy()
 
 ##    print "\nAssignmentRule for %s" % aVariableID
-##    print "  %s\n" % postprocessMathString( libsbml.formulaToString( preprocessMathTree( anAssignmentRule.getMath(), getTimeSymbol( aSBMLmodel ) ) ), getTimeSymbol( aSBMLmodel ) )
+##    print "  %s\n" % postprocess_math_string( libsbml.formulaToString( preprocess_math_tree( anAssignmentRule.getMath(), get_TimeSymbol( aSBMLmodel ) ) ), get_TimeSymbol( aSBMLmodel ) )
 ##    print "Initial Construction:\n"
-##    _dumpTreeConstructionOfNode( aFormulaTree )
+##    _dump_tree_construction_of_AST_node( aFormulaTree )
 ##    print '\n'
 
     aCounter = 1
     while ( aCounter > 0 ):
         aCounter = 0
-        _convertName2Value( aSBMLmodel, aFormulaTree, aCounter, DerivedValueDic )
+        _convert_AST_NAME_to_value( aSBMLmodel, aFormulaTree, aCounter, DerivedValueDic )
 ##        if aCounter == 0:
 ##            print 'Initial Value: %s = %f' % ( aVariableID, aSBMLmodel.getElementBySId( aVariableID ).getValue() )
 
 ##    print "Name replaced with value:\n"
-##    _dumpTreeConstructionOfNode( aFormulaTree )
+##    _dump_tree_construction_of_AST_node( aFormulaTree )
 ##    print '\n'
 
-##    _dumpTreeConstructionOfNode( aFormulaTree )
+##    _dump_tree_construction_of_AST_node( aFormulaTree )
 
     while ( aFormulaTree.getNumChildren() > 0 ):
-        _calcInitialValue( aFormulaTree )
+        _calc_AST_node_value( aFormulaTree )
 
-##    print "Initial Value of %s: %s" % ( aVariableID, _getNodeValue( aFormulaTree ))
+##    print "Initial Value of %s: %s" % ( aVariableID, _get_AST_node_value( aFormulaTree ))
 
-    DerivedValueDic[ aVariableID ] = _getNodeValue( aFormulaTree )
+    DerivedValueDic[ aVariableID ] = _get_AST_node_value( aFormulaTree )
     return True
 
 
-def _convertName2Value( aSBMLmodel, aNode, aCounter, DerivedValueDic ):
+def _convert_AST_NAME_to_value( aSBMLmodel, aNode, aCounter, DerivedValueDic ):
 
     if ( aNode.getType() == libsbml.AST_NAME ):
         aVariableID = aNode.getName()
@@ -740,7 +740,7 @@ def _convertName2Value( aSBMLmodel, aNode, aCounter, DerivedValueDic ):
                 aNode.setType( libsbml.AST_REAL )
                 aNode.setValue( anElement.getInitialConcentration() * aSBMLmodel.getCompartment( anElement.getCompartment() ).getSize() )
             else:
-                if getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic ):
+                if get_initial_value_from_AssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic ):
                     aNode.setType( libsbml.AST_REAL )
                     aNode.setValue( DerivedValueDic[ aVariableID ] )
                 else:
@@ -751,7 +751,7 @@ def _convertName2Value( aSBMLmodel, aNode, aCounter, DerivedValueDic ):
                 aNode.setType( libsbml.AST_REAL )
                 aNode.setValue( anElement.getValue() )
             else:
-                if getInitialValueFromAssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic ):
+                if get_initial_value_from_AssignmentRule( aSBMLmodel, aVariableID, DerivedValueDic ):
                     aNode.setType( libsbml.AST_REAL )
                     aNode.setValue( DerivedValueDic[ aVariableID ] )
                 else:
@@ -763,7 +763,7 @@ def _convertName2Value( aSBMLmodel, aNode, aCounter, DerivedValueDic ):
         
         else:
             raise TypeError,\
-            "_convertName2Value: Element type must be Species, Parameter, or Compartment"
+            "_convert_AST_NAME_to_value: Element type must be Species, Parameter, or Compartment"
 
     ##     Time ( initial value = 0.0 )
 
@@ -772,10 +772,10 @@ def _convertName2Value( aSBMLmodel, aNode, aCounter, DerivedValueDic ):
         aNode.setValue( 0.0 )
 
     for i in range( aNode.getNumChildren() ):
-        _convertName2Value( aSBMLmodel, aNode.getChild( i ), aCounter, DerivedValueDic )
+        _convert_AST_NAME_to_value( aSBMLmodel, aNode.getChild( i ), aCounter, DerivedValueDic )
 
 
-def _calcInitialValue( aNode ):
+def _calc_AST_node_value( aNode ):
     if ( sys.version_info[0] >= 3 or
          ( sys.version_info[0] == 2 and sys.version_info[1] >= 6 )):
         geqPython26 = True
@@ -799,82 +799,82 @@ def _calcInitialValue( aNode ):
             aNode.setValue( aRealValue )
         elif ( aNodeType == libsbml.AST_DIVIDE ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( float( _getNodeValue( aNode.getLeftChild())) / float( _getNodeValue( aNode.getRightChild())) )
+            aNode.setValue( float( _get_AST_node_value( aNode.getLeftChild())) / float( _get_AST_node_value( aNode.getRightChild())) )
 
         elif( aNodeType == libsbml.AST_MINUS ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( float( _getNodeValue( aNode.getLeftChild())) - float( _getNodeValue( aNode.getRightChild())) )
+            aNode.setValue( float( _get_AST_node_value( aNode.getLeftChild())) - float( _get_AST_node_value( aNode.getRightChild())) )
 
         elif( aNodeType == libsbml.AST_PLUS ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( float( _getNodeValue( aNode.getLeftChild())) + float( _getNodeValue( aNode.getRightChild())) )
+            aNode.setValue( float( _get_AST_node_value( aNode.getLeftChild())) + float( _get_AST_node_value( aNode.getRightChild())) )
 
         elif ( aNodeType == libsbml.AST_TIMES ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( float( _getNodeValue( aNode.getLeftChild())) * float( _getNodeValue( aNode.getRightChild())) )
+            aNode.setValue( float( _get_AST_node_value( aNode.getLeftChild())) * float( _get_AST_node_value( aNode.getRightChild())) )
 
         elif ( aNodeType == libsbml.AST_POWER ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( pow( float( _getNodeValue( aNode.getLeftChild())), float( _getNodeValue( aNode.getRightChild()))) )
+            aNode.setValue( pow( float( _get_AST_node_value( aNode.getLeftChild())), float( _get_AST_node_value( aNode.getRightChild()))) )
 
         ## Logical operators
 
         elif ( aNodeType == libsbml.AST_LOGICAL_AND ):
             aNode.setType( libsbml.AST_INTEGER )
-            aNode.setValue( _getNodeValue( aNode.getLeftChild() ) and _getNodeValue( aNode.getRightChild() ) )
+            aNode.setValue( _get_AST_node_value( aNode.getLeftChild() ) and _get_AST_node_value( aNode.getRightChild() ) )
 
         elif ( aNodeType == libsbml.AST_LOGICAL_NOT ):
             aNode.setType( libsbml.AST_INTEGER )
-            aNode.setValue( not _getNodeValue( aNode.getChild( 0 )))
+            aNode.setValue( not _get_AST_node_value( aNode.getChild( 0 )))
 
         elif ( aNodeType == libsbml.AST_LOGICAL_OR ):
             aNode.setType( libsbml.AST_INTEGER )
-            aNode.setValue( _getNodeValue( aNode.getLeftChild() ) or _getNodeValue( aNode.getRightChild() ) )
+            aNode.setValue( _get_AST_node_value( aNode.getLeftChild() ) or _get_AST_node_value( aNode.getRightChild() ) )
 
         elif ( aNodeType == libsbml.AST_LOGICAL_XOR ):
             aNode.setType( libsbml.AST_INTEGER )
-            aNode.setValue( ( not( _getNodeValue( aNode.getLeftChild() ))) and ( not( _getNodeValue( aNode.getRightChild() ))))
+            aNode.setValue( ( not( _get_AST_node_value( aNode.getLeftChild() ))) and ( not( _get_AST_node_value( aNode.getRightChild() ))))
 
         ## Relational operators
 
         elif ( aNodeType == libsbml.AST_RELATIONAL_EQ ):
             aNode.setType( libsbml.AST_INTEGER )
-            if ( float( _getNodeValue( aNode.getLeftChild() )) == float( _getNodeValue( aNode.getRightChild() )) ):
+            if ( float( _get_AST_node_value( aNode.getLeftChild() )) == float( _get_AST_node_value( aNode.getRightChild() )) ):
                 aNode.setValue( 1 )
             else:
                 aNode.setValue( 0 )
 
         elif ( aNodeType == libsbml.AST_RELATIONAL_GEQ ):
             aNode.setType( libsbml.AST_INTEGER )
-            if ( float( _getNodeValue( aNode.getLeftChild() )) >= float( _getNodeValue( aNode.getRightChild() )) ):
+            if ( float( _get_AST_node_value( aNode.getLeftChild() )) >= float( _get_AST_node_value( aNode.getRightChild() )) ):
                 aNode.setValue( 1 )
             else:
                 aNode.setValue( 0 )
 
         elif ( aNodeType == libsbml.AST_RELATIONAL_GT ):
             aNode.setType( libsbml.AST_INTEGER )
-            if ( float( _getNodeValue( aNode.getLeftChild() )) > float( _getNodeValue( aNode.getRightChild() )) ):
+            if ( float( _get_AST_node_value( aNode.getLeftChild() )) > float( _get_AST_node_value( aNode.getRightChild() )) ):
                 aNode.setValue( 1 )
             else:
                 aNode.setValue( 0 )
 
         elif ( aNodeType == libsbml.AST_RELATIONAL_LEQ ):
             aNode.setType( libsbml.AST_INTEGER )
-            if ( float( _getNodeValue( aNode.getLeftChild() )) <= float( _getNodeValue( aNode.getRightChild() )) ):
+            if ( float( _get_AST_node_value( aNode.getLeftChild() )) <= float( _get_AST_node_value( aNode.getRightChild() )) ):
                 aNode.setValue( 1 )
             else:
                 aNode.setValue( 0 )
 
         elif ( aNodeType == libsbml.AST_RELATIONAL_LT ):
             aNode.setType( libsbml.AST_INTEGER )
-            if ( float( _getNodeValue( aNode.getLeftChild() )) < float( _getNodeValue( aNode.getRightChild() )) ):
+            if ( float( _get_AST_node_value( aNode.getLeftChild() )) < float( _get_AST_node_value( aNode.getRightChild() )) ):
                 aNode.setValue( 1 )
             else:
                 aNode.setValue( 0 )
 
         elif ( aNodeType == libsbml.AST_RELATIONAL_NEQ ):
             aNode.setType( libsbml.AST_INTEGER )
-            if ( float( _getNodeValue( aNode.getLeftChild() )) != float( _getNodeValue( aNode.getRightChild() )) ):
+            if ( float( _get_AST_node_value( aNode.getLeftChild() )) != float( _get_AST_node_value( aNode.getRightChild() )) ):
                 aNode.setValue( 1 )
             else:
                 aNode.setValue( 0 )
@@ -885,168 +885,168 @@ def _calcInitialValue( aNode ):
 
         elif ( aNodeType == libsbml.AST_FUNCTION_EXP ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.exp( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( math.exp( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_LN ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.log( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( math.log( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_LOG ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.log( float( _getNodeValue( aNode.getLeftChild())), float( _getNodeValue( aNode.getRightChild() ))))
+            aNode.setValue( math.log( float( _get_AST_node_value( aNode.getLeftChild())), float( _get_AST_node_value( aNode.getRightChild() ))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_POWER ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( pow( float( _getNodeValue( aNode.getLeftChild())), float( _getNodeValue( aNode.getRightChild() ))))
+            aNode.setValue( pow( float( _get_AST_node_value( aNode.getLeftChild())), float( _get_AST_node_value( aNode.getRightChild() ))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ROOT ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( pow( float( _getNodeValue( aNode.getLeftChild())), 1.0 / float( _getNodeValue( aNode.getRightChild() ))))
+            aNode.setValue( pow( float( _get_AST_node_value( aNode.getLeftChild())), 1.0 / float( _get_AST_node_value( aNode.getRightChild() ))))
 
         ##     Number-theoretic and representation functions
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ABS ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( abs( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( abs( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_CEILING ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.ceil( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( math.ceil( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_FACTORIAL ):
             aNode.setType( libsbml.AST_INTEGER )
-            aNode.setValue( math.factorial( _getNodeValue( aNode.getChild( 0 ))))
+            aNode.setValue( math.factorial( _get_AST_node_value( aNode.getChild( 0 ))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_FLOOR ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.floor( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( math.floor( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         ##     Trigonometric functions
 
         elif ( aNodeType == libsbml.AST_FUNCTION_SIN ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.sin( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( math.sin( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_COS ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.cos( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( math.cos( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_TAN ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.tan( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( math.tan( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_CSC ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( 1.0 / math.sin( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( 1.0 / math.sin( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_SEC ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( 1.0 / math.cos( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( 1.0 / math.cos( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_COT ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( 1.0 / math.tan( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( 1.0 / math.tan( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         ##     Inverse trigonometric functions
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCSIN ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.asin( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( math.asin( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCCOS ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.acos( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( math.acos( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCTAN ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.atan( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( math.atan( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCCSC ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( 1.0 / math.asin( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( 1.0 / math.asin( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCSEC ):  ## arc-secant
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.acos( 1.0 / float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( math.acos( 1.0 / float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCCOT ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.atan( 1.0 / float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( math.atan( 1.0 / float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         ##     Hyperbolic functions
 
         elif ( aNodeType == libsbml.AST_FUNCTION_SINH ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.sinh( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( math.sinh( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_COSH ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.cosh( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( math.cosh( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_TANH ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.tanh( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( math.tanh( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_CSCH ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( 1.0 / math.sinh( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( 1.0 / math.sinh( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_SECH ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( 1.0 / math.cosh( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( 1.0 / math.cosh( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_COTH ):
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( 1.0 / math.tanh( float( _getNodeValue( aNode.getChild( 0 )))))
+            aNode.setValue( 1.0 / math.tanh( float( _get_AST_node_value( aNode.getChild( 0 )))))
 
         ##     Inverse hyperbolic functions
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCSINH ):
             aNode.setType( libsbml.AST_REAL )
             if geqPython26:
-                aNode.setValue( math.asinh( float( _getNodeValue( aNode.getChild( 0 )))))
+                aNode.setValue( math.asinh( float( _get_AST_node_value( aNode.getChild( 0 )))))
             else:
-                x = float( _getNodeValue( aNode.getChild( 0 )))
+                x = float( _get_AST_node_value( aNode.getChild( 0 )))
                 aNode.setValue( math.log( x + math.sqrt( x * x + 1.0 )))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCCOSH ):
             aNode.setType( libsbml.AST_REAL )
             if geqPython26:
-                aNode.setValue( math.acosh( float( _getNodeValue( aNode.getChild( 0 )))))
+                aNode.setValue( math.acosh( float( _get_AST_node_value( aNode.getChild( 0 )))))
             else:
-                x = float( _getNodeValue( aNode.getChild( 0 )))
+                x = float( _get_AST_node_value( aNode.getChild( 0 )))
                 aNode.setValue( math.log( x + math.sqrt( x + 1.0 ) * math.sqrt( x - 1.0 )))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCTANH ):
             aNode.setType( libsbml.AST_REAL )
             if geqPython26:
-                aNode.setValue( math.atanh( float( _getNodeValue( aNode.getChild( 0 )))))
+                aNode.setValue( math.atanh( float( _get_AST_node_value( aNode.getChild( 0 )))))
             else:
-                x = float( _getNodeValue( aNode.getChild( 0 )))
+                x = float( _get_AST_node_value( aNode.getChild( 0 )))
                 aNode.setValue( 0.5 * math.log( ( 1.0 + x ) / ( 1.0 - x )))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCCSCH ):
             aNode.setType( libsbml.AST_REAL )
             if geqPython26:
-                aNode.setValue( math.asinh( 1.0 / float( _getNodeValue( aNode.getChild( 0 )))))
+                aNode.setValue( math.asinh( 1.0 / float( _get_AST_node_value( aNode.getChild( 0 )))))
             else:
-                x = float( _getNodeValue( aNode.getChild( 0 )))
+                x = float( _get_AST_node_value( aNode.getChild( 0 )))
                 aNode.setValue( math.log( 1.0 / x + math.sqrt( 1.0 / x / x + 1.0 )))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCSECH ):
             aNode.setType( libsbml.AST_REAL )
             if geqPython26:
-                aNode.setValue( math.acosh( 1.0 / float( _getNodeValue( aNode.getChild( 0 )))))
+                aNode.setValue( math.acosh( 1.0 / float( _get_AST_node_value( aNode.getChild( 0 )))))
             else:
-                x = float( _getNodeValue( aNode.getChild( 0 )))
+                x = float( _get_AST_node_value( aNode.getChild( 0 )))
                 aNode.setValue( math.log( 1.0 / x + math.sqrt( 1.0 / x + 1.0 ) * math.sqrt( 1.0 / x - 1.0 )))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCCOTH ):
             aNode.setType( libsbml.AST_REAL )
             if geqPython26:
-                aNode.setValue( math.atanh( 1.0 / float( _getNodeValue( aNode.getChild( 0 )))))
+                aNode.setValue( math.atanh( 1.0 / float( _get_AST_node_value( aNode.getChild( 0 )))))
             else:
-                x = float( _getNodeValue( aNode.getChild( 0 )))
+                x = float( _get_AST_node_value( aNode.getChild( 0 )))
                 aNode.setValue( 0.5 * math.log( ( x + 1.0 ) / ( x - 1.0 )))
 
         ##     Other functions
@@ -1054,26 +1054,26 @@ def _calcInitialValue( aNode ):
         elif ( aNodeType == libsbml.AST_FUNCTION_DELAY ):
             ### At t = 0, delayed value is not available, thus value at t = 0 is used.
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( _getNodeValue( aNode.getChild( 0 )))
+            aNode.setValue( _get_AST_node_value( aNode.getChild( 0 )))
 
         elif ( aNodeType == libsbml.AST_FUNCTION_PIECEWISE ):
 ##            print "\nCulc AST_FUNCTION_PIECEWISE:"
-##            _dumpTreeConstructionOfNode( aNode )
+##            _dump_tree_construction_of_AST_node( aNode )
 ##
 ##            print "  #Children = %d" % aNode.getNumChildren()
             for i in range( aNode.getNumChildren() / 2 ):
-                if ( _getNodeValue( aNode.getChild( i * 2 + 1 )) != 0 ):
+                if ( _get_AST_node_value( aNode.getChild( i * 2 + 1 )) != 0 ):
 ##                    aNode = aNode.getChild( i * 2 ).deepCopy()
                     aNode.setType( aNode.getChild( i * 2 ).getType() )
-                    aNode.setValue( _getNodeValue( aNode.getChild( i * 2 )))
-##                    print "  piece(%d) is True! Value is %s" % ( i, _getNodeValue( aNode ))
+                    aNode.setValue( _get_AST_node_value( aNode.getChild( i * 2 )))
+##                    print "  piece(%d) is True! Value is %s" % ( i, _get_AST_node_value( aNode ))
                     break
             
             if ( aNode.getType() == libsbml.AST_FUNCTION_PIECEWISE ):
                 if ( aNode.getNumChildren() % 2 == 1 ):
 ##                    aNode = aNode.getRightChild().deepCopy()
                     aNode.setType( aNode.getRightChild().getType() )
-                    aNode.setValue( _getNodeValue( aNode.getRightChild()))
+                    aNode.setValue( _get_AST_node_value( aNode.getRightChild()))
                 else:
                     raise TypeError,\
                     "Can't derive an initial value from a piecewise function"
@@ -1089,13 +1089,13 @@ AST_FUNCTION            : Solved by converter
 AST_LAMBDA              : Solved by converter
         '''
 
-        _removeAllChildren( aNode )
+        _remove_all_Children( aNode )
 
     for i in range( aNode.getNumChildren() ):
-        _calcInitialValue( aNode.getChild( i ) )
+        _calc_AST_node_value( aNode.getChild( i ) )
 
 
-def _getNodeValue( aNode ):
+def _get_AST_node_value( aNode ):
     aNodeType = aNode.getType()
     if ( aNode.isReal() ):
         return aNode.getReal()
@@ -1106,7 +1106,7 @@ def _getNodeValue( aNode ):
         "aNode must be number"
 
 
-def _removeAllChildren( aNode ):
+def _remove_all_Children( aNode ):
     while ( aNode.getNumChildren() > 0 ):
         aNode.removeChild( 0 )
     return
@@ -1115,7 +1115,7 @@ def _removeAllChildren( aNode ):
 #  Output the Construction of Math Tree (ASTNode)
 # --------------------------------------------------
 
-def _dumpTreeConstructionOfNode( aNode ):
+def _dump_tree_construction_of_AST_node( aNode ):
 
 ##    print aNode.getType()
 
@@ -1249,6 +1249,6 @@ def _dumpTreeConstructionOfNode( aNode ):
         print "  AST_UNKNOWN"
 
     for i in range( aNode.getNumChildren() ):
-        _dumpTreeConstructionOfNode( aNode.getChild( i ) )
+        _dump_tree_construction_of_AST_node( aNode.getChild( i ) )
 
 
