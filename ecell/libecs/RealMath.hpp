@@ -2,7 +2,8 @@
 //
 //       This file is part of the E-Cell System
 //
-//       Copyright (C) 1996-2012 Keio University
+//       Copyright (C) 1996-2014 Keio University
+//       Copyright (C) 2008-2014 RIKEN
 //       Copyright (C) 2005-2009 The Molecular Sciences Institute
 //
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -25,7 +26,9 @@
 //
 //END_HEADER
 //
-// written by Koichi Takahashi <shafi@e-cell.org>,
+// written by
+//     Koichi Takahashi <shafi@e-cell.org>,
+//     Yasuhiro Naito
 // E-Cell Project.
 //
 

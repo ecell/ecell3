@@ -129,7 +129,9 @@ A typical command-line session is as follows::
 
    $ ecell3-session
    ecell3-session [ E-Cell SE Version 3.1.106, on Python Version 2.3.4 ]
-   Copyright (C) 1996-2012 Keio University.
+   Copyright (C) 1996-2014 Keio University
+   Copyright (C) 2008-2014 RIKEN
+   Copyright (C) 2005-2009 The Molecular Sciences Institute
    Send feedback to Koichi Takahashi <shafi@e-cell.org>
    ecell3-session>>>
 
@@ -175,8 +177,9 @@ Copyright Notice
 E-Cell System is distributed under the GNU General Public License
 version 2.
 
-  Copyright (C) 1996-2012 Keio University
-  Copyright (C) 2005-2012 The Molecular Sciences Institute
+  Copyright (C) 1996-2014 Keio University
+  Copyright (C) 2008-2014 RIKEN
+  Copyright (C) 2005-2009 The Molecular Sciences Institute
 
   E-Cell System is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public
