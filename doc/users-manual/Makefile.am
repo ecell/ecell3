@@ -4,12 +4,19 @@ DOC_pdf = users-manual.pdf
 DOC_dvi = users-manual.dvi
 
 if BUILD_USERS_MANUAL_html
-$(DOC_html)/*: users-manual.xml
+all-local: $(DOC_html)/index.html
+
+$(DOC_html)/index.html: users-manual.xml
 	$(DB2HTML) -o $(DOC_html) $<
-else
-$(DOC_html)/*:
-	$(RM) -rf $(DOC_html)
-	mkdir $(DOC_html)
+
+install-data-local:
+	@$(NORMAL_INSTALL)
+	$(MKDIR_P) $(DESTDIR)$(htmldir)/$(DOC_html)
+	$(INSTALL_DATA) $(DOC_html)/* $(DESTDIR)$(htmldir)/$(DOC_html)
+
+uninstall-local:
+	@$(NORMAL_UNINSTALL)
+	rm -f $(DESTDIR)$(htmldir)/$(DOC_html)/*
 endif
 
 if BUILD_USERS_MANUAL_ps
@@ -26,8 +33,13 @@ endif
 
 if BUILD_USERS_MANUAL_dvi
 dvi_DATA  = $(DOC_dvi)
+if BUILD_USERS_MANUAL_pdf
+$(DOC_dvi): users-manual.xml $(DOC_pdf)
+	$(DB2DVI) $<
+else
 $(DOC_dvi): users-manual.xml
 	$(DB2DVI) $<
+endif
 endif
 
 EXTRA_DIST = \
@@ -49,24 +61,6 @@ EXTRA_DIST = \
 	session-class-api.xml \
 	stddmlib.xml
 
-if BUILD_USERS_MANUAL_html
-EXTRA_DIST += $(DOC_html)
-endif
-
-if BUILD_USERS_MANUAL_html
-install-data-local:
-	(cd "$(DOC_html)" && \
-	find . -type d | while read path; do $(INSTALL) -d "$(DESTDIR)$(htmldir)/$(DOC_html)/$$path"; done && \
-	find . -type f | while read path; do $(INSTALL) -m 644 $$path "$(DESTDIR)$(htmldir)/$(DOC_html)/$$path"; done)
-
-uninstall-local:
-	( cd "$(DESTDIR)$(htmldir)" && rm -rf "$(DOC_html)" )
-else
-install-data-local:
-
-uninstall-local:
-endif
-
 clean-local:
 	$(RM) -f $(DOC_ps) $(DOC_pdf) $(DOC_dvi)
-	$(RM) -rf *.junk *.tex
+	$(RM) -rf *.junk *.tex $(DOC_html)

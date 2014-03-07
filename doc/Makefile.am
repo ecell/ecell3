@@ -5,11 +5,21 @@ EXTRA_DIST = \
 	index.tmpl
 
 if BUILD_API_REF_html
-_htmldir = $(htmldir)/api
-_html_DATA = $(wildcard api/*)
+all-local: api/
 
-api/index.html: ecell3.doxy
+apidoc_dir=$(htmldir)/api
+
+api/: ecell3.doxy
 	doxygen ecell3.doxy
+
+install-data-local:
+	@$(NORMAL_INSTALL)
+	$(MKDIR_P) $(DESTDIR)$(apidoc_dir)
+	$(INSTALL_DATA) api/* $(DESTDIR)$(apidoc_dir)
+
+uninstall-local:
+	@$(NORMAL_UNINSTALL)
+	rm -f $(DESTDIR)$(apidoc_dir)/*
 
 clean-local:
 	$(RM) -r api

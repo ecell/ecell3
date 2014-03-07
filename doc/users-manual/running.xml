@@ -60,18 +60,16 @@ items.
       <para>You can obtain the full description of the command line options
       giving -h option to <command>ecell3-em2eml</command>.</para>
       <para>
-        <screen>ecell3-em2eml -- convert a EM file to a EML file
-
+      <screen>ecell3-eml2em -- convert eml to em
+         
 Usage:
-        ecell3-em2eml [-h] [-o EMLFILE] [-p PATCHFILE] infile.em
-        By default this command automatically overwrite EMLFILE.
-
+        ecell3-eml2em [-h] [-f] [-o outfile] infile
+ 
+         
 Options:
-        -h or --help            : Print this message.
-        -o or --outfile=EMLFILE : Specify the output file name. '-' means stdout.
-        -p or --patch=PATCHFILE : Read PATCHFILE, override parameters by the input
-                                  and then produce EMLFILE.
-        -E or --preprocess      : Preprocessing only. Implies -o -.
+        -h or --help    :  Print this message.
+        -f or --force   :  Force overwrite even if outfile already exists.
+        -o or --outfile=:  Specify output file name.  '-' means stdout.
 </screen>
       </para>
     </sect2>
