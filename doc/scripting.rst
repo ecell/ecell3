@@ -93,7 +93,7 @@ without an ESS file.
 
      
     ecell3-session [ for E-Cell SE Version 3, on Python Version 2.2.1 ]
-    Copyright (C) 1996-2012 Keio University.
+    Copyright (C) 1996-2014 Keio University.
     Send feedback to Koichi Takahashi 
 
             
@@ -727,7 +727,7 @@ There is absolutely no warranty for GDB.  Type "show warranty" for details.
 This GDB was configured as "i386-redhat-linux-gnu"...
 [New Thread 1074178112 (LWP 7327)]
 ecell3-session [ E-Cell SE Version 3.2.0, on Python Version 2.2.2 ]
-Copyright (C) 1996-2003 Keio University.
+Copyright (C) 1996-2014 Keio University.
 Send feedback to Koichi Takahashi <shafi@e-cell.org>``
 ``<foo.eml, t=0>>> ``\ ```` ``Program received signal SIGINT, Interrupt.
 [Switching to Thread 1074178112 (LWP 7327)]
