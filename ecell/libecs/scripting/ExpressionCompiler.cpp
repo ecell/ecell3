@@ -147,6 +147,7 @@ public:
                             | rootNode( str_p("log") )
                             | rootNode( str_p("floor") )
                             | rootNode( str_p("ceil") )
+                            | rootNode( str_p("rem") )
                             | rootNode( str_p("sin") )
                             | rootNode( str_p("cos") )
                             | rootNode( str_p("tan") )
@@ -297,6 +298,7 @@ struct CompilerConfig
 
         // set ExpressionCompiler::FunctionMap2
         theFunctionMap2["pow"]   = pow;
+        theFunctionMap2["rem"]   = real_rem;
         theFunctionMap2["and"]   = real_and;
         theFunctionMap2["or"]    = real_or;
         theFunctionMap2["xor"]   = real_xor;

@@ -176,6 +176,13 @@ inline Real real_xor( T n1, T n2 )
 }
 
 template <typename T>
+inline Real real_rem( T n1, T n2 )
+{
+    return n1 - floor( n1 / n2 ) * n2;
+
+}
+
+template <typename T>
 inline T asinh( T n )
 {
     return log( n + sqrt( n * n + 1 ) );
