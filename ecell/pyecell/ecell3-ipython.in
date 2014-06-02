@@ -1,0 +1,150 @@
+#!/bin/sh
+
+
+PACKAGE=@PACKAGE@
+VERSION=@VERSION@
+
+PYTHON=@PYTHON@
+DEBUGGER=gdb
+
+BASENAME=`basename $0`
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+pythondir=@pythondir@
+pyexecdir=@pyexecdir@
+PYTHON_INCLUDES="@PYTHON_INCLUDES@"
+BOOST_LIBRARIES="-lboost_python"
+
+ECELL_DIRNAME=@ECELL_DIRNAME@
+
+ECELL3_PREFIX=${prefix}
+PYTHONDIR=${pyexecdir}
+
+# make a __init__.py file in ecell/SessionManager!
+PYTHONPATH="$PYTHONDIR:${PYTHONPATH}"
+PYTHON_INCLUDES=${PYTHON_INCLUDES}
+
+CXXFLAGS="@CXXFLAGS@"
+CXX="@CXX@"
+LDFLAGS="@LDFLAGS@"
+ECELL3_LIBDIR="${libdir}/${ECELL_DIRNAME}"
+
+LD_LIBRARY_PATH="${libdir}"
+
+export ECELL3_PREFIX
+export ECELL_DIRNAME
+export PYTHONDIR
+export PYTHONPATH
+export PYTHON_INCLUDES
+export BOOST_LIBRARIES
+export LTDL_LIBRARY_PATH
+export VERSION
+export CXXFLAGS
+export CXX
+export LDFLAGS
+export ECELL3_LIBDIR
+export LD_LIBRARY_PATH
+
+ecell3_usage() 
+{
+cat << EOT_USAGE
+$BASENAME ( Package: $PACKAGE, Version: $VERSION )
+
+Invoke python interpreter made ready to import E-CELL module.
+('import ecell.ecs' to load the module.)
+
+Usage:
+
+    Basic Usage:
+
+        $BASENAME [OPTIONS]     --> invoke the python interpreter
+        $BASENAME -h            --> print this message
+
+    Debugging mode:   (this would only work with gdb)
+
+        If environment variable ECELL_DEBUG is set,
+
+        $BASENAME [PYTHONOPTIONS]
+
+        invokes
+
+        $DEBUGGER $PYTHON 
+
+        with PYTHONOPTIONS passed via debugger's --command= option.
+
+    Profiling mode:   (this would only work on systems with GNU sprof)
+
+        If environment variable ECELL_PROFILE is set to soname of a
+        shared library, it does profiling by passing LD_PROFILE and
+        LD_PROFILE_OUTPUT.  The profiling output file ./SONAME.profile
+        can be inspected by sprof.  
+        ex. 
+          sprof lib/libecs.so.0 ./libecs.so.0.profile
+
+
+Configurations:
+
+        PACKAGE         = $PACKAGE
+        VERSION         = $VERSION
+        PYTHON          = $PYTHON
+        PYTHONPATH      = $PYTHONPATH
+        DEBUGGER        = $DEBUGGER
+        LD_LIBRARY_PATH = $LD_LIBRARY_PATH
+        prefix          = $prefix
+        pythondir       = $PYTHONDIR
+        ECELL3_DM_PATH  = $ECELL3_DM_PATH
+
+        CXX             = $CXX
+        CXXFLAGS        = $CXXFLAGS
+        LDFLAGS         = $LDFLAGS
+
+        If the environment variable ECELL3_DM_PATH is set to a colon (:)
+        separated directory path, it loads dynamic modules from there.
+
+        ex.
+          ECELL3_DM_PATH=/home/user/dm:/home/user/dm_other
+
+EOT_USAGE
+}
+
+cleanup()
+{
+    echo 'interrupted... cleaning up...'
+    if [ $TMPFILE ] ; then
+        rm -f $TMPFILE
+    fi
+    exit 1
+}
+
+trap cleanup 2 9 15
+
+if [ "$1" = '-h' ] ; then
+    ecell3_usage
+    exit 0
+fi
+
+if [ $ECELL_PROFILE ] ; then
+    LD_PROFILE_OUTPUT=.
+    LD_PROFILE=$ECELL_PROFILE
+    export LD_PROFILE_OUTPUT
+    export LD_PROFILE
+    rm -f $LD_PROFILE_OUTPUT/$ECELL_PROFILE.profile
+fi
+
+if [ ! $ECELL_DEBUG ] ; then
+    exec $(which ipython) "$@"
+else
+    TMPFILE=`mktemp -q /tmp/$BASENAME.XXXXXX`
+    if [ $? -ne 0 ]; then
+        echo "$BASENAME: Can't create temp file, exiting..."
+        exit 1
+    fi
+    echo "run "$@"" > $TMPFILE
+    echo $DEBUGGER --command=$TMPFILE $PYTHON
+    $DEBUGGER --command=$TMPFILE $PYTHON
+    rm -f $TMPFILE
+fi
+
+
