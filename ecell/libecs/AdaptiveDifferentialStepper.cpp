@@ -107,7 +107,7 @@ void AdaptiveDifferentialStepper::updateInternalState( Real aStepInterval )
 
     setNextStepInterval( aNewStepInterval );
 
-    DifferentialStepper::updateInternalState( aStepInterval );
+    DifferentialStepper::updateInternalState( aNewStepInterval );
 }
 
 } // namespace libecs
