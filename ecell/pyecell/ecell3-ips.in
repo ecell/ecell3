@@ -1,9 +1,32 @@
 #!/usr/bin/env @prefix@/bin/ecell3-python
 
-"""
-ecell3-ips (E-Cell3 IPython Session)
-This program is part of E-Cell Simulation Environment Version 3.
-"""
+'''
+ecell3-ips -- invoke ecell3 IPython interactive mode or run ess file
+
+Usage:
+    ecell3-ips ( -f <EML_file> | --file=<EML_file> ) [ --parameter=<name_value>... ]
+    ecell3-ips [ -C ] ( -e <ESS_file> | --exec=<ESS_file> ) [ --parameter=<name_value>... ]
+    ecell3-ips [ --parameter=<name_value>... ]
+    ecell3-ips ( -h | --help )
+
+Options:
+    -e <ESS_file> --exec=<ESS_file>  Load script file <ESS_file>.
+    -f <EML_file> --file=<EML_file>  Load model file <EML_file> and then switch to intractive mode.
+    -C                               Change to the directory where the script file <ESS_file> is placed.
+    --parameter=<name_value>         Set one or more session parameters. <name_value> is a pair of a name and a value linked by a colon.
+    -h --help                        Show this.
+
+    Example: 
+      ecell3-ips --parameter=NAME1:VALUE1 --parameter=NAME2:VALUE2
+
+Configurations:
+    If ECELL3_DM_PATH environment variable is set to a colon ({pathsep})
+    separated directory path, it tries to find dynamic modules within the
+    locations referred to by it.
+
+    Example: 
+      ECELL3_DM_PATH=/home/user/dm{pathsep}/home/user/dm_other ecell3-ips
+'''
 
 __program__ = 'ecell3-ips'
 __version__ = '0.1'
@@ -11,9 +34,11 @@ __author__ = 'Yasuhiro Naito'
 __copyright__ = 'Copyright (C) 2014 Keio University, 2014 RIKEN'
 __license__ = 'GPL'
 
+
 import sys
-import getopt
 import os
+from docopt import docopt
+from schema import Schema, SchemaError, Or
 
 import IPython
 
@@ -24,153 +49,51 @@ from ecell.Session import Session, createScriptContext
 
 #FIXME: commandline processing needed
 
-def usage():
-    aProgramName = os.path.basename( sys.argv[0] )
-    print '''
-%(appname)s -- invoke ecell3 IPython interactive mode or run ess file
 
-Usage:
+def validate_opts( opts ):
 
-    %(appname)s [-f] [-f EMLFILE]          : Load EMLFILE and then
-                                             switch to intractive mode
-    %(appname)s [ESSFILE] [-e ESSFILE]     : Run an ess file
-    %(appname)s                            : Run in intractive mode
-    %(appname)s [-h]                       : Print this message
+    schema = Schema({
+        "--exec": Or( None, os.path.exists ),
+        "--file": Or( None, os.path.exists ), 
+        "--help": bool, 
+        "--parameter": list, 
+        "-C": bool
+    })
 
-Options:
+    opts = schema.validate( opts )
 
-    -C                                 :  change to the directory where
-                                          the script (.ess) file is placed.
-    -e or --exec=[.ess file]           :  load script (.ess) file
-    -f or --file=[.eml file]           :  load model (.eml) file
-    
-    Either -e or -f option can be specified at once. 
+    return opts
 
-    -DNAME=VALUE                       :  Set session parameter
-    --parameters="[python dictionary]" :  Set session parameters
-        
-    -h or --help              :  Print this message.
-
-    Example: 
-       %(appname)s -DNAME1=VALUE1 -DNAME2=VALUE2
-       %(appname)s --parameters="{NAME1:VALUE1,NAME2:VALUE2}"
-
-    Note that spaces are not allowed in names and values.
-
-Configurations:
-    If ECELL3_DM_PATH environment variable is set to a colon (%(pathsep)s)
-    separated directory path, it tries to find dynamic modules within the
-    locations referred to by it.
-
-    Example: 
-      ECELL3_DM_PATH=/home/user/dm%(pathsep)s/home/user/dm_other %(appname)s
-
-'''% { 'appname': aProgramName, 'pathsep': os.pathsep }
 
 def main():
     # -------------------------------------
     # initialize file names
     # -------------------------------------
-    anEmlFile = None
     anEssFile = None
-    chdirToEssFile = False
     anEmlFlag = 0
 
     aParameters = {}
 
-    # -------------------------------------
-    # when ecell3-session [ essfile ] check file exist
-    # and set anESSfile 
-    # -------------------------------------
-
-    for i in range( len( sys.argv ) - 1 ):
-        i = i + 1
-        if not sys.argv[ i ][0] == "-":
-            if os.path.isfile( sys.argv[ i ] ):
-                if sys.argv[ i - 1 ] != "-e" and sys.argv[ i - 1 ] != "-f":
-                    anEssFile = sys.argv[i]
-            else:
-                sys.stderr.write( "Error: %s does not exist.\n" % sys.argv[ i ] )
-                sys.exit( 1 ) 
 
     # -------------------------------------
     # gets options
     # -------------------------------------
+    opts = docopt( __doc__.format( pathsep = os.pathsep ) )
+    
     try:
-        opts, args = getopt.gnu_getopt(
-            sys.argv[ 1: ] , 'he:f:D:C',
-            [ "parameters=", "help", "exec=", "file=" ] )
-    except:
-        usage()
-        sys.exit( -1 ) 
+        opts = validate_opts( opts )
+    except SchemaError as e:
+        print( e )
+        sys.exit( -1 )
         
     # -------------------------------------
     # checks argument
     # -------------------------------------
-    for anOption, anArg in opts:
-
-        # prints help message
-        if anOption in ( "-h", '--help' ):
-            usage()
-            sys.exit( 0 )
-            
-        # executes script file (.ess)
-        if anOption in ( "-e", '--exec'):
-            if not anArg:
-                sys.stderr.write( "Error: ess file not specified.\n" )
-                usage()
-                sys.exit( -1 )
-            anEssFile = anArg
-            
-        # load model file (.eml)
-        if anOption in ( "-f", '--file' ):
-            if not anArg:
-                sys.stderr.write( "Error: eml file not specified.\n" )
-                usage()
-                sys.exit( -1 )
-            anEmlFile = anArg            
-
-        # change directory where ESS file is placed.
-        if anOption == "-C":
-            chdirToEssFile = True
-
-        # set session parameters            
-        if anOption == "-D":
-            aSplitArgList = anArg.split( '=' )
-
-            if not aSplitArgList[1]:
-                aSplitArgList[1] = 1
-            
-            try:
-                anEvaluatedString = eval(aSplitArgList[1])
-                aParameters[aSplitArgList[0]] = anEvaluatedString
-            except:
-                aParameters[aSplitArgList[0]] = aSplitArgList[1]
-
-        # set session parameters            
-        if anOption == "--parameters":
-            try:
-                anEvaluatedArg = eval(anArg)
-
-            except:
-                import traceback 
-                aErrorMessageList = traceback.format_exception(
-                    sys.exc_type,sys.exc_value,sys.exc_traceback )
-                for aLine in aErrorMessageList: 
-                    sys.stderr.write( aLine )
-                sys.stderr.write( "Error: %s is not a valid python expression.\n" % anArg );
-                sys.exit( -1 )
-
-            # check anEvaluatedArg type
-            if not type(anEvaluatedArg) == dict:
-                sys.stderr.write( "Error: %s does not result in a python dictionary.\n" % aParameters )
-                sys.exit( -1 )
-
-            # add parameters to aParameters 
-            for aKeyString in anEvaluatedArg.keys():
-                aParameters[ aKeyString ] = anEvaluatedArg[ aKeyString ]
-                
-            
+    
+    # set session parameters
+    #FIXME: parameters processing needed
+    
+    
     aSimulator = ecell.emc.Simulator()
     aSimulator.setDMSearchPath( aSimulator.DM_SEARCH_PATH_SEPARATOR.join( ecell.config.dm_path ) )
 
@@ -190,14 +113,15 @@ More info: http://www.e-cell.org/software'''.format(
 
     session_ns = createScriptContext( aSession, aParameters )
 
-    if anEmlFile:
-        aSession.loadModel( anEmlFile )
+    if opts[ "--file" ]:
+        aSession.loadModel( opts[ "--file" ] )
 
-    if anEssFile:
-        if chdirToEssFile:
-            anEssDirectory, anEssFile = os.path.split( anEssFile )
+    if opts[ "--exec" ]:
+        # change directory where ESS file is placed.
+        if opts[ "-C" ]:
+            anEssDirectory, opts[ "--exec" ] = os.path.split( opts[ "--exec" ] )
             os.chdir( anEssDirectory )
-        execfile( ecs, session_ns )    ### NOT IPython context ###
+        execfile( opts[ "--exec" ], session_ns )    ### NOT IPython context ###
     else:
         IPython.embed( user_ns = session_ns, banner1 = banner )
          
