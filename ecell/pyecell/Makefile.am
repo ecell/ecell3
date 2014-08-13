@@ -73,6 +73,7 @@ bin_SCRIPTS = \
 	ecell3-python \
 	ecell3-ipython \
 	ecell3-session \
+	ecell3-ips \
 	ecell3-session-manager \
 	ecell3-sbml2eml \
 	ecell3-eml2sbml \
