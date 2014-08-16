@@ -51,6 +51,22 @@ class EntityStub( ObjectStub ):
         ObjectStub.__init__( self, aSimulator )
         self.theFullIDString = aFullIDString
 
+    def __repr__( self ):
+        prime_properties = [ 'Name', 'Value', 'MolarConc', 'Activity' ]
+        
+        outputs = [ p for p in prime_properties if (( p in self.getPropertyList() ) and self[ p ] ) ]
+        outputs[ 0:0 ] = [ 'ClassName', 'FullID' ]
+        max_len = max( [ len( p ) for p in outputs ] )
+        outputs = outputs[ 2: ]
+        
+        out_text = '{key:<{max}}: {val}\n'.format( max = max_len, key = 'FullID', val = self.getName() )
+        out_text += '{key:<{max}}: {val}\n'.format( max = max_len, key = 'ClassName', val = self.getClassname() )
+        
+        for p in outputs:
+            out_text += '{key:<{max}}: {val}\n'.format( max = max_len, key = p, val = self[ p ] )
+        
+        return out_text
+
     def getName( self ):
         return self.theFullIDString
 
