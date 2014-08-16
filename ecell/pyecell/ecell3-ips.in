@@ -66,18 +66,9 @@ def validate_opts( opts ):
 
 
 def main():
-    # -------------------------------------
-    # initialize file names
-    # -------------------------------------
-    anEssFile = None
-    anEmlFlag = 0
 
     aParameters = {}
 
-
-    # -------------------------------------
-    # gets options
-    # -------------------------------------
     opts = docopt( __doc__.format( pathsep = os.pathsep ) )
     
     try:
@@ -86,10 +77,6 @@ def main():
         print( e )
         sys.exit( -1 )
         
-    # -------------------------------------
-    # checks argument
-    # -------------------------------------
-    
     # set session parameters
     #FIXME: parameters processing needed
     
@@ -115,6 +102,7 @@ More info: http://www.e-cell.org/software'''.format(
 
     if opts[ "--file" ]:
         aSession.loadModel( opts[ "--file" ] )
+        banner = "{}\n\n'{}' is loaded. ( t = {} )\n".format( banner, opts[ "--file" ], aSession.getCurrentTime() )
 
     if opts[ "--exec" ]:
         # change directory where ESS file is placed.
