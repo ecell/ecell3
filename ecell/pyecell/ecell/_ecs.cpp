@@ -1777,6 +1777,11 @@ public:
         Variable::setValue( value );
     }
 
+    inline String __repr__()
+    {
+        return "__repr__ test";
+    }
+
     PythonVariable( PythonDynamicModule< PythonVariable > const& aModule )
         : PythonEntityBase< PythonVariable, Variable >( aModule ) {}
 
