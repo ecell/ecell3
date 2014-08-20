@@ -28,6 +28,13 @@
 
 import ecell._ecs
 
+def _repr_Variable( self ):
+    return """FullID:    {}
+Value:     {}
+MolarConc: {}""".format( self.FullID, self.Value, self.MolarConc )
+
+ecell._ecs.Variable.__repr__ = _repr_Variable
+
 __all__ = (
     'getLibECSVersionInfo',
     'getLibECSVersion',

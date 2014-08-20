@@ -210,6 +210,9 @@ class Session:
         return self.theSimulator.getEntityList( entityType, systemPath )
 
     def createEntityStub( self, fullid ):
+#        def __dir__( self ):
+#            pass
+#        
         return EntityStub( self.theSimulator, fullid )
 
     def getEntityProperty( self, fullPN ):
@@ -220,6 +223,50 @@ class Session:
 
     def setEntityProperty( self, fullPN, aValue ):
         self.theSimulator.setEntityProperty( fullPN, aValue )
+
+    def getSystemPathList( self ):
+        targets = [ '/' ]
+        SystemPaths = []
+        while len( targets ):
+            aSystemPath = targets.pop()
+            SystemPaths.append( aSystemPath )
+            
+            subSystemIDs = self.getEntityList( 'System', aSystemPath )
+            if len( subSystemIDs ):
+                if aSystemPath == '/':
+                    aSystemPath = ''
+                targets.extend( [ '/'.join( [ aSystemPath, s ] ) for s in subSystemIDs ] )
+        
+        return SystemPaths    # The first element is the root System
+
+    def getSystemList( self ):
+        SystemList = [ 'System::/' ]
+        SystemPaths = [ path[ 1: ] for path in self.getSystemPathList() ]     # '/A/B' -> 'A/B'
+        SystemPaths.pop( 0 )
+        
+        for path in SystemPaths:
+            path_list = path.split( '/' )
+            SystemList.append( 'System:/{path}:{ID}'.format( ID = path_list.pop(), path = '/'.join( path_list ) ) )
+        
+        return SystemList
+
+    def getVariableList( self ):
+        VariableList = []
+        for vl in [ [ path, self.getEntityList( 'Variable', path ) ] for path in self.getSystemPathList() ]:
+            VariableList.extend( [ 'Variable:{path}:{ID}'.format( path = vl[ 0 ], ID = v ) for v in vl[ 1 ] ] )
+        
+        return VariableList
+
+    def getProcessList( self ):
+        ProcessList = []
+        for pl in [ [ path, self.getEntityList( 'Process', path ) ] for path in self.getSystemPathList() ]:
+            ProcessList.extend( [ 'Process:{path}:{ID}'.format( path = pl[ 0 ], ID = p ) for p in pl[ 1 ] ] )
+        
+        return ProcessList
+
+    def getModelEntityList( self ):
+        return self.getSystemList() + self.getVariableList() + self.getProcessList()
+
 
     #
     # Logger methods
@@ -645,6 +692,7 @@ class Session:
 
 
         return aList
+    
 
 
 def createScriptContext( session, parameters ):
