@@ -529,30 +529,32 @@ def get_UnitDefinition_list( aSBMLmodel ):
 
 def get_common_denominator( aReaction ):
 
-    coefficientList = []
+    coefficientList = [ 
+        fractions.Fraction( decimal.Decimal( str( aReactant[ 'Stoichiometry' ] )))
+        for aReactant in aReaction[ 'Reactants' ] if aReactant[ 'Stoichiometry' ] != 0 ]
     
-    for aReactant in aReaction[ 'Reactants' ]:
-        if aReactant[ 'Stoichiometry' ] != 0:
-            coefficientList.append( fractions.Fraction( decimal.Decimal.from_float( aReactant[ 'Stoichiometry' ] )))
+    coefficientList.extend( [ 
+        fractions.Fraction( decimal.Decimal( str( aProduct[ 'Stoichiometry' ] ))) 
+        for aProduct in aReaction[ 'Products' ] if aProduct[ 'Stoichiometry' ] != 0 ] )
     
-    for aProduct in aReaction[ 'Products' ]:
-        if aProduct[ 'Stoichiometry' ] != 0:
-            coefficientList.append( fractions.Fraction( decimal.Decimal.from_float( aProduct[ 'Stoichiometry' ] )))
-
-    denominatorList = []
-    
-    for aCoefficient in coefficientList:
-        denominatorList.append( aCoefficient.denominator )
-
-    aGCD = decimal.Decimal( 1 )
+#    aGCD = decimal.Decimal( 1 )
     aLCM = decimal.Decimal( 1 )
 
     for aCoefficient in coefficientList:
-        aGCD = fractions.gcd( aGCD, aCoefficient.denominator )
+        aGCD = fractions.gcd( aLCM, aCoefficient.denominator )
         aLCM = aLCM * aCoefficient.denominator / aGCD
 
 #    print 'Coefficient: %s' % coefficientList
 #    print 'LCM: %s' % aLCM
+
+#    if aLCM != 1:
+#        print 'LCM = {}'.format( aLCM )
+#        for aCoefficient in coefficientList:
+#            print '{} / {}'.format( aCoefficient.numerator, aCoefficient.denominator )
+#        for aReactant in aReaction[ 'Reactants' ]:
+#            print 'R: {}'.format( aReactant[ 'Stoichiometry' ] )
+#        for aProduct in aReaction[ 'Products' ]:
+#            print 'P: {}'.format( aProduct[ 'Stoichiometry' ] )
 
     return float( aLCM )
 
