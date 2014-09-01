@@ -776,46 +776,55 @@ def _calc_AST_node_value( aNode ):
         aNodeType = aNode.getType()
         
         if   ( aNodeType == libsbml.AST_RATIONAL ):
-            aRealValue = aNode.getReal()
+            aValue = aNode.getReal()
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( aRealValue )
+            aNode.setValue( aValue )
         elif ( aNodeType == libsbml.AST_DIVIDE ):
+            aValue = float( _get_AST_node_value( aNode.getLeftChild())) / float( _get_AST_node_value( aNode.getRightChild()))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( float( _get_AST_node_value( aNode.getLeftChild())) / float( _get_AST_node_value( aNode.getRightChild())) )
+            aNode.setValue( aValue )
 
         elif( aNodeType == libsbml.AST_MINUS ):
+            aValue = float( _get_AST_node_value( aNode.getLeftChild())) - float( _get_AST_node_value( aNode.getRightChild()))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( float( _get_AST_node_value( aNode.getLeftChild())) - float( _get_AST_node_value( aNode.getRightChild())) )
+            aNode.setValue( aValue )
 
         elif( aNodeType == libsbml.AST_PLUS ):
+            aValue = float( _get_AST_node_value( aNode.getLeftChild())) + float( _get_AST_node_value( aNode.getRightChild()))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( float( _get_AST_node_value( aNode.getLeftChild())) + float( _get_AST_node_value( aNode.getRightChild())) )
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_TIMES ):
+            aValue = float( _get_AST_node_value( aNode.getLeftChild())) * float( _get_AST_node_value( aNode.getRightChild()))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( float( _get_AST_node_value( aNode.getLeftChild())) * float( _get_AST_node_value( aNode.getRightChild())) )
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_POWER ):
+            aValue = pow( float( _get_AST_node_value( aNode.getLeftChild())), float( _get_AST_node_value( aNode.getRightChild())))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( pow( float( _get_AST_node_value( aNode.getLeftChild())), float( _get_AST_node_value( aNode.getRightChild()))) )
+            aNode.setValue( aValue )
 
         ## Logical operators
 
         elif ( aNodeType == libsbml.AST_LOGICAL_AND ):
+            aValue = _get_AST_node_value( aNode.getLeftChild() ) and _get_AST_node_value( aNode.getRightChild() )
             aNode.setType( libsbml.AST_INTEGER )
-            aNode.setValue( _get_AST_node_value( aNode.getLeftChild() ) and _get_AST_node_value( aNode.getRightChild() ) )
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_LOGICAL_NOT ):
+            aValue = not _get_AST_node_value( aNode.getChild( 0 ))
             aNode.setType( libsbml.AST_INTEGER )
-            aNode.setValue( not _get_AST_node_value( aNode.getChild( 0 )))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_LOGICAL_OR ):
+            aValue = _get_AST_node_value( aNode.getLeftChild() ) or _get_AST_node_value( aNode.getRightChild() )
             aNode.setType( libsbml.AST_INTEGER )
-            aNode.setValue( _get_AST_node_value( aNode.getLeftChild() ) or _get_AST_node_value( aNode.getRightChild() ) )
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_LOGICAL_XOR ):
+            aValue = ( not( _get_AST_node_value( aNode.getLeftChild() ))) and ( not( _get_AST_node_value( aNode.getRightChild() )))
             aNode.setType( libsbml.AST_INTEGER )
-            aNode.setValue( ( not( _get_AST_node_value( aNode.getLeftChild() ))) and ( not( _get_AST_node_value( aNode.getRightChild() ))))
+            aNode.setValue( aValue )
 
         ## Relational operators
 
@@ -866,177 +875,211 @@ def _calc_AST_node_value( aNode ):
         ##     Power and logarithmic functions
 
         elif ( aNodeType == libsbml.AST_FUNCTION_EXP ):
+            aValue = math.exp( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.exp( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_LN ):
+            aValue = math.log( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.log( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_LOG ):
+            aValue = math.log( float( _get_AST_node_value( aNode.getLeftChild())), float( _get_AST_node_value( aNode.getRightChild() )))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.log( float( _get_AST_node_value( aNode.getLeftChild())), float( _get_AST_node_value( aNode.getRightChild() ))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_POWER ):
+            aValue = pow( float( _get_AST_node_value( aNode.getLeftChild())), float( _get_AST_node_value( aNode.getRightChild() )))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( pow( float( _get_AST_node_value( aNode.getLeftChild())), float( _get_AST_node_value( aNode.getRightChild() ))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ROOT ):
+            aValue = pow( float( _get_AST_node_value( aNode.getLeftChild())), 1.0 / float( _get_AST_node_value( aNode.getRightChild() )))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( pow( float( _get_AST_node_value( aNode.getLeftChild())), 1.0 / float( _get_AST_node_value( aNode.getRightChild() ))))
+            aNode.setValue( aValue )
 
         ##     Number-theoretic and representation functions
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ABS ):
+            aValue = abs( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( abs( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_CEILING ):
+            aValue = math.ceil( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.ceil( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_FACTORIAL ):
+            aValue = math.factorial( _get_AST_node_value( aNode.getChild( 0 )))
             aNode.setType( libsbml.AST_INTEGER )
-            aNode.setValue( math.factorial( _get_AST_node_value( aNode.getChild( 0 ))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_FLOOR ):
+            aValue = math.floor( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.floor( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         ##     Trigonometric functions
 
         elif ( aNodeType == libsbml.AST_FUNCTION_SIN ):
+            aValue = math.sin( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.sin( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_COS ):
+            aValue = math.cos( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.cos( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_TAN ):
+            aValue = math.tan( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.tan( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_CSC ):
+            aValue = 1.0 / math.sin( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( 1.0 / math.sin( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_SEC ):
+            aValue = 1.0 / math.cos( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( 1.0 / math.cos( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_COT ):
+            aValue = 1.0 / math.tan( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( 1.0 / math.tan( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         ##     Inverse trigonometric functions
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCSIN ):
+            aValue = math.asin( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.asin( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCCOS ):
+            aValue = math.acos( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.acos( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCTAN ):
+            aValue = math.atan( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.atan( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCCSC ):
+            aValue = 1.0 / math.asin( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( 1.0 / math.asin( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCSEC ):  ## arc-secant
+            aValue = math.acos( 1.0 / float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.acos( 1.0 / float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCCOT ):
+            aValue = math.atan( 1.0 / float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.atan( 1.0 / float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         ##     Hyperbolic functions
 
         elif ( aNodeType == libsbml.AST_FUNCTION_SINH ):
+            aValue = math.sinh( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.sinh( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_COSH ):
+            aValue = math.cosh( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.cosh( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_TANH ):
+            aValue = math.tanh( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( math.tanh( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_CSCH ):
+            aValue = 1.0 / math.sinh( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( 1.0 / math.sinh( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_SECH ):
+            aValue = 1.0 / math.cosh( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( 1.0 / math.cosh( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_COTH ):
+            aValue = 1.0 / math.tanh( float( _get_AST_node_value( aNode.getChild( 0 ))))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( 1.0 / math.tanh( float( _get_AST_node_value( aNode.getChild( 0 )))))
+            aNode.setValue( aValue )
 
         ##     Inverse hyperbolic functions
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCSINH ):
-            aNode.setType( libsbml.AST_REAL )
             if geqPython26:
-                aNode.setValue( math.asinh( float( _get_AST_node_value( aNode.getChild( 0 )))))
+                aValue = math.asinh( float( _get_AST_node_value( aNode.getChild( 0 ))))
             else:
                 x = float( _get_AST_node_value( aNode.getChild( 0 )))
-                aNode.setValue( math.log( x + math.sqrt( x * x + 1.0 )))
+                aValue = math.log( x + math.sqrt( x * x + 1.0 ))
+            aNode.setType( libsbml.AST_REAL )
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCCOSH ):
-            aNode.setType( libsbml.AST_REAL )
             if geqPython26:
-                aNode.setValue( math.acosh( float( _get_AST_node_value( aNode.getChild( 0 )))))
+                aValue = math.acosh( float( _get_AST_node_value( aNode.getChild( 0 ))))
             else:
                 x = float( _get_AST_node_value( aNode.getChild( 0 )))
-                aNode.setValue( math.log( x + math.sqrt( x + 1.0 ) * math.sqrt( x - 1.0 )))
+                aValue = math.log( x + math.sqrt( x + 1.0 ) * math.sqrt( x - 1.0 ))
+            aNode.setType( libsbml.AST_REAL )
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCTANH ):
-            aNode.setType( libsbml.AST_REAL )
             if geqPython26:
-                aNode.setValue( math.atanh( float( _get_AST_node_value( aNode.getChild( 0 )))))
+                aValue = math.atanh( float( _get_AST_node_value( aNode.getChild( 0 ))))
             else:
                 x = float( _get_AST_node_value( aNode.getChild( 0 )))
-                aNode.setValue( 0.5 * math.log( ( 1.0 + x ) / ( 1.0 - x )))
+                aValue = 0.5 * math.log( ( 1.0 + x ) / ( 1.0 - x ))
+            aNode.setType( libsbml.AST_REAL )
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCCSCH ):
-            aNode.setType( libsbml.AST_REAL )
             if geqPython26:
-                aNode.setValue( math.asinh( 1.0 / float( _get_AST_node_value( aNode.getChild( 0 )))))
+                aValue = math.asinh( 1.0 / float( _get_AST_node_value( aNode.getChild( 0 ))))
             else:
                 x = float( _get_AST_node_value( aNode.getChild( 0 )))
-                aNode.setValue( math.log( 1.0 / x + math.sqrt( 1.0 / x / x + 1.0 )))
+                aValue = math.log( 1.0 / x + math.sqrt( 1.0 / x / x + 1.0 ))
+            aNode.setType( libsbml.AST_REAL )
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCSECH ):
-            aNode.setType( libsbml.AST_REAL )
             if geqPython26:
-                aNode.setValue( math.acosh( 1.0 / float( _get_AST_node_value( aNode.getChild( 0 )))))
+                aValue = math.acosh( 1.0 / float( _get_AST_node_value( aNode.getChild( 0 ))))
             else:
                 x = float( _get_AST_node_value( aNode.getChild( 0 )))
-                aNode.setValue( math.log( 1.0 / x + math.sqrt( 1.0 / x + 1.0 ) * math.sqrt( 1.0 / x - 1.0 )))
+                aValue = math.log( 1.0 / x + math.sqrt( 1.0 / x + 1.0 ) * math.sqrt( 1.0 / x - 1.0 ))
+            aNode.setType( libsbml.AST_REAL )
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_ARCCOTH ):
-            aNode.setType( libsbml.AST_REAL )
             if geqPython26:
-                aNode.setValue( math.atanh( 1.0 / float( _get_AST_node_value( aNode.getChild( 0 )))))
+                aValue = math.atanh( 1.0 / float( _get_AST_node_value( aNode.getChild( 0 ))))
             else:
                 x = float( _get_AST_node_value( aNode.getChild( 0 )))
-                aNode.setValue( 0.5 * math.log( ( x + 1.0 ) / ( x - 1.0 )))
+                aValue = 0.5 * math.log( ( x + 1.0 ) / ( x - 1.0 ))
+            aNode.setType( libsbml.AST_REAL )
+            aNode.setValue( aValue )
 
         ##     Other functions
 
         elif ( aNodeType == libsbml.AST_FUNCTION_DELAY ):
             ### At t = 0, delayed value is not available, thus value at t = 0 is used.
+            aValue = _get_AST_node_value( aNode.getChild( 0 ))
             aNode.setType( libsbml.AST_REAL )
-            aNode.setValue( _get_AST_node_value( aNode.getChild( 0 )))
+            aNode.setValue( aValue )
 
         elif ( aNodeType == libsbml.AST_FUNCTION_PIECEWISE ):
 ##            print "\nCulc AST_FUNCTION_PIECEWISE:"
@@ -1046,16 +1089,18 @@ def _calc_AST_node_value( aNode ):
             for i in range( aNode.getNumChildren() / 2 ):
                 if ( _get_AST_node_value( aNode.getChild( i * 2 + 1 )) != 0 ):
 ##                    aNode = aNode.getChild( i * 2 ).deepCopy()
+                    aValue = _get_AST_node_value( aNode.getChild( i * 2 ))
                     aNode.setType( aNode.getChild( i * 2 ).getType() )
-                    aNode.setValue( _get_AST_node_value( aNode.getChild( i * 2 )))
+                    aNode.setValue( aValue )
 ##                    print "  piece(%d) is True! Value is %s" % ( i, _get_AST_node_value( aNode ))
                     break
             
             if ( aNode.getType() == libsbml.AST_FUNCTION_PIECEWISE ):
                 if ( aNode.getNumChildren() % 2 == 1 ):
 ##                    aNode = aNode.getRightChild().deepCopy()
+                    aValue = _get_AST_node_value( aNode.getRightChild())
                     aNode.setType( aNode.getRightChild().getType() )
-                    aNode.setValue( _get_AST_node_value( aNode.getRightChild()))
+                    aNode.setValue( aValue )
                 else:
                     raise TypeError,\
                     "Can't derive an initial value from a piecewise function"
