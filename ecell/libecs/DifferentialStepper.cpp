@@ -54,9 +54,7 @@ namespace libecs
 LIBECS_DM_INIT_STATIC( DifferentialStepper, Stepper );
 
 DifferentialStepper::DifferentialStepper()
-    : theStateFlag( true ),
-      isInterrupted( true ),
-      theNextStepInterval( 0.001 ),
+    : theNextStepInterval( 0.001 ),
       theTolerableStepInterval( 0.001 )
 {
     ; // do nothing
@@ -72,8 +70,6 @@ DifferentialStepper::~DifferentialStepper()
 void DifferentialStepper::initialize()
 {
     Stepper::initialize();
-
-    isInterrupted = true;
 
     createInterpolants();
 
@@ -250,13 +246,15 @@ void DifferentialStepper::interrupt( Time aTime )
         return;
     }
 
+    const Real aCurrentTime( getCurrentTime() );
+
     // aCallerTimeScale == 0 implies need for immediate reset
     if( aCallerTimeScale != 0.0 )
     {
         // Shrink the next step size to that of caller's
         setNextStepInterval( aCallerTimeScale );
 
-        const Real aNextStep( getCurrentTime() + aStepInterval );
+        const Real aNextStep( aCurrentTime + aStepInterval );
         const Real aCallerNextStep( aCallerCurrentTime + aCallerTimeScale );
 
         // If the next step of this occurs *before* the next step 
@@ -267,35 +265,15 @@ void DifferentialStepper::interrupt( Time aTime )
         }
     }
 
-    theNextTime = aCallerCurrentTime;
-    isInterrupted = true;
-}
+    const Real aNewStepInterval( aCallerCurrentTime - aCurrentTime );
 
-void DifferentialStepper::step()
-{
-    updateInternalState( getNextStepInterval() );
-}
-
-void DifferentialStepper::updateInternalState( Real aStepInterval )
-{
-    Stepper::setStepInterval( aStepInterval );
-
-    // check if the step interval was changed, by epsilon
-    if ( std::fabs( getTolerableStepInterval() - aStepInterval )
-             > std::numeric_limits<Real>::epsilon() )
-        isInterrupted = true;
-    else
-        isInterrupted = false;
+    loadStepInterval( aNewStepInterval );
 }
 
 const Real DifferentialStepper::Interpolant::getDifference(
         Real aTime, Real anInterval ) const
 {
     DifferentialStepper const* const theStepper( reinterpret_cast< DifferentialStepper const    * >( this->theStepper ) );
-    if ( !theStepper->theStateFlag )
-    {
-        return 0.0;
-    }
 
     const Real aTimeInterval1( aTime - theStepper->getCurrentTime() );
     const Real aTimeInterval2( aTimeInterval1 - anInterval );
@@ -353,11 +331,6 @@ const Real DifferentialStepper::Interpolant::getDifference(
 const Real DifferentialStepper::Interpolant::getVelocity( Real aTime ) const
 {
     DifferentialStepper const* const theStepper( reinterpret_cast< DifferentialStepper const* >( this->theStepper ) );
-
-    if ( !theStepper->theStateFlag )
-    {
-        return 0.0;
-    }
 
     const Real aTimeInterval( aTime - theStepper->getCurrentTime() );
 

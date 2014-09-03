@@ -586,9 +586,9 @@ void LocalSimulatorImplementation::run( const libecs::Real aDuration )
     // setup SystemStepper to step at aStopTime
 
     //FIXME: dirty, ugly!
-    libecs::Stepper* const aSystemStepper( getModel().getSystemStepper() );
-    aSystemStepper->setCurrentTime( aCurrentTime );
-    aSystemStepper->setNextTime( aStopTime );
+    libecs::Stepper* aSystemStepper( getModel().getSystemStepper() );
+    aSystemStepper->setCurrentTime( aStopTime );
+    aSystemStepper->setStepInterval( 0.0 );
 
     getModel().getScheduler().updateEvent( 0, aStopTime );
 
@@ -596,24 +596,27 @@ void LocalSimulatorImplementation::run( const libecs::Real aDuration )
     if( typeid( *theEventChecker ) != typeid( DefaultEventChecker ) &&
         theEventHandler.get() )
     {
-        runWithEvent( aStopTime );
+        runWithEvent();
     }
     else
     {
-        runWithoutEvent( aStopTime );
+        runWithoutEvent();
     }
 
 }
 
-void LocalSimulatorImplementation::runWithEvent( libecs::Real const aStopTime )
+void LocalSimulatorImplementation::runWithEvent()
 {
+    libecs::Stepper const* const aSystemStepper( getModel().getSystemStepper() );
+
     do
     {
         unsigned int aCounter( theEventCheckInterval );
         do 
         {
-            if( getModel().getTopEvent().getTime() > aStopTime )
+            if( getModel().getTopEvent().getStepper() == aSystemStepper )
             {
+                getModel().step();
                 stop();
                 return;
             }
@@ -630,14 +633,15 @@ void LocalSimulatorImplementation::runWithEvent( libecs::Real const aStopTime )
     while( theRunningFlag );
 }
 
-void LocalSimulatorImplementation::runWithoutEvent( libecs::Real const aStopTime )
+void LocalSimulatorImplementation::runWithoutEvent()
 {
     libecs::Stepper const* const aSystemStepper( getModel().getSystemStepper() );
 
     do
     {
-        if( getModel().getTopEvent().getTime() > aStopTime )
+        if( getModel().getTopEvent().getStepper() == aSystemStepper )
         {
+            getModel().step();
             stop();
             return;    // the only exit
         }

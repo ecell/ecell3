@@ -147,20 +147,18 @@ public:
         }
     }
 
-    virtual void updateInternalState( Real aStepInterval )
+    virtual void step()
     {
-        theStateFlag = false;
-
         clearVariables();
 
         // Newton iteration
         int anIterator( 0 );
         while ( anIterator < 5 )
         {
-            calculateVelocityVector( aStepInterval );
-            calculateJacobian( aStepInterval );
+            calculateVelocityVector();
+            calculateJacobian();
 
-            const Real anError( solve( aStepInterval ) );
+            const Real anError( solve() );
 
             if ( anError < getTolerance() )
             {
@@ -172,14 +170,13 @@ public:
 
         resetAll();
 
-        theStateFlag = true;
-
-        DifferentialStepper::updateInternalState( aStepInterval );
+        DifferentialStepper::step();
     }
 
-    void calculateVelocityVector( Real const aStepInterval )
+    void calculateVelocityVector()
     {
         const Real aCurrentTime( getCurrentTime() );
+        const Real aStepInterval( getStepInterval() );
 
         const ProcessVector::size_type aDiscreteProcessOffset(
                 getDiscreteProcessOffset() );
@@ -223,9 +220,10 @@ public:
         setCurrentTime( aCurrentTime );
     }
 
-    void calculateJacobian( Real const aStepInterval )
+    void calculateJacobian()
     {
         const Real aCurrentTime( getCurrentTime() );
+        const Real aStepInterval( getStepInterval() );
         const Real aPerturbation( thePerturbationRate * aStepInterval );
         const VariableVector::size_type aReadOnlyVariableOffset(
                 getReadOnlyVariableOffset() );
@@ -283,7 +281,7 @@ public:
                         theTaylorSeries[ 0 ][ anIndex ] / aPerturbation );
 
                 gsl_matrix_set( theJacobianMatrix, i, c,
-                                -1.0 * aDerivative * aStepInterval );
+                                -1.0 * aDerivative * getStepInterval() );
 
                 theTaylorSeries[ 0 ][ anIndex ] = 0.0;
             }
@@ -422,7 +420,7 @@ public:
         theActivityBuffer.resize( theProcessVector.size() );
     }
 
-    const Real solve( Real const aStepInterval )
+    const Real solve()
     {
         const VariableVector::size_type aReadOnlyVariableOffset(
                 getReadOnlyVariableOffset() );
@@ -446,7 +444,7 @@ public:
             const Real aVelocity( aVariable->getValue() - theValueBuffer[ c ] );
             aTotalVelocity += aVelocity;
             
-            theTaylorSeries[ 0 ][ c ] = aVelocity / aStepInterval;
+            theTaylorSeries[ 0 ][ c ] = aVelocity / getStepInterval();
         }
 
         return fabs( anError / aTotalVelocity );

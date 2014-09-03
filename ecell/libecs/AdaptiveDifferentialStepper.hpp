@@ -173,16 +173,16 @@ public:
 
     virtual void initialize();
 
-    virtual void updateInternalState( Real aStepInterval );
+    virtual void step();
 
-    virtual bool calculate( Real aStepInterval ) = 0;
+    virtual bool calculate() = 0;
 
     virtual GET_METHOD( Integer, Stage )
     { 
         return 2;
     }
 
-protected:
+private:
 
     Real safety;
     Real theTolerance;

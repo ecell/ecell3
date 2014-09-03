@@ -130,10 +130,6 @@ public:
 
     virtual void reset();
 
-    virtual void step();
-
-    virtual void updateInternalState( Real aStepInterval );
-
     virtual void interrupt( Time aTime );
 
     virtual libecs::Interpolant* createInterpolant( Variable const* aVariable ) const;
@@ -163,8 +159,8 @@ protected:
 
 protected:
 
-    bool theStateFlag;
-    bool isInterrupted;
+private:
+
     Real theNextStepInterval;
     Real theTolerableStepInterval;
 };

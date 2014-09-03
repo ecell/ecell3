@@ -87,8 +87,9 @@ public:
           theRejectedStepFlag( false ),
           theAcceptedError( 0.0 ),
           theAcceptedStepInterval( 0.0 ),
-          theJacobianCalculateFlag( true ),
-          theJacobianRecalculateTheta( 0.001 )
+          thePreviousStepInterval( 0.001 ),
+          theJacobianRecalculateTheta( 0.001 ),
+          isInterrupted( true )
     {
         const Real pow913( pow( 9.0, 1.0 / 3.0 ) );
 
@@ -97,6 +98,7 @@ public:
         gamma = ( 6.0 + pow913*pow913 - pow913 ) / 30.0;
 
         const Real aNorm( alpha*alpha + beta*beta );
+        const Real aStepInterval( getStepInterval() );
 
         alpha /= aNorm;
         beta /= aNorm;
@@ -180,17 +182,17 @@ public:
 
     GET_METHOD( Real, RelativeTolerance )
     {
-        return theRelativeTolerance;
+     return theRelativeTolerance;
     }
 
     SET_METHOD( Real, JacobianRecalculateTheta )
     {
-        theJacobianRecalculateTheta = value;
+     theJacobianRecalculateTheta = value;
     }
 
     GET_METHOD( Real, JacobianRecalculateTheta )
     {
-        return theJacobianRecalculateTheta;
+     return theJacobianRecalculateTheta;
     }
 
     virtual void initialize()
@@ -203,6 +205,7 @@ public:
 
         theFirstStepFlag = true;
         theJacobianCalculateFlag = true;
+        isInterrupted = true;
 
         const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
         if ( theSystemSize != aSize )
@@ -329,9 +332,10 @@ public:
         }
     }
 
-    std::pair< bool, Real > calculateRadauIIA( Real const aStepInterval, Real const aPreviousStepInterval )
+    bool calculate()
     {
         const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+        const Real aStepInterval( getStepInterval() );
         Real aNewStepInterval;
         Real aNorm( 0. );
         Real theta( fabs( theJacobianRecalculateTheta ) );
@@ -342,7 +346,7 @@ public:
         {
             const Real c1( ( 4.0 - SQRT6 ) / 10.0 );
             const Real c2( ( 4.0 + SQRT6 ) / 10.0 );
-            const Real c3q( aStepInterval / aPreviousStepInterval );
+            const Real c3q( aStepInterval / thePreviousStepInterval );
             const Real c1q( c3q * c1 );
             const Real c2q( c3q * c2 );
 
@@ -352,9 +356,9 @@ public:
                 const Real cont2( theTaylorSeries[ 1 ][ c ] + 3.0 * cont3 );
                 const Real cont1( theTaylorSeries[ 0 ][ c ] + 2.0 * cont2 - 3.0 * cont3 );
 
-                const Real z1( aPreviousStepInterval * c1q * ( cont1 + c1q * ( cont2 + c1q * cont3 ) ) );
-                const Real z2( aPreviousStepInterval * c2q * ( cont1 + c2q * ( cont2 + c2q * cont3 ) ) );
-                const Real z3( aPreviousStepInterval * c3q * ( cont1 + c3q * ( cont2 + c3q * cont3 ) ) );
+                const Real z1( thePreviousStepInterval * c1q * ( cont1 + c1q * ( cont2 + c1q * cont3 ) ) );
+                const Real z2( thePreviousStepInterval * c2q * ( cont1 + c2q * ( cont2 + c2q * cont3 ) ) );
+                const Real z3( thePreviousStepInterval * c3q * ( cont1 + c3q * ( cont2 + c3q * cont3 ) ) );
 
                 theW[ c ] = 4.3255798900631553510 * z1
                     + 0.33919925181580986954 * z2 + 0.54177053993587487119 * z3;
@@ -378,7 +382,7 @@ public:
 
         while ( anIterator < getMaxIterationNumber() )
         {
-            calculateRhs( aStepInterval );
+            calculateRhs();
 
             const Real aPreviousNorm( std::max( aNorm, Uround ) );
             aNorm = solve();
@@ -401,16 +405,20 @@ public:
 
                     if ( anIterationError >= 1.0 )
                     {
-                        return std::make_pair( false, aStepInterval * 0.8 *
-                                std::pow( std::max( 1e-4, std::min( 20.0,
+                        aNewStepInterval = aStepInterval * 0.8 *
+                                pow( std::max( 1e-4, std::min( 20.0,
                                     anIterationError ) ),
                                      -1.0 / ( 4 + getMaxIterationNumber()
-                                              - 2 - anIterator ) ) );
+                                              - 2 - anIterator ) );
+                        setStepInterval( aNewStepInterval );
+
+                        return false;
                     }
                 }
                 else
                 {
-                    return std::make_pair( false, aStepInterval * 0.5 );
+                    setStepInterval( aStepInterval * 0.5 );
+                    return false;
                 }
             }
 
@@ -438,7 +446,7 @@ public:
             theW[ c + aSize*2 ] = w1 * 0.96604818261509293619 + w2;
         }
 
-        const Real anError( estimateLocalError( aStepInterval ) );
+        const Real anError( estimateLocalError() );
 
         Real aSafetyFactor( std::min( 0.9, 0.9 *
                 ( 1 + 2*getMaxIterationNumber() ) /
@@ -486,7 +494,7 @@ public:
             {
                 setNextStepInterval( aNewStepInterval );
             }
-            return std::make_pair( true, aStepInterval );
+            return true;
         }
         else
         {
@@ -494,20 +502,23 @@ public:
 
             if ( theFirstStepFlag )
             {
-                aNewStepInterval = 0.1 * aStepInterval;
+                setStepInterval( 0.1 * aStepInterval );
+            }
+            else
+            {
+                setStepInterval( aNewStepInterval );
             }
 
-            return std::make_pair( false, aNewStepInterval );
+            return false;
         }
     }
 
-    virtual void updateInternalState( Real aStepInterval )
+    virtual void step()
     {
         const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
-        theStateFlag = false;
-
-        Real const aPreviousStepInterval( getStepInterval() );
+        thePreviousStepInterval = getStepInterval();
+        setStepInterval( getNextStepInterval() );
         clearVariables();
 
         theRejectedStepFlag = false;
@@ -528,29 +539,18 @@ public:
         if ( theJacobianCalculateFlag )
         {
             calculateJacobian();
-            setJacobianMatrix( aStepInterval );
+            setJacobianMatrix();
         }
         else
         {
-            if ( aPreviousStepInterval != aStepInterval )
-                setJacobianMatrix( aStepInterval );
+            if ( thePreviousStepInterval != getStepInterval() )
+                setJacobianMatrix();
         }
 
         UnsignedInteger count( 0 );
-        for ( ;; )
+        while ( !calculate() )
         {
-            std::pair< bool, Real > aResult( calculateRadauIIA( aStepInterval, aPreviousStepInterval ) );
-            if ( aResult.first )
-            {
-                break;
-            }
-
-            if ( ++count >= 3 )
-            {
-                break;
-            }
-
-            aStepInterval = aResult.first;
+            if ( count++ > 3 ) break;
 
             theRejectedStepFlag = true;
 
@@ -560,9 +560,10 @@ public:
                 theJacobianCalculateFlag = true;
             }
 
-            setJacobianMatrix( aStepInterval );
+            setJacobianMatrix();
         }
 
+        const Real aStepInterval( getStepInterval() );
         setTolerableStepInterval( aStepInterval );
 
         // theW will already be transformed to Z-form
@@ -596,9 +597,17 @@ public:
             theTaylorSeries[ 2 ][ c ] /= aStepInterval;
         }
 
-        theStateFlag = true;
+        if ( fabs( getTolerableStepInterval() - getStepInterval() )
+                 > std::numeric_limits<Real>::epsilon() )
+            isInterrupted = true;
+        else
+            isInterrupted = false;
+    }
 
-        DifferentialStepper::updateInternalState( aStepInterval );
+    virtual void interrupt( Time aTime )
+    {
+        isInterrupted = true;
+        DifferentialStepper::interrupt( aTime );
     }
 
     void checkDependency()
@@ -661,7 +670,7 @@ public:
                                           - aDiscreteProcessOffset );
     }
 
-    Real estimateLocalError( Real const aStepInterval )
+    Real estimateLocalError()
     {
         if ( theSystemSize == 0 )
             return 0.0;
@@ -669,6 +678,7 @@ public:
         const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
         const ProcessVector::size_type 
             aDiscreteProcessOffset( getDiscreteProcessOffset() );
+        const Real aStepInterval( getStepInterval() );
 
         Real anError;
 
@@ -811,8 +821,11 @@ public:
         }
     }
 
-    void setJacobianMatrix( Real const aStepInterval )
+    void setJacobianMatrix()
     {
+        VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+        const Real aStepInterval( getStepInterval() );
+
         const Real alphah( alpha / aStepInterval );
         const Real betah( beta / aStepInterval );
         const Real gammah( gamma / aStepInterval );
@@ -862,9 +875,10 @@ public:
                                       &aSignNum );
     }
 
-    void calculateRhs( Real aStepInterval )
+    void calculateRhs()
     {
         const Real aCurrentTime( getCurrentTime() );
+        const Real aStepInterval( getStepInterval() );
         const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
         const ProcessVector::size_type aDiscreteProcessOffset( getDiscreteProcessOffset() );
 
@@ -1088,10 +1102,12 @@ protected:
     Real    theRelativeTolerance, rtoler;
 
     bool    theFirstStepFlag, theRejectedStepFlag;
-    Real    theAcceptedError, theAcceptedStepInterval;
+    Real    theAcceptedError, theAcceptedStepInterval, thePreviousStepInterval;
 
     bool    theJacobianCalculateFlag;
     Real    theJacobianRecalculateTheta;
+
+    bool    isInterrupted;
 };
 
 LIBECS_DM_INIT( DAEStepper, Stepper );

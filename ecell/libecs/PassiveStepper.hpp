@@ -65,11 +65,24 @@ public:
     
     virtual void initialize();
 
-    virtual void step();
+    virtual void step()
+    {
+        fireProcesses();
 
-    virtual void interrupt( Time aTime );
+        setStepInterval( INF );
+    }
 
-    virtual SET_METHOD( Real, NextTime );
+    virtual void interrupt( Time aTime )
+    {
+        setCurrentTime( aTime );
+        setStepInterval( 0.0 );
+    }
+
+    virtual SET_METHOD( Real, StepInterval )
+    {
+        // skip range check
+        loadStepInterval( value );
+    }
 };
 
 } // namespace libecs

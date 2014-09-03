@@ -233,8 +233,8 @@ protected:
         theRunningFlag = true;
     }
 
-    void runWithEvent( libecs::Real aStopTime );
-    void runWithoutEvent( libecs::Real aStopTime );
+    void runWithEvent();
+    void runWithoutEvent();
 
     static libecs::Polymorph buildPolymorph( libecs::Logger::Policy const& );
     static libecs::Polymorph buildPolymorph( libecs::PropertyAttributes const& );

@@ -56,17 +56,22 @@ public:
         ; // do nothing
     }
 
-    virtual void updateInternalState( Real aStepInterval )
+    virtual void step()
     {
         const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
         clearVariables();
 
+        setStepInterval( getNextStepInterval() );
+
         fireProcesses();
         setVariableVelocity( theTaylorSeries[ 0 ] );
-
-        DifferentialStepper::updateInternalState( aStepInterval );
+        setNextStepInterval( getTolerableStepInterval() );
     }
+
+
+protected:
+
 };
 
 LIBECS_DM_INIT( FixedODE1Stepper, Stepper );

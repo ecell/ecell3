@@ -33,7 +33,6 @@
 #include <libecs/Variable.hpp>
 #include <libecs/Interpolant.hpp>
 #include <libecs/AdaptiveDifferentialStepper.hpp>
-#include <cmath>
 
 USE_LIBECS;
 
@@ -42,39 +41,43 @@ LIBECS_DM_CLASS( ODE45Stepper, AdaptiveDifferentialStepper )
 
 public:
 
-    LIBECS_DM_OBJECT( ODE45Stepper, Stepper )
+  LIBECS_DM_OBJECT( ODE45Stepper, Stepper )
     {
-        INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
+      INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
 
-        PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, SpectralRadius );
+      PROPERTYSLOT_GET_NO_LOAD_SAVE( Real, SpectralRadius );
     }
 
-    ODE45Stepper();
-    virtual ~ODE45Stepper();
+  ODE45Stepper();
+  virtual ~ODE45Stepper();
 
-    virtual void initialize();
-    virtual bool calculate( Real aStepInterval );
+  virtual void initialize();
+  virtual void step();
+  virtual bool calculate();
 
-    virtual GET_METHOD( Integer, Order ) { return 4; }
-    virtual GET_METHOD( Integer, Stage ) { return 5; }
+  virtual void interrupt( Time aTime );
 
-    GET_METHOD( Real, SpectralRadius )
-    {
-      return theSpectralRadius;
-    }
+  virtual GET_METHOD( Integer, Order ) { return 4; }
+  virtual GET_METHOD( Integer, Stage ) { return 5; }
 
-    SET_METHOD( Real, SpectralRadius )
-    {
-      theSpectralRadius = value;
-    }
+  GET_METHOD( Real, SpectralRadius )
+  {
+    return theSpectralRadius;
+  }
+
+  SET_METHOD( Real, SpectralRadius )
+  {
+    theSpectralRadius = value;
+  }
 
 protected:
 
-    Real theSpectralRadius;
+  bool isInterrupted;
+  Real theSpectralRadius;
 
-    RealMatrix theRungeKuttaBuffer;
+  RealMatrix theRungeKuttaBuffer;
 
-    Integer count;
+  Integer count;
 
 };
 
@@ -83,6 +86,7 @@ LIBECS_DM_INIT( ODE45Stepper, Stepper );
 
 ODE45Stepper::ODE45Stepper()
     :
+    isInterrupted( true ),
     theSpectralRadius( 0.0 ),
     count( 0 )
 {
@@ -99,9 +103,23 @@ void ODE45Stepper::initialize()
     AdaptiveDifferentialStepper::initialize();
 
     theRungeKuttaBuffer.resize( boost::extents[ 6 ][ getReadOnlyVariableOffset() ] );
+
+    isInterrupted = true;
 }
 
-bool ODE45Stepper::calculate( Real aStepInterval )
+void ODE45Stepper::step()
+{
+    AdaptiveDifferentialStepper::step();
+
+    //     check if the step interval was changed, by epsilon
+    if ( fabs( getTolerableStepInterval() - getStepInterval() )
+             > std::numeric_limits<Real>::epsilon() )
+    {
+        isInterrupted = true;
+    }
+}
+
+bool ODE45Stepper::calculate()
 {
     const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
@@ -111,6 +129,7 @@ bool ODE45Stepper::calculate( Real aStepInterval )
     const Real a_dydt( getDerivativeToleranceFactor() );
 
     const Real aCurrentTime( getCurrentTime() );
+    const Real aStepInterval( getStepInterval() );
 
     // ========= 1 ===========
 
@@ -328,4 +347,10 @@ bool ODE45Stepper::calculate( Real aStepInterval )
     setSpectralRadius( aSpectralRadius / aStepInterval );
 
     return true;
+}
+
+void ODE45Stepper::interrupt( Time aTime )
+{
+    isInterrupted = true;
+    AdaptiveDifferentialStepper::interrupt( aTime );
 }

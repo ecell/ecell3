@@ -111,8 +111,10 @@ void DiscreteEventStepper::initialize()
     // by the scheduler with the new stepinterval.
     // That means, this Stepper doesn't necessary step immediately
     // after initialize().
-    ProcessEvent const& aTopEvent( theScheduler.getTopEvent() );
-    theNextTime = aTopEvent.getTime();
+    ProcessEvent const & aTopEvent( theScheduler.getTopEvent() );
+    const Real aNewTime( aTopEvent.getTime() );
+
+    loadStepInterval( aNewTime - aCurrentTime );
 }
 
 
@@ -122,10 +124,24 @@ void DiscreteEventStepper::step()
 {
     theLastEventID = theScheduler.getTopID();
 
+    // assert( getCurrentTime() == theScheduler.getTopEvent().getTime() )
+
+
     theScheduler.step();
 
+
     // Set new StepInterval.
-    theNextTime = theScheduler.getTopEvent().getTime();
+    ProcessEvent const & aNewTopEvent( theScheduler.getTopEvent() );
+    const Real aNewStepInterval( aNewTopEvent.getTime() - getCurrentTime() );
+
+    // ProcessPtr const aNewTopProcess( aTopEvent.getProcess() );
+    // Calculate new timescale.
+    // To prevent 0.0 * INF -> NaN from happening, simply set zero 
+    // if the tolerance is zero.    
+    // ( DiscreteEventProcess::getTimeScale() can return INF. )
+
+    // FIXME: should be setStepInterval()
+    loadStepInterval( aNewStepInterval );
 }
 
 
@@ -138,7 +154,10 @@ void DiscreteEventStepper::interrupt( Time aTime )
     // update step intervals of all the Processes.
     theScheduler.updateAllEvents( getCurrentTime() );
 
-    setNextTime( theScheduler.getTopEvent().getTime() );
+    ProcessEvent const & aTopEvent( theScheduler.getTopEvent() );
+    const Real aNewTime( aTopEvent.getTime() );
+
+    loadStepInterval( aNewTime - getCurrentTime() );
 }
 
 void DiscreteEventStepper::log()

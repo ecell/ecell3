@@ -40,21 +40,21 @@ LIBECS_DM_CLASS( ODE23Stepper, AdaptiveDifferentialStepper )
 
 public:
 
-    LIBECS_DM_OBJECT( ODE23Stepper, Stepper )
+  LIBECS_DM_OBJECT( ODE23Stepper, Stepper )
     {
-        INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
+      INHERIT_PROPERTIES( AdaptiveDifferentialStepper );
     }
-  
-    ODE23Stepper( void );  
-    virtual ~ODE23Stepper( void );
-  
-    virtual void initialize();
-    virtual bool calculate( Real aStepInterval );
-  
-    virtual GET_METHOD( Integer, Stage ) { return 3; }
-  
-    void interIntegrate2();
-  
+
+  ODE23Stepper( void );  
+  virtual ~ODE23Stepper( void );
+
+  virtual void initialize();
+  virtual bool calculate();
+
+  virtual GET_METHOD( Integer, Stage ) { return 3; }
+
+  void interIntegrate2();
+
 protected:
 
 };
@@ -93,7 +93,7 @@ void ODE23Stepper::interIntegrate2()
     }
 }
 
-bool ODE23Stepper::calculate( Real aStepInterval )
+bool ODE23Stepper::calculate()
 {
     const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
 
@@ -103,8 +103,7 @@ bool ODE23Stepper::calculate( Real aStepInterval )
     const Real a_dydt( getDerivativeToleranceFactor() );
 
     const Real aCurrentTime( getCurrentTime() );
-
-    theStateFlag = true;
+    const Real aStepInterval( getStepInterval() );
 
     theTaylorSeries.reindex( 0 );
 

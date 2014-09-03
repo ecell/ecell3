@@ -63,7 +63,7 @@ void StepperEvent::update( Time aTime )
 
 void StepperEvent::reschedule()
 {
-    setTime( theStepper->getNextTime() );
+    setTime( theStepper->getCurrentTime() + theStepper->getStepInterval() );
 }
 
 

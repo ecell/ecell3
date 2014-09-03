@@ -110,9 +110,12 @@ public:
         }
     }
 
-    virtual bool calculate( Real aStepInterval )
+    virtual bool calculate()
     {
         const VariableVector::size_type aSize( getReadOnlyVariableOffset() );
+
+        Real aCurrentTime( getCurrentTime() );
+        Real aStepInterval( getStepInterval() );
 
         // write step() function
         theESSYNSMatrix = theESSYNSProcessPtr.first->getESSYNSMatrix();

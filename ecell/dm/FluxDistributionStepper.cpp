@@ -313,15 +313,16 @@ public:
         }
 
         setVariableVelocity( theTaylorSeries[ 0 ] );
+        step();
         log();
 
     }
- 
-    virtual void updateInternalState( Real )
+    
+    virtual void step()
     {
-        ; // do nothing
+        // do nothing.
     }
-
+    
 protected:
 
     gsl_matrix* generateInverse( gsl_matrix *m_unknown, 
