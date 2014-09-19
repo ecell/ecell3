@@ -365,15 +365,13 @@ const Real VirtualMachine::getDelayedValue( libecs::Integer n, libecs::Real t )
     BOOST_ASSERT( ! theDelayMap[ n ].empty() );
     BOOST_ASSERT( t >= 0.0 );
 
-    TimeSeries::iterator i = theDelayMap[ n ].end();
+    TimeSeries::iterator i = theDelayMap[ n ].begin();
 
     if ( theModel->getCurrentTime() >= t )
     {
         // std::cout << "(2) theDelayMap[ " << n << " ].size() = " << theDelayMap[ n ].size() << std::endl;
         i = theDelayMap[ n ].upper_bound( theModel->getCurrentTime() - t );
         // std::cout << "        upper_bound() = " << (*i).first << std::endl;
-    } else {
-        i = theDelayMap[ n ].begin();
     }
     
     if ( i != theDelayMap[ n ].begin() ) --i;
