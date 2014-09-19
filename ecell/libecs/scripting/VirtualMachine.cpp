@@ -372,6 +372,8 @@ const Real VirtualMachine::getDelayedValue( libecs::Integer n, libecs::Real t )
         // std::cout << "(2) theDelayMap[ " << n << " ].size() = " << theDelayMap[ n ].size() << std::endl;
         i = theDelayMap[ n ].upper_bound( theModel->getCurrentTime() - t );
         // std::cout << "        upper_bound() = " << (*i).first << std::endl;
+    } else {
+        i = theDelayMap[ n ].begin();
     }
     
     if ( i != theDelayMap[ n ].begin() ) --i;
