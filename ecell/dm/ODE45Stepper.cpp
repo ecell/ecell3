@@ -299,7 +299,7 @@ bool ODE45Stepper::calculate( Real aStepInterval )
 
     resetAll(); // reset all value
 
-    setMaxErrorRatio( maxError );
+    // setMaxErrorRatio( maxError );
     setCurrentTime( aCurrentTime );
 
     if( maxError > 1.1 )
