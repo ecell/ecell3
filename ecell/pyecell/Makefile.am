@@ -78,7 +78,8 @@ bin_SCRIPTS = \
 	ecell3-eml2sbml \
 	ecell3-em2eml \
 	ecell3-em2python \
-	ecell3-eml2em
+	ecell3-eml2em \
+	ecell3-cellml2eml
 
 all-local:
 	$(PYTHON_) setup.py config
