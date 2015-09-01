@@ -13,6 +13,7 @@ PYECELL_STAGING_HOME=$(ECELL_STAGING_HOME)/pyecell
 PYTHON_ = env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS) $(LIBS)" INCLTDL="$(INCLTDL)" libdir=$(libdir) BOOST_PYTHON_LIBNAME=$(BOOST_PYTHON_LIBNAME) $(PYTHON)
 
 EXTRA_DIST = \
+	ecell/CellML.py \
 	ecell/DataFile.py \
 	ecell/DataFileManager.py \
 	ecell/ECDDataFile.py \
