@@ -101,7 +101,7 @@ void AdaptiveDifferentialStepper::updateInternalState( Real aStepInterval )
     Real aNewStepInterval( aStepInterval );
     if ( maxError < 0.5 )
     {
-        aNewStepInterval = aNewStepInterval * safety * std::pow( maxError,
+        aNewStepInterval = aNewStepInterval * safety * std::pow( 1.0 / maxError,
                                             -1.0 / ( getOrder() + 1 ) );
     }
 
