@@ -73,7 +73,6 @@ void AdaptiveDifferentialStepper::updateInternalState( Real aStepInterval )
     clearVariables();
 
     Integer theRejectedStepCounter( 0 );
-    const Real maxError( getMaxErrorRatio() );
 
     while ( !calculate( aStepInterval ) )
     {
@@ -86,9 +85,11 @@ void AdaptiveDifferentialStepper::updateInternalState( Real aStepInterval )
         }
  
         // shrink it if the error exceeds 110%
-        aStepInterval = aStepInterval * safety * std::pow( maxError,
+        aStepInterval = aStepInterval * safety * std::pow( getMaxErrorRatio(),
                                                   -1.0 / getOrder() );
     }
+
+    const Real maxError( getMaxErrorRatio() );
 
     // an extra calculation for resetting the activities of processes
     fireProcesses();
