@@ -335,6 +335,7 @@ AC_CONFIG_FILES([pyecell/ecell3-em2python], [chmod +x pyecell/ecell3-em2python])
 AC_CONFIG_FILES([pyecell/ecell3-eml2em], [chmod +x pyecell/ecell3-eml2em])
 AC_CONFIG_FILES([pyecell/ecell3-eml2sbml], [chmod +x pyecell/ecell3-eml2sbml])
 AC_CONFIG_FILES([pyecell/ecell3-sbml2eml], [chmod +x pyecell/ecell3-sbml2eml])
+AC_CONFIG_FILES([pyecell/ecell3-cellml2eml], [chmod +x pyecell/ecell3-cellml2eml])
 AC_CONFIG_FILES([pyecell/ecell3-session], [chmod +x pyecell/ecell3-session])
 AC_CONFIG_FILES([pyecell/ecell3-session-manager], [chmod +x pyecell/ecell3-session-manager])
 AC_OUTPUT

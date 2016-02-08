@@ -13,6 +13,7 @@ PYECELL_STAGING_HOME=$(ECELL_STAGING_HOME)/pyecell
 PYTHON_ = env CFLAGS="$(CPPFLAGS) $(CFLAGS)" LDFLAGS="$(LDFLAGS) $(LIBS)" INCLTDL="$(INCLTDL)" libdir=$(libdir) BOOST_PYTHON_LIBNAME=$(BOOST_PYTHON_LIBNAME) $(PYTHON)
 
 EXTRA_DIST = \
+	ecell/CellML.py \
 	ecell/DataFile.py \
 	ecell/DataFileManager.py \
 	ecell/ECDDataFile.py \
@@ -78,7 +79,8 @@ bin_SCRIPTS = \
 	ecell3-eml2sbml \
 	ecell3-em2eml \
 	ecell3-em2python \
-	ecell3-eml2em
+	ecell3-eml2em \
+	ecell3-cellml2eml
 
 all-local:
 	$(PYTHON_) setup.py config

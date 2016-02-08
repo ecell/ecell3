@@ -162,7 +162,10 @@ bool ODE23Stepper::calculate( Real aStepInterval )
         theTaylorSeries[ 2 ][ c ] = 0.0;
     }
 
-    setMaxErrorRatio( maxError );
+    if ( maxError != 0.0 )
+    {
+        setMaxErrorRatio( maxError );
+    }
 
     // reset the stepper current time
     setCurrentTime( aCurrentTime );
